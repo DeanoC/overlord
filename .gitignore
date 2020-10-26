@@ -1,2 +1,9 @@
 *.class
 *.log
+target
+project/.bloop
+project/target
+.metals
+.bloop
+jvm
+native

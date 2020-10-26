@@ -1,0 +1,13 @@
+# test of overlord toml file
+
+board = "Myir-FZ3"
+bootcpu = "SaxonSoC.riscv32"
+
+[[layout]]
+  name = "ZynqPs8"
+  interconnnect = "main"
+
+[[layout]]
+  name = "SaxonSoC"
+  interconnnect = "main"
+  via = "buses.AXI_GP0" 
