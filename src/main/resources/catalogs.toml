@@ -1,0 +1,6 @@
+resources = [
+  "cpu",
+  "ram",
+  "ZynqPs7",
+  "ZynqPs8"
+]

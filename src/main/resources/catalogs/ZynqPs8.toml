@@ -1,0 +1,36 @@
+isHard = true
+hasFpga = true
+
+[[definition]]
+  type = "soc.ZynqPs8"
+
+[[definition]]
+  type = "connection.apb"
+
+[[definition]]
+  type = "connection.axi4"
+
+[[defination]]
+  type = "connection.tcm"
+
+[[defination]]
+  type = "connection.ocp"
+
+[[defination]]
+  type = "connection.pmuram"
+
+[[defination]]
+  type = "connection.pmuram"
+
+[[defination]]
+  type = "connection.ddr4"
+
+[[definition]]
+  type = "bridge.i2c"
+
+[[definition]]
+  type = "net.ethernet"
+  spinal = "ZynqPs8.Ethernet"
+
+[[definition]]
+  type = "storage.emmc"

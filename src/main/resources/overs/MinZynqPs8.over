@@ -1,0 +1,88 @@
+[[instance]]
+  name = "tcm"
+  type = "ram.SRAM"
+  count = 2
+  size = "128 KiB"
+
+[[instance]]
+  name = "pmuram"
+  type = "ram.SRAM"
+  size = "128 KiB"
+
+[[instance]]
+  name = "ocp"
+  type = "ram.SRAM"
+  size = "256 KiB"
+
+[[instance]]
+  name = "pmu"
+  type = "cpu.pmu"
+
+[[instance]]
+  name = "a53"
+  type = "cpu.a53"
+  count = 4
+
+[[instance]]
+  name = "r5f"
+  type = "cpu.r5f"
+  count = 2
+
+[[instance]]
+  name = "interconnect.main"
+  type = "NxMinterconnect.axi4"
+
+[[instance]]
+  name = "interconnect.arm_peri_bus"
+  type = "NxMinterconnect.apb"
+
+[[instance]]
+  name = "bridge.apb"
+  type = "bridge.apb.axi4"
+[[connection]]
+  name = "connection.apb->main"
+  type = "connection.axi4"
+  main = "bridge.apb"
+  secondary = "interconnect.main"
+[[connection]]
+  name = "connection.arm_peri_bus->bridge"
+  type = "connection.apb"
+  main = "interconnect.arm_peri_bus"
+  secondary = "bridge.apb"
+
+[[connection]]
+  name = "connection.r5f->tcm"
+  type = "connection.tcm"
+  main = "r5f"
+  secondary = "tcm"
+
+[[connection]]
+  name = "connection.r5f->main"
+  type = "connection.axi4"
+  main = "r5f"
+  secondary = "interconnect.main"
+
+[[connection]]
+  name = "connection.pmu->pmuram"
+  type = "connection.pmuram"
+  main = "pmu"
+  secondary = "pmuram"
+
+[[connection]]
+  name = "connection.pmu->main"
+  type = "connection.axi4"
+  main = "pmu"
+  secondary = "interconnect.main"
+
+[[connection]]
+  name = "connection.a53->ocp"
+  type = "connection.ocp"
+  main = "a53"
+  secondary = "ocp"
+
+[[connection]]
+  name = "connection.a53->main"
+  type = "connection.axi4"
+  main = "a53"
+  secondary = "interconnect.main"
+

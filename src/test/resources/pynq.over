@@ -1,0 +1,11 @@
+# test of overlord toml file
+
+board = "Pynq-Z2"
+bootcpu = "SaxonSoC.riscv32"
+
+[[includes]]
+  resource = "MinZynqPs8"
+
+#[[layout]]
+#  name = "SaxonSoC"
+#  type = "SoC"

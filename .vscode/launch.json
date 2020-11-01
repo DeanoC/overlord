@@ -6,17 +6,11 @@
   "configurations": [
     {
       "type": "scala",
+      "name": "Debug Overlord",
       "request": "launch",
-      "name": "test",
-      "testClass": "GameOverTest"
-    },
-    {
-      "type": "scala",
-      "request": "launch",
-      "name": "scala run Main",
-      "mainClass": "Main",
-      "args": [],
-      "jvmOptions": []
+      "mainClass": "overlord.Overlord",
+      "buildTarget": "overlord",
+      "args": []
     }
   ]
 }
