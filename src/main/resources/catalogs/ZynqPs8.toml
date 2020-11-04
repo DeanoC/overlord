@@ -1,8 +1,57 @@
-isHard = true
-hasFpga = true
+registerPath = "ZynqPs8"
 
 [[definition]]
-  type = "soc.ZynqPs8"
+  type = "soc.zynqps8"
+
+[[definition]]
+  type = "cpu.a53"
+  arch = "arm8-a"
+  width = 64
+  software = [
+    "a53_cti",
+    "a53_dbg",
+    "a53_etm",
+    "a53_pmu",
+    "a53_rom"
+  ]
+
+[[definition]]
+  type = "cpu.r5f"
+  arch = "arm7-a"
+  width = 32
+  software = [
+    "r5_dbg",
+    "r5_etm",
+    "r5_rom"
+  ]
+
+[[definition]]
+  type = "cpu.pmu"
+  arch = "microblaze"
+  width = 32
+  software = [
+    "pmu_global",
+    "pmu_iomodule",
+    "pmu_local"
+  ]
+
+[[definition]]
+  type = "ram.sram.tcm"
+  size = "128 KiB"
+
+[[definition]]
+  type = "ram.sram.pmuram"
+  size = "128 KiB"
+
+[[definition]]
+  type = "ram.sram.ocp"
+  size = "256 KiB"
+
+[[definition]]
+  type = "NxMinterconnect.axi4"
+
+[[definition]]
+  type = "NxMinterconnect.apb"
 
 [[definition]]
   type = "connection.apb"
@@ -10,27 +59,32 @@ hasFpga = true
 [[definition]]
   type = "connection.axi4"
 
-[[defination]]
+[[definition]]
   type = "connection.tcm"
 
-[[defination]]
+[[definition]]
   type = "connection.ocp"
 
-[[defination]]
+[[definition]]
   type = "connection.pmuram"
 
-[[defination]]
-  type = "connection.pmuram"
-
-[[defination]]
+[[definition]]
   type = "connection.ddr4"
 
 [[definition]]
-  type = "bridge.i2c"
+  type = "bridge.i2c.axi4"
 
 [[definition]]
-  type = "net.ethernet"
-  spinal = "ZynqPs8.Ethernet"
+  type = "bridge.apb.axi4"
 
 [[definition]]
-  type = "storage.emmc"
+  type = "net.ethernet.zynqps8"
+  software = ["gem"]
+
+[[definition]]
+  type = "storage.sdio.zynqps8"
+  software = ["sdio"]
+
+[[definition]]
+  type = "storage.qspi.zynqps8"
+  software = ["qspi"]

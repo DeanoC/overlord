@@ -2,4 +2,4 @@ isHard = true
 hasFpga = true
 
 [[definition]]
-  type = "soc.ZynqPs7"
+  type = "zynqps7.soc"

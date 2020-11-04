@@ -1,0 +1,943 @@
+description = "PS/PL SysMon Units Control and Status"
+[[bank]]
+  name = "AMS_CTRL"
+  address = "0xffa50000"
+[[register]]
+  name = "MISC_CTRL"
+  type = "mixed"
+  width = 32
+  description = "Register Access Error Signal Enables."
+  default = "0x00000000"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:2"
+    type = "ro"
+  [[register.field]]
+    name = "SLVERR_ENABLE_DRP"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Enable the Error signal back to DRP connection when a register access violation occurs.'''
+    longdesc = '''0: disable error signal (default). 1: assert error signal for access violations. Note: The [addr_decode_err] interrupt bit is set in the ISR_1 register regardless of the setting of this bit.'''
+  [[register.field]]
+    name = "SLVERR_ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Enable the SLVERR signal back to APB interconnect when a register access violation occurs.'''
+    longdesc = '''0: disable error signal (default). 1: assert error signal for access violations. Note: The [addr_decode_err] interrupt bit is set in the ISR_1 register regardless of the setting of this bit.'''
+[[register]]
+  name = "ISR_0"
+  type = "wtc"
+  width = 32
+  description = "Alarm Interrupt Status and Clear, Reg 0. PS and PL."
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "PL_ALM_15"
+    bits = "31"
+    type = "wtc"
+  [[register.field]]
+    name = "PL_ALM_12"
+    bits = "28"
+    type = "wtc"
+  [[register.field]]
+    name = "PL_ALM_11"
+    bits = "27"
+    type = "wtc"
+  [[register.field]]
+    name = "PL_ALM_10"
+    bits = "26"
+    type = "wtc"
+  [[register.field]]
+    name = "PL_ALM_9"
+    bits = "25"
+    type = "wtc"
+  [[register.field]]
+    name = "PL_ALM_8"
+    bits = "24"
+    type = "wtc"
+  [[register.field]]
+    name = "PL_ALM_7"
+    bits = "23"
+    type = "wtc"
+  [[register.field]]
+    name = "PL_ALM_6"
+    bits = "22"
+    type = "wtc"
+  [[register.field]]
+    name = "PL_ALM_5"
+    bits = "21"
+    type = "wtc"
+  [[register.field]]
+    name = "PL_ALM_4"
+    bits = "20"
+    type = "wtc"
+  [[register.field]]
+    name = "PL_ALM_3"
+    bits = "19"
+    type = "wtc"
+  [[register.field]]
+    name = "PL_ALM_2"
+    bits = "18"
+    type = "wtc"
+  [[register.field]]
+    name = "PL_ALM_1"
+    bits = "17"
+    type = "wtc"
+  [[register.field]]
+    name = "PL_ALM_0"
+    bits = "16"
+    type = "wtc"
+  [[register.field]]
+    name = "PS_ALM_15"
+    bits = "15"
+    type = "wtc"
+  [[register.field]]
+    name = "PS_ALM_14"
+    bits = "14"
+    type = "wtc"
+  [[register.field]]
+    name = "PS_ALM_13"
+    bits = "13"
+    type = "wtc"
+  [[register.field]]
+    name = "PS_ALM_12"
+    bits = "12"
+    type = "wtc"
+  [[register.field]]
+    name = "PS_ALM_11"
+    bits = "11"
+    type = "wtc"
+  [[register.field]]
+    name = "PS_ALM_10"
+    bits = "10"
+    type = "wtc"
+  [[register.field]]
+    name = "PS_ALM_9"
+    bits = "9"
+    type = "wtc"
+  [[register.field]]
+    name = "PS_ALM_8"
+    bits = "8"
+    type = "wtc"
+  [[register.field]]
+    name = "PS_ALM_7"
+    bits = "7"
+    type = "wtc"
+  [[register.field]]
+    name = "PS_ALM_6"
+    bits = "6"
+    type = "wtc"
+  [[register.field]]
+    name = "PS_ALM_5"
+    bits = "5"
+    type = "wtc"
+  [[register.field]]
+    name = "PS_ALM_4"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "PS_ALM_3"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "PS_ALM_2"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "PS_ALM_1"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "PS_ALM_0"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "ISR_1"
+  type = "mixed"
+  width = 32
+  description = "Alarm and Access Error Interrupt Status and Clear, Reg 1."
+  default = "0x00000000"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "31"
+    type = "wtc"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR_PL_SYSMON"
+    bits = "30"
+    type = "wtc"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR_PS_SYSMON"
+    bits = "29"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "28:5"
+    type = "ro"
+  [[register.field]]
+    name = "EOS"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "EOC"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "PL_OT"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "PS_LPD_OT"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "PS_FPD_OT"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "IMR_0"
+  type = "ro"
+  width = 32
+  description = "Interrupt Mask, Reg 0."
+  default = "0xFFFFFFFF"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "PL_ALM_15"
+    bits = "31"
+    type = "ro"
+  [[register.field]]
+    name = "PL_ALM_14"
+    bits = "30"
+    type = "ro"
+  [[register.field]]
+    name = "PL_ALM_12"
+    bits = "28"
+    type = "ro"
+  [[register.field]]
+    name = "PL_ALM_11"
+    bits = "27"
+    type = "ro"
+  [[register.field]]
+    name = "PL_ALM_10"
+    bits = "26"
+    type = "ro"
+  [[register.field]]
+    name = "PL_ALM_9"
+    bits = "25"
+    type = "ro"
+  [[register.field]]
+    name = "PL_ALM_8"
+    bits = "24"
+    type = "ro"
+  [[register.field]]
+    name = "PL_ALM_7"
+    bits = "23"
+    type = "ro"
+  [[register.field]]
+    name = "PL_ALM_6"
+    bits = "22"
+    type = "ro"
+  [[register.field]]
+    name = "PL_ALM_5"
+    bits = "21"
+    type = "ro"
+  [[register.field]]
+    name = "PL_ALM_4"
+    bits = "20"
+    type = "ro"
+  [[register.field]]
+    name = "PL_ALM_3"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "PL_ALM_2"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "PL_ALM_1"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "PL_ALM_0"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "PS_ALM_15"
+    bits = "15"
+    type = "ro"
+  [[register.field]]
+    name = "PS_ALM_14"
+    bits = "14"
+    type = "ro"
+  [[register.field]]
+    name = "PS_ALM_13"
+    bits = "13"
+    type = "ro"
+  [[register.field]]
+    name = "PS_ALM_12"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "PS_ALM_11"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "PS_ALM_10"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "PS_ALM_9"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "PS_ALM_8"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "PS_ALM_7"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "PS_ALM_6"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "PS_ALM_5"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "PS_ALM_4"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "PS_ALM_3"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "PS_ALM_2"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "PS_ALM_1"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "PS_ALM_0"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "IMR_1"
+  type = "ro"
+  width = 32
+  description = "Interrupt Mask, Reg 1."
+  default = "0xE000001F"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "31"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR_PL_SYSMON"
+    bits = "30"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR_PS_SYSMON"
+    bits = "29"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "28:5"
+    type = "ro"
+  [[register.field]]
+    name = "EOS"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "EOC"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "PL_OT"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "PS_LPD_OT"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "PS_FPD_OT"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "IER_0"
+  type = "wo"
+  width = 32
+  description = "Interrupt Enable, Reg 0."
+  default = "0x00000000"
+  offset = "0x00000020"
+  [[register.field]]
+    name = "PL_ALM_15"
+    bits = "31"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_14"
+    bits = "30"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_12"
+    bits = "28"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_11"
+    bits = "27"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_10"
+    bits = "26"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_9"
+    bits = "25"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_8"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_7"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_6"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_5"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_4"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_3"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_2"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_1"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_0"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_15"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_14"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_13"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_12"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_11"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_10"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_9"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_8"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_7"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_6"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_5"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_4"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_3"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_2"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_1"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "IER_1"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Enable, Reg 1."
+  default = "0x00000000"
+  offset = "0x00000024"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "31"
+    type = "wo"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR_PL_SYSMON"
+    bits = "30"
+    type = "wo"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR_PS_SYSMON"
+    bits = "29"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "28:5"
+    type = "ro"
+  [[register.field]]
+    name = "EOS"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "EOC"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "PL_OT"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "PS_LPD_OT"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "PS_FPD_OT"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "IDR_0"
+  type = "wo"
+  width = 32
+  description = "Interrupt Disable, Reg 0."
+  default = "0x00000000"
+  offset = "0x00000028"
+  [[register.field]]
+    name = "PL_ALM_15"
+    bits = "31"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_14"
+    bits = "30"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_12"
+    bits = "28"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_11"
+    bits = "27"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_10"
+    bits = "26"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_9"
+    bits = "25"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_8"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_7"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_6"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_5"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_4"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_3"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_2"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_1"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "PL_ALM_0"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_15"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_14"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_13"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_12"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_11"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_10"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_9"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_8"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_7"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_6"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_5"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_4"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_3"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_2"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_1"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ALM_0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "IDR_1"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Disable, Reg 1."
+  default = "0x00000000"
+  offset = "0x0000002C"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "31"
+    type = "wo"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR_PL_SYSMON"
+    bits = "30"
+    type = "wo"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR_PS_SYSMON"
+    bits = "29"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "28:5"
+    type = "ro"
+  [[register.field]]
+    name = "EOS"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "EOC"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "PL_OT"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "PS_LPD_OT"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "PS_FPD_OT"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "PS_CTRL_STATUS"
+  type = "mixed"
+  width = 32
+  description = "PS SysMon Unit Control and Status"
+  default = "0x00000000"
+  offset = "0x00000040"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "STARTUP_STATE"
+    bits = "27:24"
+    type = "ro"
+    shortdesc = '''Reserved.'''
+    longdesc = '''State of the Configuration sequence, refer to the [startup_trigger] bit for more information. 0: Pre-trim settle. 1: Wait. 2: Memory cell reset. 3: Wait for eFuse readout and oscillator to settle. 4: Pre-configuration wait. 5: Memory cell initialization. 6: Post-configuration wait. 7: Wait for MON_STAT.jtag_locked = 0. 8: Idle (PS SysMon is Ready) 9: reserved 10: Prepare for scan mode 11: Scan mode sequence Others: reserved'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:17"
+    type = "ro"
+  [[register.field]]
+    name = "STARTUP_DONE"
+    bits = "16"
+    type = "ro"
+    shortdesc = '''Reserved.'''
+    longdesc = '''Global config sequence completed, refer to the [startup_trigger] bit for more information.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:4"
+    type = "ro"
+  [[register.field]]
+    name = "AUTO_CONVST"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''Enable a sequence of measurements.'''
+    longdesc = '''0: One conversion (EOC). 1: Sequence of conversions (EOS). When enabled, the PS SysMon unit will loop through once and set EOS if averaging is off. If averaging is on, the PS SysMon unit will loop through the number times defined for averaging.'''
+  [[register.field]]
+    name = "CONVST"
+    bits = "2"
+    type = "wo"
+    shortdesc = '''Trigger start-of-conversion.'''
+    longdesc = '''Write-only. 0: no effect. 1: trigger conversion. This bit self-clears. This mechanism is similar to the event trigger in the PL SysMon unit.'''
+  [[register.field]]
+    name = "RESET_USER"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Reset for the PS SysMon.'''
+    longdesc = '''0: no reset. 1: reset asserted. Write a 1 than a 0 to reset and release the PS system monitor.'''
+  [[register.field]]
+    name = "STARTUP_TRIGGER"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Trigger PS Sysmon configuration sequence, if needed for test/debug.'''
+    longdesc = '''READ: 0: done. 1: in-process. WRITE: 0: no effect. 1: initiate the configuration sequence. When the process is done, the hardware clears this bit to 0. Note: this is similar to the automatic configuration routine run in the PL SysMon after a power-up cycle.'''
+[[register]]
+  name = "PL_CTRL_STATUS"
+  type = "ro"
+  width = 32
+  description = "PL SysMon register access control status."
+  default = "0x00000000"
+  offset = "0x00000044"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "ro"
+  [[register.field]]
+    name = "ACCESSIBLE"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Indicator for PS ability to access PL SysMon registers.'''
+    longdesc = '''Read-only. 0: not accessible. 1: accessible.'''
+[[register]]
+  name = "MON_STATUS"
+  type = "ro"
+  width = 32
+  description = "ADC SysMon status."
+  default = "0x00000000"
+  offset = "0x00000050"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:24"
+    type = "ro"
+  [[register.field]]
+    name = "JTAG_LOCKED"
+    bits = "23"
+    type = "ro"
+    shortdesc = '''SysMon Invalid Clock Indicator.'''
+    longdesc = '''0: clocking okay. 1: invalid clock frequency. The ADC clock frequency must not be less than 1 MHz and not exceed 26 MHz. Also, the ams_ref_clk must not exceed 52 MHz.'''
+  [[register.field]]
+    name = "BUSY"
+    bits = "22"
+    type = "ro"
+    shortdesc = '''ADC busy indicator.'''
+    longdesc = '''0: idle. 1: busy (or calibration is occurring). This bit will read 1 for an extended period of time during the ADC and sensor calibrations.'''
+  [[register.field]]
+    name = "CHANNEL"
+    bits = "21:16"
+    type = "ro"
+    shortdesc = '''Current sensor channel.'''
+    longdesc = '''Refer to table in UG1085 for a list of channels.'''
+  [[register.field]]
+    name = "MON_DATA"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "VCC_PSPLL"
+  type = "ro"
+  width = 32
+  description = "System PLLs voltage measurement, VCC_PSPLL."
+  default = "0x00000000"
+  offset = "0x00000060"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "ro"
+  [[register.field]]
+    name = "VALUE"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Bits [15:6] = 10-bit ADC measurement.'''
+    longdesc = '''Bits [5:0] LSBs. Read-only.'''
+[[register]]
+  name = "VCC_PSBATT"
+  type = "ro"
+  width = 32
+  description = "Battery voltage measurement, VCC_PSBATT."
+  default = "0x00000000"
+  offset = "0x0000006C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "ro"
+  [[register.field]]
+    name = "VALUE"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Bits [15:6] = 10-bit ADC measurement.'''
+    longdesc = '''Bits [5:0] LSBs. Read-only.'''
+[[register]]
+  name = "VCCINT"
+  type = "ro"
+  width = 32
+  description = "PL Internal voltage measurement, VCCINT."
+  default = "0x00000000"
+  offset = "0x00000078"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "ro"
+  [[register.field]]
+    name = "VALUE"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Bits [15:6] = 10-bit ADC measurement.'''
+    longdesc = '''Bits [5:0] LSBs. Read-only.'''
+[[register]]
+  name = "VCCBRAM"
+  type = "ro"
+  width = 32
+  description = "Block RAM voltage measurement, VCCBRAM."
+  default = "0x00000000"
+  offset = "0x0000007C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "ro"
+  [[register.field]]
+    name = "VALUE"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Bits [15:6] = 10-bit ADC measurement.'''
+    longdesc = '''Bits [5:0] LSBs. Read-only.'''
+[[register]]
+  name = "VCCAUX"
+  type = "ro"
+  width = 32
+  description = "PL Aux voltage measurement, VCCAUX."
+  default = "0x00000000"
+  offset = "0x00000080"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "ro"
+  [[register.field]]
+    name = "VALUE"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Bits [15:6] = 10-bit ADC measurement.'''
+    longdesc = '''Bits [5:0] LSBs. Read-only.'''
+[[register]]
+  name = "VCC_PSDDR_PLL"
+  type = "ro"
+  width = 32
+  description = "Voltage measurement for six DDR I/O PLLs, VCC_PSDDR_PLL."
+  default = "0x00000000"
+  offset = "0x00000084"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "ro"
+  [[register.field]]
+    name = "VALUE"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Bits [15:6] = 10-bit ADC measurement.'''
+    longdesc = '''Bits [5:0] LSBs. Read-only.'''
+[[register]]
+  name = "VCC_PSINTFP_DDR"
+  type = "ro"
+  width = 32
+  description = "VCC_PSINTFP_DDR voltage measurement."
+  default = "0x00000000"
+  offset = "0x0000009C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "ro"
+  [[register.field]]
+    name = "VALUE"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Bits [15:6] = 10-bit ADC measurement.'''
+    longdesc = '''Bits [5:0] LSBs. Read-only.'''

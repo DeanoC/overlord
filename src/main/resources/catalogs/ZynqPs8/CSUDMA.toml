@@ -1,0 +1,778 @@
+description = "CSU module DMA Engine, CSU DMA Control"
+[[bank]]
+  name = "CSUDMA"
+  address = "0xffc80000"
+[[register]]
+  name = "CSUDMA_SRC_ADDR"
+  type = "mixed"
+  width = 32
+  description = "Source mem address (lsbs) for DMA memory->stream data transfer"
+  default = "0x00000000"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "ADDR"
+    bits = "31:2"
+    type = "rw"
+    shortdesc = '''Source memory address (lsbs) for DMA memory->stream data transfer Address is word aligned, so this field is only 30-bits.'''
+    longdesc = '''(2 lsb's are 0) This field must be written initially before a DMA operation is started. In this case, it indicates the memory start address (lsbs) the DMA will begin fetching from. After the DMA has started, this field will dynamically change under DMA control to reflect the current memory source address that is being processed by the DMA. When a data word is written into the SRC FIFO from memory, ADDR will increment by 1 word. The readback is only valid if Burst Type is INCR (not WRAP) The full 48-bit source address is comprised of this field concatenated with the CSUDMA_SRC_ADDR_MSB field as follows: 48-bit SRC address = {CSUDMA_SRC_ADDR_MSB, ADDR, 2'b00}'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "1:0"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+[[register]]
+  name = "CSUDMA_SRC_SIZE"
+  type = "mixed"
+  width = 32
+  description = "DMA transfer payload for DMA memory-> stream data transfer"
+  default = "0x00000000"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:29"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "SIZE"
+    bits = "28:2"
+    type = "rw"
+    shortdesc = '''Specifies the number of 4-byte words the DMA will transfer from memory to stream Size is word aligned, so this field is only 27-bits.'''
+    longdesc = '''(2 lsb's are 0) The action of writing to this register starts a DMA transfer of length SIZE, moving data from ADDR to the stream interface. In this case, it indicates the total payload that the DMA will move from memory to stream. After the DMA has started, this field will dynamically change under DMA control to reflect the remaining payload size that the DMA must still complete. Whenever a data word is written into the SRC FIFO from memory, SIZE will decrement by 1. Note that if SIZE is programmed to 0, and the DMA is started, the interrupts DONE and MEM_DONE will be asserted.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "1"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "LAST_WORD"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''When set (1), the SRC_DMA will assert the "data_inp_last" on the stream interface when the current DMA command is completed.'''
+    longdesc = '''This signal is asserted simultaneously with the "data_inp_valid" signal associated with the final 32-bit word transfer.'''
+[[register]]
+  name = "CSUDMA_SRC_STS"
+  type = "mixed"
+  width = 32
+  description = "General SRC DMA Status"
+  default = "0x00000000"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "DONE_CNT"
+    bits = "15:13"
+    type = "wtc"
+    shortdesc = '''Number of completed SRC DMA transfers that have not been acknowledged by software: 000 - all finished transfers have been acknowledged; 001 - one finished transfer is still outstanding; etc 111 - seven or more finished transfers is still outstanding.'''
+    longdesc = '''A finished transfer is acknowledged by clearing the interrupt status flag 'DONE". This count is cleared by an explicit write of 3'b111 to this field.'''
+  [[register.field]]
+    name = "SRC_FIFO_LEVEL"
+    bits = "12:5"
+    type = "ro"
+    shortdesc = '''Indicates the current SRC FIFO level in 32-bit words.'''
+    longdesc = '''8'h00: Empty 8'h01: 1 entry etc 8'h80: 128 entries'''
+  [[register.field]]
+    name = "RD_OUTSTANDING"
+    bits = "4:1"
+    type = "ro"
+    shortdesc = '''Indicates how many memory read commands are currently outstanding in the system.'''
+    longdesc = '''An outstanding read command is one that has been issued to memory and all the data associated with that command has not yet been returned from memory. 4'h0: 0 cmds outstanding etc 4'h8: 8 cmds outstanding 4'h9: 9 cmds outstanding'''
+  [[register.field]]
+    name = "BUSY"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''BUSY=1: DMA has not completed all its work BUSY=0: DMA is DONE with the transfers, the SRC FIFO and any associated pipeline registers are all empty Note that, BUSY essentially indicates that the DMA still has remaining work to do.'''
+    longdesc = '''BUSY will reflect this status irrespective of whether the PAUSE_* is asserted or not.'''
+[[register]]
+  name = "CSUDMA_SRC_CTRL"
+  type = "mixed"
+  width = 32
+  description = "General SRC DMA Control Register 1"
+  default = "0x003FFA00"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:25"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "APB_ERR_RESP"
+    bits = "24"
+    type = "rw"
+  [[register.field]]
+    name = "ENDIANNESS"
+    bits = "23"
+    type = "rw"
+  [[register.field]]
+    name = "AXI_BRST_TYPE"
+    bits = "22"
+    type = "rw"
+  [[register.field]]
+    name = "TIMEOUT_VAL"
+    bits = "21:10"
+    type = "rw"
+    shortdesc = '''Set the timeout value for SRC DMA.'''
+    longdesc = '''There are 2 physical timers, qualified with TIMEOUT_EN, that will compare against this value: 1. Timeout counter starts to run when data is provided to the stream interface and backpressure is observed. As soon as backpressure is removed, the timer is reset. When timer expires, it stops running. 2. Timeout counter runs whenever the DMA has outstanding read commands to process. Whenever RLAST is sampled, the timer is reset. When timer expires, it stops running. TIMEOUT_VAL field is interpreted as follows: Final timeout value = TIMEOUT_VAL * timeout_prescale_period where "timeout_prescale_period" is the period of the enable that is generated by the TIMEOUT_PRESCALER. Examples (prescaler set to maximum of 4096 clk (~2.5ns) cycles) 12'h000: Final Timeout after 1*(4096 * 2.5ns) => 10.24us 12'h001: Final Timeout after 2*(4096 * 2.5ns) => 20.48us etc 12'hFFE: Final Timeout after 4095*(4096 * 2.5ns) => 41.93.ms 12'hFFF: Special function - Clears both Timers Note that if PAUSE_STRM is asserted, timeout counter #1 will be paused, and if PAUSE_MEM is asserted, timeout counter #2 will be paused. Note that writing the value of 12'hFFF will cause both timers to be cleared.'''
+  [[register.field]]
+    name = "FIFO_THRESH"
+    bits = "9:2"
+    type = "rw"
+    shortdesc = '''SRC_FIFO programmed watermark value.'''
+    longdesc = '''This is the FIFO theshold used to trigger the FIFO_THRESHOLD_HIT interrupt. 8'h00: Threshold is 0 entries 8'h01: Threshold is 1 entry etc 8'h80: Threshold is 128 entries Note that the interrupt will be triggered when the FIFO hits this threshold, irrespective of whether it is on the way up or down.'''
+  [[register.field]]
+    name = "PAUSE_STRM"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''1: Temporarily stop the transfer of data from the internal SRC data FIFO to the stream interface.'''
+    longdesc = '''This in effect will lead to the filling of the SRC FIFO. 0: DMA operates as usual. If previously PAUSED, it will continue on where it left off.'''
+  [[register.field]]
+    name = "PAUSE_MEM"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''1: Temporarily stop the issuing of new read commands to memory.'''
+    longdesc = '''This in effect will lead to the emptying of the SRC FIFO. Read memory commands that are already outstanding will continue to be processed, but no new read commands will be issued to memory while PAUSE_MEM is asserted. 0: DMA operates as usual. If previously PAUSED, it will continue on where it left off.'''
+[[register]]
+  name = "CSUDMA_SRC_CRC"
+  type = "rw"
+  width = 32
+  description = "SRC DMA Pseudo CRC"
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "CRC"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Pseudo CRC (Chksum) value on all data read from AXI memory.'''
+    longdesc = '''Whenever a 32-bit word is read from the memory and placed into the SRC FIFO, the word is added to the contents of this register. There is no special treatment for wrapping around of the 32-bit value. The initial value is 0, but any value can be loaded, since the register is read-writeable. The operation will continue on to the following DMA command if a previous DMA command's value has not been explicitly cleared by software.'''
+[[register]]
+  name = "CSUDMA_SRC_I_STS"
+  type = "mixed"
+  width = 32
+  description = "SRC DMA Interrupt Status Register"
+  default = "0x00000000"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:7"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "INVALID_APB"
+    bits = "6"
+    type = "wtc"
+  [[register.field]]
+    name = "THRESH_HIT"
+    bits = "5"
+    type = "wtc"
+    shortdesc = '''Indicates the SRC_FIFO has reached a programmed watermark value.'''
+    longdesc = '''The watermark value is set via the "FIFO_THRESH" field. Note that the interrupt will be triggered when the FIFO hits this threshold, irrespective of whether it is on the way up or down.'''
+  [[register.field]]
+    name = "TIMEOUT_MEM"
+    bits = "4"
+    type = "wtc"
+    shortdesc = '''Indicates timeout counter#2 has expired (SRC DMA sees delay on memory interface).'''
+    longdesc = '''Refer to TIMEOUT_VAL description for exact timeout duration and conditions.'''
+  [[register.field]]
+    name = "TIMEOUT_STRM"
+    bits = "3"
+    type = "wtc"
+    shortdesc = '''Indicates timeout counter#1 has expired (SRC DMA sees backpressure on stream interface).'''
+    longdesc = '''Refer to TIMEOUT_VAL description for exact timeout duration and conditions.'''
+  [[register.field]]
+    name = "AXI_RDERR"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "DONE"
+    bits = "1"
+    type = "wtc"
+    shortdesc = '''Indicates the DMA has completed a command.'''
+    longdesc = '''The last associated AXI memory read has been issued and processed (SIZE=0), all data asociated with the command has been returned and consumed (SRC FIFO is flushed of the data associated with the command). Note that the SRC FIFO may however, still have data in it when "SRC_DONE" is asserted. This data is associated with the NEXT DMA command, and NOT the current one. Note that If the SIZE is programmed to 0 and the DMA is started, the "DONE" interrupt field will be asserted.'''
+  [[register.field]]
+    name = "MEM_DONE"
+    bits = "0"
+    type = "wtc"
+    shortdesc = '''Indicates the DMA has completed the current command on the AXI memory side.'''
+    longdesc = '''The last memory read command has been issued and all outstanding data beats have been written into the SRC FIFO. Note that all data has not necessarily been consumed (SRC FIFO may still be occupied). Note too, that if the SIZE is programmed to 0 and the DMA is started, MEM_DONE will be asserted.'''
+[[register]]
+  name = "CSUDMA_SRC_I_EN"
+  type = "mixed"
+  width = 32
+  description = "SRC DMA Interrupt Enable"
+  default = "0x00000000"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:7"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "INVALID_APB"
+    bits = "6"
+    type = "wtc"
+  [[register.field]]
+    name = "THRESH_HIT"
+    bits = "5"
+    type = "wtc"
+  [[register.field]]
+    name = "TIMEOUT_MEM"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "TIMEOUT_STRM"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "AXI_RDERR"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "DONE"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "MEM_DONE"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "CSUDMA_SRC_I_DIS"
+  type = "mixed"
+  width = 32
+  description = "SRC DMA Interrupt Disable"
+  default = "0x00000000"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:7"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "INVALID_APB"
+    bits = "6"
+    type = "wtc"
+  [[register.field]]
+    name = "THRESH_HIT"
+    bits = "5"
+    type = "wtc"
+  [[register.field]]
+    name = "TIMEOUT_MEM"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "TIMEOUT_STRM"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "AXI_RDERR"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "DONE"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "MEM_DONE"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "CSUDMA_SRC_I_MASK"
+  type = "mixed"
+  width = 32
+  description = "SRC DMA Interrupt Mask"
+  default = "0x0000007F"
+  offset = "0x00000020"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:7"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "INVALID_APB"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "THRESH_HIT"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "TIMEOUT_MEM"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "TIMEOUT_STRM"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "AXI_RDERR"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "DONE"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "MEM_DONE"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "CSUDMA_SRC_CTRL2"
+  type = "mixed"
+  width = 32
+  description = "General SRC DMA Control Register 2"
+  default = "0x081BFFF8"
+  offset = "0x00000024"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "ARCACHE"
+    bits = "26:24"
+    type = "rw"
+  [[register.field]]
+    name = "ROUTE_BIT"
+    bits = "23"
+    type = "rw"
+  [[register.field]]
+    name = "TIMEOUT_EN"
+    bits = "22"
+    type = "rw"
+  [[register.field]]
+    name = "TIMEOUT_PRE"
+    bits = "15:4"
+    type = "rw"
+    shortdesc = '''Set the prescaler value for the timeout in clk (~2.'''
+    longdesc = '''5ns) cycles (Refer to TIMEOUT_VALUE description). The TIMEOUT_PRE field is interpreted as follows: 12'h000: Prescaler enables timer every cycle 12'h001: Prescaler enables timer every 2 cycles etc 12'hFFF: Prescaler enables timer every 4096 cycles'''
+  [[register.field]]
+    name = "MAX_OUTS_CMDS"
+    bits = "3:0"
+    type = "rw"
+    shortdesc = '''Controls the maximumum number of outstanding AXI read commands issued.'''
+    longdesc = '''The field is interpreted as follows: 4'h0: Up to 1 Outstanding Read command allowed 4'h1: Up to 2 Outstanding Read commands allowed etc 4'h8: Up to 9 Outstanding Read commands allowed 4'h9 - 4'hF: Invalid. Valid range is 4'h0 to 4'h8.'''
+[[register]]
+  name = "CSUDMA_SRC_ADDR_MSB"
+  type = "mixed"
+  width = 32
+  description = "Source mem address (msbs) for DMA memory->stream data transfer"
+  default = "0x00000000"
+  offset = "0x00000028"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:17"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "ADDR_MSB"
+    bits = "16:0"
+    type = "rw"
+    shortdesc = '''Source memory address (msbs) for DMA memory->stream data transfer Refer to the description for CSUDMA_SRC_ADDR for full details.'''
+    longdesc = '''This field is the 17 msbs of the full 49-bit SRC address The full 49-bit source address is comprised of this field concatenated with the CSUDMA_SRC_ADDR field as follows: 49-bit SRC address = {ADDR_MSB, CSU_DMA_SRC_ADDR.ADDR, 2'b00}'''
+[[register]]
+  name = "CSUDMA_DST_ADDR"
+  type = "mixed"
+  width = 32
+  description = "Destination mem address (lsbs) for DMA stream->memory data transfer"
+  default = "0x00000000"
+  offset = "0x00000800"
+  [[register.field]]
+    name = "ADDR"
+    bits = "31:2"
+    type = "rw"
+    shortdesc = '''Destination memory address (lsbs) for DMA stream to memory data transfer Address is word aligned, so this field is only 30-bits.'''
+    longdesc = '''(2 lsb's are 0) This field must be written initially before a DMA operation is started. In this case, it indicates the memory destination address (lsbs) the DMA will begin writing to. After the DMA has started, this field will dynamically change under DMA control to reflect the current memory destination address that is being processed by the DMA. When a BRESP is returned from memory, the ADDR will increment by 1 word. The readback is only valid if Burst Type is INCR (not WRAP) The full 48-bit destination address is comprised of this field concatenated with the CSUDMA_DST_ADDR_MSB field as follows: 48-bit DST address = {CSUDMA_DST_ADDR_MSB, ADDR, 2'b00}'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "1:0"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+[[register]]
+  name = "CSUDMA_DST_SIZE"
+  type = "mixed"
+  width = 32
+  description = "DMA transfer payload for DMA stream-> memory data transfer"
+  default = "0x00000000"
+  offset = "0x00000804"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:29"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "SIZE"
+    bits = "28:2"
+    type = "rw"
+    shortdesc = '''Specifies the number of 4-byte words the DMA will transfer from stream to memory Size is word aligned, so this field is only 27-bits.'''
+    longdesc = '''(2 lsb's are 0) The action of writing to this register starts a DMA transfer of length SIZE, moving data from the stream interface to ADDR. In this case, it indicates the total payload that the DMA will move from stream to memory. After the DMA has started, this field will dynamically change under DMA control to reflect the remaining payload size that the DMA must still complete. Whenever a BRESP is returned from memory, the SIZE will decrement by 1.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "1:0"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+[[register]]
+  name = "CSUDMA_DST_STS"
+  type = "mixed"
+  width = 32
+  description = "General DST DMA Status"
+  default = "0x00000000"
+  offset = "0x00000808"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "DONE_CNT"
+    bits = "15:13"
+    type = "wtc"
+    shortdesc = '''Number of completed DST DMA transfers that have not been acknowledged by software: 000 - all finished transfers have been acknowledged; 001 - one finished transfer is still outstanding; etc 111 - seven or more finished transfers is still outstanding.'''
+    longdesc = '''A finished transfer is acknowledged by clearing the interrupt status flag 'DONE". This count is cleared by an explicit write of 3'b111 to this field.'''
+  [[register.field]]
+    name = "DST_FIFO_LEVEL"
+    bits = "12:5"
+    type = "ro"
+    shortdesc = '''Provide the current DST FIFO level in 32-bit words.'''
+    longdesc = '''8'h00: Empty 8'h01: 1 entry etc 8'h80: 128 entries'''
+  [[register.field]]
+    name = "WR_OUTSTANDING"
+    bits = "4:1"
+    type = "ro"
+    shortdesc = '''Indicates how many memory write commands are currently outstanding in the system.'''
+    longdesc = '''An outstanding write command is one that has been issued to memory and the BRESP associated with that command has not yet been returned from memory. 4'h0: 0 cmds outstanding etc 4'h8: 8 cmds outstanding 4'h9: 9 cmds outstanding'''
+  [[register.field]]
+    name = "BUSY"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''BUSY=1: The CSU DMA stream->memory channel is busy processing the current command and cannot accept a new command.'''
+    longdesc = '''BUSY=0: implies DMA is DONE with the transfer, the DST FIFO and any associated pipeline registers are empty. DMA may accept a new command. Note that, BUSY essentially indicates that the DMA still has remaining work to do. BUSY will reflect this status irrespective of whether the PAUSE_* is asserted or not.'''
+[[register]]
+  name = "CSUDMA_DST_CTRL"
+  type = "rw"
+  width = 32
+  description = "General DST DMA Control"
+  default = "0x803FFA00"
+  offset = "0x0000080C"
+  [[register.field]]
+    name = "SSS_FIFOTHRESH"
+    bits = "31:25"
+    type = "rw"
+    shortdesc = '''When the DST FIFO level is greater than or equal to this programmed value, the SSS interface signal, "data_out_fifo_level_hit" will be asserted.'''
+    longdesc = '''This mechanism can be used by the SSS to flow control data that is being looped back from the SRC DMA. 7'h00: Reserved etc 7'h0F: Reserved 7'h10: Threshold is 17 entries etc 7'h7A: Threshold is 123 entries 7'h7B: Reserved etc 7'h7F: Reserved Note that "7'h10" is the minimum and "7'h7A" is the max value that should be programmed'''
+  [[register.field]]
+    name = "APB_ERR_RESP"
+    bits = "24"
+    type = "rw"
+  [[register.field]]
+    name = "ENDIANNESS"
+    bits = "23"
+    type = "rw"
+  [[register.field]]
+    name = "AXI_BRST_TYPE"
+    bits = "22"
+    type = "rw"
+  [[register.field]]
+    name = "TIMEOUT_VAL"
+    bits = "21:10"
+    type = "rw"
+    shortdesc = '''Set the timeout value for SRC DMA.'''
+    longdesc = '''There are 2 physical timers, qualified with TIMEOUT_EN, that will compare against this value: 1. Timeout counter starts to run when data is provided to the AXI write channel (memory) interface and backpressure is observed. As soon as backpressure is removed, the timer is reset. When timer expires, it stops running. 2. Timeout counter runs whenever the DMA is active. Whenever a data beat is provided by the SSS, the timer is reset. When timer expires, it stops running. TIMEOUT_VAL field is interpreted as follows: Final timeout value = TIMEOUT_VAL * timeout_prescale_period where "timeout_prescale_period" is the period of the enable that is generated by the TIMEOUT_PRE. Examples (prescaler set to maximum of 4096 clk (~2.5ns) cycles) 12'h000: Final Timeout after 1 * (4096 * 2.5ns)] => 10.244 us 12'h001: Final Timeout after 2 * (4096 * 2.5ns)] => 20.48 us etc 12'hFFE: Final Timeout after 4095*(4096 * 2.5ns) => 41.93.ms 12'hFFF: Special function - Clears both Timers Note that if PAUSE_MEM is asserted, timeout counter #1 will be paused and if PAUSE_STRM is asserted, timeout counter #2 will be paused. Note that writing the value of 12'hFFF will cause both timers to be cleared.'''
+  [[register.field]]
+    name = "FIFO_THRESH"
+    bits = "9:2"
+    type = "rw"
+    shortdesc = '''DST_FIFO programmed watermark value.'''
+    longdesc = '''This is the FIFO theshold used to trigger the FIFO_THRESHOLD_HIT interrupt. 8'h00: Threshold is 0 entries 8'h01: Threshold is 1 entry etc 8'h80: Threshold is 128 entries Note that the interrupt will be triggered when the FIFO hits this threshold, irrespective of whether it is on the way up or down.'''
+  [[register.field]]
+    name = "PAUSE_STRM"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''1: Temporarily stop the transfer of data to the internal DST data FIFO from the stream interface.'''
+    longdesc = '''This in effect will lead to the emptying of the DST FIFO. 0: DMA operates as usual. If previously PAUSED, it will continue on where it left off. Note. H/W has no means to apply backpressure to the stream interface. If PAUSE_STRM is asserted, the DMA will drop the stream data. This makes PAUSE mode functionally equivalent to as if the fifo were full. The value of PAUSE_STRM may therefore be limited to debug/verification only.'''
+  [[register.field]]
+    name = "PAUSE_MEM"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''1: Temporarily stop the issuing of new write commands to memory.'''
+    longdesc = '''This in effect will eventually lead to the filling of the DST FIFO. Write memory commands that are already outstanding will continue to be processed, but no new write commands will be issued to memory while PAUSE_MEM is asserted. 0: DMA operates as usual. If previously PAUSED, it will continue on where it left off.'''
+[[register]]
+  name = "CSUDMA_DST_I_STS"
+  type = "mixed"
+  width = 32
+  description = "DST DMA Interrupt Status Register"
+  default = "0x00000000"
+  offset = "0x00000814"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "FIFO_OVERFLOW"
+    bits = "7"
+    type = "wtc"
+    shortdesc = '''Indicates the DST_FIFO has overflowed.'''
+    longdesc = '''No backpressure mechanism exists on the stream interface in this direction. If the FIFO is full and 1 more data beat is produced by the stream interface, this bit will be set and the data beat will be discarded. If PAUSE_STREAM is asserted and the stream interface produces a beat of data, the beat will be discarded and FIFO_OVERFLOW will be set.'''
+  [[register.field]]
+    name = "INVALID_APB"
+    bits = "6"
+    type = "wtc"
+  [[register.field]]
+    name = "THRESH_HIT"
+    bits = "5"
+    type = "wtc"
+    shortdesc = '''Indicates the DST_FIFO has reached a programmed watermark value.'''
+    longdesc = '''The watermark value is set via the FIFO_THRESH field.'''
+  [[register.field]]
+    name = "TIMEOUT_MEM"
+    bits = "4"
+    type = "wtc"
+    shortdesc = '''Indicates timeout counter#1 has expired (DST DMA sees backpressure on AXI write data interface).'''
+    longdesc = '''Refer to TIMEOUT_VAL description for exact timeout duration and conditions.'''
+  [[register.field]]
+    name = "TIMEOUT_STRM"
+    bits = "3"
+    type = "wtc"
+    shortdesc = '''Indicates timeout counter#2 has expired (DST DMA sees delay on SSS DST interface).'''
+    longdesc = '''Refer to TIMEOUT_VAL description for exact timeout duration and conditions.'''
+  [[register.field]]
+    name = "AXI_BRESP_ERR"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "DONE"
+    bits = "1"
+    type = "wtc"
+    shortdesc = '''Indicates the DMA has completed a command.'''
+    longdesc = '''The last associated AXI memory write command has been issued and processed (SIZE=0), all data has been sent (DST FIFO is empty) and all outstanding BRESP's have been received.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "0"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+[[register]]
+  name = "CSUDMA_DST_I_EN"
+  type = "mixed"
+  width = 32
+  description = "DST DMA Interrupt Enable"
+  default = "0x00000000"
+  offset = "0x00000818"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "FIFO_OVERFLOW"
+    bits = "7"
+    type = "wtc"
+  [[register.field]]
+    name = "INVALID_APB"
+    bits = "6"
+    type = "wtc"
+  [[register.field]]
+    name = "THRESH_HIT"
+    bits = "5"
+    type = "wtc"
+  [[register.field]]
+    name = "TIMEOUT_MEM"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "TIMEOUT_STRM"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "AXI_BRESP_ERR"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "DONE"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "0"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+[[register]]
+  name = "CSUDMA_DST_I_DIS"
+  type = "mixed"
+  width = 32
+  description = "DST DMA Interrupt Disable"
+  default = "0x00000000"
+  offset = "0x0000081C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "FIFO_OVERFLOW"
+    bits = "7"
+    type = "wtc"
+  [[register.field]]
+    name = "INVALID_APB"
+    bits = "6"
+    type = "wtc"
+  [[register.field]]
+    name = "THRESH_HIT"
+    bits = "5"
+    type = "wtc"
+  [[register.field]]
+    name = "TIMEOUT_MEM"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "TIMEOUT_STRM"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "AXI_BRESP_ERR"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "DONE"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "0"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+[[register]]
+  name = "CSUDMA_DST_I_MASK"
+  type = "mixed"
+  width = 32
+  description = "DST DMA Interrupt Mask"
+  default = "0x000000FE"
+  offset = "0x00000820"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "FIFO_OVERFLOW"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "INVALID_APB"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "THRESH_HIT"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "TIMEOUT_MEM"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "TIMEOUT_STRM"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "AXI_BRESP_ERR"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "DONE"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "0"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+[[register]]
+  name = "CSUDMA_DST_CTRL2"
+  type = "mixed"
+  width = 32
+  description = "General DST DMA Control Register 2"
+  default = "0x081BFFF8"
+  offset = "0x00000824"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "AWCACHE"
+    bits = "26:24"
+    type = "rw"
+  [[register.field]]
+    name = "ROUTE_BIT"
+    bits = "23"
+    type = "rw"
+  [[register.field]]
+    name = "TIMEOUT_EN"
+    bits = "22"
+    type = "rw"
+  [[register.field]]
+    name = "TIMEOUT_PRE"
+    bits = "15:4"
+    type = "rw"
+    shortdesc = '''Set the prescaler value for the timeout in clk (~2.'''
+    longdesc = '''5ns) cycles (Refer to TIMEOUT_VAL description). The TIMEOUT_PRE field is interpreted as follows: 12'h000: Prescaler enables timer every cycle 12'h001: Prescaler enables timer every 2 cycles etc 12'hFFF: Prescaler enables timer every 4096 cycles'''
+  [[register.field]]
+    name = "MAX_OUTS_CMDS"
+    bits = "3:0"
+    type = "rw"
+    shortdesc = '''Controls the maximumum number of outstanding AXI write commands issued.'''
+    longdesc = '''The field is interpreted as follows: 4'h0: Up to 1 Outstanding Write command allowed 4'h1: Up to 2 Outstanding Write commands allowed etc 4'h8: Up to 9 Outstanding Write commands allowed 4'h9 - 4'hF: Invalid. Valid range is 4'h0 to 4'h8.'''
+[[register]]
+  name = "CSUDMA_DST_ADDR_MSB"
+  type = "mixed"
+  width = 32
+  description = "Destination mem address (msbs) for DMA stream->memory data transfer"
+  default = "0x00000000"
+  offset = "0x00000828"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:17"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "ADDR_MSB"
+    bits = "16:0"
+    type = "rw"
+    shortdesc = '''Destination memory address (msbs) for DMA stream to memory data transfer Refer to the description for CSUDMA_DST_ADDR for full details.'''
+    longdesc = '''This field is the 17 msbs of the full 49-bit DST address The full 49-bit destination address is comprised of this field concatenated with the CSUDMA_DST_ADDR field as follows: 49-bit DST address = {ADDR_MSB, CSU_DMA_DST_ADDR.ADDR, 2'b00}'''
+[[register]]
+  name = "CSUDMA_SAFETY_CHK"
+  type = "rw"
+  width = 32
+  description = "Safety endpoint connectivity check Register"
+  default = "0x00000000"
+  offset = "0x00000FF8"
+  [[register.field]]
+    name = "CHK_VAL"
+    bits = "31:0"
+    type = "rw"

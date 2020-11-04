@@ -1,0 +1,154 @@
+description = "MBIST Controller - APB to JTAG Bridge Configuration"
+[[bank]]
+  name = "MBISTJTAG"
+  address = "0xffcf0000"
+[[register]]
+  name = "MBISTJTAG_CTRL_STS"
+  type = "mixed"
+  width = 32
+  description = "Control and Status Register"
+  default = "0x00000002"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "SERACTV"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''JTAG Serializer active.'''
+    longdesc = '''The possible values of this flag are: 0: JTAG engine is inactive 1: JTAG engine is processing commands from the Command FIFO. The JTAG engine is only guaranteed to be inactive if both SERACTV and WFIFOCNT (bits [30:28]) are zero.'''
+  [[register.field]]
+    name = "WFIFOCNT"
+    bits = "30:28"
+    type = "ro"
+    shortdesc = '''Command FIFO outstanding byte count.'''
+    longdesc = '''Gives the number of command bytes held in the Command FIFO that have yet to be processed by the JTAG Engine.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "27"
+    type = "raz"
+  [[register.field]]
+    name = "RFIFOCNT"
+    bits = "26:24"
+    type = "ro"
+    shortdesc = '''Response FIFO outstanding byte count.'''
+    longdesc = '''Gives the number of bytes of response data available in the Response FIFO.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:4"
+    type = "raz"
+  [[register.field]]
+    name = "PORTCONNECTED"
+    bits = "3"
+    type = "ro"
+    shortdesc = '''The value of this bit is the logical AND of the PORTCONNECTED signals from all currently-selected ports.'''
+    longdesc = '''MBISTJTAG is only connected to 1 port and thus, this field will never be 1.'''
+  [[register.field]]
+    name = "TRST_OUT"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''JTAG TAP controller reset.'''
+    longdesc = '''This bit specifies the signal to drive out on the TRST signal for the currently-selected port or ports. The TRST signal is active LOW, when this bit is set to 1 the TRST output is LOW. Although the TRST_OUT bit, bit [1] of the CSW Register, specifies the value to be driven on the TRST signal, writing to this bit only causes the signal to change. It might be necessary to clock the devices connected to the selected JTAG port or ports, by TCK, to enable the devices to recognize the change on TRST. This means that the normal process to perform a Test Reset of the selected JTAG ports is: 1. Write 1 to the TRST_OUT bit, bit [1] of the CSW Register, to specify that TRST must be asserted LOW. 2. Drive a sequence of at least five TMS = 1 clocks from the JTAG engine. You can do this by issuing the command b00111111 to the JTAG engine. This sequence guarantees the TAP enters the Test-Logic/Reset state, even if has no TRST connection. 3. Write 0 to the TRST_OUT bit of the CSW Register, so that the TRST signal is HIGH on subsequent TCK cycles. If the JTAG connection is not clocked in this way while TRST is asserted LOW then some or all TAPs might not reset. This bit does not self-reset, it must be cleared to 0 by a software write to this register.'''
+[[register]]
+  name = "MBISTJTAG_PORTSEL"
+  type = "rw"
+  width = 8
+  description = "Port Selection Register"
+  default = "0x00000000"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "REG"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "MBISTJTAG_PORT_STS"
+  type = "wtc"
+  width = 8
+  description = "Port Status Register"
+  default = "0x00000000"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "REG"
+    bits = "7:0"
+    type = "wtc"
+[[register]]
+  name = "MBISTJTAG_BFIFO1"
+  type = "rw"
+  width = 8
+  description = "Read and Write Byte FIFO Register, Single Byte"
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "REG"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''When Reading, enable one byte to be read in parallel from the Response FIFO.'''
+    longdesc = '''When Writing, enable one byte to be written in parallel to the Command FIFO.'''
+[[register]]
+  name = "MBISTJTAG_BFIFO2"
+  type = "rw"
+  width = 16
+  description = "Read and Write Byte FIFO Register, Double Byte"
+  default = "0x00000000"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "REG"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''When Reading, enable two bytes to be read in parallel from the Response FIFO.'''
+    longdesc = '''When Writing, enable two bytes to be written in parallel to the Command FIFO.'''
+[[register]]
+  name = "MBISTJTAG_BFIFO3"
+  type = "rw"
+  width = 24
+  description = "Read and Write Byte FIFO Register, Triple Byte"
+  default = "0x00000000"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "REG"
+    bits = "23:0"
+    type = "rw"
+    shortdesc = '''When Reading, enable three bytes to be read in parallel from the Response FIFO.'''
+    longdesc = '''When Writing, enable three bytes to be written in parallel to the Command FIFO.'''
+[[register]]
+  name = "MBISTJTAG_BFIFO4"
+  type = "rw"
+  width = 32
+  description = "Read and Write Byte FIFO Register, Quad Byte"
+  default = "0x00000000"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "REG"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''When Reading, enable four bytes to be read in parallel from the Response FIFO.'''
+    longdesc = '''When Writing, enable four bytes to be written in parallel to the Command FIFO.'''
+[[register]]
+  name = "MBISTJTAG_IDR"
+  type = "ro"
+  width = 32
+  description = "Identification Register"
+  default = "0x24760010"
+  offset = "0x000000FC"
+  [[register.field]]
+    name = "REVISION"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "JEDEC_BANK"
+    bits = "27:24"
+    type = "ro"
+  [[register.field]]
+    name = "JEDEC_CODE"
+    bits = "23:17"
+    type = "ro"
+  [[register.field]]
+    name = "MEM_AP"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:8"
+    type = "ro"
+  [[register.field]]
+    name = "IDENTITY_VALUE"
+    bits = "7:0"
+    type = "ro"

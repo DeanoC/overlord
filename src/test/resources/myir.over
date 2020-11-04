@@ -4,7 +4,7 @@ board = "Myir-FZ3"
 bootcpu = "SaxonSoC.riscv32"
 
 [[includes]]
-  resource = "MinZynqPs8"
+  resource = "FullZynqPs8"
 
 #[[layout]]
 #  name = "SaxonSoC"

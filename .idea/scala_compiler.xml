@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ScalaCompilerConfiguration">
+    <profile name="sbt 1" modules="overlord_685,overlord_7366" />
+    <profile name="sbt 2" modules="cmdline,main,parser">
+      <option name="postfixOps" value="true" />
+      <option name="deprecationWarnings" value="true" />
+    </profile>
+    <profile name="sbt 3" modules="overlord">
+      <option name="deprecationWarnings" value="true" />
+    </profile>
+  </component>
+</project>

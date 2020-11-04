@@ -1,6 +1,7 @@
 resources = [
-  "cpu",
+  "sdio",
+  "spi",
   "ram",
   "ZynqPs7",
-  "ZynqPs8"
+  "ZynqPs8",
 ]

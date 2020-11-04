@@ -1,15 +1,52 @@
 type = "Xilinx"
 
 [[instance]]
-  type = "soc.ZynqPs8"
+  type = "soc.zynqps8"
 
 [[instance]]
-  type = "ram.DDR4.MT40A256M16LY"
+  type = "ram.ddr.ddr4.MT40A256M16LY"
   size = "4 GiB"
 
 [[instance]]
-  type = "storage.emmc"
+  name = "storage.sdio.sdcard.MTFC8GAKAJCN"
+  type = "storage.sdio.zynqps8"
+  port = "SDIO0"
+  bank = "SD0"
+
+[[instance]]
+  name = "storage.sdio.emmc.MTFC8GAKAJCN"
+  type = "storage.sdio.zynqps8"
   size = "8 GiB"
+  port = "SDIO1"
+  bank = "SD1"
+
+[[instance]]
+  name = "storage.qspi.MT25QU256ABA1EW9"
+  type = "storage.qspi.zynqps8"
+  size = "32 MiB"
+  port = "QSPI"
+
+[[connection]]
+  name = "connection.apb->emmc"
+  type = "connection.apb"
+  main = "interconnect.apb"
+  secondary = "storage.emmc"
+
+[[connection]]
+  name = "connection.apb->sdcard"
+  type = "connection.apb"
+  main = "interconnect.apb"
+  secondary = "storage.sdcard"
+
+[[connection]]
+  name = "connection.apb->qspi"
+  type = "connection.apb"
+  main = "interconnect.apb"
+  secondary = "storage.qspi.MT25QU256ABA1EW9"
+
+[[instance]]
+  type = "bridge.i2c.axi4"
+  port = "I2C1"
 
 [[constraint]]
   name = "ref.clk.25MhZ"
@@ -184,32 +221,32 @@ type = "Xilinx"
     pin = "AD16"
 
 [[constraint]]
-    name = "SD0.EMMC_CMD"
+    name = "SDIO1.EMMC_CMD"
     pin = "AC21"
 [[constraint]]
-    name = "SD0.EMMC_CLK"
+    name = "SDIO1.EMMC_CLK"
     pin = "AB20"
 [[constraint]]
-    name = "SD0.EMMC_RST"
+    name = "SDIO1.EMMC_RST"
     pin = "AB18"
 [[constraint]]
-    name = "SD0.EMMC_DATA"
-    pins = ["AH18","AG18","AE18","AF18","AC18","AC19","AE19","AD19"]    
+    name = "SDIO1.EMMC_DATA"
+    pins = ["AH18","AG18","AE18","AF18","AC18","AC19","AE19","AD19"]
 
 [[constraint]]
-    name = "SD1.WP"
+    name = "SDIO0.WP"
     pin = "J20"
 [[constraint]]
-    name = "SD1.CD"
+    name = "SDIO0.CD"
     pin = "K20"
 [[constraint]]
-    name = "SD1.CMD"
+    name = "SDIO0.CMD"
     pin = "M19" # PS_MIO_50
 [[constraint]]
-    name = "SD1.CLK"
+    name = "SDIO0.CLK"
     pin = "L21"
 [[constraint]]
-    name = "SD1.DATA"
+    name = "SDIO0.DATA"
     pins = ["L20","H21","J21","M18"]
 
 [[constraint]]
