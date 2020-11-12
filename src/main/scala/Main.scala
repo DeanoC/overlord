@@ -1,15 +1,21 @@
 import java.nio.file.{Files, Path}
 
-import overlord.{Board, BoardCatalog, DefinitionCatalog, DefinitionCatalogs,
-	Resources, _}
+import overlord.GameBuilder.{containerStack, pathStack}
+import overlord.{Board, BoardCatalog, DefinitionCatalog, DefinitionCatalogs, Resources, _}
 
 import scala.annotation.tailrec
 import scala.collection.immutable.Map
 
 object Main {
 	private val usage =
-		"""|Usage: overlord filename
-		   |     : filename should be a .over file with a chip layout"""
+		"""|Usage: overlord [create|report|svd] --options path filename
+			 |     : create - generate a compile project with all sub parts at 'out'
+			 |     : report - prints some info about over structure
+			 |     : svd    - produce a CMSIS-SVD file on its own
+			 |     : --out  - path where generated files should be placed
+			 |     : --nostdresources - don't use any build in resource toml files
+		   |     : --resources - TODO use specified path a root of resources tomls
+		   |		 : filename should be a .over file with a chip layout"""
 			.stripMargin
 
 	def main(args: Array[String]): Unit = {
@@ -25,6 +31,8 @@ object Main {
 
 			list match {
 				case Nil              => map
+				case "create" :: tail =>
+					nextOption(map ++ Map(Symbol("create") -> true), tail)
 				case "report" :: tail =>
 					nextOption(map ++ Map(Symbol("report") -> true), tail)
 				case "svd" :: tail    =>
@@ -61,8 +69,12 @@ object Main {
 			sys.exit(1)
 		}
 
-		val gameOverFile = Path.of(filename).toAbsolutePath.toFile
-		val source       = scala.io.Source.fromFile(gameOverFile)
+		pathStack.push(Path.of(new java.io.File(".").getCanonicalPath))
+		val filePath = pathStack.top.resolve(filename)
+		pathStack.push(filePath.getParent.toAbsolutePath)
+		containerStack.push(None)
+
+		val source       = scala.io.Source.fromFile(filePath.toFile)
 
 		val stdResources = Resources()
 		val resources    =
@@ -113,7 +125,11 @@ object Main {
 		val out      = Path.of(if (!options.contains(Symbol("out"))) "."
 		                       else options(Symbol("out")).asInstanceOf[String]
 		                       ).toAbsolutePath
-		if (options.contains(Symbol("report"))) output.Report(game, out)
-		if (options.contains(Symbol("svd"))) output.Svd(game, out)
+
+		if (options.contains(Symbol("create"))) output.Project(game, out)
+		else {
+			if (options.contains(Symbol("report"))) output.Report(game, out)
+			if (options.contains(Symbol("svd"))) output.Svd(game, out)
+		}
 	}
 }

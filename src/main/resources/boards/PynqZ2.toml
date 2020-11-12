@@ -1,4 +1,6 @@
 type = "Xilinx"
+family = "Artix 7"
+device = "xc7z020clg400-1"
 
 [[instance]]
   type = "soc.ZynqPs7"

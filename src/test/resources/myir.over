@@ -1,11 +1,22 @@
 # test of overlord toml file
 
 board = "Myir-FZ3"
-bootcpu = "SaxonSoC.riscv32"
 
 [[includes]]
   resource = "FullZynqPs8"
 
-#[[layout]]
-#  name = "SaxonSoC"
-#  type = "SoC"
+[[instance]]
+  name = "blinky"
+  type = "gateware.blinky"
+
+[[connection]]
+  type = "port"
+  connection = "blinky.q -> LED.SYS_STATUS"
+
+[[connection]]
+  type = "clock"
+  connection = "ref.clk.25MHz -> blinky.clk"
+
+[[connection]]
+  type = "constant"
+  connection = "25_000_000 -> blinky.clk_freq_hz"

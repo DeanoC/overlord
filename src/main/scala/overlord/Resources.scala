@@ -31,8 +31,11 @@ case class Resources(path: Path = Path.of("src/main/resources/")) {
 	}
 
 	def loadBoards(catalogs: DefinitionCatalogs): Map[String, Board] = {
-		val parsed = loadToToml(Paths.get(s"${path}/boards.toml").toAbsolutePath)
-		if (
+
+		GameBuilder.pathStack.push(path)
+
+		val parsed = loadToToml(path.resolve("boards.toml").toAbsolutePath)
+		val result = if (
 			!parsed.values.contains("resources") || !parsed
 				.values("resources")
 				.isInstanceOf[toml.Value.Arr]
@@ -43,14 +46,16 @@ case class Resources(path: Path = Path.of("src/main/resources/")) {
 			val resourceMaps = mutable.HashMap[String, Board]()
 			for (resource <- resources) {
 				val name  = resource.asInstanceOf[toml.Value.Str].value
-				val board = Board.FromFile(s"$path/boards/", name, catalogs)
+				val board = Board.FromFile(path.resolve("boards"), name, catalogs)
 				board match {
 					case Some(b) => resourceMaps += (name -> b)
 					case None    =>
 				}
 			}
-			resourceMaps toMap
+			resourceMaps.toMap
 		}
+		GameBuilder.pathStack.pop
+		result
 	}
 
 	private def loadToToml(absolutePath: Path): toml.Value.Tbl = {

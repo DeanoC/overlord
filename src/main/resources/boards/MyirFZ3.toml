@@ -1,4 +1,6 @@
 type = "Xilinx"
+family = "UltraScale+"
+device = "xczu3eg-sfvc784-1-e"
 
 [[instance]]
   type = "soc.zynqps8"
@@ -8,48 +10,50 @@ type = "Xilinx"
   size = "4 GiB"
 
 [[instance]]
-  name = "storage.sdio.sdcard.MTFC8GAKAJCN"
+  name = "storage.sdio.sdcard"
   type = "storage.sdio.zynqps8"
-  port = "SDIO0"
-  bank = "SD0"
+  instance = 0
 
 [[instance]]
   name = "storage.sdio.emmc.MTFC8GAKAJCN"
   type = "storage.sdio.zynqps8"
+  instance = 1
   size = "8 GiB"
-  port = "SDIO1"
-  bank = "SD1"
+
+[[connection]]
+  type = "port"
+  connection = "SDIO0 <> storage.sdio.sdcard"
+
+[[connection]]
+  type = "port"
+  connection = "SDIO1 <> storage.sdio.emmc.MTFC8GAKAJCN"
+
+[[connection]]
+  name = "connection.apb->emmc"
+  type = "connection.apb"
+  connection = "interconnect.apb -> storage.sdio"
 
 [[instance]]
   name = "storage.qspi.MT25QU256ABA1EW9"
   type = "storage.qspi.zynqps8"
   size = "32 MiB"
-  port = "QSPI"
-
-[[connection]]
-  name = "connection.apb->emmc"
-  type = "connection.apb"
-  main = "interconnect.apb"
-  secondary = "storage.emmc"
 
 [[connection]]
   name = "connection.apb->sdcard"
   type = "connection.apb"
-  main = "interconnect.apb"
-  secondary = "storage.sdcard"
+  main = "interconnect.apb -> storage.sdcard"
 
 [[connection]]
   name = "connection.apb->qspi"
   type = "connection.apb"
-  main = "interconnect.apb"
-  secondary = "storage.qspi.MT25QU256ABA1EW9"
+  main = "interconnect.apb -> storage.qspi.MT25QU256ABA1EW9"
 
 [[instance]]
   type = "bridge.i2c.axi4"
   port = "I2C1"
 
 [[constraint]]
-  name = "ref.clk.25MhZ"
+  name = "ref.clk.25MHz"
   pin = "M6"
   standard = "LVCMOS18"
 
@@ -58,7 +62,7 @@ type = "Xilinx"
   pin = "AD14"
   standard = "LVCMOS33"
 [[constraint]]
-  name = "SYS.STATUS_LED"
+  name = "LED.SYS_STATUS"
   pin = "AA13"
   standard = "LVCMOS33"
 

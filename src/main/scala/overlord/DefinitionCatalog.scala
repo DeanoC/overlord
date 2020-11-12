@@ -17,7 +17,7 @@ case class DefinitionCatalogs(val catalogs: Map[String, DefinitionCatalog]) {
 			val split = d.chipType.split('.')
 
 			if (split.length >= chipPath.length) {
-				var curMatch   = 0
+				var curMatch = 0
 
 				split.zipWithIndex.foreach(
 					cti =>
@@ -31,9 +31,6 @@ case class DefinitionCatalogs(val catalogs: Map[String, DefinitionCatalog]) {
 				}
 			}
 		}
-		if (defi.isEmpty)
-			println(s"${defType} not found in any definition catalogs")
-
 		defi
 	}
 }
@@ -74,6 +71,11 @@ object DefinitionCatalog {
 			spath.resolve(parsed("registerPath").asInstanceOf[Value.Str].value)
 		} else spath
 
+		val container = if (parsed.contains("container")) {
+			Some(parsed("container").asInstanceOf[Value.Str].value)
+		} else None
+		GameBuilder.containerStack.push(container)
+
 		var defs = ArrayBuffer[Definition]()
 
 		if (parsed.contains("definition")) {
@@ -82,27 +84,32 @@ object DefinitionCatalog {
 			for (chip <- chips) {
 				val table   = chip.asInstanceOf[Value.Tbl].values
 				val defType = table("type").asInstanceOf[Value.Str].value
-
-				val software: Option[Software] =
-					if (table.contains("software")) {
-						val arr  = table("software").asInstanceOf[Value.Arr].values
-						val regs = for (tname <- arr) yield {
-							val name = tname.asInstanceOf[Value.Str].value
-							Registers.fromResource(
-								registerPath.resolve(Path.of(s"$name" + s".toml")))
-						}
-						Some(Software(regs.flatten.toArray))
-					} else None
-
 				val attribs = table.filter(a => a._1 match {
-					case "type" | "software" => false
-					case _                   => true
+					case "type" | "software" | "gateware" => false
+					case _                                => true
 				})
 
-				defs += Definition(defType, attribs, software)
+
+				if (table.contains("software")) {
+					val arr  = table("software").asInstanceOf[Value.Arr].values
+
+					val sws = Software.defFromFile(arr, registerPath)
+					defs += Def(defType, container, attribs, sws)
+
+				} else if (table.contains("gateware")) {
+					Gateware.defFromFile(defType,
+					                     registerPath.resolve(Path.of(
+						                     s"$name/$name" + s".toml"))) match {
+						case Some(value) => defs += value
+						case None        =>
+					}
+				} else {
+					defs += Def(defType, container, attribs, Seq[Software]())
+				}
 			}
 		}
-
-		Some(DefinitionCatalog(name, defs.toSeq))
+		val result = Some(DefinitionCatalog(name, defs.toSeq))
+		GameBuilder.containerStack.pop
+		result
 	}
 }

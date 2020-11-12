@@ -1,0 +1,5 @@
+provision = "copy"
+sources = [{src = "blinky.v", language="verilog"}]
+
+ports = [ "q", "clk" ]
+parameters = [ "clk_freq_hz" ]

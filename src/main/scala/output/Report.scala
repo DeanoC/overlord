@@ -23,12 +23,9 @@ object Report {
 				.value
 				.toInt
 			println(s"${chipType} are ${bw} bit $arch CPUs")
-			cput.software match {
-				case Some(sw) =>
-					sw.registers.foreach(r => println(s"  ${r.description}"))
-				case None     =>
-			}
+			cput.softwares.foreach(r => println(s"  ${r.description}"))
 		}
+
 		for (cpu <- cpus) {
 			val name = cpu.ident
 		}

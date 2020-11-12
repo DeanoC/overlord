@@ -41,6 +41,7 @@ object Svd {
 		<addressOffset>{f"${r.offset}"}</addressOffset>
 		<size>{r.width}</size>
 		<resetValue>{f"${r.default}"}</resetValue>
+		if(r.fields.length > 0)
 		<fields> {
 			for (f <- r.fields) yield {
 				val bits = BitsDesc(f.bits)
@@ -60,60 +61,54 @@ object Svd {
 
 	private val definitionsWritten = mutable.HashMap[String, String]()
 
-	private def outputPeripheral(s: Instance[_]) : Array[xml.Elem] = {
-		s.definition.software match {
-			case Some(p) =>
-				for{regs <- p.registers} yield {
-					val bank = if(s.attributes.contains("bank")) {
-						regs.banks.find(_.name == s.attributes("bank")
-							                .asInstanceOf[toml.Value.Str].value) match {
-								case Some(value) => value
-								case None =>
-									println(s"Peripheral ${s.ident} bank name is not found in " +
-									        s"the definition")
-									return Array[xml.Elem]()
-							}
-						} else if(definitionsWritten.contains(s.definition.chipType)) {
-							println(s"Peripheral ${s.ident} contains no bank name but is " +
-							        s"used in a multiple instance definition")
+	private def outputPeripheral(s: Instance[_]) : Seq[xml.Elem] =
+		for(regs <- s.definition.softwares) yield {
+			val bank = if(s.attributes.contains("bank")) {
+				regs.banks.find(_.name == s.attributes("bank")
+					                .asInstanceOf[toml.Value.Str].value) match {
+						case Some(value) => value
+						case None =>
+							println(s"Peripheral ${s.ident} bank name is not found in " +
+							        s"the definition")
 							return Array[xml.Elem]()
-						} else regs.banks.head
+					}
+				} else if(definitionsWritten.contains(s.definition.chipType)) {
+					println(s"Peripheral ${s.ident} contains no bank name but is " +
+					        s"used in a multiple instance definition")
+					return Array[xml.Elem]()
+				} else regs.banks.head
 
-					if(definitionsWritten.contains(s.definition.chipType)) {
-						// derivedFrom case
-						val derivedFromName = definitionsWritten(s.definition.chipType)
-						<peripheral derivedFrom={derivedFromName}>
-						<name>{bank.name}</name>
-						<version>1.0</version>
-						<description>{regs.description}</description>
-						<baseAddress>{f"${bank.address}"}</baseAddress>
-					</peripheral>
-				} else {
-					// new definition
-					definitionsWritten += (s.definition.chipType -> bank.name)
-					<peripheral>
-						<name>{bank.name}</name>
-						<version>1.0</version>
-						<description>{regs.description}</description>
-						<baseAddress>{f"${bank.address}"}</baseAddress>
-						<addressBlock>
-							<offset>0x0</offset>
-							<size>{regs.bankSize}</size>
-							<usage>registers</usage>
-							<protection>s</protection>
-						</addressBlock>
-						<registers>
-							{ for (r <- regs.registers) yield outputRegister(r) }
-						</registers>
-					</peripheral>
-				}
-			}
-		case None => Array[xml.Elem]()
+			if(definitionsWritten.contains(s.definition.chipType)) {
+				// derivedFrom case
+				val derivedFromName = definitionsWritten(s.definition.chipType)
+				<peripheral derivedFrom={derivedFromName}>
+				<name>{bank.name}</name>
+				<version>1.0</version>
+				<description>{regs.description}</description>
+				<baseAddress>{f"${bank.address}"}</baseAddress>
+			</peripheral>
+		} else {
+			// new definition
+			definitionsWritten += (s.definition.chipType -> bank.name)
+			<peripheral>
+				<name>{bank.name}</name>
+				<version>1.0</version>
+				<description>{regs.description}</description>
+				<baseAddress>{f"${bank.address}"}</baseAddress>
+				<addressBlock>
+					<offset>0x0</offset>
+					<size>{regs.bankSize}</size>
+					<usage>registers</usage>
+					<protection>s</protection>
+				</addressBlock>
+				<registers>
+					{ for (r <- regs.registers) yield outputRegister(r) }
+				</registers>
+			</peripheral>
 		}
 	}
 
 	def apply(game: Game, out : Path): Unit = {
-
 		val cpus = for (cpu <- game.cpus) yield <cpu>{outputCpu(cpu)}</cpu>
 
 		val peripherals = for (p <- game.peripherals) yield outputPeripheral(p)
@@ -152,7 +147,7 @@ object Svd {
 		writeFile(path, new PrettyPrinter(Int.MaxValue, 2).format(deviceXml))
 	}
 
-	def ensureDirectories(path: Path): Unit = {
+	private def ensureDirectories(path: Path): Unit = {
 		val directory = path.toFile
 		if (directory.isDirectory && !directory.exists()) {
 			directory.mkdirs()

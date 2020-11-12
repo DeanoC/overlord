@@ -2,6 +2,8 @@ package overlord
 
 import java.nio.file.{Files, Path}
 
+import toml.Value
+
 import scala.collection.mutable
 
 case class RegisterBank(val name: String,
@@ -22,25 +24,36 @@ case class RegisterField(val name: String,
                          val longDesc: Option[String])
 
 // registers should be sorted!
-class Registers(val description: String,
-                val banks: Array[RegisterBank],
-                val registers: Array[Register])
-{
-	def bankSize : String = registers.last.offset
+case class Software(description: String,
+                    banks: Array[RegisterBank],
+                    registers: Array[Register]) {
+	def bankSize: String = registers.last.offset
 }
 
-object Registers {
-	def fromResource(path: Path): Option[Registers] = {
-		if (!Files.exists(path.toAbsolutePath)) {
-			println(s"${path} register file not found");
-			return None
-		}
-		val file   = path.toAbsolutePath.toFile
-		val source = scala.io.Source.fromFile(file)
-		parse(path.toUri.toString, source.getLines().mkString("\n"))
-	}
+object Software {
+	def defFromFile(registerDefs: Seq[toml.Value],
+	                registerPath: Path
+	               ): Seq[Software] =
+		(for (inlineTable <- registerDefs) yield {
+			val item = inlineTable.asInstanceOf[Value.Tbl].values
+			val name = item("registers").asInstanceOf[Value.Str].value
 
-	private def parse(name: String, src: String): Option[Registers] = {
+			val path = registerPath.resolve(Path.of(s"$name" + s".toml"))
+			if (!Files.exists(path.toAbsolutePath)) {
+				println(s"${path} register file not found");
+				return Seq[Software]()
+			}
+
+			GameBuilder.pathStack.push(path.getParent)
+			val file   = path.toAbsolutePath.toFile
+			val source = scala.io.Source.fromFile(file)
+			val result = parse(path.toUri.toString,
+			                   source.getLines().mkString("\n"))
+			GameBuilder.pathStack.pop()
+			result.toList
+		}).fold(List[Software]())({ (s, n) => s ++ n })
+
+	private def parse(name: String, src: String): Option[Software] = {
 		val banks     = mutable.ArrayBuffer[RegisterBank]()
 		val registers = mutable.ArrayBuffer[Register]()
 		import toml.Value
@@ -98,9 +111,7 @@ object Registers {
 			                      fields.toArray)
 		}
 
-		Some(new Registers(desc,
-		                   banks.toArray,
-		                   registers.sortBy(p => (p.offset, p.name)
-		                                    ).toArray))
+		Some(Software(desc, banks.toArray,
+		              registers.sortBy(p => (p.offset, p.name)).toArray))
 	}
 }

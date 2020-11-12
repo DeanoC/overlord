@@ -10,25 +10,6 @@
       <sourceFolder url="file://$MODULE_DIR$/../../src/test/resources" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/../../src/test/scala" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/../../target" />
-      <excludeFolder url="file://$MODULE_DIR$/../../src/main/target" />
-      <excludeFolder url="file://$MODULE_DIR$/../../null/Coursier/cache/v1/https/repo1.maven.org/maven2/org/scalactic/scalactic_2.11" />
-      <excludeFolder url="file://$MODULE_DIR$/../../null/Coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/fastparse-utils_2.11" />
-      <excludeFolder url="file://$MODULE_DIR$/../../null/Coursier/cache/v1/https/repo1.maven.org/maven2/org/scalameta/fastparse_2.11" />
-      <excludeFolder url="file://$MODULE_DIR$/../../null/Coursier/cache/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-compatible" />
-      <excludeFolder url="file://$MODULE_DIR$/../../null/Coursier/cache/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-core_2.11" />
-      <excludeFolder url="file://$MODULE_DIR$/../../null/Coursier/cache/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-diagrams_2.11" />
-      <excludeFolder url="file://$MODULE_DIR$/../../null/Coursier/cache/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-featurespec_2.11" />
-      <excludeFolder url="file://$MODULE_DIR$/../../null/Coursier/cache/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-flatspec_2.11" />
-      <excludeFolder url="file://$MODULE_DIR$/../../null/Coursier/cache/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-freespec_2.11" />
-      <excludeFolder url="file://$MODULE_DIR$/../../null/Coursier/cache/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-funspec_2.11" />
-      <excludeFolder url="file://$MODULE_DIR$/../../null/Coursier/cache/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-funsuite_2.11" />
-      <excludeFolder url="file://$MODULE_DIR$/../../null/Coursier/cache/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-matchers-core_2.11" />
-      <excludeFolder url="file://$MODULE_DIR$/../../null/Coursier/cache/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-mustmatchers_2.11" />
-      <excludeFolder url="file://$MODULE_DIR$/../../null/Coursier/cache/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-propspec_2.11" />
-      <excludeFolder url="file://$MODULE_DIR$/../../null/Coursier/cache/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-refspec_2.11" />
-      <excludeFolder url="file://$MODULE_DIR$/../../null/Coursier/cache/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-shouldmatchers_2.11" />
-      <excludeFolder url="file://$MODULE_DIR$/../../null/Coursier/cache/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest-wordspec_2.11" />
-      <excludeFolder url="file://$MODULE_DIR$/../../null/Coursier/cache/v1/https/repo1.maven.org/maven2/org/scalatest/scalatest_2.11" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

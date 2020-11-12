@@ -1,6 +1,6 @@
 package overlord
 
-import java.nio.file.{Files, Paths}
+import java.nio.file.{Files, Path}
 
 import toml._
 
@@ -10,7 +10,7 @@ sealed trait BoardType {
 	val defaultConstraints: Map[String, toml.Value]
 }
 
-case class XilinxBoard() extends BoardType {
+case class XilinxBoard(family: String, device: String) extends BoardType {
 	override val defaultConstraints: Map[String, Value] =
 		immutable.Map[String, toml.Value](
 			("pullup" -> toml.Value.Bool(false)),
@@ -33,25 +33,30 @@ case class LatticeBoard() extends BoardType {
 
 case class Board(boardType: BoardType,
                  name: String,
-                 instances: List[toml.Value],
+                 instances: Seq[Instance[_]],
                  constraints: Map[String, Constraint])
 
 object Board {
-	def FromFile(spath: String,
+	def FromFile(spath: Path,
 	             name: String,
 	             catalogs: DefinitionCatalogs): Option[Board] = {
 		println(s"Reading $name board")
 
-		val path = Paths.get(s"$spath/${name}.toml")
+		GameBuilder.pathStack.push(spath)
+
+		val path = spath.resolve(s"$name.toml")
 		if (!Files.exists(path.toAbsolutePath)) {
 			println(s"${name} board at ${path} not found");
+			GameBuilder.pathStack.pop()
 			return None
 		}
 
 		val chipFile = path.toAbsolutePath.toFile
 		val source   = scala.io.Source.fromFile(chipFile)
 
-		parse(name, source.getLines mkString "\n", catalogs)
+		val result = parse(name, source.getLines().mkString("\n"), catalogs)
+		GameBuilder.pathStack.pop()
+		result
 	}
 
 	private def parse(name: String,
@@ -69,7 +74,13 @@ object Board {
 		}
 		// what type of board?
 		val boardType = parsed("type").asInstanceOf[Value.Str].value match {
-			case "Xilinx"  => XilinxBoard()
+			case "Xilinx"  =>
+				if (!parsed.contains("family") || !parsed.contains("device")) {
+					println(s"$name Xilinx board requires a family AND device field")
+					return None
+				}
+				XilinxBoard(parsed("family").asInstanceOf[Value.Str].value,
+				            parsed("device").asInstanceOf[Value.Str].value)
 			case "Altera"  => AlteraBoard()
 			case "Lattice" => LatticeBoard()
 			case _         => println(s"$name board has a unknown type");
@@ -92,30 +103,31 @@ object Board {
 			println(s"${name} board requires a type value");
 			return None
 		}
-		var boardChips = mutable.HashMap[String, Instance[_]]()
+
+		val boardConstraints: Map[String, Constraint] =
+			if (parsed.contains("constraint")) {
+				val tconstraints = parsed("constraint").asInstanceOf[Value.Arr].values
+				(for (constraint <- tconstraints) yield {
+					val table = constraint.asInstanceOf[Value.Tbl].values
+					val t     = (table + ("type" -> Value.Str("port")))
+					Constraint.parse(t, defaultConstraints.toMap)
+				}).fold(Map[String, Constraint]())({ (m, c) => m ++ c }).toMap
+			} else Map[String, Constraint]()
 
 		// search catalogs for chips on the board
-		val boardInstances   = if (parsed.contains("instance")) {
-			parsed("instance").asInstanceOf[Value.Arr].values
-		} else List[toml.Value]()
-		var boardConstraints = mutable.HashMap[String, Constraint]()
+		val boardInstances: Seq[Instance[_]] = boardConstraints.map(bc => {
+			val attribs = bc._2.attributes
+			ConstraintInstance(bc._1,
+			                   Def("port", None, attribs, Seq[Software]()),
+			                   bc._2,
+			                   attribs)
+		}).toSeq.++(if (parsed.contains("instance")) {
+			val instances = parsed("instance").asInstanceOf[Value.Arr].values
+			for (instance <- instances) yield
+				GameBuilder.parseInstance(instance, catalogs)
+		}.filter(_.nonEmpty).map(_.get) else Seq[Instance[_]]())
 
-		if (parsed.contains("constraint")) {
-			val tconstraints =
-				parsed("constraint").asInstanceOf[Value.Arr].values
-			for (constraint <- tconstraints) {
-				val table = constraint.asInstanceOf[Value.Tbl].values
-				boardConstraints ++= Constraint.parse(table, defaultConstraints.toMap)
-			}
-		}
-
-		Some(
-			Board(
-				boardType,
-				name,
-				boardInstances,
-				boardConstraints.toMap
-				)
-			)
+		Some(Board(boardType, name, boardInstances, boardConstraints))
 	}
+
 }
