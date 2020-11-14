@@ -1,33 +1,33 @@
 package overlord
 
-import java.nio.file.{Files, Path, Paths}
+import java.nio.file.{Files, Path}
 
 import scala.collection.mutable
 import scala.language.postfixOps
 
 case class Resources(path: Path = Path.of("src/main/resources/")) {
-	def loadCatalogs(): Map[String, DefinitionCatalog] = {
-		val parsed = loadToToml(path.resolve("catalogs.toml").toAbsolutePath)
-		if (
-			!parsed.values.contains("resources") || !parsed
-				.values("resources")
-				.isInstanceOf[toml.Value.Arr]
-		) Map[String, DefinitionCatalog]()
-		else {
-			val resources    =
-				parsed.values("resources").asInstanceOf[toml.Value.Arr].values
-			val resourceMaps = mutable.HashMap[String, DefinitionCatalog]()
-			for (resource <- resources) {
-				val name    = resource.asInstanceOf[toml.Value.Str].value
-				val catalog =
-					DefinitionCatalog.fromFile(path.resolve("catalogs/"), s"$name")
-				catalog match {
-					case Some(c) => resourceMaps += (name -> c)
-					case None    =>
-				}
-			}
-			resourceMaps.toMap
+	def loadCatalogs(): Map[String, Definition] = {
+		import toml.Value
+		val parsed =
+			loadToToml(path.resolve("catalogs.toml").toAbsolutePath).values
+
+		if (!parsed.contains("resources")) return Map()
+		if (!parsed("resources").isInstanceOf[Value.Arr]) return Map()
+
+		val resources = parsed("resources").asInstanceOf[Value.Arr].values
+
+		val resourceMaps = mutable.HashMap[String, Definition]()
+
+		for (resource <- resources) {
+			val name    = resource.asInstanceOf[toml.Value.Str].value
+			val catalog =
+				DefinitionCatalog.fromFile(
+					path.resolve("catalogs/"), s"$name")
+			if (catalog.nonEmpty)
+				resourceMaps ++= catalog.get.map(f=>(f.chipType -> f))
 		}
+
+		resourceMaps.toMap
 	}
 
 	def loadBoards(catalogs: DefinitionCatalogs): Map[String, Board] = {

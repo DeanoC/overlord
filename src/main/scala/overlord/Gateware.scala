@@ -4,6 +4,13 @@ import java.nio.file.{Files, Path}
 
 import toml.Value
 
+trait GatewareTrait {
+	val actions   : Seq[GatewareAction]
+	val moduleName: String
+	val ports     : Seq[String]
+	val parameters: Map[String, String]
+}
+
 case class GatewareInstance(ident: String,
                             definition: GatewareDef,
                             attributes: Map[String, toml.Value],
@@ -29,10 +36,10 @@ case class GatewareInstance(ident: String,
 case class GatewareDef(override val chipType: String,
                        override val container: Option[String],
                        override val attributes: Map[String, Value],
-                       override val provision: String,
-                       override val sources: Seq[GatewareSourceFile],
+                       override val actions: Seq[GatewareAction],
+                       override val moduleName: String,
                        override val ports: Seq[String],
-                       override val parameters: Seq[String])
+                       override val parameters: Map[String, String])
 	extends Definition with GatewareTrait {
 	override val softwares = Seq[Software]()
 }
@@ -73,14 +80,16 @@ object Gateware {
 					return None
 			}
 		}
-		if (!parsed.contains("provision") ||
-		    !parsed("provision").isInstanceOf[Value.Str]) {
-			println(s"$name doesn't have a provision field")
+
+		if (!parsed.contains("actions") ||
+		    !parsed("actions").isInstanceOf[Value.Arr]) {
+			println(s"$name doesn't have an actions field")
 			return None
 		}
-		if (!parsed.contains("sources") ||
-		    !parsed("sources").isInstanceOf[Value.Arr]) {
-			println(s"$name doesn't have a sources field")
+
+		if (!parsed.contains("process") ||
+		    !parsed("process").isInstanceOf[Value.Arr]) {
+			println(s"$name doesn't have process fields")
 			return None
 		}
 
@@ -90,48 +99,79 @@ object Gateware {
 			return None
 		}
 
-		val provision = parsed("provision").asInstanceOf[Value.Str].value
+		val processes =
+			(for (tprocess <- parsed("process").asInstanceOf[Value.Arr].values)
+				yield {
+					tprocess match {
+						case tbl: Value.Tbl =>
+							if (tbl.values.contains("name")) {
+								val name = tbl.values("name").asInstanceOf[Value.Str].value
+								Some(name -> tbl.values)
+							} else None
+						case _              => None
+					}
+				}).flatten.toMap
 
-		val src   = {
-			val srcs = parsed("sources").asInstanceOf[Value.Arr].values
-				.map(_.asInstanceOf[Value.Tbl].values)
+		val actions =
+			(for {taction <- parsed("actions").asInstanceOf[Value.Arr].values
+			      action = taction.asInstanceOf[Value.Str].value} yield {
 
-			for (entry <- srcs) yield {
+				if (!processes.contains(action)) {
+					println(s"$action process not found in ${name}")
+					return None
+				}
+				val process = processes(action)
 
-				val filename = entry("src").asInstanceOf[Value.Str].value
+				val pathOp: GatewarePathOp = {
+					if (process.contains("path_op")) {
+						val pathOp = process("path_op").asInstanceOf[Value.Str].value
+						pathOp match {
+							case "push" => GatewarePathOp_Push()
+							case "pop"  => GatewarePathOp_Pop()
+							case _      => GatewarePathOp_Noop()
+						}
+					} else GatewarePathOp_Noop()
+				}
 
-				val data = if (provision == "copy") {
-					val path   = GameBuilder.pathStack.top.resolve(filename)
-					val file   = path.toAbsolutePath.toFile
-					val source = scala.io.Source.fromFile(file)
-					source.getLines().mkString("\n")
-				} else ""
+				process("processor").asInstanceOf[Value.Str].value match {
+					case "copy"   => GatewareAction.createCopy(name, process, pathOp)
+					case "git"    => GatewareAction.createGit(name, process, pathOp)
+					case "python" => GatewareAction.createPython(name, process, pathOp)
+					case "yaml"   => GatewareAction.createYaml(name, process, pathOp)
+					case _        => None
+				}
+			}).flatten
 
-				GatewareSourceFile(
-					filename,
-					entry("language").asInstanceOf[Value.Str].value,
-					data)
-			}
-		}
+		val moduleName =
+			if (parsed.contains("module_name"))
+				parsed("module_name").asInstanceOf[Value.Str].value
+			else name
+
 		val ports = parsed("ports").asInstanceOf[Value.Arr].values
 			.map(_.asInstanceOf[Value.Str].value)
 
-		val parameters =
-			if (parsed.contains("parameters") &&
-			    parsed("parameters").isInstanceOf[Value.Arr])
-				parsed("parameters").asInstanceOf[Value.Arr].values
-					.map(_.asInstanceOf[Value.Str].value)
-			else Seq[String]()
+		val parameters = if (parsed.contains("parameters")) {
+			parsed("parameters").asInstanceOf[Value.Arr].values
+				.map(_.asInstanceOf[Value.Tbl].values)
+				.map(t => (Utils.toString(t("key")) ->
+				           Utils.toString(t("value"))))
+				.toMap
+		} else Map[String, String]()
 
 		val attribs: Map[String, Value] = parsed.filter(
 			_._1 match {
-				case "provision" | "sources" | "ports" | "parameters" => false
-				case _                                                => true
+				case "actions" | "ports" | "parameters" | "process" => false
+				case _                                              => true
 			})
+
 
 		Some(GatewareDef(defType,
 		                 GameBuilder.containerStack.top,
-		                 attribs, provision, src, ports, parameters))
+		                 attribs,
+		                 actions,
+		                 moduleName,
+		                 ports,
+		                 parameters))
 	}
 
 }

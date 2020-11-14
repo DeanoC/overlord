@@ -2,18 +2,18 @@ package overlord
 
 import java.nio.file.{Files, Path}
 
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-case class DefinitionCatalog(val catalogName: String,
-                             val defs: Seq[Definition])
+class DefinitionCatalogs() {
+	val catalogs: mutable.HashMap[String, Definition] = mutable.HashMap()
 
-case class DefinitionCatalogs(val catalogs: Map[String, DefinitionCatalog]) {
 	def FindDefinition(defType: String): Option[Definition] = {
 		val chipPath                 = defType.split('.')
 		var bestMatch                = 0
 		var defi: Option[Definition] = None
 
-		for {(_, cat) <- catalogs; d <- cat.defs} {
+		for {cat <- catalogs; d = cat._2} {
 			val split = d.chipType.split('.')
 
 			if (split.length >= chipPath.length) {
@@ -36,7 +36,7 @@ case class DefinitionCatalogs(val catalogs: Map[String, DefinitionCatalog]) {
 }
 
 object DefinitionCatalog {
-	def fromFile(spath: Path, name: String): Option[DefinitionCatalog] = {
+	def fromFile(spath: Path, name: String): Option[Seq[Definition]] = {
 		println(s"Reading $name catalog")
 
 		val path = spath.resolve(s"${name}.toml")
@@ -54,7 +54,7 @@ object DefinitionCatalog {
 
 	private def parse(spath: Path,
 	                  name: String,
-	                  src: String): Option[DefinitionCatalog] = {
+	                  src: String): Option[Seq[Definition]] = {
 		import toml.Value
 
 		val parsed = {
@@ -91,7 +91,7 @@ object DefinitionCatalog {
 
 
 				if (table.contains("software")) {
-					val arr  = table("software").asInstanceOf[Value.Arr].values
+					val arr = table("software").asInstanceOf[Value.Arr].values
 
 					val sws = Software.defFromFile(arr, registerPath)
 					defs += Def(defType, container, attribs, sws)
@@ -108,8 +108,7 @@ object DefinitionCatalog {
 				}
 			}
 		}
-		val result = Some(DefinitionCatalog(name, defs.toSeq))
 		GameBuilder.containerStack.pop
-		result
+		Some(defs.toSeq)
 	}
 }

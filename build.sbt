@@ -1,6 +1,7 @@
 //lazy val ikuy = ProjectRef(uri("git@github.com:DeanoC/ikuy2.git#master"), "root")
 //lazy val ikuy = ProjectRef(file("../ikuy2"), "ikuy")
 
+
 ThisBuild / scalaVersion := "2.13.3"
 ThisBuild / organization := "com.deanoc"
 ThisBuild / version := "1.0"

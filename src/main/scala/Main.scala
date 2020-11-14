@@ -82,20 +82,13 @@ object Main {
 			else Some(overlord.Resources(Path.of(options(Symbol("resources"))
 				                                     .asInstanceOf[String])))
 
-		val chipCatalogs =
-			DefinitionCatalogs(
-				{
-					if (!options.contains(Symbol("nostdresources")))
-						stdResources.loadCatalogs()
-					else
-						Map[String, DefinitionCatalog]()
-				}.++ {
-					resources match {
-						case Some(r) => r.loadCatalogs()
-						case None    => Map[String, DefinitionCatalog]()
-					}
-				}.toMap
-				)
+		val chipCatalogs = new DefinitionCatalogs
+
+		if (!options.contains(Symbol("nostdresources")))
+			chipCatalogs.catalogs ++= stdResources.loadCatalogs()
+
+		if(resources.isDefined)
+			chipCatalogs.catalogs ++= resources.get.loadCatalogs()
 
 		val boardCatalog =
 			BoardCatalog {

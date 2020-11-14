@@ -9,6 +9,10 @@ board = "Myir-FZ3"
   name = "blinky"
   type = "gateware.blinky"
 
+[[instance]]
+  name = "litedram"
+  type = "gateware.litedram"
+
 [[connection]]
   type = "port"
   connection = "blinky.q -> LED.SYS_STATUS"
@@ -20,3 +24,7 @@ board = "Myir-FZ3"
 [[connection]]
   type = "constant"
   connection = "25_000_000 -> blinky.clk_freq_hz"
+
+#[[connection]]
+#  type = "constant"
+#  connection = "7000 -> liteeth.port"

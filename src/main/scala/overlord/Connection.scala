@@ -95,5 +95,8 @@ case class ConnectedConstant[B <: Instance[_]](definition: Definition,
 	override def second: Instance[_] = to
 
 	override def areConnectionCountsCompatible: Boolean = true
+
+	def asParameter: Map[String, String] =
+		Map[String,String](unconnected.second.split('.').last -> constant)
 }
 

@@ -37,11 +37,11 @@ object Top {
 		var comma = ""
 		for (c <- game.constraintConnecteds) {
 			val (dir, inst) = c.first match {
-				case instance: ConstraintInstance => ("input    ", instance)
+				case instance: ConstraintInstance => ("input wire   ", instance)
 				case _                            =>
 					c.second match {
-						case instance: ConstraintInstance => ("output   ", instance)
-						case _                            => ("inout    ",
+						case instance: ConstraintInstance => ("output wire  ", instance)
+						case _                            => ("inout  wire  ",
 							c.first.asInstanceOf[ConstraintInstance])
 					}
 			} // TODO
@@ -62,18 +62,19 @@ object Top {
 		}
 
 		sb ++= s"""\n);"""
-
-		/*
+/*
 		for (c <- game.connections) {
 			sb ++=
 			s"""
 				 |  wire ${sanatizeIdent(c.ident)};""".stripMargin
-		}*/
+		}
+		*/
+
 		for (g <- setOfGateware) {
 			comma = ""
 			sb ++=
 			s"""
-				 |  ${g.ident} ${g.ident}0(
+				 |  ${g.definition.moduleName} ${g.ident}0(
 				 |""".stripMargin
 
 			for (port <- g.definition.ports) {

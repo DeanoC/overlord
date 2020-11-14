@@ -161,22 +161,6 @@ private class GameBuilder(gameName: String,
 	unexpanded ++= board.instances
 	includeOver(gameText, catalogs)
 
-	// TODO scala generic code for these
-	private def tableIntGetOrElse(table: Map[String, toml.Value],
-	                              key: String,
-	                              default: Int) =
-		if (table.contains(key)) table(key)
-			.asInstanceOf[toml.Value.Num]
-			.value
-			.toInt else default
-
-	private def tableStringGetOrElse(table: Map[String, toml.Value],
-	                                 key: String,
-	                                 default: String) =
-		if (table.contains(key)) table(key)
-			.asInstanceOf[toml.Value.Str]
-			.value else default
-
 	def includeOver(data: String, catalogs: DefinitionCatalogs): Unit = {
 		val parsed = {
 			val parsed = toml.Toml.parse(data)

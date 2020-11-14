@@ -1,13 +1,15 @@
 package output
 
-import java.io.{BufferedWriter, FileWriter}
 import java.nio.file.Path
 
-import overlord.{AlteraBoard, Game, LatticeBoard, XilinxBoard}
+import overlord._
 
 object Edalize {
 	def apply(game: Game, out: Path): Unit = {
 		println(s"Creating Edalize script at ${out.toRealPath()}")
+		Utils.ensureDirectories(out.toRealPath())
+
+		GameBuilder.pathStack.push(out.toRealPath())
 
 		val sb = new StringBuilder()
 
@@ -18,51 +20,52 @@ object Edalize {
 			 |name = '${game.name}'
 			 |""".stripMargin
 
+		for {gateware <- game.gatewares; action <- gateware.definition.actions} {
+			val parameters = gateware.definition.parameters
+			val merged     = game.constants
+				.map(_.asParameter)
+				.fold(parameters)((o, n) => o ++ n)
+
+			action.execute(gateware, merged, GameBuilder.pathStack.top)
+		}
+
 		game.board.boardType match {
-			case XilinxBoard(_, _) =>
-				sb ++= "tool = 'vivado'\n"
+			case XilinxBoard(_, _) => sb ++= "tool = 'vivado'\n"
 			case AlteraBoard()     =>
 			case LatticeBoard()    =>
 		}
 
 		sb ++= "files = [\n"
 		for (gateware <- game.gatewares) {
-			gateware.definition.sources.foreach(
-				f => {
-					val filename = s"${gateware.ident}/${f.filename}"
-					sb ++=
-					s"""  {
-						 |    'name': os.path.relpath('$filename', work_root),
-						 |    'file_type': '${f.language}Source'
-						 |  },
-						 |""".stripMargin
-
-					ensureDirectories(out.resolve(filename).getParent)
-					if (f.data.nonEmpty) writeFile(out.resolve(filename), f.data)
+			gateware.definition.actions.foreach(
+				_ match {
+					case action: GatewareCopyAction =>
+						sb ++=
+						// @formatter:off
+s"""    {'name': os.path.relpath('${action.getDestPath}', work_root), 'file_type': '${action.language}Source'},\n"""
+						// @formatter:on
+					case GatewareGitCloneAction(git, _) =>
+					case _                              =>
 				})
 		}
+
 		sb ++=
-		s""" {
-			 |     'name': os.path.relpath('${game.name}_top.v', work_root),
-			 |     'file_type': 'verilogSource'
-			 | },
-			 |""".stripMargin
+		// @formatter:off
+s"""    {'name': os.path.relpath('${game.name}_top.v', work_root), 'file_type': 'verilogSource'},\n"""
 		sb ++=
-		s""" {
-			|     'name': os.path.relpath('${game.name}.xdc', work_root),
-			|     'file_type': 'xdc'
-			| }
-			|""".stripMargin
+s"""    {'name': os.path.relpath('${game.name}.xdc', work_root), 'file_type': 'xdc'}\n"""
+		// @formatter:on
+
 		sb ++= "]\n"
 
 		sb ++= "parameters = {\n"
 		for (gateware <- game.gatewares)
 			gateware.definition.parameters.foreach(
+				// @formatter:off
 				p => sb ++=
-				     s""" '${p}':
-					      |   {'datatype': 'int', 'default': 1000,
-								|   'paramtype': 'vlogparam'},
-					      |""".stripMargin)
+s"""    '${p._1}': {'datatype': 'string', 'default': "${p._2}", 'paramtype': 'vlogparam'},\n"""
+				// @formatter:on
+				)
 		sb ++= "}\n"
 		game.board.boardType match {
 			case XilinxBoard(_, device) =>
@@ -94,21 +97,7 @@ object Edalize {
 		    |
 		    |""".stripMargin
 
-		writeFile(out.resolve("edalize_build.py"), sb.result)
-	}
-
-	private def ensureDirectories(path: Path): Unit = {
-		val directory = path.toFile
-		if (!directory.exists()) {
-			directory.mkdirs()
-		}
-	}
-
-	private def writeFile(path: Path, s: String): Unit = {
-		val file = path.toFile
-		val bw   = new BufferedWriter(new FileWriter(file))
-		bw.write(s)
-		bw.close()
+		Utils.writeFile(out.resolve("edalize_build.py"), sb.result)
 	}
 
 }

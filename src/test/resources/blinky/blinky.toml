@@ -1,5 +1,10 @@
-provision = "copy"
-sources = [{src = "blinky.v", language="verilog"}]
-
+actions = ["copy_src"]
 ports = [ "q", "clk" ]
-parameters = [ "clk_freq_hz" ]
+parameters = [ { key = "clk_freq_hz", value = "100_000_000" }]
+
+[[process]]
+	name = 'copy_src'
+	processor = 'copy'
+	sources = [{ file ="${src}/blinky.v", language="verilog"}]
+
+

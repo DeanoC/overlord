@@ -28,8 +28,12 @@ case class Game(name: String,
 			.map(_.asInstanceOf[GatewareInstance])
 
 	def constraints: Seq[ConstraintInstance] =
-		instances.filter((_.isInstanceOf[ConstraintInstance]))
+		instances.filter(_.isInstanceOf[ConstraintInstance])
 			.map(_.asInstanceOf[ConstraintInstance])
+
+	def constants: Seq[ConnectedConstant[_]] =
+		connections.filter(_.isInstanceOf[ConnectedConstant[_]])
+			.map(_.asInstanceOf[ConnectedConstant[_]])
 
 	def constraintConnecteds: Seq[Connected] = {
 		val cb = connections.filter(f => f.isInstanceOf[ConnectedBetween[_, _]])
