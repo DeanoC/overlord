@@ -2,6 +2,12 @@ type = "Xilinx"
 family = "UltraScale+"
 device = "xczu3eg-sfvc784-1-e"
 
+[constraint_default]
+pullup = false
+slew = "Slow"
+drive = 8
+standard = "LVCMOS33"
+
 [[instance]]
   type = "soc.zynqps8"
 

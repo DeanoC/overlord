@@ -1,5 +1,7 @@
 package overlord
 
+import overlord.Definitions.{Definition, PortDefinitionType}
+import overlord.Instances.ConstraintInstance
 import toml._
 
 import scala.collection.immutable.Map
@@ -13,37 +15,11 @@ case class DiffPinConstraint(pins: Seq[(String, String)]) extends ConstraintType
 
 case class ClockPinConstraint() extends ConstraintType
 
-case class Constraint(ident: String,
-                      constraintType: ConstraintType,
-                      definition: Def,
-                      attributes: Map[String, Value]
-                     ) extends Instance[Constraint] {
-	def copyMutate(nid: String, nattribs: Map[String, Value]): Constraint =
-		copy(ident = nid, attributes = nattribs)
-}
-
-case class ConstraintInstance(ident: String,
-                              definition: Def,
-                              constraint: Constraint,
-                              attributes: Map[String, Value] =
-                              Map[String, Value](),
-                             ) extends Instance[ConstraintInstance] {
-	def copyMutate(nid: String,
-	               nattribs: Map[String, Value]): ConstraintInstance =
-		copy(ident = nid, attributes = nattribs)
-
-	override def matchIdent(a: String): Boolean = {
-		if (a == ident) true else {
-			val s = a.split('.')
-			(s.length >= 2 && (s(0) == ident && s(1) == constraint.ident))
-		}
-	}
-}
 
 object Constraint {
 	def parse(table: Map[String, toml.Value],
 	          defaults: Map[String, toml.Value]
-	         ): mutable.HashMap[String, Constraint] = {
+	         ): mutable.HashMap[String, ConstraintInstance] = {
 		// are we a pin constraint?
 		val hasPin      = table.contains("pin")
 		val hasPins     = table.contains("pins")
@@ -55,13 +31,15 @@ object Constraint {
 			parsePinConstraints(table, defaults)
 		else {
 			println(s"$table constraint isn't supported")
-			mutable.HashMap[String, Constraint]()
+			mutable.HashMap[String, ConstraintInstance]()
 		}
 	}
 
 	private def parsePinConstraints(table: Map[String, Value],
 	                                defaults: Map[String, Value]
-	                               ): mutable.HashMap[String, Constraint] = {
+	                               ): mutable.HashMap[String,
+		ConstraintInstance] = {
+
 		val hasPin        = table.contains("pin")
 		val hasPins       = table.contains("pins")
 		val hasDiffPin    = table.contains("pin_p") && table.contains("pin_n")
@@ -70,10 +48,10 @@ object Constraint {
 		val hasDirections = table.contains("directions")
 		val hasPullups    = table.contains("pullups")
 
-		var boardConstraints = mutable.HashMap[String, Constraint]()
+		var boardConstraints = mutable.HashMap[String, ConstraintInstance]()
 
 		val prefix =
-			if (hasPrefix) table("prefix").asInstanceOf[Value.Str].value + "."
+			if (hasPrefix) Utils.toString(table("prefix")) + "."
 			else ""
 
 		val notSetDefaults = defaults.filterNot(d => table.contains(d._1)).toMap
@@ -89,103 +67,76 @@ object Constraint {
 			})
 
 		if (table.contains("name")) {
-			val name = prefix + table("name").asInstanceOf[Value.Str].value
+			val name = prefix + Utils.toString(table("name"))
 
-			if (hasPin) {
-				val pin = table("pin").asInstanceOf[Value.Str].value
-				boardConstraints += (name ->
-				                     Constraint(name,
-				                                PinConstraint(Seq(pin)),
-				                                Def(name, None, attribs),
-				                                attribs
-				                                ))
-			} else if (hasPins) {
-				val pins = table("pins").asInstanceOf[toml.Value.Arr].values
-					.map(_.asInstanceOf[Value.Str].value)
-				val mk   = (name -> Constraint(name,
-				                               PinConstraint(pins),
-				                               Def(name, None, attribs),
-				                               attribs
-				                               ))
-				boardConstraints += mk
-			} else if (hasDiffPin) {
-				val pins = (
-					table("pin_p").asInstanceOf[Value.Str].value,
-					table("pin_n").asInstanceOf[Value.Str].value
-				)
-				boardConstraints += (name -> Constraint(name,
-				                                        DiffPinConstraint(Seq(pins)),
-				                                        Def(name, None, attribs),
-				                                        attribs
-				                                        ))
-			} else if (hasDiffPins) {
-				val pin_ps = table("pin_ps").asInstanceOf[Value.Arr].values
-					.map(_.asInstanceOf[Value.Str].value)
-				val pin_ns = table("pin_ns").asInstanceOf[toml.Value.Arr].values
-					.map(_.asInstanceOf[Value.Str].value)
+			val defi  = Definition(PortDefinitionType(name.split('.'), Seq()), attribs)
 
+			val cType = if (hasPin)
+				PinConstraint(Seq(Utils.toString(table("pin"))))
+			else if (hasPins)
+				PinConstraint(Utils.toArray(table("pins")).map(Utils.toString))
+			else if (hasDiffPin)
+				DiffPinConstraint(Seq((Utils.toString(table("pin_p")),
+					                      Utils.toString(table("pin_n")))))
+			else if (hasDiffPins) {
+				val pin_ps = Utils.toArray(table("pin_ps")).map(Utils.toString)
+				val pin_ns = Utils.toArray(table("pin_ns")).map(Utils.toString)
 				if (pin_ps.length != pin_ns.length) {
-					println(
-						s"${name} must have equal number of " +
-						s"pin_ps(${pin_ps.length}) and pin_ns(${pin_ns.length})"
-						)
+					println(s"${name} must have equal number of " +
+					        s"pin_ps(${pin_ps.length}) and pin_ns(${pin_ns.length})")
 					return boardConstraints
 				}
-				val mk = (name -> Constraint(name,
-				                             DiffPinConstraint(pin_ps.zip(pin_ns)),
-				                             Def(name, None, attribs),
-				                             attribs
-				                             ))
-				boardConstraints += mk
+				DiffPinConstraint(pin_ps.zip(pin_ns))
+			} else {
+				println(s"$name is a pin constraint without pins?")
+				return boardConstraints
 			}
 
+			boardConstraints +=
+			(name -> ConstraintInstance(name, defi, cType, attribs))
+
 		} else if (table.contains("names")) {
-			val names = table("names").asInstanceOf[Value.Arr].values
-				.map(prefix + _.asInstanceOf[Value.Str].value)
+
+			val names = Utils.toArray(table("names")).map(prefix + Utils.toString(_))
 
 			if (!(hasPins || hasDiffPins)) {
-				println(s"${names} contraint must have " +
-				        s"'pins' or 'pin_ps' and 'pin_ns' field"
-				        )
+				println(s"${names} constraint must have " +
+				        s"'pins' or 'pin_ps' and 'pin_ns' field")
 				return boardConstraints
 			}
 
 			if (hasPins) {
-				val pins = table("pins").asInstanceOf[Value.Arr].values
-					.map(_.asInstanceOf[Value.Str].value)
+				val pins = Utils.toArray(table("pins")).map(Utils.toString)
+
 				if (names.length != pins.length) {
-					println(
-						s"${names} must have equal number of " +
-						s"names(${names.length}) and pins(${pins.length})"
-						)
+					println(s"${names} must have equal number of " +
+					        s"names(${names.length}) and pins(${pins.length})")
 					return boardConstraints
 				}
 
 				val perNameAttribs = mutable.ArrayBuffer[(String, Value)]()
 
 				if (table.contains("directions"))
-					perNameAttribs ++= table("directions").asInstanceOf[Value.Arr].values
+					perNameAttribs ++= Utils.toArray(table("directions"))
 						.map(v => ("direction", v.asInstanceOf[Value.Str]))
 
 				if (table.contains("pullups"))
-					perNameAttribs ++= table("pullups").asInstanceOf[Value.Arr].values
+					perNameAttribs ++= Utils.toArray(table("pullups"))
 						.map(v => ("pull", v.asInstanceOf[Value.Bool]))
 
 				for ((nm, (p, (anm, v))) <- names.zip(pins.zip(perNameAttribs))) {
-					val mk = (nm -> Constraint(nm,
-					                           PinConstraint(Seq(p)),
-					                           Def(nm, None, attribs),
-					                           (attribs ++ Map(anm -> v))
-					                           ))
-					boardConstraints += mk
-
+					boardConstraints +=
+					(nm -> ConstraintInstance(nm,
+					                          Definition(
+						                          PortDefinitionType(nm.split('.'), Seq()),
+						                          attribs),
+					                          PinConstraint(Seq(p)),
+					                          (attribs ++ Map(anm -> v))))
 				}
-
 			} else if (hasDiffPins) {
-				val pin_ps = table("pin_ps").asInstanceOf[Value.Arr].values
-					.map(_.asInstanceOf[Value.Str].value)
-				val pin_ns = table("pin_ns").asInstanceOf[Value.Arr].values
-					.map(_.asInstanceOf[Value.Str].value)
+				val pin_ps = Utils.toArray(table("pin_ps")).map(Utils.toString)
+				val pin_ns = Utils.toArray(table("pin_ns")).map(Utils.toString)
+
 				if (names.length != pin_ps.length || pin_ps.length != pin_ns.length) {
 					println(
 						s"""|${names} must have equal number of
@@ -196,12 +147,14 @@ object Constraint {
 				}
 
 				for ((nm, d) <- names.zip(pin_ps.zip(pin_ns))) {
-					val mk = (nm -> Constraint(nm,
-					                           DiffPinConstraint(Seq(d)),
-					                           Def(nm, None, attribs),
-					                           attribs
-					                           ))
-					boardConstraints += mk
+					boardConstraints +=
+					(nm -> ConstraintInstance(nm,
+					                          Definition(
+						                          PortDefinitionType(nm.split('.'), Seq()),
+						                          attribs),
+					                          DiffPinConstraint(Seq(d)),
+					                          attribs))
+
 				}
 			}
 		}

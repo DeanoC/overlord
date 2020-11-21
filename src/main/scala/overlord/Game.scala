@@ -1,9 +1,12 @@
 package overlord
 
+import overlord.Connections.{Connected, ConnectedBetween, ConnectedConstant, Connection}
+import overlord.Definitions.GatewareTrait
+import overlord.Instances._
 
 case class Game(name: String,
                 connections: List[Connection],
-                instances: List[Instance[_]],
+                instances: List[Instance],
                 board: Board) {
 
 	def cpus: Seq[CpuInstance] =
@@ -21,38 +24,38 @@ case class Game(name: String,
 		instances.filter(_.isInstanceOf[NetInstance])
 			.map(_.asInstanceOf[NetInstance])
 
-	def peripherals: Seq[Instance[_]] = storages ++ nets
+	def peripherals: Seq[Instance] = storages ++ nets
 
-	def gatewares: Seq[GatewareInstance] =
-		instances.filter(_.isInstanceOf[GatewareInstance])
-			.map(_.asInstanceOf[GatewareInstance])
+	def gatewares: Seq[(Instance,GatewareTrait)] =
+		instances.filter(_.definition.gateware.nonEmpty)
+			.map( g =>(g, g.definition.gateware.get))
 
 	def constraints: Seq[ConstraintInstance] =
 		instances.filter(_.isInstanceOf[ConstraintInstance])
 			.map(_.asInstanceOf[ConstraintInstance])
 
-	def constants: Seq[ConnectedConstant[_]] =
-		connections.filter(_.isInstanceOf[ConnectedConstant[_]])
-			.map(_.asInstanceOf[ConnectedConstant[_]])
+	def constants: Seq[ConnectedConstant] =
+		connections.filter(_.isInstanceOf[ConnectedConstant])
+			.map(_.asInstanceOf[ConnectedConstant])
 
-	def constraintConnecteds: Seq[Connected] = {
-		val cb = connections.filter(f => f.isInstanceOf[ConnectedBetween[_, _]])
-			.map(_.asInstanceOf[ConnectedBetween[_, _]])
-		val cc = connections.filter(f => f.isInstanceOf[ConnectedConstant[_]])
-			.map(_.asInstanceOf[ConnectedConstant[_]])
+	def constraintConnecteds: Set[Connected] = {
+		val cb = connections.filter(f => f.isInstanceOf[ConnectedBetween])
+			.map(_.asInstanceOf[ConnectedBetween])
+		val cc = connections.filter(f => f.isInstanceOf[ConnectedConstant])
+			.map(_.asInstanceOf[ConnectedConstant])
 
 		val cbm = cb.filter(_.main.isInstanceOf[ConstraintInstance])
-		val cbs = cb.filter(_.second.isInstanceOf[ConstraintInstance])
+		val cbs = cb.filter(_.secondary.isInstanceOf[ConstraintInstance])
 		val cct = cc.filter(_.to.isInstanceOf[ConstraintInstance])
 
-		cbm ++ cbs ++ cct
+		(cbm ++ cbs ++ cct).toSet
 	}
 
 	def connectedConstraints: Seq[ConstraintInstance] = {
-		val cb = connections.filter(f => f.isInstanceOf[ConnectedBetween[_, _]])
-			.map(_.asInstanceOf[ConnectedBetween[_, _]])
-		val cc = connections.filter(f => f.isInstanceOf[ConnectedConstant[_]])
-			.map(_.asInstanceOf[ConnectedConstant[_]])
+		val cb = connections.filter(f => f.isInstanceOf[ConnectedBetween])
+			.map(_.asInstanceOf[ConnectedBetween])
+		val cc = connections.filter(f => f.isInstanceOf[ConnectedConstant])
+			.map(_.asInstanceOf[ConnectedConstant])
 
 		val cbm = cb.filter(_.main.isInstanceOf[ConstraintInstance])
 			.map(_.main.asInstanceOf[ConstraintInstance])
@@ -67,7 +70,7 @@ case class Game(name: String,
 object Game {
 	def newGame(gameName: String,
 	            gameText: String,
-	            catalogs: DefinitionCatalogs,
+	            catalogs: DefinitionCatalog,
 	            boards: BoardCatalog): Option[Game] = {
 
 		import toml.Value

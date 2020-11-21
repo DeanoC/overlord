@@ -10,7 +10,7 @@ ports = [
 ]
 
 parameters = [
-	{key="cpu", value="vexriscv"},
+	{key="cpu", value=""}, #vexriscv
 	{key="speedgrade", value="-1"},
 	{key="memtype", value="DDR3"},
 	{key="cmd_latency", value="0"},

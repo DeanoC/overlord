@@ -1,4 +1,5 @@
 resources = [
+  "Arty35T",
   "MyirFZ3",
   "PynqZ2",
 ]

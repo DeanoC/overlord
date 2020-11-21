@@ -2,12 +2,6 @@ type = "Xilinx"
 family = "Artix 7"
 device = "xc7z020clg400-1"
 
-[[instance]]
-  type = "soc.ZynqPs7"
-
-[[instance]]
-  type = "ram.DDR3.MT41K512M16HA"
-  size = "512 MiB"
 
 [constraint_default]
   pullup = false
@@ -15,9 +9,16 @@ device = "xc7z020clg400-1"
   drive = 8
   standard = "LVCMOS33"
 
+[[instance]]
+  type = "soc.zynqps7"
+
+[[instance]]
+  type = "ram.ddr.ddr3.MT41K512M16HA"
+  size = "512 MiB"
+
 [[constraint]]
   prefix =      "qspi0"
-  names =       ["ss_b", "io0", "io1", "io2", "io3", "sclk", "fbclk"]
+  names =       ["ss", "io0", "io1", "io2", "io3", "sclk", "fbclk"]
   pins =        ["A7",   "B8",  "D6",  "B7",  "A6",  "A5",   "D5"]
   directions =  ["Out",  "Bi",  "Bi",  "Bi",  "Bi",  "Out",  "Bi"]
   pullups =     [true,   false, false, false, false, false,  false]
@@ -91,11 +92,11 @@ device = "xc7z020clg400-1"
   direction =   "In"
 
 [[constraint]]
-  name =        "board.rgb_led0"
+  name =        "board.leds.rgb0"
   pins =        ["N15", "G17", "L15"]
   direction =   "Out"
 [[constraint]]
-  name =        "board.rgb_led1"
+  name =        "board.leds.rgb1"
   pins =        ["M15", "L14", "G14"]
   direction =   "Out"
 

@@ -2,94 +2,95 @@ registerPath = "ZynqPs8"
 container = "soc.zynqps8"
 
 [[definition]]
-  type = "soc.zynqps8"
+	type = "soc.zynqps8"
 
 [[definition]]
-  type = "cpu.a53"
-  arch = "arm8-a"
-  width = 64
-  software = [
-	  { registers = "a53_cti" },
-	  { registers = "a53_dbg" },
-	  { registers = "a53_etm" },
-	  { registers = "a53_pmu" },
-	  { registers = "a53_rom" },
-  ]
+	type = "cpu.a53"
+	arch = "arm8-a"
+	width = 64
+	software = [
+		{ registers = "a53_cti" },
+		{ registers = "a53_dbg" },
+		{ registers = "a53_etm" },
+		{ registers = "a53_pmu" },
+		{ registers = "a53_rom" },
+	]
 	hardware = {provisionLimit = 4}
 
 [[definition]]
-  type = "cpu.r5f"
-  arch = "arm7-a"
-  width = 32
-  software = [
-    { registers = "r5_dbg" },
-    { registers = "r5_etm" },
-    { registers = "r5_rom" },
-  ]
+	type = "cpu.r5f"
+	arch = "arm7-a"
+	width = 32
+	software = [
+		{ registers = "r5_dbg" },
+		{ registers = "r5_etm" },
+		{ registers = "r5_rom" },
+	]
 	hardware = {provisionLimit = 2}
 
 [[definition]]
-  type = "cpu.pmu"
-  arch = "microblaze"
-  width = 32
-  software = [
-    { registers = "pmu_global" },
-    { registers = "pmu_iomodule" },
-    { registers = "pmu_local" },
-  ]
+	type = "cpu.pmu"
+	arch = "microblaze"
+	width = 32
+	software = [
+		{ registers = "pmu_global" },
+		{ registers = "pmu_iomodule" },
+		{ registers = "pmu_local" },
+	]
 
 [[definition]]
-  type = "ram.sram.tcm"
-  size = "128 KiB"
+	type = "ram.sram.tcm"
+	size = "128 KiB"
+	hardware = {provisionLimit = 2}
 
 [[definition]]
-  type = "ram.sram.pmuram"
-  size = "128 KiB"
+	type = "ram.sram.pmuram"
+	size = "128 KiB"
 
 [[definition]]
-  type = "ram.sram.ocp"
-  size = "256 KiB"
+	type = "ram.sram.ocp"
+	size = "256 KiB"
 
 [[definition]]
-  type = "NxMinterconnect.axi4"
+	type = "NxMinterconnect.axi4"
 
 [[definition]]
-  type = "NxMinterconnect.apb"
+	type = "NxMinterconnect.apb"
 
 [[definition]]
-  type = "connection.apb"
+	type = "connection.apb"
 
 [[definition]]
-  type = "connection.axi4"
+	type = "connection.axi4"
 
 [[definition]]
-  type = "connection.tcm"
+	type = "connection.tcm"
 
 [[definition]]
-  type = "connection.ocp"
+	type = "connection.ocp"
 
 [[definition]]
-  type = "connection.pmuram"
+	type = "connection.pmuram"
 
 [[definition]]
-  type = "connection.ddr4"
+	type = "connection.ddr4"
 
 [[definition]]
-  type = "bridge.i2c.axi4"
+	type = "bridge.i2c.axi4"
 
 [[definition]]
-  type = "bridge.apb.axi4"
+	type = "bridge.apb.axi4"
 
 [[definition]]
-  type = "net.ethernet.zynqps8"
-  software = [{registers = "gem", bankPrefix = "ENET"}]
+	type = "net.ethernet.zynqps8"
+	software = [{registers = "gem", bankPrefix = "ENET"}]
 	hardware = {provisionLimit = 4}
 
 [[definition]]
-  type = "storage.sdio.zynqps8"
-  software = [{registers = "sdio", bankPrefix = "SD"}]
+	type = "storage.sdio.zynqps8"
+	software = [{registers = "sdio", bankPrefix = "SD"}]
 	hardware = {provisionLimit = 2}
 
 [[definition]]
-  type = "storage.qspi.zynqps8"
+	type = "storage.qspi.zynqps8"
 	software = [{registers = "qspi", bankPrefix = "QSPI"}]

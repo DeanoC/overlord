@@ -1,7 +1,7 @@
 import java.nio.file.{Files, Path}
 
 import overlord.GameBuilder.{containerStack, pathStack}
-import overlord.{Board, BoardCatalog, DefinitionCatalog, DefinitionCatalogs, Resources, _}
+import overlord._
 
 import scala.annotation.tailrec
 import scala.collection.immutable.Map
@@ -9,11 +9,11 @@ import scala.collection.immutable.Map
 object Main {
 	private val usage =
 		"""|Usage: overlord [create|report|svd] --options path filename
-			 |     : create - generate a compile project with all sub parts at 'out'
-			 |     : report - prints some info about over structure
-			 |     : svd    - produce a CMSIS-SVD file on its own
-			 |     : --out  - path where generated files should be placed
-			 |     : --nostdresources - don't use any build in resource toml files
+		   |     : create - generate a compile project with all sub parts at 'out'
+		   |     : report - prints some info about over structure
+		   |     : svd    - produce a CMSIS-SVD file on its own
+		   |     : --out  - path where generated files should be placed
+		   |     : --nostdresources - don't use any build in resource toml files
 		   |     : --resources - TODO use specified path a root of resources tomls
 		   |		 : filename should be a .over file with a chip layout"""
 			.stripMargin
@@ -40,9 +40,9 @@ object Main {
 
 				case ("--out" | "-o") :: value :: tail =>
 					nextOption(map ++ Map(Symbol("out") -> value), tail)
-				case "--nostdresources" :: tail      =>
+				case "--nostdresources" :: tail        =>
 					nextOption(map ++ Map(Symbol("nostdresources") -> true), tail)
-				case "--resources" :: value :: tail  =>
+				case "--resources" :: value :: tail    =>
 					nextOption(map ++ Map(Symbol("resources") -> value), tail)
 
 				case string :: opt2 :: tail if isSwitch(opt2) =>
@@ -69,25 +69,25 @@ object Main {
 			sys.exit(1)
 		}
 
-		pathStack.push(Path.of(new java.io.File(".").getCanonicalPath))
-		val filePath = pathStack.top.resolve(filename)
-		pathStack.push(filePath.getParent.toAbsolutePath)
-		containerStack.push(None)
+		pathStack.push(
+			Path.of((new java.io.File(classOf[Board]
+				                          .getProtectionDomain
+				                          .getCodeSource
+				                          .getLocation.toURI)).getCanonicalPath)
+				.getParent.getParent.getParent)
 
-		val source       = scala.io.Source.fromFile(filePath.toFile)
-
-		val stdResources = Resources()
+		val stdResources = Resources(pathStack.top.resolve("src/main/resources/"))
 		val resources    =
 			if (!options.contains(Symbol("resources"))) None
 			else Some(overlord.Resources(Path.of(options(Symbol("resources"))
 				                                     .asInstanceOf[String])))
 
-		val chipCatalogs = new DefinitionCatalogs
+		val chipCatalogs = new DefinitionCatalog
 
 		if (!options.contains(Symbol("nostdresources")))
 			chipCatalogs.catalogs ++= stdResources.loadCatalogs()
 
-		if(resources.isDefined)
+		if (resources.isDefined)
 			chipCatalogs.catalogs ++= resources.get.loadCatalogs()
 
 		val boardCatalog =
@@ -105,6 +105,18 @@ object Main {
 				}.toMap
 			}
 
+		val filePath = Path.of(filename)
+		pathStack.push(filePath.getParent.toAbsolutePath)
+		containerStack.push(None)
+
+		val out = Path.of(
+			if (!options.contains(Symbol("out"))) "."
+			else options(Symbol("out")).asInstanceOf[String]
+			).toAbsolutePath
+		Utils.ensureDirectories(out)
+
+		val source = scala.io.Source.fromFile(filePath.toFile)
+
 		val gameText = source.getLines().mkString("\n")
 		val game     = Game.newGame(filename,
 		                            gameText,
@@ -115,9 +127,6 @@ object Main {
 				println(s"Error parsing ${filename}")
 				sys.exit()
 		}
-		val out      = Path.of(if (!options.contains(Symbol("out"))) "."
-		                       else options(Symbol("out")).asInstanceOf[String]
-		                       ).toAbsolutePath
 
 		if (options.contains(Symbol("create"))) output.Project(game, out)
 		else {

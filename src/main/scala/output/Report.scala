@@ -15,15 +15,13 @@ object Report {
 		println(f"${cpus.length} CPU cores of ${cpuTypes.size} types")
 		println(f"------------------")
 		for (cput <- cpuTypes) {
-			val chipType = cput.chipType.split('.')(1)
-			val arch     = cput.attributes("arch").asInstanceOf[Value.Str].value
-			val bw       = cput
-				.attributes("width")
-				.asInstanceOf[Value.Num]
-				.value
-				.toInt
+			val chipType = cput.defType.toString
+			val arch     = Utils.toString(cput.attributes("arch"))
+			val bw       = Utils.toInt(cput.attributes("width"))
+
 			println(s"${chipType} are ${bw} bit $arch CPUs")
-			cput.softwares.foreach(r => println(s"  ${r.description}"))
+			if(cput.software.nonEmpty)
+				cput.software.get.groups.foreach(r => println(s"  ${r.description}"))
 		}
 
 		for (cpu <- cpus) {

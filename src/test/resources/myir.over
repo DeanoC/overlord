@@ -1,29 +1,32 @@
+#23456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
+#00000000011111111112222222222333333333344444444445555555555666666666677777777778888888888
+
 # test of overlord toml file
 
 board = "Myir-FZ3"
 
 [[includes]]
-  resource = "FullZynqPs8"
+	resource = "FullZynqPs8"
 
 [[instance]]
-  name = "blinky"
-  type = "gateware.blinky"
+	name = "blinky"
+	type = "gateware.blinky"
 
 [[instance]]
-  name = "litedram"
-  type = "gateware.litedram"
+	name = "litedram"
+	type = "gateware.litedram"
 
 [[connection]]
-  type = "port"
-  connection = "blinky.q -> LED.SYS_STATUS"
+	type = "port"
+	connection = "blinky.q -> LED.SYS_STATUS"
 
 [[connection]]
-  type = "clock"
-  connection = "ref.clk.25MHz -> blinky.clk"
+	type = "clock"
+	connection = "ref.clk.25MHz -> blinky.clk"
 
 [[connection]]
-  type = "constant"
-  connection = "25_000_000 -> blinky.clk_freq_hz"
+	type = "constant"
+	connection = "25_000_000 -> blinky.clk_freq_hz"
 
 #[[connection]]
 #  type = "constant"

@@ -3,30 +3,42 @@ package output
 import java.io.{BufferedWriter, FileWriter}
 import java.nio.file.Path
 
-import output.Edalize.writeFile
-import overlord.{ClockPinConstraint, DiffPinConstraint, Game, PinConstraint}
+import overlord.{ClockPinConstraint, DiffPinConstraint, Game, PinConstraint,
+	Utils}
 
 object Xdc {
-	def apply(game: Game, out : Path): Unit = {
+	def apply(game: Game, out: Path): Unit = {
 		val sb = new StringBuilder
 
-		for(ci <- game.connectedConstraints) {
-			val con = ci.constraint
+		val conCon = game.connectedConstraints.toSet
+		for (con <- conCon) {
 			con.constraintType match {
 				case PinConstraint(pins)     =>
-					sb ++=
-					s"""set_property -dict {
-						 |    PACKAGE_PIN ${pins.head}
-						 |    IOSTANDARD ${con.attributes("standard").asInstanceOf[toml.Value.Str].value}
-						 |} [get_ports {${sanatizeIdent(con.ident)}}];
-						 |""".stripMargin
+					val standard = Utils.toString(con.attributes("standard"))
+					if (pins.length > 1) {
+						for ((p, i) <- pins.zipWithIndex)
+							sb ++=
+							s"""set_property -dict {
+								 |    PACKAGE_PIN ${p}
+								 |    IOSTANDARD ${standard}
+								 |} [get_ports {${sanatizeIdent(con.ident)}[$i]}];
+								 |""".stripMargin
+					} else {
+						sb ++=
+						s"""set_property -dict {
+							 |    PACKAGE_PIN ${pins.head}
+							 |    IOSTANDARD ${standard}
+							 |} [get_ports {${sanatizeIdent(con.ident)}}];
+							 |""".stripMargin
+
+					}
 				case DiffPinConstraint(pins) =>
 				case ClockPinConstraint()    =>
 			}
 
 		}
 
-		writeFile(out.resolve(s"${game.name}.xdc"), sb.result)
+		writeFile(out.resolve(s"${game.name}.xdc"), sb.result())
 	}
 
 	private def ensureDirectories(path: Path): Unit = {

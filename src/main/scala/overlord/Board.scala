@@ -2,6 +2,8 @@ package overlord
 
 import java.nio.file.{Files, Path}
 
+import overlord.Definitions.Definition
+import overlord.Instances.{ConstraintInstance, Instance}
 import toml._
 
 import scala.collection.{immutable, mutable}
@@ -33,13 +35,13 @@ case class LatticeBoard() extends BoardType {
 
 case class Board(boardType: BoardType,
                  name: String,
-                 instances: Seq[Instance[_]],
-                 constraints: Map[String, Constraint])
+                 instances: Seq[Instance],
+                 constraints: Map[String, ConstraintInstance])
 
 object Board {
 	def FromFile(spath: Path,
 	             name: String,
-	             catalogs: DefinitionCatalogs): Option[Board] = {
+	             catalogs: DefinitionCatalog): Option[Board] = {
 		println(s"Reading $name board")
 
 		GameBuilder.pathStack.push(spath)
@@ -61,26 +63,25 @@ object Board {
 
 	private def parse(name: String,
 	                  source: String,
-	                  catalogs: DefinitionCatalogs): Option[Board] = {
-		val parsed    = {
+	                  catalogs: DefinitionCatalog): Option[Board] = {
+		val parsed = {
 			val tparsed = toml.Toml.parse(source)
 			if (tparsed.isLeft) {
-				println(
-					s"$name board has failed to parse with error ${tparsed.left.get}"
-					);
+				println(s"$name board has failed to parse with error ${tparsed.left}");
 				return None
 			}
-			tparsed.right.get.values
+			tparsed.toOption.get.values
 		}
+
 		// what type of board?
-		val boardType = parsed("type").asInstanceOf[Value.Str].value match {
+		val boardType = Utils.toString(parsed("type")) match {
 			case "Xilinx"  =>
 				if (!parsed.contains("family") || !parsed.contains("device")) {
 					println(s"$name Xilinx board requires a family AND device field")
 					return None
 				}
-				XilinxBoard(parsed("family").asInstanceOf[Value.Str].value,
-				            parsed("device").asInstanceOf[Value.Str].value)
+				XilinxBoard(Utils.toString(parsed("family")),
+				            Utils.toString(parsed("device")))
 			case "Altera"  => AlteraBoard()
 			case "Lattice" => LatticeBoard()
 			case _         => println(s"$name board has a unknown type");
@@ -92,10 +93,9 @@ object Board {
 			mutable.HashMap[String, Value](boardType.defaultConstraints.toSeq: _*)
 
 		if (parsed.contains("constraints_default")) {
-			val defaultsTable =
-				parsed("constraints_default").asInstanceOf[Value.Tbl].values
+			val defaultsTable = Utils.toTable(parsed("constraints_default"))
 			for {
-				(defaultName, defaultValue) <- defaultConstraints
+				(defaultName, _) <- defaultConstraints
 				if (defaultsTable.contains(defaultName))
 			} defaultConstraints(defaultName) = defaultsTable(defaultName)
 		}
@@ -104,28 +104,23 @@ object Board {
 			return None
 		}
 
-		val boardConstraints: Map[String, Constraint] =
+		val boardConstraints: Map[String, ConstraintInstance] =
 			if (parsed.contains("constraint")) {
-				val tconstraints = parsed("constraint").asInstanceOf[Value.Arr].values
+				val tconstraints = Utils.toArray(parsed("constraint"))
 				(for (constraint <- tconstraints) yield {
-					val table = constraint.asInstanceOf[Value.Tbl].values
+					val table = Utils.toTable(constraint)
 					val t     = (table + ("type" -> Value.Str("port")))
 					Constraint.parse(t, defaultConstraints.toMap)
-				}).fold(Map[String, Constraint]())({ (m, c) => m ++ c }).toMap
-			} else Map[String, Constraint]()
+				}).flatten.toMap
+			} else Map[String, ConstraintInstance]()
 
 		// search catalogs for chips on the board
-		val boardInstances: Seq[Instance[_]] = boardConstraints.map(bc => {
-			val attribs = bc._2.attributes
-			ConstraintInstance(bc._1,
-			                   Def("port", None, attribs, Seq[Software]()),
-			                   bc._2,
-			                   attribs)
-		}).toSeq.++(if (parsed.contains("instance")) {
-			val instances = parsed("instance").asInstanceOf[Value.Arr].values
-			for (instance <- instances) yield
-				GameBuilder.parseInstance(instance, catalogs)
-		}.filter(_.nonEmpty).map(_.get) else Seq[Instance[_]]())
+		val boardInstances: Seq[Instance] =
+			boardConstraints.values.toSeq ++
+			(if (parsed.contains("instance")) {
+				val instances = parsed("instance").asInstanceOf[Value.Arr].values
+				for (instance <- instances) yield Instance(instance, catalogs)
+			}.flatten else Seq[Instance]())
 
 		Some(Board(boardType, name, boardInstances, boardConstraints))
 	}

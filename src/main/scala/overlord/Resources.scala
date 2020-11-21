@@ -1,12 +1,13 @@
 package overlord
 
 import java.nio.file.{Files, Path}
+import overlord.Definitions.{DefinitionTrait, DefinitionType}
 
 import scala.collection.mutable
 import scala.language.postfixOps
 
-case class Resources(path: Path = Path.of("src/main/resources/")) {
-	def loadCatalogs(): Map[String, Definition] = {
+case class Resources(path: Path) {
+	def loadCatalogs(): Map[DefinitionType, DefinitionTrait] = {
 		import toml.Value
 		val parsed =
 			loadToToml(path.resolve("catalogs.toml").toAbsolutePath).values
@@ -16,21 +17,16 @@ case class Resources(path: Path = Path.of("src/main/resources/")) {
 
 		val resources = parsed("resources").asInstanceOf[Value.Arr].values
 
-		val resourceMaps = mutable.HashMap[String, Definition]()
+		val resourceMaps = mutable.HashMap[DefinitionType, DefinitionTrait]()
 
-		for (resource <- resources) {
+		(for (resource <- resources) yield {
 			val name    = resource.asInstanceOf[toml.Value.Str].value
-			val catalog =
-				DefinitionCatalog.fromFile(
+			DefinitionCatalog.fromFile(
 					path.resolve("catalogs/"), s"$name")
-			if (catalog.nonEmpty)
-				resourceMaps ++= catalog.get.map(f=>(f.chipType -> f))
-		}
-
-		resourceMaps.toMap
+		}).flatten.flatten.map(f => (f.defType -> f)).toMap
 	}
 
-	def loadBoards(catalogs: DefinitionCatalogs): Map[String, Board] = {
+	def loadBoards(catalogs: DefinitionCatalog): Map[String, Board] = {
 
 		GameBuilder.pathStack.push(path)
 
@@ -54,7 +50,7 @@ case class Resources(path: Path = Path.of("src/main/resources/")) {
 			}
 			resourceMaps.toMap
 		}
-		GameBuilder.pathStack.pop
+		GameBuilder.pathStack.pop()
 		result
 	}
 
@@ -71,9 +67,9 @@ case class Resources(path: Path = Path.of("src/main/resources/")) {
 		val tparsed = toml.Toml.parse(source)
 		if (tparsed.isLeft) {
 			println(
-				s"${absolutePath} has failed to parse with error ${tparsed.left.get}"
+				s"${absolutePath} has failed to parse with error ${tparsed.left}"
 				);
 			toml.Value.Tbl(Map[String, toml.Value]())
-		} else tparsed.right.get
+		} else tparsed.toOption.get
 	}
 }

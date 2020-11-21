@@ -3,6 +3,8 @@ package output
 import java.io.{BufferedWriter, FileWriter}
 import java.nio.file.Path
 
+import overlord.Instances.{CpuInstance, Instance}
+import overlord.Software.Register
 import overlord._
 
 import scala.collection.mutable
@@ -61,50 +63,52 @@ object Svd {
 
 	private val definitionsWritten = mutable.HashMap[String, String]()
 
-	private def outputPeripheral(s: Instance[_]) : Seq[xml.Elem] =
-		for(regs <- s.definition.softwares) yield {
-			val bank = if(s.attributes.contains("bank")) {
-				regs.banks.find(_.name == s.attributes("bank")
-					                .asInstanceOf[toml.Value.Str].value) match {
-						case Some(value) => value
-						case None =>
-							println(s"Peripheral ${s.ident} bank name is not found in " +
-							        s"the definition")
-							return Array[xml.Elem]()
-					}
-				} else if(definitionsWritten.contains(s.definition.chipType)) {
-					println(s"Peripheral ${s.ident} contains no bank name but is " +
-					        s"used in a multiple instance definition")
-					return Array[xml.Elem]()
-				} else regs.banks.head
+	private def outputPeripheral(s: Instance) : Seq[xml.Elem] ={
+		if(s.definition.software.isEmpty) Seq[xml.Elem]()
+		else for(regs <- s.definition.software.get.groups) yield {
+				val bank = if(s.attributes.contains("bank")) {
+					regs.banks.find(_.name == s.attributes("bank")
+						                .asInstanceOf[toml.Value.Str].value) match {
+							case Some(value) => value
+							case None =>
+								println(s"Peripheral ${s.ident} bank name is not found in " +
+								        s"the definition")
+								return Array[xml.Elem]()
+						}
+					} else if(definitionsWritten.contains(s.definition.defType.toString)) {
+						println(s"Peripheral ${s.ident} contains no bank name but is " +
+						        s"used in a multiple instance definition")
+						return Array[xml.Elem]()
+					} else regs.banks.head
 
-			if(definitionsWritten.contains(s.definition.chipType)) {
-				// derivedFrom case
-				val derivedFromName = definitionsWritten(s.definition.chipType)
-				<peripheral derivedFrom={derivedFromName}>
-				<name>{bank.name}</name>
-				<version>1.0</version>
-				<description>{regs.description}</description>
-				<baseAddress>{f"${bank.address}"}</baseAddress>
-			</peripheral>
-		} else {
-			// new definition
-			definitionsWritten += (s.definition.chipType -> bank.name)
-			<peripheral>
-				<name>{bank.name}</name>
-				<version>1.0</version>
-				<description>{regs.description}</description>
-				<baseAddress>{f"${bank.address}"}</baseAddress>
-				<addressBlock>
-					<offset>0x0</offset>
-					<size>{regs.bankSize}</size>
-					<usage>registers</usage>
-					<protection>s</protection>
-				</addressBlock>
-				<registers>
-					{ for (r <- regs.registers) yield outputRegister(r) }
-				</registers>
-			</peripheral>
+				if(definitionsWritten.contains(s.definition.defType.toString)) {
+					// derivedFrom case
+					val derivedFromName = definitionsWritten(s.definition.defType.toString)
+					<peripheral derivedFrom={derivedFromName}>
+					<name>{bank.name}</name>
+					<version>1.0</version>
+					<description>{regs.description}</description>
+					<baseAddress>{f"${bank.address}"}</baseAddress>
+				</peripheral>
+			} else {
+				// new definition
+				definitionsWritten += (s.definition.defType.toString -> bank.name)
+				<peripheral>
+					<name>{bank.name}</name>
+					<version>1.0</version>
+					<description>{regs.description}</description>
+					<baseAddress>{f"${bank.address}"}</baseAddress>
+					<addressBlock>
+						<offset>0x0</offset>
+						<size>{regs.bankSize}</size>
+						<usage>registers</usage>
+						<protection>s</protection>
+					</addressBlock>
+					<registers>
+						{ for (r <- regs.registers) yield outputRegister(r) }
+					</registers>
+				</peripheral>
+			}
 		}
 	}
 

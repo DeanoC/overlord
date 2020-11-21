@@ -1,7 +1,7 @@
 package output
 
 import java.nio.file.Path
-
+import overlord.Gateware.GatewareAction.{CopyAction, GitCloneAction, SourcesAction}
 import overlord._
 
 object Edalize {
@@ -9,25 +9,13 @@ object Edalize {
 		println(s"Creating Edalize script at ${out.toRealPath()}")
 		Utils.ensureDirectories(out.toRealPath())
 
-		GameBuilder.pathStack.push(out.toRealPath())
-
 		val sb = new StringBuilder()
-
 		sb ++=
 		s"""from edalize import *
 			 |import os
 			 |work_root = 'build'
 			 |name = '${game.name}'
 			 |""".stripMargin
-
-		for {gateware <- game.gatewares; action <- gateware.definition.actions} {
-			val parameters = gateware.definition.parameters
-			val merged     = game.constants
-				.map(_.asParameter)
-				.fold(parameters)((o, n) => o ++ n)
-
-			action.execute(gateware, merged, GameBuilder.pathStack.top)
-		}
 
 		game.board.boardType match {
 			case XilinxBoard(_, _) => sb ++= "tool = 'vivado'\n"
@@ -36,15 +24,19 @@ object Edalize {
 		}
 
 		sb ++= "files = [\n"
-		for (gateware <- game.gatewares) {
-			gateware.definition.actions.foreach(
+		for ((gateware, defi) <- game.gatewares) {
+			defi.actions.foreach(
 				_ match {
-					case action: GatewareCopyAction =>
+					case action: CopyAction =>
 						sb ++=
 						// @formatter:off
 s"""    {'name': os.path.relpath('${action.getDestPath}', work_root), 'file_type': '${action.language}Source'},\n"""
 						// @formatter:on
-					case GatewareGitCloneAction(git, _) =>
+						case action:SourcesAction =>
+							sb ++=
+						// @formatter:off
+s"""    {'name': os.path.relpath('${action.srcPath}', work_root), 'file_type': '${action.language}Source'},\n"""
+						// @formatter:on
 					case _                              =>
 				})
 		}
@@ -59,8 +51,8 @@ s"""    {'name': os.path.relpath('${game.name}.xdc', work_root), 'file_type': 'x
 		sb ++= "]\n"
 
 		sb ++= "parameters = {\n"
-		for (gateware <- game.gatewares)
-			gateware.definition.parameters.foreach(
+		for ((gateware, defi) <- game.gatewares)
+			defi.parameters.foreach(
 				// @formatter:off
 				p => sb ++=
 s"""    '${p._1}': {'datatype': 'string', 'default': "${p._2}", 'paramtype': 'vlogparam'},\n"""
@@ -97,7 +89,7 @@ s"""    '${p._1}': {'datatype': 'string', 'default': "${p._2}", 'paramtype': 'vl
 		    |
 		    |""".stripMargin
 
-		Utils.writeFile(out.resolve("edalize_build.py"), sb.result)
+		Utils.writeFile(out.resolve("edalize_build.py"), sb.result())
 	}
 
 }
