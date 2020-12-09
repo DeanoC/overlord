@@ -2,6 +2,7 @@ package output
 
 import java.nio.file.Path
 import overlord.Gateware.GatewareAction.{CopyAction, GitCloneAction, SourcesAction}
+import overlord.Instances.{AlteraBoard, LatticeBoard, XilinxBoard}
 import overlord._
 
 object Edalize {
@@ -17,7 +18,12 @@ object Edalize {
 			 |name = '${game.name}'
 			 |""".stripMargin
 
-		game.board.boardType match {
+		val board = if(game.board.nonEmpty) game.board.get else {
+			print(s"No board instance found, aborting Edalize process")
+			return
+		}
+
+		board.boardType match {
 			case XilinxBoard(_, _) => sb ++= "tool = 'vivado'\n"
 			case AlteraBoard()     =>
 			case LatticeBoard()    =>
@@ -50,6 +56,9 @@ s"""    {'name': os.path.relpath('${game.name}.xdc', work_root), 'file_type': 'x
 
 		sb ++= "]\n"
 
+		/* Currently parameters are handled by Overlord not Edalize
+		Its quite likely in future this will change so here is my original code
+
 		sb ++= "parameters = {\n"
 		for ((gateware, defi) <- game.gatewares)
 			defi.parameters.foreach(
@@ -59,18 +68,20 @@ s"""    '${p._1}': {'datatype': 'string', 'default': "${p._2}", 'paramtype': 'vl
 				// @formatter:on
 				)
 		sb ++= "}\n"
-		game.board.boardType match {
+*/
+
+		board.boardType match {
 			case XilinxBoard(_, device) =>
 				sb ++= s"tool_options = {'part': '$device'}\n"
 			case AlteraBoard()          =>
 			case LatticeBoard()         =>
 		}
 
+		//  'parameters': parameters,
 		sb ++=
 		s"""edam = {
 			 |  'files': files,
 			 |  'name': name,
-			 |  'parameters': parameters,
 			 |  'tool_options': {'vivado': tool_options},
 			 |  'toplevel': '${game.name}_top'
 			 |}

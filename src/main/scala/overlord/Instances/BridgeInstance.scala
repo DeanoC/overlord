@@ -5,7 +5,7 @@ import toml.Value
 
 case class BridgeInstance(ident: String,
                           definition: DefinitionTrait,
-                          attributes: Map[String, Value]
+                          attributes: Map[String, Value],
                          ) extends Instance {
 	def copyMutate[A <: Instance](nid: String,
 	                              nattribs: Map[String, Value]): BridgeInstance =

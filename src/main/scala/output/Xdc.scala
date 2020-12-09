@@ -2,61 +2,50 @@ package output
 
 import java.io.{BufferedWriter, FileWriter}
 import java.nio.file.Path
-
-import overlord.{ClockPinConstraint, DiffPinConstraint, Game, PinConstraint,
-	Utils}
+import overlord.{DiffPinConstraint, Game, PinConstraint, Utils}
 
 object Xdc {
 	def apply(game: Game, out: Path): Unit = {
 		val sb = new StringBuilder
 
-		val conCon = game.connectedConstraints.toSet
-		for (con <- conCon) {
-			con.constraintType match {
-				case PinConstraint(pins)     =>
-					val standard = Utils.toString(con.attributes("standard"))
-					if (pins.length > 1) {
-						for ((p, i) <- pins.zipWithIndex)
-							sb ++=
-							s"""set_property -dict {
-								 |    PACKAGE_PIN ${p}
-								 |    IOSTANDARD ${standard}
-								 |} [get_ports {${sanatizeIdent(con.ident)}[$i]}];
-								 |""".stripMargin
-					} else {
+		sb ++= "set_property CFGBVS VCCO [current_design]\n"
+		sb ++= "set_property CONFIG_VOLTAGE 3.3 [current_design]\n"
+
+		for (pinGrp <- game.pins) {
+			pinGrp.constraint match {
+				case PinConstraint(pins, ports, names, directions, pullups) =>
+					val standard = Utils.toString(pinGrp.attributes("standard"))
+					for (i <- pins.indices) {
 						sb ++=
 						s"""set_property -dict {
-							 |    PACKAGE_PIN ${pins.head}
-							 |    IOSTANDARD ${standard}
-							 |} [get_ports {${sanatizeIdent(con.ident)}}];
+							 |    PACKAGE_PIN ${pins(i)}
+							 |    IOSTANDARD $standard
+							 |    PIO_DIRECTION ${directions(i)}
+							 |    PULLUP ${pullups(i)}
+							 |} [get_ports {${sanatizeIdent(names(i))}}];
 							 |""".stripMargin
-
 					}
-				case DiffPinConstraint(pins) =>
-				case ClockPinConstraint()    =>
+
+				case DiffPinConstraint(pins, ports, names, directions, pullups) =>
 			}
+		}
+
+		for (clk <- game.clocks) {
+			val standard = Utils.toString(clk.attributes("standard"))
+			sb ++=
+			s"""set_property -dict {
+				 |    PACKAGE_PIN ${clk.pin}
+				 |    IOSTANDARD $standard
+				 |} [get_ports {${sanatizeIdent(clk.ident)}}];
+				 |""".stripMargin
 
 		}
 
-		writeFile(out.resolve(s"${game.name}.xdc"), sb.result())
-	}
-
-	private def ensureDirectories(path: Path): Unit = {
-		val directory = path.toFile
-		if (directory.isDirectory && !directory.exists()) {
-			directory.mkdirs()
-		}
+		Utils.writeFile(out.resolve(s"${game.name}.xdc"), sb.result())
 	}
 
 	private def sanatizeIdent(in: String): String = {
 		in
 			.replaceAll("""->|\.""", "_")
-	}
-
-	private def writeFile(path: Path, s: String): Unit = {
-		val file = path.toFile
-		val bw   = new BufferedWriter(new FileWriter(file))
-		bw.write(s)
-		bw.close()
 	}
 }

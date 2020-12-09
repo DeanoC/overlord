@@ -1,6 +1,7 @@
 package overlord.Definitions
 
-import overlord.Gateware.Gateware
+import overlord.Gateware.{Gateware, Parameter, Parameters, Port, Ports}
+
 import overlord.Software.Software
 import overlord.Utils
 import toml.Value
@@ -9,44 +10,42 @@ import java.nio.file.Path
 
 case class Definition(defType: DefinitionType,
                       attributes: Map[String, Value] = Map[String, Value](),
+                      ports: Map[String, Port] = Map[String, Port](),
+                      parameters: Map[String, Parameter] = Map[String, Parameter](),
                       software: Option[SoftwareTrait] = None,
                       gateware: Option[GatewareTrait] = None,
                       hardware: Option[HardwareTrait] = None)
 	extends DefinitionTrait
 
 object Definition {
-	def toDefinitionType(in: String,
-	                     ports: Seq[String]): DefinitionType = {
+	def toDefinitionType(in: String): DefinitionType = {
 		val defTypeName = in.split('.')
+		val tt          = defTypeName.tail
 
-		defTypeName.head match {
-			case "ram"             =>
-				RamDefinitionType(defTypeName.tail, ports)
-			case "cpu"             =>
-				CpuDefinitionType(defTypeName.tail, ports)
-			case "NxMinterconnect" =>
-				NxMDefinitionType(defTypeName.tail, ports)
-			case "storage"         =>
-				StorageDefinitionType(defTypeName.tail, ports)
-			case "soc"             =>
-				SocDefinitionType(defTypeName.tail, ports)
-			case "bridge"          =>
-				BridgeDefinitionType(defTypeName.tail, ports)
-			case "net"             =>
-				NetDefinitionType(defTypeName.tail, ports)
-			case _                 =>
-				OtherDefinitionType(defTypeName.tail, ports)
+		defTypeName.head.toLowerCase match {
+			case "ram"             => RamDefinitionType(tt)
+			case "cpu"             => CpuDefinitionType(tt)
+			case "nxminterconnect" => NxMDefinitionType(tt)
+			case "storage"         => StorageDefinitionType(tt)
+			case "soc"             => SocDefinitionType(tt)
+			case "bridge"          => BridgeDefinitionType(tt)
+			case "net"             => NetDefinitionType(tt)
+			case "board"           => BoardDefinitionType(tt)
+			case "pin"             => PinGroupDefinitionType(tt)
+			case "constant"        => ConstantDefinitionType(tt)
+			case "clock"           => ClockDefinitionType(tt)
+			case _                 => OtherDefinitionType(tt)
 		}
 	}
 
 	def apply(chip: Value, registerPath: Path): Definition = {
-
 		val table       = Utils.toTable(chip)
 		val defTypeName = Utils.toString(table("type"))
 
 		val attribs = table.filter(a => a._1 match {
-			case "type" | "software" | "gateware" | "hardware" => false
-			case _                                             => true
+			case "type" | "software" |
+			     "gateware" | "hardware" => false
+			case _                       => true
 		})
 
 		val sw = if (table.contains("software"))
@@ -63,15 +62,24 @@ object Definition {
 
 		val hw = None
 
-		val ports = if (gw.nonEmpty) gw.get.ports
-		else Seq[String]()
+		val ports = {
+			(if (table.contains("ports"))
+				Ports(Utils.toArray(table("ports")))
+					.map(t => (t.name -> t)).toMap
+			else Map[String, Port]())
+		}
 
-		val parameters = if (gw.nonEmpty) gw.get.parameters.map(_._1).toSeq
-		else Seq[String]()
+		val parameters = {
+			(if (table.contains("parameters"))
+				Parameters(Utils.toArray(table("parameters")))
+					.map(t => (t.key -> t)).toMap
+			else Map[String, Parameter]())
+		}
 
-		val defType = toDefinitionType(defTypeName, ports)
-
-		Definition(defType, attribs, sw, gw, hw)
-
+		Definition(toDefinitionType(defTypeName),
+		           attribs,
+		           ports,
+		           parameters,
+		           sw, gw, hw)
 	}
 }

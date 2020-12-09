@@ -1,110 +1,239 @@
 package overlord
 
-import overlord.Connections.{Connected, ConnectedBetween, ConnectedConstant, Connection}
+import overlord.Connections.{
+	Connected, ConnectedBetween, ConnectedConstant,
+	Connection
+}
 import overlord.Definitions.GatewareTrait
+import overlord.Gateware.GatewareAction.GatewareAction
 import overlord.Instances._
+import toml.Value
+
+import java.nio.file.{Files, Path}
+import scala.collection.mutable
+import scala.util.{Failure, Success, Try}
 
 case class Game(name: String,
-                connections: List[Connection],
-                instances: List[Instance],
-                board: Board) {
+                override val children: Seq[Instance],
+                connections: Seq[Connection],
+               ) extends Container {
 
-	def cpus: Seq[CpuInstance] =
-		instances.filter(_.isInstanceOf[CpuInstance])
+	override val physical: Boolean = false
+	val distanceMatrix: DistanceMatrix = DistanceMatrix(children)
+
+	override def copyMutateContainer(copy: MutContainer): Container =
+		Game(name, copy.children.toSeq, copy.connections.toSeq)
+
+
+	lazy val cpus: Seq[CpuInstance] = flatChildren
+		.filter(_.isInstanceOf[CpuInstance])
 			.map(_.asInstanceOf[CpuInstance])
 
-	def rams: Seq[RamInstance] = instances.filter(_.isInstanceOf[RamInstance])
-		.map(_.asInstanceOf[RamInstance])
+	lazy val rams: Seq[RamInstance] =
+		flatChildren.filter(_.isInstanceOf[RamInstance])
+			.map(_.asInstanceOf[RamInstance])
 
-	def storages: Seq[StorageInstance] =
-		instances.filter(_.isInstanceOf[StorageInstance])
+	lazy val storages: Seq[StorageInstance] =
+		flatChildren.filter(_.isInstanceOf[StorageInstance])
 			.map(_.asInstanceOf[StorageInstance])
 
-	def nets: Seq[NetInstance] =
-		instances.filter(_.isInstanceOf[NetInstance])
+	lazy val nets: Seq[NetInstance] =
+		flatChildren.filter(_.isInstanceOf[NetInstance])
 			.map(_.asInstanceOf[NetInstance])
 
-	def peripherals: Seq[Instance] = storages ++ nets
+	lazy val pins: Seq[PinGroupInstance] =
+		flatChildren.filter(_.isInstanceOf[PinGroupInstance])
+			.map(_.asInstanceOf[PinGroupInstance])
 
-	def gatewares: Seq[(Instance,GatewareTrait)] =
-		instances.filter(_.definition.gateware.nonEmpty)
-			.map( g =>(g, g.definition.gateware.get))
+	lazy val clocks: Seq[ClockInstance] =
+		flatChildren.filter(_.isInstanceOf[ClockInstance])
+			.map(_.asInstanceOf[ClockInstance])
 
-	def constraints: Seq[ConstraintInstance] =
-		instances.filter(_.isInstanceOf[ConstraintInstance])
-			.map(_.asInstanceOf[ConstraintInstance])
+	lazy val peripherals: Seq[Instance] = storages ++ nets
 
-	def constants: Seq[ConnectedConstant] =
+	lazy val gatewares: Seq[(Instance, GatewareTrait)] =
+		flatChildren.filter(_.definition.gateware.nonEmpty)
+			.map(g => (g, g.definition.gateware.get))
+
+	lazy val constants: Seq[ConnectedConstant] =
 		connections.filter(_.isInstanceOf[ConnectedConstant])
 			.map(_.asInstanceOf[ConnectedConstant])
 
-	def constraintConnecteds: Set[Connected] = {
-		val cb = connections.filter(f => f.isInstanceOf[ConnectedBetween])
-			.map(_.asInstanceOf[ConnectedBetween])
-		val cc = connections.filter(f => f.isInstanceOf[ConnectedConstant])
-			.map(_.asInstanceOf[ConnectedConstant])
+	lazy val board: Option[BoardInstance] =
+		children.find(_.isInstanceOf[BoardInstance])
+			.asInstanceOf[Option[BoardInstance]]
 
-		val cbm = cb.filter(_.main.isInstanceOf[ConstraintInstance])
-		val cbs = cb.filter(_.secondary.isInstanceOf[ConstraintInstance])
-		val cct = cc.filter(_.to.isInstanceOf[ConstraintInstance])
-
-		(cbm ++ cbs ++ cct).toSet
-	}
-
-	def connectedConstraints: Seq[ConstraintInstance] = {
-		val cb = connections.filter(f => f.isInstanceOf[ConnectedBetween])
-			.map(_.asInstanceOf[ConnectedBetween])
-		val cc = connections.filter(f => f.isInstanceOf[ConnectedConstant])
-			.map(_.asInstanceOf[ConnectedConstant])
-
-		val cbm = cb.filter(_.main.isInstanceOf[ConstraintInstance])
-			.map(_.main.asInstanceOf[ConstraintInstance])
-		val cbs = cb.filter(_.second.isInstanceOf[ConstraintInstance])
-			.map(_.second.asInstanceOf[ConstraintInstance])
-		val cct = cc.filter(_.to.isInstanceOf[ConstraintInstance])
-			.map(_.to.asInstanceOf[ConstraintInstance])
-		cbm ++ cbs ++ cct
-	}
 }
 
 object Game {
-	def newGame(gameName: String,
-	            gameText: String,
-	            catalogs: DefinitionCatalog,
-	            boards: BoardCatalog): Option[Game] = {
+	// these are mutable for easy backup and restore
+	var pathStack     : mutable.Stack[Path]         = mutable.Stack()
+	var containerStack: mutable.Stack[MutContainer] = mutable.Stack()
 
-		import toml.Value
+	def apply(gamePath: String,
+	          gameText: String,
+	          out: Path,
+	          catalogs: DefinitionCatalog): Option[Game] = {
+		val gameName = gamePath.split('/').last.split('.').head
+		val gb       = new GameBuilder(gameName, gameText, catalogs)
+		gb.toGame(out)
+	}
 
-		if (gameText.isEmpty) return None
+	private def readFile(name: String): Option[String] = {
+		println(s"Reading $name")
 
-		val parsed = {
-			val parsed = toml.Toml.parse(gameText)
-			parsed match {
-				case Right(value) => value.values
-				case Left(value)  => println(s"game.over has failed to parse with " +
-				                             s"error ${Left(parsed)}")
-					return None
+		val path = Game.pathStack.top.resolve(name)
+
+		if (!Files.exists(path.toAbsolutePath)) {
+			// try resource
+			Try(getClass.getResourceAsStream("/" + name)) match {
+				case Failure(exception) =>
+					println(s"$name catalog at ${name} $exception");
+					None
+				case Success(value)     =>
+					if (value == null) {
+						println(s"$name catalog at ${name} not found");
+						None
+					}
+					Some(scala.io.Source.fromInputStream(value).mkString)
+			}
+		} else {
+			val file   = path.toAbsolutePath.toFile
+			val source = scala.io.Source.fromFile(file)
+			Some(source.getLines().mkString("\n"))
+		}
+	}
+
+	private class GameBuilder(gameName: String,
+	                          gameText: String,
+	                          catalogs: DefinitionCatalog) {
+
+		private val defaults = mutable.Map[String, Value]()
+
+		containerStack.push(new MutContainer)
+
+		process(gameText, catalogs)
+
+		private def process(data: String, catalogs: DefinitionCatalog): Unit = {
+
+			val parsed = {
+				val parsed = toml.Toml.parse(data)
+				parsed match {
+					case Right(value) => value.values
+					case Left(_)      => println(s"game.over has failed to parse with " +
+					                             s"error ${Left(parsed)}")
+						return
+				}
+			}
+
+			if (parsed.contains("defaults"))
+				defaults ++= Utils.toTable(parsed("defaults"))
+
+			// includes
+			if (parsed.contains("include")) {
+				val tincs = Utils.toArray(parsed("include"))
+				for (include <- tincs) {
+					val table       = Utils.toTable(include)
+					val incResource = Utils.toString(table("resource"))
+
+					containerStack.push(new MutContainer)
+
+					Game.readFile(incResource) match {
+						case Some(d) => process(d, catalogs)
+						case _       =>
+							println(s"Include resource file ${incResource} not found")
+							containerStack.pop()
+							return
+					}
+				}
+			}
+
+			val container = containerStack.top
+
+			// extract instances
+			if (parsed.contains("instance")) {
+				val instances = Utils.toArray(parsed("instance"))
+				container.children ++= instances.flatMap(
+					Instance(_, defaults.toMap, catalogs))
+			}
+
+			// extract connections
+			if (parsed.contains("connection")) {
+				val connections = Utils.toArray(parsed("connection"))
+				container.connections ++=
+				connections.flatMap(Connection(_, catalogs))
+			}
+			// find instance to use as a container
+			container.children.find(
+				i => i.isInstanceOf[Container] &&
+				     i.asInstanceOf[Container].children.isEmpty) match {
+				case Some(v) =>
+					val c = v.asInstanceOf[Container]
+					container.children = container.children
+						.filterNot(_.isInstanceOf[Container])
+					val n = c.copyMutateContainer(container)
+					containerStack.pop()
+					val t = Game.containerStack.top
+					t.children ++= Seq(n.asInstanceOf[Instance])
+
+				case None =>
 			}
 		}
 
-		if (!parsed.contains("board")) {
-			println(s"game.over requires a board value")
-			return None
+		def toGame(out: Path,
+		           phase1: Boolean = true,
+		           phase2: Boolean = true): Option[Game] = {
+			val softPath = out.resolve("soft")
+			val gatePath = out.resolve("gate")
+			Utils.ensureDirectories(softPath)
+			Utils.ensureDirectories(gatePath)
+
+			val top = containerStack.top
+
+			if (phase1) {
+				println("Procesing gateware phase 1")
+				executePhase(top.children.toSeq, top.connections.toSeq, gatePath,
+					{
+						_.isPhase1
+					})
+			}
+
+			if (phase2) {
+				println("Procesing gateware phase 2")
+				executePhase(top.children.toSeq, top.connections.toSeq, gatePath,
+					{
+						_.isPhase2
+					})
+			}
+
+			val (expanded, expandedConnections) =
+				Connection.expandAndConnect(top.connections.toSeq, top.children.toSeq)
+
+			Some(Game(gameName, expanded, expandedConnections))
 		}
+	}
 
-		// fix name (remove '-')
-		val boardName = parsed("board").asInstanceOf[Value.Str]
-			.value.filterNot(c => c == '-')
+	private def executePhase(instances: Seq[Instance],
+	                         connections: Seq[Connection],
+	                         gatePath: Path,
+	                         phase: (GatewareAction) => Boolean): Unit = {
+		Game.pathStack.push(gatePath.toRealPath())
+		for {(gateware, defi) <-
+			     instances.filter(_.definition.gateware.nonEmpty)
+				     .map(g => (g, g.definition.gateware.get))} {
+			val backupStack = Game.pathStack.clone()
 
-		val board = (boards.FindBoard(boardName) match {
-			case Some(b) => b
-			case None    => println(s"$boardName board wasn't found in board " +
-			                        s"catalog")
-				return None
-		})
+			for {action <- defi.actions.filter(phase(_))} {
+				val parameters = defi.parameters
+				val merged     = connections.filter(
+					_.isInstanceOf[ConnectedConstant])
+					.map(_.asInstanceOf[ConnectedConstant])
+					.map(_.asParameter)
+					.fold(parameters)((o, n) => o ++ n)
 
-		val name = gameName.split('/').last.split('.').head
-
-		GameBuilder.gameFrom(name, gameText, catalogs, board)
+				action.execute(gateware, merged.toMap, Game.pathStack.top)
+			}
+			Game.pathStack = backupStack
+		}
 	}
 }

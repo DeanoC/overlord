@@ -1,23 +1,35 @@
 package overlord.Gateware.GatewareAction
 
-import java.nio.file.Path
+import overlord.Gateware.Parameter
 
+import java.nio.file.Path
 import overlord.Instances.Instance
 import overlord.Utils
 import toml.Value
 
 case class YamlAction(parameterKeys: Seq[String],
                       filename: String,
-                      pathOp: GatewarePathOp)
+                      pathOp: GatewareActionPathOp)
 	extends GatewareAction {
-	override def execute(gateware: Instance,
-	                     parameters: Map[String, String],
-	                     outPath: Path): Unit = {
+
+	override val phase: GatewareActionPhase = GatewareActionPhase1()
+
+	override def execute(gateware: Instance, parameters: Map[String, Parameter], outPath: Path): Unit = {
 		val sb = new StringBuilder()
-		for (k <- parameterKeys) {
-			if (parameters.contains(k))
-				sb ++= s"$k: ${parameters(k)}\n"
+		for {k <- parameterKeys
+		     if parameters.contains(k)} sb ++= {
+			parameters(k).value match {
+				case v: Value.Str  => s"$k: ${v.value}\n"
+				case v: Value.Bool => s"$k: ${v.value}\n"
+				case v: Value.Num  => s"$k: ${v.value}\n"
+				case v: Value.Real => s"$k: ${v.value}\n"
+
+				case _: Value.Arr  => assert(false); ""
+				case _: Value.Tbl  => assert(false); ""
+			}
 		}
+
+		Utils.ensureDirectories(outPath.resolve(filename).getParent)
 		Utils.writeFile(outPath.resolve(filename), sb.result())
 
 		updatePath(outPath)
@@ -27,7 +39,7 @@ case class YamlAction(parameterKeys: Seq[String],
 object YamlAction {
 	def apply(name: String,
 	          process: Map[String, Value],
-	          pathOp: GatewarePathOp): Seq[YamlAction] = {
+	          pathOp: GatewareActionPathOp): Seq[YamlAction] = {
 		if (!process.contains("parameters")) {
 			println(s"Yaml process $name doesn't have a parameters field")
 			None

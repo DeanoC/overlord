@@ -1,10 +1,17 @@
-actions = ["copy_src"]
+actions = [
+	"copy_src",
+	"read_verilog_top"
+]
+
 ports = [ "q", "clk" ]
 parameters = [ { key = "clk_freq_hz", value = "100_000_000" }]
 
 [[process]]
-	name = 'copy_src'
-	processor = 'copy'
-	sources = [{ file ="${src}/blinky.v", language="verilog"}]
+name = 'copy_src'
+processor = 'copy'
+sources = [{ file ="${src}/blinky.v", language="verilog"}]
 
-
+[[process]]
+name = 'read_verilog_top'
+processor = 'read_verilog_top'
+name = "blinky"

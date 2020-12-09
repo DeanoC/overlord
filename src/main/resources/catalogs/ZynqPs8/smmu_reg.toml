@@ -1,0 +1,270 @@
+description = "SMMU Configuration and Event Control"
+[[bank]]
+  name = "SMMU_REG"
+  address = "0xfd5f0000"
+[[register]]
+  name = "MISC_CTRL"
+  type = "rw"
+  width = 1
+  description = "Controls for the register block."
+  default = "0x00000000"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "SLVERR_ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''By default, invalid address requests are ignored.'''
+    longdesc = '''However, a maskable interrupt exsists. By enabling this slverr_enable invalid address requests cause a slverr to occur. Enable/Disable SLVERR during address decode failure. 0: SLVERR is disabled. For request address: Writes are ignored. Read returns 0. 1: SLVERR is enabled. For requestes address, SLVERR is asserted. Writes are ignored. Read returns 0.'''
+[[register]]
+  name = "ISR_0"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Status Register. This is a sticky register that holds the value of the interrupt until cleared by a value of 1."
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "31"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:5"
+    type = "ro"
+  [[register.field]]
+    name = "GBL_FLT_IRPT_NS"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "GBL_FLT_IRPT_S"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "COMB_PERF_IRPT_TBU"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "COMB_IRPT_S"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "COMB_IRPT_NS"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "IMR_0"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Mask Register. This is a read-only location and can be atomically altered by either the IDR or the IER."
+  default = "0x8000001F"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "31"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:5"
+    type = "ro"
+  [[register.field]]
+    name = "GBL_FLT_IRPT_NS"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "GBL_FLT_IRPT_S"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "COMB_PERF_IRPT_TBU"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "COMB_IRPT_S"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "COMB_IRPT_NS"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "IER_0"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Enable Register. A write of 1 to this location will unmask the interrupt"
+  default = "0x00000000"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "31"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:5"
+    type = "ro"
+  [[register.field]]
+    name = "GBL_FLT_IRPT_NS"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "GBL_FLT_IRPT_S"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "COMB_PERF_IRPT_TBU"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "COMB_IRPT_S"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "COMB_IRPT_NS"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "IDR_0"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Disable Register. A write of 1 to this location will mask the interrupt"
+  default = "0x00000000"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "31"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:5"
+    type = "ro"
+  [[register.field]]
+    name = "GBL_FLT_IRPT_NS"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "GBL_FLT_IRPT_S"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "COMB_PERF_IRPT_TBU"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "COMB_IRPT_S"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "COMB_IRPT_NS"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "QREQN"
+  type = "rw"
+  width = 32
+  description = "Low Power Signals for TBU"
+  default = "0x00007FFF"
+  offset = "0x00000040"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:15"
+    type = "rw"
+  [[register.field]]
+    name = "TBU_TBU5_5_CG"
+    bits = "14"
+    type = "rw"
+  [[register.field]]
+    name = "TBU_TBU5_5_PD"
+    bits = "13"
+    type = "rw"
+  [[register.field]]
+    name = "TBU_TBU4_4_CG"
+    bits = "12"
+    type = "rw"
+  [[register.field]]
+    name = "TBU_TBU4_4_PD"
+    bits = "11"
+    type = "rw"
+  [[register.field]]
+    name = "TBU_TBU3_3_CG"
+    bits = "10"
+    type = "rw"
+  [[register.field]]
+    name = "TBU_TBU3_3_PD"
+    bits = "9"
+    type = "rw"
+  [[register.field]]
+    name = "PD_MST_BR_TBU2_2"
+    bits = "8"
+    type = "rw"
+  [[register.field]]
+    name = "PD_SLV_BR_TBU2_2"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "TBU_TBU2_2_CG"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "TBU_TBU2_2_PD"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "TBU_TBU1_1_CG"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "TBU_TBU1_1_PD"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "TBU_TBU0_0_CG"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "TBU_TBU0_0_PD"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "TCU"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "MISC"
+  type = "mixed"
+  width = 32
+  description = "Miscellaneous signals"
+  default = "0x00000016"
+  offset = "0x00000054"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:13"
+    type = "rw"
+  [[register.field]]
+    name = "SPNIDEN"
+    bits = "12"
+    type = "rw"
+  [[register.field]]
+    name = "AWAKEUP_PROG"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "CONFIG_SIGNALS"
+  type = "rw"
+  width = 32
+  description = "Miscellaneous signals"
+  default = "0x00000000"
+  offset = "0x00000058"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:2"
+    type = "rw"
+  [[register.field]]
+    name = "CFG_NORMALIZE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "0"
+    type = "rw"

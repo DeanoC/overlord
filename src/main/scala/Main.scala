@@ -1,6 +1,6 @@
 import java.nio.file.{Files, Path}
-
-import overlord.GameBuilder.{containerStack, pathStack}
+import overlord.Game.{containerStack, pathStack}
+import overlord.Instances.BoardInstance
 import overlord._
 
 import scala.annotation.tailrec
@@ -69,14 +69,16 @@ object Main {
 			sys.exit(1)
 		}
 
-		pathStack.push(
-			Path.of((new java.io.File(classOf[Board]
+		Game.pathStack.push(
+			Path.of((new java.io.File(classOf[BoardInstance]
 				                          .getProtectionDomain
 				                          .getCodeSource
 				                          .getLocation.toURI)).getCanonicalPath)
 				.getParent.getParent.getParent)
 
-		val stdResources = Resources(pathStack.top.resolve("src/main/resources/"))
+		val stdResources = Resources(Game.pathStack
+			                             .top
+			                             .resolve("src/main/resources/"))
 		val resources    =
 			if (!options.contains(Symbol("resources"))) None
 			else Some(overlord.Resources(Path.of(options(Symbol("resources"))
@@ -90,24 +92,8 @@ object Main {
 		if (resources.isDefined)
 			chipCatalogs.catalogs ++= resources.get.loadCatalogs()
 
-		val boardCatalog =
-			BoardCatalog {
-				{
-					if (!options.contains(Symbol("nostdresources")))
-						stdResources.loadBoards(chipCatalogs)
-					else
-						Map[String, Board]()
-				}.++ {
-					resources match {
-						case Some(r) => r.loadBoards(chipCatalogs)
-						case None    => Map[String, Board]()
-					}
-				}.toMap
-			}
-
 		val filePath = Path.of(filename)
-		pathStack.push(filePath.getParent.toAbsolutePath)
-		containerStack.push(None)
+		Game.pathStack.push(filePath.getParent.toAbsolutePath)
 
 		val out = Path.of(
 			if (!options.contains(Symbol("out"))) "."
@@ -118,10 +104,10 @@ object Main {
 		val source = scala.io.Source.fromFile(filePath.toFile)
 
 		val gameText = source.getLines().mkString("\n")
-		val game     = Game.newGame(filename,
-		                            gameText,
-		                            chipCatalogs,
-		                            boardCatalog) match {
+		val game     = Game(filename,
+		                    gameText,
+		                    out,
+		                    chipCatalogs) match {
 			case Some(game) => game
 			case None       =>
 				println(s"Error parsing ${filename}")

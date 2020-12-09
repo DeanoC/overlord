@@ -1,0 +1,5 @@
+resources = [
+  "boards/Arty35T",
+  "boards/MyirFZ3",
+  "boards/PynqZ2",
+]

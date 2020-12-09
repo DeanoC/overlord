@@ -1,8 +1,8 @@
 package overlord.Connections
 
-import overlord.Definitions.{
-	ClockDefinitionType, ConstantDefinitionType,
-	Definition, DefinitionTrait, PortDefinitionType
+import overlord.Gateware.{
+	InOutWireDirection, InWireDirection,
+	OutWireDirection, WireDirection
 }
 import overlord.Instances.Instance
 import overlord.{Connections, DefinitionCatalog, Utils}
@@ -10,19 +10,47 @@ import toml.Value
 
 import scala.collection.mutable
 
+sealed trait ConnectionDirection {
+	override def toString: String =
+		this match {
+			case FirstToSecondConnection() => "first to second"
+			case SecondToFirstConnection() => "second to first"
+			case BiDirectionConnection()   => "bi direction"
+		}
+
+	def flip: ConnectionDirection = this match {
+		case FirstToSecondConnection() => SecondToFirstConnection()
+		case SecondToFirstConnection() => FirstToSecondConnection()
+		case BiDirectionConnection()   => this
+	}
+
+}
+
+case class FirstToSecondConnection() extends ConnectionDirection
+
+case class SecondToFirstConnection() extends ConnectionDirection
+
+case class BiDirectionConnection() extends ConnectionDirection
+
 sealed trait ConnectionType
 
 case class PortConnectionType() extends ConnectionType
 
 case class ClockConnectionType() extends ConnectionType
 
-case class ConstantConnectionType() extends ConnectionType
+case class ConstantConnectionType(constant: toml.Value) extends ConnectionType
 
-case class PortGroupConnectionType() extends ConnectionType
+case class PortGroupConnectionType(first_prefix: String,
+                                   second_prefix: String,
+                                   excludes: Seq[String],
+                                  )
+	extends ConnectionType
 
 trait Connection {
 
 	val connectionType: ConnectionType
+
+	def direction: ConnectionDirection
 
 	def isUnconnected: Boolean = this.isInstanceOf[UnconnectedTrait]
 
@@ -39,16 +67,22 @@ trait Connection {
 
 object Connection {
 
-	def toConnectionType(ctype: String): ConnectionType =
+	def toConnectionType(first: String,
+	                     ctype: String,
+	                     table: Map[String, toml.Value]): ConnectionType = {
 		ctype match {
 			case "port"       => PortConnectionType()
 			case "clock"      => ClockConnectionType()
-			case "constant"   => ConstantConnectionType()
-			case "port_group" => PortGroupConnectionType()
+			case "constant"   => ConstantConnectionType(Utils.stringToValue(first))
+			case "port_group" => PortGroupConnectionType(
+				Utils.lookupString(table, "first_prefix", ""),
+				Utils.lookupString(table, "second_prefix", ""),
+				Utils.lookupArray(table, "excludes").map(Utils.toString))
 			case _            =>
 				println(s"$ctype is an unknown connection type")
 				PortConnectionType()
 		}
+	}
 
 	def apply(connection: Value,
 	          catalogs: DefinitionCatalog): Option[Connection] = {
@@ -71,15 +105,16 @@ object Connection {
 			println(s"$conntype has an invalid connection field: $cons")
 			return None
 		}
-		val (first, secondary) = con(1) match {
-			case "->" | "<->" | "<>" => (con(0), con(2))
-			case "<-"                => (con(2), con(0))
-			case _                   =>
+		val (first, dir, secondary) = con(1) match {
+			case "->"         => (con(0), FirstToSecondConnection(), con(2))
+			case "<->" | "<>" => (con(0), BiDirectionConnection(), con(2))
+			case "<-"         => (con(0), SecondToFirstConnection(), con(2))
+			case _            =>
 				println(s"$conntype has an invalid connection ${con(1)} : $cons")
 				return None
 		}
 		Some(Connections.Unconnected(
-			toConnectionType(conntype), first, secondary))
+			toConnectionType(first, conntype, table), first, dir, secondary))
 	}
 
 	private def connect(unconnected: Seq[Connection],
@@ -118,7 +153,6 @@ object Connection {
 			i <- 0 until 2
 		} {
 			if (i == 1) done += con
-
 			// expansion of connections requires equal counts on both sides
 			// OR one side to be shared (NxMConnect are always shared)
 			// we also have to ensure we dont double count when replicated both
@@ -141,7 +175,7 @@ object Connection {
 				for (index <- 0 until count) yield {
 					val m: Instance = {
 						val mident = if (con.firstCount == 1) con.firstFullName
-						else s"${con.firstFullName}.${index}"
+						else s"${con.firstFullName}.$index"
 						(expanded.find(p => p.ident == s"$mident") match {
 							case Some(value) => value
 							case None        => println(s"$mident isn't a instance name")
@@ -160,14 +194,21 @@ object Connection {
 					}
 
 					result += (con match {
-						case ConnectedBetween(t, _, _, _, _, _) =>
-							Connections.ConnectedBetween(t,
-							                             WildCardConnectionPriority(),
-							                             m, s, m.ident, s.ident)
-						case ConnectedConstant(t, _, c, _, _)   =>
-							Connections.ConnectedConstant(t, WildCardConnectionPriority(),
-							                              c, s, s.ident)
-						case v                                  =>
+						case ConnectedBetween(t, _, om, d, os) =>
+							Connections.ConnectedBetween(
+								t,
+								WildCardConnectionPriority(),
+								InstanceLoc(m, om.port, m.ident),
+								d,
+								InstanceLoc(s, os.port, s.ident))
+						case ConnectedConstant(t, _, c, d, ot) =>
+							Connections.ConnectedConstant(
+								t,
+								WildCardConnectionPriority(),
+								c,
+								d,
+								InstanceLoc(s, ot.port, s.ident))
+						case v                                 =>
 							println(s"Expansion of unknown Connected Type?? $con")
 							v
 					})
@@ -209,24 +250,25 @@ object Connection {
 			expandedConnection.filter(c => o.firstFullName == c.firstFullName &&
 			                               o.secondFullName == c.secondFullName)
 
-		val dupToUse = (for (dups <- dupsseq) yield {
+		val dupToUse    = (for (dups <- dupsseq) yield {
 
 			val expli = dups.find(_.asConnected
-					              .connectionPriority
-					              .isInstanceOf[ExplicitConnectionPriority])
-			val wildc =dups.find(_.asConnected
-					              .connectionPriority
-					              .isInstanceOf[WildCardConnectionPriority])
-			val grpc = dups.find(_.asConnected
-					              .connectionPriority
-					              .isInstanceOf[GroupConnectionPriority])
-			if(expli.nonEmpty) expli.get
-			else if(wildc.nonEmpty) wildc.get
-			else if(grpc.nonEmpty) grpc.get
+				                      .connectionPriority
+				                      .isInstanceOf[ExplicitConnectionPriority])
+			val wildc = dups.find(_.asConnected
+				                      .connectionPriority
+				                      .isInstanceOf[WildCardConnectionPriority])
+			val grpc  = dups.find(_.asConnected
+				                      .connectionPriority
+				                      .isInstanceOf[GroupConnectionPriority])
+			if (expli.nonEmpty) expli.get
+			else if (wildc.nonEmpty) wildc.get
+			else if (grpc.nonEmpty) grpc.get
 			else dups.head
 		})
+		val connections = expandedConnection.diff(dupsseq) ++ dupToUse
 
-		(expanded, expandedConnection.diff(dupsseq) ++ dupToUse)
+		(expanded, connections)
 	}
 
 }

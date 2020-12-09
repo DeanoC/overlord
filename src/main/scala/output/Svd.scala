@@ -1,8 +1,9 @@
 package output
 
+import overlord.Gateware.BitsDesc
+
 import java.io.{BufferedWriter, FileWriter}
 import java.nio.file.Path
-
 import overlord.Instances.{CpuInstance, Instance}
 import overlord.Software.Register
 import overlord._
@@ -165,19 +166,7 @@ object Svd {
 		bw.close()
 	}
 
-	sealed case class BitsDesc(val text: String) {
-		val singleBit: Boolean = text.split(":").length < 2
-		val hi       : Int     = Integer.parseInt(text.split(":")(0))
-		val lo       : Int     = if (singleBit) hi else Integer.parseInt(text
-			                                                                 .split(
-				                                                                 ":")
-			                                                                 (1))
-		val bitCount : Int     = (hi - lo) + 1
-		val mask     : Long    = ((1L << bitCount.toLong) - 1L) << lo.toLong
 
-		// sanity check
-		if (singleBit) assert(bitCount == 1)
-	}
 
 	/* TODO
 		<dataType>{f"uint${1 << log2Up(r.defi.width.max(8))}_t"}</dataType>

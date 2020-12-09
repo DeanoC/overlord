@@ -1,19 +1,19 @@
 package overlord.Gateware.GatewareAction
 
 import java.nio.file.Path
-
-import overlord.Gateware.Gateware
+import overlord.Gateware.{Gateware, Parameter}
 import overlord.Instances.Instance
 import overlord.Utils
 import toml.Value
 
 case class PythonAction(script: String,
                         args: String,
-                        pathOp: GatewarePathOp)
+                        pathOp: GatewareActionPathOp)
 	extends GatewareAction {
-	override def execute(instance: Instance,
-	                     parameters: Map[String, String],
-	                     outPath: Path): Unit = {
+
+	override val phase: GatewareActionPhase = GatewareActionPhase1()
+
+	override def execute(instance: Instance, parameters: Map[String, Parameter], outPath: Path): Unit = {
 		import scala.language.postfixOps
 
 		val result = sys.process.Process(
@@ -28,7 +28,7 @@ case class PythonAction(script: String,
 object PythonAction {
 	def apply(name: String,
 	          process: Map[String, Value],
-	          pathOp: GatewarePathOp): Seq[PythonAction] = {
+	          pathOp: GatewareActionPathOp): Seq[PythonAction] = {
 		if (!process.contains("script")) {
 			println(s"Python process $name doesn't have a script field")
 			None

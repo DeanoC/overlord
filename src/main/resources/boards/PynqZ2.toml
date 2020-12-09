@@ -3,11 +3,11 @@ family = "Artix 7"
 device = "xc7z020clg400-1"
 
 
-[constraint_default]
-  pullup = false
-  slew = "Slow"
-  drive = 8
-  standard = "LVCMOS33"
+[defaults]
+pullup = false
+slew = "Slow"
+drive = 8
+standard = "LVCMOS33"
 
 [[instance]]
   type = "soc.zynqps7"

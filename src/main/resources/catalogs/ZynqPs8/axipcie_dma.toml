@@ -1,0 +1,607 @@
+description = "PCIe Bridge - DMA Channel 0"
+[[bank]]
+  name = "AXIPCIE_DMA0"
+  address = "0xfd0f0000"
+[[bank]]
+  name = "AXIPCIE_DMA1"
+  address = "0xfd0f0080"
+[[bank]]
+  name = "AXIPCIE_DMA2"
+  address = "0xfd0f0100"
+[[bank]]
+  name = "AXIPCIE_DMA3"
+  address = "0xfd0f0180"
+[[register]]
+  name = "DMA_CHANNEL_SRC_Q_PTR_LO"
+  type = "rw"
+  width = 32
+  description = "Queue Base Address Low"
+  default = "0x00000000"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "START_ADDR_LO"
+    bits = "31:6"
+    type = "rw"
+    shortdesc = '''Queue Base Address[31:6].'''
+    longdesc = '''Queues are required to be 64-byte aligned (start_addr_lo[5:0] == 00000).'''
+  [[register.field]]
+    name = "READ_ATTR"
+    bits = "5:2"
+    type = "rw"
+    shortdesc = '''Queue Read Attributes.'''
+    longdesc = '''Transaction attributes used for Queue Reads. If Queue Location == AXI, read_attr[3:0] is used for m_arcache[3:0]. If Queue Location == PCIe, read_attr[2:0] is used for PCIe Attr[2:0].'''
+  [[register.field]]
+    name = "QUEUE_ENABLE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "QUEUE_LOCATION"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "DMA_CHANNEL_SRC_Q_PTR_HI"
+  type = "rw"
+  width = 32
+  description = "Queue Base Address High"
+  default = "0x00000000"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "START_ADDR_HI"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Queue Base Address[63:32].'''
+    longdesc = '''Must be set to 0x0 if the Queue is located in 32-bit address space.'''
+[[register]]
+  name = "DMA_CHANNEL_SRC_Q_SIZE"
+  type = "rw"
+  width = 32
+  description = "Queue Size"
+  default = "0x00000000"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "QUEUE_SIZE"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Queue Size.'''
+    longdesc = '''Number of Elements in the Queue. queue_size must be >= 2. A minimum of 2 elements is required to support software/hardware queue flow control ownership. queue_size is used to identify the wrap boundary of the Queue.'''
+[[register]]
+  name = "DMA_CHANNEL_SRC_Q_LIMIT"
+  type = "rw"
+  width = 32
+  description = "Queue Limit Pointer"
+  default = "0x00000000"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "LIMIT"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Queue Flow Control - Limit Pointer.'''
+    longdesc = '''Index of the first Queue element still ``owned'' by software. Incremented by software to give the DMA Channel additional elements to execute. DMA Channel hardware will pause and not utilize queue elements when Q_LIMIT is reached until Q_LIMIT is advanced to provide additional elements to execute.'''
+[[register]]
+  name = "DMA_CHANNEL_DST_Q_PTR_LO"
+  type = "rw"
+  width = 32
+  description = "Queue Base Address Low"
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "START_ADDR_LO"
+    bits = "31:6"
+    type = "rw"
+    shortdesc = '''Queue Base Address[31:6].'''
+    longdesc = '''Queues are required to be 64-byte aligned (start_addr_lo[5:0] == 00000).'''
+  [[register.field]]
+    name = "READ_ATTR"
+    bits = "5:2"
+    type = "rw"
+    shortdesc = '''Queue Read Attributes.'''
+    longdesc = '''Transaction attributes used for Queue Reads. If Queue Location == AXI, read_attr[3:0] is used for m_arcache[3:0]. If Queue Location == PCIe, read_attr[2:0] is used for PCIe Attr[2:0].'''
+  [[register.field]]
+    name = "QUEUE_ENABLE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "QUEUE_LOCATION"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "DMA_CHANNEL_DST_Q_PTR_HI"
+  type = "rw"
+  width = 32
+  description = "Queue Base Address High"
+  default = "0x00000000"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "START_ADDR_HI"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Queue Base Address[63:32].'''
+    longdesc = '''Must be set to 0x0 if the Queue is located in 32-bit address space.'''
+[[register]]
+  name = "DMA_CHANNEL_DST_Q_SIZE"
+  type = "rw"
+  width = 32
+  description = "Queue Size"
+  default = "0x00000000"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "QUEUE_SIZE"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Queue Size.'''
+    longdesc = '''Number of Elements in the Queue. queue_size must be >= 2. A minimum of 2 elements is required to support software/hardware queue flow control ownership. queue_size is used to identify the wrap boundary of the Queue.'''
+[[register]]
+  name = "DMA_CHANNEL_DST_Q_LIMIT"
+  type = "rw"
+  width = 32
+  description = "Queue Limit Pointer"
+  default = "0x00000000"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "LIMIT"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Queue Flow Control - Limit Pointer.'''
+    longdesc = '''Index of the first Queue element still ``owned'' by software. Incremented by software to give the DMA Channel additional elements to execute. DMA Channel hardware will pause and not utilize queue elements when Q_LIMIT is reached until Q_LIMIT is advanced to provide additional elements to execute.'''
+[[register]]
+  name = "DMA_CHANNEL_STAS_Q_PTR_LO"
+  type = "rw"
+  width = 32
+  description = "Queue Base Address Low"
+  default = "0x00000000"
+  offset = "0x00000020"
+  [[register.field]]
+    name = "START_ADDR_LO"
+    bits = "31:6"
+    type = "rw"
+    shortdesc = '''Queue Base Address[31:6].'''
+    longdesc = '''Queues are required to be 64-byte aligned (start_addr_lo[5:0] == 00000).'''
+  [[register.field]]
+    name = "READ_ATTR"
+    bits = "5:2"
+    type = "rw"
+    shortdesc = '''Queue Read Attributes.'''
+    longdesc = '''Transaction attributes used for Queue Reads. If Queue Location == AXI, read_attr[3:0] is used for m_arcache[3:0]. If Queue Location == PCIe, read_attr[2:0] is used for PCIe Attr[2:0].'''
+  [[register.field]]
+    name = "QUEUE_ENABLE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "QUEUE_LOCATION"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "DMA_CHANNEL_STAS_Q_PTR_HI"
+  type = "rw"
+  width = 32
+  description = "Queue Base Address High"
+  default = "0x00000000"
+  offset = "0x00000024"
+  [[register.field]]
+    name = "START_ADDR_HI"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Queue Base Address[63:32].'''
+    longdesc = '''Must be set to 0x0 if the Queue is located in 32-bit address space.'''
+[[register]]
+  name = "DMA_CHANNEL_STAS_Q_SIZE"
+  type = "rw"
+  width = 32
+  description = "Queue Size"
+  default = "0x00000000"
+  offset = "0x00000028"
+  [[register.field]]
+    name = "QUEUE_SIZE"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Queue Size.'''
+    longdesc = '''Number of Elements in the Queue. queue_size must be >= 2. A minimum of 2 elements is required to support software/hardware queue flow control ownership. queue_size is used to identify the wrap boundary of the Queue.'''
+[[register]]
+  name = "DMA_CHANNEL_STAS_Q_LIMIT"
+  type = "rw"
+  width = 32
+  description = "Queue Limit Pointer"
+  default = "0x00000000"
+  offset = "0x0000002C"
+  [[register.field]]
+    name = "LIMIT"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Queue Flow Control - Limit Pointer.'''
+    longdesc = '''Index of the first Queue element still ``owned'' by software. Incremented by software to give the DMA Channel additional elements to execute. DMA Channel hardware will pause and not utilize queue elements when Q_LIMIT is reached until Q_LIMIT is advanced to provide additional elements to execute.'''
+[[register]]
+  name = "DMA_CHANNEL_STAD_Q_PTR_LO"
+  type = "rw"
+  width = 32
+  description = "Queue Base Address Low"
+  default = "0x00000000"
+  offset = "0x00000030"
+  [[register.field]]
+    name = "START_ADDR_LO"
+    bits = "31:6"
+    type = "rw"
+    shortdesc = '''Queue Base Address[31:6].'''
+    longdesc = '''Queues are required to be 64-byte aligned (start_addr_lo[5:0] == 00000).'''
+  [[register.field]]
+    name = "READ_ATTR"
+    bits = "5:2"
+    type = "rw"
+    shortdesc = '''Queue Read Attributes.'''
+    longdesc = '''Transaction attributes used for Queue Reads. If Queue Location == AXI, read_attr[3:0] is used for m_arcache[3:0]. If Queue Location == PCIe, read_attr[2:0] is used for PCIe Attr[2:0].'''
+  [[register.field]]
+    name = "QUEUE_ENABLE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "QUEUE_LOCATION"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "DMA_CHANNEL_STAD_Q_PTR_HI"
+  type = "rw"
+  width = 32
+  description = "Queue Base Address High"
+  default = "0x00000000"
+  offset = "0x00000034"
+  [[register.field]]
+    name = "START_ADDR_HI"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Queue Base Address[63:32].'''
+    longdesc = '''Must be set to 0x0 if the Queue is located in 32-bit address space.'''
+[[register]]
+  name = "DMA_CHANNEL_STAD_Q_SIZE"
+  type = "rw"
+  width = 32
+  description = "Queue Size"
+  default = "0x00000000"
+  offset = "0x00000038"
+  [[register.field]]
+    name = "QUEUE_SIZE"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Queue Size.'''
+    longdesc = '''Number of Elements in the Queue. queue_size must be >= 2. A minimum of 2 elements is required to support software/hardware queue flow control ownership. queue_size is used to identify the wrap boundary of the Queue.'''
+[[register]]
+  name = "DMA_CHANNEL_STAD_Q_LIMIT"
+  type = "rw"
+  width = 32
+  description = "Queue Limit Pointer"
+  default = "0x00000000"
+  offset = "0x0000003C"
+  [[register.field]]
+    name = "LIMIT"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Queue Flow Control - Limit Pointer.'''
+    longdesc = '''Index of the first Queue element still ``owned'' by software. Incremented by software to give the DMA Channel additional elements to execute. DMA Channel hardware will pause and not utilize queue elements when Q_LIMIT is reached until Q_LIMIT is advanced to provide additional elements to execute.'''
+[[register]]
+  name = "DMA_CHANNEL_SRC_Q_NEXT"
+  type = "rw"
+  width = 32
+  description = "Queue Next Pointer"
+  default = "0x00000000"
+  offset = "0x00000040"
+  [[register.field]]
+    name = "NEXT"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Queue Flow Control - Next Pointer.'''
+    longdesc = '''Index of the next Queue element that will be read by DMA Channel hardware. Incremented by DMA Channel hardware as queue read requests are generated. The number of queue elements available for the DMA Channel == SRC_Q_LIMIT - SRC_Q_NEXT (taking into account wrapping). SRC_Q_NEXT does not indicate that Queue Elements have been completed, only that the DMA Channel has started processing for the queue elements. Software must write this register to 0x0 to initialize the queue prior to enabling the DMA Channel. Software is prohibited from writing this register while the DMA Channel is enabled. SRC_Q_NEXT is utilized by DMA Channel hardware to track its location in the queue and should not be used by DMA software.'''
+[[register]]
+  name = "DMA_CHANNEL_DST_Q_NEXT"
+  type = "rw"
+  width = 32
+  description = "Queue Next Pointer"
+  default = "0x00000000"
+  offset = "0x00000044"
+  [[register.field]]
+    name = "NEXT"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Queue Flow Control - Next Pointer.'''
+    longdesc = '''Index of the next Queue element that will be read by DMA Channel hardware. Incremented by DMA Channel hardware as queue read requests are generated. The number of queue elements available for the DMA Channel == DST_Q_LIMIT - DST_Q_NEXT (taking into account wrapping). DST_Q_NEXT does not indicate that Queue Elements have been completed, only that the DMA Channel has started processing for the queue elements. Software must write this register to 0x0 to initialize the queue prior to enabling the DMA Channel. Software is prohibited from writing this register while the DMA Channel is enabled. DST_Q_NEXT is utilized by DMA Channel hardware to track its location in the queue and should not be used by DMA software.'''
+[[register]]
+  name = "DMA_CHANNEL_STAS_Q_NEXT"
+  type = "rw"
+  width = 32
+  description = "Queue Next Pointer"
+  default = "0x00000000"
+  offset = "0x00000048"
+  [[register.field]]
+    name = "NEXT"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Queue Flow Control - Next Pointer.'''
+    longdesc = '''Index of the next Queue element that will be written by DMA Channel hardware with DMA completion status. Incremented by DMA Channel hardware as elements are reserved to receive DMA completion status. The number of queue elements available for the DMA Channel == STAS_Q_LIMIT - STAS_Q_NEXT (taking into account wrapping). STAS_Q_NEXT does not indicate that Queue Elements have been written, only that the DMA Channel has reserved elements to receive DMA completion status. Software must write this register to 0x0 to initialize the queue prior to enabling the DMA Channel. Software is prohibited from writing this register while the DMA Channel is enabled. STAS_Q_NEXT is utilized by DMA Channel hardware to track its location in the queue and should not be used by DMA software.'''
+[[register]]
+  name = "DMA_CHANNEL_STAD_Q_NEXT"
+  type = "rw"
+  width = 32
+  description = "Write only to initialize DMA Channel"
+  default = "0x00000000"
+  offset = "0x0000004C"
+  [[register.field]]
+    name = "NEXT"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Queue Flow Control - Next Pointer.'''
+    longdesc = '''Index of the next Queue element that will be written by DMA Channel hardware with DMA completion status. Incremented by DMA Channel hardware as elements are reserved to receive DMA completion status. The number of queue elements available for the DMA Channel == STAD_Q_LIMIT - STAD_Q_NEXT (taking into account wrapping). STAD_Q_NEXT does not indicate that Queue Elements have been written, only that the DMA Channel has reserved elements to receive DMA completion status. Software must write this register to 0x0 to initialize the queue prior to enabling the DMA Channel. Software is prohibited from writing this register while the DMA Channel is enabled. STAD_Q_NEXT is utilized by DMA Channel hardware to track its location in the queue and should not be used by DMA software.'''
+[[register]]
+  name = "DMA_CHANNEL_SCRATCH0"
+  type = "rw"
+  width = 32
+  description = "Scratchpad Register"
+  default = "0x00000000"
+  offset = "0x00000050"
+  [[register.field]]
+    name = "SCRATCH0"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Scratchpad Register.'''
+    longdesc = '''Intended to enable information to be passed between sofwtare. For example, applications with both an AXI CPU and an PCIe CPU may use this register to pass information between CPUs. The DMA Channel implementation does not use or alter this information.'''
+[[register]]
+  name = "DMA_CHANNEL_SCRATCH1"
+  type = "rw"
+  width = 32
+  description = "Scratchpad Register"
+  default = "0x00000000"
+  offset = "0x00000054"
+  [[register.field]]
+    name = "SCRATCH1"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Scratchpad Register.'''
+    longdesc = '''Intended to enable information to be passed between sofwtare. For example, applications with both an AXI CPU and an PCIe CPU may use this register to pass information between CPUs. The DMA Channel implementation does not use or alter this information.'''
+[[register]]
+  name = "DMA_CHANNEL_SCRATCH2"
+  type = "rw"
+  width = 32
+  description = "Scratchpad Register"
+  default = "0x00000000"
+  offset = "0x00000058"
+  [[register.field]]
+    name = "SCRATCH2"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Scratchpad Register.'''
+    longdesc = '''Intended to enable information to be passed between sofwtare. For example, applications with both an AXI CPU and an PCIe CPU may use this register to pass information between CPUs. The DMA Channel implementation does not use or alter this information.'''
+[[register]]
+  name = "DMA_CHANNEL_SCRATCH3"
+  type = "rw"
+  width = 32
+  description = "Scratchpad Register"
+  default = "0x00000000"
+  offset = "0x0000005C"
+  [[register.field]]
+    name = "SCRATCH3"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Scratchpad Register.'''
+    longdesc = '''Intended to enable information to be passed between sofwtare. For example, applications with both an AXI CPU and an PCIe CPU may use this register to pass information between CPUs. The DMA Channel implementation does not use or alter this information.'''
+[[register]]
+  name = "DMA_CHANNEL_PCIE_INTERRUPT_CONTROL"
+  type = "mixed"
+  width = 32
+  description = "PCI Express Interrupt Control"
+  default = "0x00000000"
+  offset = "0x00000060"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:24"
+    type = "ro"
+  [[register.field]]
+    name = "COALESCE_COUNT"
+    bits = "23:16"
+    type = "rw"
+    shortdesc = '''PCIe DMA SGL Interrupt Coalesce Count.'''
+    longdesc = '''Controls the frequency at which a DMA SGL Interrupt Event, completion of a source SGL Element that had both the 'EOP' and 'Interrupt' SGL control bits set to 1, causes PCIe Interrupts. An internal DMA Channel-specific PCIe DMA SGL Coalesce Counter is maintained. For each DMA SGL Interrupt Event, if the current PCIe DMA SGL Coalesce Counter is equal to PCIe DMA SGL Interrupt Coalesce Count, then a PCIe interrupt is generated and the PCIe DMA SGL Coalesce Counter is cleared otherwise the PCIe DMA SGL Coalesce Counter is incremented. The PCIe DMA SGL Coalesce Counter is also cleared when DMA Enable == 0. This mechanism allows software to configure the DMA Channel to interrupt PCIe once every 1-256 DMA SGL Interrupt Events. When a non-0 value is programmed into PCIe DMA SGL Interrupt Coalesce Count, software must anticipate that at the end of all DMA packet transfers, interrupts may be pending in the PCIe DMA SGL Coalesce Counter that will not cause an interrupt because no more interrupts will arrive for PCIe DMA SGL Coalesce Counter to reach the PCIe DMA SGL Interrupt Coalesce Count threshold.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:3"
+    type = "ro"
+  [[register.field]]
+    name = "SGL_INT_ENABLE"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "DMA_ERR_INT_ENABLE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "INTERRUPT_MASK"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "DMA_CHANNEL_PCIE_INTERRUPT_STATUS"
+  type = "mixed"
+  width = 32
+  description = "PCIe Interrupt Status"
+  default = "0x00000000"
+  offset = "0x00000064"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "ro"
+  [[register.field]]
+    name = "SOFTWARE_INT"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "DMA_SGL_INT"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "DMA_ERROR_INT"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "DMA_CHANNEL_AXI_INTERRUPT_CONTROL"
+  type = "mixed"
+  width = 32
+  description = "PCI Express Interrupt Control"
+  default = "0x00000000"
+  offset = "0x00000068"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:24"
+    type = "ro"
+  [[register.field]]
+    name = "COALESCE_COUNT"
+    bits = "23:16"
+    type = "rw"
+    shortdesc = '''AXI DMA SGL Interrupt Coalesce Count.'''
+    longdesc = '''Controls the frequency at which a DMA SGL Interrupt Event (completion of a source SGL Element that had both the 'EOP' and 'Interrupt' SGL control bits set to 1) causes AXI Interrupts. An internal DMA Channel-specific AXI DMA SGL Coalesce Counter is maintained. For each DMA SGL Interrupt Event, if the current AXI DMA SGL Coalesce Counter is equal to AXI DMA SGL Interrupt Coalesce Count, then a AXI interrupt is generated and the AXI DMA SGL Coalesce Counter is cleared otherwise the AXI DMA SGL Coalesce Counter is incremented. The AXI DMA SGL Coalesce Counter is also cleared when DMA Enable == 0. This mechanism allows software to configure the DMA Channel to interrupt AXI once every 1-256 DMA SGL Interrupt Events. When a non-0 value is programmed into AXI DMA SGL Interrupt Coalesce Count, software must anticipate that at the end of all DMA packet transfers, interrupts may be pending in the AXI DMA SGL Coalesce Counter that will not cause an interrupt because no more interrupts will arrive for AXI DMA SGL Coalesce Counter to reach the AXI DMA SGL Interrupt Coalesce Count threshold.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:3"
+    type = "ro"
+  [[register.field]]
+    name = "SGL_INT_ENABLE"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "DMA_ERR_INT_ENABLE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "INTERRUPT_ENABLE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "DMA_CHANNEL_AXI_INTERRUPT_STATUS"
+  type = "mixed"
+  width = 32
+  description = "AXI Interrupt Status"
+  default = "0x00000000"
+  offset = "0x0000006C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "ro"
+  [[register.field]]
+    name = "SOFTWARE_INT"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "DMA_SGL_INT"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "DMA_ERROR_INT"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "DMA_CHANNEL_PCIE_INTERRUPT_ASSERT"
+  type = "ro"
+  width = 32
+  description = "PCIe Interrupt Assertion."
+  default = "0x00000000"
+  offset = "0x00000070"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "ro"
+  [[register.field]]
+    name = "PCIE_SOFTWARE_INTERRUPT"
+    bits = "3"
+    type = "ro"
+    shortdesc = '''PCIe Software Interrupt.'''
+    longdesc = '''Write a 1 to this register to generate a PCIe Software Interrupt. An interrupt is generated and propagated through the PCI Express Core to PCIe in the same manner as a DMA Channel interrupt (using the same Interrupt Vector). Interrupts are generated by writes to this register independent of whether the DMA Channel is enabled.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "2:0"
+    type = "ro"
+[[register]]
+  name = "DMA_CHANNEL_AXI_INTERRUPT_ASSERT"
+  type = "ro"
+  width = 32
+  description = "AXI Interrupt Assertion."
+  default = "0x00000000"
+  offset = "0x00000074"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "ro"
+  [[register.field]]
+    name = "AXI_SOFTWARE_INTERRUPT"
+    bits = "3"
+    type = "ro"
+    shortdesc = '''AXI Software Interrupt.'''
+    longdesc = '''Write a 1 to this register to generate a AXI Software Interrupt. An interrupt is generated and propagated through to AXI in the same manner as a DMA Channel interrupt (using the same Interrupt Vector). Interrupts are generated by writes to this register independent of whether the DMA Channel is enabled.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "2:0"
+    type = "ro"
+[[register]]
+  name = "DMA_CHANNEL_DMA_CONTROL"
+  type = "mixed"
+  width = 32
+  description = "DMA Channel Control"
+  default = "0x00000000"
+  offset = "0x00000078"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:3"
+    type = "ro"
+  [[register.field]]
+    name = "CMPL_STAT_Q_ELEM_SIZE"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''DMA Channel Completion Status Queue Element Size.'''
+    longdesc = '''If UserID and/or UserHandle information is needed for an application, the application must setup the DMA Channel with 64-bit Status Queue Elements. If these features are not needed, then the DMA Channel may be setup with 32-bit Status Queue Elements to reduce the bus utilization required to write status Queue Elements.'''
+  [[register.field]]
+    name = "DMA_RESET"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''DMA Channel Reset.'''
+    longdesc = '''Each DMA Channel has a small Source SGL FIFO, Destination SGL FIFO, Source DMA Completion Status FIFO, and Destination DMA Completion Status FIFO to enable overlapping of DMA transactions for higher throughput. When a DMA Channel is disabled, these FIFOs may not empty fully and may need to be flushed before the DMA Channel can be reused for a new operation.'''
+  [[register.field]]
+    name = "DMA_ENABLE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "DMA_CHANNEL_DMA_STATUS"
+  type = "ro"
+  width = 32
+  description = "DMA Channel Status"
+  default = "0x00008000"
+  offset = "0x0000007C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "ro"
+  [[register.field]]
+    name = "CHANNEL_PRESENT"
+    bits = "15"
+    type = "ro"
+    shortdesc = '''DMA Channel Present.'''
+    longdesc = '''During initialization, the DMA Driver can read this register at all possible DMA Channel Register locations to determine how many DMA Channels are implemented.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "14"
+    type = "ro"
+  [[register.field]]
+    name = "CHANNEL_NUMBER"
+    bits = "13:4"
+    type = "ro"
+    shortdesc = '''DMA Channel Number[9:0].'''
+    longdesc = '''Unique DMA Channel Number assigned to this DMA Channel. The DMA Channel Number register is for informational purposes and is not needed for DMA operation. DMA Channel number is unique for each DMA Channel even for multi-function and SR-IOV applications.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "3:1"
+    type = "ro"
+  [[register.field]]
+    name = "DMA_RUNNING"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''DMA Running.'''
+    longdesc = '''Prior to transitioning DMA Enable from 0 to 1 or modifying the contents of the DMA Channel's Queue Management Registers, software must read DMA Running == 0 to verify that the prior DMA operation completed and that it is safe to re-initialize and re-start the DMA Channel. The DMA Channel Source and Destination Queues can be re-used for new DMA operations (by changing the Queue Scatter-Gather List contents) without having to disable the DMA Channel. In general software should setup the Source SGL, Destination SGL, Source DMA Completion Status, and Destination DMA Completion Status Queues once at driver initialization and keep the DMA Channel Enabled for the entire time the driver is loaded. When there is new work to do, the Driver makes the associated queue elements available to be executed by updatign the Queue LIMIT pointers.'''

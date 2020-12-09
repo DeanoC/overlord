@@ -2,6 +2,7 @@ package overlord
 
 import java.nio.file.{Files, Path}
 import overlord.Definitions.{DefinitionTrait, DefinitionType}
+import overlord.Instances.BoardInstance
 
 import scala.collection.mutable
 import scala.language.postfixOps
@@ -24,34 +25,6 @@ case class Resources(path: Path) {
 			DefinitionCatalog.fromFile(
 					path.resolve("catalogs/"), s"$name")
 		}).flatten.flatten.map(f => (f.defType -> f)).toMap
-	}
-
-	def loadBoards(catalogs: DefinitionCatalog): Map[String, Board] = {
-
-		GameBuilder.pathStack.push(path)
-
-		val parsed = loadToToml(path.resolve("boards.toml").toAbsolutePath)
-		val result = if (
-			!parsed.values.contains("resources") || !parsed
-				.values("resources")
-				.isInstanceOf[toml.Value.Arr]
-		) Map[String, Board]()
-		else {
-			val resources    =
-				parsed.values("resources").asInstanceOf[toml.Value.Arr].values
-			val resourceMaps = mutable.HashMap[String, Board]()
-			for (resource <- resources) {
-				val name  = resource.asInstanceOf[toml.Value.Str].value
-				val board = Board.FromFile(path.resolve("boards"), name, catalogs)
-				board match {
-					case Some(b) => resourceMaps += (name -> b)
-					case None    =>
-				}
-			}
-			resourceMaps.toMap
-		}
-		GameBuilder.pathStack.pop()
-		result
 	}
 
 	private def loadToToml(absolutePath: Path): toml.Value.Tbl = {

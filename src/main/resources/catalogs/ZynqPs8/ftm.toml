@@ -1,0 +1,328 @@
+description = "Fabric Trigger Macrocell interface from PL to ECT"
+[[bank]]
+  name = "CORESIGHT_SOC_FTM"
+  address = "0xfe9d0000"
+[[register]]
+  name = "GPI"
+  type = "ro"
+  width = 32
+  description = "General Purpose Input"
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "IN"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "GPO"
+  type = "rw"
+  width = 32
+  description = "General Purpose Output"
+  default = "0x00000000"
+  offset = "0x00000020"
+  [[register.field]]
+    name = "OUT"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "ITTRIGOUT"
+  type = "wo"
+  width = 1
+  description = "Trigger Output Register"
+  default = "0x00000000"
+  offset = "0x00000ED0"
+  [[register.field]]
+    name = "TRIGOUT"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "ITTRIGOUTACK"
+  type = "ro"
+  width = 1
+  description = "Trigger Output Acknowledge Register"
+  default = "0x00000000"
+  offset = "0x00000ED4"
+  [[register.field]]
+    name = "TRIGOUTACK"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ITTRIGIN"
+  type = "ro"
+  width = 1
+  description = "Trigger Input Register"
+  default = "0x00000000"
+  offset = "0x00000ED8"
+  [[register.field]]
+    name = "TRIGIN"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ITTRIGINACK"
+  type = "wo"
+  width = 1
+  description = "Trigger Input Acknowledge Register"
+  default = "0x00000000"
+  offset = "0x00000EDC"
+  [[register.field]]
+    name = "TRIGINACK"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "ITCTRL"
+  type = "rw"
+  width = 1
+  description = "Integration Control Register"
+  default = "0x00000000"
+  offset = "0x00000F00"
+  [[register.field]]
+    name = "INTEGRATION"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "CLAIMSET"
+  type = "rw"
+  width = 4
+  description = "Claim Tag Set Register"
+  default = "0x00000001"
+  offset = "0x00000FA0"
+  [[register.field]]
+    name = "SET"
+    bits = "3:0"
+    type = "rw"
+    shortdesc = '''The claim tag register is used for any interrogating tools to determine if the device is being programmed or has been programmed.'''
+    longdesc = '''Read: 1= Claim tag is implemented, 0 = Claim tag is not implemented Write: 1= Set claim tag bit, 0= No effect'''
+[[register]]
+  name = "CLAIMCLR"
+  type = "rw"
+  width = 4
+  description = "Claim Tag Clear Register"
+  default = "0x00000000"
+  offset = "0x00000FA4"
+  [[register.field]]
+    name = "CLEAR"
+    bits = "3:0"
+    type = "rw"
+    shortdesc = '''The claim tag register is used for any interrogating tools to determine if the device is being programmed or has been programmed.'''
+    longdesc = '''Read: Current value of claim tag. Write: 1= Clear claim tag bit, 0= No effect'''
+[[register]]
+  name = "LAR"
+  type = "wo"
+  width = 32
+  description = "Lock Access Register"
+  default = "0x00000000"
+  offset = "0x00000FB0"
+  [[register.field]]
+    name = "KEY"
+    bits = "31:0"
+    type = "wo"
+    shortdesc = '''Write Access Code.'''
+    longdesc = '''Write behavior depends on PADDRDBG31 pin: - PADDRDBG31=0 (lower 2GB): After reset (via PRESETDBGn), FTM is locked, i.e., writes to all other registers using lower 2GB addresses are ignored. To unlock, 0xC5ACCE55 must be written this register. After the required registers are written, to lock again, write a value other than 0xC5ACCE55 to this register. - PADDRDBG31=1 (upper 2GB): FTM is unlocked when upper 2GB addresses are used to write to all the registers. However, write to this register is ignored using a upper 2GB address! Note: read from this register always returns 0, regardless of PADDRDBG31.'''
+[[register]]
+  name = "LSR"
+  type = "ro"
+  width = 3
+  description = "Lock Status Register"
+  default = "0x00000003"
+  offset = "0x00000FB4"
+  [[register.field]]
+    name = "8BIT"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "STATUS"
+    bits = "1"
+    type = "ro"
+    shortdesc = '''Read behavior depends on PADDRDBG31 pin: - PADDRDBG31=0 (lower 2GB): When a lower 2GB address is used to read this register, this bit indicates whether FTM is in locked state (1= locked, 0= unlocked).'''
+    longdesc = '''- PADDRDBG31=1 (upper 2GB): always returns 0.'''
+  [[register.field]]
+    name = "IMP"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Read behavior depends on PADDRDBG31 pin: - PADDRDBG31=0 (lower 2GB): always returns 1, meaning lock mechanism are implemented.'''
+    longdesc = '''- PADDRDBG31=1 (upper 2GB): always returns 0, meaning lock mechanism is NOT implemented.'''
+[[register]]
+  name = "AUTHSTATUS"
+  type = "ro"
+  width = 8
+  description = "Authentication Status Register"
+  default = "0x00000000"
+  offset = "0x00000FB8"
+  [[register.field]]
+    name = "SNI"
+    bits = "7:6"
+    type = "ro"
+    shortdesc = '''Secure non-invasive debug If ((SPNIDEN or SPIDEN) and (NIDEN or DBGEN)) is true, this field is 2'b11, indicating the functionality is implemented and enabled.'''
+    longdesc = '''Otherwise, this field is 2'b10 (implemented but disabled).'''
+  [[register.field]]
+    name = "SI"
+    bits = "5:4"
+    type = "ro"
+    shortdesc = '''Secure invasive debug Always 2'b00.'''
+    longdesc = '''This functionality is not implemented.'''
+  [[register.field]]
+    name = "NSNI"
+    bits = "3:2"
+    type = "ro"
+    shortdesc = '''Non-secure non-invasive debug IF (NIDEN or DBGEN) is 1, this field is 2'b11, indicating the functionality is implemented and enabled.'''
+    longdesc = '''Otherwise, this field is 2'b10 (implemented but disabled)'''
+  [[register.field]]
+    name = "NSI"
+    bits = "1:0"
+    type = "ro"
+    shortdesc = '''Non-secure invasive debug Always 2'b00.'''
+    longdesc = '''This functionality is not implemented.'''
+[[register]]
+  name = "DEVID"
+  type = "ro"
+  width = 8
+  description = "Device ID"
+  default = "0x00000000"
+  offset = "0x00000FC8"
+  [[register.field]]
+    name = "ID"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "DEVTYPE"
+  type = "ro"
+  width = 8
+  description = "Device Type"
+  default = "0x00000000"
+  offset = "0x00000FCC"
+  [[register.field]]
+    name = "TYPE"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "PIDR4"
+  type = "ro"
+  width = 8
+  description = "Peripheral ID4"
+  default = "0x00000001"
+  offset = "0x00000FD0"
+  [[register.field]]
+    name = "ID"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "PIDR5"
+  type = "ro"
+  width = 8
+  description = "Peripheral ID5"
+  default = "0x00000000"
+  offset = "0x00000FD4"
+  [[register.field]]
+    name = "ID"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "PIDR6"
+  type = "ro"
+  width = 8
+  description = "Peripheral ID6"
+  default = "0x00000000"
+  offset = "0x00000FD8"
+  [[register.field]]
+    name = "ID"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "PIDR7"
+  type = "ro"
+  width = 8
+  description = "Peripheral ID7"
+  default = "0x00000000"
+  offset = "0x00000FDC"
+  [[register.field]]
+    name = "ID"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "PIDR0"
+  type = "ro"
+  width = 8
+  description = "Peripheral ID0"
+  default = "0x00000021"
+  offset = "0x00000FE0"
+  [[register.field]]
+    name = "ID"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "PIDR1"
+  type = "ro"
+  width = 8
+  description = "Peripheral ID1"
+  default = "0x0000003F"
+  offset = "0x00000FE4"
+  [[register.field]]
+    name = "ID"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "PIDR2"
+  type = "ro"
+  width = 8
+  description = "Peripheral ID2"
+  default = "0x00000009"
+  offset = "0x00000FE8"
+  [[register.field]]
+    name = "ID"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "PIDR3"
+  type = "ro"
+  width = 8
+  description = "Peripheral ID3"
+  default = "0x00000000"
+  offset = "0x00000FEC"
+  [[register.field]]
+    name = "ID"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "CIDR0"
+  type = "ro"
+  width = 8
+  description = "Component ID0"
+  default = "0x0000000D"
+  offset = "0x00000FF0"
+  [[register.field]]
+    name = "ID"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "CIDR1"
+  type = "ro"
+  width = 8
+  description = "Component ID1"
+  default = "0x00000090"
+  offset = "0x00000FF4"
+  [[register.field]]
+    name = "ID"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "CIDR2"
+  type = "ro"
+  width = 8
+  description = "Component ID2"
+  default = "0x00000005"
+  offset = "0x00000FF8"
+  [[register.field]]
+    name = "ID"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "CIDR3"
+  type = "ro"
+  width = 8
+  description = "Component ID3"
+  default = "0x000000B1"
+  offset = "0x00000FFC"
+  [[register.field]]
+    name = "ID"
+    bits = "7:0"
+    type = "ro"

@@ -1,10 +1,9 @@
 package overlord.Gateware.GatewareAction
 
 import java.nio.file.Path
-
-import overlord.Gateware.Gateware
+import overlord.Gateware.{Gateware, Parameter}
 import overlord.Instances.Instance
-import overlord.{GameBuilder, Utils}
+import overlord.{Game, Utils}
 import toml.Value
 
 case class SbtAction(
@@ -12,20 +11,21 @@ case class SbtAction(
 	                    args: String,
 	                    withBuildSbt: Boolean,
 	                    srcPath: String,
-	                    pathOp: GatewarePathOp)
+	                    pathOp: GatewareActionPathOp)
 	extends GatewareAction {
-	override def execute(instance: Instance,
-	                     parameters: Map[String, String],
-	                     outPath: Path): Unit = {
+
+	override val phase: GatewareActionPhase = GatewareActionPhase1()
+
+	override def execute(instance: Instance, parameters: Map[String, Parameter], outPath: Path): Unit = {
 		import scala.language.postfixOps
 
 		val srcAbsPath = if (srcPath.contains("${dest}/")) {
-			GameBuilder.pathStack.top.resolve(
+			Game.pathStack.top.resolve(
 				srcPath.replace("${dest}/", ""))
 		} else Path.of(srcPath)
 
 		val moddedOutPath = if (!withBuildSbt) outPath
-		else GameBuilder.pathStack.top.resolve(instance.ident)
+		else Game.pathStack.top.resolve(instance.ident)
 
 		val dstAbsPath = moddedOutPath.resolve(mainScala)
 		Utils.ensureDirectories(moddedOutPath)
@@ -51,7 +51,7 @@ case class SbtAction(
 object SbtAction {
 	def apply(name: String,
 	          process: Map[String, Value],
-	          pathOp: GatewarePathOp): Seq[SbtAction] = {
+	          pathOp: GatewareActionPathOp): Seq[SbtAction] = {
 		if (!process.contains("args")) {
 			println(s"SBT process $name doesn't have a args field")
 			None
@@ -76,7 +76,7 @@ object SbtAction {
 			mainScala,
 			args,
 			withBuildSbt,
-			GameBuilder.pathStack.top.toString,
+			Game.pathStack.top.toString,
 			pathOp))
 	}
 }

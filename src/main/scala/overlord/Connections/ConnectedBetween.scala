@@ -1,24 +1,23 @@
 package overlord.Connections
 
-import overlord.Definitions.{
-	ClockDefinitionType, DefinitionTrait,
-	DefinitionType, PortDefinitionType
-}
-import overlord.Instances.Instance
+import overlord.Definitions.{ClockDefinitionType, DefinitionTrait, DefinitionType}
+import overlord.Gateware.{Port, WireDirection}
+import overlord.Instances.{ClockInstance, Instance, PinGroupInstance}
+import toml.Value
 
 case class ConnectedBetween(connectionType: ConnectionType,
                             connectionPriority: ConnectionPriority,
-                            main: Instance,
-                            secondary: Instance,
-                            mainFullName: String,
-                            secondaryFullName: String)
+                            main: InstanceLoc,
+                            direction: ConnectionDirection,
+                            secondary: InstanceLoc)
 	extends Connected {
+
 	override def connectsToInstance(inst: Instance): Boolean =
-		(main == inst || secondary == inst)
+		(main.instance == inst || secondary.instance == inst)
 
-	override def first: Option[Instance] = Some(main)
+	override def first: Option[InstanceLoc] = Some(main)
 
-	override def second: Option[Instance] = Some(secondary)
+	override def second: Option[InstanceLoc] = Some(secondary)
 
 	override def areConnectionCountsCompatible: Boolean = {
 		val sharedOkay = main.attributes.contains("shared") ||
@@ -27,43 +26,27 @@ case class ConnectedBetween(connectionType: ConnectionType,
 		assert((sharedOkay && firstCount == 1) ||
 		       (sharedOkay && secondaryCount == 1) ||
 		       (!sharedOkay))
-		(main.count == secondary.count) || sharedOkay
+
+		(firstCount == secondaryCount) || sharedOkay
 	}
 
-	override def firstCount: Int = main.count
+	override def firstCount: Int = main.instance.count
 
-	override def secondaryCount: Int = secondary.count
+	override def secondaryCount: Int = secondary.instance.count
 
 	def mainType: DefinitionType = main.definition.defType
 
 	def secondaryType: DefinitionType = secondary.definition.defType
 
-	def isPortToChip: Boolean = {
-		main.definition.defType.isInstanceOf[PortDefinitionType] &&
-		!secondary.definition.defType.isInstanceOf[PortDefinitionType]
-	}
+	def isPinToChip: Boolean = main.isPin && secondary.isChip
 
-	def isPortToPort: Boolean = {
-		main.definition.defType.isInstanceOf[PortDefinitionType] &&
-		secondary.definition.defType.isInstanceOf[PortDefinitionType]
-	}
+	def isChipToChip: Boolean = main.isChip && secondary.isChip
 
-	def isChipToChip: Boolean = {
-		!main.definition.defType.isInstanceOf[PortDefinitionType] &&
-		!secondary.definition.defType.isInstanceOf[PortDefinitionType]
-	}
+	def isChipToPin: Boolean = main.isChip && secondary.isPin
 
-	def isChipToPort: Boolean = {
-		!main.definition.defType.isInstanceOf[PortDefinitionType] &&
-		secondary.definition.defType.isInstanceOf[PortDefinitionType]
-	}
+	def isClock: Boolean = main.isClock || secondary.isClock
 
-	def isClock: Boolean = {
-		main.definition.defType.isInstanceOf[ClockDefinitionType] ||
-		secondary.definition.defType.isInstanceOf[ClockDefinitionType]
-	}
+	override def firstFullName: String = main.fullName
 
-	override def firstFullName: String = mainFullName
-
-	override def secondFullName: String = secondaryFullName
+	override def secondFullName: String = secondary.fullName
 }

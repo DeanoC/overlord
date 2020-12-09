@@ -2,7 +2,7 @@ package overlord.Software
 
 import java.nio.file.{Files, Path}
 import overlord.Definitions.{SoftwareGroup, SoftwareTrait}
-import overlord.{GameBuilder, Utils}
+import overlord.{Game, Utils}
 import toml.Value
 
 import scala.collection.mutable
@@ -40,12 +40,12 @@ object Software {
 				return None
 			}
 
-			GameBuilder.pathStack.push(path.getParent)
+			Game.pathStack.push(path.getParent)
 			val file   = path.toAbsolutePath.toFile
 			val source = scala.io.Source.fromFile(file)
 			val result = parse(path.toUri.toString,
 			                   source.getLines().mkString("\n"))
-			GameBuilder.pathStack.pop()
+			Game.pathStack.pop()
 			result.toList
 		}
 		Some(Software(groups.flatten))

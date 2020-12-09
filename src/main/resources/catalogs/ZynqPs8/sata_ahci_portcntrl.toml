@@ -1,0 +1,838 @@
+description = "SATA AHCI Port 0 Control"
+[[bank]]
+  name = "SATA_AHCI_PORT0_CNTRL"
+  address = "0xfd0c0100"
+[[bank]]
+  name = "SATA_AHCI_PORT1_CNTRL"
+  address = "0xfd0c0180"
+[[register]]
+  name = "PXCLB"
+  type = "mixed"
+  width = 32
+  description = "Port x Command List Base Address (PxCLB)"
+  default = "0x00000000"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "CLB"
+    bits = "31:10"
+    type = "rw"
+    shortdesc = '''Command List Base Address (CLB): Indicates the 32-bit base physical address for the command list for this port.'''
+    longdesc = '''This base is used when fetching commands to execute. The structure pointed to by this address range is 1K-bytes in length. This address must be 1K-byte aligned as indicated by bits 09:00 being read only.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "9:0"
+    type = "ro"
+[[register]]
+  name = "PXCLBU"
+  type = "rw"
+  width = 32
+  description = "Port x Command List Base Address Upper 32-bits (PxCLBU)"
+  default = "0x00000000"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "CLBU"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Command List Base Address Upper (CLBU): Indicates the upper 32-bits for the command list base physical address for this port.'''
+    longdesc = '''This base is used when fetching commands to execute. This register shall be read only '0' for HBAs that do not support 64-bit addressing.'''
+[[register]]
+  name = "PXFB"
+  type = "mixed"
+  width = 32
+  description = "Port x FIS Base Address (PxFB)"
+  default = "0x00000000"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "FB"
+    bits = "31:8"
+    type = "rw"
+    shortdesc = '''FIS Base Address (FB): Indicates the 32-bit base physical address for received FISes.'''
+    longdesc = '''The structure pointed to by this address range is 256 bytes in length. This address must be 256-byte aligned as indicated by bits 07:00 being read only. When FIS-based switching is in use, this structure is 4KB in length and the address shall be 4KB aligned (refer to section 9.3.3).'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "PXFBU"
+  type = "rw"
+  width = 32
+  description = "Port x FIS Base Address Upper 32-bits (PxFBU)"
+  default = "0x00000000"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "FBU"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''FIS Base Address Upper (FBU): Indicates the upper 32-bits for the received FIS base physical address for this port.'''
+    longdesc = '''This register shall be read only '0' for HBAs that do not support 64-bit addressing.'''
+[[register]]
+  name = "PXIS"
+  type = "mixed"
+  width = 32
+  description = "Port x Interupt Status (PxIS)"
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "CPDS"
+    bits = "31"
+    type = "wtc"
+    shortdesc = '''Cold Port Detect Status (CPDS): When set, a device status has changed as detected by the cold presence detect logic.'''
+    longdesc = '''This bit can either be set due to a non-connected port receiving a device, or a connected port having its device removed. This bit is only valid if the port supports cold presence detect as indicated by PxCMD.CPD set to '1'.'''
+  [[register.field]]
+    name = "TFES"
+    bits = "30"
+    type = "wtc"
+  [[register.field]]
+    name = "HBFS"
+    bits = "29"
+    type = "wtc"
+    shortdesc = '''Host Bus Fatal Error Status (HBFS): Indicates that the HBA encountered a host bus error that it cannot recover from, such as a bad software pointer.'''
+    longdesc = '''In PCI, such an indication would be a target or master abort.'''
+  [[register.field]]
+    name = "HBDS"
+    bits = "28"
+    type = "wtc"
+  [[register.field]]
+    name = "IFS"
+    bits = "27"
+    type = "wtc"
+    shortdesc = '''Interface Fatal Error Status (IFS): Indicates that the HBA encountered an error on the Serial ATA interface which caused the transfer to stop.'''
+    longdesc = '''Refer to section 6.1.2.'''
+  [[register.field]]
+    name = "INFS"
+    bits = "26"
+    type = "wtc"
+    shortdesc = '''Interface Non-fatal Error Status (INFS): Indicates that the HBA encountered an error on the Serial ATA interface but was able to continue operation.'''
+    longdesc = '''Refer to section 6.1.2.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "25"
+    type = "ro"
+  [[register.field]]
+    name = "OFS"
+    bits = "24"
+    type = "wtc"
+  [[register.field]]
+    name = "IPMS"
+    bits = "23"
+    type = "wtc"
+    shortdesc = '''Incorrect Port Multiplier Status (IPMS): Indicates that the HBA received a FIS from a device that did not have a command outstanding.'''
+    longdesc = '''The IPMS bit may be set during enumeration of devices on a Port Multiplier due to the normal Port Multiplier enumeration process. It is recommended that IPMS only be used after enumeration is complete on the Port Multiplier. IPMS is not set when an asynchronous notification is received (a Set Device Bits FIS with the Notification 'N' bit set to '1').'''
+  [[register.field]]
+    name = "PRCS"
+    bits = "22"
+    type = "ro"
+    shortdesc = '''PhyRdy Change Status (PRCS): When set to '1' indicates the internal PhyRdy signal changed state.'''
+    longdesc = '''This bit reflects the state of PxSERR.DIAG.N. To clear this bit, software must clear PxSERR.DIAG.N to '0'.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "21:8"
+    type = "ro"
+  [[register.field]]
+    name = "DMPS"
+    bits = "7"
+    type = "wtc"
+    shortdesc = '''Device Mechanical Presence Status (DMPS): When set, indicates that a mechanical presence switch associated with this port has been opened or closed, which may lead to a change in the connection state of the device.'''
+    longdesc = '''This bit is only valid if both CAP.SMPS and PxCMD.MPSP are set to '1'.'''
+  [[register.field]]
+    name = "PCS"
+    bits = "6"
+    type = "ro"
+    shortdesc = '''Port Connect Change Status (PCS): 1=Change in Current Connect Status.'''
+    longdesc = '''0=No change in Current Connect Status. This bit reflects the state of PxSERR.DIAG.X. This bit is only cleared when PxSERR.DIAG.X is cleared.'''
+  [[register.field]]
+    name = "DPS"
+    bits = "5"
+    type = "wtc"
+    shortdesc = '''Descriptor Processed (DPS): A PRD with the 'I' bit set has transferred all of its data.'''
+    longdesc = '''Refer to section 5.4.2.'''
+  [[register.field]]
+    name = "UFS"
+    bits = "4"
+    type = "ro"
+    shortdesc = '''Unknown FIS Interrupt (UFS): When set to '1', indicates that an unknown FIS was received and has been copied into system memory.'''
+    longdesc = '''This bit is cleared to '0' by software clearing the PxSERR.DIAG.F bit to '0'. Note that this bit does not directly reflect the PxSERR.DIAG.F bit. PxSERR.DIAG.F is set immediately when an unknown FIS is detected, whereas this bit is set when that FIS is posted to memory. Software should wait to act on an unknown FIS until this bit is set to '1' or the two bits may become out of sync.'''
+  [[register.field]]
+    name = "SDBS"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "DSS"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "PSS"
+    bits = "1"
+    type = "wtc"
+    shortdesc = '''PIO Setup FIS Interrupt (PSS): A PIO Setup FIS has been received with the 'I' bit set, it has been copied into system memory, and the data related to that FIS has been transferred.'''
+    longdesc = '''This bit shall be set even if the data transfer resulted in an error.'''
+  [[register.field]]
+    name = "DHRS"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "PXIE"
+  type = "mixed"
+  width = 32
+  description = "Port x Interrupt Enable (PxIE): This register enables and disables the reporting of the corresponding interrupt to system software. When a bit is set ('1') and the corresponding interrupt condition is active, then an interrupt is generated. Interrupt sources that are disabled ('0') are still reflected in the status registers. This register is symmetrical with the PxIS register."
+  default = "0x00000000"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "CPDE"
+    bits = "31"
+    type = "rw"
+    shortdesc = '''Cold Presence Detect Enable (CPDE): When set, GHC.'''
+    longdesc = '''IE is set, and PxS.CPDS is set, the HBA shall generate an interrupt. For systems that do not support cold presence detect, this bit shall be a read-only '0'.'''
+  [[register.field]]
+    name = "TFEE"
+    bits = "30"
+    type = "rw"
+    shortdesc = '''Task File Error Enable (TFEE): When set, GHC.'''
+    longdesc = '''IE is set, and PxS.TFES is set, the HBA shall generate an interrupt.'''
+  [[register.field]]
+    name = "HBFE"
+    bits = "29"
+    type = "rw"
+    shortdesc = '''Host Bus Fatal Error Enable (HBFE): When set, GHC.'''
+    longdesc = '''IE is set, and PxIS.HBFS is set, the HBA shall generate an interrupt.'''
+  [[register.field]]
+    name = "HBDE"
+    bits = "28"
+    type = "rw"
+    shortdesc = '''Host Bus Data Error Enable (HBDE): when set, GHC.'''
+    longdesc = '''IE is set, and PxIS.HBDS is set, the HBA shall generate an interrupt.'''
+  [[register.field]]
+    name = "IFE"
+    bits = "27"
+    type = "rw"
+    shortdesc = '''Interface Fatal Error Enable (IFE): When set, GHC.'''
+    longdesc = '''IE is set, and PxIS.IFS is set, the HBA shall generate an interrupt.'''
+  [[register.field]]
+    name = "INFE"
+    bits = "26"
+    type = "rw"
+    shortdesc = '''Interface Non-fatal Error Enable (INFE): When set, GHC.'''
+    longdesc = '''IE is set, and PxIS.INFS is set, the HBA shall generate an interrupt.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "25"
+    type = "ro"
+  [[register.field]]
+    name = "OFE"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Overflow Enable (OFE): When set, and GHC.'''
+    longdesc = '''IE and PxIS.OFS are set, the HBA shall generate an interupt.'''
+  [[register.field]]
+    name = "IPME"
+    bits = "23"
+    type = "rw"
+    shortdesc = '''Incorrect Port Multiplier Enable (IPME): When set, and GHC.'''
+    longdesc = '''IE and PxIS.IPMS are set, the HBA shall generate an interupt.'''
+  [[register.field]]
+    name = "PRCE"
+    bits = "22"
+    type = "rw"
+    shortdesc = '''PhyRdy Change Interrupt Enable (PRCE): When set to '1', and GHC.'''
+    longdesc = '''IE is set to '1', and PxIS.PRCS is set to '1', the HBA shall generate an interrupt.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "21:8"
+    type = "ro"
+  [[register.field]]
+    name = "DMPE"
+    bits = "7"
+    type = "rw"
+    shortdesc = '''Device Mechanical Presence Enable (DMPE): When set, and GHC.'''
+    longdesc = '''IE is set to '1', and PxIS.DMPS is set, the HBA shall generate an interrupt. For systems that do not support a mechanical presence switch, this bit shall be a read-only '0'.'''
+  [[register.field]]
+    name = "PCE"
+    bits = "6"
+    type = "rw"
+    shortdesc = '''Port Change Interrupt Enable (PCE): When set, GHC.'''
+    longdesc = '''IE is set, and PxIS.PCS is set, the HBA shall generate an interrupt.'''
+  [[register.field]]
+    name = "DPE"
+    bits = "5"
+    type = "rw"
+    shortdesc = '''Descriptor Processed Interrupt Enable (DPE): When set, GHC.'''
+    longdesc = '''IE is set, and PxIS.DPS is set, the HBA shall generate an interrupt.'''
+  [[register.field]]
+    name = "UFE"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''Unknown FIS Interrupt Enable (UFE): When set, GHC.'''
+    longdesc = '''IE is set, and PxIS.UFS is set to '1', the HBA shall generate an interrupt.'''
+  [[register.field]]
+    name = "SDBE"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''Set Device Bits FIS Interrupt Enable (SDBE): When set, GHC.'''
+    longdesc = '''IE is set, and PxIS.SDBS is set, the HBA shall generate an interrupt.'''
+  [[register.field]]
+    name = "DSE"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''DMA Setup FIS Interrupt Enable (DSE): When set, GHC.'''
+    longdesc = '''IE is set, and PxIS.DSS is set, the HBA shall generate an interrupt.'''
+  [[register.field]]
+    name = "PSE"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''PIO Setup FIS Interrupt Enable (PSE): When set, GHC.'''
+    longdesc = '''IE is set, and PxIS.PSS is set, the HBA shall generate an interrupt.'''
+  [[register.field]]
+    name = "DHRE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Device to Host Register FIS Interrupt Enable (DHRE): When set, GHC.'''
+    longdesc = '''IE is set, and PxIS.DHRS is set, the HBA shall generate an interrupt.'''
+[[register]]
+  name = "PXCMD"
+  type = "mixed"
+  width = 32
+  description = "Port x Command and Status (PxCMD)"
+  default = "0x00400000"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "ICC"
+    bits = "31:28"
+    type = "rw"
+    shortdesc = '''Interface Communication Control (ICC): This field is used to control power management states of the interface.'''
+    longdesc = '''If the Link layer is currently in the L_IDLE state or L_NoCommPower state, writes to this field shall cause the HBA to initiate a transition to the interface power management state requested. If the Link layer is not currently in the L_IDLE state or L_NoCommPower state, writes to this field shall have no effect. When system software writes a non-reserved value other than No-Op (0h), the HBA shall perform the actions described above (for the value written) and update this field back to Idle (0h). If software writes to this field to change the state to a state the link is already in (i.e. interface is in the active state and a request is made to go to the active state), the HBA shall take no action and return this field to Idle. If the interface is in a low power state and software wants to transition to a different low power state, software must first bring the link to active and then initiate the transition to the desired low power state. If CAPS2.DESO is cleared to '0', transition to DevSleep may occur from any other interface state. If CAP2.DESO is set to '1', then DevSleep may only be transitioned to if the interface is in Slumber.'''
+  [[register.field]]
+    name = "ASP"
+    bits = "27"
+    type = "rw"
+    shortdesc = '''Aggressive Slumber / Partial (ASP): When set to '1', and ALPE is set, the HBA shall aggressively enter the Slumber state when it clears the PxCI register and the PxSACT register is cleared or when it clears the PxSACT register and PxCI is cleared.'''
+    longdesc = '''When cleared, and ALPE is set, the HBA shall aggressively enter the Partial state when it clears the PxCI register and the PxSACT register is cleared or when it clears the PxSACT register and PxCI is cleared. If CAP.SALP is cleared to '0' software shall treat this bit as reserved. See section 8.3.1.3 for details.'''
+  [[register.field]]
+    name = "ALPE"
+    bits = "26"
+    type = "rw"
+    shortdesc = '''Aggressive Link Power Management Enable (ALPE): When set to '1', the HBA shall aggressively enter a lower link power state (Partial or Slumber) based upon the setting of the ASP bit.'''
+    longdesc = '''Software shall only set this bit to '1' if CAP.SALP is set to '1'; if CAP.SALP is cleared to '0' software shall treat this bit as reserved. See section 8.3.1.3 for details.'''
+  [[register.field]]
+    name = "DLAE"
+    bits = "25"
+    type = "rw"
+    shortdesc = '''Drive LED on ATAPI Enable (DLAE): When set to '1', the HBA shall drive the LED pin active for commands regardless of the state of PxCMD.'''
+    longdesc = '''ATAPI. When cleared, the HBA shall only drive the LED pin active for commands if PxCMD.ATAPI set to '0'. See section 10.11 for details on the activity LED.'''
+  [[register.field]]
+    name = "ATAPI"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Device is ATAPI (ATAPI): When set to '1', the connected device is an ATAPI device.'''
+    longdesc = '''This bit is used by the HBA to control whether or not to generate the desktop LED when commands are active. See section 10.11 for details on the activity LED.'''
+  [[register.field]]
+    name = "APSTE"
+    bits = "23"
+    type = "rw"
+    shortdesc = '''Automatic Partial to Slumber Transitions Enabled (APSTE): When set to '1', the HBA may perform Automatic Partial to Slumber Transitions.'''
+    longdesc = '''When cleared to '0' the port shall not perform Automatic Partial to Slumber Transitions. Software shall only set this bit to '1' if CAP2.APST is set to '1'; if CAP2.APST is cleared to '0' software shall treat this bit as reserved.'''
+  [[register.field]]
+    name = "FBSCP"
+    bits = "22"
+    type = "ro"
+    shortdesc = '''FIS-based Switching Capable Port (FBSCP): When set to '1', indicates that this port supports Port Multiplier FIS-based switching.'''
+    longdesc = '''When cleared to '0', indicates that this port does not support FIS-based switching. This bit may only be set to '1' if both CAP.SPM and CAP.FBSS are set to '1'.'''
+  [[register.field]]
+    name = "ESP"
+    bits = "21"
+    type = "ro"
+    shortdesc = '''External SATA Port (ESP): When set to '1', indicates that this port's signal connector is externally accessible on a signal only connector (e.'''
+    longdesc = '''g. eSATA connector). When set to '1', CAP.SXS shall be set to '1'. When cleared to '0', indicates that this port's signal connector is not externally accessible on a signal only connector. ESP is mutually exclusive with the HPCP bit in this register. If ESP is set to '1', then the port may experience hot plug events.'''
+  [[register.field]]
+    name = "CPD"
+    bits = "20"
+    type = "ro"
+    shortdesc = '''Cold Presence Detection (CPD): If set to '1', the platform supports cold presence detection on this port.'''
+    longdesc = '''If cleared to '0', the platform does not support cold presence detection on this port. When this bit is set to '1', PxCMD.HPCP should also be set to '1'.'''
+  [[register.field]]
+    name = "MPSP"
+    bits = "19"
+    type = "ro"
+    shortdesc = '''Mechanical Presence Switch Attached to Port (MPSP): If set to '1', the platform supports an mechanical presence switch attached to this port.'''
+    longdesc = '''If cleared to '0', the platform does not support a mechanical presence switch attached to this port. When this bit is set to '1', PxCMD.HPCP should also be set to '1'.'''
+  [[register.field]]
+    name = "HPCP"
+    bits = "18"
+    type = "ro"
+    shortdesc = '''Hot Plug Capable Port (HPCP): When set to '1', indicates that this port's signal and power connectors are externally accessible via a joint signal and power connector for blindmate device hot plug.'''
+    longdesc = '''When cleared to '0', indicates that this port's signal and power connectors are not externally accessible via a joint signal and power connector. HPCP is mutually exclusive with the ESP bit in this register.'''
+  [[register.field]]
+    name = "PMA"
+    bits = "17"
+    type = "rw"
+    shortdesc = '''Port Multiplier Attached (PMA): This bit is read/write for HBAs that support a Port Multiplier (CAP.'''
+    longdesc = '''SPM = '1'). This bit is read-only for HBAs that do not support a port Multiplier (CAP.SPM = '0'). When set to '1' by software, a Port Multiplier is attached to the HBA for this port. When cleared to '0' by software, a Port Multiplier is not attached to the HBA for this port. Software is responsible for detecting whether a Port Multiplier is present; hardware does not auto-detect the presence of a Port Multiplier. Software shall only set this bit to '1' when PxCMD.ST is cleared to '0'.'''
+  [[register.field]]
+    name = "CPS"
+    bits = "16"
+    type = "ro"
+    shortdesc = '''Cold Presence State (CPS): The CPS bit reports whether a device is currently detected on this port via cold presence detection.'''
+    longdesc = '''If CPS is set to '1', then the HBA detects via cold presence that a device is attached to this port. If CPS is cleared to '0' , then the HBA detects via cold presence that there is no device attached to this port.'''
+  [[register.field]]
+    name = "CR"
+    bits = "15"
+    type = "ro"
+    shortdesc = '''Command List Running (CR): When this bit is set, the command list DMA engine for the port is running.'''
+    longdesc = '''See the AHCI state machine in section 5.3.2 for details on when this bit is set and cleared by the HBA.'''
+  [[register.field]]
+    name = "FR"
+    bits = "14"
+    type = "ro"
+    shortdesc = '''FIS Receive Running (FR): When set, the FIS Receive DMA engine for the port is running.'''
+    longdesc = '''See section 10.3.2 for details on when this bit is set and cleared by the HBA.'''
+  [[register.field]]
+    name = "MPSS"
+    bits = "13"
+    type = "ro"
+    shortdesc = '''Mechanical Presence Switch State (MPSS): The MPSS bit reports the state of a mechanical presence switch attached to this port.'''
+    longdesc = '''If CAP.SMPS is set to '1' and the mechanical presence switch is closed then this bit is cleared to '0'. If CAP.SMPS is set to '1' and the mechanical presence switch is open then this bit is set to '1'. If CAP.SMPS is set to '0' then this bit is cleared to '0'. Software should only use this bit if both CAP.SMPS and PxCMD.MPSP are set to '1'.'''
+  [[register.field]]
+    name = "CCS"
+    bits = "12:8"
+    type = "ro"
+    shortdesc = '''Current Command Slot (CCS): This field is valid when PxCMD.'''
+    longdesc = '''ST is set to '1' and shall be set to the command slot value of the command that is currently being issued by the HBA. When PxCMD.ST transitions from '1' to '0', this field shall be reset to '0'. After PxCMD.ST transitions from '0' to '1', the highest priority slot to issue from next is command slot 0. After the first command has been issued, the highest priority slot to issue from next is PxCMD.CCS + 1. For example, after the HBA has issued its first command, if CCS = 0h and PxCI is set to 3h, the next command that will be issued is from command slot 1.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:5"
+    type = "ro"
+  [[register.field]]
+    name = "FRE"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''FIS Receive Enable (FRE): When set, the HBA may post received FISes into the FIS receive area pointed to by PxFB (and for 64-bit HBAs, PxFBU).'''
+    longdesc = '''When cleared, received FISes are not accepted by the HBA, except for the first D2H register FIS after the initialization sequence, and no FISes are posted to the FIS receive area. System software must not set this bit until PxFB (PxFBU) have been programmed with a valid pointer to the FIS receive area, and if software wishes to move the base, this bit must first be cleared, and software must wait for the FR bit in this register to be cleared. Refer to section 10.3.2 for important restrictions on when FRE can be set and cleared.'''
+  [[register.field]]
+    name = "CLO"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''Command List Override (CLO): Setting this bit to '1' causes PxTFD.'''
+    longdesc = '''STS.BSY and PxTFD.STS.DRQ to be cleared to '0'. This allows a software reset to be transmitted to the device regardless of whether the BSY and DRQ bits are still set in the PxTFD.STS register. The HBA sets this bit to '0' when PxTFD.STS.BSY and PxTFD.STS.DRQ have been cleared to '0'. A write to this register with a value of '0' shall have no effect. This bit shall only be set to '1' immediately prior to setting the PxCMD.ST bit to '1' from a previous value of '0'. Setting this bit to '1' at any other time is not supported and will result in indeterminate behavior. Software must wait for CLO to be cleared to '0' before setting PxCMD.ST to '1'.'''
+  [[register.field]]
+    name = "POD"
+    bits = "2"
+    type = "ro"
+    shortdesc = '''Power On Device (POD): This bit is read/write for HBAs that support cold presence detection on this port as indicated by PxCMD.'''
+    longdesc = '''CPD set to '1'. This bit is read only '1' for HBAs that do not support cold presence detect. When set, the HBA sets the state of a pin on the HBA to '1' so that it may be used to provide power to a cold-presence detectable port.'''
+  [[register.field]]
+    name = "SUD"
+    bits = "1"
+    type = "ro"
+    shortdesc = '''Spin-Up Device (SUD): This bit is read/write for HBAs that support staggered spin-up via CAP.'''
+    longdesc = '''SSS. This bit is read only '1' for HBAs that do not support staggered spin-up. On an edge detect from '0' to '1', the HBA shall start a COMRESET initializatoin sequence to the device. Clearing this bit to '0' does not cause any OOB signal to be sent on the interface. When this bit is cleared to '0' and PxSCTL.DET=0h, the HBA will enter listen mode as detailed in section 10.10.1.'''
+  [[register.field]]
+    name = "ST"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Start (ST): When set, the HBA may process the command list.'''
+    longdesc = '''When cleared, the HBA may not process the command list. Whenever this bit is changed from a '0' to a '1', the HBA starts processing the command list at entry '0'. Whenever this bit is changed from a '1' to a '0', the PxCI register is cleared by the HBA upon the HBA putting the controller into an idle state. This bit shall only be set to '1' by software after PxCMD.FRE has been set to '1'. Refer to section 10.3.1 for important restrictions on when ST can be set to '1'.'''
+[[register]]
+  name = "PXTFD"
+  type = "ro"
+  width = 32
+  description = "Port x Task File Data (PxTFD): This is a 32-bit register that copies specific fields of the task file when FISes are received. The FISes that contain this information are: * D2H Register FIS * PIO Setup FIS * Set Device Bits FIS (BSY and DRQ are not updated with this FIS) Status (STS): Contains the latest copy of the task file status register. The HBA shall update the entire 8-bit field, not just the bits noted above."
+  default = "0x0000007F"
+  offset = "0x00000020"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "ro"
+  [[register.field]]
+    name = "ERR"
+    bits = "15:8"
+    type = "ro"
+  [[register.field]]
+    name = "STS_BSY"
+    bits = "7"
+    type = "ro"
+    shortdesc = '''STS.'''
+    longdesc = '''BSY: Indicates the interface is busy.'''
+  [[register.field]]
+    name = "STS_CS1"
+    bits = "6:4"
+    type = "ro"
+    shortdesc = '''STS.'''
+    longdesc = '''CS1: Command specific.'''
+  [[register.field]]
+    name = "STS_DRQ"
+    bits = "3"
+    type = "ro"
+    shortdesc = '''STS.'''
+    longdesc = '''DRQ: Indicates a data transfer is requested.'''
+  [[register.field]]
+    name = "STS_CS"
+    bits = "2:1"
+    type = "ro"
+    shortdesc = '''STS.'''
+    longdesc = '''CS: Command specific.'''
+  [[register.field]]
+    name = "STS_ERR"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''STS.'''
+    longdesc = '''ERR: Indicates an error during the transfer.'''
+[[register]]
+  name = "PXSIG"
+  type = "ro"
+  width = 32
+  description = "Port x Signature (PxSIG): This is a 32-bit register which contains the initial signature of an attached device when the first D2H Register FIS is received from that device. It is updated once after a reset sequence."
+  default = "0xFFFFFFFF"
+  offset = "0x00000024"
+  [[register.field]]
+    name = "SIG"
+    bits = "31:0"
+    type = "ro"
+    shortdesc = '''Signature (SIG): Contains the signature received from a device on the first D2H Register FIS.'''
+    longdesc = '''The bit order is as follows: Bit Field 31:24 LBA High Register 23:16 LBA Mid Register 15:08 LBA Low Register 07:00 Sector Count Register'''
+[[register]]
+  name = "PXSSTS"
+  type = "ro"
+  width = 32
+  description = "Port x serial ATA Status (SCR0: Sstatus) (PxSSTS): This 32-bit register conveys the current state of the interface and host. The HBA updates it continuously and asynchronously. When the HBA transmits a COMRESET to the device, this register is updated to its reset values."
+  default = "0x00000000"
+  offset = "0x00000028"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:12"
+    type = "ro"
+  [[register.field]]
+    name = "IPM"
+    bits = "11:8"
+    type = "ro"
+    shortdesc = '''Interface Power Management (IPM): Indicates the current interface state.'''
+    longdesc = '''All other values reserved.'''
+  [[register.field]]
+    name = "SPD"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''Current Interface Speed (SPD): Indicates the negotiated interface communication speed.'''
+    longdesc = '''All other values reserved'''
+  [[register.field]]
+    name = "DET"
+    bits = "3:0"
+    type = "ro"
+    shortdesc = '''Device Detection (DET): Indicates the interface device detection and Phy state*.'''
+    longdesc = '''All other values reserved. * The means by which the implementation determines device presence may be vendor specific. However, device presence shall always be indicated anytime a COMINIT signal is received.'''
+[[register]]
+  name = "PXSCTL"
+  type = "mixed"
+  width = 32
+  description = "Port x Serial ATA Control (SCR2: SControl) (PxSCTL): This is a 32-bit read-write register by which software controls SATA capabilities. Writes to this register result in an action being taken by the host adapter or interface. Reads from the register return the last value written to it."
+  default = "0x00000300"
+  offset = "0x0000002C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:20"
+    type = "ro"
+  [[register.field]]
+    name = "PMP"
+    bits = "19:16"
+    type = "ro"
+  [[register.field]]
+    name = "SPM"
+    bits = "15:12"
+    type = "ro"
+  [[register.field]]
+    name = "IPM"
+    bits = "11:8"
+    type = "rw"
+    shortdesc = '''Interface Power Management Transitions Allowed (IPM): Indicates which power states the HBA is allowed to transition to.'''
+    longdesc = '''If an interface power management state is disabled, the HBA is not allowed to initiate that state and the HBA must PMNAKP any request from the device to enter that state. All other values reserved.'''
+  [[register.field]]
+    name = "SPD"
+    bits = "7:4"
+    type = "rw"
+    shortdesc = '''Speed Allowed (SPD): Indicates the highest allowable speed of the interface.'''
+    longdesc = '''All other values reserved.'''
+  [[register.field]]
+    name = "DET"
+    bits = "3:0"
+    type = "rw"
+    shortdesc = '''Device Detection Initialization (DET): Controls the HBA's device detection and interface initialization.'''
+    longdesc = '''All other values reserved. This field may only be modified when PxCMD.ST is '0'. Changing this field while the PxCMD.ST bit is set to '1' results in undefined behavior. When PxCMD.ST is set to '1', this field should have a value of 0h. Note: It is permissible to implement any of the Serial ATA defined behaviors for transmission of COMRESET when DET=1h.'''
+[[register]]
+  name = "PXSERR"
+  type = "wtc"
+  width = 32
+  description = "Port x Serial ATA Error (SCR1: SError) (PxSERR): Error (ERR)- The ERR field contains error information for use by host software in determining the appropriate response to the error condition. Diagnostics (DIAG) - Contains diagnostic error information for use by diagnostic software in validating correct operation or isolating failure modes:"
+  default = "0x00000000"
+  offset = "0x00000030"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:27"
+    type = "wtc"
+  [[register.field]]
+    name = "DIAG_X"
+    bits = "26"
+    type = "wtc"
+    shortdesc = '''Exchanged (X): When set to one this bit indicates that a change in device presence has been detected since the last time this bit was cleared.'''
+    longdesc = '''The means by which the implementation determines that the device presence has changed is vendor specific. This bit shall always be set to one anytime a COMINIT signal is received. This bit is reflected in the PxIS.PCS bit.'''
+  [[register.field]]
+    name = "DIAG_F"
+    bits = "25"
+    type = "wtc"
+  [[register.field]]
+    name = "DIAG_T"
+    bits = "24"
+    type = "wtc"
+  [[register.field]]
+    name = "DIAG_S"
+    bits = "23"
+    type = "wtc"
+    shortdesc = '''Link Sequence Error (S): Indicates that one or more Link state machine error conditions was encountered.'''
+    longdesc = '''The Link Layer state machine defines the conditions under which the link layer detects an erroneous transition.'''
+  [[register.field]]
+    name = "DIAG_H"
+    bits = "22"
+    type = "wtc"
+    shortdesc = '''Handshake Error (H): Indicates that one or more R_ERR handshake response was received in response to frame transmission.'''
+    longdesc = '''Such errors may be the result of a CRC error detected by the recipient, a disparity or 8b/10b decoding error, or other error condition leading to a negative handshake on a transmitted frame.'''
+  [[register.field]]
+    name = "DIAG_C"
+    bits = "21"
+    type = "wtc"
+  [[register.field]]
+    name = "DIAG_D"
+    bits = "20"
+    type = "wtc"
+  [[register.field]]
+    name = "DIAG_B"
+    bits = "19"
+    type = "wtc"
+  [[register.field]]
+    name = "DIAG_W"
+    bits = "18"
+    type = "wtc"
+  [[register.field]]
+    name = "DIAG_I"
+    bits = "17"
+    type = "wtc"
+  [[register.field]]
+    name = "DIAG_N"
+    bits = "16"
+    type = "wtc"
+    shortdesc = '''PhyRdy Change (N): Indicates that the PhyRdy signal changed state.'''
+    longdesc = '''This bit is reflected in the PxIS.PRCS bit.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:12"
+    type = "wtc"
+  [[register.field]]
+    name = "ERR_E"
+    bits = "11"
+    type = "wtc"
+    shortdesc = '''Internal Error (E): The host bus adapter experienced an internal error that caused the operation to fail and may have put the host bus adapter into an error state.'''
+    longdesc = '''The internal error may include a master or target abort when attempting to access system memory, an elasticity buffer overflow, a primitive mis-alignment, a synchronization FIFO overflow, and other internal error conditions. Typically when an internal error occurs, a non-fatal or fatal status bit in the PxIS register will also be set to give software guidance on the recovery mechanism required.'''
+  [[register.field]]
+    name = "ERR_P"
+    bits = "10"
+    type = "wtc"
+  [[register.field]]
+    name = "ERR_C"
+    bits = "9"
+    type = "wtc"
+    shortdesc = '''Persistent Communication or Data Integrity Error (C): A communication error that was not recovered occurred that is expected to be persistent.'''
+    longdesc = '''Persistent communications errors may arise from faulty interconnect with the device, from a device that has been removed or has failed, or a number of other causes.'''
+  [[register.field]]
+    name = "ERR_T"
+    bits = "8"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:2"
+    type = "wtc"
+  [[register.field]]
+    name = "ERR_M"
+    bits = "1"
+    type = "wtc"
+    shortdesc = '''Recovered Communications Error (M): Communications between the device and host was temporarily lost but was re-established.'''
+    longdesc = '''This can arise from a device temporarily being removed, from a temporary loss of Phy synchronization, or from other causes and may be derived from the PhyNRdy signal between the Phy and Link layers.'''
+  [[register.field]]
+    name = "ERR_I"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "PXSACT"
+  type = "rw"
+  width = 32
+  description = "Port x Serial ATA Active (SCR3: SActive) (PxSACT)"
+  default = "0x00000000"
+  offset = "0x00000034"
+  [[register.field]]
+    name = "DS"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Device Status (DS): This field is bit significant.'''
+    longdesc = '''Each bit corresponds to the TAG and command slot of a native queued command, where bit 0 corresponds to TAG 0 and command slot 0. This field is set by software prior to issuing a native queued command for a particular command slot. Prior to writing PxCI[TAG] to '1', software will set DS[TAG] to '1' to indicate that a command with that TAG is outstanding. The device clears bits in this field by sending a Set Device Bits FIS to the host. The HBA clears bits in this field that are set to '1' in the SActive field of the Set Device Bits FIS. The HBA only clears bits that correspond to native queued commands that have completed successfully. Software should only write this field when PxCMD.ST is set to '1'. This field is cleared when PxCMD.ST is written from a '1' to a '0' by software. This field is not cleared by a COMRESET or a software reset.'''
+[[register]]
+  name = "PXCI"
+  type = "rw"
+  width = 32
+  description = "PxCI: Port x Command Issue"
+  default = "0x00000000"
+  offset = "0x00000038"
+  [[register.field]]
+    name = "CI"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Commands Issued (CI): This field is bit significant.'''
+    longdesc = '''Each bit corresponds to a command slot, where bit 0 corresponds to command slot 0. This field is set by software to indicate to the HBA that a command has been built in system memory for a command slot and may be sent to the device. When the HBA receives a FIS which clears the BSY, DRQ, and ERR bits for the command, it clears the corresponding bit in this register for that command slot. Bits in this field shall only be set to '1' by software when PxCMD.ST is set to '1'. This field is also cleared when PxCMD.ST is written from a '1' to a '0' by software.'''
+[[register]]
+  name = "PXSNTF"
+  type = "mixed"
+  width = 32
+  description = "Port x Serial ATA Notification (SCR4: SNotification) (PxSNTF): This register is used to determine if asynchronous notification events have occurred for directly connected devices and devices connected to a Port Multiplier."
+  default = "0x00000000"
+  offset = "0x0000003C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "ro"
+  [[register.field]]
+    name = "PMN"
+    bits = "15:0"
+    type = "wtc"
+    shortdesc = '''PM Notify (PMN): This field indicates whether a particular device with the corresponding PM Port number issued a Set Device Bits FIS to the host with the Notification bit set.'''
+    longdesc = '''PM Port 0h sets bit 0.. PM Port Fh sets bit 15 Individual bits are cleared by software writing 1's to the corresponding bit positions. This field is reset to default on a HBA Reset, but it is not reset by COMRESET or software reset.'''
+[[register]]
+  name = "PXFBS"
+  type = "mixed"
+  width = 32
+  description = "Port x FIS-based Switching Control (PxFBS): This register is used to control and obtain status for Port Multiplier FIS-based switching."
+  default = "0x00004000"
+  offset = "0x00000040"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:20"
+    type = "ro"
+  [[register.field]]
+    name = "DWE"
+    bits = "19:16"
+    type = "ro"
+    shortdesc = '''Device With Error (DWE): Set by hardware to the value of the Port Multiplier port number of the device that experienced a fatal error condition.'''
+    longdesc = '''This field is only valid when PxFBS.SDE = '1'.'''
+  [[register.field]]
+    name = "ADO"
+    bits = "15:12"
+    type = "ro"
+    shortdesc = '''Active Device Optimization (ADO): This register exposes the number of active devices that the FIS-based switching implementation has been optimized for.'''
+    longdesc = '''When there are more devices active than indicated in this field, throughput of concurrent traffic may degrade. For optimal performance, software should limit the number of active devices based on this value. The minimum value for this field shall be 2h, indicating that at least two devices may be active with high performance maintained.'''
+  [[register.field]]
+    name = "DEV"
+    bits = "11:8"
+    type = "rw"
+    shortdesc = '''Device To Issue (DEV): Set by software to the Port Multiplier port value of the next command to issue.'''
+    longdesc = '''This field enables hardware to know the port the command is to be issued to without fetching the command header. Software shall not issue commands to multiple Port Multiplier ports on the same write of the PxCI register.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:3"
+    type = "ro"
+  [[register.field]]
+    name = "SDE"
+    bits = "2"
+    type = "ro"
+    shortdesc = '''Single Device Error (SDE): When set to '1' and a fatal error condition has occurred, hardware believes the error is localized to one device such that software's first error recovery step should be to utilize the PxFBS.'''
+    longdesc = '''DEC functionality. When cleared to '0' and a fatal error condition has occurred, the error applies to the entire port and to clear the error PxCMD.ST shall be cleared to '0' by software. This bit is cleared on PxFBS.DEC being set to '1' or on PxCMD.ST being cleared to '0'.'''
+  [[register.field]]
+    name = "DEC"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Device Error Clear (DEC): When set to '1' by software, the HBA shall clear the device specific error condition and the HBA shall flush any commands outstanding for the device that experienced the error, including clearing the PxCI and PxSACT bits for that device to '0'.'''
+    longdesc = '''When hardware has completed error recovery actions, hardware shall clear the bit to '0'. A write of '0' to this bit by software shall have no effect. Software shall only set this bit to '1' if PxFBS.EN is set to '1' and PxFBS.SDE is set to '1'.'''
+  [[register.field]]
+    name = "EN"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Enable (EN): When set to '1', a Port Multiplier is attached and the HBA shall use FIS-based switching to communicate with it.'''
+    longdesc = '''When cleared to '0', FIS-based switching is not being used. Software shall only change the value of the EN bit when PxCMD.ST is cleared to '0'.'''
+[[register]]
+  name = "PXDEVSLP"
+  type = "mixed"
+  width = 32
+  description = "PxDEVSLP - Port x Device Sleep"
+  default = "0x00000002"
+  offset = "0x00000044"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:29"
+    type = "ro"
+  [[register.field]]
+    name = "DM"
+    bits = "28:25"
+    type = "ro"
+    shortdesc = '''DITO Multiplier (DM): 0's based value that specifies the DITO multiplier that the HBA applies to the specified DITO value, effectively extending the range of DITO from 1ms to 16368ms.'''
+    longdesc = '''A value of 0h indicates a multiplier of 1. A maximum multiplier of 16 may be applied. The HBA computes the total idle timeout as a product of DM and DITO (i.e. DITOactual = DITO * (DM+1)).'''
+  [[register.field]]
+    name = "DITO"
+    bits = "24:15"
+    type = "rw"
+    shortdesc = '''Device Sleep Idle Timeout (DITO): This field specifies the amount of the time (in approximate 1ms granularity) that the HBA shall wait before driving the DEVSLP signal.'''
+    longdesc = '''Refer to section 8.5.1.1.1 for details. Hardware reloads its port specific Device Sleep timer with this value each time the port transitions out of the DEVSLP state. For example: from DevSleep to active or PxDEVSLP.ADSE transitions from '0' to a '1'. If CAP2.SDS is cleared to '0' or CAP2.SADM is cleared to '0' or PxDEVSLP.DSP is cleared to '0' then these bits are read-only 0h and software shall treat these bits as reserved. If CAP2.SDS is set to '1' and CAP2.SADM is set to '1' and PxDEVSLP.DSP is set to '1' then these bits are read-write. Software shall only set this value when PxCMD.ST is cleared to '0' and PxDEVSLP.ADSE is cleared to '0'.'''
+  [[register.field]]
+    name = "MDAT"
+    bits = "14:10"
+    type = "rw"
+    shortdesc = '''Minimum Device Sleep Assertion Time (MDAT): This field specifies the minimum amount of time (in 1ms granularity) that the HBA must assert the DEVSLP signal before it may be de-asserted.'''
+    longdesc = '''The nominal value is 10ms and the minimum is 1ms depending on device identification information. If CAP2.SDS is cleared to '0' or PxDEVSLP.DSP is cleared to '0' then these bits are read-only 0h and software shall treat these bits as reserved. If CAP2.SDS is set to '1' and PxDEVSLP.DSP is set to '1' then these bits are read-write. Software shall only set this value when PxCMD.ST is cleared to '0', PxDEVSLP.ADSE is cleared to '0', and prior to setting PxCMD.ICC to 8h.'''
+  [[register.field]]
+    name = "DETO"
+    bits = "9:2"
+    type = "rw"
+    shortdesc = '''Device Sleep Exit Timeout (DETO): This field specifies the maximum duration (in approximate 1ms granularity) from DEVSLP de-assertion until the device is ready to accept OOB.'''
+    longdesc = '''The nominal value is 20ms while the max value is 255ms depending on device identification information. If CAP2.SDS is cleared to '0' or PxDEVSLP.DSP is cleared to '0' then these bits are read-only 0h and software shall treat these bits as reserved. If CAP2.SDS is set to '1' and PxDEVSLP.DSP is set to '1' then these bits are read-write. Software shall only set this value when PxCMD.ST is cleared to '0', PxDEVSLP.ADSE is cleared to '0', and prior to setting PxCMD.ICC to 8h.'''
+  [[register.field]]
+    name = "DSP"
+    bits = "1"
+    type = "ro"
+    shortdesc = '''Device Sleep Present (DSP): If set to '1', the platform supports Device Sleep on this port.'''
+    longdesc = '''If cleared to '0', the platform does not support Device Sleep on this port. This bit may only be set to '1' if CAP2.SDS is set to '1'. DSP is mutually exclusive with the PxCMD.HPCP bit and PxCMD.ESP bit.'''
+  [[register.field]]
+    name = "ADSE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Aggressive Device Sleep Enable (ADSE): When this bit is set to '1', the HBA shall assert the DEVSLP signal after the port has been idle (PxCI = 0h and PxSACT = 0h) for the amount of time specified by the PxDEVSLP.'''
+    longdesc = '''DITO register. When this bit is set to '1' and CAP2.DESO is set to '1', the HBA shall assert the DEVSLP signal after the port has been idle (PxCI = 0h and PxSACT = 0h) for the amount of time specified by PxDEVSLP.DITO and the interface is in Slumber (PxSSTS.IPM = 6h).When this bit is cleared to '0', the HBA does not enter DevSleep unless software directed via PxCMD.ICC. This bit shall only be set to '1' if PxDEVSLP.DSP is set to '1'. If CAP2.SDS is cleared to '0' or CAP2.SADM is cleared to '0' or if PxDEVSLP.DSP is cleared to '0', then these bits are read-only 0h and software shall treat these bits as reserved. If CAP2.SDS is set to '1' and CAP2.SADM is set to '1' and if PxDEVSLP.DSP is set to '1', then these bits are read-write.'''
+[[register]]
+  name = "PBERR"
+  type = "mixed"
+  width = 32
+  description = "PBERR - Port 0/1 BIST Error. The BIST operation as programmed by the SATA must report the operation as passing or failing, This bit is added to reflect the status of the BIST operation running in the link layer. Note: All Status Registers have no predefined Reset value. The value shown in reset is a typical value that will be read after reset but will be dependent on the SERDES status, the actual value read can differ from this."
+  default = "0x00000003"
+  offset = "0x00000070"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:2"
+    type = "ro"
+  [[register.field]]
+    name = "BEOS"
+    bits = "1"
+    type = "wtc"
+    shortdesc = '''BIST Error one shot bit (BEOS): 1= BIST operation failed 0 = BIST operation passed.'''
+    longdesc = '''When the BIST.'''
+  [[register.field]]
+    name = "BERR"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "CMDS"
+  type = "ro"
+  width = 32
+  description = "CMDS - Port 0/1 Command Status Error. The BIST operation as programmed by the SATA must report the operation as passing or failing, This bit is added to reflect the status of the BIST operation running in the link layer. Note: All Status Registers have no predefined Reset value. The value shown in reset is a typical value that will be read after reset but will be dependent on the SERDES status, the actual value read can differ from this."
+  default = "0x00000002"
+  offset = "0x00000074"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:12"
+    type = "ro"
+  [[register.field]]
+    name = "CQMS"
+    bits = "11:8"
+    type = "ro"
+  [[register.field]]
+    name = "CS"
+    bits = "7:0"
+    type = "ro"

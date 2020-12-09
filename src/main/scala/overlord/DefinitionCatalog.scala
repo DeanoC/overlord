@@ -75,12 +75,6 @@ object DefinitionCatalog {
 			spath.resolve(parsed("registerPath").asInstanceOf[Value.Str].value)
 		} else spath
 
-		val container = if (parsed.contains("container")) {
-			Some(parsed("container").asInstanceOf[Value.Str].value)
-		} else None
-
-		GameBuilder.containerStack.push(container)
-
 		var defs = ArrayBuffer[DefinitionTrait]()
 
 		if (parsed.contains("definition")) {
@@ -89,7 +83,6 @@ object DefinitionCatalog {
 				defs += Definition(chip, registerPath)
 		}
 
-		GameBuilder.containerStack.pop()
 		Some(defs.toSeq)
 	}
 }

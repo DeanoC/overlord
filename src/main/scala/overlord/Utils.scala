@@ -61,4 +61,18 @@ object Utils {
 	def lookupInt(tbl: Map[String, Value], key: String, or: Int): Int =
 		if (tbl.contains(key)) Utils.toInt(tbl(key)) else or
 
+	def lookupArray(tbl: Map[String, Value], key: String): Seq[Value] =
+		if (tbl.contains(key)) Utils.toArray(tbl(key)) else Seq()
+
+
+	def stringToValue(s: String): Value = {
+		if (s.contains(".")) Value.Real(s.toFloat)
+		else if (s.contains("'")) Value.Str(s)
+		else if (s.contains('"')) Value.Str(s)
+		else if (s.toLowerCase == "true") Value.Bool(true)
+		else if (s.toLowerCase == "false") Value.Bool(false)
+		else Value.Num(s.replace("_", "").toInt)
+	}
+
+
 }

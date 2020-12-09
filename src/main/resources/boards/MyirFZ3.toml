@@ -2,7 +2,7 @@ type = "Xilinx"
 family = "UltraScale+"
 device = "xczu3eg-sfvc784-1-e"
 
-[constraint_default]
+[default]
 pullup = false
 slew = "Slow"
 drive = 8

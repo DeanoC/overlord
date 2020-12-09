@@ -1,27 +1,28 @@
 package overlord.Gateware.GatewareAction
 
 import java.nio.file.Path
-
-import overlord.Gateware.Gateware
+import overlord.Gateware.{Gateware, Parameter}
 import overlord.Instances.Instance
-import overlord.{GameBuilder, Utils}
+import overlord.{Game, Utils}
 import toml.Value
 
 case class SourcesAction(filename: String,
                          language: String,
                          srcPath: String,
-                         pathOp: GatewarePathOp)
+                         pathOp: GatewareActionPathOp)
 	extends GatewareAction {
 
+	override val phase: GatewareActionPhase = GatewareActionPhase1()
+
 	override def execute(gateware: Instance,
-	                     parameters: Map[String, String],
+	                     parameters: Map[String, Parameter],
 	                     outPath: Path): Unit = {}
 }
 
 object SourcesAction {
 	def apply(name: String,
 	          process: Map[String, Value],
-	          pathOp: GatewarePathOp): Seq[SourcesAction] = {
+	          pathOp: GatewareActionPathOp): Seq[SourcesAction] = {
 		if (!process.contains("sources")) {
 			println(s"Sources process $name doesn't have a sources field")
 			None
@@ -32,7 +33,7 @@ object SourcesAction {
 			val filename = Utils.toString(entry("file"))
 			val srcPath  = if (filename.contains("${src}")) {
 				val tmp = filename.replace("${src}", "")
-				GameBuilder.pathStack.top.toString + tmp
+				Game.pathStack.top.toString + tmp
 			} else filename
 
 			SourcesAction(filename,

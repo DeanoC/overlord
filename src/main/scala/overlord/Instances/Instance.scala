@@ -1,10 +1,14 @@
 package overlord.Instances
 
+import overlord.Connections.Connection
+
 import java.nio.file.Path
 import overlord.Definitions._
-import overlord.Gateware.Gateware
+import overlord.Gateware.{Gateware, Parameter, Port}
 import overlord.{DefinitionCatalog, Utils}
 import toml.Value
+
+import scala.collection.mutable
 
 trait Instance {
 	val ident     : String
@@ -14,38 +18,38 @@ trait Instance {
 	private val splitIdent           = ident.split('.')
 	private val splitIdentWidthIndex = splitIdent.zipWithIndex
 
-	def hasPortsOrParameters: Boolean =
-		definition.defType.hasPortsOrParameters
-
-	def getMatchName(a: String): Option[String] = {
+	def getMatchNameAndPort(a: String): (Option[String], Option[Port]) = {
 		val withoutBits = a.split('[').head
-		if (a == ident) Some(a)
-		else if (withoutBits == ident) Some(withoutBits)
+		if (a == ident)
+			(Some(a), getPort(a.split('.').last))
+		else if (withoutBits == ident)
+			(Some(withoutBits), getPort(withoutBits.split('.').last))
 		else {
+			val splitWithoutBits = withoutBits.split('.')
 
 			// wildcard match both ident and match
-			val is = for ((id, i) <- splitIdentWidthIndex) yield {
-				if ((i < withoutBits.length) && (id == "_" || id == "*"))
-					withoutBits(i)
+			val is = for ((id, i) <- splitIdentWidthIndex) yield
+				if ((i < splitWithoutBits.length) && (id == "_" || id == "*"))
+					splitWithoutBits(i)
 				else id
-			}
-			val ms = for ((id, i) <- withoutBits.split('.').zipWithIndex) yield {
-				if ((i < is.length) && (id == "_" || id == "*")) is(i)
-				else id
-			}
 
-			if (ms sameElements is) Some(ms.mkString("."))
-			else if (definition.defType.hasPortsOrParameters) {
+			val ms =
+				for ((id, i) <- withoutBits.split('.').zipWithIndex) yield
+					if ((i < is.length) && (id == "_" || id == "*")) is(i)
+					else id
+
+			if (ms sameElements is)
+				(Some(ms.mkString(".")), getPort(ms(0)))
+			else {
 				val msv = ms.reverse
 				val mp  = msv.head
 				val tms = if (msv.length > 1) msv.tail.reverse else msv
 
-				if ((is sameElements tms) &&
-				    definition.defType.portsOrParameters.contains(mp))
-					Some(s"${ms.mkString(".")}")
-				else None
-			} else None
-
+				val port = getPort(mp)
+				if ((is sameElements tms) && port.nonEmpty)
+					(Some(s"${ms.mkString(".")}"), port)
+				else (None, None)
+			}
 		}
 	}
 
@@ -57,10 +61,37 @@ trait Instance {
 	def shared: Boolean = attributes.contains("shared")
 
 	def isGateware: Boolean = definition.gateware.nonEmpty
+
+	lazy val phase2Ports: Map[String, Port] =
+		definition.ports ++ (if (definition.gateware.nonEmpty)
+			definition.gateware.get.ports.toMap else Map())
+
+	def getPort(lastName: String): Option[Port] = {
+		if (phase2Ports.contains(lastName))
+			Some(phase2Ports(lastName))
+		else None
+	}
+	def getPorts: Map[String,Port] = phase2Ports
+
 }
+
+trait Container {
+	val children: Seq[Instance]
+	val physical: Boolean
+
+	lazy val flatChildren: Seq[Instance] =
+		children.filter(_.isInstanceOf[Container])
+			.map(_.asInstanceOf[Container]).flatMap(_.flatChildren) ++ children
+
+	def copyMutateContainer(copy: MutContainer): Container
+}
+
+class MutContainer(var children: mutable.Seq[Instance] = mutable.Seq(),
+                   var connections: mutable.Seq[Connection] = mutable.Seq())
 
 object Instance {
 	def apply(parsed: Value,
+	          defaults: Map[String, Value],
 	          catalogs: DefinitionCatalog): Option[Instance] = {
 
 		val table = Utils.toTable(parsed)
@@ -73,61 +104,80 @@ object Instance {
 		val defTypeString = Utils.toString(table("type"))
 		val name          = Utils.lookupString(table, "name", defTypeString)
 
-		val attribs: Map[String, Value] = table.filter(
+		val attribs: Map[String, Value] = (defaults ++ table.filter(
 			_._1 match {
 				case "type" | "name" => false
 				case _               => true
-			})
+			}))
 
-		val defType = Definition.toDefinitionType(defTypeString, Seq())
+		val defType = Definition.toDefinitionType(defTypeString)
 
 		val defi = catalogs.FindDefinition(defType) match {
 			case Some(d) => d
-			case None    =>
-				if (table.contains("gateware")) {
-					val path = Path.of(
-						Utils.lookupString(table, "gateware", s"$name/$name" + s".toml"))
-
-					Gateware(defTypeString, path) match {
-						case Some(gw) =>
-							val dt     =
-								Definition.toDefinitionType(defTypeString,
-								                            gw.ports ++
-								                            gw.parameters.map(_._1).toSeq)
-							val result = Definition(dt, attribs, None, Some(gw))
-							catalogs.catalogs += (dt -> result)
-							result
-
-						case None =>
-							println(s"gateware $path not found")
-							return None
-					}
-				} else {
-					println(s"${defType} not found in any catalogs")
+			case None    => definitionFrom(catalogs,
+			                               table,
+			                               defTypeString,
+			                               name,
+			                               attribs,
+			                               defType) match {
+				case Some(value) => value
+				case None        =>
+					println(s"No definition found or could be create $name $defType")
 					return None
-				}
+			}
 		}
 
-		defType match {
-			case _: RamDefinitionType      =>
-				Some(RamInstance(name, defi, attribs))
-			case _: CpuDefinitionType      =>
-				Some(CpuInstance(name, defi, attribs))
-			case _: NxMDefinitionType      =>
-				Some(NxMInstance(name, defi, attribs))
-			case _: StorageDefinitionType  =>
-				Some(StorageInstance(name, defi, attribs))
-			case _: SocDefinitionType      =>
-				Some(SocInstance(name, defi, attribs))
-			case _: BridgeDefinitionType   =>
-				Some(BridgeInstance(name, defi, attribs))
-			case _: NetDefinitionType      =>
-				Some(NetInstance(name, defi, attribs))
-			case _: OtherDefinitionType    =>
-				Some(OtherInstance(name, defi, attribs))
-			case _: PortDefinitionType     => None
-			case _: ClockDefinitionType    => None
-			case _: ConstantDefinitionType => None
+		defi.createInstance(name, attribs)
+
+	}
+
+	private def definitionFrom(catalogs: DefinitionCatalog,
+	                           table: Map[String, Value],
+	                           defTypeString: String,
+	                           name: String,
+	                           attribs: Map[String, Value],
+	                           defType: DefinitionType)
+	: Option[Definition] = {
+		if (table.contains("gateware")) {
+			val path = Path.of(
+				Utils.lookupString(table, "gateware", s"$name/$name" + s".toml"))
+
+			Gateware(defTypeString, path) match {
+				case Some(gw) =>
+					val result = Definition(defType, attribs,
+					                        gw.ports.toMap,
+					                        gw.parameters.toMap,
+					                        None,
+					                        Some(gw),
+					                        None)
+					catalogs.catalogs += (defType -> result)
+					Some(result)
+
+				case None =>
+					println(s"gateware $path not found")
+					None
+			}
+		} else defType match {
+			/*		case RamDefinitionType(ident)      =>
+						case CpuDefinitionType(ident)      =>
+						case NxMDefinitionType(ident)      =>
+						case StorageDefinitionType(ident)  =>
+						case SocDefinitionType(ident)      =>
+						case BridgeDefinitionType(ident)   =>
+						case NetDefinitionType(ident)      =>
+						case OtherDefinitionType(ident)    =>
+						case PortDefinitionType(ident)     =>
+						case ConstantDefinitionType(ident) =>
+			*/
+			case BoardDefinitionType(_) |
+			     ClockDefinitionType(_) |
+			     PinGroupDefinitionType(_) =>
+				val result = Definition(defType, attribs)
+				catalogs.catalogs += (defType -> result)
+				Some(result)
+			case _                         =>
+				println(s"${defType} not found in any catalogs")
+				None
 		}
 	}
 }

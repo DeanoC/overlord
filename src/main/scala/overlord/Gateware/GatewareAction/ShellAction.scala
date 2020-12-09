@@ -1,15 +1,14 @@
 package overlord.Gateware.GatewareAction
 
 import java.nio.file.Path
-
-import overlord.Gateware.Gateware
+import overlord.Gateware.{Gateware, Parameter}
 import overlord.Instances.Instance
 
 case class ShellAction(script: String,
                        args: String,
-                       pathOp: GatewarePathOp)
+                       pathOp: GatewareActionPathOp,
+                       phase: GatewareActionPhase = GatewareActionPhase1()
+                      )
 	extends GatewareAction {
-	override def execute(gateware: Instance,
-	                     parameters: Map[String, String],
-	                     outPath: Path): Unit = ???
+	override def execute(gateware: Instance, parameters: Map[String, Parameter], outPath: Path): Unit = ???
 }
