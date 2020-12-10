@@ -115,15 +115,7 @@ object Top {
 	def writeTopWire(loc: InstanceLoc, comma: String): String = {
 		val sb = new StringBuilder
 
-		if (loc.isPin) {
-			val pg = loc.instance.asInstanceOf[PinGroupInstance]
-			for (port <- pg.constraint.ports) {
-				val wdir = port.direction
-				val dir  = s"${wdir}"
-				val bits = if (port.width.singleBit) "" else s"${port.width.text}"
-				sb ++= s"$comma\t$dir wire $bits ${sanatizeIdent(port.name)}"
-			}
-		} else if (loc.isClock) {
+		if (loc.isClock) {
 			val clk = loc.instance.asInstanceOf[ClockInstance]
 			sb ++= s"$comma\tinput wire ${sanatizeIdent(loc.fullName)}"
 		} else if (loc.port.nonEmpty) {

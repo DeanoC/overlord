@@ -38,7 +38,7 @@ object Definition {
 		}
 	}
 
-	def apply(chip: Value, registerPath: Path): Definition = {
+	def apply(chip: Value, path: Path): Definition = {
 		val table       = Utils.toTable(chip)
 		val defTypeName = Utils.toString(table("type"))
 
@@ -49,15 +49,14 @@ object Definition {
 		})
 
 		val sw = if (table.contains("software"))
-			Software(Utils.toArray(table("software")), registerPath)
+			Software(Utils.toArray(table("software")), path)
 		else None
 
 		val name = defTypeName.split('.')
 
 		val gw = if (table.contains("gateware"))
 			Gateware(name.last,
-			         registerPath.resolve(Path.of(
-				         s"${name.last}/${name.last}" + s".toml")))
+			         path.resolve(Utils.toString(table("gateware"))))
 		else None
 
 		val hw = None

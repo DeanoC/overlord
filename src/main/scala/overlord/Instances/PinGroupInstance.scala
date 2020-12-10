@@ -1,6 +1,6 @@
 package overlord.Instances
 
-import overlord.Definitions.{Definition, DefinitionTrait}
+import overlord.Definitions.DefinitionTrait
 import overlord.Gateware.{BitsDesc, Port, WireDirection}
 import overlord.{DiffPinConstraint, PinConstraint, PinConstraintType, Utils}
 import toml.Value
@@ -17,17 +17,10 @@ case class PinGroupInstance(ident: String,
 	: PinGroupInstance =
 		copy(ident = nid, attributes = nattribs)
 
-	lazy val allPorts: Map[String, Port] =
-		phase2Ports ++ constraint.ports.map(p => (p.name -> p))
+	private lazy val allPorts: Map[String, Port] =
+		super.getPorts ++ constraint.ports.map(p => (p.name -> p))
 
-	override def getPort(lastName: String): Option[Port] = {
-		if (allPorts.contains(lastName))
-			Some(allPorts(lastName))
-		else None
-	}
-
-	override def getPorts: Map[String, Port] = allPorts
-
+	override def getPorts: Map[String,Port] = allPorts
 }
 
 object PinGroupInstance {
@@ -133,9 +126,12 @@ object PinGroupInstance {
 
 		val directions = if (hasDirection) {
 			val dir = Utils.toString(attributes("direction"))
+				.toLowerCase
 			for (i <- 0 until pinCount) yield dir
 		} else if (hasDirections)
-			Utils.toArray(attributes("directions")).map(Utils.toString)
+			Utils.toArray(attributes("directions"))
+				.map(Utils.toString)
+				.map(_.toLowerCase)
 		else for (i <- 0 until pinCount) yield "inout"
 
 		val pullups = if (hasPullup) {

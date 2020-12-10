@@ -1,9 +1,7 @@
 package overlord.Connections
 
-import overlord.Definitions.{ClockDefinitionType, DefinitionTrait, DefinitionType}
-import overlord.Gateware.{Port, WireDirection}
-import overlord.Instances.{ClockInstance, Instance, PinGroupInstance}
-import toml.Value
+import overlord.Definitions.DefinitionType
+import overlord.Instances.Instance
 
 case class ConnectedBetween(connectionType: ConnectionType,
                             connectionPriority: ConnectionPriority,
@@ -13,7 +11,8 @@ case class ConnectedBetween(connectionType: ConnectionType,
 	extends Connected {
 
 	override def connectsToInstance(inst: Instance): Boolean =
-		(main.instance == inst || secondary.instance == inst)
+		(main.instance.ident == inst.ident ||
+		 secondary.instance.ident == inst.ident)
 
 	override def first: Option[InstanceLoc] = Some(main)
 

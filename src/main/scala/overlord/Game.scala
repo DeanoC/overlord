@@ -63,6 +63,9 @@ case class Game(name: String,
 		children.find(_.isInstanceOf[BoardInstance])
 			.asInstanceOf[Option[BoardInstance]]
 
+	lazy val connected: Seq[Connected] =
+		connections.filter(_.isInstanceOf[Connected])
+			.map(_.asInstanceOf[Connected])
 }
 
 object Game {

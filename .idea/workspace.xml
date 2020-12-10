@@ -5,161 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="73b7f681-932b-4979-9f4f-6aee48997ac8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/a53_cti.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/a53_dbg.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/a53_etm.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/a53_pmu.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/a53_rom.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/afifm.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/ams.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/apm.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/apmddr.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/apu.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/axipcie_dma.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/axipcie_egress.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/axipcie_ingress.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/axipcie_main.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/bbram.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/can.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/cci400.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/cci_reg.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/crf_apb.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/crl_apb.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/csu.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/csudma.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/cti.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/daprom.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/ddr_phy.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/ddr_qos_ctrl.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/ddrc.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/dp.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/dpdma.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/efuse.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/etf4k.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/etf8k.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/etr.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/fpd_gpv.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/fpd_slcr.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/fpd_slcr_secure.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/ftm.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/funnel3p.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/funnel4p.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/gem.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/gic400.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/gpio.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/gpu.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/i2c.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/iou_gpv.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/iou_scntr.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/iou_scntrs.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/iou_secure_slcr.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/iou_slcr.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/ipi.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/lpd_gpv.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/lpd_slcr.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/lpd_slcr_secure.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/mbistjtag.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/nand.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/ocm.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/pcie_attrib.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/pl390.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/plsysmon.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/pmu_global.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/pmu_iomodule.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/pmu_local.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/pssysmon.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/qspi.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/r5_dbg.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/r5_etm.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/r5_rom.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/replic.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/rpu.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/rsa.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/rsa_core.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/rtc.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/sata_ahci_hba.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/sata_ahci_portcntrl.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/sata_ahci_vendor.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/sdio.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/serdes.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/siou.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/smmu500.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/smmu_reg.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/spi.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/stm.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/swdt.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/tpiu.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/tsgen.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/ttc.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/uart.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/usb3_regs.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/usb3_xhci.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/vcu_slcr.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/xmpu_ddr.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/xmpu_fpd.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/xmpu_ocm.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/xmpu_sink.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/xppu.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/xppu_sink.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/zdma.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/input/VerilogModuleParser.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Wire.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/overlord/DistanceMatrix.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/ReadVerilogTopAction.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/TomlAction.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/Parameter.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/Port.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/BoardInstance.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/ClockInstance.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/PinGroupInstance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/overlord-build.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/overlord-build.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/boards.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/boards.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/cpus.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/cpus/vexriscv/VexRiscV_smallest.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/cpus/vexriscv/vexriscv_smallest.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/boards/Arty35T.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/boards/Arty35T.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/boards/MyirFZ3.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/boards/MyirFZ3.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/boards/PynqZ2.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/boards/PynqZ2.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/overs/FullZynqPs8.over" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/overs/FullZynqPs8.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/overs/MinZynqPs8.over" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/overs/MinZynqPs8.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/overs/SaxonSoC.over" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/overs/SaxonSoC.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/Main.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/Main.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/output/Edalize.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Edalize.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/output/Project.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Project.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/output/Report.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Report.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/output/Svd.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Svd.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/output/Top.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Top.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/output/Xdc.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Xdc.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Board.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/BoardCatalog.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Connected.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Connected.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/ConnectedBetween.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/ConnectedBetween.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/ConnectedConstant.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/ConnectedConstant.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Connection.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Connection.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Unconnected.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Unconnected.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Constraint.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Constraint.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/DefinitionCatalog.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/DefinitionCatalog.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Definitions/Definition.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Definitions/Definition.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Definitions/DefinitionTrait.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Definitions/DefinitionTrait.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Definitions/GatewareTrait.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Definitions/GatewareTrait.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Game.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Game.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/GameBuilder.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/Gateware.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/Gateware.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/CopyAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/CopyAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/GatewareAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/GatewareAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/GitCloneAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/GitCloneAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/PythonAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/PythonAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/SbtAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/SbtAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/ShellAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/ShellAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/SourcesAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/SourcesAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/YamlAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/YamlAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/BridgeInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/BridgeInstance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/ConstraintInstance.scala" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/Instance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/Instance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Resources.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Resources.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Software/Software.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Software/Software.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Utils.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Utils.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/resources/blinky/blinky.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/resources/blinky/blinky.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/PinGroupInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/PinGroupInstance.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -241,8 +102,10 @@
       <recent name="$PROJECT_DIR$/src/test/resources" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src/main/resources" />
+      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/cpus/vexriscv" />
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs" />
+      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/cpus" />
+      <recent name="$PROJECT_DIR$/src/main/resources" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="overlord.Software" />
@@ -344,7 +207,7 @@
       <workItem from="1606938284592" duration="4472000" />
       <workItem from="1607005232434" duration="18146000" />
       <workItem from="1607363222761" duration="23156000" />
-      <workItem from="1607499261042" duration="26144000" />
+      <workItem from="1607499261042" duration="54781000" />
     </task>
     <task id="LOCAL-00001" summary="Major work on connection expansion and block connections&#10;Refactor and reorg instances, constraits, actions etc.&#10;moved ps8 docs to lower case">
       <created>1605964442645</created>
@@ -353,7 +216,14 @@
       <option name="project" value="LOCAL" />
       <updated>1605964442645</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Overlord major overhaul.&#10;Autoconnect pins and ports&#10;Verilog top scanning ports and parameter&#10;New Board/Pin framework&#10;Verilog Parameters in handled">
+      <created>1607545088275</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1607545088275</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -376,7 +246,8 @@
       <path value="$PROJECT_DIR$/gate/litedram" />
     </ignored-roots>
     <MESSAGE value="Major work on connection expansion and block connections&#10;Refactor and reorg instances, constraits, actions etc.&#10;moved ps8 docs to lower case" />
-    <option name="LAST_COMMIT_MESSAGE" value="Major work on connection expansion and block connections&#10;Refactor and reorg instances, constraits, actions etc.&#10;moved ps8 docs to lower case" />
+    <MESSAGE value="Overlord major overhaul.&#10;Autoconnect pins and ports&#10;Verilog top scanning ports and parameter&#10;New Board/Pin framework&#10;Verilog Parameters in handled" />
+    <option name="LAST_COMMIT_MESSAGE" value="Overlord major overhaul.&#10;Autoconnect pins and ports&#10;Verilog top scanning ports and parameter&#10;New Board/Pin framework&#10;Verilog Parameters in handled" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -387,12 +258,19 @@
           <option name="timeStamp" value="51" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="scala-line">
+          <url>file://$PROJECT_DIR$/src/main/resources/catalogs/cpus/vexriscv/VexRiscV_smallest.scala</url>
+          <line>16</line>
+          <option name="timeStamp" value="200" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="scala-line">
           <url>file://$PROJECT_DIR$/src/main/scala/output/Top.scala</url>
-          <line>75</line>
-          <properties>
-            <option name="lambda-ordinal" value="-1" />
-          </properties>
-          <option name="timeStamp" value="198" />
+          <line>135</line>
+          <option name="timeStamp" value="221" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="scala-line">
+          <url>file://$PROJECT_DIR$/src/main/scala/output/Top.scala</url>
+          <line>141</line>
+          <option name="timeStamp" value="224" />
         </line-breakpoint>
         <breakpoint enabled="true" type="java-exception">
           <properties class="java.lang.ArrayIndexOutOfBoundsException" package="java.lang" />

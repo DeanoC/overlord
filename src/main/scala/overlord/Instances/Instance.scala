@@ -62,13 +62,13 @@ trait Instance {
 
 	def isGateware: Boolean = definition.gateware.nonEmpty
 
-	lazy val phase2Ports: Map[String, Port] =
+	private lazy val phase2Ports: Map[String, Port] =
 		definition.ports ++ (if (definition.gateware.nonEmpty)
 			definition.gateware.get.ports.toMap else Map())
 
 	def getPort(lastName: String): Option[Port] = {
-		if (phase2Ports.contains(lastName))
-			Some(phase2Ports(lastName))
+		if (getPorts.contains(lastName))
+			Some(getPorts(lastName))
 		else None
 	}
 	def getPorts: Map[String,Port] = phase2Ports

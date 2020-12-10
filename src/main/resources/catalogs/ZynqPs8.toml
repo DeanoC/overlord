@@ -1,4 +1,4 @@
-registerPath = "ZynqPs8"
+path = "ZynqPs8"
 container = "soc.zynqps8"
 
 [[definition]]

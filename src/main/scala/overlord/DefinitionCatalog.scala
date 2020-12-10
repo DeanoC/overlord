@@ -20,7 +20,8 @@ class DefinitionCatalog {
 		var defi: Option[value] = None
 
 		for {k <- catalogs.keys
-		     if k.getClass == defType.getClass} {
+		     if k.getClass == defType.getClass
+		     if k.ident.length >= defType.ident.length} {
 			var curMatch = 0
 			for {(s, i) <- k.ident.zipWithIndex
 			     if i < defType.ident.length
@@ -28,7 +29,8 @@ class DefinitionCatalog {
 			     if s == defType.ident(i)
 			     } curMatch += 1
 
-			if (curMatch > bestMatch) {
+			if (curMatch > bestMatch &&
+			    curMatch >= defType.ident.length) {
 				defi = Some(catalogs(k))
 				bestMatch = curMatch
 			}
@@ -59,7 +61,6 @@ object DefinitionCatalog {
 	private def parse(spath: Path,
 	                  name: String,
 	                  src: String): Option[Seq[DefinitionTrait]] = {
-		import toml.Value
 
 		val parsed = {
 			val parsed = toml.Toml.parse(src)
@@ -71,8 +72,8 @@ object DefinitionCatalog {
 			}
 		}
 
-		val registerPath = if (parsed.contains("registerPath")) {
-			spath.resolve(parsed("registerPath").asInstanceOf[Value.Str].value)
+		val path = if (parsed.contains("path")) {
+			spath.resolve(Utils.toString(parsed("path")))
 		} else spath
 
 		var defs = ArrayBuffer[DefinitionTrait]()
@@ -80,7 +81,7 @@ object DefinitionCatalog {
 		if (parsed.contains("definition")) {
 			val chips = Utils.toArray(parsed("definition"))
 			for (chip <- chips)
-				defs += Definition(chip, registerPath)
+				defs += Definition(chip, path)
 		}
 
 		Some(defs.toSeq)
