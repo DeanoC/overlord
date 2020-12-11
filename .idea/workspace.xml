@@ -5,22 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="73b7f681-932b-4979-9f4f-6aee48997ac8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/cpus.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/cpus/vexriscv/VexRiscV_smallest.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/cpus/vexriscv/vexriscv_smallest.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/pipelined_memory_bus/build.sbt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/pipelined_memory_bus/pipelined_memory_bus.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/pipelined_memory_bus/pipelined_memory_bus.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/boards/Arty35T.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/boards/Arty35T.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/output/Top.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Top.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/output/Xdc.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Xdc.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/ConnectedBetween.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/ConnectedBetween.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/cpus.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/cpus.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/cpus/vexriscv/VexRiscV_smallest.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/cpus/vexriscv/VexRiscV_smallest.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/cpus/vexriscv/vexriscv_smallest.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/cpus/vexriscv/vexriscv_smallest.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Unconnected.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Unconnected.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/DefinitionCatalog.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/DefinitionCatalog.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Definitions/Definition.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Definitions/Definition.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Game.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Game.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/Instance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/Instance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/PinGroupInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/PinGroupInstance.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/TomlAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/TomlAction.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/YamlAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/YamlAction.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,7 +80,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../xmasdemo/xmasdemo.over" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/main/resources/catalogs" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -99,6 +96,7 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/resources/catalogs" />
       <recent name="$PROJECT_DIR$/src/test/resources" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -158,13 +156,28 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="Scala REPL" type="ScalaScriptConsoleRunConfiguration" factoryName="Scala Console" temporary="true" show_console_on_std_err="false" show_console_on_std_out="false">
+      <module name="overlord" />
+      <option name="allowRunningInParallel" value="false" />
+      <option name="javaOptions" value="-Djline.terminal=NONE" />
+      <option name="myConsoleArgs" value="" />
+      <option name="selectedOptions">
+        <list />
+      </option>
+      <option name="workingDirectory" value="$PROJECT_DIR$" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <list>
       <item itemvalue="Application.xmas demo create" />
       <item itemvalue="Application.xmas demo report" />
       <item itemvalue="Application.Main" />
+      <item itemvalue="Scala REPL.Scala REPL" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Scala REPL.Scala REPL" />
         <item itemvalue="Application.Main" />
       </list>
     </recent_temporary>
@@ -207,7 +220,7 @@
       <workItem from="1606938284592" duration="4472000" />
       <workItem from="1607005232434" duration="18146000" />
       <workItem from="1607363222761" duration="23156000" />
-      <workItem from="1607499261042" duration="54781000" />
+      <workItem from="1607499261042" duration="72735000" />
     </task>
     <task id="LOCAL-00001" summary="Major work on connection expansion and block connections&#10;Refactor and reorg instances, constraits, actions etc.&#10;moved ps8 docs to lower case">
       <created>1605964442645</created>
@@ -223,7 +236,14 @@
       <option name="project" value="LOCAL" />
       <updated>1607545088275</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Fixed definition matching too short names&#10;Added cpus catalogs&#10;Improved gateware definition pathing&#10;Added VexRiscV_smallest to catalog, added ability to customize verilog name and top module name&#10;Improved port handling for pingroup&#10;and clock instances&#10;Computed direction better (refine from inout to uni directional when possible)&#10;Xdc writes more info and only outputs used constraints">
+      <created>1607631735074</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1607631735074</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -247,7 +267,8 @@
     </ignored-roots>
     <MESSAGE value="Major work on connection expansion and block connections&#10;Refactor and reorg instances, constraits, actions etc.&#10;moved ps8 docs to lower case" />
     <MESSAGE value="Overlord major overhaul.&#10;Autoconnect pins and ports&#10;Verilog top scanning ports and parameter&#10;New Board/Pin framework&#10;Verilog Parameters in handled" />
-    <option name="LAST_COMMIT_MESSAGE" value="Overlord major overhaul.&#10;Autoconnect pins and ports&#10;Verilog top scanning ports and parameter&#10;New Board/Pin framework&#10;Verilog Parameters in handled" />
+    <MESSAGE value="Fixed definition matching too short names&#10;Added cpus catalogs&#10;Improved gateware definition pathing&#10;Added VexRiscV_smallest to catalog, added ability to customize verilog name and top module name&#10;Improved port handling for pingroup&#10;and clock instances&#10;Computed direction better (refine from inout to uni directional when possible)&#10;Xdc writes more info and only outputs used constraints" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed definition matching too short names&#10;Added cpus catalogs&#10;Improved gateware definition pathing&#10;Added VexRiscV_smallest to catalog, added ability to customize verilog name and top module name&#10;Improved port handling for pingroup&#10;and clock instances&#10;Computed direction better (refine from inout to uni directional when possible)&#10;Xdc writes more info and only outputs used constraints" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -259,18 +280,13 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="scala-line">
           <url>file://$PROJECT_DIR$/src/main/resources/catalogs/cpus/vexriscv/VexRiscV_smallest.scala</url>
-          <line>16</line>
+          <line>19</line>
           <option name="timeStamp" value="200" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="scala-line">
-          <url>file://$PROJECT_DIR$/src/main/scala/output/Top.scala</url>
-          <line>135</line>
-          <option name="timeStamp" value="221" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="scala-line">
-          <url>file://$PROJECT_DIR$/src/main/scala/output/Top.scala</url>
-          <line>141</line>
-          <option name="timeStamp" value="224" />
+          <url>file://$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/TomlAction.scala</url>
+          <line>18</line>
+          <option name="timeStamp" value="229" />
         </line-breakpoint>
         <breakpoint enabled="true" type="java-exception">
           <properties class="java.lang.ArrayIndexOutOfBoundsException" package="java.lang" />
