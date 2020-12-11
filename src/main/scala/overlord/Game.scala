@@ -1,11 +1,9 @@
 package overlord
 
-import overlord.Connections.{
-	Connected, ConnectedBetween, ConnectedConstant,
-	Connection
-}
+import overlord.Connections.{Connected, ConnectedBetween, ConnectedConstant, Connection, ConstantConnectionType}
 import overlord.Definitions.GatewareTrait
 import overlord.Gateware.GatewareAction.GatewareAction
+import overlord.Gateware.Parameter
 import overlord.Instances._
 import toml.Value
 
@@ -227,7 +225,21 @@ object Game {
 			val backupStack = Game.pathStack.clone()
 
 			for {action <- defi.actions.filter(phase(_))} {
-				val parameters = defi.parameters
+
+				val conParameters  = connections
+					.filter(_.isUnconnected)
+					.map(_.asUnconnected)
+					.filter(_.isConstant).map(c => {
+					val constant = c.connectionType.asInstanceOf[ConstantConnectionType]
+					val name     = c.secondFullName.split('.').lastOption match {
+						case Some(value) => value
+						case None        => c.secondFullName
+					}
+					mutable.HashMap[String, Parameter](
+						(name, Parameter(name, constant.constant)))
+				}).fold(mutable.HashMap[String, Parameter]())((o, n) => o ++ n)
+
+				val parameters = defi.parameters ++ conParameters
 				val merged     = connections.filter(
 					_.isInstanceOf[ConnectedConstant])
 					.map(_.asInstanceOf[ConnectedConstant])

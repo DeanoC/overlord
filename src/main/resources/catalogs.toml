@@ -1,5 +1,6 @@
 resources =[
   "boards",
+  "buses",
   "cpus",
   "sdio",
   "spi",

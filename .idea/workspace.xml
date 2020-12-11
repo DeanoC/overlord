@@ -9,7 +9,6 @@
       <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/pipelined_memory_bus/build.sbt" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/pipelined_memory_bus/pipelined_memory_bus.scala" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/pipelined_memory_bus/pipelined_memory_bus.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/cpus.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/cpus.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/cpus/vexriscv/VexRiscV_smallest.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/cpus/vexriscv/VexRiscV_smallest.scala" afterDir="false" />
@@ -220,7 +219,7 @@
       <workItem from="1606938284592" duration="4472000" />
       <workItem from="1607005232434" duration="18146000" />
       <workItem from="1607363222761" duration="23156000" />
-      <workItem from="1607499261042" duration="72735000" />
+      <workItem from="1607499261042" duration="73658000" />
     </task>
     <task id="LOCAL-00001" summary="Major work on connection expansion and block connections&#10;Refactor and reorg instances, constraits, actions etc.&#10;moved ps8 docs to lower case">
       <created>1605964442645</created>
@@ -243,7 +242,14 @@
       <option name="project" value="LOCAL" />
       <updated>1607631735074</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Added spinal pipelined memory bus to resources&#10;added buses to resource catalogs&#10;Improved directory handling to Toml and Yaml&#10;Better parameter handling, still too verbose and no arrays yet">
+      <created>1607720223593</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1607720223593</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -268,7 +274,8 @@
     <MESSAGE value="Major work on connection expansion and block connections&#10;Refactor and reorg instances, constraits, actions etc.&#10;moved ps8 docs to lower case" />
     <MESSAGE value="Overlord major overhaul.&#10;Autoconnect pins and ports&#10;Verilog top scanning ports and parameter&#10;New Board/Pin framework&#10;Verilog Parameters in handled" />
     <MESSAGE value="Fixed definition matching too short names&#10;Added cpus catalogs&#10;Improved gateware definition pathing&#10;Added VexRiscV_smallest to catalog, added ability to customize verilog name and top module name&#10;Improved port handling for pingroup&#10;and clock instances&#10;Computed direction better (refine from inout to uni directional when possible)&#10;Xdc writes more info and only outputs used constraints" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed definition matching too short names&#10;Added cpus catalogs&#10;Improved gateware definition pathing&#10;Added VexRiscV_smallest to catalog, added ability to customize verilog name and top module name&#10;Improved port handling for pingroup&#10;and clock instances&#10;Computed direction better (refine from inout to uni directional when possible)&#10;Xdc writes more info and only outputs used constraints" />
+    <MESSAGE value="Added spinal pipelined memory bus to resources&#10;added buses to resource catalogs&#10;Improved directory handling to Toml and Yaml&#10;Better parameter handling, still too verbose and no arrays yet" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added spinal pipelined memory bus to resources&#10;added buses to resource catalogs&#10;Improved directory handling to Toml and Yaml&#10;Better parameter handling, still too verbose and no arrays yet" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

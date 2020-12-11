@@ -1,0 +1,40 @@
+actions = [
+    "make_config",
+    "sbt_run",
+    "src",
+    "read_verilog_top"
+]
+
+[[process]]
+name = 'make_config'
+processor = 'toml'
+filename = 'config.toml'
+parameters = [
+    "consumer_count",
+    "data_width",
+    "address_width",
+    "ibus_data_width",
+    "ibus_address_width",
+    "instruction_width",
+    "dbus_data_width",
+    "dbus_address_width",
+]
+
+[[process]]
+name = 'sbt_run'
+processor = 'sbt'
+main_scala = "pipelined_memory_bus.scala"
+with_build_sbt = true
+args = 'runMain PipelinedMemoryBus ./config.toml .. PipelinedMemoryBus'
+path_op = 'push'
+
+[[process]]
+name = 'src'
+processor = 'source'
+sources = [{ file ="PipelinedMemoryBus.v", language="verilog"}]
+
+
+[[process]]
+name = 'read_verilog_top'
+processor = 'read_verilog_top'
+source = {file = "PipelinedMemoryBus.v",  module_name = "PipelinedMemoryBus"}

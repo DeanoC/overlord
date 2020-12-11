@@ -2,7 +2,7 @@ package overlord.Gateware.GatewareAction
 
 import overlord.Gateware.Parameter
 import overlord.Instances.Instance
-import overlord.Utils
+import overlord.{Game, Utils}
 import toml.Value
 
 import java.nio.file.Path
@@ -14,7 +14,7 @@ case class TomlAction(parameterKeys: Seq[String],
 
 	override val phase: GatewareActionPhase = GatewareActionPhase1()
 
-	override def execute(gateware: Instance, parameters: Map[String, Parameter], outPath: Path): Unit = {
+	override def execute(instance: Instance, parameters: Map[String, Parameter], outPath: Path): Unit = {
 		val sb = new StringBuilder()
 		for {k <- parameterKeys
 		     if parameters.contains(k)} sb ++= {
@@ -29,10 +29,14 @@ case class TomlAction(parameterKeys: Seq[String],
 			}
 		}
 
-		Utils.ensureDirectories(outPath.resolve(filename).getParent)
-		Utils.writeFile(outPath.resolve(filename), sb.result())
+		val moddedOutPath = Game.pathStack.top.resolve(instance.ident)
 
-		updatePath(outPath)
+		val dstAbsPath = moddedOutPath.resolve(filename)
+		Utils.ensureDirectories(dstAbsPath.getParent)
+
+		Utils.writeFile(dstAbsPath, sb.result())
+
+		updatePath(dstAbsPath.getParent)
 	}
 }
 

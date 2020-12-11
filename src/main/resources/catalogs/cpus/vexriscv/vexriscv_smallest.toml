@@ -17,7 +17,7 @@ path_op = 'push'
 name = 'sbt_run'
 processor = 'sbt'
 main_scala = "VexRiscV_smallest.scala"
-args = 'runMain VexRiscV_smallest ..'
+args = 'runMain VexRiscV_smallest .. VexRiscV_smallest'
 
 [[process]]
 name = 'src'

@@ -8,16 +8,16 @@ object VexRiscV_smallest {
 
 		val targetDir = if (args.length >= 1) args(0)
 		else "."
+		val name      = if (args.length >= 2) args(1)
+		else "VexRiscV_smallest"
+
 
 		val config = SpinalConfig(
 			targetDirectory = targetDir,
-			netlistFileName = "VexRiscV_smallest.v"
+			netlistFileName = name + ".v"
 			)
 
-		config.generateVerilog({
-			val cpu = GenSmallest.cpu().setDefinitionName("VexRiscV_smallest")
-			cpu
-		})
+		config.generateVerilog(GenSmallest.cpu().setDefinitionName(name))
 	}
 
 	object GenSmallest {

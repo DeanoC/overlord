@@ -5,4 +5,3 @@ type = "cpu.riscv32im.vexriscv_smallest"
 arch = "riscv32im"
 width = 32
 gateware = "vexriscv/vexriscv_smallest.toml"
-hardware = {provisionLimit = 1}

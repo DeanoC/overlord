@@ -1,13 +1,18 @@
 package overlord.Connections
 
 import overlord.{Connections, DiffPinConstraint, PinConstraint}
-import overlord.Gateware.{BitsDesc, InOutWireDirection, InWireDirection, OutWireDirection, Port, WireDirection}
+import overlord.Gateware.{
+	BitsDesc, InOutWireDirection, InWireDirection,
+	OutWireDirection, Port, WireDirection
+}
 import overlord.Instances.{Container, Instance, PinGroupInstance}
 
 trait UnconnectedTrait extends Connection {
 	def first: String
 
 	def second: String
+
+	def isConstant: Boolean
 
 	def connect(unexpanded: Seq[Instance]): Seq[Connected]
 }
@@ -17,13 +22,18 @@ case class Unconnected(connectionType: ConnectionType,
                        direction: ConnectionDirection,
                        secondary: String,
                       ) extends UnconnectedTrait {
-	override def firstFullName: String = main
+	def firstFullName: String = main
 
-	override def secondFullName: String = secondary
+	def secondFullName: String = secondary
 
 	override def first: String = main
 
 	override def second: String = secondary
+
+	override def isConstant: Boolean = connectionType match {
+		case ConstantConnectionType(_) => true
+		case _                         => false
+	}
 
 	override def connect(unexpanded: Seq[Instance]): Seq[Connected] = {
 		connectionType match {
@@ -64,10 +74,10 @@ case class Unconnected(connectionType: ConnectionType,
 	                               fil: InstanceLoc,
 	                               sil: InstanceLoc) = {
 		val fp = {
-			if(fil.port.nonEmpty) fil.port.get
-			else if(fil.isPin) {
+			if (fil.port.nonEmpty) fil.port.get
+			else if (fil.isPin) {
 				fil.instance.asInstanceOf[PinGroupInstance].constraint.ports.head
-			} else if(fil.isClock) {
+			} else if (fil.isClock) {
 				Port(fil.fullName, BitsDesc(1), InWireDirection())
 			} else {
 				println(s"${fil.fullName} unable to get port")
@@ -75,10 +85,10 @@ case class Unconnected(connectionType: ConnectionType,
 			}
 		}
 		val sp = {
-			if(sil.port.nonEmpty) sil.port.get
-			else if(sil.isPin) {
+			if (sil.port.nonEmpty) sil.port.get
+			else if (sil.isPin) {
 				sil.instance.asInstanceOf[PinGroupInstance].constraint.ports.head
-			} else if(sil.isClock) {
+			} else if (sil.isClock) {
 				Port(sil.fullName, BitsDesc(1), InWireDirection())
 			} else {
 				println(s"${sil.fullName} unable to get port")
@@ -86,7 +96,7 @@ case class Unconnected(connectionType: ConnectionType,
 			}
 		}
 
-		var firstDirection = fp.direction
+		var firstDirection  = fp.direction
 		var secondDirection = sp.direction
 
 		if (fp.direction != InOutWireDirection()) {
