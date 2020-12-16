@@ -2,19 +2,14 @@ package output
 
 import java.io.{BufferedWriter, FileWriter}
 import java.nio.file.Path
-import overlord.Connections.{
-	Connected, ConnectedBetween, ConnectedConstant,
-	InstanceLoc, Unconnected, Wire, Wires
-}
-import overlord.Gateware.{Port, WireDirection}
-import overlord.Instances.{
-	BoardInstance, ClockInstance, Instance,
-	PinGroupInstance
-}
+import overlord.Connections.{Connected, ConnectedBetween, ConnectedConstant, InstanceLoc, Unconnected, Wire, Wires}
+import overlord.Gateware.{Gateware, Port, WireDirection}
+import overlord.Instances.{BoardInstance, ClockInstance, Instance, PinGroupInstance}
 import overlord._
 import toml.Value
 
 import scala.collection.mutable
+import scala.util.{Failure, Success, Try}
 
 object Top {
 
@@ -67,7 +62,7 @@ object Top {
 
 			sb ++=
 			s"""
-				 |  ${gw.moduleName}""".stripMargin
+				 |  ${instance.ident}""".stripMargin
 
 			val merged = {
 				val m = game.constants
@@ -80,14 +75,11 @@ object Top {
 				sb ++= " #(\n"
 				var pcomma = ""
 				for ((k, v) <- merged) {
-					val sn = v.value match {
-						case v: Value.Str  => s"'${v.value}'"
-						case v: Value.Bool => s"${v.value}"
-						case v: Value.Num  => s"${v.value}"
-						case v: Value.Real => s"${v.value}"
-
-						case _: Value.Arr => assert(false); ""
-						case _: Value.Tbl => assert(false); ""
+					val sn = Try {
+						v.value.toLong
+					} match {
+						case Failure(_)     => s"'${v.value.toString()}'"
+						case Success(value) => s"$value"
 					}
 
 					sb ++= s"""$pcomma    .${k}($sn)"""
@@ -96,7 +88,7 @@ object Top {
 				sb ++= "  \n )"
 			}
 
-			sb ++= s" ${instance.ident}0(\n"
+			sb ++= s" ${instance.ident}(\n"
 
 			sb ++= writeChipWires(instance, wires)
 

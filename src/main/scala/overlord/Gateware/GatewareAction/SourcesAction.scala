@@ -3,7 +3,8 @@ package overlord.Gateware.GatewareAction
 import java.nio.file.Path
 import overlord.Gateware.{Gateware, Parameter}
 import overlord.Instances.Instance
-import overlord.{Game, Utils}
+import overlord.Game
+import ikuy_utils._
 import toml.Value
 
 case class SourcesAction(filename: String,
@@ -14,9 +15,17 @@ case class SourcesAction(filename: String,
 
 	override val phase: GatewareActionPhase = GatewareActionPhase1()
 
-	override def execute(gateware: Instance,
+	private var actualSrcPath = srcPath
+
+	override def execute(instance: Instance,
 	                     parameters: Map[String, Parameter],
-	                     outPath: Path): Unit = {}
+	                     outPath: Path): Unit = {
+		actualSrcPath = srcPath.replace("${name}", instance.ident)
+
+	}
+
+	def getSrcPath: String = actualSrcPath
+
 }
 
 object SourcesAction {

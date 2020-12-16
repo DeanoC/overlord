@@ -2,6 +2,7 @@ resources =[
   "boards",
   "buses",
   "cpus",
+  "others",
   "sdio",
   "spi",
   "ram",

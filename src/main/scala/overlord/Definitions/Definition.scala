@@ -3,7 +3,7 @@ package overlord.Definitions
 import overlord.Gateware.{Gateware, Parameter, Parameters, Port, Ports}
 
 import overlord.Software.Software
-import overlord.Utils
+import ikuy_utils._
 import toml.Value
 
 import java.nio.file.Path

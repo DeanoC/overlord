@@ -2,7 +2,8 @@ package overlord.Instances
 
 import overlord.Definitions.DefinitionTrait
 import overlord.Gateware.{BitsDesc, Port, WireDirection}
-import overlord.{DiffPinConstraint, PinConstraint, PinConstraintType, Utils}
+import overlord.{DiffPinConstraint, PinConstraint, PinConstraintType}
+import ikuy_utils._
 import toml.Value
 
 import scala.collection.immutable.Map

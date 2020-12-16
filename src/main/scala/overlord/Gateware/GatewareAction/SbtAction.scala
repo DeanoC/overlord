@@ -3,7 +3,8 @@ package overlord.Gateware.GatewareAction
 import java.nio.file.Path
 import overlord.Gateware.{Gateware, Parameter}
 import overlord.Instances.Instance
-import overlord.{Game, Utils}
+import overlord.Game
+import ikuy_utils._
 import toml.Value
 
 case class SbtAction(
@@ -16,7 +17,9 @@ case class SbtAction(
 
 	override val phase: GatewareActionPhase = GatewareActionPhase1()
 
-	override def execute(instance: Instance, parameters: Map[String, Parameter], outPath: Path): Unit = {
+	override def execute(instance: Instance,
+	                     parameters: Map[String, Parameter],
+	                     outPath: Path): Unit = {
 		import scala.language.postfixOps
 
 		val srcAbsPath = if (srcPath.contains("${dest}/")) {
@@ -39,7 +42,10 @@ case class SbtAction(
 		Utils.writeFile(dstAbsPath, source)
 
 		val proargs = args.replace("${dest}", moddedOutPath.toString)
-		val result  = sys.process.Process(Seq("sbt", proargs), moddedOutPath.toFile).!
+			.replace("${name}", instance.ident)
+
+		val result  =
+			sys.process.Process(Seq("sbt", proargs), moddedOutPath.toFile).!
 
 		if (result != 0)
 			println(s"FAILED sbt of $args")

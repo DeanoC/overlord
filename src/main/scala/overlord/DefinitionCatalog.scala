@@ -7,6 +7,7 @@ import overlord.Software.Software
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
+import ikuy_utils._
 
 class DefinitionCatalog {
 	type key = DefinitionType

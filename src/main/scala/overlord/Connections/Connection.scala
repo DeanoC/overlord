@@ -1,11 +1,10 @@
 package overlord.Connections
 
-import overlord.Gateware.{
-	InOutWireDirection, InWireDirection,
-	OutWireDirection, WireDirection
-}
+import overlord.Gateware.{InOutWireDirection, InWireDirection,
+	OutWireDirection, WireDirection}
 import overlord.Instances.Instance
-import overlord.{Connections, DefinitionCatalog, Utils}
+import overlord.{Connections, DefinitionCatalog}
+import ikuy_utils._
 import toml.Value
 
 import scala.collection.mutable
@@ -38,7 +37,7 @@ case class PortConnectionType() extends ConnectionType
 
 case class ClockConnectionType() extends ConnectionType
 
-case class ConstantConnectionType(constant: toml.Value) extends ConnectionType
+case class ConstantConnectionType(constant: BigInt) extends ConnectionType
 
 case class PortGroupConnectionType(first_prefix: String,
                                    second_prefix: String,
@@ -73,7 +72,8 @@ object Connection {
 		ctype match {
 			case "port"       => PortConnectionType()
 			case "clock"      => ClockConnectionType()
-			case "constant"   => ConstantConnectionType(Utils.stringToValue(first))
+			case "constant"   => ConstantConnectionType(
+				Utils.parseBigInt(first.replace("_", "")))
 			case "port_group" => PortGroupConnectionType(
 				Utils.lookupString(table, "first_prefix", ""),
 				Utils.lookupString(table, "second_prefix", ""),

@@ -19,19 +19,4 @@ object Project {
 		if (game.cpus.nonEmpty)
 			output.Svd(game, softPath)
 	}
-
-	def ensureDirectories(path: Path): Unit = {
-		val directory = path.toFile
-		if (!directory.exists()) {
-			directory.mkdirs()
-		}
-	}
-
-	private def writeFile(path: Path, s: String): Unit = {
-		val file = path.toFile
-		val bw   = new BufferedWriter(new FileWriter(file))
-		bw.write(s)
-		bw.close()
-	}
-
 }

@@ -1,9 +1,7 @@
 package overlord.Instances
 
-import overlord.Connections.Connection
 import overlord.Definitions.DefinitionTrait
-import overlord.Gateware.{Parameter, Port}
-import overlord.Utils
+import ikuy_utils._
 import toml.Value
 
 import scala.collection.immutable

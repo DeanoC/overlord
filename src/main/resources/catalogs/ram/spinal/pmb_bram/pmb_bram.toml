@@ -5,37 +5,30 @@ actions = [
     "read_verilog_top"
 ]
 
+parameters = [
+    {key='size_in_bytes', value = 16384},
+]
+
 [[process]]
 name = 'make_config'
 processor = 'toml'
 filename = 'config.toml'
 parameters = [
-    "consumer_count",
-    "data_width",
-    "address_width",
-    "base_address",
-    "bank_size",
-
-    "ibus_data_width",
-    "ibus_address_width",
-    "instruction_width",
-    "dbus_data_width",
-    "dbus_address_width",
+    "size_in_bytes"
 ]
 
 [[process]]
 name = 'sbt_run'
 processor = 'sbt'
-main_scala = "pipelined_memory_bus.scala"
+main_scala = "pmb_bram.scala"
 with_build_sbt = true
-args = '+runMain PipelinedMemoryBus config.toml .. ${name}'
+args = '+runMain PmbBram config.toml .. ${name}'
 path_op = 'push'
 
 [[process]]
 name = 'src'
 processor = 'source'
 sources = [{ file ="${name}.v", language="verilog"}]
-
 
 [[process]]
 name = 'read_verilog_top'

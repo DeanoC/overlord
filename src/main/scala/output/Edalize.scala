@@ -4,6 +4,7 @@ import java.nio.file.Path
 import overlord.Gateware.GatewareAction.{CopyAction, GitCloneAction, SourcesAction}
 import overlord.Instances.{AlteraBoard, LatticeBoard, XilinxBoard}
 import overlord._
+import ikuy_utils._
 
 object Edalize {
 	def apply(game: Game, out: Path): Unit = {
@@ -41,7 +42,7 @@ s"""    {'name': os.path.relpath('${action.getDestPath}', work_root), 'file_type
 						case action:SourcesAction =>
 							sb ++=
 						// @formatter:off
-s"""    {'name': os.path.relpath('${action.srcPath}', work_root), 'file_type': '${action.language}Source'},\n"""
+s"""    {'name': os.path.relpath('${action.getSrcPath}', work_root), 'file_type': '${action.language}Source'},\n"""
 						// @formatter:on
 					case _                              =>
 				})

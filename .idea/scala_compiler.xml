@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ScalaCompilerConfiguration">
     <profile name="sbt 1" modules="overlord_9552" />
-    <profile name="sbt 2" modules="overlord">
+    <profile name="sbt 2" modules="a7772c47d5d7e84d3e85.ikuy_utils,ikuy_utils,overlord">
       <option name="deprecationWarnings" value="true" />
     </profile>
   </component>

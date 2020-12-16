@@ -1,10 +1,10 @@
 package overlord.Gateware
 
-import overlord.Utils
+import ikuy_utils._
 import toml.Value
 
 case class Parameter(key: String,
-                     value: toml.Value)
+                     value: BigInt)
 
 object Parameters {
 	def apply(array: Seq[toml.Value]): Seq[Parameter] = {
@@ -12,8 +12,7 @@ object Parameters {
 			v match {
 				case Value.Tbl(tbl) => if (tbl.contains("key")) {
 					val key  = Utils.toString(tbl("key"))
-					val value = if(tbl.contains("value")) tbl("value")
-					else toml.Value.Str("NO_VALUE")
+					val value = Utils.lookupBigInt(tbl,"value",0)
 
 					Some(Parameter(key, value))
 				}
@@ -21,7 +20,7 @@ object Parameters {
 					println(s"$array is a parameter inline table without a key")
 					None
 				}
-				case Value.Str(s)   => Some(Parameter(s, toml.Value.Str("NO_VALUE")))
+				case Value.Str(s)   => Some(Parameter(s, 0))
 				case _              => None
 			}
 		}).flatten

@@ -1,7 +1,9 @@
 package output
 
 import java.nio.file.Path
-import overlord.{DiffPinConstraint, Game, PinConstraint, Utils}
+import overlord.{DiffPinConstraint, Game, PinConstraint}
+
+import ikuy_utils._
 
 object Xdc {
 	def apply(game: Game, out: Path): Unit = {

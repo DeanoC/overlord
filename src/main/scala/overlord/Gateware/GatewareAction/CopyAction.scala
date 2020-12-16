@@ -1,9 +1,10 @@
 package overlord.Gateware.GatewareAction
 
 import java.nio.file.Path
-import overlord.Gateware.{Gateware, Parameter}
+import overlord.Gateware.Parameter
 import overlord.Instances.Instance
-import overlord.{Game, Utils}
+import overlord.Game
+import ikuy_utils._
 import toml.Value
 
 case class CopyAction(filename: String,

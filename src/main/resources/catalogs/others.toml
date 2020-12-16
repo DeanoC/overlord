@@ -1,0 +1,5 @@
+path = "others"
+
+[[definition]]
+type = "other.resetti"
+gateware = "resetti/resetti.toml"

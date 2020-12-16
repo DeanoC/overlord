@@ -7,7 +7,7 @@ import scala.collection.mutable
 
 case class ConnectedConstant(connectionType: ConnectionType,
                              connectionPriority: ConnectionPriority,
-                             constant: toml.Value,
+                             constant: BigInt,
                              direction: ConnectionDirection,
                              to: InstanceLoc)
 	extends Connected {

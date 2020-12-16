@@ -1,6 +1,6 @@
 package overlord.Gateware
 
-import overlord.Utils
+import ikuy_utils._
 import toml.Value
 
 sealed trait WireDirection {

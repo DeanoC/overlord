@@ -1,23 +1,45 @@
 import vexriscv.plugin._
 import vexriscv.{VexRiscv, VexRiscvConfig, plugin}
 import spinal.core._
+import ikuy_utils.Utils
+import toml.Value
 
 object VexRiscV_smallest {
 	def main(args: Array[String]): Unit = {
 		println(s"Building VexRiscV smallest cpu")
 
-		val targetDir = if (args.length >= 1) args(0)
-		else "."
-		val name      = if (args.length >= 2) args(1)
-		else "VexRiscV_smallest"
+		val tomlFile  = if (args.length >= 1) Some(args(0)) else None
+		val targetDir = if (args.length >= 2) args(1) else "."
+		val name      = if (args.length >= 3) args(2) else "VexRiscv"
 
+		val table = if (tomlFile.isEmpty) {
+			println(s"No toml config file provided, defaults will be used")
+			Map[String, Value]()
+		}
+		else {
+			println(s"Reading $tomlFile for pmb_bram config")
+			Utils.readToml(tomlFile.get)
+		}
+
+		val luInt  = new Function2[String, Int, Int] {
+			override def apply(k: String, default: Int): Int =
+				Utils.lookupInt(table, k, default)
+		}
+		val luBInt = new Function2[String, BigInt, BigInt] {
+			override def apply(k: String, default: BigInt): BigInt =
+				Utils.lookupBigInt(table, k, default)
+		}
 
 		val config = SpinalConfig(
 			targetDirectory = targetDir,
 			netlistFileName = name + ".v"
 			)
 
-		config.generateVerilog(GenSmallest.cpu().setDefinitionName(name))
+		config
+			.withPrivateNamespace
+			.generateVerilog {
+				GenSmallest.cpu().setDefinitionName(name)
+			}
 	}
 
 	object GenSmallest {

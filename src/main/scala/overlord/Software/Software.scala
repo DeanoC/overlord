@@ -2,10 +2,9 @@ package overlord.Software
 
 import java.nio.file.{Files, Path}
 import overlord.Definitions.{SoftwareGroup, SoftwareTrait}
-import overlord.{Game, Utils}
+import overlord.Game
+import ikuy_utils._
 import toml.Value
-
-import scala.collection.mutable
 
 case class RegisterBank(name: String,
                         address: String)

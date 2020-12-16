@@ -20,8 +20,9 @@ object VerilogModuleParser {
 		val txt      = load(absolutePath)
 		val boundary = mutable.ArrayBuffer[VerilogBoundary]()
 		for {i <- txt.indices
-		     if txt(i).contains(name)
-		     if txt(i).contains("module")} {
+		     if txt(i).contains("module")
+		     if txt(i).split(" ").exists(_ == name)
+		     } {
 			for {j <- i + 1 until txt.length} {
 				val words = txt(j).split(" ")
 					.filterNot(w => w == "wire" || w == "reg")

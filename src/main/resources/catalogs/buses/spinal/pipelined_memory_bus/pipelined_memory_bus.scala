@@ -4,48 +4,9 @@ import spinal.lib._
 import spinal.lib.bus.misc.SizeMapping
 import spinal.lib.bus.simple.{PipelinedMemoryBus => pmb}
 import spinal.lib.bus.simple.PipelinedMemoryBusConfig
+import ikuy_utils._
 
 object PipelinedMemoryBus {
-
-	object Utils {
-		def toString(t: toml.Value): String = t match {
-			case str: Value.Str => str.value
-			case _              => println(s"ERR $t not a string"); "ERROR"
-		}
-
-		def toArray(t: Value): Seq[Value] = t match {
-			case arr: Value.Arr => arr.values
-			case _              => println(s"ERR $t not an Array"); Seq[Value]()
-		}
-
-		def toTable(t: Value): Map[String, Value] = t match {
-			case tbl: Value.Tbl => tbl.values
-			case _              => println(s"ERR $t not a Table");
-				Map[String,
-					Value]()
-		}
-
-		def toBoolean(t: Value): Boolean = t match {
-			case b: Value.Bool => b.value
-			case _             => println(s"ERR $t not a bool"); false
-		}
-
-		def toInt(t: Value): Int = t match {
-			case b: Value.Num => b.value.toInt
-			case _            => println(s"ERR $t not a number"); 0
-		}
-
-		def lookupString(tbl: Map[String, Value], key: String, or: String)
-		: String =
-			if (tbl.contains(key)) Utils.toString(tbl(key)) else or
-
-		def lookupInt(tbl: Map[String, Value], key: String, or: Int): Int =
-			if (tbl.contains(key)) Utils.toInt(tbl(key)) else or
-
-		def lookupArray(tbl: Map[String, Value], key: String): Seq[Value] =
-			if (tbl.contains(key)) Utils.toArray(tbl(key)) else Seq()
-
-	}
 
 	var instructionWidth: Int = 32
 	var iBusDataWidth   : Int = 32
@@ -55,6 +16,9 @@ object PipelinedMemoryBus {
 	var consumerCount   : Int = 1
 	var busDataWidth    : Int = 32
 	var busAddressWidth : Int = 32
+
+	var baseAddress    : BigInt = 0x80000000l
+	var addressBankSize: BigInt = 0x1000l
 
 	def main(args: Array[String]): Unit = {
 		println(s"Building Spinal Pipelined Memory Bus")
@@ -67,11 +31,15 @@ object PipelinedMemoryBus {
 			println(s"No toml config file provided, defaults will be used")
 			Map[String, Value]()
 		}
-		else readToml(tomlFile)
+		else Utils.readToml(tomlFile.get)
 
-		val luInt = new Function2[String, Int, Int] {
+		val luInt  = new Function2[String, Int, Int] {
 			override def apply(k: String, default: Int): Int =
 				Utils.lookupInt(table, k, default)
+		}
+		val luBInt = new Function2[String, BigInt, BigInt] {
+			override def apply(k: String, default: BigInt): BigInt =
+				Utils.lookupBigInt(table, k, default)
 		}
 
 		consumerCount = luInt("consumer_count", consumerCount)
@@ -82,6 +50,9 @@ object PipelinedMemoryBus {
 		instructionWidth = luInt("instruction_width", iBusAddressWidth)
 		dBusDataWidth = luInt("dbus_data_width", busDataWidth)
 		dBusAddressWidth = luInt("dbus_address_width", busAddressWidth)
+
+		baseAddress = luBInt("base_address", baseAddress)
+		addressBankSize = luBInt("bank_size", addressBankSize)
 
 		if (iBusDataWidth != instructionWidth) {
 			println("Currently iBus Data Width and instructionWidth must be equal")
@@ -96,29 +67,11 @@ object PipelinedMemoryBus {
 			netlistFileName = name + ".v"
 			)
 
-		config.generateVerilog(
-			MuraxBus().setDefinitionName(name)
-			).printPrunedIo()
-	}
-
-	private def readToml(tomlFile: Option[String]): Map[String, Value] = {
-		println(s"Reading $tomlFile for pipelined memory bus config")
-		val file = new java.io.File(tomlFile.get)
-		if (!file.exists()) {
-			println(s"No config file found at ${file.getCanonicalPath}")
-			return Map[String, Value]()
-		}
-
-		val path       = file.getCanonicalPath
-		val sourcetext = scala.io.Source.fromFile(file)
-		val source     = sourcetext.getLines().mkString("\n")
-
-		val tparsed = toml.Toml.parse(source)
-
-		if (tparsed.isLeft) {
-			println(s"${path} has failed to parse with error ${tparsed.left}");
-			Map[String, Value]()
-		} else tparsed.right.get.values
+		config
+			.withPrivateNamespace
+			.generateVerilog {
+				MuraxBus().setDefinitionName(name)
+			}.printPrunedIo()
 	}
 
 	case class DBusSimpleCmd() extends Bundle {
@@ -252,10 +205,9 @@ object PipelinedMemoryBus {
 
 		val tmp = for (i <- 0 until consumerCount) yield pmb(busConfig)
 
-		val baseAddress = 0x80000000l
 
 		val mainBusMapping = for (i <- 0 until consumerCount) yield
-			(tmp(i), SizeMapping(0x80000000l + i * 1024l, 1024l))
+			(tmp(i), SizeMapping(baseAddress + i * addressBankSize, addressBankSize))
 
 		PipelinedMemoryBusDecoder(arb.io.bus,
 		                          mainBusMapping,

@@ -1,31 +1,22 @@
-module_name = "VexRiscV_smallest"
-
 actions = [
-	"git_clone",
 	"sbt_run",
 	"src",
 	"read_verilog_top"
 ]
 
 [[process]]
-name = 'git_clone'
-processor = 'git'
-url = 'https://github.com/SpinalHDL/VexRiscv'
-path_op = 'push'
-
-[[process]]
 name = 'sbt_run'
 processor = 'sbt'
+with_build_sbt = true
 main_scala = "VexRiscV_smallest.scala"
-args = 'runMain VexRiscV_smallest .. VexRiscV_smallest'
+args = '+runMain VexRiscV_smallest config.toml .. ${name}'
 
 [[process]]
 name = 'src'
 processor = 'source'
-sources = [{ file ="VexRiscV_smallest.v", language="verilog"}]
-
+sources = [{ file ="${name}.v", language="verilog"}]
 
 [[process]]
 name = 'read_verilog_top'
 processor = 'read_verilog_top'
-source = {file = "VexRiscV_smallest.v",  module_name = "VexRiscV_smallest"}
+source = "${name}"

@@ -2,10 +2,12 @@ package overlord.Gateware.GatewareAction
 
 import overlord.Gateware.Parameter
 import overlord.Instances.Instance
-import overlord.{Game, Utils}
+import overlord.Game
+import ikuy_utils._
 import toml.Value
 
 import java.nio.file.Path
+import scala.util.{Failure, Success, Try}
 
 case class TomlAction(parameterKeys: Seq[String],
                       filename: String,
@@ -14,18 +16,18 @@ case class TomlAction(parameterKeys: Seq[String],
 
 	override val phase: GatewareActionPhase = GatewareActionPhase1()
 
-	override def execute(instance: Instance, parameters: Map[String, Parameter], outPath: Path): Unit = {
+	override def execute(instance: Instance,
+	                     parameters: Map[String, Parameter],
+	                     outPath: Path): Unit = {
 		val sb = new StringBuilder()
 		for {k <- parameterKeys
 		     if parameters.contains(k)} sb ++= {
-			parameters(k).value match {
-				case v: Value.Str  => s"$k = '${v.value}'\n"
-				case v: Value.Bool => s"$k = ${v.value}\n"
-				case v: Value.Num  => s"$k = ${v.value}\n"
-				case v: Value.Real => s"$k = ${v.value}\n"
-
-				case _: Value.Arr  => assert(false); ""
-				case _: Value.Tbl  => assert(false); ""
+			val v = parameters(k).value
+			Try {
+				v.toLong
+			} match {
+				case Failure(_)     => s"$k = '$v'\n"
+				case Success(value) => s"$k = $value\n"
 			}
 		}
 

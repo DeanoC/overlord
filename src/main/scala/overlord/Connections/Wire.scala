@@ -44,41 +44,6 @@ object Wires {
 							            None,
 							            dm.instanceOf(p).ident)
 
-						// validate directions
-						if (cploc.port.nonEmpty) {
-							cploc.port.get.direction match {
-								case InWireDirection()  =>
-									if (c.direction != SecondToFirstConnection() &&
-									    c.direction != BiDirectionConnection()) {
-										println(s"${cploc.fullName} is an input wire isn't " +
-										        s"connected like that")
-									}
-								case OutWireDirection() =>
-									if (c.direction != FirstToSecondConnection() &&
-									    c.direction != BiDirectionConnection()) {
-										println(s"${cploc.fullName} is an output wire isn't " +
-										        s"connected like that")
-									}
-								case _                  =>
-							}
-						}
-						if (ploc.port.nonEmpty) {
-							ploc.port.get.direction match {
-								case OutWireDirection() =>
-									if (c.direction != SecondToFirstConnection() &&
-									    c.direction != BiDirectionConnection()) {
-										println(s"${ploc.fullName} is an output wire isn't " +
-										        s"connected like that")
-									}
-								case InWireDirection()  =>
-									if (c.direction != FirstToSecondConnection() &&
-									    c.direction != BiDirectionConnection()) {
-										println(s"${ploc.fullName} is an input wire isn't " +
-										        s"connected like that")
-									}
-								case _                  =>
-							}
-						}
 						if (c.direction == SecondToFirstConnection())
 							ghosts += GhostWire(p, cp, ploc, cploc, c.direction.flip)
 						else if (c.direction == BiDirectionConnection() && cp > p)

@@ -4,13 +4,13 @@ import overlord.Definitions.GatewareTrait
 import overlord.Gateware.GatewareAction._
 
 import java.nio.file.{Files, Path}
-import overlord.{Game, Utils}
+import overlord.Game
+import ikuy_utils._
 import toml.Value
 
 import scala.collection.mutable
 
 case class Gateware(actions: Seq[GatewareAction],
-                    moduleName: String,
                     ports: mutable.HashMap[String, Port],
                     parameters: mutable.HashMap[String, Parameter],
                     verilog_parameters: mutable.HashSet[String]
@@ -90,16 +90,11 @@ object Gateware {
 					case "yaml"             => YamlAction(name, process, pathOp)
 					case "toml"             => TomlAction(name, process, pathOp)
 					case "sbt"              => SbtAction(name, process, pathOp)
-					case "read_verilog_top" => ReadVerilogTopAction(name, process,
-					                                                pathOp)
+					case "read_verilog_top" =>
+						ReadVerilogTopAction(name, process, pathOp)
 					case _                  => None
 				}
 			}).flatten
-
-		val moduleName =
-			(if (parsed.contains("module_name"))
-				Utils.toString(parsed("module_name"))
-			else name).split('.').last
 
 		val ports = if (parsed.contains("ports"))
 			Ports(Utils.toArray(parsed("ports"))).map(t => (t.name -> t)).toMap
@@ -117,7 +112,6 @@ object Gateware {
 		parameters.foreach(p => parameterHash += (p._1 -> p._2))
 
 		Some(Gateware(actions,
-		              moduleName,
 		              portHash,
 		              parameterHash,
 		              mutable.HashSet()))

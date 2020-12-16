@@ -2,7 +2,7 @@ package overlord.Instances
 
 import overlord.Definitions.DefinitionTrait
 import overlord.Gateware.{BitsDesc, Port}
-import overlord.Utils
+import ikuy_utils._
 import toml.Value
 
 case class ClockInstance(ident: String,
