@@ -2,8 +2,8 @@ package output
 
 import java.nio.file.Path
 import overlord.{DiffPinConstraint, Game, PinConstraint}
-
 import ikuy_utils._
+import overlord.Connections.WildCardConnectionPriority
 
 object Xdc {
 	def apply(game: Game, out: Path): Unit = {
@@ -13,18 +13,20 @@ object Xdc {
 		sb ++= "set_property CONFIG_VOLTAGE 3.3 [current_design]\n"
 
 		for {pinGrp <- game.pins
-		     if game.connected.exists(_.connectsToInstance(pinGrp))
+		     oconnected = game.connected.find(_.connectsToInstance(pinGrp))
+		     if oconnected.nonEmpty
+		     if oconnected.get.connectionPriority != WildCardConnectionPriority()
 		     } {
 			pinGrp.constraint match {
 				case PinConstraint(pins, ports, names, directions, pullups) =>
 					val standard = Utils.toString(pinGrp.attributes("standard"))
 					for (i <- pins.indices) {
 
-						val dir = directions(i) match {
-							case "input"  => "INPUT"
-							case "output" => "OUTPUT"
-							case "inout"  => "BIDIR"
-							case _        => "ERROR"
+						val dir = directions(i).toLowerCase match {
+							case "input" | "in"   => "INPUT"
+							case "output" | "out" => "OUTPUT"
+							case "inout"          => "BIDIR"
+							case _                => "ERROR"
 						}
 
 						sb ++=

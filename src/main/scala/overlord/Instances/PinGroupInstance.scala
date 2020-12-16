@@ -21,7 +21,7 @@ case class PinGroupInstance(ident: String,
 	private lazy val allPorts: Map[String, Port] =
 		super.getPorts ++ constraint.ports.map(p => (p.name -> p))
 
-	override def getPorts: Map[String,Port] = allPorts
+	override def getPorts: Map[String, Port] = allPorts
 }
 
 object PinGroupInstance {
@@ -50,25 +50,29 @@ object PinGroupInstance {
 			return None
 		}
 
-		val prefix =
-			if (hasPrefix) Utils.toString(attributes("prefix")) + "."
-			else ""
-
 		val attribs = attributes.filter(
 			_._1 match {
 				case "type"                       => false
 				case "prefix" | "name" | "names"  => false
 				case "pin" | "pin_p" | "pin_n"    => false
 				case "pins" | "pin_ps" | "pin_ns" => false
-				case "direction" | "directions"   =>
-					if (hasDirections || hasDirection) false else true
-				case "pullup" | "pullups"         =>
-					if (hasPullups || hasPullup) false else true
+				case "direction" | "directions"   => false
+				case "pullup" | "pullups"         => false
 				case _                            => true
 			})
 
-		val name = prefix +
-		           (if (hasName) Utils.toString(attributes("name")) else ident)
+		val name: String = {
+			val pf =
+				if (hasPrefix) Utils.toString(attributes("prefix")) + "."
+				else ""
+
+			val nm =
+				if (hasName) Utils.toString(attributes("name"))
+				else if (hasNames) ""
+				else ident
+
+			pf + nm
+		}
 
 		val pins = if (hasPin) Seq(Utils.toString(attributes("pin")))
 		else if (hasPins) Utils.toArray(attributes("pins")).map(Utils.toString)
@@ -115,13 +119,13 @@ object PinGroupInstance {
 		val pinNames = if (hasNames)
 			Utils.toArray(attributes("names"))
 				.map(Utils.toString)
-				.map(prefix + _)
+				.map(name + _)
 		else Seq(name)
 
 		val constraintPinNames = if (hasNames)
 			Utils.toArray(attributes("names"))
 				.map(Utils.toString)
-				.map(prefix + _)
+				.map(name + _)
 		else if (pinCount > 1) for (i <- 0 until pinCount) yield name + s"[$i]"
 		else Seq(name)
 

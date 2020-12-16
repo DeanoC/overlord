@@ -51,9 +51,9 @@ trait Connection {
 
 	def direction: ConnectionDirection
 
-	def isUnconnected: Boolean = this.isInstanceOf[UnconnectedTrait]
+	def isUnconnected: Boolean = this.isInstanceOf[Unconnected]
 
-	def asUnconnected: UnconnectedTrait = this.asInstanceOf[UnconnectedTrait]
+	def asUnconnected: Unconnected = this.asInstanceOf[Unconnected]
 
 	def isConnected: Boolean = this.isInstanceOf[Connected]
 

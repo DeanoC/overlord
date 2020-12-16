@@ -2,11 +2,14 @@ package output
 
 import java.io.{BufferedWriter, FileWriter}
 import java.nio.file.Path
-import overlord.Connections.{Connected, ConnectedBetween, ConnectedConstant, InstanceLoc, Unconnected, Wire, Wires}
-import overlord.Gateware.{Gateware, Port, WireDirection}
-import overlord.Instances.{BoardInstance, ClockInstance, Instance, PinGroupInstance}
+import overlord.Connections.{
+	InstanceLoc, WildCardConnectionPriority, Wire, Wires
+}
+import overlord.Gateware.{Port, WireDirection}
+import overlord.Instances.{
+	ClockInstance, Instance, PinGroupInstance
+}
 import overlord._
-import toml.Value
 
 import scala.collection.mutable
 import scala.util.{Failure, Success, Try}
@@ -115,7 +118,7 @@ object Top {
 			val wdir = port.direction
 			val dir  = s"${wdir}"
 			val bits = if (port.width.singleBit) "" else s"${port.width.text}"
-			sb ++= s"$comma\t$dir wire $bits ${sanatizeIdent(port.name)}"
+			sb ++= s"$comma\t$dir wire $bits ${sanatizeIdent(loc.fullName)}"
 		}
 		sb.result()
 	}
@@ -127,10 +130,8 @@ object Top {
 
 		var comma = ""
 
-		for {wire <- wires.filter(w => w.startLoc.instance
-			                               .isInstanceOf[PinGroupInstance] ||
-		                               w.startLoc.instance
-			                               .isInstanceOf[ClockInstance])
+		for {wire <-
+			     wires.filter(_.isStartPinOrClock)
 		     loc = wire.startLoc} {
 			val s = writeTopWire(loc, comma)
 			if (s.nonEmpty) {
@@ -139,10 +140,8 @@ object Top {
 			}
 		}
 
-		for {wire <- wires
-		     oloc = wire.endLocs
-			     .find(il => il.instance.isInstanceOf[PinGroupInstance] ||
-			                 il.instance.isInstanceOf[ClockInstance])
+		for {wire <- wires.filterNot(_.priority == WildCardConnectionPriority())
+		     oloc = wire.findEndIsPinOrClock
 		     if oloc.nonEmpty
 		     loc = oloc.get} {
 			val s = writeTopWire(loc, comma)
@@ -158,19 +157,10 @@ object Top {
 	private def writeChipToChipWires(wires: Seq[Wire]): String = {
 		val sb: StringBuilder = new StringBuilder
 
-		val c2cs = wires.filter(
+		val c2cs = wires.filterNot(
 			w => {
-				if (!(w.startLoc.instance.isInstanceOf[PinGroupInstance] ||
-				      w.startLoc.instance.isInstanceOf[ClockInstance])) {
-					var result = false
-					for {
-						ew <- w.endLocs
-						if !(ew.instance.isInstanceOf[PinGroupInstance] ||
-						     ew.instance.isInstanceOf[ClockInstance])
-					} result = true
-
-					result
-				} else false
+				w.isStartPinOrClock ||
+				(w.findEndIsPinOrClock.nonEmpty && w.endLocs.length == 1)
 			})
 
 		for {wire <- c2cs

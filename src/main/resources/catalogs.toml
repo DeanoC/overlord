@@ -3,6 +3,7 @@ resources =[
   "buses",
   "bridges",
   "cpus",
+  "ios",
   "others",
   "sdio",
   "spi",

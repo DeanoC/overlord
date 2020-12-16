@@ -5,26 +5,21 @@ actions = [
     "read_verilog_top"
 ]
 
+
 [[process]]
 name = 'make_config'
 processor = 'toml'
 filename = 'config.toml'
 parameters = [
-   "apb_address_width",
-   "apb_data_width",
-   "apb_use_slave_error",
-   "apb_pipeline",
-
-   "pmb_addresswidth",
-   "pmb_datawidth",
+    "reset_clocks"
 ]
 
 [[process]]
 name = 'sbt_run'
 processor = 'sbt'
-main_scala = "pmb_to_apb.scala"
+main_scala = "apb_ctrl.scala"
 with_build_sbt = true
-args = '+runMain PMBToAPBBridge config.toml .. ${name}'
+args = '+runMain UartApbCtrl config.toml .. ${name}'
 path_op = 'push'
 
 [[process]]

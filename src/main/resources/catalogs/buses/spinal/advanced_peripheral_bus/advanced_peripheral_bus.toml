@@ -10,12 +10,12 @@ name = 'make_config'
 processor = 'toml'
 filename = 'config.toml'
 parameters = [
-    "consumerCount",
-    "addressWidth",
-    "dataWidth",
-    "useSlaveError",
-    "baseAddress",
-    "addressBankSize"
+    "consumer_count",
+    "address_width",
+    "data_width",
+    "use_slave_error",
+    "base_address",
+    "bank_size"
 ]
 
 [[process]]

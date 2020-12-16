@@ -5,27 +5,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="73b7f681-932b-4979-9f4f-6aee48997ac8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/modules/ikuy_utils.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/bridges.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/bridges/pmb_to_apb/build.sbt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/bridges/pmb_to_apb/pmb_to_apb.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/bridges/pmb_to_apb/pmb_to_apb.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/advanced_peripheral_bus/advanced_peripheral_bus.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/advanced_peripheral_bus/advanced_peripheral_bus.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/advanced_peripheral_bus/build.sbt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/overlord.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/overlord.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ios.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ios/uart/apb_ctrl/apb_ctrl.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ios/uart/apb_ctrl/apb_ctrl.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ios/uart/apb_ctrl/build.sbt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/boards/Arty35T.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/boards/Arty35T.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/buses.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/overs/FullZynqPs8.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/overs/FullZynqPs8.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/overs/MinZynqPs8.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/overs/MinZynqPs8.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/overs/SaxonSoC.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/overs/SaxonSoC.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/Main.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/Main.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/output/Report.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Report.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Definitions/Definition.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Definitions/Definition.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Definitions/DefinitionTrait.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Definitions/DefinitionTrait.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/bridges/pmb_to_apb/pmb_to_apb.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/bridges/pmb_to_apb/pmb_to_apb.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/advanced_peripheral_bus/advanced_peripheral_bus.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/advanced_peripheral_bus/advanced_peripheral_bus.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/advanced_peripheral_bus/advanced_peripheral_bus.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/advanced_peripheral_bus/advanced_peripheral_bus.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/others/resetti/resetti.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/others/resetti/resetti.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/output/Top.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Top.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/output/Xdc.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Xdc.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Connection.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Connection.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Unconnected.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Unconnected.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Wire.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Wire.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/PinGroupInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/PinGroupInstance.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -88,7 +84,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/main/resources/catalogs/bridges/pmb_to_apb" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/main/resources/catalogs/io/uart/apb_ctrl" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -104,18 +100,18 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/io/uart/apb_ctrl" />
+      <recent name="$PROJECT_DIR$/src/main/resources/catalogs" />
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs/bridges/pmb_to_apb" />
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/advanced_peripheral_bus" />
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs/other.resetti" />
-      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/cpus/vexriscv" />
-      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/ram/spinal/pmb_bram" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/ios/uart" />
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs/other.resetti" />
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs/cpus/vexriscv" />
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs" />
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs/cpus" />
-      <recent name="$PROJECT_DIR$/src/main/resources" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="overlord.Software" />
@@ -249,7 +245,7 @@
       <workItem from="1607974205213" duration="17152000" />
       <workItem from="1608104099049" duration="7000" />
       <workItem from="1608104214752" duration="22000" />
-      <workItem from="1608104259406" duration="9040000" />
+      <workItem from="1608104259406" duration="34519000" />
     </task>
     <task id="LOCAL-00001" summary="Major work on connection expansion and block connections&#10;Refactor and reorg instances, constraits, actions etc.&#10;moved ps8 docs to lower case">
       <created>1605964442645</created>
@@ -300,7 +296,14 @@
       <option name="project" value="LOCAL" />
       <updated>1608103374655</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Renamed NXMinterconnect to bus&#10;added Advanced Peripheral Bus from Spinal to catalog&#10;added PipelinedMemoryBus to APB Bridge to Spinal&#10;Added bridges catalog&#10;Fixed compile in Report.scala">
+      <created>1608115175244</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1608115175244</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -328,7 +331,8 @@
     <MESSAGE value="Added spinal pipelined memory bus to resources&#10;added buses to resource catalogs&#10;Improved directory handling to Toml and Yaml&#10;Better parameter handling, still too verbose and no arrays yet" />
     <MESSAGE value="Updated sbt to use similar style across the chip&#10;Updated the chip scala to a style style and&#10;Added resetti chip&#10;Moved ikuy_utils to seperate git repro&#10;added + to runMain sbt process to enable fetch compile to work&#10;Constant is now number only and now a BigInt to enable unsigned 64 bit &#10;Fixed pathing for some cases in Edalize&#10;Removed module_name from gateware now is the actual name of the instance&#10;Added pmb ram chip&#10;Added ${name} to read verilog sources, and sbt action&#10;Added 64 bit decoder to toml and yaml. For unsigned 64 bit has to be a string&#10;Fixed module name decoding from VerilogModuleParser (now has to be exact)&#10;Removed incorrect warnings from Wire.scala due to automagic hook up" />
     <MESSAGE value="Missed resetti added file from last commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="Missed resetti added file from last commit" />
+    <MESSAGE value="Renamed NXMinterconnect to bus&#10;added Advanced Peripheral Bus from Spinal to catalog&#10;added PipelinedMemoryBus to APB Bridge to Spinal&#10;Added bridges catalog&#10;Fixed compile in Report.scala" />
+    <option name="LAST_COMMIT_MESSAGE" value="Renamed NXMinterconnect to bus&#10;added Advanced Peripheral Bus from Spinal to catalog&#10;added PipelinedMemoryBus to APB Bridge to Spinal&#10;Added bridges catalog&#10;Fixed compile in Report.scala" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -339,11 +343,6 @@
           <option name="timeStamp" value="51" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="scala-line">
-          <url>file://$PROJECT_DIR$/src/main/scala/overlord/Game.scala</url>
-          <line>210</line>
-          <option name="timeStamp" value="204" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="scala-line">
           <url>file://$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/ReadVerilogTopAction.scala</url>
           <line>55</line>
           <option name="timeStamp" value="209" />
@@ -352,6 +351,16 @@
           <url>file://$PROJECT_DIR$/src/main/scala/overlord/Gateware/Gateware.scala</url>
           <line>22</line>
           <option name="timeStamp" value="215" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="scala-line">
+          <url>file://$PROJECT_DIR$/src/main/scala/overlord/Connections/Unconnected.scala</url>
+          <line>109</line>
+          <option name="timeStamp" value="229" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="scala-line">
+          <url>file://$PROJECT_DIR$/src/main/scala/output/Top.scala</url>
+          <line>168</line>
+          <option name="timeStamp" value="246" />
         </line-breakpoint>
         <breakpoint enabled="true" type="java-exception">
           <properties class="java.lang.ArrayIndexOutOfBoundsException" package="java.lang" />
@@ -365,6 +374,7 @@
         <PinnedItemInfo parentTag="overlord.Instances.NxMInstance" memberName="phase2Ports" />
         <PinnedItemInfo parentTag="java.lang.String" memberName="value" />
         <PinnedItemInfo parentTag="overlord.Instances.RamInstance" memberName="definition" />
+        <PinnedItemInfo parentTag="overlord.Connections.Wire" memberName="endLocs" />
       </pinned-members>
     </pin-to-top-manager>
   </component>

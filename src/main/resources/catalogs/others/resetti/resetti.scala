@@ -1,7 +1,5 @@
 import spinal.core._
 import spinal.lib._
-import spinal.lib.bus.simple.PipelinedMemoryBus
-import spinal.lib.bus.simple.PipelinedMemoryBusConfig
 import ikuy_utils.Utils
 import toml.Value
 

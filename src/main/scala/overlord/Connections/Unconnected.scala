@@ -14,7 +14,6 @@ trait UnconnectedTrait extends Connection {
 
 	def isConstant: Boolean
 
-	def connect(unexpanded: Seq[Instance]): Seq[Connected]
 }
 
 case class Unconnected(connectionType: ConnectionType,
@@ -35,7 +34,7 @@ case class Unconnected(connectionType: ConnectionType,
 		case _                         => false
 	}
 
-	override def connect(unexpanded: Seq[Instance]): Seq[Connected] = {
+	def connect(unexpanded: Seq[Instance]): Seq[Connected] = {
 		connectionType match {
 			case _: PortConnectionType      => ConnectPortConnection(unexpanded)
 			case _: ClockConnectionType     => ConnectPortConnection(unexpanded)

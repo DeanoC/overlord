@@ -2,11 +2,22 @@ package overlord.Connections
 
 import overlord.DistanceMatrix
 import overlord.Gateware.{InOutWireDirection, InWireDirection, OutWireDirection}
+import overlord.Instances.{ClockInstance, PinGroupInstance}
 
 import scala.collection.mutable
 
 case class Wire(startLoc: InstanceLoc,
-                endLocs: Seq[InstanceLoc])
+                endLocs: Seq[InstanceLoc],
+                priority: ConnectionPriority) {
+	def isStartPinOrClock: Boolean = startLoc.instance
+		                                 .isInstanceOf[PinGroupInstance] ||
+	                                 startLoc.instance
+		                                 .isInstanceOf[ClockInstance]
+
+	def findEndIsPinOrClock: Option[InstanceLoc] =
+		endLocs.find(il => il.instance.isInstanceOf[PinGroupInstance] ||
+		                   il.instance.isInstanceOf[ClockInstance])
+}
 
 object Wires {
 
@@ -14,7 +25,8 @@ object Wires {
 	                             ep: Int,
 	                             sloc: InstanceLoc,
 	                             eloc: InstanceLoc,
-	                             direction: ConnectionDirection)
+	                             direction: ConnectionDirection,
+	                             priority: ConnectionPriority)
 
 	def apply(dm: DistanceMatrix,
 	          connected: Seq[Connected]): Seq[Wire] = {
@@ -45,48 +57,61 @@ object Wires {
 							            dm.instanceOf(p).ident)
 
 						if (c.direction == SecondToFirstConnection())
-							ghosts += GhostWire(p, cp, ploc, cploc, c.direction.flip)
+							ghosts += GhostWire(p, cp, ploc, cploc,
+							                    c.direction.flip,
+							                    c.connectionPriority)
 						else if (c.direction == BiDirectionConnection() && cp > p)
-							ghosts += GhostWire(p, cp, ploc, cploc, c.direction)
+							ghosts += GhostWire(p, cp, ploc, cploc, c.direction,
+							                    c.connectionPriority)
 						else
-							ghosts += GhostWire(cp, p, cploc, ploc, c.direction)
+							ghosts += GhostWire(cp, p, cploc, ploc, c.direction,
+							                    c.connectionPriority)
 						cp = p
 					}
 				}
 			})
 
 		val (fanoutTmpWires, singleTmpWires) = {
-			val fotWires =
-				mutable.HashMap[InstanceLoc, mutable.ArrayBuffer[InstanceLoc]]()
+			val fotWires  =
+				mutable.HashMap[InstanceLoc,
+					(ConnectionPriority, mutable.ArrayBuffer[InstanceLoc])]()
+			val sTmpWires =
+				mutable.HashMap[InstanceLoc, (ConnectionPriority, InstanceLoc)]()
 
 			for {i <- ghosts.indices
 			     startLoc = ghosts(i).sloc
 			     endLoc = ghosts(i).eloc
+			     priority = ghosts(i).priority
 			     } {
 				if (fotWires.contains(startLoc))
-					fotWires(startLoc) += endLoc
+					fotWires(startLoc)._2 += endLoc
 				else
-					fotWires += (startLoc -> mutable.ArrayBuffer(endLoc))
+					fotWires += (startLoc -> (priority, mutable.ArrayBuffer(endLoc)))
 			}
 
-			val sTmpWires = mutable.HashMap[InstanceLoc, InstanceLoc]()
-
-			val multiFanoutTmpWires = (for (fo <- fotWires) yield {
-				if (fo._2.length == 1) {
-					if (fo._1.port.nonEmpty &&
-					    fo._1.port.get.direction == InWireDirection())
-						sTmpWires += (fo._2(0) -> fo._1)
-					else sTmpWires += (fo._1 -> fo._2(0))
+			val multiFanoutTmpWires = (for ((sl, (pr, els)) <- fotWires) yield {
+				if (els.length == 1) {
+					if (sl.port.nonEmpty &&
+					    sl.port.get.direction == InWireDirection())
+						sTmpWires += ((els(0), ->(pr, sl)))
+					else sTmpWires += ((sl -> (pr, els(0))))
 					None
-				} else Some(fo)
+				} else Some(sl -> (pr, els))
 			}).flatten.toMap
-
 
 			(multiFanoutTmpWires, sTmpWires)
 		}
 
-		wires ++= fanoutTmpWires.map(w => Wire(w._1, w._2.toSeq))
-		wires ++= singleTmpWires.map(w => Wire(w._1, Seq(w._2)))
+		wires ++= fanoutTmpWires.map {
+			case (sl, (pr, els)) => Wire(sl, els.toSeq, pr)
+		}
+		wires ++= singleTmpWires.map {
+			case (sl, (pr, el)) => Wire(sl, Seq(el), pr)
+		}
+
+		wires.sortInPlaceWith((a, b) =>
+			                      a.startLoc.instance.ident <
+			                      b.startLoc.instance.ident)
 
 		wires.toSeq
 	}
