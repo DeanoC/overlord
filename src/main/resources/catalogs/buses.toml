@@ -1,5 +1,10 @@
 path = "buses"
 
 [[definition]]
-type = "NxMinterconnect.spinal_pipelined_memory_bus"
+type = "bus.pipelined_memory_bus.spinal"
 gateware = "spinal/pipelined_memory_bus/pipelined_memory_bus.toml"
+
+[[definition]]
+type = "bus.advanced_peripheral_bus.spinal"
+gateware = "spinal/advanced_peripheral_bus/advanced_peripheral_bus.toml"
+

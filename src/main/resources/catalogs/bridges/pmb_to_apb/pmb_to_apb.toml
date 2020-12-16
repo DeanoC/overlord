@@ -1,0 +1,38 @@
+actions = [
+    "make_config",
+    "sbt_run",
+    "src",
+    "read_verilog_top"
+]
+
+[[process]]
+name = 'make_config'
+processor = 'toml'
+filename = 'config.toml'
+parameters = [
+   "apbAddressWidth",
+   "apbDataWidth",
+   "apbUseSlaveError",
+   "apbPipeline",
+
+   "pmbAddressWidth",
+   "pmbDataWidth",
+]
+
+[[process]]
+name = 'sbt_run'
+processor = 'sbt'
+main_scala = "pmb_to_apb.scala"
+with_build_sbt = true
+args = '+runMain PMBToAPBBridge config.toml .. ${name}'
+path_op = 'push'
+
+[[process]]
+name = 'src'
+processor = 'source'
+sources = [{ file ="${name}.v", language="verilog"}]
+
+[[process]]
+name = 'read_verilog_top'
+processor = 'read_verilog_top'
+source = "${name}"

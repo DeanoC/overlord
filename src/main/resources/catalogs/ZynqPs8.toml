@@ -52,10 +52,10 @@ container = "soc.zynqps8"
 	size = "256 KiB"
 
 [[definition]]
-	type = "NxMinterconnect.axi4"
+	type = "bus.axi4"
 
 [[definition]]
-	type = "NxMinterconnect.apb"
+	type = "bus.apb"
 
 [[definition]]
 	type = "connection.apb"

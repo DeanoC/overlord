@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id="ikuy_utils [http://github.com/DeanoC/ikuy_utils.git#master]" external.linked.project.path="$USER_HOME$/.sbt/1.0/staging/a7772c47d5d7e84d3e85/ikuy_utils" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_15">
+    <output url="file://$USER_HOME$/.sbt/1.0/staging/a7772c47d5d7e84d3e85/ikuy_utils/target/scala-2.13/classes" />
+    <output-test url="file://$USER_HOME$/.sbt/1.0/staging/a7772c47d5d7e84d3e85/ikuy_utils/target/scala-2.13/test-classes" />
+    <exclude-output />
+    <content url="file://$USER_HOME$/.sbt/1.0/staging/a7772c47d5d7e84d3e85/ikuy_utils">
+      <sourceFolder url="file://$USER_HOME$/.sbt/1.0/staging/a7772c47d5d7e84d3e85/ikuy_utils/src/main/scala" isTestSource="false" />
+      <excludeFolder url="file://$USER_HOME$/.sbt/1.0/staging/a7772c47d5d7e84d3e85/ikuy_utils/target" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="library" name="sbt: tech.sparse:toml-scala_2.13:0.2.2:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang:scala-library:2.13.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.chuusai:shapeless_2.13:2.3.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scalameta:fastparse_2.13:1.0.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-collection-compat_2.13:2.3.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.lihaoyi:sourcecode_2.13:0.1.7:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scalameta:fastparse-utils_2.13:1.0.1:jar" level="project" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

@@ -32,11 +32,11 @@
 # Interconnects
 [[instance]]
   name = "interconnect.main"
-  type = "NxMinterconnect.axi4"
+  type = "bus.axi4"
 
 [[instance]]
   name = "interconnect.apb"
-  type = "NxMinterconnect.apb"
+  type = "bus.apb"
 
 # Bridges
 [[instance]]

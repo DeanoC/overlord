@@ -1,5 +1,4 @@
 import java.nio.file.{Files, Path}
-import overlord.Game.{containerStack, pathStack}
 import overlord.Instances.BoardInstance
 import overlord._
 

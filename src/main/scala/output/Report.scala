@@ -152,7 +152,7 @@ object Report {
 			val name = (instance.definition.defType match {
 				case RamDefinitionType(ident)      => "ram."
 				case CpuDefinitionType(ident)      => "cpu."
-				case NxMDefinitionType(ident)      => "NxM."
+				case BusDefinitionType(ident)      => "bus."
 				case StorageDefinitionType(ident)  => "storage."
 				case SocDefinitionType(ident)      => "soc."
 				case BridgeDefinitionType(ident)   => "bridge."
@@ -160,7 +160,6 @@ object Report {
 				case OtherDefinitionType(ident)    => "other."
 				case PinGroupDefinitionType(ident) => "pin."
 				case ClockDefinitionType(ident)    => "clock."
-				case ConstantDefinitionType(ident) => "constant."
 				case BoardDefinitionType(ident)    => "board."
 			}) + id
 			sb ++= (indent + f"type: $name%n")

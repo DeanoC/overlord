@@ -15,7 +15,7 @@ case class RamDefinitionType(ident: Seq[String]
 case class CpuDefinitionType(ident: Seq[String]
                             ) extends DefinitionType
 
-case class NxMDefinitionType(ident: Seq[String]
+case class BusDefinitionType(ident: Seq[String]
                             ) extends DefinitionType
 
 case class StorageDefinitionType(ident: Seq[String]
@@ -39,9 +39,6 @@ case class PinGroupDefinitionType(ident: Seq[String]
 case class ClockDefinitionType(ident: Seq[String])
 	extends DefinitionType
 
-case class ConstantDefinitionType(ident: Seq[String]
-                                 ) extends DefinitionType
-
 case class BoardDefinitionType(ident: Seq[String]
                               ) extends DefinitionType
 
@@ -59,28 +56,26 @@ trait DefinitionTrait {
 	                   attribs: Map[String, Value]
 	                  ): Option[Instance] = {
 		defType match {
-			case _: RamDefinitionType      =>
+			case _: RamDefinitionType     =>
 				Some(RamInstance(name, this, attribs))
-			case _: CpuDefinitionType      =>
+			case _: CpuDefinitionType     =>
 				Some(CpuInstance(name, this, attribs))
-			case _: NxMDefinitionType      =>
+			case _: BusDefinitionType     =>
 				Some(NxMInstance(name, this, attribs))
-			case _: StorageDefinitionType  =>
+			case _: StorageDefinitionType =>
 				Some(StorageInstance(name, this, attribs))
-			case _: SocDefinitionType      =>
+			case _: SocDefinitionType     =>
 				Some(SocInstance(name, this, attribs))
-			case _: BridgeDefinitionType   =>
+			case _: BridgeDefinitionType  =>
 				Some(BridgeInstance(name, this, attribs))
-			case _: NetDefinitionType      =>
+			case _: NetDefinitionType     =>
 				Some(NetInstance(name, this, attribs))
-			case _: OtherDefinitionType    =>
+			case _: OtherDefinitionType   =>
 				Some(OtherInstance(name, this, attribs))
 			case _: PinGroupDefinitionType =>
 				PinGroupInstance(name, this, attribs)
 			case _: ClockDefinitionType    =>
 				ClockInstance(name, this, attribs)
-
-			case _: ConstantDefinitionType => ???
 			case _: BoardDefinitionType    =>
 				BoardInstance(name = name, this, attribs)
 		}

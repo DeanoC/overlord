@@ -25,14 +25,13 @@ object Definition {
 		defTypeName.head.toLowerCase match {
 			case "ram"             => RamDefinitionType(tt)
 			case "cpu"             => CpuDefinitionType(tt)
-			case "nxminterconnect" => NxMDefinitionType(tt)
+			case "bus" => BusDefinitionType(tt)
 			case "storage"         => StorageDefinitionType(tt)
 			case "soc"             => SocDefinitionType(tt)
 			case "bridge"          => BridgeDefinitionType(tt)
 			case "net"             => NetDefinitionType(tt)
 			case "board"           => BoardDefinitionType(tt)
 			case "pin"             => PinGroupDefinitionType(tt)
-			case "constant"        => ConstantDefinitionType(tt)
 			case "clock"           => ClockDefinitionType(tt)
 			case _                 => OtherDefinitionType(tt)
 		}

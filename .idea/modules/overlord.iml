@@ -12,8 +12,8 @@
       <excludeFolder url="file://$MODULE_DIR$/../../target" />
     </content>
     <orderEntry type="inheritedJdk" />
+    <orderEntry type="module" module-name="ikuy_utils" exported="" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="a7772c47d5d7e84d3e85.ikuy_utils" exported="" />
     <orderEntry type="library" name="sbt: com.chuusai:shapeless_2.13:2.3.3:jar" level="project" />
     <orderEntry type="library" name="sbt: com.lihaoyi:sourcecode_2.13:0.1.7:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-collection-compat_2.13:2.3.1:jar" level="project" />

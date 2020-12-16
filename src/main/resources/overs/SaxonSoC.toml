@@ -7,5 +7,5 @@
 
 [[instance]]
   name = "SaxonPrivate"
-  type = "NxMinterconnect"
+  type = "bus"
   
