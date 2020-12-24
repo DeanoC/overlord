@@ -6,6 +6,7 @@ ThisBuild / scalaVersion := "2.11.12"
 ThisBuild / organization := "com.deanoc"
 ThisBuild / version := "1.0"
 ThisBuild / scalacOptions += "-deprecation"
+ThisBuild / scalacOptions += "-target:jvm-1.8"
 ThisBuild / licenses := Seq(
 	"The MIT License (MIT)" -> url("http://opensource.org/licenses/MIT")
 	)

@@ -5,9 +5,8 @@ actions = [
     "read_verilog_top"
 ]
 
-parameters = [
-    {key='size_in_bytes', value = 16384},
-]
+[parameters]
+size_in_bytes = 16384
 
 [[process]]
 name = 'make_config'

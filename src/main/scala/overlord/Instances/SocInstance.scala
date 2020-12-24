@@ -1,14 +1,24 @@
 package overlord.Instances
 
+import ikuy_utils.Variant
 import overlord.Definitions.DefinitionTrait
 import toml.Value
 
 case class SocInstance(ident: String,
-                       definition: DefinitionTrait,
-                       attributes: Map[String, Value]
+                       private val defi: DefinitionTrait
                       ) extends Instance {
-	def copyMutate[A <: Instance](nid: String,
-	                              nattribs: Map[String, Value]): SocInstance =
-		copy(ident = nid, attributes = nattribs)
+	override def definition:DefinitionTrait = defi
 
+	override def copyMutate[A <: Instance](nid: String): SocInstance =
+		copy(ident = nid)
+
+}
+
+object SocInstance {
+	def apply(ident: String,
+	          definition: DefinitionTrait,
+	          attribs: Map[String, Variant]
+	         ): Option[SocInstance] = {
+		Some(SocInstance(ident, definition))
+	}
 }

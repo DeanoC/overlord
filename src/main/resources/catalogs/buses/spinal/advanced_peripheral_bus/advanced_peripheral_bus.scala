@@ -4,6 +4,7 @@ import spinal.lib._
 import spinal.lib.bus.misc.SizeMapping
 import spinal.lib.bus.amba3.apb._
 import ikuy_utils._
+import java.nio.file.Path
 
 object AdvancedPeripheralBus {
 
@@ -24,9 +25,9 @@ object AdvancedPeripheralBus {
 
 		val table = if (tomlFile.isEmpty) {
 			println(s"No toml config file provided, defaults will be used")
-			Map[String, Value]()
+			Map[String, Variant]()
 		}
-		else Utils.readToml(tomlFile.get)
+		else Utils.readToml(name, Path.of(tomlFile.get), getClass)
 
 		val luInt  = new Function2[String, Int, Int] {
 			override def apply(k: String, default: Int): Int =
@@ -37,19 +38,20 @@ object AdvancedPeripheralBus {
 				Utils.lookupBigInt(table, k, default)
 		}
 
-		consumerCount = luInt("consumer_count", consumerCount)
+		consumerCount = luInt("bus_count", consumerCount)
+		dataWidth = luInt("bus_data_width", dataWidth)
+		addressWidth = luInt("bus_address_width", addressWidth)
+		baseAddress = luBInt("bus_base", baseAddress)
+		addressBankSize = luBInt("bus_bank_size", addressBankSize)
 
-		addressWidth = luInt("address_width", addressWidth)
-		dataWidth = luInt("data_width", dataWidth)
 		useSlaveError = luInt("use_slave_error", useSlaveError)
-
-		baseAddress = luBInt("base_address", baseAddress)
-		addressBankSize = luBInt("bank_size", addressBankSize)
 
 		println(s"bus has $dataWidth data with $addressWidth bit address")
 		println(s"$consumerCount consumers attached to bus")
 
 		val config = SpinalConfig(
+			defaultConfigForClockDomains =
+				ClockDomainConfig(resetKind = spinal.core.SYNC),
 			targetDirectory = targetDir,
 			netlistFileName = name + ".v"
 			)

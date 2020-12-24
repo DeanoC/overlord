@@ -59,23 +59,20 @@ case class Port(name: String,
                 direction: WireDirection = InOutWireDirection())
 
 object Ports {
-	def apply(array: Seq[toml.Value]): Seq[Port] = {
-		(for (v <- array) yield {
-			v match {
-				case Value.Tbl(tbl) => if (tbl.contains("name")) {
-					val name  = Utils.toString(tbl("name"))
-					val width = Utils.lookupInt(tbl, "width", 1)
-					val dir   = WireDirection(
-						Utils.lookupString(tbl, "direction", "inout"))
-					Some(Port(name, BitsDesc(width), dir))
-				}
-				else {
-					println(s"$array is a port inline table without a name")
-					None
-				}
-				case Value.Str(s)   => Some(Port(s, BitsDesc(1)))
-				case _              => None
-			}
-		}).flatten
-	}
+	def apply(array: Array[Variant]): Seq[Port] =
+		array.flatMap(_ match {
+			              case TableV(tbl) => if (tbl.contains("name")) {
+				              val name  = Utils.toString(tbl("name"))
+				              val width = Utils.lookupInt(tbl, "width", 1)
+				              val dir   = WireDirection(
+					              Utils.lookupString(tbl, "direction", "inout"))
+				              Some(Port(name, BitsDesc(width), dir))
+			              }
+			              else {
+				              println(s"$array is a port inline table without a name")
+				              None
+			              }
+			              case StringV(s)  => Some(Port(s, BitsDesc(1)))
+			              case _           => None
+		              })
 }

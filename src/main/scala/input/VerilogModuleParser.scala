@@ -7,7 +7,7 @@ import scala.collection.mutable
 
 sealed trait VerilogBoundary
 
-case class VerilogParameter(parameter: String) extends VerilogBoundary
+case class VerilogParameterKey(parameter: String) extends VerilogBoundary
 
 case class VerilogPort(direction: String, bits: BitsDesc, name: String)
 	extends VerilogBoundary
@@ -40,7 +40,7 @@ object VerilogModuleParser {
 						case "input" | "output" | "inout" =>
 							boundary += VerilogPort(t, b, n)
 						case "parameter"                  =>
-							boundary += VerilogParameter(n)
+							boundary += VerilogParameterKey(n)
 						case _                            =>
 					}
 				}

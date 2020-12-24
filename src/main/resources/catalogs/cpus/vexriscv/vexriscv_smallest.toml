@@ -1,7 +1,14 @@
 actions = [
+	"make_config",
 	"sbt_run",
 	"src",
 	"read_verilog_top"
+]
+[[process]]
+name = 'make_config'
+processor = 'toml'
+filename = 'config.toml'
+parameters = [
 ]
 
 [[process]]

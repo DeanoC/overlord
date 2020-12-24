@@ -1,8 +1,9 @@
 package overlord.Gateware.GatewareAction
 
+import ikuy_utils.Variant
+
 import java.nio.file.Path
 import overlord.Game
-import overlord.Gateware.{Gateware, Parameter}
 import overlord.Instances.Instance
 
 sealed trait GatewareActionPathOp
@@ -21,7 +22,7 @@ case class GatewareActionPhase2() extends GatewareActionPhase
 
 trait GatewareAction {
 	def execute(gateware: Instance,
-	            parameters: Map[String, Parameter],
+	            parameters: Map[String, Variant],
 	            outPath: Path): Unit
 
 	val phase : GatewareActionPhase

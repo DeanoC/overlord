@@ -6,10 +6,10 @@ trait SoftwareTrait {
 	val groups: Seq[SoftwareGroup]
 }
 
-case class SoftwareGroup(val description: String,
-                         val banks: Array[RegisterBank],
-                         val registers: Array[Register],
+case class SoftwareGroup(description: String,
+                         banks: Array[RegisterBank],
+                         registers: Array[Register],
                         ) {
-	def bankSize: String = registers.last.offset
+	def bankSize: BigInt = registers.last.offset
 }
 

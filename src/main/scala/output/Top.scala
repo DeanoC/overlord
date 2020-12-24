@@ -1,14 +1,15 @@
 package output
 
+import ikuy_utils._
+
 import java.io.{BufferedWriter, FileWriter}
 import java.nio.file.Path
 import overlord.Connections.{
-	InstanceLoc, WildCardConnectionPriority, Wire, Wires
+	InstanceLoc, WildCardConnectionPriority, Wire,
+	Wires
 }
 import overlord.Gateware.{Port, WireDirection}
-import overlord.Instances.{
-	ClockInstance, Instance, PinGroupInstance
-}
+import overlord.Instances.{ClockInstance, Instance, PinGroupInstance}
 import overlord._
 
 import scala.collection.mutable
@@ -67,22 +68,23 @@ object Top {
 			s"""
 				 |  ${instance.ident}""".stripMargin
 
-			val merged = {
-				val m = game.constants
-					.map(_.asParameter)
-					.fold(gw.parameters)((o, n) => o ++ n)
-				m.filter(c => gw.verilog_parameters.contains(c._1))
-			}
+			val merged = game.constants
+				.map(_.asParameter)
+				.fold(gw.parameters)((o, n) => o ++ n)
+				.filter(c => instance.parameterKeys.contains(c._1))
 
 			if (merged.nonEmpty) {
 				sb ++= " #(\n"
 				var pcomma = ""
 				for ((k, v) <- merged) {
-					val sn = Try {
-						v.value.toLong
-					} match {
-						case Failure(_)     => s"'${v.value.toString()}'"
-						case Success(value) => s"$value"
+					val sn = v match {
+						case ArrayV(arr)       => "TODO"
+						case BigIntV(bigInt)   => s"$bigInt"
+						case BooleanV(boolean) => s"$boolean"
+						case IntV(int)         => s"$int"
+						case TableV(table)     => "TODO:"
+						case StringV(string)   => s"'$string'"
+						case DoubleV(dbl)      => s"$dbl"
 					}
 
 					sb ++= s"""$pcomma    .${k}($sn)"""

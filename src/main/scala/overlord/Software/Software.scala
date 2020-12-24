@@ -4,16 +4,15 @@ import java.nio.file.{Files, Path}
 import overlord.Definitions.{SoftwareGroup, SoftwareTrait}
 import overlord.Game
 import ikuy_utils._
-import toml.Value
 
 case class RegisterBank(name: String,
-                        address: String)
+                        address: BigInt)
 
 case class Register(name: String,
                     regType: String,
                     width: Int,
-                    default: String,
-                    offset: String,
+                    default: BigInt,
+                    offset: BigInt,
                     desc: String,
                     fields: Array[RegisterField])
 
@@ -27,11 +26,11 @@ case class RegisterField(name: String,
 case class Software(groups: Seq[SoftwareGroup]) extends SoftwareTrait
 
 object Software {
-	def apply(registerDefs: Seq[toml.Value],
+	def apply(registerDefs: Seq[Variant],
 	          registerPath: Path): Option[Software] = {
 		val groups = for (inlineTable <- registerDefs) yield {
-			val item = inlineTable.asInstanceOf[Value.Tbl].values
-			val name = item("registers").asInstanceOf[Value.Str].value
+			val item = inlineTable.asInstanceOf[TableV].value
+			val name = item("registers").asInstanceOf[StringV].value
 
 			val path = registerPath.resolve(Path.of(s"$name" + s".toml"))
 			if (!Files.exists(path.toAbsolutePath)) {
@@ -40,48 +39,37 @@ object Software {
 			}
 
 			Game.pathStack.push(path.getParent)
-			val file   = path.toAbsolutePath.toFile
-			val source = scala.io.Source.fromFile(file)
-			val result = parse(path.toUri.toString,
-			                   source.getLines().mkString("\n"))
+			val source = Utils.readToml(name, path, getClass)
+			val result = parse(name, source)
 			Game.pathStack.pop()
 			result.toList
 		}
 		Some(Software(groups.flatten))
 	}
 
-	private def parse(name: String, src: String): Option[SoftwareGroup] = {
-		import toml.Value
+	private def parse(name: String, parsed: Map[String, Variant])
+	: Option[SoftwareGroup] = {
 
-		val parsed = {
-			val parsed = toml.Toml.parse(src)
-			parsed match {
-				case Right(value) => value.values
-				case Left(value)  => println(s"$name has failed to parse with " +
-				                             s"error ${Left(parsed)}")
-					return None
-			}
-		}
 		val desc   = if (parsed.contains("description"))
-			parsed("description").asInstanceOf[Value.Str].value
+			parsed("description").asInstanceOf[StringV].value
 		else "No Description"
 
 		val tbanks = Utils.toArray(parsed("bank"))
 		val banks  = for (bank <- tbanks) yield {
 			val table   = Utils.toTable(bank)
 			val name    = Utils.toString(table("name"))
-			val address = Utils.toString(table("address"))
+			val address = Utils.toBigInt(table("address"))
 			RegisterBank(name, address)
 		}
 
-		val tregisters = parsed("register").asInstanceOf[Value.Arr].values
+		val tregisters = Utils.toArray(parsed("register"))
 		val registers  = for (reg <- tregisters) yield {
 			val table   = Utils.toTable(reg)
 			val name    = Utils.toString(table("name"))
 			val regType = Utils.toString(table("type"))
 			val width   = Utils.toInt(table("width"))
-			val default = Utils.toString(table("default"))
-			val offset  = Utils.toString(table("offset"))
+			val default = Utils.toBigInt(table("default"))
+			val offset  = Utils.toBigInt(table("offset"))
 			val desc    = Utils.toString(table("description"))
 
 			val fields = if (table.contains("field")) {
@@ -101,12 +89,11 @@ object Software {
 
 					RegisterField(fieldName, fieldBits, fieldType, shortDesc, longDesc)
 				}
-			}.toArray else Array[RegisterField]()
+			} else Array[RegisterField]()
 
 			Register(name, regType, width, default, offset, desc, fields)
 		}
 
-		Some(SoftwareGroup(desc, banks.toArray,
-		                   registers.sortBy(p => (p.offset, p.name)).toArray))
+		Some(SoftwareGroup(desc, banks, registers.sortBy(p => (p.offset, p.name))))
 	}
 }

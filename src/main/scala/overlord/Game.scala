@@ -1,16 +1,16 @@
 package overlord
 
-import overlord.Connections.{Connected, ConnectedBetween, ConnectedConstant, Connection, ConstantConnectionType}
+import overlord.Connections.{
+	Connected, ConnectedBetween, ConnectedConstant,
+	Connection, ConstantConnectionType
+}
 import overlord.Definitions.GatewareTrait
 import overlord.Gateware.GatewareAction.GatewareAction
-import overlord.Gateware.Parameter
 import overlord.Instances._
 import ikuy_utils._
-import toml.Value
 
-import java.nio.file.{Files, Path}
+import java.nio.file.Path
 import scala.collection.mutable
-import scala.util.{Failure, Success, Try}
 
 case class Game(name: String,
                 override val children: Seq[Instance],
@@ -26,7 +26,7 @@ case class Game(name: String,
 
 	lazy val cpus: Seq[CpuInstance] = flatChildren
 		.filter(_.isInstanceOf[CpuInstance])
-			.map(_.asInstanceOf[CpuInstance])
+		.map(_.asInstanceOf[CpuInstance])
 
 	lazy val rams: Seq[RamInstance] =
 		flatChildren.filter(_.isInstanceOf[RamInstance])
@@ -72,61 +72,27 @@ object Game {
 	var pathStack     : mutable.Stack[Path]         = mutable.Stack()
 	var containerStack: mutable.Stack[MutContainer] = mutable.Stack()
 
-	def apply(gamePath: String,
-	          gameText: String,
+	def apply(gameName: String,
+	          gamePath: Path,
 	          out: Path,
 	          catalogs: DefinitionCatalog): Option[Game] = {
-		val gameName = gamePath.split('/').last.split('.').head
-		val gb       = new GameBuilder(gameName, gameText, catalogs)
+		val gb = new GameBuilder(gameName, gamePath, catalogs)
 		gb.toGame(out)
 	}
 
-	private def readFile(name: String): Option[String] = {
-		println(s"Reading $name")
-
-		val path = Game.pathStack.top.resolve(name)
-
-		if (!Files.exists(path.toAbsolutePath)) {
-			// try resource
-			Try(getClass.getResourceAsStream("/" + name)) match {
-				case Failure(exception) =>
-					println(s"$name catalog at ${name} $exception");
-					None
-				case Success(value)     =>
-					if (value == null) {
-						println(s"$name catalog at ${name} not found");
-						None
-					}
-					Some(scala.io.Source.fromInputStream(value).mkString)
-			}
-		} else {
-			val file   = path.toAbsolutePath.toFile
-			val source = scala.io.Source.fromFile(file)
-			Some(source.getLines().mkString("\n"))
-		}
-	}
-
 	private class GameBuilder(gameName: String,
-	                          gameText: String,
+	                          gamePath: Path,
 	                          catalogs: DefinitionCatalog) {
 
-		private val defaults = mutable.Map[String, Value]()
+		private val defaults = mutable.Map[String, Variant]()
 
 		containerStack.push(new MutContainer)
 
-		process(gameText, catalogs)
+		process(gamePath, catalogs)
 
-		private def process(data: String, catalogs: DefinitionCatalog): Unit = {
+		private def process(path: Path, catalogs: DefinitionCatalog): Unit = {
 
-			val parsed = {
-				val parsed = toml.Toml.parse(data)
-				parsed match {
-					case Right(value) => value.values
-					case Left(_)      => println(s"game.over has failed to parse with " +
-					                             s"error ${Left(parsed)}")
-						return
-				}
-			}
+			val parsed = Utils.readToml(gameName, path, getClass)
 
 			if (parsed.contains("defaults"))
 				defaults ++= Utils.toTable(parsed("defaults"))
@@ -135,15 +101,16 @@ object Game {
 			if (parsed.contains("include")) {
 				val tincs = Utils.toArray(parsed("include"))
 				for (include <- tincs) {
-					val table       = Utils.toTable(include)
-					val incResource = Utils.toString(table("resource"))
+					val table           = Utils.toTable(include)
+					val incResourceName = Utils.toString(table("resource"))
+					val incResourcePath = Path.of(incResourceName)
 
 					containerStack.push(new MutContainer)
 
-					Game.readFile(incResource) match {
-						case Some(d) => process(d, catalogs)
+					Utils.readFile(incResourceName, incResourcePath, getClass) match {
+						case Some(d) => process(incResourcePath, catalogs)
 						case _       =>
-							println(s"Include resource file ${incResource} not found")
+							println(s"Include resource file ${incResourceName} not found")
 							containerStack.pop()
 							return
 					}
@@ -192,6 +159,8 @@ object Game {
 
 			val top = containerStack.top
 
+			Connection.preConnect(top.connections.toSeq, top.children.toSeq)
+
 			if (phase1) {
 				println("Procesing gateware phase 1")
 				executePhase(top.children.toSeq, top.connections.toSeq, gatePath,
@@ -220,14 +189,15 @@ object Game {
 	                         gatePath: Path,
 	                         phase: (GatewareAction) => Boolean): Unit = {
 		Game.pathStack.push(gatePath.toRealPath())
-		for {(gateware, defi) <-
+		for {(instance, defi) <-
 			     instances.filter(_.definition.gateware.nonEmpty)
 				     .map(g => (g, g.definition.gateware.get))} {
+
 			val backupStack = Game.pathStack.clone()
 
 			for {action <- defi.actions.filter(phase(_))} {
 
-				val conParameters  = connections
+				val conParameters = connections
 					.filter(_.isUnconnected)
 					.map(_.asUnconnected)
 					.filter(_.isConstant).map(c => {
@@ -236,18 +206,30 @@ object Game {
 						case Some(value) => value
 						case None        => c.secondFullName
 					}
-					mutable.HashMap[String, Parameter](
-						(name, Parameter(name, constant.constant)))
-				}).fold(mutable.HashMap[String, Parameter]())((o, n) => o ++ n)
+					mutable.Map[String, Variant]((name -> constant.constant))
+				}).fold(mutable.HashMap[String, Variant]())((o, n) => o ++ n)
 
-				val parameters = defi.parameters ++ conParameters
-				val merged     = connections.filter(
+				val instanceSpecificParameters = instance match {
+					case bus: BusInstance =>
+						val busCount = bus.connectedCount
+						bus.connectedCount = 0 // reset count for connection indexing
+						Map[String, Variant]{
+							"bus_count" -> IntV(busCount)
+						}
+					case _                => Map[String, Variant]()
+				}
+
+				val parameters = instance.parameters ++
+				                 conParameters ++
+				                 instanceSpecificParameters
+
+				val merged = connections.filter(
 					_.isInstanceOf[ConnectedConstant])
 					.map(_.asInstanceOf[ConnectedConstant])
+					.filter(c => instance.parameterKeys.contains(c.secondFullName))
 					.map(_.asParameter)
 					.fold(parameters)((o, n) => o ++ n)
-
-				action.execute(gateware, merged.toMap, Game.pathStack.top)
+				action.execute(instance, merged, Game.pathStack.top)
 			}
 			Game.pathStack = backupStack
 		}

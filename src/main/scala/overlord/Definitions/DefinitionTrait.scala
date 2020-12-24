@@ -1,6 +1,7 @@
 package overlord.Definitions
 
-import overlord.Gateware.{Parameter, Port}
+import ikuy_utils.Variant
+import overlord.Gateware.Port
 import overlord.Instances._
 import toml.Value
 
@@ -46,38 +47,27 @@ case class BoardDefinitionType(ident: Seq[String]
 trait DefinitionTrait {
 	val defType   : DefinitionType
 	val ports     : Map[String, Port]
-	val parameters: Map[String, Parameter]
-	val attributes: Map[String, toml.Value]
+	val parameters: Map[String, Variant]
+	val attributes: Map[String, Variant]
 	val software  : Option[SoftwareTrait]
 	val gateware  : Option[GatewareTrait]
 	val hardware  : Option[HardwareTrait]
 
 	def createInstance(name: String,
-	                   attribs: Map[String, Value]
+	                   attribs: Map[String, Variant]
 	                  ): Option[Instance] = {
 		defType match {
-			case _: RamDefinitionType     =>
-				Some(RamInstance(name, this, attribs))
-			case _: CpuDefinitionType     =>
-				Some(CpuInstance(name, this, attribs))
-			case _: BusDefinitionType     =>
-				Some(NxMInstance(name, this, attribs))
-			case _: StorageDefinitionType =>
-				Some(StorageInstance(name, this, attribs))
-			case _: SocDefinitionType     =>
-				Some(SocInstance(name, this, attribs))
-			case _: BridgeDefinitionType  =>
-				Some(BridgeInstance(name, this, attribs))
-			case _: NetDefinitionType     =>
-				Some(NetInstance(name, this, attribs))
-			case _: OtherDefinitionType   =>
-				Some(OtherInstance(name, this, attribs))
-			case _: PinGroupDefinitionType =>
-				PinGroupInstance(name, this, attribs)
-			case _: ClockDefinitionType    =>
-				ClockInstance(name, this, attribs)
-			case _: BoardDefinitionType    =>
-				BoardInstance(name = name, this, attribs)
+			case _: RamDefinitionType      => RamInstance(name, this, attribs)
+			case _: CpuDefinitionType      => CpuInstance(name, this, attribs)
+			case _: BusDefinitionType      => BusInstance(name, this, attribs)
+			case _: StorageDefinitionType  => StorageInstance(name, this, attribs)
+			case _: SocDefinitionType      => SocInstance(name, this, attribs)
+			case _: BridgeDefinitionType   => BridgeInstance(name, this, attribs)
+			case _: NetDefinitionType      => NetInstance(name, this, attribs)
+			case _: OtherDefinitionType    => OtherInstance(name, this, attribs)
+			case _: PinGroupDefinitionType => PinGroupInstance(name, this, attribs)
+			case _: ClockDefinitionType    => ClockInstance(name, this, attribs)
+			case _: BoardDefinitionType    => BoardInstance(name, this, attribs)
 		}
 	}
 }

@@ -18,8 +18,7 @@ object Xdc {
 		     if oconnected.get.connectionPriority != WildCardConnectionPriority()
 		     } {
 			pinGrp.constraint match {
-				case PinConstraint(pins, ports, names, directions, pullups) =>
-					val standard = Utils.toString(pinGrp.attributes("standard"))
+				case PinConstraint(pins, _, standard, names, directions, pullups) =>
 					for (i <- pins.indices) {
 
 						val dir = directions(i).toLowerCase match {
@@ -39,16 +38,20 @@ object Xdc {
 							 |""".stripMargin
 					}
 
-				case DiffPinConstraint(pins, ports, names, directions, pullups) =>
+				case DiffPinConstraint(pins,
+				                       ports,
+				                       standard,
+				                       names,
+				                       directions,
+				                       pullups) => ???
 			}
 		}
 
 		for (clk <- game.clocks) {
-			val standard = Utils.toString(clk.attributes("standard"))
 			sb ++=
 			s"""set_property -dict {
 				 |    PACKAGE_PIN ${clk.pin}
-				 |    IOSTANDARD $standard
+				 |    IOSTANDARD ${clk.standard}
 				 |} [get_ports {${sanatizeIdent(clk.ident)}}];
 				 |""".stripMargin
 

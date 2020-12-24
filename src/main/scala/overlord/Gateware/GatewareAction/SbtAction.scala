@@ -1,24 +1,21 @@
 package overlord.Gateware.GatewareAction
 
 import java.nio.file.Path
-import overlord.Gateware.{Gateware, Parameter}
 import overlord.Instances.Instance
 import overlord.Game
 import ikuy_utils._
-import toml.Value
 
-case class SbtAction(
-	                    mainScala: String,
-	                    args: String,
-	                    withBuildSbt: Boolean,
-	                    srcPath: String,
-	                    pathOp: GatewareActionPathOp)
+case class SbtAction(mainScala: String,
+                     args: String,
+                     withBuildSbt: Boolean,
+                     srcPath: String,
+                     pathOp: GatewareActionPathOp)
 	extends GatewareAction {
 
 	override val phase: GatewareActionPhase = GatewareActionPhase1()
 
 	override def execute(instance: Instance,
-	                     parameters: Map[String, Parameter],
+	                     parameters: Map[String, Variant],
 	                     outPath: Path): Unit = {
 		import scala.language.postfixOps
 
@@ -33,18 +30,26 @@ case class SbtAction(
 		val dstAbsPath = moddedOutPath.resolve(mainScala)
 		Utils.ensureDirectories(moddedOutPath)
 
-		if (withBuildSbt) {
-			val source = Utils.readFile(srcAbsPath.resolve("build.sbt"))
-			Utils.writeFile(moddedOutPath.resolve("build.sbt"), source)
+		Utils.readFile("build.sbt",
+		               srcAbsPath.resolve("build.sbt"), getClass) match {
+			case Some(value) =>
+				Utils.writeFile(moddedOutPath.resolve("build.sbt"), value)
+			case None        =>
+				println("built.sbt not found")
+				return
 		}
 
-		val source = Utils.readFile(srcAbsPath.resolve(mainScala))
-		Utils.writeFile(dstAbsPath, source)
+		val source = Utils.readFile(mainScala,
+		                            srcAbsPath.resolve(mainScala),
+		                            getClass)
+		if(source.nonEmpty)
+			Utils.writeFile(dstAbsPath, source.get)
+		else println(s"$mainScala doesn't not exist")
 
 		val proargs = args.replace("${dest}", moddedOutPath.toString)
 			.replace("${name}", instance.ident)
 
-		val result  =
+		val result =
 			sys.process.Process(Seq("sbt", proargs), moddedOutPath.toFile).!
 
 		if (result != 0)
@@ -56,7 +61,7 @@ case class SbtAction(
 
 object SbtAction {
 	def apply(name: String,
-	          process: Map[String, Value],
+	          process: Map[String, Variant],
 	          pathOp: GatewareActionPathOp): Seq[SbtAction] = {
 		if (!process.contains("args")) {
 			println(s"SBT process $name doesn't have a args field")
@@ -67,7 +72,7 @@ object SbtAction {
 			None
 		}
 
-		if (!process("args").isInstanceOf[Value.Str]) {
+		if (!process("args").isInstanceOf[StringV]) {
 			println(s"SBT process $name args isn't a string")
 			None
 		}

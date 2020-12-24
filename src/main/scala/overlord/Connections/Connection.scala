@@ -1,7 +1,9 @@
 package overlord.Connections
 
-import overlord.Gateware.{InOutWireDirection, InWireDirection,
-	OutWireDirection, WireDirection}
+import overlord.Gateware.{
+	InOutWireDirection, InWireDirection,
+	OutWireDirection, WireDirection
+}
 import overlord.Instances.Instance
 import overlord.{Connections, DefinitionCatalog}
 import ikuy_utils._
@@ -37,13 +39,14 @@ case class PortConnectionType() extends ConnectionType
 
 case class ClockConnectionType() extends ConnectionType
 
-case class ConstantConnectionType(constant: BigInt) extends ConnectionType
+case class ConstantConnectionType(constant: Variant) extends ConnectionType
 
 case class PortGroupConnectionType(first_prefix: String,
                                    second_prefix: String,
-                                   excludes: Seq[String],
-                                  )
+                                   excludes: Seq[String])
 	extends ConnectionType
+
+case class BusConnectionType() extends ConnectionType
 
 trait Connection {
 
@@ -68,25 +71,25 @@ object Connection {
 
 	def toConnectionType(first: String,
 	                     ctype: String,
-	                     table: Map[String, toml.Value]): ConnectionType = {
+	                     table: Map[String, Variant]): ConnectionType = {
 		ctype match {
 			case "port"       => PortConnectionType()
 			case "clock"      => ClockConnectionType()
-			case "constant"   => ConstantConnectionType(
-				Utils.parseBigInt(first.replace("_", "")))
+			case "constant"   => ConstantConnectionType(Utils.stringToVariant(first))
 			case "port_group" => PortGroupConnectionType(
 				Utils.lookupString(table, "first_prefix", ""),
 				Utils.lookupString(table, "second_prefix", ""),
 				Utils.lookupArray(table, "excludes").map(Utils.toString))
+			case "bus"        => BusConnectionType()
 			case _            =>
 				println(s"$ctype is an unknown connection type")
 				PortConnectionType()
 		}
 	}
 
-	def apply(connection: Value,
+	def apply(connection: Variant,
 	          catalogs: DefinitionCatalog): Option[Connection] = {
-		val table = connection.asInstanceOf[Value.Tbl].values
+		val table = Utils.toTable(connection)
 
 		if (!table.contains("type")) {
 			println(s"connection ${connection} requires a type field")
@@ -123,21 +126,21 @@ object Connection {
 			c.connect(unexpanded)).flatten
 	}
 
-	private def expand(instances: Seq[Instance],
-	                   unexpanded: Seq[Instance]): Seq[Instance] = {
-		(for {
-			toExpand <- instances
-			index <- 0 until {
-				if (toExpand.attributes.contains("count")) {
-					val tomlCount = toExpand.attributes("count")
-					tomlCount.asInstanceOf[Value.Num].value.toInt
-				} else 0
-			}} yield {
-			toExpand.copyMutate(
-				nid = s"${toExpand.ident}.$index",
-				nattribs = toExpand.attributes.filterNot(_._1 == "count"))
-		}) ++ unexpanded.diff(instances)
+	def preConnect(unconnected: Seq[Connection],
+	                    unexpanded: Seq[Instance]): Unit = {
+		(for (c <- unconnected.filter(_.isUnconnected).map(_.asUnconnected))
+			c.preConnect(unexpanded))
 	}
+
+	private def expand(instances: Seq[Instance],
+	                   unexpanded: Seq[Instance]): Seq[Instance] =
+		(for {
+			inst <- instances
+			if inst.replicationCount > 1
+			index <- 0 until inst.replicationCount
+		} yield inst.copyMutate(s"${inst.ident}.$index")) ++
+		unexpanded.diff(instances)
+
 
 	private def expandConnections(expanding: Seq[Connected],
 	                              expanded: Seq[Instance],
@@ -166,11 +169,9 @@ object Connection {
 			                     con.second.nonEmpty)))
 
 			if (doReplicate) {
-				val replicator = (if (i == 0) con.first.get else con.second.get)
-					.asInstanceOf[Instance]
-				val count      = if (replicator.attributes.contains("count"))
-					Utils.toInt(replicator.attributes("count"))
-				else 0
+
+				val count = (if (i == 0) con.first.get else con.second.get)
+					.asInstanceOf[Instance].replicationCount
 
 				for (index <- 0 until count) yield {
 					val m: Instance = {
@@ -227,11 +228,7 @@ object Connection {
 	((Seq[Instance], Seq[Connection])) = {
 		val connected = Connection.connect(unconnected, unexpanded)
 
-		val expandableInstances = unexpanded.filter(
-			p => p.attributes.contains("count") && {
-				p.attributes("count").isInstanceOf[Value.Num] &&
-				p.attributes("count").asInstanceOf[Value.Num].value.toInt > 1
-			})
+		val expandableInstances = unexpanded.filter(_.replicationCount > 1)
 
 		val connectionsNeedExpanding = for {
 			toExpand <- expandableInstances

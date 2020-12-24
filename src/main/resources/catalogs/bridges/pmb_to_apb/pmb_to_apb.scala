@@ -4,6 +4,7 @@ import spinal.lib._
 import spinal.lib.bus.misc.SizeMapping
 import spinal.lib.bus.amba3.apb._
 import spinal.lib.bus.simple._
+import java.nio.file.Path
 
 import ikuy_utils._
 
@@ -26,9 +27,9 @@ object PMBToAPBBridge {
 
 		val table = if (tomlFile.isEmpty) {
 			println(s"No toml config file provided, defaults will be used")
-			Map[String, Value]()
+			Map[String, Variant]()
 		}
-		else Utils.readToml(tomlFile.get)
+		else Utils.readToml(name, Path.of(tomlFile.get), getClass)
 
 		val luInt = new Function2[String, Int, Int] {
 			override def apply(k: String, default: Int): Int =
@@ -51,6 +52,8 @@ object PMBToAPBBridge {
 		println(s"bridge to APB of $apbDataWidth bits & $apbAddressWidth address")
 
 		val config = SpinalConfig(
+			defaultConfigForClockDomains =
+				ClockDomainConfig(resetKind = spinal.core.SYNC),
 			targetDirectory = targetDir,
 			netlistFileName = name + ".v"
 			)

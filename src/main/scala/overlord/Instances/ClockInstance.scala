@@ -7,13 +7,14 @@ import toml.Value
 
 case class ClockInstance(ident: String,
                          pin: String,
-                         definition: DefinitionTrait,
-                         attributes: Map[String, Value])
+                         standard: String,
+                         private val defi: DefinitionTrait)
 	extends Instance {
 
-	override def copyMutate[A <: Instance](nid: String,
-	                                       nattribs: Map[String, Value])
-	: ClockInstance = copy(ident = nid, attributes = nattribs)
+	override def definition: DefinitionTrait = defi
+
+	override def copyMutate[A <: Instance](nid: String): ClockInstance =
+		copy(ident = nid)
 
 	override def getPort(lastName: String): Option[Port] = {
 		// TODO replace this hack
@@ -22,7 +23,7 @@ case class ClockInstance(ident: String,
 		else None*/
 	}
 
-	override def getPorts: Map[String, Port] =
+	override def ports: Map[String, Port] =
 		Map[String, Port]("clk" -> Port("clk", BitsDesc(1)))
 
 }
@@ -30,15 +31,17 @@ case class ClockInstance(ident: String,
 object ClockInstance {
 	def apply(name: String,
 	          definition: DefinitionTrait,
-	          attributes: Map[String, Value]): Option[ClockInstance] = {
+	          attributes: Map[String, Variant]): Option[ClockInstance] = {
 		if (!attributes.contains("pin")) {
 			println(s"$name clock doesn't contain a pin")
 			None
 		} else {
+			val standard = Utils.lookupString(attributes, "standard", "LVCMOS33")
+
 			Some(ClockInstance(name,
 			                   Utils.toString(attributes("pin")),
-			                   definition = definition,
-			                   attributes = attributes))
+			                   standard,
+			                   defi = definition))
 		}
 	}
 }

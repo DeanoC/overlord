@@ -3,3 +3,4 @@ path = "ios"
 [[definition]]
 type = "other.uart.apb_ctrl"
 gateware = "uart/apb_ctrl/apb_ctrl.toml"
+consumer_prefix = "apb_"

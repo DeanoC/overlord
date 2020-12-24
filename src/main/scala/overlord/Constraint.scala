@@ -11,6 +11,7 @@ sealed trait PinConstraintType{
 
 case class PinConstraint( pins: Seq[String],
                           ports: Seq[Port],
+                          standard: String,
                           names: Seq[String]= Seq(),
                           directions: Seq[String]= Seq(),
                           pullups: Seq[Boolean]= Seq())
@@ -18,6 +19,7 @@ case class PinConstraint( pins: Seq[String],
 
 case class DiffPinConstraint( pins: Seq[(String, String)],
                               ports: Seq[Port],
+                              standard: String,
                               names: Seq[String] = Seq(),
                               directions: Seq[String]= Seq(),
                               pullups: Seq[Boolean]= Seq())

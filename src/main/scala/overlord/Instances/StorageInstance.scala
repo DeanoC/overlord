@@ -1,15 +1,23 @@
 package overlord.Instances
 
+import ikuy_utils.Variant
 import overlord.Definitions.DefinitionTrait
 import toml.Value
 
 case class StorageInstance(ident: String,
-                           definition: DefinitionTrait,
-                           attributes: Map[String, Value]
+                           private val defi: DefinitionTrait
                           ) extends Instance {
-	def copyMutate[A <: Instance](nid: String,
-	                              nattribs: Map[String, Value])
-	: StorageInstance =
-		copy(ident = nid, attributes = nattribs)
+	override def definition:DefinitionTrait = defi
+	override def copyMutate[A <: Instance](nid: String) : StorageInstance =
+		copy(ident = nid)
 
+}
+
+object StorageInstance {
+	def apply(ident: String,
+	          definition: DefinitionTrait,
+	          attribs: Map[String, Variant]
+	         ): Option[StorageInstance] = {
+		Some(StorageInstance(ident, definition))
+	}
 }

@@ -1,14 +1,25 @@
 package overlord.Instances
 
+import ikuy_utils.Variant
 import overlord.Definitions.DefinitionTrait
 import toml.Value
 
 case class BridgeInstance(ident: String,
-                          definition: DefinitionTrait,
-                          attributes: Map[String, Value],
+                          private val defi: DefinitionTrait
                          ) extends Instance {
-	def copyMutate[A <: Instance](nid: String,
-	                              nattribs: Map[String, Value]): BridgeInstance =
-		copy(ident = nid, attributes = nattribs)
 
+	override def definition:DefinitionTrait = defi
+
+	override def copyMutate[A <: Instance](nid: String): BridgeInstance =
+		copy(ident = nid)
+
+}
+
+object BridgeInstance {
+	def apply(ident: String,
+	          definition: DefinitionTrait,
+	          attribs: Map[String, Variant]
+	         ): Option[BridgeInstance] = {
+		Some(BridgeInstance(ident, definition))
+	}
 }

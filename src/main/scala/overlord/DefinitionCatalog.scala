@@ -43,7 +43,7 @@ class DefinitionCatalog {
 }
 
 object DefinitionCatalog {
-	def fromFile(spath: Path, name: String): Option[Seq[DefinitionTrait]] = {
+	def fromFile(name: String, spath: Path): Option[Seq[DefinitionTrait]] = {
 		println(s"Reading $name catalog")
 
 		val path = spath.resolve(s"${name}.toml")
@@ -53,25 +53,13 @@ object DefinitionCatalog {
 			return None
 		}
 
-		val chipFile = path.toAbsolutePath.toFile
-		val source   = scala.io.Source.fromFile(chipFile)
-
-		parse(spath, name, source.getLines().mkString("\n"))
+		val source = Utils.readToml(name, path, getClass)
+		parse(name, source, spath)
 	}
 
-	private def parse(spath: Path,
-	                  name: String,
-	                  src: String): Option[Seq[DefinitionTrait]] = {
-
-		val parsed = {
-			val parsed = toml.Toml.parse(src)
-			parsed match {
-				case Right(value) => value.values
-				case Left(_)      => println(s"$name has failed to parse with " +
-				                             s"error ${Left(parsed)}")
-					return None
-			}
-		}
+	private def parse(name: String,
+	                  parsed: Map[String, Variant],
+	                  spath: Path): Option[Seq[DefinitionTrait]] = {
 
 		val path = if (parsed.contains("path")) {
 			spath.resolve(Utils.toString(parsed("path")))

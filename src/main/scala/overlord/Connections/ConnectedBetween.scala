@@ -10,6 +10,10 @@ case class ConnectedBetween(connectionType: ConnectionType,
                             secondary: InstanceLoc)
 	extends Connected {
 
+	def mainType: DefinitionType = main.definition.defType
+
+	def secondaryType: DefinitionType = secondary.definition.defType
+
 	override def connectsToInstance(inst: Instance): Boolean =
 		(main.instance.ident == inst.ident ||
 		 secondary.instance.ident == inst.ident)
@@ -19,8 +23,7 @@ case class ConnectedBetween(connectionType: ConnectionType,
 	override def second: Option[InstanceLoc] = Some(secondary)
 
 	override def areConnectionCountsCompatible: Boolean = {
-		val sharedOkay = main.attributes.contains("shared") ||
-		                 secondary.attributes.contains("shared")
+		val sharedOkay = main.instance.shared// || secondary.instance.shared
 
 		assert((sharedOkay && firstCount == 1) ||
 		       (sharedOkay && secondaryCount == 1) ||
@@ -29,21 +32,17 @@ case class ConnectedBetween(connectionType: ConnectionType,
 		(firstCount == secondaryCount) || sharedOkay
 	}
 
-	override def firstCount: Int = main.instance.count
+	override def firstCount: Int = main.instance.replicationCount
 
-	override def secondaryCount: Int = secondary.instance.count
+	override def secondaryCount: Int = secondary.instance.replicationCount
 
-	def mainType: DefinitionType = main.definition.defType
+	override def isPinToChip: Boolean = main.isPin && secondary.isChip
 
-	def secondaryType: DefinitionType = secondary.definition.defType
+	override def isChipToChip: Boolean = main.isChip && secondary.isChip
 
-	def isPinToChip: Boolean = main.isPin && secondary.isChip
+	override def isChipToPin: Boolean = main.isChip && secondary.isPin
 
-	def isChipToChip: Boolean = main.isChip && secondary.isChip
-
-	def isChipToPin: Boolean = main.isChip && secondary.isPin
-
-	def isClock: Boolean = main.isClock || secondary.isClock
+	override def isClock: Boolean = main.isClock || secondary.isClock
 
 	override def firstFullName: String = main.fullName
 

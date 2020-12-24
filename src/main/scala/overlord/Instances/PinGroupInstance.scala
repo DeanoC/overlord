@@ -10,24 +10,23 @@ import scala.collection.immutable.Map
 
 case class PinGroupInstance(ident: String,
                             constraint: PinConstraintType,
-                            definition: DefinitionTrait,
-                            attributes: Map[String, Value]
+                            private val defi: DefinitionTrait
                            ) extends Instance {
-	override def copyMutate[A <: Instance](nid: String,
-	                                       nattribs: Map[String, Value])
-	: PinGroupInstance =
-		copy(ident = nid, attributes = nattribs)
+	override def definition: DefinitionTrait = defi
+
+	override def copyMutate[A <: Instance](nid: String): PinGroupInstance =
+		copy(ident = nid)
 
 	private lazy val allPorts: Map[String, Port] =
-		super.getPorts ++ constraint.ports.map(p => (p.name -> p))
+		super.ports ++ constraint.ports.map(p => (p.name -> p))
 
-	override def getPorts: Map[String, Port] = allPorts
+	override def ports: Map[String, Port] = allPorts
 }
 
 object PinGroupInstance {
 	def apply(ident: String,
 	          definition: DefinitionTrait,
-	          attributes: Map[String, Value]): Option[PinGroupInstance] = {
+	          attributes: Map[String, Variant]): Option[PinGroupInstance] = {
 
 		val hasPin      = attributes.contains("pin")
 		val hasPins     = attributes.contains("pins")
@@ -74,19 +73,19 @@ object PinGroupInstance {
 			pf + nm
 		}
 
-		val pins = if (hasPin) Seq(Utils.toString(attributes("pin")))
+		val pins = if (hasPin) Array(Utils.toString(attributes("pin")))
 		else if (hasPins) Utils.toArray(attributes("pins")).map(Utils.toString)
-		else Seq()
+		else Array("")
 
 		val diffPins = if (hasDiffPin)
-			Seq((Utils.toString(attributes("pin_p")),
-				    Utils.toString(attributes("pin_n"))))
+			Array((Utils.toString(attributes("pin_p")),
+				      Utils.toString(attributes("pin_n"))))
 		else if (hasDiffPins) {
 			val pin_ps = Utils.toArray(attributes("pin_ps")).map(Utils.toString)
 			val pin_ns = Utils.toArray(attributes("pin_ns")).map(Utils.toString)
 
 			pin_ps.zip(pin_ns)
-		} else Seq()
+		} else Array(("",""))
 
 		val pinCount = Math.max(pins.length, diffPins.length)
 
@@ -115,48 +114,55 @@ object PinGroupInstance {
 				return None
 			}
 		}
+		val standard = Utils.lookupString(attributes, "standard", "LVCMOS33")
 
 		val pinNames = if (hasNames)
 			Utils.toArray(attributes("names"))
 				.map(Utils.toString)
 				.map(name + _)
-		else Seq(name)
+		else Array(name)
 
 		val constraintPinNames = if (hasNames)
 			Utils.toArray(attributes("names"))
 				.map(Utils.toString)
 				.map(name + _)
-		else if (pinCount > 1) for (i <- 0 until pinCount) yield name + s"[$i]"
-		else Seq(name)
+		else if (pinCount > 1)
+			(for (i <- 0 until pinCount) yield name + s"[$i]").toArray
+		else Array(name)
 
 		val directions = if (hasDirection) {
-			val dir = Utils.toString(attributes("direction"))
-				.toLowerCase
-			for (i <- 0 until pinCount) yield dir
+			val dir = Utils.toString(attributes("direction")).toLowerCase
+			Array.fill(pinCount)(dir)
 		} else if (hasDirections)
 			Utils.toArray(attributes("directions"))
 				.map(Utils.toString)
 				.map(_.toLowerCase)
-		else for (i <- 0 until pinCount) yield "inout"
+		else Array.fill(pinCount)("inout")
 
 		val pullups = if (hasPullup) {
 			val pullup = Utils.toBoolean(attributes("pullup"))
-			for (i <- 0 until pinCount) yield pullup
+			Array.fill(pinCount)(pullup)
 		} else if (hasPullups)
 			Utils.toArray(attributes("pullups")).map(Utils.toBoolean)
-		else for (i <- 0 until pinCount) yield false
+		else Array.fill(pinCount)(false)
 
 		val ports = if (pinNames.length > 1)
 			for ((nm, i) <- pinNames.zipWithIndex) yield
 				Port(nm.split('.').last, BitsDesc(1), WireDirection(directions(i)))
-		else Seq(
+		else Array(
 			Port(pinNames.head, BitsDesc(pinCount), WireDirection(directions.head)))
 
 		val constraint = if (hasPin || hasPins)
-			PinConstraint(pins, ports, constraintPinNames, directions, pullups)
+			PinConstraint(pins,
+			              ports,
+			              standard,
+			              constraintPinNames,
+			              directions,
+			              pullups)
 		else if (hasDiffPin || hasDiffPins)
 			DiffPinConstraint(diffPins,
 			                  ports,
+			                  standard,
 			                  constraintPinNames,
 			                  directions,
 			                  pullups)
@@ -164,8 +170,7 @@ object PinGroupInstance {
 
 		Some(PinGroupInstance(name,
 		                      constraint,
-		                      definition,
-		                      attribs))
+		                      definition))
 	}
 }
 

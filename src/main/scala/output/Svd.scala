@@ -1,5 +1,6 @@
 package output
 
+import ikuy_utils.Utils
 import overlord.Gateware.BitsDesc
 
 import java.io.{BufferedWriter, FileWriter}
@@ -67,8 +68,8 @@ object Svd {
 	private def outputPeripheral(s: Instance) : Seq[xml.Elem] ={
 		if(s.definition.software.isEmpty) Seq[xml.Elem]()
 		else for(regs <- s.definition.software.get.groups) yield {
-				val bank = if(s.attributes.contains("bank")) {
-					regs.banks.find(_.name == s.attributes("bank")
+				val bank = if(false) {//(s.attributes.contains("bank")) {
+					regs.banks.find(_.name == "TODO"//s.attributes("bank")
 						                .asInstanceOf[toml.Value.Str].value) match {
 							case Some(value) => value
 							case None =>
@@ -142,29 +143,16 @@ object Svd {
 			</device>
 	//@formatter:on
 
-		ensureDirectories(out)
+		Utils.ensureDirectories(out)
 		val path =
 			if (out.toFile.isDirectory) out.resolve(s"${
 				game.name
 			}.svd")
 			else out
 
-		writeFile(path, new PrettyPrinter(Int.MaxValue, 2).format(deviceXml))
+		Utils.writeFile(path, new PrettyPrinter(Int.MaxValue, 2).format(deviceXml))
 	}
 
-	private def ensureDirectories(path: Path): Unit = {
-		val directory = path.toFile
-		if (directory.isDirectory && !directory.exists()) {
-			directory.mkdirs()
-		}
-	}
-
-	private def writeFile(path: Path, s: String): Unit = {
-		val file = path.toFile
-		val bw   = new BufferedWriter(new FileWriter(file))
-		bw.write(s)
-		bw.close()
-	}
 
 
 

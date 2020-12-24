@@ -1,10 +1,8 @@
 package overlord.Gateware.GatewareAction
 
 import java.nio.file.Path
-import overlord.Gateware.Parameter
 import overlord.Instances.Instance
 import ikuy_utils._
-import toml.Value
 
 case class PythonAction(script: String,
                         args: String,
@@ -13,7 +11,7 @@ case class PythonAction(script: String,
 
 	override val phase: GatewareActionPhase = GatewareActionPhase1()
 
-	override def execute(instance: Instance, parameters: Map[String, Parameter], outPath: Path): Unit = {
+	override def execute(instance: Instance, parameters: Map[String, Variant], outPath: Path): Unit = {
 		import scala.language.postfixOps
 
 		val result = sys.process.Process(
@@ -27,13 +25,13 @@ case class PythonAction(script: String,
 
 object PythonAction {
 	def apply(name: String,
-	          process: Map[String, Value],
+	          process: Map[String, Variant],
 	          pathOp: GatewareActionPathOp): Seq[PythonAction] = {
 		if (!process.contains("script")) {
 			println(s"Python process $name doesn't have a script field")
 			None
 		}
-		if (!process("script").isInstanceOf[Value.Str]) {
+		if (!process("script").isInstanceOf[StringV]) {
 			println(s"Python process $name script isn't a string")
 			None
 		}
@@ -41,7 +39,7 @@ object PythonAction {
 			println(s"Python process $name doesn't have a args field")
 			None
 		}
-		if (!process("args").isInstanceOf[Value.Str]) {
+		if (!process("args").isInstanceOf[StringV]) {
 			println(s"Python process $name args isn't a string")
 			None
 		}

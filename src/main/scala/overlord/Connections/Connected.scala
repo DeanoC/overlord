@@ -16,8 +16,6 @@ case class InstanceLoc(instance: Instance,
                        fullName: String) {
 	def definition: DefinitionTrait = instance.definition
 
-	def attributes: Map[String, Value] = instance.attributes
-
 	def isPin: Boolean = instance.isInstanceOf[PinGroupInstance]
 	def isClock: Boolean = instance.isInstanceOf[ClockInstance]
 	def isChip:Boolean = !(isPin || isClock)

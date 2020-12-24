@@ -1,10 +1,11 @@
 import spinal.core._
 import spinal.lib._
-import ikuy_utils.Utils
+import ikuy_utils._
 import toml.Value
+import java.nio.file.Path
 
 object Resetti {
-	var resetClocks: Int    = 64
+	var resetClocks: Int = 64
 
 	def main(args: Array[String]): Unit = {
 		println(s"Building Resetti")
@@ -15,12 +16,10 @@ object Resetti {
 
 		val table = if (tomlFile.isEmpty) {
 			println(s"No toml config file provided, defaults will be used")
-			Map[String, Value]()
+			Map[String, Variant]()
 		}
-		else {
-			println(s"Reading $tomlFile for resetti config")
-			Utils.readToml(tomlFile.get)
-		}
+		else Utils.readToml(name, Path.of(tomlFile.get), getClass)
+
 
 		val luInt  = new Function2[String, Int, Int] {
 			override def apply(k: String, default: Int): Int =
@@ -50,35 +49,36 @@ object Resetti {
 	case class ResettiComponent()
 		extends Component {
 		val io = new Bundle {
-			val mainClk = in Bool
+			val clk = in Bool
 			val asyncReset = in Bool
 			val syncReset = out Bool
 		}
 		noIoPrefix()
 
 		val resetCtrlClockDomain = ClockDomain(
-			clock = io.mainClk,
-			config = ClockDomainConfig(
-				resetKind = BOOT
-				)
+			clock = io.clk,
+			config = ClockDomainConfig(resetKind = BOOT),
+			frequency = FixedFrequency(100 MHz) // TODO
 			)
 
 		val resetCtrl = new ClockingArea(resetCtrlClockDomain) {
-			val syncResetUnbuffered  = False
+			val systemResetUnbuffered  = False
 
-			//Implement an counter to keep the reset reset high for resetClocks cycles
-			// Also this counter will automatically do a reset when the system boot.
-			val systemClkResetCounter = Reg(UInt(log2Up(resetClocks-1) bits)) init(0)
-			when(systemClkResetCounter =/= U(systemClkResetCounter.range -> true)){
-				systemClkResetCounter := systemClkResetCounter + 1
-				syncResetUnbuffered := True
+			//Implement an counter to keep the reset axiResetOrder high 64 cycles
+			// Also this counter will automaticly do a reset when the system boot.
+			val systemResetCounter = Reg(UInt(log2Up(resetClocks-1) bits)) init(0)
+			when(systemResetCounter =/= U(systemResetCounter.range -> true)){
+				systemResetCounter := systemResetCounter + 1
+				systemResetUnbuffered := True
 			}
 			when(BufferCC(io.asyncReset)){
-				systemClkResetCounter := 0
+				systemResetCounter := 0
 			}
 
-			io.syncReset := RegNext(syncResetUnbuffered)
+			//Create all reset used later in the design
+			val systemReset  = RegNext(systemResetUnbuffered)
 		}
+		io.syncReset := resetCtrl.systemReset
 	}
 
 }

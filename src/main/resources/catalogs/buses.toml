@@ -3,8 +3,12 @@ path = "buses"
 [[definition]]
 type = "bus.pipelined_memory_bus.spinal"
 gateware = "spinal/pipelined_memory_bus/pipelined_memory_bus.toml"
+supplier_prefix = ["dBus_", "iBus_"]
+consumer_prefix = "consumers_${index}_"
 
 [[definition]]
 type = "bus.advanced_peripheral_bus.spinal"
 gateware = "spinal/advanced_peripheral_bus/advanced_peripheral_bus.toml"
+supplier_prefix = "supplier_"
+consumer_prefix = "consumers_${index}_"
 

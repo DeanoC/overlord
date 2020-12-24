@@ -1,14 +1,23 @@
 package overlord.Instances
 
+import ikuy_utils.Variant
 import overlord.Definitions.DefinitionTrait
 import toml.Value
 
 case class RamInstance(ident: String,
-                       definition: DefinitionTrait,
-                       attributes: Map[String, Value],
+                       private val defi: DefinitionTrait
                       ) extends Instance {
-	def copyMutate[A <: Instance](nid: String,
-	                              nattribs: Map[String, Value]): RamInstance =
-		copy(ident = nid, attributes = nattribs)
+	override def definition:DefinitionTrait = defi
 
+	override def copyMutate[A <: Instance](nid: String): RamInstance =
+		copy(ident = nid)
+
+}
+object RamInstance {
+	def apply(ident: String,
+	          definition: DefinitionTrait,
+	          attribs: Map[String, Variant]
+	         ): Option[RamInstance] = {
+		Some(RamInstance(ident, definition))
+	}
 }

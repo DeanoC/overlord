@@ -3,55 +3,38 @@ package overlord.Gateware
 import overlord.Definitions.GatewareTrait
 import overlord.Gateware.GatewareAction._
 
-import java.nio.file.{Files, Path}
+import java.nio.file.Path
 import overlord.Game
 import ikuy_utils._
-import toml.Value
 
 import scala.collection.mutable
 
 case class Gateware(actions: Seq[GatewareAction],
                     ports: mutable.HashMap[String, Port],
-                    parameters: mutable.HashMap[String, Parameter],
+                    parameters: Map[String, Variant],
                     verilog_parameters: mutable.HashSet[String]
                    ) extends GatewareTrait
 
 object Gateware {
 	def apply(name: String, spath: Path): Option[Gateware] = {
 		val path = Game.pathStack.top.resolve(spath)
-		if (!Files.exists(path.toAbsolutePath)) {
-			println(s"${path.toAbsolutePath} gateware file not found");
-			return None
-		}
 		Game.pathStack.push(path.getParent)
-		val file   = path.toAbsolutePath.toFile
-		val source = scala.io.Source.fromFile(file)
-
-		val result = parse(name, source.getLines().mkString("\n"))
+		val result = parse(name, Utils.readToml(name, path, getClass))
 		Game.pathStack.pop()
 		result
 	}
 
-	private def parse(name: String, data: String): Option[Gateware] = {
-
-		val parsed = {
-			val parsed = toml.Toml.parse(data)
-			parsed match {
-				case Right(value) => value.values
-				case Left(value)  => println(s"$name has failed to parse with " +
-				                             s"error ${Left(parsed)}")
-					return None
-			}
-		}
+	private def parse(name: String,
+	                  parsed: Map[String, Variant]): Option[Gateware] = {
 
 		if (!parsed.contains("actions") ||
-		    !parsed("actions").isInstanceOf[Value.Arr]) {
+		    !parsed("actions").isInstanceOf[ArrayV]) {
 			println(s"$name doesn't have an actions field")
 			return None
 		}
 
 		if (!parsed.contains("process") ||
-		    !parsed("process").isInstanceOf[Value.Arr]) {
+		    !parsed("process").isInstanceOf[ArrayV]) {
 			println(s"$name doesn't have process fields")
 			return None
 		}
@@ -101,19 +84,15 @@ object Gateware {
 		else Map()
 
 		val parameters = if (parsed.contains("parameters"))
-			Parameters(Utils.toArray(parsed("parameters")))
-				.map(t => (t.key -> t)).toMap
-		else Map()
+			Utils.toTable(parsed("parameters"))
+		else Map[String,Variant]()
 
 		val portHash = mutable.HashMap[String, Port]()
 		ports.foreach(p => portHash += (p._1 -> p._2))
 
-		val parameterHash = mutable.HashMap[String, Parameter]()
-		parameters.foreach(p => parameterHash += (p._1 -> p._2))
-
 		Some(Gateware(actions,
 		              portHash,
-		              parameterHash,
+		              parameters,
 		              mutable.HashSet()))
 	}
 }

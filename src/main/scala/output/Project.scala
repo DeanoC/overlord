@@ -1,6 +1,5 @@
 package output
 
-import java.io.{BufferedWriter, FileWriter}
 import java.nio.file.Path
 
 import overlord.Game
@@ -16,7 +15,9 @@ object Project {
 		output.Top(game, gatePath)
 		output.Edalize(game, gatePath)
 
-		if (game.cpus.nonEmpty)
+		if (game.cpus.nonEmpty) {
+			output.Compiler(game, softPath)
 			output.Svd(game, softPath)
+		}
 	}
 }

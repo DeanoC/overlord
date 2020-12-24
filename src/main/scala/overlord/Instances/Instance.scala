@@ -7,17 +7,57 @@ import overlord.Definitions._
 import overlord.Gateware.{Gateware, Port}
 import overlord.DefinitionCatalog
 import ikuy_utils._
-import toml.Value
 
 import scala.collection.mutable
 
 trait Instance {
-	val ident     : String
-	val definition: DefinitionTrait
-	val attributes: Map[String, Value]
+	val ident: String
+
+	val replicationCount: Int     = 1 // TODO revisit this
+	val shared          : Boolean = false
+
+	val instancePorts: mutable.HashMap[String, Port] =
+		mutable.HashMap[String, Port]()
+
+	val instanceParameters: mutable.HashMap[String, Variant] =
+		mutable.HashMap[String, Variant]()
+
+	val instanceParameterKeys: mutable.HashSet[String] =
+		mutable.HashSet[String]()
 
 	private val splitIdent           = ident.split('.')
 	private val splitIdentWidthIndex = splitIdent.zipWithIndex
+
+	def definition: DefinitionTrait
+
+	def ports: Map[String, Port] =
+		definition.ports ++ {
+			if (definition.gateware.nonEmpty)
+				definition.gateware.get.ports.toMap
+			else Map[String, Port]()
+		} ++ instancePorts.toMap
+
+	def parameters: Map[String, Variant] =
+		definition.parameters ++ {
+			if (definition.gateware.nonEmpty)
+				definition.gateware.get.parameters.toMap
+			else Map[String, Variant]()
+		} ++ instanceParameters.toMap
+
+	def parameterKeys: Set[String] = instanceParameterKeys.toSet
+
+	def software: Seq[SoftwareTrait] = definition.software.toList
+
+	def gateware: Option[GatewareTrait] = definition.gateware
+
+	def hardware: Option[HardwareTrait] = definition.hardware
+
+	def copyMutate[A <: Instance](nid: String): Instance
+
+	def isGateware: Boolean = gateware.nonEmpty
+
+	def getPort(lastName: String): Option[Port] =
+		if (ports.contains(lastName)) Some(ports(lastName)) else None
 
 	def getMatchNameAndPort(a: String): (Option[String], Option[Port]) = {
 		val withoutBits = a.split('[').head
@@ -53,27 +93,6 @@ trait Instance {
 			}
 		}
 	}
-
-	def copyMutate[A <: Instance](nid: String,
-	                              nattribs: Map[String, Value]): Instance
-
-	def count: Int = Utils.lookupInt(attributes, "count", 1)
-
-	def shared: Boolean = attributes.contains("shared")
-
-	def isGateware: Boolean = definition.gateware.nonEmpty
-
-	private lazy val phase2Ports: Map[String, Port] =
-		definition.ports ++ (if (definition.gateware.nonEmpty)
-			definition.gateware.get.ports.toMap else Map())
-
-	def getPort(lastName: String): Option[Port] = {
-		if (getPorts.contains(lastName))
-			Some(getPorts(lastName))
-		else None
-	}
-	def getPorts: Map[String,Port] = phase2Ports
-
 }
 
 trait Container {
@@ -91,8 +110,8 @@ class MutContainer(var children: mutable.Seq[Instance] = mutable.Seq(),
                    var connections: mutable.Seq[Connection] = mutable.Seq())
 
 object Instance {
-	def apply(parsed: Value,
-	          defaults: Map[String, Value],
+	def apply(parsed: Variant,
+	          defaults: Map[String, Variant],
 	          catalogs: DefinitionCatalog): Option[Instance] = {
 
 		val table = Utils.toTable(parsed)
@@ -102,13 +121,16 @@ object Instance {
 			return None
 		}
 
-		val defTypeString = Utils.toString(table("type"))
-		val name          = Utils.lookupString(table, "name", defTypeString)
+		val defTypeString    = Utils.toString(table("type"))
+		val name             = Utils.lookupString(table, "name", defTypeString)
+		val replicationCount = Utils.lookupInt(table, "count", 1)
+		val shared           = Utils.lookupBoolean(table, "shared", or = false)
 
-		val attribs: Map[String, Value] = (defaults ++ table.filter(
+		val attribs: Map[String, Variant] = (defaults ++ table.filter(
 			_._1 match {
-				case "type" | "name" => false
-				case _               => true
+				case "type" | "name"    => false
+				case "shared" | "count" => false
+				case _                  => true
 			}))
 
 		val defType = Definition.toDefinitionType(defTypeString)
@@ -128,15 +150,21 @@ object Instance {
 			}
 		}
 
-		defi.createInstance(name, attribs)
+		defi.createInstance(name, attribs) match {
+			case Some(i) =>
+				//				i.replicationCount = replicationCount
+				//				i.shared = shared
+				Some(i)
+			case None    => None
+		}
 
 	}
 
 	private def definitionFrom(catalogs: DefinitionCatalog,
-	                           table: Map[String, Value],
+	                           table: Map[String, Variant],
 	                           defTypeString: String,
 	                           name: String,
-	                           attribs: Map[String, Value],
+	                           attribs: Map[String, Variant],
 	                           defType: DefinitionType)
 	: Option[Definition] = {
 		if (table.contains("gateware")) {

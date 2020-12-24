@@ -5,6 +5,7 @@ import spinal.lib.bus.misc.SizeMapping
 import spinal.lib.bus.simple.{PipelinedMemoryBus => pmb}
 import spinal.lib.bus.simple.PipelinedMemoryBusConfig
 import ikuy_utils._
+import java.nio.file.Path
 
 object PipelinedMemoryBus {
 
@@ -29,9 +30,9 @@ object PipelinedMemoryBus {
 
 		val table = if (tomlFile.isEmpty) {
 			println(s"No toml config file provided, defaults will be used")
-			Map[String, Value]()
+			Map[String, Variant]()
 		}
-		else Utils.readToml(tomlFile.get)
+		else Utils.readToml(name, Path.of(tomlFile.get), getClass)
 
 		val luInt  = new Function2[String, Int, Int] {
 			override def apply(k: String, default: Int): Int =
@@ -42,20 +43,20 @@ object PipelinedMemoryBus {
 				Utils.lookupBigInt(table, k, default)
 		}
 
-		consumerCount = luInt("consumer_count", consumerCount)
-		busDataWidth = luInt("data_width", busDataWidth)
-		busAddressWidth = luInt("address_width", busAddressWidth)
+		consumerCount = luInt("bus_count", consumerCount)
+		busDataWidth = luInt("bus_data_width", busDataWidth)
+		busAddressWidth = luInt("bus_address_width", busAddressWidth)
+		baseAddress = luBInt("bus_base", baseAddress)
+		addressBankSize = luBInt("bus_bank_size", addressBankSize)
+
 		iBusDataWidth = luInt("ibus_data_width", busDataWidth)
 		iBusAddressWidth = luInt("ibus_address_width", busAddressWidth)
 		instructionWidth = luInt("instruction_width", iBusAddressWidth)
 		dBusDataWidth = luInt("dbus_data_width", busDataWidth)
 		dBusAddressWidth = luInt("dbus_address_width", busAddressWidth)
 
-		baseAddress = luBInt("base_address", baseAddress)
-		addressBankSize = luBInt("bank_size", addressBankSize)
-
 		if (iBusDataWidth != instructionWidth) {
-			println("Currently iBus Data Width and instructionWidth must be equal")
+			println("Currently iBus Data Width and instruction Width must be equal")
 			return
 		}
 
@@ -63,6 +64,8 @@ object PipelinedMemoryBus {
 		println(s"$consumerCount consumers attached to bus")
 
 		val config = SpinalConfig(
+			defaultConfigForClockDomains =
+				ClockDomainConfig(resetKind = spinal.core.SYNC),
 			targetDirectory = targetDir,
 			netlistFileName = name + ".v"
 			)
@@ -205,13 +208,12 @@ object PipelinedMemoryBus {
 
 		val tmp = for (i <- 0 until consumerCount) yield pmb(busConfig)
 
-
 		val mainBusMapping = for (i <- 0 until consumerCount) yield
 			(tmp(i), SizeMapping(baseAddress + i * addressBankSize, addressBankSize))
 
 		PipelinedMemoryBusDecoder(arb.io.bus,
 		                          mainBusMapping,
-		                          pipelineMaster = false)
+		                          pipelineMaster = true)
 
 		for (i <- 0 until consumerCount) tmp(i) <> io.consumers(i)
 		arb.io.iBus <> io.iBus

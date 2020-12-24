@@ -87,14 +87,15 @@ object Main {
 
 		val chipCatalogs = new DefinitionCatalog
 
+		val filePath = Path.of(filename)
+		Game.pathStack.push(filePath.getParent.toAbsolutePath)
+
 		if (!options.contains(Symbol("nostdresources")))
 			chipCatalogs.catalogs ++= stdResources.loadCatalogs()
 
 		if (resources.isDefined)
 			chipCatalogs.catalogs ++= resources.get.loadCatalogs()
 
-		val filePath = Path.of(filename)
-		Game.pathStack.push(filePath.getParent.toAbsolutePath)
 
 		val out = Path.of(
 			if (!options.contains(Symbol("out"))) "."
@@ -102,11 +103,10 @@ object Main {
 			).toAbsolutePath
 		Utils.ensureDirectories(out)
 
-		val source = scala.io.Source.fromFile(filePath.toFile)
+		val gameName = filename.split('/').last.split('.').head
 
-		val gameText = source.getLines().mkString("\n")
-		val game     = Game(filename,
-		                    gameText,
+		val game     = Game(gameName,
+		                    filePath,
 		                    out,
 		                    chipCatalogs) match {
 			case Some(game) => game

@@ -1,11 +1,9 @@
 package overlord.Gateware.GatewareAction
 
 import java.nio.file.Path
-import overlord.Gateware.Parameter
 import overlord.Instances.Instance
 import overlord.Game
 import ikuy_utils._
-import toml.Value
 
 case class CopyAction(filename: String,
                       language: String,
@@ -17,7 +15,7 @@ case class CopyAction(filename: String,
 
 	private var dstAbsPath: Path = Path.of("")
 
-	override def execute(gateware: Instance, parameters: Map[String, Parameter], outPath: Path): Unit = {
+	override def execute(gateware: Instance, parameters: Map[String, Variant], outPath: Path): Unit = {
 		val fn         = filename.split('/').last
 		val pathString = s"${gateware.ident}/$fn"
 		dstAbsPath = outPath.resolve(pathString.replace("${dest}/", ""))
@@ -28,7 +26,7 @@ case class CopyAction(filename: String,
 		} else Path.of(srcPath)
 
 		Utils.ensureDirectories(dstAbsPath.getParent)
-		val source = Utils.readFile(srcAbsPath)
+		val source = Utils.readFile(fn, srcAbsPath, getClass)
 		Utils.writeFile(dstAbsPath, source.toString)
 
 		updatePath(dstAbsPath.getParent)
@@ -42,7 +40,7 @@ case class CopyAction(filename: String,
 
 object CopyAction {
 	def apply(name: String,
-	          process: Map[String, Value],
+	          process: Map[String, Variant],
 	          pathOp: GatewareActionPathOp): Seq[CopyAction] = {
 		if (!process.contains("sources")) {
 			println(s"Sources process $name doesn't have a sources field")

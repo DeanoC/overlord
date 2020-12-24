@@ -33,22 +33,21 @@ case class LatticeBoard() extends BoardType {
 
 case class BoardInstance(ident: String,
                          boardType: BoardType,
-                         definition: DefinitionTrait,
-                         attributes: Map[String, Value],
+                         private val defi: DefinitionTrait,
                          override val children: Seq[Instance]
                         ) extends Instance with Container {
 
-	override val physical:Boolean = false
-	override def copyMutate[A <: Instance](nid: String,
-	                                       nattribs: Map[String, Value])
-	: BoardInstance =
-		copy(ident = nid, attributes = nattribs)
+	override def definition: DefinitionTrait = defi
+
+	override val physical: Boolean = false
+
+	override def copyMutate[A <: Instance](nid: String): BoardInstance =
+		copy(ident = nid)
 
 	override def copyMutateContainer(copy: MutContainer): Container = {
 		BoardInstance(ident = ident,
 		              boardType = boardType,
-		              definition = definition,
-		              attributes = attributes,
+		              defi = definition,
 		              children = copy.children.toSeq)
 	}
 }
@@ -56,7 +55,7 @@ case class BoardInstance(ident: String,
 object BoardInstance {
 	def apply(name: String,
 	          definition: DefinitionTrait,
-	          attribs: Map[String, Value]): Option[BoardInstance] = {
+	          attribs: Map[String, Variant]): Option[BoardInstance] = {
 		if (!attribs.contains("board_type")) {
 			println(s"${name} board requires a type value");
 			return None
@@ -81,8 +80,7 @@ object BoardInstance {
 
 		Some(BoardInstance(name,
 		                   boardType = boardType,
-		                   definition = definition,
-		                   attributes = attribs,
+		                   defi = definition,
 		                   children = Seq() // we be fixed up in post
 		                   ))
 	}

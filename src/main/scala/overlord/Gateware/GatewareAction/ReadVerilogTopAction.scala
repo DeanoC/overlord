@@ -1,7 +1,7 @@
 package overlord.Gateware.GatewareAction
 
-import input.{VerilogParameter, VerilogPort}
-import overlord.Gateware.{Parameter, Port, WireDirection}
+import input.{VerilogParameterKey, VerilogPort}
+import overlord.Gateware.{Port, WireDirection}
 import overlord.Instances.Instance
 import overlord.Game
 import ikuy_utils._
@@ -16,21 +16,21 @@ case class ReadVerilogTopAction(filename: String,
 	override val phase: GatewareActionPhase = GatewareActionPhase2()
 
 	override def execute(instance: Instance,
-	                     parameters: Map[String, Parameter],
+	                     parameters: Map[String, Variant],
 	                     outPath: Path): Unit = {
 		val name = filename.replace("${name}", instance.ident)
 		val bs   = input.VerilogModuleParser(
 			outPath.resolve(name + ".v"), name.split("/").last)
 
 		if (instance.isGateware) {
-			instance.definition.gateware.get.ports ++=
+			instance.instancePorts ++=
 			bs.filter(_.isInstanceOf[VerilogPort])
 				.map(_.asInstanceOf[VerilogPort])
 				.map(p => (p.name -> Port(p.name, p.bits, WireDirection(p.direction))))
 
-			instance.definition.gateware.get.verilog_parameters ++=
-			bs.filter(_.isInstanceOf[VerilogParameter])
-				.map(_.asInstanceOf[VerilogParameter])
+			instance.instanceParameterKeys ++=
+			bs.filter(_.isInstanceOf[VerilogParameterKey])
+				.map(_.asInstanceOf[VerilogParameterKey])
 				.map(p => p.parameter)
 		}
 
@@ -40,7 +40,7 @@ case class ReadVerilogTopAction(filename: String,
 
 object ReadVerilogTopAction {
 	def apply(name: String,
-	          process: Map[String, Value],
+	          process: Map[String, Variant],
 	          pathOp: GatewareActionPathOp): Option[ReadVerilogTopAction] = {
 		if (!process.contains("source")) {
 			println(s"Read Verilog Top process $name doesn't have a source field")
@@ -48,8 +48,8 @@ object ReadVerilogTopAction {
 		}
 
 		val filename = process("source") match {
-			case s: Value.Str => s.value
-			case t: Value.Tbl => Utils.toString(t.values("file"))
+			case s: StringV => s.value
+			case t: TableV  => Utils.toString(t.value("file"))
 		}
 
 		val srcPath = if (filename.contains("${src}")) {

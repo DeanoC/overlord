@@ -1,13 +1,10 @@
 package overlord.Gateware.GatewareAction
 
-import overlord.Gateware.Parameter
 import overlord.Instances.Instance
 import overlord.Game
 import ikuy_utils._
-import toml.Value
 
 import java.nio.file.Path
-import scala.util.{Failure, Success, Try}
 
 case class TomlAction(parameterKeys: Seq[String],
                       filename: String,
@@ -17,40 +14,43 @@ case class TomlAction(parameterKeys: Seq[String],
 	override val phase: GatewareActionPhase = GatewareActionPhase1()
 
 	override def execute(instance: Instance,
-	                     parameters: Map[String, Parameter],
+	                     parameters: Map[String, Variant],
 	                     outPath: Path): Unit = {
 		val sb = new StringBuilder()
 		for {k <- parameterKeys
-		     if parameters.contains(k)} sb ++= {
-			val v = parameters(k).value
-			Try {
-				v.toLong
-			} match {
-				case Failure(_)     => s"$k = '$v'\n"
-				case Success(value) => s"$k = $value\n"
-			}
+		     if parameters.contains(k)} {
+			sb ++= (parameters(k) match {
+				case ArrayV(arr)       => "TODO"
+				case BigIntV(bigInt)   => s"$k = $bigInt\n"
+				case BooleanV(boolean) => s"$k = $boolean\n"
+				case IntV(int)         => s"$k = $int\n"
+				case TableV(table)     =>"TODO"
+				case StringV(string)   => s"$k = '$string'\n"
+				case DoubleV(dbl)      => s"$k = $dbl\n"
+			})
 		}
 
 		val moddedOutPath = Game.pathStack.top.resolve(instance.ident)
 
-		val dstAbsPath = moddedOutPath.resolve(filename)
-		Utils.ensureDirectories(dstAbsPath.getParent)
+	val dstAbsPath = moddedOutPath.resolve(filename)
+	Utils.ensureDirectories(dstAbsPath.getParent)
 
-		Utils.writeFile(dstAbsPath, sb.result())
+	Utils.writeFile(dstAbsPath, sb.result())
 
-		updatePath(dstAbsPath.getParent)
-	}
+	updatePath(dstAbsPath.getParent)
+}
+
 }
 
 object TomlAction {
 	def apply(name: String,
-	          process: Map[String, Value],
+	          process: Map[String, Variant],
 	          pathOp: GatewareActionPathOp): Seq[TomlAction] = {
 		if (!process.contains("parameters")) {
 			println(s"Toml process $name doesn't have a parameters field")
 			None
 		}
-		if (!process("parameters").isInstanceOf[Value.Arr]) {
+		if (!process("parameters").isInstanceOf[ArrayV]) {
 			println(s"Toml process $name parameters isn't an array")
 			None
 		}
@@ -58,7 +58,7 @@ object TomlAction {
 			println(s"Toml process $name doesn't have a filename field")
 			None
 		}
-		if (!process("filename").isInstanceOf[Value.Str]) {
+		if (!process("filename").isInstanceOf[StringV]) {
 			println(s"Toml process $name filename isn't a string")
 			None
 		}

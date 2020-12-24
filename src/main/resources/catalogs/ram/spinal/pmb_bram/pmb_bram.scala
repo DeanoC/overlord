@@ -2,8 +2,9 @@ import spinal.core._
 import spinal.lib._
 import spinal.lib.bus.simple.PipelinedMemoryBus
 import spinal.lib.bus.simple.PipelinedMemoryBusConfig
-import ikuy_utils.Utils
+import ikuy_utils._
 import toml.Value
+import java.nio.file.Path
 
 object PmbBram {
 	var sizeInBytes    : BigInt = 4096
@@ -20,12 +21,10 @@ object PmbBram {
 
 		val table = if (tomlFile.isEmpty) {
 			println(s"No toml config file provided, defaults will be used")
-			Map[String, Value]()
+			Map[String, Variant]()
 		}
-		else {
-			println(s"Reading $tomlFile for pmb_bram config")
-			Utils.readToml(tomlFile.get)
-		}
+		else Utils.readToml(name, Path.of(tomlFile.get), getClass)
+
 
 		val luInt  = new Function2[String, Int, Int] {
 			override def apply(k: String, default: Int): Int =
@@ -46,6 +45,8 @@ object PmbBram {
 		println(s"$bitsPerByte bits per byte and $sizeInBytes bytes capacity")
 
 		val config = SpinalConfig(
+			defaultConfigForClockDomains =
+				ClockDomainConfig(resetKind = spinal.core.SYNC),
 			targetDirectory = targetDir,
 			netlistFileName = name + ".v"
 			)
