@@ -49,7 +49,7 @@ object BusInstance {
 		val iParams = Map[String, Variant]( elems =
 			("bus_data_width" -> attribs.getOrElse("bus_data_width", IntV(32))),
 			("bus_address_width" -> attribs.getOrElse("bus_address_width", IntV(32))),
-			("bus_base" -> attribs.getOrElse("bus_base", BigIntV(0))),
+			("bus_base_address" -> attribs.getOrElse("bus_base_address", BigIntV(0))),
 			("bus_bank_size" -> attribs.getOrElse("bus_bank_size", BigIntV(1024)))
 			)
 		//@formatter:on

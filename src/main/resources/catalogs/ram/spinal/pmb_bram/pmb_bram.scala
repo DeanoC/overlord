@@ -7,10 +7,10 @@ import toml.Value
 import java.nio.file.Path
 
 object PmbBram {
-	var sizeInBytes    : BigInt = 4096
-	var bitsPerByte    : Int    = 8
-	var busDataWidth   : Int    = 32
-	var busAddressWidth: Int    = 32
+	var sizeInBytes    : BigInt = 0
+	var bitsPerByte    : Int    = 0
+	var busDataWidth   : Int    = 0
+	var busAddressWidth: Int    = 0
 
 	def main(args: Array[String]): Unit = {
 		println(s"Building Spinal Pipelined Memory Bus RAM")
@@ -44,6 +44,14 @@ object PmbBram {
 		        s"bus")
 		println(s"$bitsPerByte bits per byte and $sizeInBytes bytes capacity")
 
+		if (sizeInBytes <= 0 ||
+		    bitsPerByte <= 0 ||
+		    busDataWidth <= 0 ||
+		    busAddressWidth <= 0) {
+			println("invalid RAM setup")
+			return
+		}
+
 		val config = SpinalConfig(
 			defaultConfigForClockDomains =
 				ClockDomainConfig(resetKind = spinal.core.SYNC),
@@ -72,7 +80,9 @@ object PmbBram {
 		val wordCount = sizeInBytes / (busDataWidth / bitsPerByte)
 
 		val ram = Mem(wordType = Bits(busDataWidth bits), wordCount)
-		ram.init(for (i <- 0 until wordCount.toInt) yield B(i, busDataWidth bits))
+		ram.init(
+			for (i <- 0 until wordCount.toInt) yield B(0, busDataWidth bits)
+			)
 
 		io.bus.rsp.valid := RegNext(io.bus.cmd.fire &&
 		                            !io.bus.cmd.write) init (False)

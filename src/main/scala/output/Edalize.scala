@@ -1,9 +1,14 @@
 package output
 
 import java.nio.file.Path
-import overlord.Gateware.GatewareAction.{CopyAction, GitCloneAction,
-	SourcesAction}
-import overlord.Instances.{AlteraBoard, LatticeBoard, XilinxBoard}
+import overlord.Gateware.GatewareAction.{
+	CopyAction, GitCloneAction,
+	SourcesAction
+}
+import overlord.Instances.{
+	AlteraBoard, LatticeBoard, PrimaryBootFillType,
+	XilinxBoard, ZeroFillType
+}
 import overlord._
 import ikuy_utils._
 
@@ -24,10 +29,11 @@ object Edalize {
 			 |import os
 			 |from bitstring import BitArray, BitStream
 			 |
+			 |
 			 |""".stripMargin
 
 		sb ++=
-		s"""def prep_rom(name, inpath, outpath, bits_per_byte, data_width, size_in_bytes):
+		s"""def prep_rom(name, in_path, out_path, bits_per_byte, data_width, size_in_bytes):
 			 |    "turns roms into form for bitstream"
 			 |    assert ((data_width % bits_per_byte) == 0)
 			 |    bytes_per_data_element = int(data_width // bits_per_byte)
@@ -36,21 +42,68 @@ object Edalize {
 			 |    for i in range(0, bytes_per_data_element):
 			 |        out_data.append(BitStream())
 			 |
-			 |
-			 |    with open(inpath, 'rb') as ifile:
+			 |    with open(in_path, 'rb') as ifile:
 			 |        data = BitStream(ifile.read())
-			 |        data.append((size_in_bytes*bits_per_byte) - data.length)
+			 |        data.append((size_in_bytes * bits_per_byte) - data.length)
 			 |
 			 |        while data.pos < data.length:
 			 |            for i in range(0, bytes_per_data_element):
 			 |                out_data[i].append(data.read(bits_per_byte))
 			 |
 			 |        for i in range(0, bytes_per_data_element):
-			 |            out_data[i].tofile(open(outpath + str(i) + ".bin", "wb")
-			 |            )
-			 |"""
+			 |            with open(out_path + str(i) + ".bin", "wt") as f:
+			 |                while out_data[i].pos < out_data[i].length:
+			 |                    d = out_data[i].read(8).bin
+			 |                    f.write(str(d) + '\\n')
+	     |"""
 			.stripMargin
 		//@formatter:on
+
+		for {ram <- game.rams} {
+			ram.fillType match {
+				case PrimaryBootFillType() =>
+
+					val luBInt = new Function2[String, BigInt, BigInt] {
+						override def apply(k: String, default: BigInt): BigInt =
+							Utils.lookupBigInt(ram.parameters, k, default)
+					}
+					val luInt  = new Function2[String, Int, Int] {
+						override def apply(k: String, default: Int): Int =
+							Utils.lookupInt(ram.parameters, k, default)
+					}
+
+					val sizeInBytes  = ram.getSizeInBytes
+					val bitsPerByte  = luInt("bits_per_byte", 0)
+					val busDataWidth = luInt("data_width", 0)
+					if (sizeInBytes <= 0 ||
+					    bitsPerByte <= 0 ||
+					    busDataWidth <= 0) {
+						println("invalid RAM setup")
+						return
+					}
+
+
+					val inPath  =
+						s"../soft/build/bootroms/riscv32noneelf_primary_boot" +
+						s"/riscv32noneelf_boot.bin"
+
+					val outPath = s"${ram.ident}.v_toplevel_ram_symbol"
+
+
+					sb ++= s"\n\n" +
+					       s"prep_rom('${ram.ident}', \n" +
+					       s"         r'${inPath}', \n" +
+					       s"         r'${outPath}', \n" +
+					       s"         ${bitsPerByte}, \n" +
+					       s"         ${busDataWidth}, \n" +
+					       s"         $sizeInBytes)\n"
+
+				case _ | ZeroFillType() =>
+			}
+
+		}
+		sb ++= "work_root = 'build'\n"
+		sb ++= "name = 'xmasdemo'\n"
 
 		board.boardType match {
 			case XilinxBoard(_, _) => sb ++= "tool = 'vivado'\n"

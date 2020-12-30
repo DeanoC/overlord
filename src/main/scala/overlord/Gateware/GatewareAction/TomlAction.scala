@@ -19,7 +19,7 @@ case class TomlAction(parameterKeys: Seq[String],
 		val sb = new StringBuilder()
 		for {k <- parameterKeys
 		     if parameters.contains(k)} {
-			sb ++= s"$k = ${parameters(k).toString}\n"
+			sb ++= s"$k = ${parameters(k).toTomlString}\n"
 		}
 
 		val moddedOutPath = Game.pathStack.top.resolve(instance.ident)

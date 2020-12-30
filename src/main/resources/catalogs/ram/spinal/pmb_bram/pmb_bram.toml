@@ -5,6 +5,13 @@ actions = [
     "read_verilog_top"
 ]
 
+[parameters]
+size_in_bytes = 1024
+bits_per_byte = 8
+data_width = 32
+address_width = 32
+
+
 [[process]]
 name = 'make_config'
 processor = 'toml'

@@ -225,7 +225,7 @@ case class Unconnected(connectionType: ConnectionType,
 			                                     1024)
 
 			val connectionSize = Utils.lookupBigInt(attributes,
-			                                        key = "size",
+			                                        key = "size_in_bytes",
 			                                        busBankSize)
 
 
@@ -242,8 +242,8 @@ case class Unconnected(connectionType: ConnectionType,
 			}
 			val address = Utils.lookupBigInt(
 				attributes,
-				key = "address", {
-					val base = Utils.lookupBigInt(bus.parameters, "base_bus", 0)
+				key = "base_address", {
+					val base = Utils.lookupBigInt(bus.parameters, "bus_base_address", 0)
 					base + bus.consumerCount * size
 				})
 

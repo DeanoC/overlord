@@ -5,33 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="73b7f681-932b-4979-9f4f-6aee48997ac8" name="Default Changelist" comment="Added Variant type with BigInt handling">
-      <change afterPath="$PROJECT_DIR$/src/main/resources/software/bootrom/CMakeLists.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/software/bootrom/crt_riscv32noneelf.S" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/software/bootrom/main.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/software/bootrom/primary_boot_riscv32noneelf.ld" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/software/generate_compilers.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/software/toolchain_template.cmake" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/output/BootRom.scala" afterDir="false" />
       <change beforePath="$USER_HOME$/.sbt/1.0/staging/a7772c47d5d7e84d3e85/ikuy_utils/src/main/scala/ikuy_utils/Utils.scala" beforeDir="false" afterPath="$USER_HOME$/.sbt/1.0/staging/a7772c47d5d7e84d3e85/ikuy_utils/src/main/scala/ikuy_utils/Utils.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/buses.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/advanced_peripheral_bus/advanced_peripheral_bus.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/advanced_peripheral_bus/advanced_peripheral_bus.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/advanced_peripheral_bus/advanced_peripheral_bus.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/advanced_peripheral_bus/advanced_peripheral_bus.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/pipelined_memory_bus/pipelined_memory_bus.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/pipelined_memory_bus/pipelined_memory_bus.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/pipelined_memory_bus/pipelined_memory_bus.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/pipelined_memory_bus/pipelined_memory_bus.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/cpus.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/cpus.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/ram/spinal/pmb_bram/pmb_bram.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ram/spinal/pmb_bram/pmb_bram.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/ram/spinal/pmb_bram/pmb_bram.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ram/spinal/pmb_bram/pmb_bram.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/Main.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/Main.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/output/Compiler.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Compiler.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/output/Edalize.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Edalize.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/output/Project.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Project.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Connection.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Connection.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Unconnected.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Unconnected.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Game.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Game.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/TomlAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/TomlAction.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/BusInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/BusInstance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/CpuInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/CpuInstance.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/RamInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/RamInstance.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -253,7 +234,7 @@
       <workItem from="1608580428836" duration="49027000" />
       <workItem from="1608988065779" duration="45642000" />
       <workItem from="1609257335982" duration="6643000" />
-      <workItem from="1609318971651" duration="1127000" />
+      <workItem from="1609318971651" duration="14737000" />
     </task>
     <task id="LOCAL-00001" summary="Major work on connection expansion and block connections&#10;Refactor and reorg instances, constraits, actions etc.&#10;moved ps8 docs to lower case">
       <created>1605964442645</created>
@@ -332,7 +313,14 @@
       <option name="project" value="LOCAL" />
       <updated>1608844564267</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Buses now take array of address, size as input&#10;Instances can now optionally specify address and size else use generated ones&#10;Generate cmake scripts for boot roms&#10;Moved compiler script to resource file for better editing&#10;Generate cmake tool chain files for the compilers that it builds&#10;cpus now take a primary_boot tag to say they will boot the SoC&#10;cpus now take a triple element to say which compiler etc. they use&#10;WIP crt file for riscv32 metal cpus&#10;Edalize now has a function to update boot rom from compiled rom&#10;Support for bus consumer array and ram size in game&#10;Dummy bootrom main.c to check linking okay&#10;Not finished update and instance only cli driver&#10;linker script for riscv32 metal&#10;Our Variant supports toString&#10;TomlAction can now output arrays&#10;Removed UnconnectionTrait into Unconnected&#10;Moved bus connection to preconnect&#10;Fixed bus connection bug for direct non-prefixed ports">
+      <created>1609323140180</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1609323140180</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -364,7 +352,8 @@
     <MESSAGE value="&#10;Fixed use of boolean parameter (which isn't support yet)&#10;Uart APB control chip added&#10;Fixed Xdc generation error due to wildcard matching&#10;Fixed Top wires generation error due to wildcard matching&#10;Fixed pmb_to_apb parameter names&#10;Fixed pin group naming bug" />
     <MESSAGE value="Added Variant type with BigInt handling" />
     <MESSAGE value="Fixed sync timing not being default&#10;Fixed combintorial loops in vexriscv config&#10;Fixed clock pin standard&#10;Added multiple bus hookups&#10;Added own Variant type with BigInt support&#10;Utility to lookup string or array of strings&#10;PreConnect stage added&#10;Bus connections now work out connection count&#10;connection syntax for bridges and busses improved&#10;Standardised instance object creation &#10;WIP compiler generation&#10;new parameter syntax&#10;Parameter class removed" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed sync timing not being default&#10;Fixed combintorial loops in vexriscv config&#10;Fixed clock pin standard&#10;Added multiple bus hookups&#10;Added own Variant type with BigInt support&#10;Utility to lookup string or array of strings&#10;PreConnect stage added&#10;Bus connections now work out connection count&#10;connection syntax for bridges and busses improved&#10;Standardised instance object creation &#10;WIP compiler generation&#10;new parameter syntax&#10;Parameter class removed" />
+    <MESSAGE value="Buses now take array of address, size as input&#10;Instances can now optionally specify address and size else use generated ones&#10;Generate cmake scripts for boot roms&#10;Moved compiler script to resource file for better editing&#10;Generate cmake tool chain files for the compilers that it builds&#10;cpus now take a primary_boot tag to say they will boot the SoC&#10;cpus now take a triple element to say which compiler etc. they use&#10;WIP crt file for riscv32 metal cpus&#10;Edalize now has a function to update boot rom from compiled rom&#10;Support for bus consumer array and ram size in game&#10;Dummy bootrom main.c to check linking okay&#10;Not finished update and instance only cli driver&#10;linker script for riscv32 metal&#10;Our Variant supports toString&#10;TomlAction can now output arrays&#10;Removed UnconnectionTrait into Unconnected&#10;Moved bus connection to preconnect&#10;Fixed bus connection bug for direct non-prefixed ports" />
+    <option name="LAST_COMMIT_MESSAGE" value="Buses now take array of address, size as input&#10;Instances can now optionally specify address and size else use generated ones&#10;Generate cmake scripts for boot roms&#10;Moved compiler script to resource file for better editing&#10;Generate cmake tool chain files for the compilers that it builds&#10;cpus now take a primary_boot tag to say they will boot the SoC&#10;cpus now take a triple element to say which compiler etc. they use&#10;WIP crt file for riscv32 metal cpus&#10;Edalize now has a function to update boot rom from compiled rom&#10;Support for bus consumer array and ram size in game&#10;Dummy bootrom main.c to check linking okay&#10;Not finished update and instance only cli driver&#10;linker script for riscv32 metal&#10;Our Variant supports toString&#10;TomlAction can now output arrays&#10;Removed UnconnectionTrait into Unconnected&#10;Moved bus connection to preconnect&#10;Fixed bus connection bug for direct non-prefixed ports" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -378,6 +367,16 @@
           <url>file://$PROJECT_DIR$/src/main/scala/overlord/DefinitionCatalog.scala</url>
           <line>51</line>
           <option name="timeStamp" value="254" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="scala-line">
+          <url>file://$PROJECT_DIR$/src/main/scala/overlord/Connections/Unconnected.scala</url>
+          <line>245</line>
+          <option name="timeStamp" value="288" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="scala-line">
+          <url>file://$PROJECT_DIR$/src/main/scala/overlord/Instances/BusInstance.scala</url>
+          <line>48</line>
+          <option name="timeStamp" value="289" />
         </line-breakpoint>
         <breakpoint enabled="true" type="java-exception">
           <properties class="java.lang.ArrayIndexOutOfBoundsException" package="java.lang" />
