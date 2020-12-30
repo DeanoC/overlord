@@ -69,11 +69,13 @@ object PmbBram {
 		}
 		noIoPrefix()
 
-		val ram = Mem(Bits(busDataWidth bits),
-		              sizeInBytes / (busDataWidth / bitsPerByte))
+		val wordCount = sizeInBytes / (busDataWidth / bitsPerByte)
 
-		io.bus.rsp.valid :=
-		RegNext(io.bus.cmd.fire && !io.bus.cmd.write) init (False)
+		val ram = Mem(wordType = Bits(busDataWidth bits), wordCount)
+		ram.init(for (i <- 0 until wordCount.toInt) yield B(i, busDataWidth bits))
+
+		io.bus.rsp.valid := RegNext(io.bus.cmd.fire &&
+		                            !io.bus.cmd.write) init (False)
 
 		io.bus.rsp.data := ram.readWriteSync(
 			address = (io.bus.cmd.address >> 2).resized,

@@ -10,11 +10,9 @@ name = 'make_config'
 processor = 'toml'
 filename = 'config.toml'
 parameters = [
-    "bus_count",
     "bus_data_width",
     "bus_address_width",
-    "bus_base",
-    "bus_bank_size",
+    "consumers",
 
     "ibus_data_width",
     "ibus_address_width",

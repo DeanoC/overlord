@@ -117,7 +117,8 @@ object Connection {
 				return None
 		}
 		Some(Connections.Unconnected(
-			toConnectionType(first, conntype, table), first, dir, secondary))
+			toConnectionType(first, conntype, table),
+			first, dir, secondary, table))
 	}
 
 	private def connect(unconnected: Seq[Connection],
@@ -127,7 +128,7 @@ object Connection {
 	}
 
 	def preConnect(unconnected: Seq[Connection],
-	                    unexpanded: Seq[Instance]): Unit = {
+	               unexpanded: Seq[Instance]): Unit = {
 		(for (c <- unconnected.filter(_.isUnconnected).map(_.asUnconnected))
 			c.preConnect(unexpanded))
 	}

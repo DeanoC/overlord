@@ -1,13 +1,14 @@
 package overlord.Instances
 
-import ikuy_utils.Variant
+import ikuy_utils.{Utils, Variant}
 import overlord.Definitions.DefinitionTrait
 import toml.Value
 
 case class CpuInstance(ident: String,
+                       primary_boot: Boolean,
                        private val defi: DefinitionTrait
                       ) extends Instance {
-	override def definition:DefinitionTrait = defi
+	override def definition: DefinitionTrait = defi
 
 	override def copyMutate[A <: Instance](nid: String): CpuInstance =
 		copy(ident = nid)
@@ -19,6 +20,11 @@ object CpuInstance {
 	          definition: DefinitionTrait,
 	          attribs: Map[String, Variant]
 	         ): Option[CpuInstance] = {
-		Some(CpuInstance(ident, definition))
+
+		val primary_boot = Utils.lookupBoolean(attribs,
+		                                       key = "primary_boot",
+		                                       or = false)
+
+		Some(CpuInstance(ident, primary_boot, definition))
 	}
 }

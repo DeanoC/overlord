@@ -1,10 +1,11 @@
 package overlord.Instances
 
-import ikuy_utils.Variant
+import ikuy_utils.{Utils, Variant}
 import overlord.Definitions.DefinitionTrait
 import toml.Value
 
 case class RamInstance(ident: String,
+                       sizeInBytes: Option[BigInt],
                        private val defi: DefinitionTrait
                       ) extends Instance {
 	override def definition:DefinitionTrait = defi
@@ -18,6 +19,11 @@ object RamInstance {
 	          definition: DefinitionTrait,
 	          attribs: Map[String, Variant]
 	         ): Option[RamInstance] = {
-		Some(RamInstance(ident, definition))
+
+		val sizeInBytes =  if(attribs.contains("size_in_bytes"))
+			Some(Utils.toBigInt(attribs("size_in_bytes")))
+		else None
+
+		Some(RamInstance(ident, sizeInBytes, definition))
 	}
 }

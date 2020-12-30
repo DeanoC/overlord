@@ -19,26 +19,18 @@ case class TomlAction(parameterKeys: Seq[String],
 		val sb = new StringBuilder()
 		for {k <- parameterKeys
 		     if parameters.contains(k)} {
-			sb ++= (parameters(k) match {
-				case ArrayV(arr)       => "TODO"
-				case BigIntV(bigInt)   => s"$k = $bigInt\n"
-				case BooleanV(boolean) => s"$k = $boolean\n"
-				case IntV(int)         => s"$k = $int\n"
-				case TableV(table)     =>"TODO"
-				case StringV(string)   => s"$k = '$string'\n"
-				case DoubleV(dbl)      => s"$k = $dbl\n"
-			})
+			sb ++= s"$k = ${parameters(k).toString}\n"
 		}
 
 		val moddedOutPath = Game.pathStack.top.resolve(instance.ident)
 
-	val dstAbsPath = moddedOutPath.resolve(filename)
-	Utils.ensureDirectories(dstAbsPath.getParent)
+		val dstAbsPath = moddedOutPath.resolve(filename)
+		Utils.ensureDirectories(dstAbsPath.getParent)
 
-	Utils.writeFile(dstAbsPath, sb.result())
+		Utils.writeFile(dstAbsPath, sb.result())
 
-	updatePath(dstAbsPath.getParent)
-}
+		updatePath(dstAbsPath.getParent)
+	}
 
 }
 

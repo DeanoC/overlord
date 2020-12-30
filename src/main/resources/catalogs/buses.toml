@@ -11,4 +11,3 @@ type = "bus.advanced_peripheral_bus.spinal"
 gateware = "spinal/advanced_peripheral_bus/advanced_peripheral_bus.toml"
 supplier_prefix = "supplier_"
 consumer_prefix = "consumers_${index}_"
-

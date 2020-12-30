@@ -3,6 +3,8 @@ package overlord.Instances
 import ikuy_utils._
 import overlord.Definitions.DefinitionTrait
 
+import scala.collection.mutable
+
 case class BusInstance(ident: String,
                        supplierPrefixes: Seq[String],
                        consumerPrefix: String,
@@ -10,7 +12,21 @@ case class BusInstance(ident: String,
                        private val defi: DefinitionTrait
                       ) extends Instance {
 
-	var connectedCount: Int = 0
+	def addConsumer(instance: Instance, address: BigInt, size: BigInt): Unit = {
+		consumerIndices += (instance -> consumers.length)
+		consumers += (address -> size)
+	}
+
+	def getIndex(instance: Instance): Int = consumerIndices(instance)
+
+	def consumerCount: Int = consumers.length
+
+	def consumersVariant: Variant = ArrayV(consumers.flatMap{
+		case (addr, size) => Seq(BigIntV(addr), BigIntV(size))
+	}.toArray)
+
+	private var consumers = mutable.ArrayBuffer[(BigInt, BigInt)]()
+	private var consumerIndices = mutable.HashMap[Instance, Int]()
 
 	override def definition: DefinitionTrait = defi
 
@@ -28,13 +44,16 @@ object BusInstance {
 	          definition: DefinitionTrait,
 	          attribs: Map[String, Variant]
 	         ): Option[BusInstance] = {
-		val iParams          = Map[String, Variant](
+
+		//@formatter:off
+		val iParams = Map[String, Variant]( elems =
 			("bus_data_width" -> attribs.getOrElse("bus_data_width", IntV(32))),
-			("bus_address_width" ->
-			 attribs.getOrElse("bus_address_width", IntV(32))),
+			("bus_address_width" -> attribs.getOrElse("bus_address_width", IntV(32))),
 			("bus_base" -> attribs.getOrElse("bus_base", BigIntV(0))),
 			("bus_bank_size" -> attribs.getOrElse("bus_bank_size", BigIntV(1024)))
 			)
+		//@formatter:on
+
 		val supplierPrefixes = Utils.lookupStrings(definition.attributes,
 		                                           "supplier_prefix",
 		                                           "supplier_")

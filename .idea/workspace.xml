@@ -5,78 +5,34 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="73b7f681-932b-4979-9f4f-6aee48997ac8" name="Default Changelist" comment="Added Variant type with BigInt handling">
-      <change afterPath="$PROJECT_DIR$/src/main/scala/output/Compiler.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/software/bootrom/CMakeLists.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/software/bootrom/crt_riscv32noneelf.S" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/software/bootrom/main.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/software/bootrom/primary_boot_riscv32noneelf.ld" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/software/generate_compilers.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/software/toolchain_template.cmake" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/output/BootRom.scala" afterDir="false" />
       <change beforePath="$USER_HOME$/.sbt/1.0/staging/a7772c47d5d7e84d3e85/ikuy_utils/src/main/scala/ikuy_utils/Utils.scala" beforeDir="false" afterPath="$USER_HOME$/.sbt/1.0/staging/a7772c47d5d7e84d3e85/ikuy_utils/src/main/scala/ikuy_utils/Utils.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/ikuy_utils.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/ikuy_utils.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/overlord.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/overlord.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/bridges.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/bridges.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/bridges/pmb_to_apb/build.sbt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/bridges/pmb_to_apb/build.sbt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/bridges/pmb_to_apb/pmb_to_apb.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/bridges/pmb_to_apb/pmb_to_apb.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/buses.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/advanced_peripheral_bus/advanced_peripheral_bus.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/advanced_peripheral_bus/advanced_peripheral_bus.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/advanced_peripheral_bus/advanced_peripheral_bus.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/advanced_peripheral_bus/advanced_peripheral_bus.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/advanced_peripheral_bus/build.sbt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/advanced_peripheral_bus/build.sbt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/pipelined_memory_bus/build.sbt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/pipelined_memory_bus/build.sbt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/pipelined_memory_bus/pipelined_memory_bus.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/pipelined_memory_bus/pipelined_memory_bus.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/pipelined_memory_bus/pipelined_memory_bus.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/pipelined_memory_bus/pipelined_memory_bus.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/cpus.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/cpus.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/cpus/vexriscv/VexRiscV_smallest.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/cpus/vexriscv/VexRiscV_smallest.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/cpus/vexriscv/build.sbt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/cpus/vexriscv/build.sbt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/cpus/vexriscv/vexriscv_smallest.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/cpus/vexriscv/vexriscv_smallest.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/ios.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ios.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/ios/uart/apb_ctrl/apb_ctrl.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ios/uart/apb_ctrl/apb_ctrl.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/ios/uart/apb_ctrl/build.sbt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ios/uart/apb_ctrl/build.sbt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/others/resetti/build.sbt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/others/resetti/build.sbt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/others/resetti/resetti.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/others/resetti/resetti.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/ram/spinal/pmb_bram/build.sbt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ram/spinal/pmb_bram/build.sbt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/ram/spinal/pmb_bram/pmb_bram.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ram/spinal/pmb_bram/pmb_bram.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/ram/spinal/pmb_bram/pmb_bram.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ram/spinal/pmb_bram/pmb_bram.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/Main.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/Main.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/input/VerilogModuleParser.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/input/VerilogModuleParser.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/output/Compiler.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Compiler.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/output/Edalize.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Edalize.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/output/Project.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Project.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/output/Svd.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Svd.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/output/Top.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Top.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/output/Xdc.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Xdc.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Connected.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Connected.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/ConnectedBetween.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/ConnectedBetween.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/ConnectedConstant.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/ConnectedConstant.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Connection.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Connection.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Unconnected.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Unconnected.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Constraint.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Constraint.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/DefinitionCatalog.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/DefinitionCatalog.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Definitions/Definition.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Definitions/Definition.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Definitions/DefinitionTrait.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Definitions/DefinitionTrait.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Definitions/GatewareTrait.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Definitions/GatewareTrait.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Definitions/SoftwareTrait.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Definitions/SoftwareTrait.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Game.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Game.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/Gateware.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/Gateware.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/CopyAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/CopyAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/GatewareAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/GatewareAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/GitCloneAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/GitCloneAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/PythonAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/PythonAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/ReadVerilogTopAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/ReadVerilogTopAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/SbtAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/SbtAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/ShellAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/ShellAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/SourcesAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/SourcesAction.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/TomlAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/TomlAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/YamlAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/YamlAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/Parameter.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/Port.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/Port.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/BoardInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/BoardInstance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/BridgeInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/BridgeInstance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/ClockInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/ClockInstance.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/BusInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/BusInstance.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/CpuInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/CpuInstance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/Instance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/Instance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/NetInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/NetInstance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/NxMInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/BusInstance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/OtherInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/OtherInstance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/PinGroupInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/PinGroupInstance.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/RamInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/RamInstance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/SocInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/SocInstance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/StorageInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/StorageInstance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Resources.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Resources.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Software/Software.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Software/Software.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -151,7 +107,7 @@
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="scala_project_settings_configurable.last_selected_tab_index" value="0" />
-    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -176,6 +132,7 @@
       <recent name="overlord.Definitions" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="output" />
       <recent name="overlord.Connections" />
       <recent name="overlord.Gateware.GatewareAction" />
     </key>
@@ -203,17 +160,6 @@
       <module name="overlord" />
       <option name="PROGRAM_PARAMETERS" value="report ./xmasdemo.over --out build" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../xmasdemo" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
-      <option name="arquillianRunConfiguration">
-        <value>
-          <option name="containerStateName" value="" />
-        </value>
-      </option>
-      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -304,7 +250,10 @@
       <workItem from="1608104259406" duration="85959000" />
       <workItem from="1608469080985" duration="772000" />
       <workItem from="1608496172236" duration="20810000" />
-      <workItem from="1608580428836" duration="37759000" />
+      <workItem from="1608580428836" duration="49027000" />
+      <workItem from="1608988065779" duration="45642000" />
+      <workItem from="1609257335982" duration="6643000" />
+      <workItem from="1609318971651" duration="1127000" />
     </task>
     <task id="LOCAL-00001" summary="Major work on connection expansion and block connections&#10;Refactor and reorg instances, constraits, actions etc.&#10;moved ps8 docs to lower case">
       <created>1605964442645</created>
@@ -376,7 +325,14 @@
       <option name="project" value="LOCAL" />
       <updated>1608497204030</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="Fixed sync timing not being default&#10;Fixed combintorial loops in vexriscv config&#10;Fixed clock pin standard&#10;Added multiple bus hookups&#10;Added own Variant type with BigInt support&#10;Utility to lookup string or array of strings&#10;PreConnect stage added&#10;Bus connections now work out connection count&#10;connection syntax for bridges and busses improved&#10;Standardised instance object creation &#10;WIP compiler generation&#10;new parameter syntax&#10;Parameter class removed">
+      <created>1608844564267</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1608844564267</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -407,7 +363,8 @@
     <MESSAGE value="Renamed NXMinterconnect to bus&#10;added Advanced Peripheral Bus from Spinal to catalog&#10;added PipelinedMemoryBus to APB Bridge to Spinal&#10;Added bridges catalog&#10;Fixed compile in Report.scala" />
     <MESSAGE value="&#10;Fixed use of boolean parameter (which isn't support yet)&#10;Uart APB control chip added&#10;Fixed Xdc generation error due to wildcard matching&#10;Fixed Top wires generation error due to wildcard matching&#10;Fixed pmb_to_apb parameter names&#10;Fixed pin group naming bug" />
     <MESSAGE value="Added Variant type with BigInt handling" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added Variant type with BigInt handling" />
+    <MESSAGE value="Fixed sync timing not being default&#10;Fixed combintorial loops in vexriscv config&#10;Fixed clock pin standard&#10;Added multiple bus hookups&#10;Added own Variant type with BigInt support&#10;Utility to lookup string or array of strings&#10;PreConnect stage added&#10;Bus connections now work out connection count&#10;connection syntax for bridges and busses improved&#10;Standardised instance object creation &#10;WIP compiler generation&#10;new parameter syntax&#10;Parameter class removed" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed sync timing not being default&#10;Fixed combintorial loops in vexriscv config&#10;Fixed clock pin standard&#10;Added multiple bus hookups&#10;Added own Variant type with BigInt support&#10;Utility to lookup string or array of strings&#10;PreConnect stage added&#10;Bus connections now work out connection count&#10;connection syntax for bridges and busses improved&#10;Standardised instance object creation &#10;WIP compiler generation&#10;new parameter syntax&#10;Parameter class removed" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -421,21 +378,6 @@
           <url>file://$PROJECT_DIR$/src/main/scala/overlord/DefinitionCatalog.scala</url>
           <line>51</line>
           <option name="timeStamp" value="254" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="scala-line">
-          <url>file://$USER_HOME$/.sbt/1.0/staging/a7772c47d5d7e84d3e85/ikuy_utils/src/main/scala/ikuy_utils/Utils.scala</url>
-          <line>130</line>
-          <option name="timeStamp" value="255" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="scala-line">
-          <url>file://$PROJECT_DIR$/src/main/scala/overlord/Connections/Unconnected.scala</url>
-          <line>270</line>
-          <option name="timeStamp" value="269" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="scala-line">
-          <url>file://$PROJECT_DIR$/src/main/scala/overlord/Instances/BusInstance.scala</url>
-          <line>30</line>
-          <option name="timeStamp" value="270" />
         </line-breakpoint>
         <breakpoint enabled="true" type="java-exception">
           <properties class="java.lang.ArrayIndexOutOfBoundsException" package="java.lang" />

@@ -8,12 +8,10 @@ import java.nio.file.Path
 
 object AdvancedPeripheralBus {
 
-	var consumerCount  : Int    = 1
-	var addressWidth   : Int    = 20
-	var dataWidth      : Int    = 32
-	var useSlaveError  : Int    = 1
-	var baseAddress    : BigInt = 0x00000l
-	var addressBankSize: BigInt = 4096l
+	private var addressWidth   : Int    = 20
+	private var dataWidth      : Int    = 32
+	private var useSlaveError  : Int    = 1
+	private var consumerBuses = Array[(BigInt, BigInt)]()
 
 	def main(args: Array[String]): Unit = {
 		println(s"Building Spinal Advanced Peripheral Bus")
@@ -29,6 +27,11 @@ object AdvancedPeripheralBus {
 		}
 		else Utils.readToml(name, Path.of(tomlFile.get), getClass)
 
+		if(!table.contains("consumers")) {
+			println("No consumers for bus, nothing to do")
+			return
+		}
+
 		val luInt  = new Function2[String, Int, Int] {
 			override def apply(k: String, default: Int): Int =
 				Utils.lookupInt(table, k, default)
@@ -38,16 +41,18 @@ object AdvancedPeripheralBus {
 				Utils.lookupBigInt(table, k, default)
 		}
 
-		consumerCount = luInt("bus_count", consumerCount)
 		dataWidth = luInt("bus_data_width", dataWidth)
 		addressWidth = luInt("bus_address_width", addressWidth)
-		baseAddress = luBInt("bus_base", baseAddress)
-		addressBankSize = luBInt("bus_bank_size", addressBankSize)
+		consumerBuses = {
+			val cons = Utils.toArray(table("consumers"))
+			for (i <- 0 until cons.length by 2) yield
+				(Utils.toBigInt(cons(i)), Utils.toBigInt(cons(i + 1)))
+		}.toArray
 
 		useSlaveError = luInt("use_slave_error", useSlaveError)
 
 		println(s"bus has $dataWidth data with $addressWidth bit address")
-		println(s"$consumerCount consumers attached to bus")
+		println(s"${consumerBuses.length} consumers attached to bus")
 
 		val config = SpinalConfig(
 			defaultConfigForClockDomains =
@@ -72,20 +77,19 @@ object AdvancedPeripheralBus {
 
 		val io = new Bundle {
 			val supplier  = slave(Apb3(busConfig))
-			val consumers = Array.fill(consumerCount) {
+			val consumers = Array.fill(consumerBuses.length) {
 				master(Apb3(busConfig))
 			}
 		}
 		noIoPrefix()
 
-		val tmp = for (i <- 0 until consumerCount) yield Apb3(busConfig)
-
-		val busMapping = for (i <- 0 until consumerCount) yield
-			(tmp(i), SizeMapping(baseAddress + i * addressBankSize, addressBankSize))
+		val busMapping = for (i <- 0 until consumerBuses.length) yield
+			(Apb3(busConfig), SizeMapping(consumerBuses(i)._1, consumerBuses(i)._2))
 
 		Apb3Decoder(io.supplier, busMapping)
 
-		for (i <- 0 until consumerCount) tmp(i) <> io.consumers(i)
+		for (i <- 0 until consumerBuses.length)
+			busMapping(i)._1 <> io.consumers(i)
 	}
 
 }

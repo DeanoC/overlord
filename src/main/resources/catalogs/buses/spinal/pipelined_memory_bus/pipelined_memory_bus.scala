@@ -9,17 +9,15 @@ import java.nio.file.Path
 
 object PipelinedMemoryBus {
 
-	var instructionWidth: Int = 32
-	var iBusDataWidth   : Int = 32
-	var iBusAddressWidth: Int = 32
-	var dBusDataWidth   : Int = 32
-	var dBusAddressWidth: Int = 32
-	var consumerCount   : Int = 1
-	var busDataWidth    : Int = 32
-	var busAddressWidth : Int = 32
+	private var instructionWidth: Int = 32
+	private var iBusDataWidth   : Int = 32
+	private var iBusAddressWidth: Int = 32
+	private var dBusDataWidth   : Int = 32
+	private var dBusAddressWidth: Int = 32
+	private var busDataWidth    : Int = 32
+	private var busAddressWidth : Int = 32
 
-	var baseAddress    : BigInt = 0x80000000l
-	var addressBankSize: BigInt = 0x1000l
+	private var consumerBuses = Array[(BigInt, BigInt)]()
 
 	def main(args: Array[String]): Unit = {
 		println(s"Building Spinal Pipelined Memory Bus")
@@ -43,11 +41,13 @@ object PipelinedMemoryBus {
 				Utils.lookupBigInt(table, k, default)
 		}
 
-		consumerCount = luInt("bus_count", consumerCount)
 		busDataWidth = luInt("bus_data_width", busDataWidth)
 		busAddressWidth = luInt("bus_address_width", busAddressWidth)
-		baseAddress = luBInt("bus_base", baseAddress)
-		addressBankSize = luBInt("bus_bank_size", addressBankSize)
+		consumerBuses = {
+			val cons = Utils.toArray(table("consumers"))
+			for (i <- 0 until cons.length by 2) yield
+				(Utils.toBigInt(cons(i)), Utils.toBigInt(cons(i + 1)))
+		}.toArray
 
 		iBusDataWidth = luInt("ibus_data_width", busDataWidth)
 		iBusAddressWidth = luInt("ibus_address_width", busAddressWidth)
@@ -61,7 +61,7 @@ object PipelinedMemoryBus {
 		}
 
 		println(s"bus has $busDataWidth data with $busAddressWidth bit address")
-		println(s"$consumerCount consumers attached to bus")
+		println(s"${consumerBuses.length} consumers attached to bus")
 
 		val config = SpinalConfig(
 			defaultConfigForClockDomains =
@@ -198,7 +198,7 @@ object PipelinedMemoryBus {
 		val io = new Bundle {
 			val iBus      = slave(IBusSimpleBus())
 			val dBus      = slave(DBusSimpleBus())
-			val consumers = Array.fill(consumerCount) {
+			val consumers = Array.fill(consumerBuses.length) {
 				master(pmb(busConfig))
 			}
 		}
@@ -206,16 +206,16 @@ object PipelinedMemoryBus {
 
 		val arb = PipelinedMemoryBusArbiter()
 
-		val tmp = for (i <- 0 until consumerCount) yield pmb(busConfig)
-
-		val mainBusMapping = for (i <- 0 until consumerCount) yield
-			(tmp(i), SizeMapping(baseAddress + i * addressBankSize, addressBankSize))
+		val mainBusMapping = for (i <- 0 until consumerBuses.length) yield
+			(pmb(busConfig), SizeMapping(consumerBuses(i)._1, consumerBuses(i)._2))
 
 		PipelinedMemoryBusDecoder(arb.io.bus,
 		                          mainBusMapping,
 		                          pipelineMaster = true)
 
-		for (i <- 0 until consumerCount) tmp(i) <> io.consumers(i)
+		for (i <- 0 until consumerBuses.length)
+			mainBusMapping(i)._1 <> io.consumers(i)
+
 		arb.io.iBus <> io.iBus
 		arb.io.dBus <> io.dBus
 	}
@@ -263,8 +263,7 @@ object PipelinedMemoryBus {
 	}
 
 	case class PipelinedMemoryBusDecoder(producer: pmb,
-	                                     specification: Seq[
-		                                     (pmb, SizeMapping)],
+	                                     specification: Seq[(pmb, SizeMapping)],
 	                                     pipelineMaster: Boolean)
 		extends Area {
 
@@ -277,7 +276,7 @@ object PipelinedMemoryBus {
 			producerPipelined.rsp >> producer.rsp
 		}
 
-		val (consumerBuses, memorySpaces) = specification.unzip
+		val (consumers, memorySpaces) = specification.unzip
 
 		val hits: Seq[Bool] =
 			for ((slaveBus, memorySpace) <- specification) yield {
@@ -289,7 +288,7 @@ object PipelinedMemoryBus {
 
 		val noHit: Bool = !hits.orR
 
-		producerPipelined.cmd.ready := (hits, consumerBuses).zipped
+		producerPipelined.cmd.ready := (hits, consumers).zipped
 			                               .map(_ && _.cmd.ready).orR || noHit
 
 		val rspPending: Bool = RegInit(False)
@@ -301,15 +300,15 @@ object PipelinedMemoryBus {
 			RegNextWhen(OHToUInt(hits), producerPipelined.cmd.fire)
 
 		producerPipelined.rsp.valid :=
-		consumerBuses.map(_.rsp.valid).orR || (rspPending && rspNoHit)
+		consumers.map(_.rsp.valid).orR || (rspPending && rspNoHit)
 
 		producerPipelined.rsp.payload :=
-		consumerBuses.map(_.rsp.payload).read(rspSourceId)
+		consumers.map(_.rsp.payload).read(rspSourceId)
 
 		when(rspPending && !producerPipelined.rsp.valid) {
 			//Only one pending read request is allowed
 			producerPipelined.cmd.ready := False
-			consumerBuses.foreach(_.cmd.valid := False)
+			consumers.foreach(_.cmd.valid := False)
 		}
 	}
 

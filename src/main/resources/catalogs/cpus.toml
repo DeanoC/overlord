@@ -2,6 +2,7 @@ path = "cpus"
 
 [[definition]]
 type = "cpu.riscv32im.vexriscv_smallest"
+triple = "riscv32-none-elf"
 width = 32
 gateware = "vexriscv/vexriscv_smallest.toml"
 supplier_prefix = ["dBus_", "iBus_"]

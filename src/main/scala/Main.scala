@@ -34,6 +34,8 @@ object Main {
 				case Nil              => map
 				case "create" :: tail =>
 					nextOption(map ++ Map(Symbol("create") -> true), tail)
+				case "update" :: tail =>
+					nextOption(map ++ Map(Symbol("update") -> true), tail)
 				case "report" :: tail =>
 					nextOption(map ++ Map(Symbol("report") -> true), tail)
 				case "svd" :: tail    =>
@@ -45,6 +47,8 @@ object Main {
 					nextOption(map ++ Map(Symbol("nostdresources") -> true), tail)
 				case "--resources" :: value :: tail    =>
 					nextOption(map ++ Map(Symbol("resources") -> value), tail)
+				case "--instance" :: value :: tail     =>
+					nextOption(map ++ Map(Symbol("instance") -> value), tail)
 
 				case string :: opt2 :: tail if isSwitch(opt2) =>
 					nextOption(map ++ Map(Symbol("infile") -> string), list.tail)
@@ -105,10 +109,7 @@ object Main {
 
 		val gameName = filename.split('/').last.split('.').head
 
-		val game     = Game(gameName,
-		                    filePath,
-		                    out,
-		                    chipCatalogs) match {
+		val game = Game(gameName, filePath, out, chipCatalogs) match {
 			case Some(game) => game
 			case None       =>
 				println(s"Error parsing ${filename}")
@@ -116,6 +117,11 @@ object Main {
 		}
 
 		if (options.contains(Symbol("create"))) output.Project(game, out)
+		if (options.contains(Symbol("update"))) {
+			val instance = if (!options.contains(Symbol("instance"))) None
+			else Some(options(Symbol("instance")).asInstanceOf[String])
+			output.UpdateProject(game, out, instance)
+		}
 		else {
 			if (options.contains(Symbol("report"))) output.Report(game, out)
 			if (options.contains(Symbol("svd"))) output.Svd(game, out)

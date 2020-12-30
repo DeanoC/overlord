@@ -1,39 +1,25 @@
 package overlord.Connections
 
-import ikuy_utils.Utils
-import overlord.{Connections, DiffPinConstraint, PinConstraint}
-import overlord.Gateware.{
-	BitsDesc, InOutWireDirection, InWireDirection,
-	OutWireDirection, Port, WireDirection
-}
-import overlord.Instances.{
-	BridgeInstance, BusInstance, Container, Instance,
-	PinGroupInstance
-}
-
-trait UnconnectedTrait extends Connection {
-	def first: String
-
-	def second: String
-
-	def isConstant: Boolean
-
-}
+import ikuy_utils.{Utils, Variant}
+import overlord.Connections
+import overlord.Gateware._
+import overlord.Instances._
 
 case class Unconnected(connectionType: ConnectionType,
                        main: String,
                        direction: ConnectionDirection,
                        secondary: String,
-                      ) extends UnconnectedTrait {
+                       attributes: Map[String, Variant]
+                      ) extends Connection {
 	def firstFullName: String = main
 
 	def secondFullName: String = secondary
 
-	override def first: String = main
+	def first: String = main
 
-	override def second: String = secondary
+	def second: String = secondary
 
-	override def isConstant: Boolean = connectionType match {
+	def isConstant: Boolean = connectionType match {
 		case ConstantConnectionType(_) => true
 		case _                         => false
 	}
@@ -213,7 +199,6 @@ case class Unconnected(connectionType: ConnectionType,
 			Seq[Instance]()
 		}
 
-		//		val conn = Connections.ConnectedBus(mo.head, direction, so.head)
 		val mainIL      = mo.head
 		val secondaryIL = so.head
 		val isMainBus   = mo.head.instance.isInstanceOf[BusInstance]
@@ -226,13 +211,43 @@ case class Unconnected(connectionType: ConnectionType,
 			(isMainBus && direction == FirstToSecondConnection()) ||
 			(!isMainBus && direction == SecondToFirstConnection())
 
-		val bus: BusInstance = if (isMainBus)
-			mainIL.instance.asInstanceOf[BusInstance]
-		else
-			secondaryIL.instance.asInstanceOf[BusInstance]
-
 		if (mainIsSupplier) {
-			bus.connectedCount += 1
+			val bus: BusInstance = if (isMainBus)
+				mainIL.instance.asInstanceOf[BusInstance]
+			else
+				secondaryIL.instance.asInstanceOf[BusInstance]
+
+			val other = if (!isMainBus) mainIL.instance
+			else secondaryIL.instance
+
+			val busBankSize = Utils.lookupBigInt(bus.parameters,
+			                                     "bus_bank_size",
+			                                     1024)
+
+			val connectionSize = Utils.lookupBigInt(attributes,
+			                                        key = "size",
+			                                        busBankSize)
+
+
+			val size    = other match {
+				case ram: RamInstance =>
+					ram.sizeInBytes match {
+						case Some(v) => v
+						case None    =>
+							Utils.lookupBigInt(ram.definition.attributes,
+							                   "size_in_bytes",
+							                   connectionSize)
+					}
+				case _                => connectionSize
+			}
+			val address = Utils.lookupBigInt(
+				attributes,
+				key = "address", {
+					val base = Utils.lookupBigInt(bus.parameters, "base_bus", 0)
+					base + bus.consumerCount * size
+				})
+
+			bus.addConsumer(other, address, size)
 		}
 	}
 
@@ -245,7 +260,6 @@ case class Unconnected(connectionType: ConnectionType,
 			Seq[Instance]()
 		}
 
-		//		val conn = Connections.ConnectedBus(mo.head, direction, so.head)
 		val mainIL      = mo.head
 		val secondaryIL = so.head
 		val isMainBus   = mo.head.instance.isInstanceOf[BusInstance]
@@ -269,30 +283,37 @@ case class Unconnected(connectionType: ConnectionType,
 		else secondaryIL.instance
 
 		val busPrefixes = if (mainIsSupplier) {
-			val s = bus.consumerPrefix.replace("${index}", s"${bus.connectedCount}")
-			bus.connectedCount += 1
-			Seq(s)
+			Seq(
+				bus.consumerPrefix.replace("${index}",
+				                           s"${bus.getIndex(other)}")
+				)
 		} else bus.supplierPrefixes
 
 		// bridges are special
 		val otherPrefixes = (if (other.isInstanceOf[BridgeInstance]) {
 			Utils.lookupStrings(other.definition.attributes,
-			                   bus.definition.defType.ident(0),
-			                   "bus_")
+			                    bus.definition.defType.ident.head,
+			                    "bus_")
 		} else {
 			if (mainIsSupplier) {
 				Utils.lookupStrings(other.definition.attributes,
-				                   "consumer_prefix",
-				                   "bus_")
+				                    "consumer_prefix",
+				                    "bus_")
 			} else {
 				Utils.lookupStrings(other.definition.attributes,
-				                   "supplier_prefix",
-				                   "bus_")
+				                    "supplier_prefix",
+				                    "bus_")
 			}
 		})
 
-
-		for {
+		if (busPrefixes == otherPrefixes) for {
+			bp <- busPrefixes
+			fp <- bus.ports.values.filter(_.name.startsWith(bp))
+			sp <- other.ports.values.filter(_.name.startsWith(bp))
+			if fp.name == sp.name
+		} yield
+			ConnectPortGroupBetween(bus, fp, busLoc.fullName, other, sp)
+		else for {
 			bp <- busPrefixes
 			op <- otherPrefixes
 			fp <- bus.ports.values.filter(_.name.startsWith(bp))
