@@ -8,6 +8,8 @@ import toml.Value
 case class ClockInstance(ident: String,
                          pin: String,
                          standard: String,
+                         period: Double,
+                         waveform: String,
                          private val defi: DefinitionTrait)
 	extends Instance {
 
@@ -37,11 +39,15 @@ object ClockInstance {
 			None
 		} else {
 			val standard = Utils.lookupString(attributes, "standard", "LVCMOS33")
+			val period   = Utils.lookupDouble(attributes, "period", 10.0)
+			val waveform = Utils.lookupString(attributes, "waveform", "{0 5}")
 
 			Some(ClockInstance(name,
 			                   Utils.toString(attributes("pin")),
 			                   standard,
-			                   defi = definition))
+			                   period,
+			                   waveform,
+			                   definition))
 		}
 	}
 }

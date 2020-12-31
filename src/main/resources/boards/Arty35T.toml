@@ -15,7 +15,7 @@ board_device = "xc7a35tcsg324-1"
 name = "clk.100MHz"
 type = "clock.ref"
 pin = "E3"
-period = "10.00"
+period = 10.0
 waveform = "{0 5}"
 
 # JTAG

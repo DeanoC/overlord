@@ -66,7 +66,7 @@ object Top {
 
 			sb ++=
 			s"""
-				 |  ${instance.ident}""".stripMargin
+				 |  (*dont_touch = "true"*) ${instance.ident}""".stripMargin
 
 			val merged = game.constants
 				.map(_.asParameter)
@@ -106,7 +106,7 @@ object Top {
 
 		sb ++= s"""endmodule\n"""
 
-		writeFile(out.resolve(game.name + "_top.v"), sb.result())
+		Utils.writeFile(out.resolve(game.name + "_top.v"), sb.result())
 	}
 
 	def writeTopWire(loc: InstanceLoc, comma: String): String = {
@@ -230,12 +230,4 @@ object Top {
 	private def sanatizeIdent(in: String): String = {
 		in.replaceAll("""->|\.""", "_")
 	}
-
-	private def writeFile(path: Path, s: String): Unit = {
-		val file = path.toFile
-		val bw   = new BufferedWriter(new FileWriter(file))
-		bw.write(s)
-		bw.close()
-	}
-
 }

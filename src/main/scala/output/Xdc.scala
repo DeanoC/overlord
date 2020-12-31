@@ -55,6 +55,12 @@ object Xdc {
 				 |} [get_ports {${sanatizeIdent(clk.ident)}}];
 				 |""".stripMargin
 
+			//@formatter:off
+			sb ++=
+			s"""create_clock -add -name ${sanatizeIdent(clk.ident)} -period ${clk.period} -waveform ${clk.waveform} [get_ports {${sanatizeIdent(clk.ident)}}]
+				 |""".stripMargin
+			//@formatter:on
+
 		}
 
 		Utils.writeFile(out.resolve(s"${game.name}.xdc"), sb.result())
