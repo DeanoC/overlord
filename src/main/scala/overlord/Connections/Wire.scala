@@ -114,5 +114,6 @@ object Wires {
 			                      b.startLoc.instance.ident)
 
 		wires.toSeq
+
 	}
 }

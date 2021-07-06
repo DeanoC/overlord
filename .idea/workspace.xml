@@ -5,12 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="73b7f681-932b-4979-9f4f-6aee48997ac8" name="Default Changelist" comment="Added Variant type with BigInt handling">
-      <change beforePath="$USER_HOME$/.sbt/1.0/staging/a7772c47d5d7e84d3e85/ikuy_utils/src/main/scala/ikuy_utils/Utils.scala" beforeDir="false" afterPath="$USER_HOME$/.sbt/1.0/staging/a7772c47d5d7e84d3e85/ikuy_utils/src/main/scala/ikuy_utils/Utils.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/boards/Arty35T.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/boards/Arty35T.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/output/Top.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Top.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/output/Xdc.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Xdc.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/ClockInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/ClockInstance.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Wire.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Wire.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,6 +52,14 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitSEFilterConfiguration">
+    <file-type-list>
+      <filtered-out-file-type name="LOCAL_BRANCH" />
+      <filtered-out-file-type name="REMOTE_BRANCH" />
+      <filtered-out-file-type name="TAG" />
+      <filtered-out-file-type name="COMMIT_BY_MESSAGE" />
+    </file-type-list>
+  </component>
   <component name="ProjectCodeStyleSettingsMigration">
     <option name="version" value="1" />
   </component>
@@ -74,6 +79,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/src/main/resources/catalogs/io/uart/apb_ctrl" />
+    <property name="ml.local.models.training.notification.expired" value="true" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -85,7 +91,7 @@
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="scala_project_settings_configurable.last_selected_tab_index" value="0" />
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -116,6 +122,17 @@
     </key>
   </component>
   <component name="RunManager" selected="Application.xmas demo create">
+    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
+      <option name="arquillianRunConfiguration">
+        <value>
+          <option name="containerStateName" value="" />
+        </value>
+      </option>
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Main" type="Application" factoryName="Application" temporary="true">
       <option name="MAIN_CLASS_NAME" value="Main" />
       <module name="overlord" />
@@ -147,6 +164,7 @@
       <option name="allowRunningInParallel" value="false" />
       <option name="javaOptions" value="-Djline.terminal=NONE" />
       <option name="myConsoleArgs" value="" />
+      <option name="projectPathOnTarget" />
       <option name="selectedOptions">
         <list />
       </option>
@@ -231,7 +249,11 @@
       <workItem from="1608580428836" duration="49027000" />
       <workItem from="1608988065779" duration="45642000" />
       <workItem from="1609257335982" duration="6643000" />
-      <workItem from="1609318971651" duration="21078000" />
+      <workItem from="1609318971651" duration="21749000" />
+      <workItem from="1609405058047" duration="3913000" />
+      <workItem from="1625569018494" duration="240000" />
+      <workItem from="1625569278102" duration="38000" />
+      <workItem from="1625569338062" duration="14335000" />
     </task>
     <task id="LOCAL-00001" summary="Major work on connection expansion and block connections&#10;Refactor and reorg instances, constraits, actions etc.&#10;moved ps8 docs to lower case">
       <created>1605964442645</created>
@@ -324,7 +346,14 @@
       <option name="project" value="LOCAL" />
       <updated>1609356313649</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Output clock period and waveform for constraint&#10;HACK: Added dont_touch as vivido is stripping things and I can't figure out why...&#10;Utils toDouble and lookupDouble">
+      <created>1609404899304</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1609404899304</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -335,7 +364,19 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="branch">
+                    <value>
+                      <list>
+                        <option value="HEAD" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
           </value>
         </entry>
       </map>
@@ -358,31 +399,12 @@
     <MESSAGE value="Fixed sync timing not being default&#10;Fixed combintorial loops in vexriscv config&#10;Fixed clock pin standard&#10;Added multiple bus hookups&#10;Added own Variant type with BigInt support&#10;Utility to lookup string or array of strings&#10;PreConnect stage added&#10;Bus connections now work out connection count&#10;connection syntax for bridges and busses improved&#10;Standardised instance object creation &#10;WIP compiler generation&#10;new parameter syntax&#10;Parameter class removed" />
     <MESSAGE value="Buses now take array of address, size as input&#10;Instances can now optionally specify address and size else use generated ones&#10;Generate cmake scripts for boot roms&#10;Moved compiler script to resource file for better editing&#10;Generate cmake tool chain files for the compilers that it builds&#10;cpus now take a primary_boot tag to say they will boot the SoC&#10;cpus now take a triple element to say which compiler etc. they use&#10;WIP crt file for riscv32 metal cpus&#10;Edalize now has a function to update boot rom from compiled rom&#10;Support for bus consumer array and ram size in game&#10;Dummy bootrom main.c to check linking okay&#10;Not finished update and instance only cli driver&#10;linker script for riscv32 metal&#10;Our Variant supports toString&#10;TomlAction can now output arrays&#10;Removed UnconnectionTrait into Unconnected&#10;Moved bus connection to preconnect&#10;Fixed bus connection bug for direct non-prefixed ports" />
     <MESSAGE value="renamed some bus parameter to be more consistant&#10;Fixed issues with prep_rom and now issues the calls as require.&#10;TODO the naming of prop_rom calls is slightly hardcoded&#10;rams are now required to provide data including defaults from toml so prep_rom&#10;Added RamFillType enum, so far just zero and boot_primary. TODO file and other code&#10;renamed toml variant toString to toTomlString" />
-    <option name="LAST_COMMIT_MESSAGE" value="renamed some bus parameter to be more consistant&#10;Fixed issues with prep_rom and now issues the calls as require.&#10;TODO the naming of prop_rom calls is slightly hardcoded&#10;rams are now required to provide data including defaults from toml so prep_rom&#10;Added RamFillType enum, so far just zero and boot_primary. TODO file and other code&#10;renamed toml variant toString to toTomlString" />
+    <MESSAGE value="Output clock period and waveform for constraint&#10;HACK: Added dont_touch as vivido is stripping things and I can't figure out why...&#10;Utils toDouble and lookupDouble" />
+    <option name="LAST_COMMIT_MESSAGE" value="Output clock period and waveform for constraint&#10;HACK: Added dont_touch as vivido is stripping things and I can't figure out why...&#10;Utils toDouble and lookupDouble" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint type="scala-line">
-          <url>file://$PROJECT_DIR$/src/main/scala/output/Report.scala</url>
-          <line>139</line>
-          <option name="timeStamp" value="51" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="scala-line">
-          <url>file://$PROJECT_DIR$/src/main/scala/overlord/DefinitionCatalog.scala</url>
-          <line>51</line>
-          <option name="timeStamp" value="254" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="scala-line">
-          <url>file://$PROJECT_DIR$/src/main/scala/overlord/Connections/Unconnected.scala</url>
-          <line>245</line>
-          <option name="timeStamp" value="288" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="scala-line">
-          <url>file://$PROJECT_DIR$/src/main/scala/overlord/Instances/BusInstance.scala</url>
-          <line>48</line>
-          <option name="timeStamp" value="289" />
-        </line-breakpoint>
         <breakpoint enabled="true" type="java-exception">
           <properties class="java.lang.ArrayIndexOutOfBoundsException" package="java.lang" />
           <option name="timeStamp" value="174" />
@@ -391,22 +413,23 @@
           <properties class="java.lang.IndexOutOfBoundsException" package="java.lang" />
           <option name="timeStamp" value="248" />
         </breakpoint>
+        <line-breakpoint enabled="true" type="scala-line">
+          <url>file://$PROJECT_DIR$/src/main/scala/overlord/Connections/Unconnected.scala</url>
+          <line>54</line>
+          <option name="timeStamp" value="254" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <pin-to-top-manager>
       <pinned-members>
         <PinnedItemInfo parentTag="overlord.DefinitionCatalog" memberName="catalogs" />
+        <PinnedItemInfo parentTag="overlord.Gateware.Gateware" memberName="actions" />
         <PinnedItemInfo parentTag="overlord.Instances.NxMInstance" memberName="phase2Ports" />
         <PinnedItemInfo parentTag="java.lang.String" memberName="value" />
         <PinnedItemInfo parentTag="overlord.Instances.RamInstance" memberName="definition" />
         <PinnedItemInfo parentTag="overlord.Connections.Wire" memberName="endLocs" />
       </pinned-members>
     </pin-to-top-manager>
-    <watches-manager>
-      <configuration name="Application">
-        <watch expression="Game.pathStack" language="Scala" />
-      </configuration>
-    </watches-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

@@ -11,7 +11,10 @@
     <option name="RIGHT_MARGIN" value="80" />
     <option name="FORMATTER_TAGS_ENABLED" value="true" />
     <option name="SOFT_MARGINS" value="170" />
-    <H2CodeStyleSettings version="5">
+    <H2CodeStyleSettings version="6">
+      <option name="USE_GENERAL_STYLE" value="false" />
+    </H2CodeStyleSettings>
+    <H2CodeStyleSettings version="6">
       <option name="USE_GENERAL_STYLE" value="false" />
     </H2CodeStyleSettings>
     <ScalaCodeStyleSettings>
