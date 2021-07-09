@@ -11,12 +11,14 @@ object Project {
 		val softPath = out.resolve("soft")
 		val gatePath = out.resolve("gate")
 
+		output.Report(game, gatePath)
 		output.Xdc(game, gatePath)
 		output.Top(game, gatePath)
 		output.Edalize(game, gatePath)
 
 		if (game.cpus.nonEmpty) {
 			output.Compiler(game, softPath)
+			output.BaseCHeaders(game, softPath.resolve("include"))
 			output.BootRom(game, softPath.resolve("bootroms"))
 			output.Svd(game, softPath)
 		}

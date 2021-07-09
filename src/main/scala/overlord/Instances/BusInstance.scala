@@ -18,7 +18,7 @@ case class BusInstance(ident: String,
 	}
 
 	def getIndex(instance: Instance): Int = {
-		if( connectedInstances.contains(instance))
+		if( consumerInstances.contains(instance))
 			consumerIndices(instance)
 		else
 			-1
@@ -36,7 +36,7 @@ case class BusInstance(ident: String,
 		consumers(index)
 	}
 
-	def connectedInstances: Seq[Instance] = consumerIndices.keysIterator.toSeq
+	def consumerInstances: Seq[Instance] = consumerIndices.keysIterator.toSeq
 
 	private var consumers = mutable.ArrayBuffer[(BigInt, BigInt)]()
 	private var consumerIndices = mutable.HashMap[Instance, Int]()

@@ -9,17 +9,11 @@ object Compiler {
 	def apply(game: Game, out: Path): Unit = {
 		if (game.cpus.isEmpty) return
 
-		println(s"Creating Compiler scripts at ${out}")
-		Utils.ensureDirectories(out.toRealPath())
+		println(s"Creating Compiler scripts at $out")
+		Utils.ensureDirectories(out)
 
 		val triples: Set[String] = {
-			game.cpus.flatMap { c =>
-				if (c.definition.attributes.contains("triple")) {
-					Some(Utils.toString(c.definition.attributes("triple")))
-				} else {
-					None
-				}
-			}
+			game.cpus.map(_.triple)
 		}.toSet
 
 		genCompilerScript(triples, out)
@@ -63,7 +57,7 @@ object Compiler {
 		for (triple <- triples) {
 			val sanTriple = triple.replace("""-""", "")
 
-			// read to read a specialist toolchain file, if none exist use template
+			// try to read a specialist toolchain file, if none exist use template
 			val tt = Utils.readFile(
 				name = "toolchain_" + sanTriple,
 				path = Path.of(s"software/toolchain_$sanTriple.cmake"),

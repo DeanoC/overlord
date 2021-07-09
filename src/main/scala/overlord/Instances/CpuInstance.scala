@@ -13,6 +13,12 @@ case class CpuInstance(ident: String,
 	override def copyMutate[A <: Instance](nid: String): CpuInstance =
 		copy(ident = nid)
 
+	lazy val width : Int =
+		Utils.lookupInt(definition.attributes, key = "width", or = 32)
+	lazy val triple          : String =
+		Utils.lookupString(definition.attributes, key = "triple", or = "unknown-unknown-unknown")
+	lazy val sanitized_triple: String = triple.replace("""-""", "")
+
 }
 
 object CpuInstance {

@@ -1,8 +1,7 @@
 package overlord
 
-import overlord.Connections.{Connected, ConnectedBetween, ConnectedConstant, Connection, ConstantConnectionType}
-import overlord.Definitions.{DefinitionTrait, GatewareTrait}
-import overlord.Gateware.GatewareAction.GatewareAction
+import overlord.Connections.{Connected, ConnectedConstant, Connection, Wire, Wires}
+import overlord.Definitions.GatewareTrait
 import overlord.Instances._
 import ikuy_utils._
 import overlord.Software.RegisterBank
@@ -11,15 +10,25 @@ import java.nio.file.Path
 import scala.collection.mutable
 
 case class Game(name: String,
-                override val children: Seq[Instance],
-                connections: Seq[Connection],
-               ) extends Container {
+                children: Seq[Instance],
+                connected: Seq[Connected],
+                distanceMatrix: DistanceMatrix,
+                wires: Seq[Wire]
+               ){
+	lazy val setOfGateware: Set[Instance] = {
+		val setOfGateware = mutable.HashSet[Instance]()
+		connected.foreach { c =>
+			if (c.first.nonEmpty && c.first.get.instance.isGateware)
+				setOfGateware += c.first.get.instance
+			if (c.second.nonEmpty && c.second.get.instance.isGateware)
+				setOfGateware += c.second.get.instance
+		}
+		setOfGateware.toSet
+	}
 
-	override val physical: Boolean = false
-	val distanceMatrix: DistanceMatrix = DistanceMatrix(children)
-
-	override def copyMutateContainer(copy: MutContainer): Container =
-		Game(name, copy.children.toSeq, copy.connections.toSeq)
+	lazy val flatChildren: Seq[Instance] =
+		children.filter(_.isInstanceOf[Container])
+			.map(_.asInstanceOf[Container]).flatMap(_.flatChildren) ++ children
 
 	lazy val allInstances: Seq[Instance] = flatChildren
 
@@ -51,23 +60,21 @@ case class Game(name: String,
 		flatChildren.filter(_.isInstanceOf[ClockInstance])
 			.map(_.asInstanceOf[ClockInstance])
 
-	lazy val peripherals: Seq[Instance] = storages ++ nets
-
 	lazy val gatewares: Seq[(Instance, GatewareTrait)] =
 		flatChildren.filter(_.definition.gateware.nonEmpty)
 			.map(g => (g, g.definition.gateware.get))
 
 	lazy val constants: Seq[ConnectedConstant] =
-		connections.filter(_.isInstanceOf[ConnectedConstant])
+		connected.filter(_.isInstanceOf[ConnectedConstant])
 			.map(_.asInstanceOf[ConnectedConstant])
 
 	lazy val board: Option[BoardInstance] =
 		children.find(_.isInstanceOf[BoardInstance])
 			.asInstanceOf[Option[BoardInstance]]
 
-	lazy val connected: Seq[Connected] =
-		connections.filter(_.isInstanceOf[Connected])
-			.map(_.asInstanceOf[Connected])
+	def getBusesConnectedToCpu(cpu:CpuInstance) : Seq[BusInstance] = {
+		buses.filter(_.consumerInstances.contains(cpu))
+	}
 }
 
 object Game {
@@ -175,87 +182,39 @@ object Game {
 			val (expanded, expandedConnections) =
 				Connection.expandAndConnect(top.connections.toSeq, top.children.toSeq)
 
-			// inform instances that are connected to busses, there address
+			// instances that are connected to buses need a register bank
 			val buses = expanded.filter(_.isInstanceOf[BusInstance])
 				.map(_.asInstanceOf[BusInstance])
-			for(  bus <- buses;
-						inst <- bus.connectedInstances;
-						rl <- inst.instanceRegisterLists
-			      if !inst.instanceRegisterBanks.exists(_.name == rl.name)) {
+			for(bus <- buses;
+			    inst <- bus.consumerInstances;
+			    rl <- inst.instanceRegisterLists
+			    if !inst.instanceRegisterBanks.exists(_.name == rl.name)) {
 
 				val (address, _) = bus.getConsumerAddressAndSize(inst)
 				inst.instanceRegisterBanks +=
 					RegisterBank(s"${bus.ident}_${inst.ident}",address, rl.name)
 			}
 
+			val setOfConnected = expandedConnections
+				.filter(_.isConnected)
+				.map(_.asConnected).toSet
 
-			Some(Game(gameName, expanded, expandedConnections))
-		}
-	}
+			val dm: DistanceMatrix = DistanceMatrix(expanded)
 
-}
-
-object OutputGateware {
-	def apply(top: MutContainer,
-	          gatePath: Path,
-	          phase: GatewareAction => Boolean): Unit = {
-		Game.pathStack.push(gatePath.toRealPath())
-
-		for {(instance, gateware) <-
-			     top.children.filter(_.definition.gateware.nonEmpty)
-				     .map(g => (g, g.definition.gateware.get))} {
-
-			OutputGateware.executePhase(instance, gateware,
-			                            top.connections.toSeq, phase)
-		}
-	}
-
-	def executePhase(instance: Instance,
-	                 gateware: GatewareTrait,
-	                 connections: Seq[Connection],
-	                 phase: GatewareAction => Boolean): Unit = {
-
-		val backupStack = Game.pathStack.clone()
-		for {action <- gateware.actions.filter(phase(_))} {
-
-			val conParameters = connections
-				.filter(_.isUnconnected)
-				.map(_.asUnconnected)
-				.filter(_.isConstant).map(c => {
-				val constant = c.connectionType.asInstanceOf[ConstantConnectionType]
-				val name     = c.secondFullName.split('.').lastOption match {
-					case Some(value) => value
-					case None        => c.secondFullName
-				}
-				mutable.Map[String, Variant](name -> constant.constant)
-			}).fold(mutable.HashMap[String, Variant]())((o, n) => o ++ n)
-
-			val instanceSpecificParameters = instance match {
-				case bus: BusInstance =>
-					Map[String, Variant]("consumers" -> bus.consumersVariant)
-				case ram: RamInstance =>
-					ram.sizeInBytes match {
-						case Some(v) =>
-							Map[String, Variant]("size_in_bytes" -> BigIntV(v))
-						case None    => Map[String, Variant]()
-					}
-				case _                => Map[String, Variant]()
+			val connectionMask = Array.fill[Boolean](dm.dim)(elem = false)
+			for {connected <- setOfConnected
+			     (sp, ep) = dm.indicesOf(connected)} {
+				connectionMask(sp) = true
+				dm.routeBetween(sp, ep).foreach(connectionMask(_) = true)
 			}
+			dm.removeSelfLinks()
+			dm.instanceMask(connectionMask)
 
-			val parameters = instance.parameters ++
-			                 conParameters ++
-			                 instanceSpecificParameters
+			val wires = Wires(dm, setOfConnected.toSeq)
 
-			val merged = connections.filter(
-				_.isInstanceOf[ConnectedConstant])
-				.map(_.asInstanceOf[ConnectedConstant])
-				.filter(c => instance.parameterKeys.contains(c.secondFullName))
-				.map(_.asParameter)
-				.fold(parameters)((o, n) => o ++ n)
-
-			action.execute(instance, merged, Game.pathStack.top)
+			Some(Game(gameName, expanded, setOfConnected.toSeq, dm, wires))
 		}
-
-		Game.pathStack = backupStack
 	}
+
 }
+

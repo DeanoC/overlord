@@ -14,8 +14,8 @@ import ikuy_utils._
 
 object Edalize {
 	def apply(game: Game, out: Path): Unit = {
-		println(s"Creating Edalize script at ${out.toRealPath()}")
-		Utils.ensureDirectories(out.toRealPath())
+		println(s"Creating Edalize script at $out")
+		Utils.ensureDirectories(out)
 
 		val board = if (game.board.nonEmpty) game.board.get else {
 			print(s"No board instance found, aborting Edalize process")
@@ -92,10 +92,10 @@ object Edalize {
 
 					sb ++= s"\n\n" +
 					       s"prep_rom('${ram.ident}', \n" +
-					       s"         r'${inPath}', \n" +
-					       s"         r'${outPath}', \n" +
-					       s"         ${bitsPerByte}, \n" +
-					       s"         ${busDataWidth}, \n" +
+					       s"         r'$inPath', \n" +
+					       s"         r'$outPath', \n" +
+					       s"         $bitsPerByte, \n" +
+					       s"         $busDataWidth, \n" +
 					       s"         $sizeInBytes)\n"
 
 				case _ | ZeroFillType() =>
@@ -112,7 +112,7 @@ object Edalize {
 		}
 
 		sb ++= "files = [\n"
-		for ((gateware, defi) <- game.gatewares) {
+		for ((_, defi) <- game.gatewares) {
 			defi.actions.foreach {
 				case action: CopyAction =>
 					sb ++=

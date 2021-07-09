@@ -122,7 +122,7 @@ case class Unconnected(connectionType: ConnectionType,
 		val sport = sp.copy(direction = secondDirection)
 
 		val fmloc = InstanceLoc(fil.instance, Some(fport), fil.fullName)
-		val fsloc = InstanceLoc(sil.instance, Some(sport), fil.fullName)
+		val fsloc = InstanceLoc(sil.instance, Some(sport), sil.fullName)
 
 		Connections.ConnectedBetween(PortConnectionType(),
 		                             cbp, fmloc, direction, fsloc)
@@ -158,8 +158,8 @@ case class Unconnected(connectionType: ConnectionType,
 		val fport = fp.copy(direction = firstDirection)
 		val sport = sp.copy(direction = secondDirection)
 
-		val fmloc = InstanceLoc(fi, Some(fport), s"${fn}.${fp.name}")
-		val fsloc = InstanceLoc(si, Some(sport), s"${fn}.${sp.name}")
+		val fmloc = InstanceLoc(fi, Some(fport), s"$fn.${fp.name}")
+		val fsloc = InstanceLoc(si, Some(sport), s"$fn.${sp.name}")
 
 		Connections.ConnectedBetween(PortConnectionType(),
 		                             GroupConnectionPriority(),
@@ -290,7 +290,7 @@ case class Unconnected(connectionType: ConnectionType,
 		} else bus.supplierPrefixes
 
 		// bridges are special
-		val otherPrefixes = (if (other.isInstanceOf[BridgeInstance]) {
+		val otherPrefixes = if (other.isInstanceOf[BridgeInstance]) {
 			Utils.lookupStrings(other.definition.attributes,
 			                    bus.definition.defType.ident.head,
 			                    "bus_")
@@ -304,7 +304,7 @@ case class Unconnected(connectionType: ConnectionType,
 				                    "supplier_prefix",
 				                    "bus_")
 			}
-		})
+		}
 
 		if (busPrefixes == otherPrefixes) for {
 			bp <- busPrefixes

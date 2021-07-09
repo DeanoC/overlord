@@ -16,52 +16,21 @@ import scala.collection.mutable
 import scala.util.{Failure, Success, Try}
 
 object Top {
-
-	type TopPort = (Instance, WireDirection, Port)
-
 	def apply(game: Game, out: Path): Unit = {
-
-		val dm = game.distanceMatrix
-
-		val setOfConnected = game.connections
-			.filter(_.isConnected)
-			.map(_.asConnected).toSet
-
-		val setOfGateware = {
-			val setOfGateware = mutable.HashSet[Instance]()
-			setOfConnected.foreach { c =>
-				if (c.first.nonEmpty && c.first.get.instance.isGateware)
-					setOfGateware += c.first.get.instance
-				if (c.second.nonEmpty && c.second.get.instance.isGateware)
-					setOfGateware += c.second.get.instance
-			}
-			setOfGateware.toSet
-		}
-
-		val connectionMask = Array.fill[Boolean](dm.dim)(elem = false)
-		for {connected <- setOfConnected
-		     (sp, ep) = dm.indicesOf(connected)} {
-			connectionMask(sp) = true
-			dm.routeBetween(sp, ep).foreach(connectionMask(_) = true)
-		}
-		dm.removeSelfLinks()
-		dm.instanceMask(connectionMask)
-
-		val wires = Wires(dm, setOfConnected.toSeq)
 
 		val sb = new StringBuilder()
 
 		sb ++=
-		s"""module ${sanatizeIdent(game.name)}_top (\n"""
+		s"""module ${sanitizeIdent(game.name)}_top (\n"""
 
-		sb ++= writeTopWires(wires)
+		sb ++= writeTopWires(game.wires)
 
 		sb ++= s"""\n);\n"""
 
-		sb ++= writeChipToChipWires(wires)
+		sb ++= writeChipToChipWires(game.wires)
 
 		// instantiation
-		for ((instance, gw) <- setOfGateware.map(
+		for ((instance, gw) <- game.setOfGateware.map(
 			i => (i, i.definition.gateware.get))) {
 
 			sb ++=
@@ -87,7 +56,7 @@ object Top {
 						case DoubleV(dbl)      => s"$dbl"
 					}
 
-					sb ++= s"""$pcomma    .${k}($sn)"""
+					sb ++= s"""$pcomma    .$k($sn)"""
 					pcomma = ",\n"
 				}
 				sb ++= "  \n )"
@@ -95,7 +64,7 @@ object Top {
 
 			sb ++= s" ${instance.ident}(\n"
 
-			sb ++= writeChipWires(instance, wires)
+			sb ++= writeChipWires(instance, game.wires)
 
 			sb ++=
 			s"""
@@ -114,13 +83,13 @@ object Top {
 
 		if (loc.isClock) {
 			val clk = loc.instance.asInstanceOf[ClockInstance]
-			sb ++= s"$comma\tinput wire ${sanatizeIdent(loc.fullName)}"
+			sb ++= s"$comma\tinput wire ${sanitizeIdent(loc.fullName)}"
 		} else if (loc.port.nonEmpty) {
 			val port = loc.port.get
 			val wdir = port.direction
-			val dir  = s"${wdir}"
+			val dir  = s"$wdir"
 			val bits = if (port.width.singleBit) "" else s"${port.width.text}"
-			sb ++= s"$comma\t$dir wire $bits ${sanatizeIdent(loc.fullName)}"
+			sb ++= s"$comma\t$dir wire $bits ${sanitizeIdent(loc.fullName)}"
 		}
 		sb.result()
 	}
@@ -169,7 +138,7 @@ object Top {
 		     if wire.startLoc.port.nonEmpty} {
 			val port = wire.startLoc.port.get
 			val bits = if (port.width.singleBit) "" else s"${port.width.text}"
-			sb ++= s"wire $bits ${sanatizeIdent(wire.startLoc.fullName)};\n"
+			sb ++= s"wire $bits ${sanitizeIdent(wire.startLoc.fullName)};\n"
 		}
 		sb.result()
 	}
@@ -183,7 +152,7 @@ object Top {
 
 		for {wire <- cs0} {
 			if (wire.startLoc.port.nonEmpty) {
-				sb ++= s"$comma\t.${sanatizeIdent(wire.startLoc.port.get.name)}("
+				sb ++= s"$comma\t.${sanitizeIdent(wire.startLoc.port.get.name)}("
 				val loc = wire.endLocs.length match {
 					case 0 => None
 					case 1 => Some(wire.endLocs.head)
@@ -193,16 +162,16 @@ object Top {
 				if (loc.nonEmpty) {
 					if (wire.startLoc.isClock) {
 						val clk = wire.startLoc.instance.asInstanceOf[ClockInstance]
-						sb ++= s"${sanatizeIdent(clk.ident)})"
+						sb ++= s"${sanitizeIdent(clk.ident)})"
 					} else if (wire.startLoc.isPin) {
 						val pg = wire.startLoc.instance.asInstanceOf[PinGroupInstance]
-						sb ++= s"${sanatizeIdent(pg.ident)})"
+						sb ++= s"${sanitizeIdent(pg.ident)})"
 					} else if (loc.get.port.nonEmpty) {
-						sb ++= s"${sanatizeIdent(wire.startLoc.fullName)})"
+						sb ++= s"${sanitizeIdent(wire.startLoc.fullName)})"
 					} else
-						sb ++= s"${sanatizeIdent(wire.endLocs.head.fullName)})"
+						sb ++= s"${sanitizeIdent(wire.endLocs.head.fullName)})"
 				} else
-					sb ++= s"${sanatizeIdent(wire.startLoc.fullName)})"
+					sb ++= s"${sanitizeIdent(wire.startLoc.fullName)})"
 				comma = ",\n"
 			}
 		}
@@ -211,14 +180,15 @@ object Top {
 		for {wire <- cs1} {
 			val loc = wire.endLocs.find(_.instance == instance)
 			if (loc.nonEmpty && loc.get.port.nonEmpty) {
-				sb ++= s"$comma\t.${sanatizeIdent(loc.get.port.get.name)}("
+				sb ++= s"$comma\t.${sanitizeIdent(loc.get.port.get.name)}("
+				val inst = wire.startLoc.instance
 				if (wire.startLoc.isClock) {
-					val clk = wire.startLoc.instance.asInstanceOf[ClockInstance]
-					sb ++= s"${sanatizeIdent(clk.ident)})"
+					val clk = inst.asInstanceOf[ClockInstance]
+					sb ++= s"${sanitizeIdent(clk.ident)})"
 				} else if (wire.startLoc.isPin) {
-					val pg = wire.startLoc.instance.asInstanceOf[PinGroupInstance]
-					sb ++= s"${sanatizeIdent(pg.ident)})"
-				} else sb ++= s"${sanatizeIdent(wire.startLoc.fullName)})"
+					val pg = inst.asInstanceOf[PinGroupInstance]
+					sb ++= s"${sanitizeIdent(pg.ident)})"
+				} else sb ++= s"${sanitizeIdent(wire.startLoc.fullName)})"
 
 				comma = ",\n"
 			}
@@ -227,7 +197,7 @@ object Top {
 		sb.result()
 	}
 
-	private def sanatizeIdent(in: String): String = {
+	private def sanitizeIdent(in: String): String = {
 		in.replaceAll("""->|\.""", "_")
 	}
 }
