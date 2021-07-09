@@ -10,7 +10,7 @@ object BootRom {
 	def apply(game: Game, out: Path): Unit = {
 		if (game.cpus.isEmpty) return
 
-		println(s"Creating BootRom projects at ${out}")
+		println(s"Creating BootRom projects at $out")
 
 		val primaryBooters = game.cpus.flatMap { c =>
 			if (c.primary_boot) Some(c)
@@ -56,7 +56,7 @@ object BootRom {
 			copy(Path.of(s"software/bootrom/main.c"),
 			     dir.resolve("main.c"))
 
-			// read to read a specialist cmake file, if none exist use template
+			// try to read a specialist cmake file, if none exist use template
 			val tt = Utils.readFile(
 				"CMakeLists_" + sanTriple,
 				Path.of(s"software/bootrom/CMakeLists_$sanTriple.txt"),
@@ -103,8 +103,6 @@ object BootRom {
 
 			sb ++= "cmake --build build/bootroms/" + sanTriple + "_primary_boot"
 		}
-
 		Utils.writeFile(out.resolve("../make_bootrooms.sh"), sb.result())
-
 	}
 }

@@ -2,7 +2,8 @@ actions = [
     "make_config",
     "sbt_run",
     "src",
-    "read_verilog_top"
+    "read_verilog_top",
+    "read_toml_registers"
 ]
 
 
@@ -31,3 +32,8 @@ sources = [{ file ="${name}.v", language="verilog"}]
 name = 'read_verilog_top'
 processor = 'read_verilog_top'
 source = "${name}"
+
+[[process]]
+name = 'read_toml_registers'
+processor = 'read_toml_registers'
+source = "${name}_regs"

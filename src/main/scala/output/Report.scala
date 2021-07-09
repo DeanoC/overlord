@@ -17,17 +17,17 @@ object Report {
 		val sb       = new StringBuilder
 		val cpus     = game.cpus
 		val cpuTypes = cpus.map(_.definition).toSet
-		sb ++= (f"------------------%n")
-		sb ++= (f"${cpus.length} CPU cores of ${cpuTypes.size} types%n")
-		sb ++= (f"------------------%n")
+		sb ++= f"------------------%n"
+		sb ++= f"${cpus.length} CPU cores of ${cpuTypes.size} types%n"
+		sb ++= f"------------------%n"
 		for (cput <- cpuTypes) {
 			val chipType = cput.defType.ident.mkString
 			val arch     = Utils.lookupString(cput.attributes, "arch", "UNKNOWN")
 			val bw       = Utils.lookupInt(cput.attributes, "width", 32)
 
-			sb ++= (f"${chipType} are ${bw} bit $arch CPUs%n")
-			if (cput.software.nonEmpty)
-				cput.software.get.groups.foreach(r => println(s"  ${r.description}"))
+			sb ++= f"$chipType are $bw bit $arch CPUs%n"
+			if (cput.registerLists.nonEmpty)
+				cput.registerLists.foreach(r => println(s"  ${r.description}"))
 		}
 
 		sb ++= f"%n------------------%n"
@@ -41,11 +41,11 @@ object Report {
 
 		sb ++= reportInstance(game)
 
-		sb ++= (f"%n------------------%n")
-		sb ++= (f"Connections%n")
-		sb ++= (f"------------------%n%n")
+		sb ++= f"%n------------------%n"
+		sb ++= f"Connections%n"
+		sb ++= f"------------------%n%n"
 		for (connection <- game.connections) {
-			sb ++= (f"------------------%n")
+			sb ++= f"------------------%n"
 			sb ++= f"${connection.firstFullName} <> ${connection.secondFullName}%n"
 		}
 

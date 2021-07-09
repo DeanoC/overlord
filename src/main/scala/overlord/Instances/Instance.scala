@@ -7,6 +7,7 @@ import overlord.Definitions._
 import overlord.Gateware.{Gateware, Port}
 import overlord.DefinitionCatalog
 import ikuy_utils._
+import overlord.Software.{RegisterBank, RegisterList}
 
 import scala.collection.mutable
 
@@ -16,14 +17,13 @@ trait Instance {
 	val replicationCount: Int     = 1 // TODO revisit this
 	val shared          : Boolean = false
 
-	val instancePorts: mutable.HashMap[String, Port] =
-		mutable.HashMap[String, Port]()
+	val instanceParameterKeys: mutable.HashSet[String] = mutable.HashSet()
 
-	val instanceParameters: mutable.HashMap[String, Variant] =
-		mutable.HashMap[String, Variant]()
-
-	val instanceParameterKeys: mutable.HashSet[String] =
-		mutable.HashSet[String]()
+	val instancePorts: mutable.HashMap[String, Port] = mutable.HashMap()
+	val instanceParameters: mutable.HashMap[String, Variant] = mutable.HashMap()
+	val instanceRegisterBanks: mutable.ArrayBuffer[RegisterBank] = mutable.ArrayBuffer()
+	val instanceRegisterLists: mutable.ArrayBuffer[RegisterList] = mutable.ArrayBuffer()
+	val instanceDocs: mutable.ArrayBuffer[String] = mutable.ArrayBuffer()
 
 	private val splitIdent           = ident.split('.')
 	private val splitIdentWidthIndex = splitIdent.zipWithIndex
@@ -37,24 +37,23 @@ trait Instance {
 			else Map[String, Port]()
 		} ++ instancePorts.toMap
 
-	def parameters: Map[String, Variant] =
-		definition.parameters ++ {
+	def parameters: Map[String, Variant] = definition.parameters ++ {
 			if (definition.gateware.nonEmpty)
-				definition.gateware.get.parameters.toMap
+				definition.gateware.get.parameters
 			else Map[String, Variant]()
 		} ++ instanceParameters.toMap
 
+	def registerLists: Seq[RegisterList] = definition.registerLists ++ instanceRegisterLists
+	def registerBanks: Seq[RegisterBank] = definition.registerBanks ++ instanceRegisterBanks
+	def docs: Seq[String] = definition.docs ++ instanceDocs
+
 	def parameterKeys: Set[String] = instanceParameterKeys.toSet
-
-	def software: Seq[SoftwareTrait] = definition.software.toList
-
-	def gateware: Option[GatewareTrait] = definition.gateware
 
 	def hardware: Option[HardwareTrait] = definition.hardware
 
 	def copyMutate[A <: Instance](nid: String): Instance
 
-	def isGateware: Boolean = gateware.nonEmpty
+	def isGateware: Boolean = definition.gateware.nonEmpty
 
 	def getPort(lastName: String): Option[Port] =
 		if (ports.contains(lastName)) Some(ports(lastName)) else None
@@ -126,12 +125,12 @@ object Instance {
 		val replicationCount = Utils.lookupInt(table, "count", 1)
 		val shared           = Utils.lookupBoolean(table, "shared", or = false)
 
-		val attribs: Map[String, Variant] = (defaults ++ table.filter(
+		val attribs: Map[String, Variant] = defaults ++ table.filter(
 			_._1 match {
 				case "type" | "name"    => false
 				case "shared" | "count" => false
 				case _                  => true
-			}))
+			})
 
 		val defType = Definition.toDefinitionType(defTypeString)
 
@@ -175,10 +174,8 @@ object Instance {
 				case Some(gw) =>
 					val result = Definition(defType, attribs,
 					                        gw.ports.toMap,
-					                        gw.parameters.toMap,
-					                        None,
-					                        Some(gw),
-					                        None)
+					                        gw.parameters,
+					                        Some(gw))
 					catalogs.catalogs += (defType -> result)
 					Some(result)
 
@@ -205,7 +202,7 @@ object Instance {
 				catalogs.catalogs += (defType -> result)
 				Some(result)
 			case _                         =>
-				println(s"${defType} not found in any catalogs")
+				println(s"$defType not found in any catalogs")
 				None
 		}
 	}

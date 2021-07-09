@@ -38,126 +38,124 @@ object Svd {
 		<endian>little</endian>
 	}
 
-	private def outputRegister(r: Register) =
-	<register>
-		<name>{r.name}</name>
-		<description>{r.desc}</description>
-		<addressOffset>{f"${r.offset}"}</addressOffset>
-		<size>{r.width}</size>
-		<resetValue>{f"${r.default}"}</resetValue>
-		if(r.fields.length > 0)
-		<fields> {
-			for (f <- r.fields) yield {
-				val bits = BitsDesc(f.bits)
-				<field>
-					<name>{f.name}</name>
-					<description> {
-						if (f.longDesc.nonEmpty) f.longDesc.get
-						else if(f.shortDesc.nonEmpty) f.shortDesc }
-					</description>
-					<lsb>{bits.lo}</lsb>
-					<msb>{bits.hi}</msb>
-				</field>
-			}
-			}
-		</fields>
-	</register>
+	private def outputRegister(r: Register) = {
+ 	  <register>
+			<name>{r.name}</name>
+			<description>{r.desc}</description>
+			<addressOffset>{f"${r.offset}"}</addressOffset>
+			<size>{r.width}</size>
+			<resetValue>{f"${r.default}"}</resetValue>
+	    { if(r.fields.nonEmpty)
+		    <fields> {
+			    for (f <- r.fields) yield {
+				    val bits = BitsDesc(f.bits)
+				    <field>
+					    <name>{f.name}</name>
+					    <description> {
+						    if (f.longDesc.nonEmpty) f.longDesc.get
+						    else if(f.shortDesc.nonEmpty) f.shortDesc.get
+						    }
+					    </description>
+					    <lsb>{bits.lo}</lsb>
+					    <msb>{bits.hi}</msb>
+				    </field>
+			    }
+		    }
+		    </fields>
+	    }
+    </register>
+	}
 
-	private val definitionsWritten = mutable.HashMap[String, String]()
+		private val definitionsWritten = mutable.HashMap[String, String]()
 
-	private def outputPeripheral(s: Instance) : Seq[xml.Elem] ={
-		if(s.definition.software.isEmpty) Seq[xml.Elem]()
-		else for(regs <- s.definition.software.get.groups) yield {
-				val bank = if(false) {//(s.attributes.contains("bank")) {
-					regs.banks.find(_.name == "TODO"//s.attributes("bank")
-						                .asInstanceOf[toml.Value.Str].value) match {
-							case Some(value) => value
-							case None =>
-								println(s"Peripheral ${s.ident} bank name is not found in " +
-								        s"the definition")
-								return Array[xml.Elem]()
-						}
-					} else if(definitionsWritten.contains(s.definition.defType.toString)) {
-						println(s"Peripheral ${s.ident} contains no bank name but is " +
-						        s"used in a multiple instance definition")
-						return Array[xml.Elem]()
-					} else regs.banks.head
+		private def outputRegisters(s: Instance) : Seq[xml.Elem] ={
+			if(s.instanceRegisterBanks.isEmpty) return Seq[xml.Elem]()
 
-				if(definitionsWritten.contains(s.definition.defType.toString)) {
+			for(bank <- s.instanceRegisterBanks.toIndexedSeq) yield {
+				val rl = s.instanceRegisterLists.find(_.name == bank.registerListName) match {
+					case Some(value) => value
+					case None =>
+						println(s"Peripheral ${s.ident} ${bank.registerListName} is not found in " +
+						        s"the definition")
+						return Seq[xml.Elem]()
+				}
+
+				if(definitionsWritten.contains(bank.registerListName)) {
 					// derivedFrom case
-					val derivedFromName = definitionsWritten(s.definition.defType.toString)
+					val derivedFromName = definitionsWritten(bank.registerListName)
 					<peripheral derivedFrom={derivedFromName}>
-					<name>{bank.name}</name>
-					<version>1.0</version>
-					<description>{regs.description}</description>
-					<baseAddress>{f"${bank.address}"}</baseAddress>
-				</peripheral>
-			} else {
-				// new definition
-				definitionsWritten += (s.definition.defType.toString -> bank.name)
-				<peripheral>
-					<name>{bank.name}</name>
-					<version>1.0</version>
-					<description>{regs.description}</description>
-					<baseAddress>{f"${bank.address}"}</baseAddress>
-					<addressBlock>
-						<offset>0x0</offset>
-						<size>{regs.bankSize}</size>
-						<usage>registers</usage>
-						<protection>s</protection>
-					</addressBlock>
-					<registers>
-						{ for (r <- regs.registers) yield outputRegister(r) }
-					</registers>
-				</peripheral>
+						<name>{bank.name}</name>
+						<version>1.0</version>
+						<description>{rl.description}</description>
+						<baseAddress>{f"${bank.address}"}</baseAddress>
+					</peripheral>
+				} else {
+					// new definition
+					definitionsWritten += (bank.registerListName -> bank.name)
+					<peripheral>
+						<name>{bank.name}</name>
+						<version>1.0</version>
+						<description>{rl.description}</description>
+						<baseAddress>{f"${bank.address}"}</baseAddress>
+						<addressBlock>
+							<offset>0x0</offset>
+							<size>{rl.sizeInBytes}</size>
+							<usage>registers</usage>
+							<protection>s</protection>
+						</addressBlock>
+						<registers>
+							{ for (r <- rl.registers) yield outputRegister(r) }
+						</registers>
+					</peripheral>
+				}
 			}
 		}
-	}
 
-	def apply(game: Game, out : Path): Unit = {
-		val cpus = for (cpu <- game.cpus) yield <cpu>{outputCpu(cpu)}</cpu>
+		def apply(game: Game, out : Path): Unit = {
+			val cpus = for (cpu <- game.cpus) yield <cpu>{outputCpu(cpu)}</cpu>
 
-		val peripherals = for (p <- game.peripherals) yield outputPeripheral(p)
+			val instances = for (p <- game.allInstances) yield outputRegisters(p)
 
-		val deviceXml: xml.Elem =
-			<device schemaVersion="1.3"
-			        xmlns:xs="http://www.w3.org/2001/XMLSchema-instance"
-			        xs:noNamespaceSchemaLocation="etc/CMSIS-SVD.xsd">
-				<vendor>overlord</vendor>
-				<vendorID>OVER</vendorID>
-				<name>{game.name}</name>
-				<version>0.0.0</version>
-				<description>{game.name}</description>
-				<licenseText>// SPDX-License-Identifier: MIT\n</licenseText>
-				<cpu>{outputFakeCpu(game.cpus.head)}</cpu>
-				<addressUnitBits>8</addressUnitBits>
-				<width>32</width>
-				<size>32</size>
-				<access>read-write</access>
-				<resetValue>0x00000000</resetValue>
-				<resetMask>0xFFFFFFFF</resetMask>
-				<peripherals>{peripherals}</peripherals>
-				<vendorExtensions>
-					<cpus>{cpus}</cpus>
-				</vendorExtensions>
-			</device>
-	//@formatter:on
+			val deviceXml: xml.Elem =
+				<device schemaVersion="1.3"
+				        xmlns:xs="http://www.w3.org/2001/XMLSchema-instance"
+				        xs:noNamespaceSchemaLocation="etc/CMSIS-SVD.xsd">
+					<vendor>overlord</vendor>
+					<vendorID>OVER</vendorID>
+					<name>{game.name}</name>
+					<version>0.0.0</version>
+					<description>{game.name}</description>
+					<licenseText>// SPDX-License-Identifier: MIT\n</licenseText>
+					<cpu>{outputFakeCpu(game.cpus.head)}</cpu>
+					<addressUnitBits>8</addressUnitBits>
+					<width>32</width>
+					<size>32</size>
+					<access>read-write</access>
+					<resetValue>0x00000000</resetValue>
+					<resetMask>0xFFFFFFFF</resetMask>
+					<peripherals>{instances}</peripherals>
+					<vendorExtensions>
+						<cpus>{cpus}</cpus>
+					</vendorExtensions>
+				</device>
+			//@formatter:on
 
-		Utils.ensureDirectories(out)
-		val path =
-			if (out.toFile.isDirectory) out.resolve(s"${
-				game.name
-			}.svd")
-			else out
+			Utils.ensureDirectories(out)
+			val path =
+				if (out.toFile.isDirectory) out.resolve(s"${
+					game.name
+				}.svd")
+				else out
 
-		Utils.writeFile(path, new PrettyPrinter(Int.MaxValue, 2).format(deviceXml))
-	}
+			Utils.writeFile(path,
+			                new PrettyPrinter(Int.MaxValue, 2).format(deviceXml))
+		}
 
 
 
 
 	/* TODO
-		<dataType>{f"uint${1 << log2Up(r.defi.width.max(8))}_t"}</dataType>
+ 		<dataType>{f"uint${1 << log2Up(r.defi.width.max(8))}_t"}</dataType>
 	*/
 
 }

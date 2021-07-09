@@ -17,13 +17,26 @@ case class BusInstance(ident: String,
 		consumers += (address -> size)
 	}
 
-	def getIndex(instance: Instance): Int = consumerIndices(instance)
+	def getIndex(instance: Instance): Int = {
+		if( connectedInstances.contains(instance))
+			consumerIndices(instance)
+		else
+			-1
+	}
 
 	def consumerCount: Int = consumers.length
 
 	def consumersVariant: Variant = ArrayV(consumers.flatMap{
 		case (addr, size) => Seq(BigIntV(addr), BigIntV(size))
 	}.toArray)
+
+	def getConsumerAddressAndSize(instance: Instance) : (BigInt, BigInt) = {
+		val index = getIndex(instance)
+		if(index == -1) return(0,0)
+		consumers(index)
+	}
+
+	def connectedInstances: Seq[Instance] = consumerIndices.keysIterator.toSeq
 
 	private var consumers = mutable.ArrayBuffer[(BigInt, BigInt)]()
 	private var consumerIndices = mutable.HashMap[Instance, Int]()
@@ -47,10 +60,10 @@ object BusInstance {
 
 		//@formatter:off
 		val iParams = Map[String, Variant]( elems =
-			("bus_data_width" -> attribs.getOrElse("bus_data_width", IntV(32))),
-			("bus_address_width" -> attribs.getOrElse("bus_address_width", IntV(32))),
-			("bus_base_address" -> attribs.getOrElse("bus_base_address", BigIntV(0))),
-			("bus_bank_size" -> attribs.getOrElse("bus_bank_size", BigIntV(1024)))
+			"bus_data_width" -> attribs.getOrElse("bus_data_width", IntV(32)) ,
+			"bus_address_width" -> attribs.getOrElse("bus_address_width", IntV(32)) ,
+			"bus_base_address" -> attribs.getOrElse("bus_base_address", BigIntV(0)) ,
+			"bus_bank_size" -> attribs.getOrElse("bus_bank_size", BigIntV(1024))
 			)
 		//@formatter:on
 

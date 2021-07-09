@@ -6,6 +6,7 @@ import overlord.Gateware.GatewareAction._
 import java.nio.file.Path
 import overlord.Game
 import ikuy_utils._
+import overlord.Instances.MutContainer
 
 import scala.collection.mutable
 
@@ -52,7 +53,7 @@ object Gateware {
 			      action = Utils.toString(taction)} yield {
 
 				if (!processes.contains(action)) {
-					println(s"$action process not found in ${name}")
+					println(s"$action process not found in $name")
 					return None
 				}
 				val process = processes(action)
@@ -75,12 +76,14 @@ object Gateware {
 					case "sbt"              => SbtAction(name, process, pathOp)
 					case "read_verilog_top" =>
 						ReadVerilogTopAction(name, process, pathOp)
+					case "read_toml_registers" =>
+						ReadTomlRegistersAction(name, process, pathOp)
 					case _                  => None
 				}
 			}).flatten
 
 		val ports = if (parsed.contains("ports"))
-			Ports(Utils.toArray(parsed("ports"))).map(t => (t.name -> t)).toMap
+			Ports(Utils.toArray(parsed("ports"))).map(t => t.name -> t).toMap
 		else Map()
 
 		val parameters = if (parsed.contains("parameters"))

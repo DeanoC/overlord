@@ -3,6 +3,7 @@ package overlord.Definitions
 import ikuy_utils.Variant
 import overlord.Gateware.Port
 import overlord.Instances._
+import overlord.Software.{RegisterBank, RegisterList}
 import toml.Value
 
 
@@ -49,9 +50,13 @@ trait DefinitionTrait {
 	val ports     : Map[String, Port]
 	val parameters: Map[String, Variant]
 	val attributes: Map[String, Variant]
-	val software  : Option[SoftwareTrait]
+
 	val gateware  : Option[GatewareTrait]
 	val hardware  : Option[HardwareTrait]
+
+	val registerBanks: Seq[RegisterBank]
+	val registerLists: Seq[RegisterList]
+	val docs         : Seq[String]
 
 	def createInstance(name: String,
 	                   attribs: Map[String, Variant]

@@ -1,13 +1,11 @@
 package overlord
 
-import overlord.Connections.{
-	Connected, ConnectedBetween, ConnectedConstant,
-	Connection, ConstantConnectionType
-}
+import overlord.Connections.{Connected, ConnectedBetween, ConnectedConstant, Connection, ConstantConnectionType}
 import overlord.Definitions.{DefinitionTrait, GatewareTrait}
 import overlord.Gateware.GatewareAction.GatewareAction
 import overlord.Instances._
 import ikuy_utils._
+import overlord.Software.RegisterBank
 
 import java.nio.file.Path
 import scala.collection.mutable
@@ -23,6 +21,7 @@ case class Game(name: String,
 	override def copyMutateContainer(copy: MutContainer): Container =
 		Game(name, copy.children.toSeq, copy.connections.toSeq)
 
+	lazy val allInstances: Seq[Instance] = flatChildren
 
 	lazy val cpus: Seq[CpuInstance] = flatChildren
 		.filter(_.isInstanceOf[CpuInstance])
@@ -31,6 +30,10 @@ case class Game(name: String,
 	lazy val rams: Seq[RamInstance] =
 		flatChildren.filter(_.isInstanceOf[RamInstance])
 			.map(_.asInstanceOf[RamInstance])
+
+	lazy val buses: Seq[BusInstance] =
+		flatChildren.filter(_.isInstanceOf[BusInstance])
+			.map(_.asInstanceOf[BusInstance])
 
 	lazy val storages: Seq[StorageInstance] =
 		flatChildren.filter(_.isInstanceOf[StorageInstance])
@@ -110,7 +113,7 @@ object Game {
 					Utils.readFile(incResourceName, incResourcePath, getClass) match {
 						case Some(d) => process(incResourcePath, catalogs)
 						case _       =>
-							println(s"Include resource file ${incResourceName} not found")
+							println(s"Include resource file $incResourceName not found")
 							containerStack.pop()
 							return
 					}
@@ -172,6 +175,20 @@ object Game {
 			val (expanded, expandedConnections) =
 				Connection.expandAndConnect(top.connections.toSeq, top.children.toSeq)
 
+			// inform instances that are connected to busses, there address
+			val buses = expanded.filter(_.isInstanceOf[BusInstance])
+				.map(_.asInstanceOf[BusInstance])
+			for(  bus <- buses;
+						inst <- bus.connectedInstances;
+						rl <- inst.instanceRegisterLists
+			      if !inst.instanceRegisterBanks.exists(_.name == rl.name)) {
+
+				val (address, _) = bus.getConsumerAddressAndSize(inst)
+				inst.instanceRegisterBanks +=
+					RegisterBank(s"${bus.ident}_${inst.ident}",address, rl.name)
+			}
+
+
 			Some(Game(gameName, expanded, expandedConnections))
 		}
 	}
@@ -181,7 +198,7 @@ object Game {
 object OutputGateware {
 	def apply(top: MutContainer,
 	          gatePath: Path,
-	          phase: (GatewareAction) => Boolean): Unit = {
+	          phase: GatewareAction => Boolean): Unit = {
 		Game.pathStack.push(gatePath.toRealPath())
 
 		for {(instance, gateware) <-
@@ -196,7 +213,7 @@ object OutputGateware {
 	def executePhase(instance: Instance,
 	                 gateware: GatewareTrait,
 	                 connections: Seq[Connection],
-	                 phase: (GatewareAction) => Boolean): Unit = {
+	                 phase: GatewareAction => Boolean): Unit = {
 
 		val backupStack = Game.pathStack.clone()
 		for {action <- gateware.actions.filter(phase(_))} {
@@ -210,7 +227,7 @@ object OutputGateware {
 					case Some(value) => value
 					case None        => c.secondFullName
 				}
-				mutable.Map[String, Variant]((name -> constant.constant))
+				mutable.Map[String, Variant](name -> constant.constant)
 			}).fold(mutable.HashMap[String, Variant]())((o, n) => o ++ n)
 
 			val instanceSpecificParameters = instance match {

@@ -18,7 +18,7 @@ case class PinGroupInstance(ident: String,
 		copy(ident = nid)
 
 	private lazy val allPorts: Map[String, Port] =
-		super.ports ++ constraint.ports.map(p => (p.name -> p))
+		super.ports ++ constraint.ports.map(p => p.name -> p)
 
 	override def ports: Map[String, Port] = allPorts
 }
@@ -99,18 +99,18 @@ object PinGroupInstance {
 				Utils.toArray(attributes("pullups")).length else pinCount
 
 			if (pinCount != pinNameCount) {
-				println(s"${name} must have equal number of " +
-				        s"pin names(${pinNameCount}) and pins(${pinCount})")
+				println(s"$name must have equal number of " +
+				        s"pin names($pinNameCount) and pins($pinCount)")
 				return None
 			}
 			if (pinCount != dirCount) {
-				println(s"${name} must have equal number of " +
-				        s"pin directions(${dirCount}) and pins(${pinCount})")
+				println(s"$name must have equal number of " +
+				        s"pin directions($dirCount) and pins($pinCount)")
 				return None
 			}
 			if (pinCount != pullupCount) {
-				println(s"${name} must have equal number of " +
-				        s"pin pullups(${pullupCount}) and pins(${pinCount})")
+				println(s"$name must have equal number of " +
+				        s"pin pullups($pullupCount) and pins($pinCount)")
 				return None
 			}
 		}
@@ -153,19 +153,19 @@ object PinGroupInstance {
 			Port(pinNames.head, BitsDesc(pinCount), WireDirection(directions.head)))
 
 		val constraint = if (hasPin || hasPins)
-			PinConstraint(pins,
-			              ports,
+			PinConstraint(pins.toSeq,
+			              ports.toSeq,
 			              standard,
-			              constraintPinNames,
-			              directions,
-			              pullups)
+			              constraintPinNames.toSeq,
+			              directions.toSeq,
+			              pullups.toSeq)
 		else if (hasDiffPin || hasDiffPins)
-			DiffPinConstraint(diffPins,
-			                  ports,
+			DiffPinConstraint(diffPins.toSeq,
+			                  ports.toSeq,
 			                  standard,
-			                  constraintPinNames,
-			                  directions,
-			                  pullups)
+			                  constraintPinNames.toSeq,
+			                  directions.toSeq,
+			                  pullups.toSeq)
 		else return None
 
 		Some(PinGroupInstance(name,

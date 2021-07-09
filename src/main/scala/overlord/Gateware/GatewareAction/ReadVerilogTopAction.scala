@@ -5,7 +5,6 @@ import overlord.Gateware.{Port, WireDirection}
 import overlord.Instances.Instance
 import overlord.Game
 import ikuy_utils._
-import toml.Value
 
 import java.nio.file.Path
 
@@ -26,7 +25,7 @@ case class ReadVerilogTopAction(filename: String,
 			instance.instancePorts ++=
 			bs.filter(_.isInstanceOf[VerilogPort])
 				.map(_.asInstanceOf[VerilogPort])
-				.map(p => (p.name -> Port(p.name, p.bits, WireDirection(p.direction))))
+				.map(p => p.name -> Port(p.name, p.bits, WireDirection(p.direction)))
 
 			instance.instanceParameterKeys ++=
 			bs.filter(_.isInstanceOf[VerilogParameterKey])

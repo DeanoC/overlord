@@ -1,8 +1,7 @@
 package overlord.Definitions
 
 import overlord.Gateware.{Gateware, Port, Ports}
-
-import overlord.Software.Software
+import overlord.Software.{RegisterBank, RegisterList, Software}
 import ikuy_utils._
 
 import java.nio.file.Path
@@ -11,15 +10,18 @@ case class Definition(defType: DefinitionType,
                       attributes: Map[String, Variant],
                       ports: Map[String, Port] = Map[String, Port](),
                       parameters: Map[String, Variant] = Map[String, Variant](),
-                      software: Option[SoftwareTrait] = None,
                       gateware: Option[GatewareTrait] = None,
-                      hardware: Option[HardwareTrait] = None)
+                      hardware: Option[HardwareTrait] = None,
+                      registerBanks: Seq[RegisterBank] = Seq[RegisterBank](),
+                      registerLists: Seq[RegisterList] = Seq[RegisterList](),
+                      docs: Seq[String] = Seq[String]()
+                     )
 	extends DefinitionTrait
 
 object Definition {
 	def toDefinitionType(in: String): DefinitionType = {
 		val defTypeName = in.split('.')
-		val tt          = defTypeName.tail
+		val tt          = defTypeName.tail.toSeq
 
 		defTypeName.head.toLowerCase match {
 			case "ram"     => RamDefinitionType(tt)
@@ -47,7 +49,7 @@ object Definition {
 		})
 
 		val sw = if (table.contains("software"))
-			Software(Utils.toArray(table("software")), path)
+			Software(Utils.toArray(table("software")).toSeq, path)
 		else None
 
 		val name = defTypeName.split('.')
@@ -60,10 +62,10 @@ object Definition {
 		val hw = None
 
 		val ports = {
-			(if (table.contains("ports"))
+			if (table.contains("ports"))
 				Ports(Utils.toArray(table("ports")))
-					.map(t => (t.name -> t)).toMap
-			else Map[String, Port]())
+					.map(t => t.name -> t).toMap
+			else Map[String, Port]()
 		}
 
 		val parameters = if (table.contains("parameters"))
@@ -74,6 +76,9 @@ object Definition {
 		           attribs,
 		           ports,
 		           parameters,
-		           sw, gw, hw)
+		           gw, hw,
+		           if(sw.nonEmpty) sw.get.banks else Seq(),
+		           if(sw.nonEmpty) sw.get.registerLists else Seq(),
+		           if(sw.nonEmpty) sw.get.docs else Seq())
 	}
 }
