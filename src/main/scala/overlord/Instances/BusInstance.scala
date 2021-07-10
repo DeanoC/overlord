@@ -4,6 +4,7 @@ import ikuy_utils._
 import overlord.Definitions.DefinitionTrait
 
 import scala.collection.mutable
+import scala.math.Numeric.BigIntIsIntegral
 
 case class BusInstance(ident: String,
                        supplierPrefixes: Seq[String],
@@ -12,13 +13,56 @@ case class BusInstance(ident: String,
                        private val defi: DefinitionTrait
                       ) extends Instance {
 
-	def addConsumer(instance: Instance, address: BigInt, size: BigInt): Unit = {
-		consumerIndices += (instance -> consumers.length)
-		consumers += (address -> size)
+	lazy val busDataWidth: Int    =
+		localParams("bus_data_width").asInstanceOf[IntV].value
+	lazy val busAddrWidth: Int    =
+		localParams("bus_address_width").asInstanceOf[IntV].value
+	lazy val busBaseAddr: BigInt =
+		localParams("bus_base_address").asInstanceOf[BigIntV].value
+	lazy val busBankAlignment: BigInt =
+		localParams("bus_bank_alignment").asInstanceOf[BigIntV].value
+
+	private val fixedAddrConsumers    = mutable.ArrayBuffer[(Instance, BigInt, BigInt)]()
+	private val variableAddrConsumers = mutable.ArrayBuffer[(Instance, BigInt)]()
+
+	def addFixedAddressConsumer(instance: Instance, address: BigInt, size: BigInt): Unit =
+		fixedAddrConsumers += ((instance, address, size))
+
+	def addVariableAddressConsumer(instance: Instance, size: BigInt): Unit =
+		variableAddrConsumers += ((instance, size))
+
+	def computeConsumerAddresses(): Unit = {
+		fixedAddrConsumers.sortInPlaceWith((a, b) => a._2 < b._2)
+
+		var currentAddress = busBaseAddr
+		if (fixedAddrConsumers.nonEmpty && fixedAddrConsumers.head._2 < currentAddress) {
+			println(f"${fixedAddrConsumers.head._1.ident} has invalid fixed addresss%n")
+		}
+		while(fixedAddrConsumers.nonEmpty || variableAddrConsumers.nonEmpty) {
+			val consumeFixed = {
+				(variableAddrConsumers.isEmpty && fixedAddrConsumers.nonEmpty) ||
+				(
+					variableAddrConsumers.nonEmpty && fixedAddrConsumers.nonEmpty &&
+					((currentAddress == fixedAddrConsumers.head._2) ||
+					(currentAddress + variableAddrConsumers.head._2 > fixedAddrConsumers.head._2))
+				)
+			}
+
+			val (instance, address, size) =
+				if(consumeFixed)
+					fixedAddrConsumers.remove(0)
+				else {
+					val (instance, size) = variableAddrConsumers.remove(0)
+					(instance, currentAddress, size)
+				}
+			consumerIndices += (instance -> consumers.length)
+			consumers += (address -> size)
+			currentAddress = (address + size).max(busBaseAddr)
+		}
 	}
 
 	def getIndex(instance: Instance): Int = {
-		if( consumerInstances.contains(instance))
+		if (consumerInstances.contains(instance))
 			consumerIndices(instance)
 		else
 			-1
@@ -26,19 +70,19 @@ case class BusInstance(ident: String,
 
 	def consumerCount: Int = consumers.length
 
-	def consumersVariant: Variant = ArrayV(consumers.flatMap{
+	def consumersVariant: Variant = ArrayV(consumers.flatMap {
 		case (addr, size) => Seq(BigIntV(addr), BigIntV(size))
 	}.toArray)
 
-	def getConsumerAddressAndSize(instance: Instance) : (BigInt, BigInt) = {
+	def getConsumerAddressAndSize(instance: Instance): (BigInt, BigInt) = {
 		val index = getIndex(instance)
-		if(index == -1) return(0,0)
+		if (index == -1) return (0, 0)
 		consumers(index)
 	}
 
 	def consumerInstances: Seq[Instance] = consumerIndices.keysIterator.toSeq
 
-	private var consumers = mutable.ArrayBuffer[(BigInt, BigInt)]()
+	private var consumers       = mutable.ArrayBuffer[(BigInt, BigInt)]()
 	private var consumerIndices = mutable.HashMap[Instance, Int]()
 
 	override def definition: DefinitionTrait = defi
@@ -63,7 +107,7 @@ object BusInstance {
 			"bus_data_width" -> attribs.getOrElse("bus_data_width", IntV(32)) ,
 			"bus_address_width" -> attribs.getOrElse("bus_address_width", IntV(32)) ,
 			"bus_base_address" -> attribs.getOrElse("bus_base_address", BigIntV(0)) ,
-			"bus_bank_size" -> attribs.getOrElse("bus_bank_size", BigIntV(1024))
+			"bus_bank_alignment" -> attribs.getOrElse("bus_bank_alignment", BigIntV(1024))
 			)
 		//@formatter:on
 

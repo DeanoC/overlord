@@ -39,8 +39,7 @@ object Wires {
 			c => {
 				val (sp, ep) = dm.indicesOf(c)
 
-				if (!(sp < 0 || ep < 0 ||
-				      c.first.isEmpty || c.second.isEmpty)) {
+				if (!(sp < 0 || ep < 0 || c.first.isEmpty || c.second.isEmpty)) {
 					val f     = c.first.get
 					val s     = c.second.get
 					val route = dm.routeBetween(sp, ep)
@@ -94,7 +93,7 @@ object Wires {
 					if (sl.port.nonEmpty &&
 					    sl.port.get.direction == InWireDirection())
 						sTmpWires += ((els(0), ->(pr, sl)))
-					else sTmpWires += ((sl -> (pr, els(0))))
+					else sTmpWires += (sl -> (pr, els(0)))
 					None
 				} else Some(sl -> (pr, els))
 			}).flatten.toMap

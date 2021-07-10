@@ -72,9 +72,12 @@ case class Game(name: String,
 		children.find(_.isInstanceOf[BoardInstance])
 			.asInstanceOf[Option[BoardInstance]]
 
-	def getBusesConnectedToCpu(cpu:CpuInstance) : Seq[BusInstance] = {
-		buses.filter(_.consumerInstances.contains(cpu))
-	}
+	def getBusesConnectedTo(instance: Instance) : Seq[BusInstance] =
+		buses.filter(distanceMatrix.connected(_, instance))
+
+	def getDirectBusesConnectedTo(instance: Instance) : Seq[BusInstance] =
+		buses.filter(distanceMatrix.distanceBetween(_, instance) == 1)
+
 }
 
 object Game {
@@ -199,17 +202,7 @@ object Game {
 				.filter(_.isConnected)
 				.map(_.asConnected).toSet
 
-			val dm: DistanceMatrix = DistanceMatrix(expanded)
-
-			val connectionMask = Array.fill[Boolean](dm.dim)(elem = false)
-			for {connected <- setOfConnected
-			     (sp, ep) = dm.indicesOf(connected)} {
-				connectionMask(sp) = true
-				dm.routeBetween(sp, ep).foreach(connectionMask(_) = true)
-			}
-			dm.removeSelfLinks()
-			dm.instanceMask(connectionMask)
-
+			val dm: DistanceMatrix = DistanceMatrix(expanded, setOfConnected.toSeq)
 			val wires = Wires(dm, setOfConnected.toSeq)
 
 			Some(Game(gameName, expanded, setOfConnected.toSeq, dm, wires))

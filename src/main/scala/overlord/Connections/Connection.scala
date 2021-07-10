@@ -1,13 +1,8 @@
 package overlord.Connections
 
-import overlord.Gateware.{
-	InOutWireDirection, InWireDirection,
-	OutWireDirection, WireDirection
-}
-import overlord.Instances.Instance
+import overlord.Instances.{BusInstance, Instance}
 import overlord.{Connections, DefinitionCatalog}
 import ikuy_utils._
-import toml.Value
 
 import scala.collection.mutable
 
@@ -79,7 +74,7 @@ object Connection {
 			case "port_group" => PortGroupConnectionType(
 				Utils.lookupString(table, "first_prefix", ""),
 				Utils.lookupString(table, "second_prefix", ""),
-				Utils.lookupArray(table, "excludes").map(Utils.toString))
+				Utils.lookupArray(table, "excludes").toSeq.map(Utils.toString))
 			case "bus"        => BusConnectionType()
 			case _            =>
 				println(s"$ctype is an unknown connection type")
@@ -92,13 +87,13 @@ object Connection {
 		val table = Utils.toTable(connection)
 
 		if (!table.contains("type")) {
-			println(s"connection ${connection} requires a type field")
+			println(s"connection $connection requires a type field")
 			return None
 		}
 		val conntype = Utils.toString(table("type"))
 
 		if (!table.contains("connection")) {
-			println(s"connection ${conntype} requires a connection field")
+			println(s"connection $conntype requires a connection field")
 			return None
 		}
 
@@ -122,15 +117,20 @@ object Connection {
 	}
 
 	private def connect(unconnected: Seq[Connection],
-	                    unexpanded: Seq[Instance]): Seq[Connection] = {
+	                    unexpanded: Seq[Instance]): Seq[Connection] =
 		(for (c <- unconnected.filter(_.isUnconnected).map(_.asUnconnected)) yield
 			c.connect(unexpanded)).flatten
-	}
+
 
 	def preConnect(unconnected: Seq[Connection],
 	               unexpanded: Seq[Instance]): Unit = {
-		(for (c <- unconnected.filter(_.isUnconnected).map(_.asUnconnected))
-			c.preConnect(unexpanded))
+		for (c <- unconnected.filter(_.isUnconnected).map(_.asUnconnected))
+			c.preConnect(unexpanded)
+
+		unexpanded.filter(_.isInstanceOf[BusInstance])
+			.map(_.asInstanceOf[BusInstance])
+			.foreach(_.computeConsumerAddresses())
+
 	}
 
 	private def expand(instances: Seq[Instance],
@@ -178,21 +178,21 @@ object Connection {
 					val m: Instance = {
 						val mident = if (con.firstCount == 1) con.firstFullName
 						else s"${con.firstFullName}.$index"
-						(expanded.find(p => p.ident == s"$mident") match {
+						expanded.find(p => p.ident == s"$mident") match {
 							case Some(value) => value
 							case None        => println(s"$mident isn't a instance name")
 								return Seq()
-						})
+						}
 					}
 
 					val s: Instance = {
 						val sident = if (con.secondaryCount == 1) con.secondFullName
-						else s"${con.secondFullName}.${index}"
-						(expanded.find(p => p.ident == s"$sident") match {
+						else s"${con.secondFullName}.$index"
+						expanded.find(p => p.ident == s"$sident") match {
 							case Some(value) => value
 							case None        => println(s"$sident isn't a instance name")
 								return Seq()
-						})
+						}
 					}
 
 					result += (con match {
@@ -226,7 +226,7 @@ object Connection {
 
 	def expandAndConnect(unconnected: Seq[Connection],
 	                     unexpanded: Seq[Instance]):
-	((Seq[Instance], Seq[Connection])) = {
+	(Seq[Instance], Seq[Connection]) = {
 		val connected = Connection.connect(unconnected, unexpanded)
 
 		val expandableInstances = unexpanded.filter(_.replicationCount > 1)
@@ -248,7 +248,7 @@ object Connection {
 			expandedConnection.filter(c => o.firstFullName == c.firstFullName &&
 			                               o.secondFullName == c.secondFullName)
 
-		val dupToUse    = (for (dups <- dupsseq) yield {
+		val dupToUse    = for (dups <- dupsseq) yield {
 
 			val expli = dups.find(_.asConnected
 				                      .connectionPriority
@@ -263,7 +263,7 @@ object Connection {
 			else if (wildc.nonEmpty) wildc.get
 			else if (grpc.nonEmpty) grpc.get
 			else dups.head
-		})
+		}
 		val connections = expandedConnection.diff(dupsseq) ++ dupToUse
 
 		(expanded, connections)

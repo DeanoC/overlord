@@ -86,8 +86,7 @@ object Top {
 			sb ++= s"$comma\tinput wire ${sanitizeIdent(loc.fullName)}"
 		} else if (loc.port.nonEmpty) {
 			val port = loc.port.get
-			val wdir = port.direction
-			val dir  = s"$wdir"
+			val dir  = s"${port.direction}"
 			val bits = if (port.width.singleBit) "" else s"${port.width.text}"
 			sb ++= s"$comma\t$dir wire $bits ${sanitizeIdent(loc.fullName)}"
 		}
@@ -101,10 +100,8 @@ object Top {
 
 		var comma = ""
 
-		for {wire <-
-			     wires.filter(_.isStartPinOrClock)
-		     loc = wire.startLoc} {
-			val s = writeTopWire(loc, comma)
+		for (wire <- wires.filter(_.isStartPinOrClock)) {
+			val s = writeTopWire(wire.startLoc, comma)
 			if (s.nonEmpty) {
 				sb ++= s
 				comma = ",\n"
@@ -153,24 +150,15 @@ object Top {
 		for {wire <- cs0} {
 			if (wire.startLoc.port.nonEmpty) {
 				sb ++= s"$comma\t.${sanitizeIdent(wire.startLoc.port.get.name)}("
-				val loc = wire.endLocs.length match {
+				val oloc = wire.endLocs.length match {
 					case 0 => None
 					case 1 => Some(wire.endLocs.head)
 					case _ => wire.endLocs.find(_.instance == instance)
 				}
 
-				if (loc.nonEmpty) {
-					if (wire.startLoc.isClock) {
-						val clk = wire.startLoc.instance.asInstanceOf[ClockInstance]
-						sb ++= s"${sanitizeIdent(clk.ident)})"
-					} else if (wire.startLoc.isPin) {
-						val pg = wire.startLoc.instance.asInstanceOf[PinGroupInstance]
-						sb ++= s"${sanitizeIdent(pg.ident)})"
-					} else if (loc.get.port.nonEmpty) {
-						sb ++= s"${sanitizeIdent(wire.startLoc.fullName)})"
-					} else
-						sb ++= s"${sanitizeIdent(wire.endLocs.head.fullName)})"
-				} else
+				if (oloc.nonEmpty && (!oloc.get.isChip))
+					sb ++= s"${sanitizeIdent(oloc.get.fullName)})"
+				else
 					sb ++= s"${sanitizeIdent(wire.startLoc.fullName)})"
 				comma = ",\n"
 			}

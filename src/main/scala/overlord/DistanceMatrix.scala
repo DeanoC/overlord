@@ -15,7 +15,8 @@ case class DistanceMatrix(instanceArray: Array[Instance]) {
 	}
 	private val routeMatrix    = Array.ofDim[Seq[Int]](dim, dim)
 
-	def +=(s: Int, e: Int, v: (Int, Seq[Int])): Unit = {
+	def +=(tuple:(Int, Int, (Int, Seq[Int]))): Unit = {
+		val (s, e, v) = tuple
 		distanceMatrix(s)(e) = v._1
 		routeMatrix(s)(e) = v._2
 	}
@@ -27,12 +28,12 @@ case class DistanceMatrix(instanceArray: Array[Instance]) {
 	def between(s: Int, e: Int): (Int, Seq[Int]) =
 		(distanceMatrix(s)(e), routeMatrix(s)(e))
 
-	def rowDistance(r: Int): Seq[Int] = distanceMatrix(r)
+	def rowDistance(r: Int): Seq[Int] = distanceMatrix(r).toSeq
 
 	def columnDistance(c: Int): Seq[Int] =
 		for (i <- 0 until dim) yield distanceMatrix(i)(c)
 
-	def rowBetween(r: Int): Seq[Seq[Int]] = routeMatrix(r)
+	def rowBetween(r: Int): Seq[Seq[Int]] = routeMatrix(r).toSeq
 
 	def columnBetween(c: Int): Seq[Seq[Int]] =
 		for (i <- 0 until dim) yield routeMatrix(i)(c)
@@ -42,6 +43,11 @@ case class DistanceMatrix(instanceArray: Array[Instance]) {
 	def indexOf(c: Instance): Int = instanceArray.indexOf(c)
 
 	def indexOf(c: InstanceLoc): Int = indexOf(c.instance)
+
+	def distanceBetween(a:Instance, b:Instance): Int =
+		distanceBetween(indexOf(a), indexOf(b))
+
+	def connected(a:Instance, b:Instance): Boolean = distanceBetween(a, b) > 0
 
 	def indicesOf(c: Connected): (Int, Int) = (
 		if (c.first.nonEmpty) indexOf(c.first.get) else -1,
@@ -63,14 +69,14 @@ case class DistanceMatrix(instanceArray: Array[Instance]) {
 		sb.result()
 	}
 
-	def removeSelfLinks(): Unit =
+	private def removeSelfLinks(): Unit =
 		for (i <- 0 until dim) distanceMatrix(i)(i) = Int.MaxValue
 
-	def instanceMask(maskArray: Array[Boolean]): Unit = {
+	private def instanceMask(maskArray: Array[Boolean]): Unit = {
 		assert(maskArray.length == dim)
 
 		for {i <- 0 until dim
-		     if !(maskArray(i))
+		     if !maskArray(i)
 		     j <- 0 until dim} {
 			distanceMatrix(i)(j) = Int.MaxValue
 			distanceMatrix(j)(i) = Int.MaxValue
@@ -112,7 +118,7 @@ object DistanceMatrix {
 			).toArray.flatten
 	}
 
-	def apply(instances: Seq[Instance]): DistanceMatrix = {
+	def apply(instances: Seq[Instance], connected: Seq[Connected]): DistanceMatrix = {
 		val instancesArray = flattenInstances(instances)
 		val dm             = DistanceMatrix(instancesArray)
 
@@ -127,15 +133,15 @@ object DistanceMatrix {
 		for {i <- 0 until dm.dim}
 			dm += (i, i, (0, Seq(i)))
 
-		// top level instances are connected to all other top levels
-		for {sinst <- instances
-		     einst <- instances
-		     if sinst != einst
-		     if !dm.virtualContainers.contains(sinst)
-		     if !dm.virtualContainers.contains(einst)
-		     si = instancesArray.indexOf(sinst)
-		     ei = instancesArray.indexOf(einst)
-		     } {
+		// connected are 1 links
+		for(con <- connected
+		    if con.first.isDefined
+		    if con.second.isDefined;
+		    sinst = con.first.get.instance;
+				einst = con.second.get.instance;
+				si = instancesArray.indexOf(sinst);
+				ei = instancesArray.indexOf(einst)
+		    ) {
 			dm += (si, ei, (1, Seq(ei)))
 			dm += (ei, si, (1, Seq(si)))
 		}
@@ -150,10 +156,8 @@ object DistanceMatrix {
 			dm += (sp, ep, (1, Seq(ep)))
 			dm += (ep, sp, (1, Seq(sp)))
 		}
-		// virtual containers are promoted to top level and have single
-		// link to all topleve and siblings
-		// (TODO proper hierachy)
-		// top level to virtual children
+
+		// top level to virtual container children
 		for {containerInstance <- dm.virtualContainers
 		     container = containerInstance.asInstanceOf[Container]
 		     child <- container.children
@@ -165,42 +169,24 @@ object DistanceMatrix {
 			dm += (sp, ep, (1, Seq(ep)))
 			dm += (ep, sp, (1, Seq(sp)))
 		}
-		// virtual children to virtual children
-		for {scontainerInstance <- dm.virtualContainers
-		     scontainer = scontainerInstance.asInstanceOf[Container]
-		     schild <- scontainer.children
-		     econtainerInstance <- dm.virtualContainers
-		     econtainer = econtainerInstance.asInstanceOf[Container]
-		     echild <- econtainer.children
-		     if schild != echild
-		     sp = instancesArray.indexOf(schild)
-		     ep = instancesArray.indexOf(echild)
-		     } {
-			dm += (sp, ep, (1, Seq(ep)))
-			dm += (ep, sp, (1, Seq(sp)))
-		}
 
+		// compute the distance between instances
 		for {sp <- 0 until dm.dim
 		     ep <- 0 until dm.dim} {
 			val path = new Path(sp, ep)
 			computeDistanceBetween(dm, path.sp, path)
 		}
-		//		println(dm.toString)
 
-		/*
-		val setOfConnected = connections
-			.filter(_.isConnected)
-			.map(_.asConnected)
-			.toSet
-		for {connection <- setOfConnected
-				 first = connection.first.get
-				 second = connection.second.get
-				 sp = instancesArray.indexOf(connection.first.get)
-				 ep = instancesArray.indexOf(connection.second.get)
-				 }
-			println(s"route between $sp and $ep is ${dm.routeBetween(sp, ep)}" +
-							s" of distance ${dm.distanceBetween(sp, ep)}")
-	*/
+		// remove all non connected left overs
+		val connectionMask = Array.fill[Boolean](dm.dim)(elem = false)
+		for {connected <- connected
+		     (sp, ep) = dm.indicesOf(connected)} {
+			connectionMask(sp) = true
+			dm.routeBetween(sp, ep).foreach(connectionMask(_) = true)
+		}
+		dm.removeSelfLinks()
+		dm.instanceMask(connectionMask)
+
 		dm
 	}
 

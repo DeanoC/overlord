@@ -15,9 +15,9 @@ case class CpuInstance(ident: String,
 
 	lazy val width : Int =
 		Utils.lookupInt(definition.attributes, key = "width", or = 32)
-	lazy val triple          : String =
+	lazy val triple: String =
 		Utils.lookupString(definition.attributes, key = "triple", or = "unknown-unknown-unknown")
-	lazy val sanitized_triple: String = triple.replace("""-""", "")
+	lazy val sanitizedTriple: String = triple.replace("""-""", "")
 
 }
 

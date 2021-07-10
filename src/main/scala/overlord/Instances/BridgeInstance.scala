@@ -1,12 +1,15 @@
 package overlord.Instances
 
-import ikuy_utils.Variant
+import ikuy_utils.{BigIntV, IntV, Variant}
 import overlord.Definitions.DefinitionTrait
-import toml.Value
 
 case class BridgeInstance(ident: String,
+                          private val localParams: Map[String, Variant],
                           private val defi: DefinitionTrait
                          ) extends Instance {
+
+	lazy val addressWindowWidth: Int =
+		localParams("address_window_width").asInstanceOf[BigIntV].value.toInt
 
 	override def definition:DefinitionTrait = defi
 
@@ -20,6 +23,11 @@ object BridgeInstance {
 	          definition: DefinitionTrait,
 	          attribs: Map[String, Variant]
 	         ): Option[BridgeInstance] = {
-		Some(BridgeInstance(ident, definition))
+		//@formatter:off
+		val iParams = Map[String, Variant]( elems =
+	      "address_window_width" -> attribs.getOrElse("address_window_width", BigIntV(16)),
+	    )
+		//@formatter:on
+		Some(BridgeInstance(ident, iParams, definition))
 	}
 }

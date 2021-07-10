@@ -69,14 +69,13 @@ object Svd {
 		private val definitionsWritten = mutable.HashMap[String, String]()
 
 		private def outputRegisters(s: Instance) : Seq[xml.Elem] ={
-			if(s.instanceRegisterBanks.isEmpty) return Seq[xml.Elem]()
+			if(s.registerBanks.isEmpty) return Seq[xml.Elem]()
 
-			for(bank <- s.instanceRegisterBanks.toIndexedSeq) yield {
-				val rl = s.instanceRegisterLists.find(_.name == bank.registerListName) match {
+			for(bank <- s.registerBanks.toIndexedSeq) yield {
+				val rl = s.registerLists.find(_.name == bank.registerListName) match {
 					case Some(value) => value
 					case None =>
-						println(s"Peripheral ${s.ident} ${bank.registerListName} is not found in " +
-						        s"the definition")
+						println(s"Peripheral ${s.ident} ${bank.registerListName} is not found")
 						return Seq[xml.Elem]()
 				}
 
