@@ -20,12 +20,11 @@ object Top {
 
 		val sb = new StringBuilder()
 
-		sb ++=
-		s"""module ${sanitizeIdent(game.name)}_top (\n"""
+		sb ++= s"module ${sanitizeIdent(game.name)}_top (\n"
 
 		sb ++= writeTopWires(game.wires)
 
-		sb ++= s"""\n);\n"""
+		sb ++= s"\n);\n"
 
 		sb ++= writeChipToChipWires(game.wires)
 

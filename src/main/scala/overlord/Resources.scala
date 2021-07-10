@@ -4,15 +4,28 @@ import ikuy_utils.{ArrayV, Utils}
 
 import java.nio.file.{Files, Path}
 import overlord.Definitions.{DefinitionTrait, DefinitionType}
+import overlord.Instances.BoardInstance
 
 import scala.language.postfixOps
 
+object Resources {
+	def projectRootPath(): Path =
+		Path.of(new java.io.File(classOf[BoardInstance]
+			                         .getProtectionDomain
+			                         .getCodeSource
+			                         .getLocation.toURI).getCanonicalPath)
+			.getParent.getParent.getParent
+
+	def stdResourcePath(): Path = {
+		projectRootPath().resolve("src/main/resources/")
+	}
+}
+
 case class Resources(path: Path) {
 	def loadCatalogs(): Map[DefinitionType, DefinitionTrait] = {
-		import toml.Value
 		val parsed =
 			Utils.readToml("catalogs.toml",
-			               path.resolve("catalogs.toml").toAbsolutePath,
+			               path.resolve("catalogs.toml"),
 			               getClass)
 
 		if (!parsed.contains("resources")) {
@@ -30,6 +43,6 @@ case class Resources(path: Path) {
 			val name = Utils.toString(resource)
 			DefinitionCatalog.fromFile(s"$name",
 			                           path.resolve("catalogs/"))
-		}).flatten.flatten.map(f => (f.defType -> f)).toMap
+		}).flatten.flatten.map(f => f.defType -> f).toMap
 	}
 }

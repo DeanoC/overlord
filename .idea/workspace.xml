@@ -4,21 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="73b7f681-932b-4979-9f4f-6aee48997ac8" name="Default Changelist" comment="Fixed Distance Matrix to only connect Top items that are connected&#10;Moved more functionality into Distance Matrix&#10;Bridged bus address calculation now correct&#10;added pow2 and log2 to Utils">
+    <list default="true" id="73b7f681-932b-4979-9f4f-6aee48997ac8" name="Default Changelist" comment="Base C Header implementation WIP&#10;Bridge address working&#10;Bus fixed and variable address fitter&#10;Distance Matrix no longer assumed tops are connected.&#10;Moved more in Distance Matrix&#10;Game now stores Distance Matrix and Wires&#10;Fixes to naming in the top file.&#10;pow2 and log2 in Utils">
       <change beforePath="$USER_HOME$/.sbt/1.0/staging/a7772c47d5d7e84d3e85/ikuy_utils/src/main/scala/ikuy_utils/Utils.scala" beforeDir="false" afterPath="$USER_HOME$/.sbt/1.0/staging/a7772c47d5d7e84d3e85/ikuy_utils/src/main/scala/ikuy_utils/Utils.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/output/BaseCHeaders.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/BaseCHeaders.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/etc/CMSIS-SVD.xsd" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/etc/CMSIS-SVD.xsd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/Main.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/Main.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/output/Svd.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Svd.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/output/Top.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Top.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Connection.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Connection.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Unconnected.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Unconnected.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Wire.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Wire.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/DistanceMatrix.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/DistanceMatrix.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Game.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Game.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/BridgeInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/BridgeInstance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/BusInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/BusInstance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/CpuInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/CpuInstance.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Resources.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Resources.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -114,11 +107,11 @@
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs/other.resetti" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/resources" />
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs/ios/uart" />
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs/other.resetti" />
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs/cpus/vexriscv" />
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs" />
-      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/cpus" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="overlord" />
@@ -265,7 +258,7 @@
       <workItem from="1609405058047" duration="3913000" />
       <workItem from="1625569018494" duration="240000" />
       <workItem from="1625569278102" duration="38000" />
-      <workItem from="1625569338062" duration="93973000" />
+      <workItem from="1625569338062" duration="98659000" />
     </task>
     <task id="LOCAL-00001" summary="Major work on connection expansion and block connections&#10;Refactor and reorg instances, constraits, actions etc.&#10;moved ps8 docs to lower case">
       <created>1605964442645</created>
@@ -386,7 +379,14 @@
       <option name="project" value="LOCAL" />
       <updated>1625828244495</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="Base C Header implementation WIP&#10;Bridge address working&#10;Bus fixed and variable address fitter&#10;Distance Matrix no longer assumed tops are connected.&#10;Moved more in Distance Matrix&#10;Game now stores Distance Matrix and Wires&#10;Fixes to naming in the top file.&#10;pow2 and log2 in Utils">
+      <created>1625932321737</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1625932321737</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -438,31 +438,11 @@
     <MESSAGE value="Added gateware register definitions and banks handling&#10;ReadTomlRegistersAction can read toml files produced by sbt into gateware&#10;Cleanup code analysis warnings" />
     <MESSAGE value="Begining of C Header output&#10;Moved distance matrix into game from Top&#10;fixed bug in Report" />
     <MESSAGE value="Fixed Distance Matrix to only connect Top items that are connected&#10;Moved more functionality into Distance Matrix&#10;Bridged bus address calculation now correct&#10;added pow2 and log2 to Utils" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed Distance Matrix to only connect Top items that are connected&#10;Moved more functionality into Distance Matrix&#10;Bridged bus address calculation now correct&#10;added pow2 and log2 to Utils" />
+    <MESSAGE value="Base C Header implementation WIP" />
+    <MESSAGE value="Base C Header implementation WIP&#10;Bridge address working&#10;Bus fixed and variable address fitter&#10;Distance Matrix no longer assumed tops are connected.&#10;Moved more in Distance Matrix&#10;Game now stores Distance Matrix and Wires&#10;Fixes to naming in the top file.&#10;pow2 and log2 in Utils" />
+    <option name="LAST_COMMIT_MESSAGE" value="Base C Header implementation WIP&#10;Bridge address working&#10;Bus fixed and variable address fitter&#10;Distance Matrix no longer assumed tops are connected.&#10;Moved more in Distance Matrix&#10;Game now stores Distance Matrix and Wires&#10;Fixes to naming in the top file.&#10;pow2 and log2 in Utils" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <breakpoint enabled="true" type="java-exception">
-          <properties class="java.lang.ArrayIndexOutOfBoundsException" package="java.lang" />
-          <option name="timeStamp" value="174" />
-        </breakpoint>
-        <breakpoint enabled="true" type="java-exception">
-          <properties class="java.lang.IndexOutOfBoundsException" package="java.lang" />
-          <option name="timeStamp" value="248" />
-        </breakpoint>
-        <line-breakpoint enabled="true" type="scala-line">
-          <url>file://$PROJECT_DIR$/src/main/scala/overlord/Connections/Unconnected.scala</url>
-          <line>56</line>
-          <option name="timeStamp" value="254" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="scala-line">
-          <url>file://$PROJECT_DIR$/src/main/scala/output/Top.scala</url>
-          <line>162</line>
-          <option name="timeStamp" value="329" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <pin-to-top-manager>
       <pinned-members>
         <PinnedItemInfo parentTag="overlord.DefinitionCatalog" memberName="catalogs" />

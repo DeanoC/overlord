@@ -21,14 +21,14 @@ object Main {
 
 	def main(args: Array[String]): Unit = {
 		if (args.length == 0) {
-			println(usage);
+			println(usage)
 			sys.exit(1)
 		}
 		type OptionMap = Map[Symbol, Any]
 
 		@tailrec
 		def nextOption(map: OptionMap, list: List[String]): OptionMap = {
-			def isSwitch(s: String) = (s(0) == '-')
+			def isSwitch(s: String) = s(0) == '-'
 
 			list match {
 				case Nil              => map
@@ -62,28 +62,22 @@ object Main {
 
 		val options = nextOption(Map(), args.toList)
 		if (!options.contains(Symbol("infile"))) {
-			println(usage);
-			println("filename is required");
+			println(usage)
+			println("filename is required")
 			sys.exit(1)
 		}
 
 		val filename = options(Symbol("infile")).asInstanceOf[String]
 		if (!Files.exists(Path.of(filename))) {
-			println(usage);
-			println(s"${filename} does not exists");
+			println(usage)
+			println(s"$filename does not exists")
 			sys.exit(1)
 		}
 
-		Game.pathStack.push(
-			Path.of((new java.io.File(classOf[BoardInstance]
-				                          .getProtectionDomain
-				                          .getCodeSource
-				                          .getLocation.toURI)).getCanonicalPath)
-				.getParent.getParent.getParent)
+		Game.pathStack.push(Resources.projectRootPath())
 
-		val stdResources = Resources(Game.pathStack
-			                             .top
-			                             .resolve("src/main/resources/"))
+		val stdResources = Resources(Resources.stdResourcePath())
+
 		val resources    =
 			if (!options.contains(Symbol("resources"))) None
 			else Some(overlord.Resources(Path.of(options(Symbol("resources"))
@@ -112,7 +106,7 @@ object Main {
 		val game = Game(gameName, filePath, out, chipCatalogs) match {
 			case Some(game) => game
 			case None       =>
-				println(s"Error parsing ${filename}")
+				println(s"Error parsing $filename")
 				sys.exit()
 		}
 
