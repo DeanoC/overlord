@@ -4,23 +4,23 @@ import ikuy_utils._
 import overlord.Definitions.DefinitionTrait
 
 import scala.collection.mutable
-import scala.math.Numeric.BigIntIsIntegral
 
 case class BusInstance(ident: String,
-                       supplierPrefixes: Seq[String],
-                       consumerPrefix: String,
-                       private val localParams: Map[String, Variant],
                        private val defi: DefinitionTrait
                       ) extends Instance {
 
-	lazy val busDataWidth: Int    =
-		localParams("bus_data_width").asInstanceOf[IntV].value
-	lazy val busAddrWidth: Int    =
-		localParams("bus_address_width").asInstanceOf[IntV].value
-	lazy val busBaseAddr: BigInt =
-		localParams("bus_base_address").asInstanceOf[BigIntV].value
-	lazy val busBankAlignment: BigInt =
-		localParams("bus_bank_alignment").asInstanceOf[BigIntV].value
+	lazy val busDataWidth    : Int         =
+		Utils.lookupInt(attributes, "bus_data_width", 32)
+	lazy val busAddrWidth    : Int         =
+		Utils.lookupInt(attributes, "bus_address_width", 32)
+	lazy val busBaseAddr     : BigInt      =
+		Utils.lookupBigInt(attributes, "bus_base_address", 0)
+	lazy val busBankAlignment: BigInt      =
+		Utils.lookupBigInt(attributes, "bus_bank_alignment", 1024)
+	lazy val supplierPrefixes: Seq[String] =
+		Utils.lookupStrings(attributes, "supplier_prefix", "supplier_")
+	lazy val consumerPrefix  : String      =
+		Utils.lookupString(attributes, "consumer_prefix", "consumer${index}_")
 
 	private val fixedAddrConsumers    = mutable.ArrayBuffer[(Instance, BigInt, BigInt)]()
 	private val variableAddrConsumers = mutable.ArrayBuffer[(Instance, BigInt)]()
@@ -38,18 +38,18 @@ case class BusInstance(ident: String,
 		if (fixedAddrConsumers.nonEmpty && fixedAddrConsumers.head._2 < currentAddress) {
 			println(f"${fixedAddrConsumers.head._1.ident} has invalid fixed addresss%n")
 		}
-		while(fixedAddrConsumers.nonEmpty || variableAddrConsumers.nonEmpty) {
+		while (fixedAddrConsumers.nonEmpty || variableAddrConsumers.nonEmpty) {
 			val consumeFixed = {
 				(variableAddrConsumers.isEmpty && fixedAddrConsumers.nonEmpty) ||
 				(
 					variableAddrConsumers.nonEmpty && fixedAddrConsumers.nonEmpty &&
 					((currentAddress == fixedAddrConsumers.head._2) ||
-					(currentAddress + variableAddrConsumers.head._2 > fixedAddrConsumers.head._2))
-				)
+					 (currentAddress + variableAddrConsumers.head._2 > fixedAddrConsumers.head._2))
+					)
 			}
 
 			val (instance, address, size) =
-				if(consumeFixed)
+				if (consumeFixed)
 					fixedAddrConsumers.remove(0)
 				else {
 					val (instance, size) = variableAddrConsumers.remove(0)
@@ -90,9 +90,6 @@ case class BusInstance(ident: String,
 	override def copyMutate[A <: Instance](nid: String): BusInstance =
 		copy(ident = nid)
 
-	override def parameters: Map[String, Variant] =
-		super.parameters ++ localParams
-
 	override val shared: Boolean = true
 }
 
@@ -102,27 +99,16 @@ object BusInstance {
 	          attribs: Map[String, Variant]
 	         ): Option[BusInstance] = {
 
-		//@formatter:off
-		val iParams = Map[String, Variant]( elems =
-			"bus_data_width" -> attribs.getOrElse("bus_data_width", IntV(32)) ,
-			"bus_address_width" -> attribs.getOrElse("bus_address_width", IntV(32)) ,
-			"bus_base_address" -> attribs.getOrElse("bus_base_address", BigIntV(0)) ,
-			"bus_bank_alignment" -> attribs.getOrElse("bus_bank_alignment", BigIntV(1024))
-			)
-		//@formatter:on
+		val bus = BusInstance(ident, definition)
 
-		val supplierPrefixes = Utils.lookupStrings(definition.attributes,
-		                                           "supplier_prefix",
-		                                           "supplier_")
+		bus.mergeParameter(attribs, "bus_data_width")
+		bus.mergeParameter(attribs, "bus_address_width")
+		bus.mergeParameter(attribs, "bus_base_address")
+		bus.mergeParameter(attribs, "bus_bank_alignment")
+		bus.mergeParameter(attribs, "supplier_prefix")
+		bus.mergeParameter(attribs, "consumer_prefix")
 
-		val consumerPrefix = Utils.lookupString(definition.attributes,
-		                                        "consumer_prefix",
-		                                        "consumers_${index}_")
 
-		Some(BusInstance(ident,
-		                 supplierPrefixes,
-		                 consumerPrefix,
-		                 iParams,
-		                 definition))
+		Some(bus)
 	}
 }

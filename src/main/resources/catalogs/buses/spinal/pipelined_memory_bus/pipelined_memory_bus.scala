@@ -198,7 +198,7 @@ object PipelinedMemoryBus {
 		val io = new Bundle {
 			val iBus      = slave(IBusSimpleBus())
 			val dBus      = slave(DBusSimpleBus())
-			val consumers = Array.fill(consumerBuses.length) {
+			val consumer = Array.fill(consumerBuses.length) {
 				master(pmb(busConfig))
 			}
 		}
@@ -214,7 +214,7 @@ object PipelinedMemoryBus {
 		                          pipelineMaster = true)
 
 		for (i <- 0 until consumerBuses.length)
-			mainBusMapping(i)._1 <> io.consumers(i)
+			mainBusMapping(i)._1 <> io.consumer(i)
 
 		arb.io.iBus <> io.iBus
 		arb.io.dBus <> io.dBus
@@ -279,10 +279,10 @@ object PipelinedMemoryBus {
 		val (consumers, memorySpaces) = specification.unzip
 
 		val hits: Seq[Bool] =
-			for ((slaveBus, memorySpace) <- specification) yield {
+			for ((consumerBus, memorySpace) <- specification) yield {
 				val hit = memorySpace.hit(producerPipelined.cmd.address)
-				slaveBus.cmd.valid := producerPipelined.cmd.valid && hit
-				slaveBus.cmd.payload := producerPipelined.cmd.payload.resized
+				consumerBus.cmd.valid := producerPipelined.cmd.valid && hit
+				consumerBus.cmd.payload := producerPipelined.cmd.payload.resized
 				hit
 			}
 

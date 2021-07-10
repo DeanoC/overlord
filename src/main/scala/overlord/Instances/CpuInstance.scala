@@ -5,19 +5,21 @@ import overlord.Definitions.DefinitionTrait
 import toml.Value
 
 case class CpuInstance(ident: String,
-                       primary_boot: Boolean,
                        private val defi: DefinitionTrait
                       ) extends Instance {
+	lazy val primaryBoot: Boolean =
+		Utils.lookupBoolean(attributes, "primary_boot", or = false)
+	lazy val width : Int = Utils.lookupInt(attributes, "width", 32)
+	lazy val triple: String =
+		Utils.lookupString(attributes, key = "triple", or = "unknown-unknown-unknown")
+
+	lazy val sanitizedTriple: String = triple.replace("""-""", "")
+
 	override def definition: DefinitionTrait = defi
 
 	override def copyMutate[A <: Instance](nid: String): CpuInstance =
 		copy(ident = nid)
 
-	lazy val width : Int =
-		Utils.lookupInt(definition.attributes, key = "width", or = 32)
-	lazy val triple: String =
-		Utils.lookupString(definition.attributes, key = "triple", or = "unknown-unknown-unknown")
-	lazy val sanitizedTriple: String = triple.replace("""-""", "")
 
 }
 
@@ -27,10 +29,10 @@ object CpuInstance {
 	          attribs: Map[String, Variant]
 	         ): Option[CpuInstance] = {
 
-		val primary_boot = Utils.lookupBoolean(attribs,
-		                                       key = "primary_boot",
-		                                       or = false)
+		val cpu  = CpuInstance(ident, definition)
 
-		Some(CpuInstance(ident, primary_boot, definition))
+		cpu.mergeParameter(attribs, "primary_boot")
+
+		Some(cpu)
 	}
 }

@@ -48,7 +48,6 @@ case class BoardDefinitionType(ident: Seq[String]
 trait DefinitionTrait {
 	val defType   : DefinitionType
 	val ports     : Map[String, Port]
-	val parameters: Map[String, Variant]
 	val attributes: Map[String, Variant]
 
 	val gateware  : Option[GatewareTrait]

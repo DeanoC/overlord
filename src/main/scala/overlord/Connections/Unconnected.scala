@@ -218,9 +218,9 @@ case class Unconnected(connectionType: ConnectionType,
 
 			val other = if (!isMainBus) mainIL.instance else secondaryIL.instance
 
-			val busBankAlignment = Utils.lookupBigInt(bus.parameters,
-			                                     "bus_bank_alignment",
-			                                     1024)
+			val busBankAlignment = Utils.lookupBigInt(bus.attributes,
+			                                          "bus_bank_alignment",
+			                                          1024)
 
 			val connectionSize = Utils.lookupBigInt(attributes,
 			                                        key = "size_in_bytes",
@@ -234,7 +234,7 @@ case class Unconnected(connectionType: ConnectionType,
 					ram.sizeInBytes match {
 						case Some(v) => v
 						case None    =>
-							Utils.lookupBigInt(ram.definition.attributes,
+							Utils.lookupBigInt(ram.attributes,
 							                   "size_in_bytes",
 							                   connectionSize)
 					}
@@ -287,13 +287,13 @@ case class Unconnected(connectionType: ConnectionType,
 		// bridges are special
 		val otherPrefixes =
 			if (other.isInstanceOf[BridgeInstance])
-				Utils.lookupStrings(other.definition.attributes,
+				Utils.lookupStrings(other.attributes,
 				                    bus.definition.defType.ident.head,
 				                    "bus_")
-			else if (mainIsSupplier) Utils.lookupStrings(other.definition.attributes,
+			else if (mainIsSupplier) Utils.lookupStrings(other.attributes,
 			                                             "consumer_prefix",
 			                                             "bus_")
-			else Utils.lookupStrings(other.definition.attributes,
+			else Utils.lookupStrings(other.attributes,
 			                         "supplier_prefix",
 			                         "bus_")
 

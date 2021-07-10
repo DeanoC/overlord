@@ -57,7 +57,7 @@ object OutputGateware {
 				case _                => Map[String, Variant]()
 			}
 
-			val parameters = instance.parameters ++
+			val parameters = instance.attributes ++
 			                 conParameters ++
 			                 instanceSpecificParameters
 

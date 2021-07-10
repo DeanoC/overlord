@@ -9,7 +9,6 @@ import java.nio.file.Path
 case class Definition(defType: DefinitionType,
                       attributes: Map[String, Variant],
                       ports: Map[String, Port] = Map[String, Port](),
-                      parameters: Map[String, Variant] = Map[String, Variant](),
                       gateware: Option[GatewareTrait] = None,
                       hardware: Option[HardwareTrait] = None,
                       registerBanks: Seq[RegisterBank] = Seq[RegisterBank](),
@@ -68,14 +67,9 @@ object Definition {
 			else Map[String, Port]()
 		}
 
-		val parameters = if (table.contains("parameters"))
-			Utils.toTable(table("parameters"))
-		else Map[String, Variant]()
-
 		Definition(toDefinitionType(defTypeName),
 		           attribs,
 		           ports,
-		           parameters,
 		           gw, hw,
 		           if(sw.nonEmpty) sw.get.banks else Seq(),
 		           if(sw.nonEmpty) sw.get.registerLists else Seq(),

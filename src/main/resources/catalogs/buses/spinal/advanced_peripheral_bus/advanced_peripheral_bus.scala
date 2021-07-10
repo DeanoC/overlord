@@ -77,7 +77,7 @@ object AdvancedPeripheralBus {
 
 		val io = new Bundle {
 			val supplier  = slave(Apb3(busConfig))
-			val consumers = Array.fill(consumerBuses.length) {
+			val consumer = Array.fill(consumerBuses.length) {
 				master(Apb3(busConfig))
 			}
 		}
@@ -89,7 +89,7 @@ object AdvancedPeripheralBus {
 		Apb3Decoder(io.supplier, busMapping)
 
 		for (i <- 0 until consumerBuses.length)
-			busMapping(i)._1 <> io.consumers(i)
+			busMapping(i)._1 <> io.consumer(i)
 	}
 
 }

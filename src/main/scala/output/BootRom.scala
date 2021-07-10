@@ -12,10 +12,12 @@ object BootRom {
 
 		println(s"Creating BootRom projects at $out")
 
-		val primaryBooters = game.cpus.flatMap { c =>
-			if (c.primary_boot) Some(c)
-			else None
-		}
+		val primaryBooters =
+			if (game.cpus.length == 1) Seq(game.cpus.head)
+			else game.cpus.flatMap { c =>
+				if (c.primaryBoot) Some(c)
+				else None
+			}
 
 		if (primaryBooters.isEmpty) {
 			println("There must be at least 1 primary boot cpu if any cpus")
@@ -42,8 +44,8 @@ object BootRom {
 		}
 
 		for (booter <- booters) {
-			val triple    = Utils.toString(booter.definition.attributes("triple"))
-			val sanTriple = triple.replace("""-""", "")
+			val triple    = Utils.toString(booter.attributes("triple"))
+			val sanTriple = triple.replace("-", "")
 			val dir       = out.resolve(sanTriple + "_primary_boot")
 
 			Utils.ensureDirectories(dir)
@@ -91,7 +93,7 @@ object BootRom {
 		val sb = new StringBuilder
 
 		for (primary <- primarys) {
-			val triple    = Utils.toString(primary.definition.attributes("triple"))
+			val triple    = Utils.toString(primary.attributes("triple"))
 			val sanTriple = triple.replace("-", "")
 			sb ++=
 			"cmake -D " +

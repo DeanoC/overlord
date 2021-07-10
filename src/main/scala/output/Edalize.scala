@@ -65,11 +65,11 @@ object Edalize {
 
 					val luBInt = new Function2[String, BigInt, BigInt] {
 						override def apply(k: String, default: BigInt): BigInt =
-							Utils.lookupBigInt(ram.parameters, k, default)
+							Utils.lookupBigInt(ram.attributes, k, default)
 					}
 					val luInt  = new Function2[String, Int, Int] {
 						override def apply(k: String, default: Int): Int =
-							Utils.lookupInt(ram.parameters, k, default)
+							Utils.lookupInt(ram.attributes, k, default)
 					}
 
 					val sizeInBytes  = ram.getSizeInBytes

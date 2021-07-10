@@ -17,34 +17,61 @@ trait Instance {
 	val replicationCount: Int     = 1 // TODO revisit this
 	val shared          : Boolean = false
 
-	val instanceParameterKeys: mutable.HashSet[String] = mutable.HashSet()
 
-	val instancePorts: mutable.HashMap[String, Port] = mutable.HashMap()
-	val instanceParameters: mutable.HashMap[String, Variant] = mutable.HashMap()
 	val instanceRegisterBanks: mutable.ArrayBuffer[RegisterBank] = mutable.ArrayBuffer()
 	val instanceRegisterLists: mutable.ArrayBuffer[RegisterList] = mutable.ArrayBuffer()
-	val instanceDocs: mutable.ArrayBuffer[String] = mutable.ArrayBuffer()
+	val instanceDocs         : mutable.ArrayBuffer[String]       = mutable.ArrayBuffer()
+
+	private lazy val instancePorts: mutable.HashMap[String, Port] = {
+		mutable.HashMap[String, Port](definition.ports.toSeq: _*) ++ {
+			if (definition.gateware.nonEmpty)
+				definition.gateware.get.ports
+			else mutable.HashMap[String, Port]()
+		}
+	}
+
+	private lazy val instanceAttributes: mutable.HashMap[String, Variant] = {
+		mutable.HashMap[String, Variant](definition.attributes.toSeq: _*) ++ {
+			if (definition.gateware.nonEmpty)
+				definition.gateware.get.parameters
+			else Map[String, Variant]()
+		}
+	}
+	private lazy val instanceParameterKeys: mutable.HashSet[String] = mutable.HashSet()
+
+	def mergeParameter(attribs: Map[String, Variant], key: String): Unit = {
+		if (attribs.contains(key)) {
+			// overwrite existing or add it
+			instanceAttributes.updateWith(key) {
+				case Some(_) => Some(attribs(key))
+				case None    => Some(attribs(key))
+			}
+		}
+	}
+
+	def mergePort(key: String, port: Port): Unit =
+		instancePorts.updateWith(key) {
+			case Some(_) => Some(port)
+			case None => Some(port)
+		}
+
+	def mergeParameterKey(key: String): Unit = instanceParameterKeys += key
 
 	private val splitIdent           = ident.split('.')
 	private val splitIdentWidthIndex = splitIdent.zipWithIndex
 
 	def definition: DefinitionTrait
 
-	def ports: Map[String, Port] =
-		definition.ports ++ {
-			if (definition.gateware.nonEmpty)
-				definition.gateware.get.ports.toMap
-			else Map[String, Port]()
-		} ++ instancePorts.toMap
+	def ports: Map[String, Port] = instancePorts.toMap
 
-	def parameters: Map[String, Variant] = definition.parameters ++ {
-			if (definition.gateware.nonEmpty)
-				definition.gateware.get.parameters
-			else Map[String, Variant]()
-		} ++ instanceParameters.toMap
+	def attributes: Map[String, Variant] = instanceAttributes.toMap
 
-	def registerLists: Seq[RegisterList] = definition.registerLists ++ instanceRegisterLists
-	def registerBanks: Seq[RegisterBank] = definition.registerBanks ++ instanceRegisterBanks
+	def registerLists: Seq[RegisterList] = definition.registerLists ++
+	                                       instanceRegisterLists
+
+	def registerBanks: Seq[RegisterBank] = definition.registerBanks ++
+	                                       instanceRegisterBanks
+
 	def docs: Seq[String] = definition.docs ++ instanceDocs
 
 	def parameterKeys: Set[String] = instanceParameterKeys.toSet
@@ -174,7 +201,6 @@ object Instance {
 				case Some(gw) =>
 					val result = Definition(defType, attribs,
 					                        gw.ports.toMap,
-					                        gw.parameters,
 					                        Some(gw))
 					catalogs.catalogs += (defType -> result)
 					Some(result)

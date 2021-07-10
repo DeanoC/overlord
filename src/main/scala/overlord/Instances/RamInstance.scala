@@ -21,7 +21,7 @@ case class RamInstance(ident: String,
 
 	def getSizeInBytes: BigInt = sizeInBytes match {
 		case Some(value) => value
-		case None        => Utils.lookupBigInt(parameters, "size_in_bytes", 1024)
+		case None        => Utils.lookupBigInt(attributes, "size_in_bytes", 1024)
 	}
 
 }

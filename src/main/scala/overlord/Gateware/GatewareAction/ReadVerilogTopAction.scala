@@ -22,15 +22,16 @@ case class ReadVerilogTopAction(filename: String,
 			outPath.resolve(name + ".v"), name.split("/").last)
 
 		if (instance.isGateware) {
-			instance.instancePorts ++=
 			bs.filter(_.isInstanceOf[VerilogPort])
 				.map(_.asInstanceOf[VerilogPort])
-				.map(p => p.name -> Port(p.name, p.bits, WireDirection(p.direction)))
+				.foreach(p => instance.mergePort(p.name,
+				                                 Port(p.name,
+				                                      p.bits,
+				                                      WireDirection(p.direction))))
 
-			instance.instanceParameterKeys ++=
 			bs.filter(_.isInstanceOf[VerilogParameterKey])
 				.map(_.asInstanceOf[VerilogParameterKey])
-				.map(p => p.parameter)
+				.foreach(p => instance.mergeParameterKey(p.parameter))
 		}
 
 		updatePath(outPath)
@@ -49,6 +50,7 @@ object ReadVerilogTopAction {
 		val filename = process("source") match {
 			case s: StringV => s.value
 			case t: TableV  => Utils.toString(t.value("file"))
+			case _ => println("Source is an invalid type"); ""
 		}
 
 		val srcPath = if (filename.contains("${src}")) {
