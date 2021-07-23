@@ -10,9 +10,7 @@ case class DistanceMatrix(instanceArray: Array[Instance]) {
 
 	private var virtualContainers = Seq[Instance]()
 
-	private val distanceMatrix = Array.fill[Int](dim, dim) {
-		Int.MaxValue
-	}
+	private val distanceMatrix = Array.fill[Int](dim, dim) { DistanceMatrix.NotComputed }
 	private val routeMatrix    = Array.ofDim[Seq[Int]](dim, dim)
 
 	def +=(tuple:(Int, Int, (Int, Seq[Int]))): Unit = {
@@ -28,10 +26,14 @@ case class DistanceMatrix(instanceArray: Array[Instance]) {
 	def between(s: Int, e: Int): (Int, Seq[Int]) =
 		(distanceMatrix(s)(e), routeMatrix(s)(e))
 
-	def rowDistance(r: Int): Seq[Int] = distanceMatrix(r).toSeq
+	def rowDistances(r: Int): Seq[Int] = distanceMatrix(r).toSeq
 
-	def columnDistance(c: Int): Seq[Int] =
+	def columnDistances(c: Int): Seq[Int] =
 		for (i <- 0 until dim) yield distanceMatrix(i)(c)
+
+	def validColumnDistances(c: Int): Seq[Int] = columnDistances(c).filter(_ > 0)
+
+	def doesColumnHaveAnyLinks(c: Int): Boolean = validColumnDistances(c).nonEmpty
 
 	def rowBetween(r: Int): Seq[Seq[Int]] = routeMatrix(r).toSeq
 
@@ -56,21 +58,32 @@ case class DistanceMatrix(instanceArray: Array[Instance]) {
 	override def toString: String = {
 		val sb = new StringBuilder
 		sb ++= f"DistanceMatrix $dim x $dim%n"
+
+		sb ++= f"     | "
+		for {i <- 0 until dim}
+			sb ++= f"$i%4d | "
+		sb ++= "\n"
+		sb ++= "-------" * (dim+1)
+		sb ++= "\n"
+
 		for {sp <- 0 until dim} {
-			sb ++= "       " * sp
-			for {ep <- sp until dim} {
-				val e = if (distanceMatrix(sp)(ep) != Int.MaxValue)
+			sb ++= f"$sp%4d | "
+			for {ep <- 0 until dim} {
+				val e = if (distanceMatrix(sp)(ep) != DistanceMatrix.NotComputed)
 					f"${distanceMatrix(sp)(ep)}%4d"
 				else "    "
 				sb ++= f"$e | "
 			}
 			sb ++= "\n"
 		}
+		for((instance, index) <- instanceArray.zipWithIndex)
+			sb ++= f"$index - ${instance.ident}%n"
+
 		sb.result()
 	}
 
-	private def removeSelfLinks(): Unit =
-		for (i <- 0 until dim) distanceMatrix(i)(i) = Int.MaxValue
+	private def setIdentityDiagonal(): Unit =
+		for (i <- 0 until dim) distanceMatrix(i)(i) = 0
 
 	private def instanceMask(maskArray: Array[Boolean]): Unit = {
 		assert(maskArray.length == dim)
@@ -78,17 +91,19 @@ case class DistanceMatrix(instanceArray: Array[Instance]) {
 		for {i <- 0 until dim
 		     if !maskArray(i)
 		     j <- 0 until dim} {
-			distanceMatrix(i)(j) = Int.MaxValue
-			distanceMatrix(j)(i) = Int.MaxValue
+			distanceMatrix(i)(j) = DistanceMatrix.NoRoute
+			distanceMatrix(j)(i) = DistanceMatrix.NoRoute
 		}
 	}
 }
 
 
 object DistanceMatrix {
+	private val NotComputed = -1
+	private val NoRoute = -2
 
-	private class Path(val sp: Int, val ep: Int) {
-		var minDistance: Int      = Int.MaxValue
+	private case class Path(val sp: Int, val ep: Int) {
+		var minDistance: Int      = DistanceMatrix.NotComputed
 		var minRoute   : Seq[Int] = Seq()
 
 		def setMin(dist: Int, route: Seq[Int]): Path = {
@@ -130,8 +145,7 @@ object DistanceMatrix {
 		}
 
 		// instance to itself has a length of 0
-		for {i <- 0 until dm.dim}
-			dm += (i, i, (0, Seq(i)))
+		dm.setIdentityDiagonal()
 
 		// connected are 1 links
 		for(con <- connected
@@ -170,51 +184,64 @@ object DistanceMatrix {
 			dm += (ep, sp, (1, Seq(sp)))
 		}
 
-		// compute the distance between instances
-		for {sp <- 0 until dm.dim
-		     ep <- 0 until dm.dim} {
-			val path = new Path(sp, ep)
-			computeDistanceBetween(dm, path.sp, path)
+		// any columns with not links can't be linked to anything
+		for { sp <- 0 until dm.dim } {
+			if(!dm.doesColumnHaveAnyLinks(sp)) {
+				for(i <- 0 until dm.dim
+				    if sp != i) {
+					dm.distanceMatrix(i)(sp) = DistanceMatrix.NoRoute
+					dm.distanceMatrix(sp)(i) = DistanceMatrix.NoRoute
+				}
+			}
 		}
 
-		// remove all non connected left overs
-		val connectionMask = Array.fill[Boolean](dm.dim)(elem = false)
-		for {connected <- connected
-		     (sp, ep) = dm.indicesOf(connected)} {
-			connectionMask(sp) = true
-			dm.routeBetween(sp, ep).foreach(connectionMask(_) = true)
+		// compute the distance between instances
+		for {sp <- 0 until dm.dim
+		     ep <- sp until dm.dim
+		     if sp != ep } {
+				computeDistanceBetween(dm, sp, Path(sp, ep))
 		}
-		dm.removeSelfLinks()
-		dm.instanceMask(connectionMask)
+
+		dm.setIdentityDiagonal()
 
 		dm
 	}
 
 	private def computeDistanceBetween(dm: DistanceMatrix,
 	                                   sp: Int,
-	                                   path: Path): (Int, Seq[Int]) = {
+	                                   path: Path,
+	                                   tried: Seq[Int] = Seq()) : (Int, Seq[Int]) = {
 		val ep = path.ep
 		if (sp == ep) (0, Seq())
-		else if (dm.distanceBetween(sp, ep) >= 0 &&
-		         dm.distanceBetween(sp, ep) != Int.MaxValue) dm.between(sp, ep)
+		else if(tried.contains(sp)) (NoRoute, Seq())
+		else if(dm.distanceMatrix(sp)(ep) == NoRoute) (NoRoute, Seq())
+		else if (dm.distanceBetween(sp, ep) >= 0) dm.between(sp, ep)
+		else if (dm.distanceBetween(ep, sp) >= 0) dm.between(sp, ep)
 		else {
 			// find possible segments in path
-			val columnCandidates = dm.columnDistance(sp).zipWithIndex
-				.filter(a => (a._1 >= 1 && a._1 != Int.MaxValue) && a._2 != sp)
+			val col = dm.columnDistances(sp).zipWithIndex
+			val columnCandidates = col.filter(_._1 >= 1)
+				.filter(_._2 != sp)
+				.filter(p => !tried.contains(p._2))
+			if(columnCandidates.isEmpty) return (NoRoute, Seq())
 
 			for (candidate <- columnCandidates) {
-				val (ld, lr) = computeDistanceBetween(dm, candidate._2, path)
-				val dist     = ld + candidate._1
-				val route    = Seq(candidate._2) ++ lr
+				val (ld, lr) = computeDistanceBetween(dm, candidate._2, path, Seq(sp) ++ tried)
+				if(ld != NotComputed && ld != NoRoute) {
+					val dist  = ld + candidate._1
+					val route = Seq(candidate._2) ++ lr
 
-				// update matrix as we go
-				if (dm.distanceBetween(sp, path.ep) >= dist) {
-					dm += (sp, path.ep, (dist, route))
-				}
+					// update matrix as we go
+					val db = dm.distanceBetween(sp, path.ep)
+					if (db < 0 || db >= dist) {
+						dm += (sp, path.ep, (dist, route))
+						dm += (path.ep, sp, (dist, route.reverse))
+					}
 
-				if (dist < path.minDistance) {
-					path.setMin(dist, route)
-					if (dist <= 1) return (dist, route)
+					if (dist < path.minDistance) {
+						path.setMin(dist, route)
+						if (dist <= 1) return (dist, route)
+					}
 				}
 			}
 			(path.minDistance, path.minRoute)

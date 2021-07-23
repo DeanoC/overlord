@@ -55,17 +55,22 @@ case class BusInstance(ident: String,
 					val (instance, size) = variableAddrConsumers.remove(0)
 					(instance, currentAddress, size)
 				}
-			consumerIndices += (instance -> consumers.length)
+
+			val indexCount = getIndices(instance).length
+			consumerIndices += ((instance,indexCount) -> consumers.length)
 			consumers += (address -> size)
 			currentAddress = (address + size).max(busBaseAddr)
 		}
 	}
 
-	def getIndex(instance: Instance): Int = {
-		if (consumerInstances.contains(instance))
-			consumerIndices(instance)
+	def getFirstIndex(instance: Instance): Int = {
+		if (consumerIndices.contains((instance,0)))
+			consumerIndices((instance,0))
 		else
 			-1
+	}
+	def getIndices(instance: Instance): Seq[Int] = {
+		consumerIndices.filter(_._1._1 == instance).values.toSeq
 	}
 
 	def consumerCount: Int = consumers.length
@@ -74,16 +79,20 @@ case class BusInstance(ident: String,
 		case (addr, size) => Seq(BigIntV(addr), BigIntV(size))
 	}.toArray)
 
-	def getConsumerAddressAndSize(instance: Instance): (BigInt, BigInt) = {
-		val index = getIndex(instance)
+	def getFirstConsumerAddressAndSize(instance: Instance): (BigInt, BigInt) = {
+		val index = getFirstIndex(instance)
 		if (index == -1) return (0, 0)
 		consumers(index)
 	}
+	def getConsumerAddressesAndSizes(instance: Instance): Seq[(BigInt, BigInt)] = {
+		getIndices(instance).map(consumers(_))
+	}
 
-	def consumerInstances: Seq[Instance] = consumerIndices.keysIterator.toSeq
+	def consumerInstances: Seq[Instance] =
+		consumerIndices.keysIterator.map(_._1).distinct.toSeq
 
 	private var consumers       = mutable.ArrayBuffer[(BigInt, BigInt)]()
-	private var consumerIndices = mutable.HashMap[Instance, Int]()
+	private var consumerIndices = mutable.HashMap[(Instance, Int), Int]()
 
 	override def definition: DefinitionTrait = defi
 

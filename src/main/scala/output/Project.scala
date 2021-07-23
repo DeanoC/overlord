@@ -11,7 +11,7 @@ object Project {
 		val softPath = out.resolve("soft")
 		val gatePath = out.resolve("gate")
 
-		output.Report(game, gatePath)
+		output.Report(game, out)
 		output.Xdc(game, gatePath)
 		output.Top(game, gatePath)
 		output.Edalize(game, gatePath)

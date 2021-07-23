@@ -156,13 +156,9 @@ object Svd {
 		Utils.ensureDirectories(out)
 
 		// copy etc/CMSIS-SVD.xsd
-		val respath = Resources.stdResourcePath()
 		val etc     = out.resolve("etc")
 		Utils.ensureDirectories(etc)
-		val source = Utils.readFile("CMSIS-SVD.xsd",
-		                            respath.resolve("etc/CMSIS-SVD.xsd"),
-		                            getClass)
-		Utils.writeFile(etc.resolve("CMSIS-SVD.xsd"), source.get)
+		Utils.copy(Path.of("etc/CMSIS-SVD.xsd"), etc.resolve("CMSIS-SVD.xsd"))
 
 		val path = if (out.toFile.isDirectory)
 			out.resolve(s"${game.name}.svd")

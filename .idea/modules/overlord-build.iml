@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module external.linked.project.id="overlord-build" external.linked.project.path="$MODULE_DIR$/../../project" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" sbt.imports="SUB:DOLLAR2906b84568d492a91172.`overlord`, _root_.sbt.Keys._, _root_.sbt.ScriptedPlugin.autoImport._, _root_.sbt.plugins.MiniDependencyTreePlugin.autoImport._, _root_.sbt._, _root_.sbt.nio.Keys._, _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.ScriptedPlugin, _root_.sbt.plugins.SbtPlugin, _root_.sbt.plugins.SemanticdbPlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.sbt.plugins.Giter8TemplatePlugin, _root_.sbt.plugins.MiniDependencyTreePlugin, _root_.scala.xml.{TopScope=&amp;gt;SUB:DOLLARscope}" sbt.resolvers="file:$USER_HOME$/.sbt/preloaded|maven|local-preloaded, https://repo1.maven.org/maven2/|maven|public, /home/deano/.ivy2/cache|ivy|Local cache" type="SBT_MODULE" version="4">
+<module external.linked.project.id="overlord-build" external.linked.project.path="$MODULE_DIR$/../../project" external.root.project.path="$MODULE_DIR$/../.." external.system.id="SBT" sbt.imports="SUB:DOLLAR02050e9ad59cbaadcd14.`overlord`, _root_.sbt.Keys._, _root_.sbt.ScriptedPlugin.autoImport._, _root_.sbt.plugins.MiniDependencyTreePlugin.autoImport._, _root_.sbt._, _root_.sbt.nio.Keys._, _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.ScriptedPlugin, _root_.sbt.plugins.SbtPlugin, _root_.sbt.plugins.SemanticdbPlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.sbt.plugins.Giter8TemplatePlugin, _root_.sbt.plugins.MiniDependencyTreePlugin, _root_.scala.xml.{TopScope=&amp;gt;SUB:DOLLARscope}" sbt.resolvers="file:$USER_HOME$/.sbt/preloaded|maven|local-preloaded, https://repo1.maven.org/maven2/|maven|public, /home/deano/.ivy2/cache|ivy|Local cache" type="SBT_MODULE" version="4">
   <component name="NewModuleRootManager">
     <output url="file://$MODULE_DIR$/../../project/target/idea-classes" />
     <output-test url="file://$MODULE_DIR$/../../project/target/idea-test-classes" />
@@ -15,12 +15,10 @@
     <orderEntry type="module-library">
       <library name="sbt: sbt-and-plugins">
         <CLASSES>
-          <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.12/lib/jansi.jar!/" />
-          <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.12/lib/jline.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.12/lib/scala-compiler.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.12/lib/scala-library.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.12/lib/scala-reflect.jar!/" />
-          <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.12/lib/scala-xml_2.12.jar!/" />
+          <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.12/lib/scala-xml_2.12-1.0.6.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.12/org.scala-sbt/sbt/1.4.3/actions_2.12-1.4.3.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.12/org.scala-sbt/sbt/1.4.3/caffeine-2.8.5.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.12/org.scala-sbt/sbt/1.4.3/checker-qual-3.4.1.jar!/" />
@@ -70,6 +68,8 @@
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.12/org.scala-sbt/sbt/1.4.3/sbinary_2.12-0.5.1.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.12/org.scala-sbt/sbt/1.4.3/sbt-1.4.3.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.12/org.scala-sbt/sbt/1.4.3/scala-collection-compat_2.12-2.2.0.jar!/" />
+          <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.12/org.scala-sbt/sbt/1.4.3/scala-compiler-2.12.12.jar!/" />
+          <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.12/org.scala-sbt/sbt/1.4.3/scala-library-2.12.12.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.12/org.scala-sbt/sbt/1.4.3/scala-parser-combinators_2.12-1.1.2.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.12/org.scala-sbt/sbt/1.4.3/scala-reflect-2.12.12.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.12/org.scala-sbt/sbt/1.4.3/scala-xml_2.12-1.3.0.jar!/" />
@@ -113,6 +113,6 @@
   </component>
   <component name="SbtModule">
     <option name="buildForURI" value="file:$MODULE_DIR$/../../" />
-    <option name="imports" value="SUB:DOLLAR2906b84568d492a91172.`overlord`, _root_.sbt.Keys._, _root_.sbt.ScriptedPlugin.autoImport._, _root_.sbt.plugins.MiniDependencyTreePlugin.autoImport._, _root_.sbt._, _root_.sbt.nio.Keys._, _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.ScriptedPlugin, _root_.sbt.plugins.SbtPlugin, _root_.sbt.plugins.SemanticdbPlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.sbt.plugins.Giter8TemplatePlugin, _root_.sbt.plugins.MiniDependencyTreePlugin, _root_.scala.xml.{TopScope=&gt;SUB:DOLLARscope}" />
+    <option name="imports" value="SUB:DOLLAR02050e9ad59cbaadcd14.`overlord`, _root_.sbt.Keys._, _root_.sbt.ScriptedPlugin.autoImport._, _root_.sbt.plugins.MiniDependencyTreePlugin.autoImport._, _root_.sbt._, _root_.sbt.nio.Keys._, _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.ScriptedPlugin, _root_.sbt.plugins.SbtPlugin, _root_.sbt.plugins.SemanticdbPlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.sbt.plugins.Giter8TemplatePlugin, _root_.sbt.plugins.MiniDependencyTreePlugin, _root_.scala.xml.{TopScope=&gt;SUB:DOLLARscope}" />
   </component>
 </module>

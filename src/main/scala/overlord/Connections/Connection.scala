@@ -118,8 +118,9 @@ object Connection {
 
 	private def connect(unconnected: Seq[Connection],
 	                    unexpanded: Seq[Instance]): Seq[Connection] =
-		(for (c <- unconnected.filter(_.isUnconnected).map(_.asUnconnected)) yield
-			c.connect(unexpanded)).flatten
+		(for (c <- unconnected.filter(_.isUnconnected).map(_.asUnconnected)) yield {
+			c.connect(unexpanded)
+		}).flatten
 
 
 	def preConnect(unconnected: Seq[Connection],

@@ -80,6 +80,7 @@ trait Instance {
 
 	def copyMutate[A <: Instance](nid: String): Instance
 
+	def isHardware: Boolean = !isGateware
 	def isGateware: Boolean = definition.gateware.nonEmpty
 
 	def getPort(lastName: String): Option[Port] =

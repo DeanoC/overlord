@@ -11,9 +11,9 @@ case class CpuInstance(ident: String,
 		Utils.lookupBoolean(attributes, "primary_boot", or = false)
 	lazy val width : Int = Utils.lookupInt(attributes, "width", 32)
 	lazy val triple: String =
-		Utils.lookupString(attributes, key = "triple", or = "unknown-unknown-unknown")
-
-	lazy val sanitizedTriple: String = triple.replace("""-""", "")
+		Utils.lookupString(attributes, key = "triple", or = "ERR-ERR-ERR")
+	lazy val sanitizedTriple: String = triple.replace("-", "_")
+	lazy val cpuCount : Int = Utils.lookupInt(attributes, "core_count", 1)
 
 	override def definition: DefinitionTrait = defi
 
@@ -31,6 +31,7 @@ object CpuInstance {
 
 		val cpu  = CpuInstance(ident, definition)
 
+		cpu.mergeParameter(attribs, "cpu_count")
 		cpu.mergeParameter(attribs, "primary_boot")
 
 		Some(cpu)

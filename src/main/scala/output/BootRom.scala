@@ -50,12 +50,12 @@ object BootRom {
 
 			Utils.ensureDirectories(dir)
 
-			copy(Path.of(s"software/bootrom/primary_boot_$sanTriple.ld"),
+			Utils.copy(Path.of(s"software/bootrom/primary_boot_$sanTriple.ld"),
 			     dir.resolve("boot.ld"))
 
-			copy(Path.of(s"software/bootrom/crt_$sanTriple.S"),
+			Utils.copy(Path.of(s"software/bootrom/crt_$sanTriple.S"),
 			     dir.resolve("crt.S"))
-			copy(Path.of(s"software/bootrom/main.c"),
+			Utils.copy(Path.of(s"software/bootrom/main.c"),
 			     dir.resolve("main.c"))
 
 			// try to read a specialist cmake file, if none exist use template
@@ -72,19 +72,6 @@ object BootRom {
 
 			Utils.writeFile(dir.resolve("CMakeLists.txt"), tt)
 		}
-	}
-
-	private def copy(src: Path,
-	                 dest: Path): Unit = {
-
-		val tt = Utils.readFile(src.toString, src, getClass) match {
-			case Some(value) => value
-			case None        =>
-				println(s"$src not found, so copy failed")
-				return
-		}
-
-		Utils.writeFile(dest, tt)
 	}
 
 	private def genShellScript(primarys: Seq[CpuInstance],

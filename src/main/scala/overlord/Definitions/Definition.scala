@@ -3,6 +3,7 @@ package overlord.Definitions
 import overlord.Gateware.{Gateware, Port, Ports}
 import overlord.Software.{RegisterBank, RegisterList, Software}
 import ikuy_utils._
+import overlord.Hardware.Hardware
 
 import java.nio.file.Path
 
@@ -27,7 +28,6 @@ object Definition {
 			case "cpu"     => CpuDefinitionType(tt)
 			case "bus"     => BusDefinitionType(tt)
 			case "storage" => StorageDefinitionType(tt)
-			case "soc"     => SocDefinitionType(tt)
 			case "bridge"  => BridgeDefinitionType(tt)
 			case "net"     => NetDefinitionType(tt)
 			case "board"   => BoardDefinitionType(tt)
@@ -58,7 +58,9 @@ object Definition {
 			         path.resolve(Utils.toString(table("gateware"))))
 		else None
 
-		val hw = None
+		val hw = if (table.contains("hardware"))
+			Hardware(Utils.toArray(table("hardware")))
+		else None
 
 		val ports = {
 			if (table.contains("ports"))

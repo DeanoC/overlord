@@ -9,376 +9,330 @@ drive = 8
 standard = "LVCMOS33"
 
 [[instance]]
-  type = "soc.zynqps8"
-
-[[instance]]
-  type = "ram.ddr.ddr4.MT40A256M16LY"
-  size = "4 GiB"
-
-[[instance]]
-  name = "storage.sdio.sdcard"
-  type = "storage.sdio.zynqps8"
-  instance = 0
-
-[[instance]]
-  name = "storage.sdio.emmc.MTFC8GAKAJCN"
-  type = "storage.sdio.zynqps8"
-  instance = 1
-  size = "8 GiB"
-
-[[connection]]
-  type = "port"
-  connection = "SDIO0 <> storage.sdio.sdcard"
-
-[[connection]]
-  type = "port"
-  connection = "SDIO1 <> storage.sdio.emmc.MTFC8GAKAJCN"
-
-[[connection]]
-  name = "connection.apb->emmc"
-  type = "connection.apb"
-  connection = "interconnect.apb -> storage.sdio"
-
-[[instance]]
-  name = "storage.qspi.MT25QU256ABA1EW9"
-  type = "storage.qspi.zynqps8"
-  size = "32 MiB"
-
-[[connection]]
-  name = "connection.apb->sdcard"
-  type = "connection.apb"
-  main = "interconnect.apb -> storage.sdcard"
-
-[[connection]]
-  name = "connection.apb->qspi"
-  type = "connection.apb"
-  main = "interconnect.apb -> storage.qspi.MT25QU256ABA1EW9"
-
-[[instance]]
-  type = "bridge.i2c.axi4"
-  port = "I2C1"
+type = "bridge.i2c.axi4"
+port = "I2C1"
 
 [[constraint]]
-  name = "ref.clk.25MHz"
-  pin = "M6"
-  standard = "LVCMOS18"
+name = "ref.clk.25MHz"
+pin = "M6"
+standard = "LVCMOS18"
 
 [[constraint]]
-  name = "SYS.FAN_TACH"
-  pin = "AD14"
-  standard = "LVCMOS33"
+name = "SYS.FAN_TACH"
+pin = "AD14"
+standard = "LVCMOS33"
 [[constraint]]
-  name = "LED.SYS_STATUS"
-  pin = "AA13"
-  standard = "LVCMOS33"
+name = "LED.SYS_STATUS"
+pin = "AA13"
+standard = "LVCMOS33"
 
 # J15
 [[constraint]]
-  name = "HD_L06_25"
-  pin_p = "F12"
-  pin_n = "F11"
+name = "HD_L06_25"
+pin_p = "F12"
+pin_n = "F11"
 [[constraint]]
-  name = "HD_L07_26"
-  pin_p = "G13"
-  pin_n = "F13"
+name = "HD_L07_26"
+pin_p = "G13"
+pin_n = "F13"
 [[constraint]]
-  name = "HD_L08_25"
-  pin_p = "E12"
-  pin_n = "D11"
+name = "HD_L08_25"
+pin_p = "E12"
+pin_n = "D11"
 [[constraint]]
-  name = "HD_L10_25"
-  pin_p = "B11"
-  pin_n = "A10"
+name = "HD_L10_25"
+pin_p = "B11"
+pin_n = "A10"
 [[constraint]]
-  name = "HP_BANK66_L01"
-  pin_p = "G1"
-  pin_n = "F1"
+name = "HP_BANK66_L01"
+pin_p = "G1"
+pin_n = "F1"
 [[constraint]]
-  name = "HP_BANK66_L02"
-  pin_p = "E1"
-  pin_n = "D1"
+name = "HP_BANK66_L02"
+pin_p = "E1"
+pin_n = "D1"
 [[constraint]]
-  name = "HP_BANK66_L07"
-  pin_p = "C1"
-  pin_n = "B1"
+name = "HP_BANK66_L07"
+pin_p = "C1"
+pin_n = "B1"
 [[constraint]]
-  name = "HP_BANK66_L08"
-  pin_p = "A2"
-  pin_n = "A1"
+name = "HP_BANK66_L08"
+pin_p = "A2"
+pin_n = "A1"
 [[constraint]]
-  name = "HP_BANK66_L12"
-  pin_p = "C3"
-  pin_n = "C2"
+name = "HP_BANK66_L12"
+pin_p = "C3"
+pin_n = "C2"
 [[constraint]]
-  name = "HP_BANK65_L07"
-  pin_p = "L1"
-  pin_n = "K1"
+name = "HP_BANK65_L07"
+pin_p = "L1"
+pin_n = "K1"
 [[constraint]]
-  name = "HP_BANK65_L08"
-  pin_p = "J1"
-  pin_n = "H1"
+name = "HP_BANK65_L08"
+pin_p = "J1"
+pin_n = "H1"
 [[constraint]]
-  name = "HP_BANK65_L12"
-  pin_p = "L3"
-  pin_n = "L2"
+name = "HP_BANK65_L12"
+pin_p = "L3"
+pin_n = "L2"
 
 # J16
 [[constraint]]
-  name = "PS_MIO6"
-  pin = "AF16"
+name = "PS_MIO6"
+pin = "AF16"
 [[constraint]]
-  name = "PS_MIO7"
-  pin = "AH17"
+name = "PS_MIO7"
+pin = "AH17"
 [[constraint]]
-  name = "PS_MIO8"
-  pin = "AF17"
+name = "PS_MIO8"
+pin = "AF17"
 [[constraint]]
-  name = "PS_MIO9"
-  pin = "AC16"
-  
+name = "PS_MIO9"
+pin = "AC16"
+
 [[constraint]]
-  name = "HD_L03_26"
-  pin_p = "B13"
-  pin_n = "A13"
+name = "HD_L03_26"
+pin_p = "B13"
+pin_n = "A13"
 [[constraint]]
-  name = "HD_L05_25"
-  pin_p = "G11"
-  pin_n = "F10"
+name = "HD_L05_25"
+pin_p = "G11"
+pin_n = "F10"
 [[constraint]]
-  name = "HD_L06_26"
-  pin_p = "E14"
-  pin_n = "E13"
+name = "HD_L06_26"
+pin_p = "E14"
+pin_n = "E13"
 [[constraint]]
-  name = "HD_L07_25"
-  pin_p = "E10"
-  pin_n = "D10"
+name = "HD_L07_25"
+pin_p = "E10"
+pin_n = "D10"
 [[constraint]]
-  name = "HD_L08_26"
-  pin_p = "F15"
-  pin_n = "E15"
+name = "HD_L08_26"
+pin_p = "F15"
+pin_n = "E15"
 [[constraint]]
-  name = "HD_L09_25"
-  pin_p = "C11"
-  pin_n = "B10"
+name = "HD_L09_25"
+pin_p = "C11"
+pin_n = "B10"
 [[constraint]]
-  name = "HD_L10_26"
-  pin_p = "H14"
-  pin_n = "H13"
+name = "HD_L10_26"
+pin_p = "H14"
+pin_n = "H13"
 [[constraint]]
-  name = "HD_L11_25"
-  pin_p = "A12"
-  pin_n = "A11"
+name = "HD_L11_25"
+pin_p = "A12"
+pin_n = "A11"
 
 # BT1120
 [[constraint]]
-  name = "BT1120.CLK"
-  pin = "AC12"
+name = "BT1120.CLK"
+pin = "AC12"
 [[constraint]]
-  name = "BT1120.DATA"
-  pins = [  "Y9",  "AA8", "AB9", "Y10", 
-            "AH11", "AG10", "AF10", "AE10", 
-            "AG11", "AF11", "AG21", "AF12", 
-            "AD10", "AE12", "W10", "AD11"]
+name = "BT1120.DATA"
+pins = ["Y9", "AA8", "AB9", "Y10",
+    "AH11", "AG10", "AF10", "AE10",
+    "AG11", "AF11", "AG21", "AF12",
+    "AD10", "AE12", "W10", "AD11"]
 [[constraint]]
-  name = "BT1120.UART0_RXD" # BT1120 GPIO X
-  pin = "AH10"
+name = "BT1120.UART0_RXD" # BT1120 GPIO X
+pin = "AH10"
 [[constraint]]
-  name = "BT1120.UART0_TXD" # BT1120 GPIO Y
-  pin = "AB10"
+name = "BT1120.UART0_TXD" # BT1120 GPIO Y
+pin = "AB10"
 [[constraint]]
-  name = "BT1120.GPIO_Z"
-  pin = "AD12"
+name = "BT1120.GPIO_Z"
+pin = "AD12"
 
 # MIPI CSI
 [[constraint]]
-  name = "MIPI.CSI_CLK"
-  pin_p = "AD5"
-  pin_n = "AD4"
+name = "MIPI.CSI_CLK"
+pin_p = "AD5"
+pin_n = "AD4"
 [[constraint]]
-   name = "MIPI.CSI_DATA0"
-   pin_p = "AC4"
-   pin_n = "AC3"
+name = "MIPI.CSI_DATA0"
+pin_p = "AC4"
+pin_n = "AC3"
 [[constraint]]
-    name = "MIPI.CSI_DATA1"
-    pin_p = "AB4"
-    pin_n = "AB3"
+name = "MIPI.CSI_DATA1"
+pin_p = "AB4"
+pin_n = "AB3"
 [[constraint]]
-    name ="MIPI.CSI_DATA2"
-    pin_p = "AB2"
-    pin_n =  "AC2"
+name = "MIPI.CSI_DATA2"
+pin_p = "AB2"
+pin_n = "AC2"
 [[constraint]]
-    name = "MIPI.CSI_DATA3"
-    pin_p = "AB1"
-    pin_n = "AC1"
+name = "MIPI.CSI_DATA3"
+pin_p = "AB1"
+pin_n = "AC1"
 [[constraint]]
-    name = "CAM.PWDN_n"
-    pin = "J7"
+name = "CAM.PWDN_n"
+pin = "J7"
 [[constraint]]
-    name = "CAM.RST_n"
-    pin = "H7"
+name = "CAM.RST_n"
+pin = "H7"
 [[constraint]]
-    name = "CAM.MCLK"
-    pin = "K8"
+name = "CAM.MCLK"
+pin = "K8"
 
 [[constraint]]
-    name = "QSPI.LOWER_SCK"
-    pin = "AG15"
+name = "QSPI.LOWER_SCK"
+pin = "AG15"
 [[constraint]]
-    name = "QSPI.LOWER_DATA"
-    pins = ["AH16","AG16","AF15","AH15"]
+name = "QSPI.LOWER_DATA"
+pins = ["AH16", "AG16", "AF15", "AH15"]
 [[constraint]]
-    name = "QSPI.LOWER_CS"
-    pin = "AD16"
+name = "QSPI.LOWER_CS"
+pin = "AD16"
 
 [[constraint]]
-    name = "SDIO1.EMMC_CMD"
-    pin = "AC21"
+name = "SDIO1.EMMC_CMD"
+pin = "AC21"
 [[constraint]]
-    name = "SDIO1.EMMC_CLK"
-    pin = "AB20"
+name = "SDIO1.EMMC_CLK"
+pin = "AB20"
 [[constraint]]
-    name = "SDIO1.EMMC_RST"
-    pin = "AB18"
+name = "SDIO1.EMMC_RST"
+pin = "AB18"
 [[constraint]]
-    name = "SDIO1.EMMC_DATA"
-    pins = ["AH18","AG18","AE18","AF18","AC18","AC19","AE19","AD19"]
+name = "SDIO1.EMMC_DATA"
+pins = ["AH18", "AG18", "AE18", "AF18", "AC18", "AC19", "AE19", "AD19"]
 
 [[constraint]]
-    name = "SDIO0.WP"
-    pin = "J20"
+name = "SDIO0.WP"
+pin = "J20"
 [[constraint]]
-    name = "SDIO0.CD"
-    pin = "K20"
+name = "SDIO0.CD"
+pin = "K20"
 [[constraint]]
-    name = "SDIO0.CMD"
-    pin = "M19" # PS_MIO_50
+name = "SDIO0.CMD"
+pin = "M19" # PS_MIO_50
 [[constraint]]
-    name = "SDIO0.CLK"
-    pin = "L21"
+name = "SDIO0.CLK"
+pin = "L21"
 [[constraint]]
-    name = "SDIO0.DATA"
-    pins = ["L20","H21","J21","M18"]
+name = "SDIO0.DATA"
+pins = ["L20", "H21", "J21", "M18"]
 
 [[constraint]]
-    name = "USBHUB.RESET_N"
-    pin = "J17"
+name = "USBHUB.RESET_N"
+pin = "J17"
 [[constraint]]
-    name = "USBPHY.RESET_N"
-    pin = "H18"
+name = "USBPHY.RESET_N"
+pin = "H18"
 [[constraint]]
-    name = "USB0.CLK_IN"
-    pin = "G18" # PS_MIO_52
+name = "USB0.CLK_IN"
+pin = "G18" # PS_MIO_52
 [[constraint]]
-    name = "USB0.DIR"
-    pin ="D16"
+name = "USB0.DIR"
+pin = "D16"
 [[constraint]]
-    name = "USB0.NXT"
-    pin = "B16"
+name = "USB0.NXT"
+pin = "B16"
 [[constraint]]
-    name = "USB0.STP"
-    pin = "F18"
+name = "USB0.STP"
+pin = "F18"
 [[constraint]]
-    name = "USB0.TX_DATA"
-    pins = ["C16", "A16", "F17", "E17", "C17", "D17", "A17", "E18"]
+name = "USB0.TX_DATA"
+pins = ["C16", "A16", "F17", "E17", "C17", "D17", "A17", "E18"]
 [[constraint]]
-    name = "USB0.SSTX"
-    pin_p = "D23"
-    pin_n = "D24"
+name = "USB0.SSTX"
+pin_p = "D23"
+pin_n = "D24"
 [[constraint]]
-    name = "USB0.SSRX"
-    pin_p = "D27"
-    pin_n = "D28"
+name = "USB0.SSRX"
+pin_p = "D27"
+pin_n = "D28"
 [[constraint]]
-    name = "MGTR.USB3_0_CLK_26MHz"
-    pin_p = "E21"
-    pin_n = "E22"
-
- [[constraint]]
-    name = "ENET.TXC"
-    pin = "E19"
-[[constraint]]
-    name = "ENET.TDATA"
-    pins = ["A18", "G19", "B18", "C18"]
-[[constraint]]
-    name = "ENET.TX_CTL"
-    pin = "D19"
-[[constraint]]
-    name = "ENET.RXC"
-    pin = "C19" # PS_MIO_70
-[[constraint]]
-    name = "ENET.RDATA"
-    pins = ["B19", "G20", "G21", "D20"]
-[[constraint]]
-    name = "ENET.RX_CTL"
-    pin = "A19"
-[[constraint]]
-    name = "ENET.MDC"
-    pin = "B20"
-[[constraint]]
-    name = "ENET.MDIO"
-    pin = "F20"
-[[constraint]]
-    name = "ENET.INT"
-    pin = "H19"
-[[constraint]]
-    name = "ENET.RST"
-    pin = "K18" # PS_MIO_40
+name = "MGTR.USB3_0_CLK_26MHz"
+pin_p = "E21"
+pin_n = "E22"
 
 [[constraint]]
-    name = "WDT.FEED"
-    pin = "J19"
+name = "ENET.TXC"
+pin = "E19"
+[[constraint]]
+name = "ENET.TDATA"
+pins = ["A18", "G19", "B18", "C18"]
+[[constraint]]
+name = "ENET.TX_CTL"
+pin = "D19"
+[[constraint]]
+name = "ENET.RXC"
+pin = "C19" # PS_MIO_70
+[[constraint]]
+name = "ENET.RDATA"
+pins = ["B19", "G20", "G21", "D20"]
+[[constraint]]
+name = "ENET.RX_CTL"
+pin = "A19"
+[[constraint]]
+name = "ENET.MDC"
+pin = "B20"
+[[constraint]]
+name = "ENET.MDIO"
+pin = "F20"
+[[constraint]]
+name = "ENET.INT"
+pin = "H19"
+[[constraint]]
+name = "ENET.RST"
+pin = "K18" # PS_MIO_40
 
 [[constraint]]
-    name = "DEBUG.RXD"
-    pin = "L17"
-[[constraint]]
-    name = "DEBUG.TXD"
-    pin = "H17"
+name = "WDT.FEED"
+pin = "J19"
 
 [[constraint]]
-    name = "PS.PMIC_IRQ"
-    pin = "L15"
+name = "DEBUG.RXD"
+pin = "L17"
 [[constraint]]
-    name = "PL.PMIC_IRQ"
-    pin = "AE13"
+name = "DEBUG.TXD"
+pin = "H17"
 
 [[constraint]]
-    name = "PMBUS.CLK"
-    pin = "AE15" # PL_SMB_SCLK
+name = "PS.PMIC_IRQ"
+pin = "L15"
 [[constraint]]
-    name = "PMBUS.DAT"
-    pin = "AG14" # PL_SMB_SDA
+name = "PL.PMIC_IRQ"
+pin = "AE13"
 
 [[constraint]]
-    name = "CAN.TX"
-    pin = "AB19"
+name = "PMBUS.CLK"
+pin = "AE15" # PL_SMB_SCLK
 [[constraint]]
-    name = "CAN.RX"
-    pin = "AB21"
-[[constraint]]
-    name = "PL.485_RXD"
-    pin = "AB15"
-[[constraint]]
-    name = "PL.485_TXD"
-    pin = "AB14"
-[[constraint]]
-    name = "PL.485_DE"
-    pin = "W14"
-    
-[[constraint]]
-    name = "SECURE.PIOA"
-    pin = "Y14"
-[[constraint]]
-    name = "SECURE.PIOB"
-    pin = "Y13"
+name = "PMBUS.DAT"
+pin = "AG14" # PL_SMB_SDA
 
-    # i2c0   : cam (0x1B)
 [[constraint]]
-    name = "I2C0.SCL"
-    pin = "L18"
+name = "CAN.TX"
+pin = "AB19"
 [[constraint]]
-    name = "I2C0.SDA"
-    pin = "K19"
+name = "CAN.RX"
+pin = "AB21"
+[[constraint]]
+name = "PL.485_RXD"
+pin = "AB15"
+[[constraint]]
+name = "PL.485_TXD"
+pin = "AB14"
+[[constraint]]
+name = "PL.485_DE"
+pin = "W14"
+
+[[constraint]]
+name = "SECURE.PIOA"
+pin = "Y14"
+[[constraint]]
+name = "SECURE.PIOB"
+pin = "Y13"
+
+# i2c0   : cam (0x1B)
+[[constraint]]
+name = "I2C0.SCL"
+pin = "L18"
+[[constraint]]
+name = "I2C0.SDA"
+pin = "K19"
 
 # on i2c1: DeepCover Secure Auth chip(DS28C36BQ) 0x1B
 #        : 256Kb Eeprom (CAT24C256WI) 0x51, 
@@ -386,54 +340,54 @@ standard = "LVCMOS33"
 #        : Clock Gen (si5332) Initial = 0x6A Config = 0x76
 #        : pmbus (TPS6508641RSKT) 0x5E
 [[constraint]]
-    name = "I2C1.SCL"
-    pin = "J16"
+name = "I2C1.SCL"
+pin = "J16"
 [[constraint]]
-    name = "I2C1.SDA"
-    pin = "L16"
+name = "I2C1.SDA"
+pin = "L16"
 
 [[constraint]]
-    name = "PCIE.RST"
-    pin = "H16"
+name = "PCIE.RST"
+pin = "H16"
 [[constraint]]
-    name = "PCIE.HOTPLUG_DET"
-    pin = "AG13"
+name = "PCIE.HOTPLUG_DET"
+pin = "AG13"
 
 [[constraint]]
-    name = "MGTR.PCIE_CLK_100MHz"
-    pin_p = "F23"
-    pin_n = "F24"
+name = "MGTR.PCIE_CLK_100MHz"
+pin_p = "F23"
+pin_n = "F24"
 [[constraint]]
-    name = "MGTR.DP_CLK_27MHz"
-    pin_p = "C21"
-    pin_n = "C22"
+name = "MGTR.DP_CLK_27MHz"
+pin_p = "C21"
+pin_n = "C22"
 
 [[constraint]]
-    name = "MGT0_PCIE_TX0"
-    pin_p = "E25"
-    pin_n = "E26"
+name = "MGT0_PCIE_TX0"
+pin_p = "E25"
+pin_n = "E26"
 [[constraint]]
-    name = "MGT0_PCIE_RX0"
-    pin_p = "F27"
-    pin_n = "F28"
+name = "MGT0_PCIE_RX0"
+pin_p = "F27"
+pin_n = "F28"
 [[constraint]]
-    name = "MGT0.DP1_TX"
-    pin_p = "C25"
-    pin_n = "C26"
+name = "MGT0.DP1_TX"
+pin_p = "C25"
+pin_n = "C26"
 [[constraint]]
-    name = "MGT0.DP0_TX"
-    pin_p = "B25"
-    pin_n = "B24"
+name = "MGT0.DP0_TX"
+pin_p = "B25"
+pin_n = "B24"
 
 [[constraint]]
-    name = "DP.DOUT"
-    pin = "J15"
+name = "DP.DOUT"
+pin = "J15"
 [[constraint]]
-    name = "DP.HP_DET"
-    pin = "K15"
+name = "DP.HP_DET"
+pin = "K15"
 [[constraint]]
-    name = "DP.OE"
-    pin = "G16"
+name = "DP.OE"
+pin = "G16"
 [[constraint]]
-    name = "DP.DIN"
-    pin = "F16" # PS_MIO_30
+name = "DP.DIN"
+pin = "F16" # PS_MIO_30

@@ -23,9 +23,6 @@ case class BusDefinitionType(ident: Seq[String]
 case class StorageDefinitionType(ident: Seq[String]
                                 ) extends DefinitionType
 
-case class SocDefinitionType(ident: Seq[String]
-                            ) extends DefinitionType
-
 case class BridgeDefinitionType(ident: Seq[String]
                                ) extends DefinitionType
 
@@ -65,7 +62,6 @@ trait DefinitionTrait {
 			case _: CpuDefinitionType      => CpuInstance(name, this, attribs)
 			case _: BusDefinitionType      => BusInstance(name, this, attribs)
 			case _: StorageDefinitionType  => StorageInstance(name, this, attribs)
-			case _: SocDefinitionType      => SocInstance(name, this, attribs)
 			case _: BridgeDefinitionType   => BridgeInstance(name, this, attribs)
 			case _: NetDefinitionType      => NetInstance(name, this, attribs)
 			case _: OtherDefinitionType    => OtherInstance(name, this, attribs)

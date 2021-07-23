@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="VcsDirectoryMappings">
-    <mapping directory="$USER_HOME$/.sbt/1.0/staging/a7772c47d5d7e84d3e85/ikuy_utils" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/../ikuy_utils" vcs="Git" />
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
   </component>

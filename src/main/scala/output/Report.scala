@@ -16,33 +16,32 @@ object Report {
 
 		val sb       = new StringBuilder
 		val cpus     = game.cpus
+
 		val cpuTypes = cpus.map(_.definition).toSet
 		sb ++= f"------------------%n"
-		sb ++= f"${cpus.length} CPU cores of ${cpuTypes.size} types%n"
+		sb ++= f"${cpus.map(_.cpuCount).sum} CPU cores of ${cpuTypes.size} different types%n"
 		sb ++= f"------------------%n"
 		for (cput <- cpuTypes) {
 			val chipType = cput.defType.ident.mkString
 			val arch     = Utils.lookupString(cput.attributes, "arch", "UNKNOWN")
 			val bw       = Utils.lookupInt(cput.attributes, "width", 32)
 
-			sb ++= f"$chipType are $bw bit $arch CPUs%n"
-			if (cput.registerLists.nonEmpty)
-				cput.registerLists.foreach(r => println(s"  ${r.description}"))
+			val coreCount = cpus.filter(_.definition == cput).map(_.cpuCount).sum
+
+			sb ++= f"$coreCount cores of $chipType ($bw bit $arch) CPU%n"
+
+			for(rl <- cput.registerLists)
+				sb ++= f"   ${rl.name} - ${rl.description}%n"
 		}
 
 		sb ++= f"%n------------------%n"
 		sb ++= f"Instances%n"
 		sb ++= f"------------------%n%n"
 
-		for (cpu <- cpus) {
-			sb ++= (f"cpu instance ${cpu.ident} of type " +
-			        f"${cpu.definition.defType.ident.mkString(".")}%n")
-		}
-
 		sb ++= reportGame(game)
 
 		sb ++= f"%n------------------%n"
-		sb ++= f"Connected%n"
+		sb ++= f"Connections%n"
 		sb ++= f"------------------%n%n"
 		for (connection <- game.connected) {
 			sb ++= f"------------------%n"
@@ -50,8 +49,6 @@ object Report {
 		}
 
 		val boardIndex = game.distanceMatrix.instanceArray.indexWhere(_.isInstanceOf[BoardInstance])
-
-		sb ++= f"board has flat index $boardIndex%n"
 
 		// solve for single links not passing through the board boundary
 		val singleNonBoardLinks =
@@ -110,7 +107,7 @@ object Report {
 			}
 			)
 
-		//		sb ++= dm.toString
+		sb ++= game.distanceMatrix.toString
 
 		Utils.writeFile(Game.pathStack.top.resolve("report.txt"), sb.result())
 	}
@@ -137,7 +134,6 @@ object Report {
 			case CpuDefinitionType(ident)      => "cpu."
 			case BusDefinitionType(ident)      => "bus."
 			case StorageDefinitionType(ident)  => "storage."
-			case SocDefinitionType(ident)      => "soc."
 			case BridgeDefinitionType(ident)   => "bridge."
 			case NetDefinitionType(ident)      => "net."
 			case OtherDefinitionType(ident)    => "other."

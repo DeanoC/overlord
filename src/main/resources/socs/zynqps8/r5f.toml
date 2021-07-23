@@ -1,0 +1,42 @@
+[[instance]]
+type = "cpu.r5f"
+
+[[instance]]
+type = "ram.sram.tcm"
+
+[[instance]]
+name = "R5InternalBus"
+type = "bus.axi4"
+
+[[instance]]
+name = "R5_to_MainBus"
+type = "bridge.internal"
+address_window_width = 32
+
+[[connection]]
+type = "bus"
+connection = "cpu.r5f -> R5InternalBus"
+
+[[connection]]
+type = "bus"
+connection = "R5InternalBus -> R5_to_MainBus"
+fixed_address = "0"
+
+[[connection]]
+type = "bus"
+connection = "R5_to_MainBus -> MainBus"
+
+[[connection]]
+type = "bus"
+connection = "R5InternalBus -> ram.sram.tcm"
+fixed_address = [["0x0000_0000", "64 KiB"], ["0x0002_0000", "64 KiB"]]
+
+[[connection]]
+type = "bus"
+connection = "R5InternalBus -> ram.ddr.ddr4"
+fixed_address = [["0x10_0000", "2047 MiB"]]
+
+[[connection]]
+type = "bus"
+connection = "R5InternalBus -> ram.sram.ocp"
+fixed_address = "0xFFFC_0000"

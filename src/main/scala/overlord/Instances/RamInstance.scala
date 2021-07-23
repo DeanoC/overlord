@@ -10,7 +10,7 @@ case class ZeroFillType() extends RamFillType
 case class PrimaryBootFillType() extends RamFillType
 
 case class RamInstance(ident: String,
-                       sizeInBytes: Option[BigInt],
+                       private val sizeInBytes: Option[BigInt],
                        fillType: RamFillType,
                        private val defi: DefinitionTrait
                       ) extends Instance {

@@ -1,6 +1,9 @@
 path = "bridges"
 
 [[definition]]
+type = "bridge.internal"
+
+[[definition]]
 type = "bridge.pmb_to_apb"
 gateware = "pmb_to_apb/pmb_to_apb.toml"
 advanced_peripheral_bus = "apb_"

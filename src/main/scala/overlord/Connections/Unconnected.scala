@@ -1,6 +1,6 @@
 package overlord.Connections
 
-import ikuy_utils.{Utils, Variant}
+import ikuy_utils.{BigIntV, Utils, Variant}
 import overlord.Connections
 import overlord.Gateware._
 import overlord.Instances._
@@ -194,29 +194,36 @@ case class Unconnected(connectionType: ConnectionType,
 		val mo = matchInstances(main, unexpanded)
 		val so = matchInstances(second, unexpanded)
 
+		if (mo.isEmpty) {
+			println(s"$main instance can't be found")
+		}
+		if (so.isEmpty) {
+			println(s"$second instance can't be found")
+		}
+
 		if (mo.length != 1 || so.length != 1) {
 			println(s"connection $main between $second count error")
 			Seq[Instance]()
 		}
 
 		val mainIL      = mo.head
-		val secondaryIL = so.head
-		val isMainBus   = mo.head.instance.isInstanceOf[BusInstance]
+		val otherIL     = so.head
+		val isMainABus  = mo.head.instance.isInstanceOf[BusInstance]
 
 		// main = bus and first to second so main is supplier, other is consumer
 		// main = bus and second to first so main is consumer, other is supplier
 		// other = bus and first to second so main is consumer, other is supplier
 		// other = bus and second to first so main is supplier, other is consumer
 		val mainIsSupplier =
-			(isMainBus && direction == FirstToSecondConnection()) ||
-			(!isMainBus && direction == SecondToFirstConnection())
+			(isMainABus && direction == FirstToSecondConnection()) ||
+			(!isMainABus && direction == SecondToFirstConnection())
 
 		if (mainIsSupplier) {
 			val bus: BusInstance =
-				if (isMainBus) mainIL.instance.asInstanceOf[BusInstance]
-				else secondaryIL.instance.asInstanceOf[BusInstance]
+				if (isMainABus) mainIL.instance.asInstanceOf[BusInstance]
+				else otherIL.instance.asInstanceOf[BusInstance]
 
-			val other = if (!isMainBus) mainIL.instance else secondaryIL.instance
+			val other = if (!isMainABus) mainIL.instance else otherIL.instance
 
 			val busBankAlignment = Utils.lookupBigInt(bus.attributes,
 			                                          "bus_bank_alignment",
@@ -228,28 +235,35 @@ case class Unconnected(connectionType: ConnectionType,
 
 
 			val size    = other match {
-				case bridge: BridgeInstance =>
-					Utils.pow2(bridge.addressWindowWidth).toBigInt
-				case ram: RamInstance =>
-					ram.sizeInBytes match {
-						case Some(v) => v
-						case None    =>
-							Utils.lookupBigInt(ram.attributes,
-							                   "size_in_bytes",
-							                   connectionSize)
-					}
+				case bridge: BridgeInstance => Utils.pow2(bridge.addressWindowWidth).toBigInt
+				case ram: RamInstance => ram.getSizeInBytes
 				case _                => connectionSize
 			}
 			if(attributes.contains("fixed_address")) {
-				val address = Utils.toBigInt(attributes("fixed_address"))
-				bus.addFixedAddressConsumer(other, address, size)
+				val faAttrib = attributes("fixed_address")
+				if(faAttrib.isInstanceOf[BigIntV]) {
+					val address = Utils.toBigInt(faAttrib)
+					bus.addFixedAddressConsumer(other, address, size)
+				} else {
+					val fixedAddresses = Utils.toArray(faAttrib)
+					for(fixedAddress <- fixedAddresses) {
+						val fa = Utils.toArray(fixedAddress)
+						val address = Utils.toBigInt(fa(0))
+						val size    = Utils.toBigInt(fa(1))
+
+						bus.addFixedAddressConsumer(other, address, size)
+					}
+
+				}
 			} else {
-				bus.addVariableAddressConsumer(other, size)
+				if(other.isHardware)
+					println(s"${other.ident} is hardware and requires a fixed_address")
+				else bus.addVariableAddressConsumer(other, size)
 			}
 		}
 	}
 
-	private def connectBusConnection(unexpanded: Seq[Instance]) = {
+	private def connectBusConnection(unexpanded: Seq[Instance]): Seq[ConnectedBetween] = {
 		val mo = matchInstances(main, unexpanded)
 		val so = matchInstances(second, unexpanded)
 
@@ -278,10 +292,17 @@ case class Unconnected(connectionType: ConnectionType,
 
 		val other = if (!isMainBus) mainIL.instance else secondaryIL.instance
 
+		if(bus.isHardware || other.isHardware) {
+			return Seq(ConnectedBetween(BusConnectionType(),
+			                        GroupConnectionPriority(),
+			                        InstanceLoc(bus, None, bus.ident),
+			                        direction,
+			                        InstanceLoc(other, None, other.ident)))
+		}
 		val busPrefixes =
 			if (mainIsSupplier)
 				Seq(bus.consumerPrefix.replace("${index}",
-				                               s"${bus.getIndex(other)}"))
+				                               s"${bus.getFirstIndex(other)}"))
 			else bus.supplierPrefixes
 
 		// bridges are special

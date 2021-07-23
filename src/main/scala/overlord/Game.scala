@@ -78,6 +78,16 @@ case class Game(name: String,
 	def getDirectBusesConnectedTo(instance: Instance) : Seq[BusInstance] =
 		buses.filter(distanceMatrix.distanceBetween(_, instance) == 1)
 
+	def getEndBusesConnecting(start:Instance, end:Instance) : Seq[BusInstance] = {
+		val startBuses = getBusesConnectedTo(start)
+		val endBuses = getBusesConnectedTo(end)
+		val busesInCommon = startBuses.intersect(endBuses)
+		busesInCommon.intersect(getDirectBusesConnectedTo(end))
+	}
+
+	def getRAMConnectedTo(instance: Instance) : Seq[RamInstance] =
+		rams.filter(distanceMatrix.connected(_, instance))
+
 }
 
 object Game {
@@ -135,27 +145,22 @@ object Game {
 			// extract instances
 			if (parsed.contains("instance")) {
 				val instances = Utils.toArray(parsed("instance"))
-				container.children ++= instances.flatMap(
-					Instance(_, defaults.toMap, catalogs))
+				container.children ++= instances.flatMap(Instance(_, defaults.toMap, catalogs))
 			}
 
 			// extract connections
 			if (parsed.contains("connection")) {
 				val connections = Utils.toArray(parsed("connection"))
-				container.connections ++=
-				connections.flatMap(Connection(_, catalogs))
+				container.connections ++= connections.flatMap(Connection(_, catalogs))
 			}
 			// find instance to use as a container
-			container.children.find(
-				i => i.isInstanceOf[Container] &&
-				     i.asInstanceOf[Container].children.isEmpty) match {
+			container.children.find(_.isInstanceOf[Container]) match {
 				case Some(v) =>
 					val c = v.asInstanceOf[Container]
-					container.children = container.children
-						.filterNot(_.isInstanceOf[Container])
+					container.children = container.children.filterNot(_.isInstanceOf[Container])
 					val n = c.copyMutateContainer(container)
 					containerStack.pop()
-					val t = Game.containerStack.top
+					val t = containerStack.top
 					t.children ++= Seq(n.asInstanceOf[Instance])
 
 				case None =>
@@ -170,7 +175,12 @@ object Game {
 			Utils.ensureDirectories(softPath)
 			Utils.ensureDirectories(gatePath)
 
-			val top = containerStack.top
+			val top = containerStack.head
+			for(c <- containerStack.tail) {
+				top.children ++= c.children
+				top.connections ++= c.connections
+			}
+			containerStack.clear()
 
 			Connection.preConnect(top.connections.toSeq, top.children.toSeq)
 
@@ -193,7 +203,7 @@ object Game {
 			    rl <- inst.instanceRegisterLists
 			    if !inst.instanceRegisterBanks.exists(_.name == rl.name)) {
 
-				val (address, _) = bus.getConsumerAddressAndSize(inst)
+				val (address, _) = bus.getFirstConsumerAddressAndSize(inst)
 				inst.instanceRegisterBanks +=
 					RegisterBank(s"${bus.ident}_${inst.ident}",address, rl.name)
 			}

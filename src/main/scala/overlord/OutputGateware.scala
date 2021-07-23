@@ -48,12 +48,6 @@ object OutputGateware {
 			val instanceSpecificParameters = instance match {
 				case bus: BusInstance =>
 					Map[String, Variant]("consumers" -> bus.consumersVariant)
-				case ram: RamInstance =>
-					ram.sizeInBytes match {
-						case Some(v) =>
-							Map[String, Variant]("size_in_bytes" -> BigIntV(v))
-						case None    => Map[String, Variant]()
-					}
 				case _                => Map[String, Variant]()
 			}
 
