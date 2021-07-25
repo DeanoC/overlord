@@ -1,7 +1,3 @@
-type = "Xilinx"
-family = "UltraScale+"
-device = "xczu3eg-sfvc784-1-e"
-
 [default]
 pullup = false
 slew = "Slow"
@@ -9,8 +5,10 @@ drive = 8
 standard = "LVCMOS33"
 
 [[instance]]
-type = "bridge.i2c.axi4"
-port = "I2C1"
+type = "board.myirFZ3"
+board_type = "Xilinx"
+board_family = "UltraScale+"
+board_device = "xczu3eg-sfvc784-1-e"
 
 [[constraint]]
 name = "ref.clk.25MHz"

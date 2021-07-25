@@ -201,7 +201,6 @@ object DistanceMatrix {
 		     child <- container.children
 		     ei = instancesArray.indexOf(child)} {
 			neighbours(si) += ei
-			neighbours(ei) += si
 		}
 
 		// top level to virtual container children
@@ -214,7 +213,6 @@ object DistanceMatrix {
 		     ei = instancesArray.indexOf(inst)
 		     } {
 			neighbours(si) += ei
-			neighbours(ei) += si
 		}
 
 
