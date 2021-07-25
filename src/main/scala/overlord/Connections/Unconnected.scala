@@ -256,9 +256,7 @@ case class Unconnected(connectionType: ConnectionType,
 
 				}
 			} else {
-				if(other.isHardware)
-					println(s"${other.ident} is hardware and requires a fixed_address")
-				else bus.addVariableAddressConsumer(other, size)
+				if(!other.isHardware) bus.addVariableAddressConsumer(other, size)
 			}
 		}
 	}

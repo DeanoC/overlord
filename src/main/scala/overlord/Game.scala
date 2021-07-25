@@ -73,20 +73,21 @@ case class Game(name: String,
 			.asInstanceOf[Option[BoardInstance]]
 
 	def getBusesConnectedTo(instance: Instance) : Seq[BusInstance] =
-		buses.filter(distanceMatrix.connected(_, instance))
+		buses.filter(distanceMatrix.connected(instance,_))
 
 	def getDirectBusesConnectedTo(instance: Instance) : Seq[BusInstance] =
-		buses.filter(distanceMatrix.distanceBetween(_, instance) == 1)
+		buses.filter(distanceMatrix.distanceBetween(instance,_) == 1)
 
 	def getEndBusesConnecting(start:Instance, end:Instance) : Seq[BusInstance] = {
 		val startBuses = getBusesConnectedTo(start)
-		val endBuses = getBusesConnectedTo(end)
-		val busesInCommon = startBuses.intersect(endBuses)
-		busesInCommon.intersect(getDirectBusesConnectedTo(end))
+		(for(bus <- startBuses) yield {
+			val connected = distanceMatrix.connected(bus, end)
+			if(connected) Some(bus) else None
+		}).flatten
 	}
 
 	def getRAMConnectedTo(instance: Instance) : Seq[RamInstance] =
-		rams.filter(distanceMatrix.connected(_, instance))
+		rams.filter(distanceMatrix.connected(instance,_))
 
 }
 

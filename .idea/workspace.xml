@@ -6,10 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="73b7f681-932b-4979-9f4f-6aee48997ac8" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/socs/MinZynqPs8.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/socs/MinZynqPs8.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Unconnected.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Unconnected.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/DistanceMatrix.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/DistanceMatrix.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Game.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Game.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -263,7 +261,7 @@
       <workItem from="1626874244118" duration="61000" />
       <workItem from="1626874325252" duration="16465000" />
       <workItem from="1626941166484" duration="52716000" />
-      <workItem from="1627073007142" duration="23357000" />
+      <workItem from="1627073007142" duration="25148000" />
     </task>
     <task id="LOCAL-00001" summary="Major work on connection expansion and block connections&#10;Refactor and reorg instances, constraits, actions etc.&#10;moved ps8 docs to lower case">
       <created>1605964442645</created>
@@ -412,7 +410,14 @@
       <option name="project" value="LOCAL" />
       <updated>1627073214944</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="New distancematrix and routematrix algorithm&#10;Now using Dijkstra shortest path algo&#10;Takes into account connection directions&#10;Better logging of DistanceMatrix and RouteMatrix">
+      <created>1627208262679</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1627208262679</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -470,7 +475,8 @@
     <MESSAGE value="Copy CMSIS-SVD.xsd to project to validate our svd&#10;Add stdResources paths to Resources Object" />
     <MESSAGE value="Refactored parameters and attribute merging etc.&#10;Definition no longer have parameters, only gateware does.&#10;Instance merge all attributes, ports etc.&#10;Cpu and Bus Instance now use lazy variable and the merged attributes instead of custom constructor parameters" />
     <MESSAGE value="DistanceMatrix fixed added NonRoute flag and using negative numbers as markers&#10;Lots of work with C Header output&#10;Work on fixing hardware" />
-    <option name="LAST_COMMIT_MESSAGE" value="DistanceMatrix fixed added NonRoute flag and using negative numbers as markers&#10;Lots of work with C Header output&#10;Work on fixing hardware" />
+    <MESSAGE value="New distancematrix and routematrix algorithm&#10;Now using Dijkstra shortest path algo&#10;Takes into account connection directions&#10;Better logging of DistanceMatrix and RouteMatrix" />
+    <option name="LAST_COMMIT_MESSAGE" value="New distancematrix and routematrix algorithm&#10;Now using Dijkstra shortest path algo&#10;Takes into account connection directions&#10;Better logging of DistanceMatrix and RouteMatrix" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -483,6 +489,11 @@
           <properties class="java.lang.NullPointerException" package="java.lang" />
           <option name="timeStamp" value="16" />
         </breakpoint>
+        <line-breakpoint enabled="true" type="scala-line">
+          <url>file://$PROJECT_DIR$/src/main/scala/output/BaseCHeaders.scala</url>
+          <line>50</line>
+          <option name="timeStamp" value="39" />
+        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <pin-to-top-manager>
