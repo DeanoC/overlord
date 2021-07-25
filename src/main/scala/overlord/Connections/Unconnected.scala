@@ -294,10 +294,8 @@ case class Unconnected(connectionType: ConnectionType,
 
 		if(bus.isHardware || other.isHardware) {
 			return Seq(ConnectedBetween(BusConnectionType(),
-			                        GroupConnectionPriority(),
-			                        InstanceLoc(bus, None, bus.ident),
-			                        direction,
-			                        InstanceLoc(other, None, other.ident)))
+			                        GroupConnectionPriority(), mainIL,
+			                        direction, secondaryIL))
 		}
 		val busPrefixes =
 			if (mainIsSupplier)

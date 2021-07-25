@@ -39,8 +39,6 @@ path = "ZynqPs8"
 		{ registers = "pmu_local" },
 	]
 
-# tcm is 256KiB in lock step mode or 128K in dual core mode
-# Doesn't really matter we put here as the bus will split and portion correctly
 [[definition]]
 	type = "ram.sram.tcm"
 	size_in_bytes = "256 KiB"

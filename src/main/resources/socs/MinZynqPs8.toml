@@ -79,3 +79,13 @@ connection = "MainBus -> ram.ddr.ddr4"
 [[connection]]
 type = "bus"
 connection = "MainBus -> ram.sram.ocp"
+
+[[connection]]
+type = "bus"
+connection = "MainBus -> ram.sram.tcm"
+fixed_address = [
+    ["0xFFE0_0000", "64 KiB"],
+    ["0xFFE2_0000", "64 KiB"],
+    ["0xFFE9_0000", "64 KiB"],
+    ["0xFFEB_0000", "64 KiB"]
+]
