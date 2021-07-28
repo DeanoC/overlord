@@ -98,8 +98,6 @@ case class BusInstance(ident: String,
 
 	override def copyMutate[A <: Instance](nid: String): BusInstance =
 		copy(ident = nid)
-
-	override val shared: Boolean = true
 }
 
 object BusInstance {

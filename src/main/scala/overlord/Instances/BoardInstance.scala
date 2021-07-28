@@ -53,9 +53,13 @@ case class BoardInstance(ident: String,
 }
 
 object BoardInstance {
+
 	def apply(name: String,
 	          definition: DefinitionTrait,
-	          attribs: Map[String, Variant]): Option[BoardInstance] = {
+	          iattribs: Map[String, Variant]): Option[BoardInstance] = {
+
+		val attribs = Utils.mergeAintoB(iattribs, definition.attributes)
+
 		if (!attribs.contains("board_type")) {
 			println(s"${name} board requires a type value");
 			return None

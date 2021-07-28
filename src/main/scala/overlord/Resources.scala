@@ -1,6 +1,6 @@
 package overlord
 
-import ikuy_utils.{ArrayV, Utils}
+import ikuy_utils.{ArrayV, Utils, Variant}
 
 import java.nio.file.{Files, Path}
 import overlord.Definitions.{DefinitionTrait, DefinitionType}
@@ -42,7 +42,8 @@ case class Resources(path: Path) {
 		(for (resource <- resources) yield {
 			val name = Utils.toString(resource)
 			DefinitionCatalog.fromFile(s"$name",
-			                           path.resolve("catalogs/"))
+			                           path.resolve("catalogs/"),
+			                           Map[String, Variant]())
 		}).flatten.flatten.map(f => f.defType -> f).toMap
 	}
 }

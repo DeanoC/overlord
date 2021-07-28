@@ -37,8 +37,8 @@ object Definition {
 		}
 	}
 
-	def apply(chip: Variant, path: Path): Definition = {
-		val table       = Utils.toTable(chip)
+	def apply(defi: Variant, path: Path, defaults: Map[String,Variant]): Definition = {
+		val table       = Utils.mergeAintoB(Utils.toTable(defi), defaults)
 		val defTypeName = Utils.toString(table("type"))
 
 		val attribs = table.filter(a => a._1 match {

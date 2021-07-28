@@ -14,14 +14,17 @@ case class VerilogPort(direction: String, bits: BitsDesc, name: String)
 
 object VerilogModuleParser {
 	private val bitRegEx = "\\[\\d+:\\d+\\]".r
+	private val moduleRegEx = "\\s*module\\s+(\\w+)[\\s|(]*".r
+	private val endPortsRegEx = "\\);".r
 
 	def apply(absolutePath: Path, name: String): Seq[VerilogBoundary] = {
 		println(s"parsing $name verilog for ports and parameter")
 		val txt      = load(absolutePath)
 		val boundary = mutable.ArrayBuffer[VerilogBoundary]()
-		for {i <- txt.indices
-		     if txt(i).contains("module")
-		     if txt(i).split(" ").exists(_ == name)
+		for {i <- txt.indices;
+		     if txt(i).contains("module") && !txt(i).contains("endmodule")
+		     moduleRegEx(n) = txt(i)
+				 if n == name
 		     } {
 			for {j <- i + 1 until txt.length} {
 				val words = txt(j).split(" ")
@@ -44,7 +47,7 @@ object VerilogModuleParser {
 						case _                            =>
 					}
 				}
-				if (txt(j).contains(");")) {
+				if (endPortsRegEx.matches(txt(j))) {
 					return boundary.toSeq
 				}
 			}

@@ -2,8 +2,6 @@ package overlord
 
 import java.nio.file.{Files, Path}
 import overlord.Definitions.{Definition, DefinitionTrait, DefinitionType}
-import overlord.Gateware.Gateware
-import overlord.Software.Software
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -43,7 +41,9 @@ class DefinitionCatalog {
 }
 
 object DefinitionCatalog {
-	def fromFile(name: String, spath: Path): Option[Seq[DefinitionTrait]] = {
+	def fromFile(name: String,
+	             spath: Path,
+	             defaultMap: Map[String,Variant]): Option[Seq[DefinitionTrait]] = {
 		println(s"Reading $name catalog")
 
 		val path = spath.resolve(s"${name}.toml")
@@ -54,23 +54,36 @@ object DefinitionCatalog {
 		}
 
 		val source = Utils.readToml(name, path, getClass)
-		parse(name, source, spath)
+		parse(source, spath, defaultMap)
 	}
-
-	private def parse(name: String,
-	                  parsed: Map[String, Variant],
-	                  spath: Path): Option[Seq[DefinitionTrait]] = {
+	private def parse(parsed: Map[String, Variant],
+	                  spath: Path,
+	                  defaultMap: Map[String,Variant]): Option[Seq[DefinitionTrait]] = {
 
 		val path = if (parsed.contains("path")) {
 			spath.resolve(Utils.toString(parsed("path")))
 		} else spath
 
-		var defs = ArrayBuffer[DefinitionTrait]()
+		val defs = ArrayBuffer[DefinitionTrait]()
+		val defaults = if (parsed.contains("defaults"))
+				Utils.mergeAintoB(Utils.toTable(parsed("defaults")), defaultMap)
+			else defaultMap
 
 		if (parsed.contains("definition")) {
-			val chips = Utils.toArray(parsed("definition"))
-			for (chip <- chips)
-				defs += Definition(chip, path)
+			val tdef = Utils.toArray(parsed("definition"))
+			for (defi <- tdef) defs += Definition(defi, path, defaults)
+		}
+
+		if(parsed.contains("resources")) {
+			val resources = Utils.lookupArray(parsed, "resources")
+			for (resource <- resources) {
+				val name = Utils.toString(resource)
+				val cat = DefinitionCatalog.fromFile(s"$name",spath, defaults)
+				cat match {
+					case Some(value) => defs ++= value
+					case None        =>
+				}
+			}
 		}
 
 		Some(defs.toSeq)

@@ -274,59 +274,67 @@ case class Unconnected(connectionType: ConnectionType,
 		val secondaryIL = so.head
 		val isMainBus   = mo.head.instance.isInstanceOf[BusInstance]
 
-		// main = bus and first to second so main is supplier, other is consumer
-		// main = bus and second to first so main is consumer, other is supplier
-		// other = bus and first to second so main is consumer, other is supplier
-		// other = bus and second to first so main is supplier, other is consumer
-		val mainIsSupplier =
-			(isMainBus && direction == FirstToSecondConnection()) ||
-			(!isMainBus && direction == SecondToFirstConnection())
-
-		val busLoc = if (isMainBus) mainIL else secondaryIL
-
 		val bus: BusInstance =
 			if (isMainBus) mainIL.instance.asInstanceOf[BusInstance]
 			else secondaryIL.instance.asInstanceOf[BusInstance]
-
 		val other = if (!isMainBus) mainIL.instance else secondaryIL.instance
+
+		val busLoc = if (isMainBus) mainIL else secondaryIL
+
+		// main = bus and first to second so main is bus, other is consumer
+		// main = bus and second to first so main is bus, other is supplier
+		// other = bus and first to second so main is supplier, other is bus
+		// other = bus and second to first so main is consumer, other is bus
+		val isBusSupplier =
+			(isMainBus && direction == FirstToSecondConnection()) ||
+			(!isMainBus && direction == SecondToFirstConnection())
 
 		if(bus.isHardware || other.isHardware) {
 			return Seq(ConnectedBetween(BusConnectionType(),
 			                        GroupConnectionPriority(), mainIL,
 			                        direction, secondaryIL))
 		}
-		val busPrefixes =
-			if (mainIsSupplier)
-				Seq(bus.consumerPrefix.replace("${index}",
-				                               s"${bus.getFirstIndex(other)}"))
-			else bus.supplierPrefixes
 
+		// if the bus isn't the supplier it needs to present its consumer interface
+		// and vice versa
+		val busPrefixes = if (isBusSupplier)
+			Seq(bus.consumerPrefix.replace("${index}",s"${bus.getFirstIndex(other)}"))
+		else bus.supplierPrefixes
+
+		// other the same but in reverse and bridges are special
 		// bridges are special
 		val otherPrefixes =
 			if (other.isInstanceOf[BridgeInstance])
 				Utils.lookupStrings(other.attributes,
 				                    bus.definition.defType.ident.head,
 				                    "bus_")
-			else if (mainIsSupplier) Utils.lookupStrings(other.attributes,
-			                                             "consumer_prefix",
-			                                             "bus_")
-			else Utils.lookupStrings(other.attributes,
-			                         "supplier_prefix",
-			                         "bus_")
+			else if (isBusSupplier)
+				Utils.lookupStrings(other.attributes, "consumer_prefix", "bus_")
+			else
+				Utils.lookupStrings(other.attributes, "supplier_prefix", "bus_")
 
-		if (busPrefixes == otherPrefixes) for {
-			bp <- busPrefixes
-			fp <- bus.ports.values.filter(_.name.startsWith(bp))
-			sp <- other.ports.values.filter(_.name.startsWith(bp))
-			if fp.name == sp.name
-		} yield ConnectPortGroupBetween(bus, fp, busLoc.fullName, other, sp)
-		else for {
-			bp <- busPrefixes
-			op <- otherPrefixes
-			fp <- bus.ports.values.filter(_.name.startsWith(bp))
-			sp <- other.ports.values.filter(_.name.startsWith(op))
-			if fp.name.stripPrefix(bp) == sp.name.stripPrefix(op)
-		} yield ConnectPortGroupBetween(bus, fp, busLoc.fullName, other, sp)
+		if (busPrefixes == otherPrefixes) {
+			for {
+				bp <- busPrefixes
+				fp <- bus.ports.values.filter(_.name.startsWith(bp))
+				sp <- other.ports.values.filter(_.name.startsWith(bp))
+				if fp.name == sp.name
+			} yield {
+				if(isMainBus) ConnectPortGroupBetween(bus, fp, busLoc.fullName, other, sp)
+				else ConnectPortGroupBetween(other, sp, busLoc.fullName, bus, fp)
+			}
+		}
+		else {
+			for {
+				bp <- busPrefixes
+				op <- otherPrefixes
+				fp <- bus.ports.values.filter(_.name.startsWith(bp))
+				sp <- other.ports.values.filter(_.name.startsWith(op))
+				if fp.name.stripPrefix(bp) == sp.name.stripPrefix(op)
+			} yield {
+				if(isMainBus) ConnectPortGroupBetween(bus, fp, busLoc.fullName, other, sp)
+				else ConnectPortGroupBetween(other, sp, busLoc.fullName, bus, fp)
+			}
+		}
 	}
-
 }

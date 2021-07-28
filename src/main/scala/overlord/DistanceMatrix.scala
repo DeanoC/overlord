@@ -1,6 +1,6 @@
 package overlord
 
-import overlord.Connections.{BiDirectionConnection, Connected, FirstToSecondConnection, InstanceLoc, SecondToFirstConnection}
+import overlord.Connections.{BiDirectionConnection, Connected, ExplicitConnectionPriority, FirstToSecondConnection, InstanceLoc, PortConnectionType, PortGroupConnectionType, SecondToFirstConnection}
 import overlord.Instances.{Container, Instance}
 
 import scala.collection.mutable
@@ -82,7 +82,7 @@ case class DistanceMatrix(instanceArray: Array[Instance]) {
 		sb ++= f"Routes%n"
 		for {i <- 0 until dim} {
 			for {j <- 0 until dim} {
-				if(routeMatrix(i)(j) != null) {
+				if(routeMatrix(i)(j) != null && routeMatrix(i)(j).nonEmpty) {
 					sb ++= f"route between $i and $j, length ${routeMatrix(i)(j).length}%n"
 					sb ++= f"$i"
 					for {k <- routeMatrix(i)(j)} {
@@ -223,7 +223,7 @@ object DistanceMatrix {
 				case Some((cost, path)) =>
 					dm.distanceMatrix(i)(j) = cost
 					dm.routeMatrix(i)(j) = path.map(_.index).tail
-				case None               =>
+				case None               => dm.routeMatrix(i)(j) = Seq()
 			}
 		}
 	}

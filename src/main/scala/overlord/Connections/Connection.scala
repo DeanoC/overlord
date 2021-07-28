@@ -116,12 +116,11 @@ object Connection {
 			first, dir, secondary, table))
 	}
 
-	private def connect(unconnected: Seq[Connection],
+	def connect(unconnected: Seq[Connection],
 	                    unexpanded: Seq[Instance]): Seq[Connection] =
 		(for (c <- unconnected.filter(_.isUnconnected).map(_.asUnconnected)) yield {
 			c.connect(unexpanded)
 		}).flatten
-
 
 	def preConnect(unconnected: Seq[Connection],
 	               unexpanded: Seq[Instance]): Unit = {
@@ -133,141 +132,4 @@ object Connection {
 			.foreach(_.computeConsumerAddresses())
 
 	}
-
-	private def expand(instances: Seq[Instance],
-	                   unexpanded: Seq[Instance]): Seq[Instance] =
-		(for {
-			inst <- instances
-			if inst.replicationCount > 1
-			index <- 0 until inst.replicationCount
-		} yield inst.copyMutate(s"${inst.ident}.$index")) ++
-		unexpanded.diff(instances)
-
-
-	private def expandConnections(expanding: Seq[Connected],
-	                              expanded: Seq[Instance],
-	                              connected: Seq[Connection]):
-	Seq[Connection] = {
-		val result = mutable.ArrayBuffer[Connection]()
-		val done   = mutable.ArrayBuffer[Connection]()
-
-		for {
-			con <- expanding
-			if con.areConnectionCountsCompatible
-			if !done.contains(con)
-			i <- 0 until 2
-		} {
-			if (i == 1) done += con
-			// expansion of connections requires equal counts on both sides
-			// OR one side to be shared (NxMConnect are always shared)
-			// we also have to ensure we dont double count when replicated both
-			// sides
-			val doReplicate = (i == 0 && con.first.nonEmpty &&
-			                   con.firstCount == con.secondaryCount) ||
-			                  ((con.firstCount != con.secondaryCount) &&
-			                   ((i == 0 && con.firstCount != 1 &&
-			                     con.first.nonEmpty) ||
-			                    (i == 1 && con.secondaryCount != 1 &&
-			                     con.second.nonEmpty)))
-
-			if (doReplicate) {
-
-				val count = (if (i == 0) con.first.get else con.second.get)
-					.asInstanceOf[Instance].replicationCount
-
-				for (index <- 0 until count) yield {
-					val m: Instance = {
-						val mident = if (con.firstCount == 1) con.firstFullName
-						else s"${con.firstFullName}.$index"
-						expanded.find(p => p.ident == s"$mident") match {
-							case Some(value) => value
-							case None        => println(s"$mident isn't a instance name")
-								return Seq()
-						}
-					}
-
-					val s: Instance = {
-						val sident = if (con.secondaryCount == 1) con.secondFullName
-						else s"${con.secondFullName}.$index"
-						expanded.find(p => p.ident == s"$sident") match {
-							case Some(value) => value
-							case None        => println(s"$sident isn't a instance name")
-								return Seq()
-						}
-					}
-
-					result += (con match {
-						case ConnectedBetween(t, _, om, d, os) =>
-							Connections.ConnectedBetween(
-								t,
-								WildCardConnectionPriority(),
-								InstanceLoc(m, om.port, m.ident),
-								d,
-								InstanceLoc(s, os.port, s.ident))
-						case ConnectedConstant(t, _, c, d, ot) =>
-							Connections.ConnectedConstant(
-								t,
-								WildCardConnectionPriority(),
-								c,
-								d,
-								InstanceLoc(s, ot.port, s.ident))
-						case v                                 =>
-							println(s"Expansion of unknown Connected Type?? $con")
-							v
-					})
-				}
-			}
-		}
-
-		(result ++ connected.diff(result))
-			.filter(!_.connectionType.isInstanceOf[PortGroupConnectionType])
-			.toSeq
-	}
-
-
-	def expandAndConnect(unconnected: Seq[Connection],
-	                     unexpanded: Seq[Instance]):
-	(Seq[Instance], Seq[Connection]) = {
-		val connected = Connection.connect(unconnected, unexpanded)
-
-		val expandableInstances = unexpanded.filter(_.replicationCount > 1)
-
-		val connectionsNeedExpanding = for {
-			toExpand <- expandableInstances
-			con <- connected.filter(_.isConnected).map(_.asConnected)
-			if con.connectsToInstance(toExpand)
-		} yield con
-
-		val expanded = Connection.expand(expandableInstances, unexpanded)
-
-		val expandedConnection = Connection.expandConnections(
-			connectionsNeedExpanding,
-			expanded,
-			connected)
-
-		val dupsseq = for (o <- expandedConnection) yield
-			expandedConnection.filter(c => o.firstFullName == c.firstFullName &&
-			                               o.secondFullName == c.secondFullName)
-
-		val dupToUse    = for (dups <- dupsseq) yield {
-
-			val expli = dups.find(_.asConnected
-				                      .connectionPriority
-				                      .isInstanceOf[ExplicitConnectionPriority])
-			val wildc = dups.find(_.asConnected
-				                      .connectionPriority
-				                      .isInstanceOf[WildCardConnectionPriority])
-			val grpc  = dups.find(_.asConnected
-				                      .connectionPriority
-				                      .isInstanceOf[GroupConnectionPriority])
-			if (expli.nonEmpty) expli.get
-			else if (wildc.nonEmpty) wildc.get
-			else if (grpc.nonEmpty) grpc.get
-			else dups.head
-		}
-		val connections = expandedConnection.diff(dupsseq) ++ dupToUse
-
-		(expanded, connections)
-	}
-
 }

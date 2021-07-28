@@ -6,48 +6,41 @@ import ikuy_utils._
 import toml.Value
 
 case class ClockInstance(ident: String,
-                         pin: String,
-                         standard: String,
-                         period: Double,
-                         waveform: String,
                          private val defi: DefinitionTrait)
 	extends Instance {
+
+	lazy val pin: String =
+		Utils.lookupString(attributes, "pin", or = "INVALID")
+	lazy val standard: String =
+		Utils.lookupString(attributes, "standard", or = "LVCMOS33")
+	lazy val period: Double   =
+		Utils.lookupDouble(attributes, "period", 10.0)
+	lazy val waveform: String =
+		Utils.lookupString(attributes, "waveform", "{0 5}")
 
 	override def definition: DefinitionTrait = defi
 
 	override def copyMutate[A <: Instance](nid: String): ClockInstance =
 		copy(ident = nid)
 
-	override def getPort(lastName: String): Option[Port] = {
-		// TODO replace this hack
-		Some(Port(lastName, BitsDesc(1)))
-		/*if(lastName == "clk") Some(Port(lastName, BitsDesc(1)))
-		else None*/
-	}
-
-	override def ports: Map[String, Port] =
-		Map[String, Port]("clk" -> Port("clk", BitsDesc(1)))
-
 }
 
 object ClockInstance {
 	def apply(name: String,
 	          definition: DefinitionTrait,
-	          attributes: Map[String, Variant]): Option[ClockInstance] = {
-		if (!attributes.contains("pin")) {
-			println(s"$name clock doesn't contain a pin")
+	          attribs: Map[String, Variant]): Option[ClockInstance] = {
+
+		if(!definition.attributes.contains("pin") && attribs.contains("pin")) {
+			println(f"$name is a clock without a pin attribute")
 			None
 		} else {
-			val standard = Utils.lookupString(attributes, "standard", "LVCMOS33")
-			val period   = Utils.lookupDouble(attributes, "period", 10.0)
-			val waveform = Utils.lookupString(attributes, "waveform", "{0 5}")
+			val clock  = ClockInstance(name, definition)
+			clock.mergeParameter(attribs, "pin")
+			clock.mergeParameter(attribs, "standard")
+			clock.mergeParameter(attribs, "period")
+			clock.mergeParameter(attribs, "waveform")
 
-			Some(ClockInstance(name,
-			                   Utils.toString(attributes("pin")),
-			                   standard,
-			                   period,
-			                   waveform,
-			                   definition))
+			Some(clock)
 		}
 	}
 }

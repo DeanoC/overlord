@@ -14,10 +14,6 @@ import scala.collection.mutable
 trait Instance {
 	val ident: String
 
-	val replicationCount: Int     = 1 // TODO revisit this
-	val shared          : Boolean = false
-
-
 	val instanceRegisterBanks: mutable.ArrayBuffer[RegisterBank] = mutable.ArrayBuffer()
 	val instanceRegisterLists: mutable.ArrayBuffer[RegisterList] = mutable.ArrayBuffer()
 	val instanceDocs         : mutable.ArrayBuffer[String]       = mutable.ArrayBuffer()
@@ -150,13 +146,10 @@ object Instance {
 
 		val defTypeString    = Utils.toString(table("type"))
 		val name             = Utils.lookupString(table, "name", defTypeString)
-		val replicationCount = Utils.lookupInt(table, "count", 1)
-		val shared           = Utils.lookupBoolean(table, "shared", or = false)
 
 		val attribs: Map[String, Variant] = defaults ++ table.filter(
 			_._1 match {
 				case "type" | "name"    => false
-				case "shared" | "count" => false
 				case _                  => true
 			})
 
@@ -178,10 +171,7 @@ object Instance {
 		}
 
 		defi.createInstance(name, attribs) match {
-			case Some(i) =>
-				//				i.replicationCount = replicationCount
-				//				i.shared = shared
-				Some(i)
+			case Some(i) => Some(i)
 			case None    => None
 		}
 
@@ -222,12 +212,6 @@ object Instance {
 						case PortDefinitionType(ident)     =>
 						case ConstantDefinitionType(ident) =>
 			*/
-			case BoardDefinitionType(_) |
-			     ClockDefinitionType(_) |
-			     PinGroupDefinitionType(_) =>
-				val result = Definition(defType, attribs)
-				catalogs.catalogs += (defType -> result)
-				Some(result)
 			case _                         =>
 				println(s"$defType not found in any catalogs")
 				None

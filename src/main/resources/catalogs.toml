@@ -8,6 +8,5 @@ resources =[
   "sdio",
   "spi",
   "ram",
-  "ZynqPs7",
-  "ZynqPs8",
+  "socs",
 ]

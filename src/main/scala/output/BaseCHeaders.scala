@@ -10,6 +10,16 @@ import java.nio.file.Path
 import scala.collection.mutable
 
 object BaseCHeaders {
+	private def cpuPath(cpu: CpuInstance, out: Path) = out.resolve(s"${cpu.sanitizedTriple}")
+
+	private def hwPath(cpu: CpuInstance, out: Path) = cpuPath(cpu, out).resolve("hw")
+
+	private def filePath(out: Path, name: String ): Path = {
+		val fn = s"${name.replace('.', '_')}.h".toLowerCase()
+		val filename = Path.of(fn).getFileName
+		out.resolve(filename)
+	}
+
 	def apply(game: Game, out: Path): Unit = {
 		if (game.cpus.isEmpty) return
 
@@ -18,13 +28,12 @@ object BaseCHeaders {
 
 		genCpuHeaders(game, out)
 	}
-	private def hwPath(cpu: CpuInstance, out: Path) =
-		out.resolve(s"${cpu.sanitizedTriple}").resolve("hw")
 
 	private def genCpuHeaders(game: Game, out: Path): Unit = {
 		val postfix = (s:BigInt) => if(s > Int.MaxValue) "ULL" else "U"
 
 		for (cpu <- game.cpus) {
+			Utils.ensureDirectories(cpuPath(cpu, out))
 			val sb = new StringBuilder
 			sb ++= f"#pragma once%n"
 			sb ++= f"// Copyright Deano Calver%n"
@@ -67,10 +76,14 @@ object BaseCHeaders {
 					}
 
 					val si = ram.ident.split('.').tail.mkString("_").replace('.', '_')
-					val totalSize = ram.getSizeInBytes
-					sb ++= f"#define ${si.toUpperCase()}_TOTAL_SIZE_IN_BYTES $totalSize${postfix(totalSize)}%n"
 
 					val asplits = bus.getConsumerAddressesAndSizes(ram)
+					if(asplits.nonEmpty) {
+						val totalSize = ram.getSizeInBytes
+						sb ++= f"#define ${si.toUpperCase()}_TOTAL_SIZE_IN_BYTES " +
+						       f"$totalSize${postfix(totalSize)}%n"
+					}
+
 					var i = 0
 					for ((address, size) <- asplits) {
 						val pf = if(i != 0)s"_$i" else ""
@@ -83,9 +96,7 @@ object BaseCHeaders {
 				}
 			}
 
-			val path = hwPath(cpu, out)
-			Utils.ensureDirectories(path)
-			Utils.writeFile(path.resolve(s"platform.h"), sb.result())
+			Utils.writeFile(filePath(cpuPath(cpu, out),"platform"), sb.result())
 
 			genCpuHeadersFor(cpu, game, out)
 			genInstanceHeadersFor(cpu, game, out)
@@ -93,6 +104,9 @@ object BaseCHeaders {
 	}
 	private def genCpuHeadersFor(cpu: CpuInstance, game: Game, out: Path): Unit = {
 		val definitionsWritten = mutable.HashMap[String, String]()
+
+
+		Utils.ensureDirectories(hwPath(cpu, out))
 
 		// output register definations first
 		for(rl <- cpu.registerLists) {
@@ -105,10 +119,7 @@ object BaseCHeaders {
 
 			sb ++= genRegisterList(s"${rl.name}_".toUpperCase(), rl)
 
-			val path = hwPath(cpu, out)
-			Utils.ensureDirectories(path)
-			val fn = s"${rl.name.replace('.', '_')}.h".toLowerCase()
-			Utils.writeFile(path.resolve(fn), sb.result())
+			Utils.writeFile(filePath(hwPath(cpu, out),rl.name), sb.result())
 		}
 
 		// now write banks
@@ -130,10 +141,7 @@ object BaseCHeaders {
 
 				sb ++= f"#define ${bank.name}_BASE_ADDR 0x${bank.address}%x%n"
 
-				val path = hwPath(cpu, out)
-				Utils.ensureDirectories(path)
-				val fn = s"${bank.name.replace('.', '_')}.h".toLowerCase()
-				Utils.writeFile(path.resolve(fn), sb.result())
+				Utils.writeFile(filePath(hwPath(cpu, out),bank.name), sb.result())
 			}
 		}
 	}
@@ -188,10 +196,7 @@ object BaseCHeaders {
 					case _:BusInstance =>
 					case _:BridgeInstance =>
 					case _ =>
-						val path = hwPath(cpu, out)
-						Utils.ensureDirectories(path)
-						val fn = s"${instance.ident.replace('.', '_')}.h".toLowerCase()
-						Utils.writeFile(path.resolve(fn), sb.result())
+						Utils.writeFile(filePath(hwPath(cpu, out),instance.ident), sb.result())
 				}
 			}
 		}

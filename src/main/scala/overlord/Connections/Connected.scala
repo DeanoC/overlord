@@ -27,12 +27,6 @@ trait Connected extends Connection {
 
 	def connectsToInstance(inst: Instance): Boolean
 
-	def areConnectionCountsCompatible: Boolean
-
-	def firstCount: Int
-
-	def secondaryCount: Int
-
 	def first: Option[InstanceLoc]
 
 	def second: Option[InstanceLoc]

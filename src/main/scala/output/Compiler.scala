@@ -19,6 +19,9 @@ object Compiler {
 		genCompilerScript(triples, out)
 		genCMakeToolChains(triples, out)
 	}
+	private def sanatizeTriple(triple:String) : String = {
+		triple.replace("-", "_")
+	}
 
 	private def genCompilerScript(triples: Set[String], out: Path): Unit = {
 		val sb = new StringBuilder
@@ -55,7 +58,7 @@ object Compiler {
 		}
 
 		for (triple <- triples) {
-			val sanTriple = triple.replace("""-""", "")
+			val sanTriple = sanatizeTriple(triple)
 
 			// try to read a specialist toolchain file, if none exist use template
 			val tt = Utils.readFile(

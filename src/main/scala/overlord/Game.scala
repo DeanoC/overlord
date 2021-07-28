@@ -1,7 +1,7 @@
 package overlord
 
 import overlord.Connections.{Connected, ConnectedConstant, Connection, Wire, Wires}
-import overlord.Definitions.GatewareTrait
+import overlord.Definitions.{Definition, GatewareTrait}
 import overlord.Instances._
 import ikuy_utils._
 import overlord.Software.RegisterBank
@@ -110,11 +110,14 @@ object Game {
 
 		private val defaults = mutable.Map[String, Variant]()
 
-		containerStack.push(new MutContainer)
 
 		process(gamePath, catalogs)
 
 		private def process(path: Path, catalogs: DefinitionCatalog): Unit = {
+
+			val container = new MutContainer
+
+			containerStack.push(container)
 
 			val parsed = Utils.readToml(gameName, path, getClass)
 
@@ -129,8 +132,6 @@ object Game {
 					val incResourceName = Utils.toString(table("resource"))
 					val incResourcePath = Path.of(incResourceName)
 
-					containerStack.push(new MutContainer)
-
 					Utils.readFile(incResourceName, incResourcePath, getClass) match {
 						case Some(d) => process(incResourcePath, catalogs)
 						case _       =>
@@ -140,8 +141,6 @@ object Game {
 					}
 				}
 			}
-
-			val container = containerStack.top
 
 			// extract instances
 			if (parsed.contains("instance")) {
@@ -153,18 +152,6 @@ object Game {
 			if (parsed.contains("connection")) {
 				val connections = Utils.toArray(parsed("connection"))
 				container.connections ++= connections.flatMap(Connection(_, catalogs))
-			}
-			// find instance to use as a container
-			container.children.find(_.isInstanceOf[Container]) match {
-				case Some(v) =>
-					val c = v.asInstanceOf[Container]
-					container.children = container.children.filterNot(_.isInstanceOf[Container])
-					val n = c.copyMutateContainer(container)
-					containerStack.pop()
-					val t = containerStack.top
-					t.children ++= Seq(n.asInstanceOf[Instance])
-
-				case None =>
 			}
 		}
 
@@ -193,11 +180,10 @@ object Game {
 				_.isPhase2
 			})
 
-			val (expanded, expandedConnections) =
-				Connection.expandAndConnect(top.connections.toSeq, top.children.toSeq)
+			val connected = Connection.connect(top.connections.toSeq, top.children.toSeq)
 
 			// instances that are connected to buses need a register bank
-			val buses = expanded.filter(_.isInstanceOf[BusInstance])
+			val buses = connected.filter(_.isInstanceOf[BusInstance])
 				.map(_.asInstanceOf[BusInstance])
 			for(bus <- buses;
 			    inst <- bus.consumerInstances;
@@ -209,14 +195,14 @@ object Game {
 					RegisterBank(s"${bus.ident}_${inst.ident}",address, rl.name)
 			}
 
-			val setOfConnected = expandedConnections
+			val setOfConnected = connected
 				.filter(_.isConnected)
 				.map(_.asConnected).toSet
 
-			val dm: DistanceMatrix = DistanceMatrix(expanded, setOfConnected.toSeq)
+			val dm: DistanceMatrix = DistanceMatrix(top.children.toSeq, setOfConnected.toSeq)
 			val wires = Wires(dm, setOfConnected.toSeq)
 
-			Some(Game(gameName, expanded, setOfConnected.toSeq, dm, wires))
+			Some(Game(gameName, top.children.toSeq, setOfConnected.toSeq, dm, wires))
 		}
 	}
 

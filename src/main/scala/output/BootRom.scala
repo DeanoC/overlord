@@ -31,12 +31,15 @@ object BootRom {
 		genShellScript(primaryBooters, secondaryBooters, out)
 	}
 
+	private def sanatizeTriple(triple:String) : String = {
+		triple.replace("-", "_")
+	}
+
 	private def genPrimary(booters: Seq[CpuInstance], out: Path): Unit = {
 
 		val template = Utils.readFile(
 			"CMakeLists",
-			Path.of("software/bootrom/CMakeLists.txt"),
-			getClass) match {
+			Path.of("software/bootrom/CMakeLists.txt"), getClass) match {
 			case Some(script) => script
 			case None         =>
 				println("ERROR: resource CMakeLists.txt not found!")
@@ -45,8 +48,8 @@ object BootRom {
 
 		for (booter <- booters) {
 			val triple    = Utils.toString(booter.attributes("triple"))
-			val sanTriple = triple.replace("-", "")
-			val dir       = out.resolve(sanTriple + "_primary_boot")
+			val sanTriple = sanatizeTriple(triple)
+			val dir       = out.resolve(sanatizeTriple(triple) + "_primary_boot")
 
 			Utils.ensureDirectories(dir)
 
@@ -81,7 +84,7 @@ object BootRom {
 
 		for (primary <- primarys) {
 			val triple    = Utils.toString(primary.attributes("triple"))
-			val sanTriple = triple.replace("-", "")
+			val sanTriple = sanatizeTriple(triple)
 			sb ++=
 			"cmake -D " +
 			"CMAKE_TOOLCHAIN_FILE=$PWD/" + sanTriple + "_toolchain.cmake " +

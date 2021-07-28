@@ -37,8 +37,11 @@ object Wires {
 		// connection are logical, wires are physical
 		connected.foreach(
 			c => {
-				val (sp, ep) = dm.indicesOf(c)
-
+				val (sp, ep) = c.direction match {
+					case FirstToSecondConnection() => dm.indicesOf(c)
+					case SecondToFirstConnection() => (dm.indicesOf(c)._2, dm.indicesOf(c)._1)
+					case BiDirectionConnection()   => dm.indicesOf(c)
+				}
 				if (!(sp < 0 || ep < 0 || c.first.isEmpty || c.second.isEmpty)) {
 					val f     = c.first.get
 					val s     = c.second.get
@@ -47,24 +50,11 @@ object Wires {
 					var cp = sp
 					for {p <- route} {
 						val cploc = if (cp == sp) f else if (cp == ep) s else
-							InstanceLoc(dm.instanceOf(cp),
-							            None,
-							            dm.instanceOf(cp).ident)
+							InstanceLoc(dm.instanceOf(cp), None, dm.instanceOf(cp).ident)
 						val ploc  = if (p == sp) f else if (p == ep) s else
-							InstanceLoc(dm.instanceOf(p),
-							            None,
-							            dm.instanceOf(p).ident)
+							InstanceLoc(dm.instanceOf(p), None, dm.instanceOf(p).ident)
 
-						if (c.direction == SecondToFirstConnection())
-							ghosts += GhostWire(p, cp, ploc, cploc,
-							                    c.direction.flip,
-							                    c.connectionPriority)
-						else if (c.direction == BiDirectionConnection() && cp > p)
-							ghosts += GhostWire(p, cp, ploc, cploc, c.direction,
-							                    c.connectionPriority)
-						else
-							ghosts += GhostWire(cp, p, cploc, ploc, c.direction,
-							                    c.connectionPriority)
+						ghosts += GhostWire(cp, p, cploc, ploc, c.direction, c.connectionPriority)
 						cp = p
 					}
 				}

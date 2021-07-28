@@ -13,15 +13,9 @@ case class ConnectedConstant(connectionType: ConnectionType,
 	override def connectsToInstance(inst: Instance): Boolean =
 		to.instance == inst
 
-	override def firstCount: Int = to.instance.replicationCount
-
-	override def secondaryCount: Int = to.instance.replicationCount
-
 	override def first: Option[InstanceLoc] = None
 
 	override def second: Option[InstanceLoc] = Some(to)
-
-	override def areConnectionCountsCompatible: Boolean = true
 
 	def asParameter: Map[String, Variant] = Map(to.fullName -> constant)
 

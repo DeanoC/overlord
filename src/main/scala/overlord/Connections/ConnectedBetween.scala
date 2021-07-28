@@ -22,20 +22,6 @@ case class ConnectedBetween(connectionType: ConnectionType,
 
 	override def second: Option[InstanceLoc] = Some(secondary)
 
-	override def areConnectionCountsCompatible: Boolean = {
-		val sharedOkay = main.instance.shared// || secondary.instance.shared
-
-		assert((sharedOkay && firstCount == 1) ||
-		       (sharedOkay && secondaryCount == 1) ||
-		       (!sharedOkay))
-
-		(firstCount == secondaryCount) || sharedOkay
-	}
-
-	override def firstCount: Int = main.instance.replicationCount
-
-	override def secondaryCount: Int = secondary.instance.replicationCount
-
 	override def isPinToChip: Boolean = main.isPin && secondary.isChip
 
 	override def isChipToChip: Boolean = main.isChip && secondary.isChip
