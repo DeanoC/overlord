@@ -1,6 +1,6 @@
-package overlord.Gateware.GatewareAction
+package actions
 
-import overlord.Instances.Instance
+import overlord.Instances.ChipInstance
 import overlord.Game
 import ikuy_utils._
 
@@ -8,12 +8,12 @@ import java.nio.file.Path
 
 case class TomlAction(parameterKeys: Seq[String],
                       filename: String,
-                      pathOp: GatewareActionPathOp)
+                      pathOp: ActionPathOp)
 	extends GatewareAction {
 
-	override val phase: GatewareActionPhase = GatewareActionPhase1()
+	override val phase: Int = 1
 
-	override def execute(instance: Instance,
+	override def execute(instance: ChipInstance,
 	                     parameters: Map[String, Variant],
 	                     outPath: Path): Unit = {
 		val sb = new StringBuilder()
@@ -37,7 +37,7 @@ case class TomlAction(parameterKeys: Seq[String],
 object TomlAction {
 	def apply(name: String,
 	          process: Map[String, Variant],
-	          pathOp: GatewareActionPathOp): Seq[TomlAction] = {
+	          pathOp: ActionPathOp): Seq[TomlAction] = {
 		if (!process.contains("parameters")) {
 			println(s"Toml process $name doesn't have a parameters field")
 			None

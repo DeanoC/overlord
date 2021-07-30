@@ -1,6 +1,6 @@
 package overlord.Connections
 
-import overlord.Instances.{BusInstance, Instance}
+import overlord.Instances.{BusInstance, ChipInstance}
 import overlord.{Connections, DefinitionCatalog}
 import ikuy_utils._
 
@@ -117,13 +117,13 @@ object Connection {
 	}
 
 	def connect(unconnected: Seq[Connection],
-	                    unexpanded: Seq[Instance]): Seq[Connection] =
+	                    unexpanded: Seq[ChipInstance]): Seq[Connection] =
 		(for (c <- unconnected.filter(_.isUnconnected).map(_.asUnconnected)) yield {
 			c.connect(unexpanded)
 		}).flatten
 
 	def preConnect(unconnected: Seq[Connection],
-	               unexpanded: Seq[Instance]): Unit = {
+	               unexpanded: Seq[ChipInstance]): Unit = {
 		for (c <- unconnected.filter(_.isUnconnected).map(_.asUnconnected))
 			c.preConnect(unexpanded)
 

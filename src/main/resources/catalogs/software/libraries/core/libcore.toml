@@ -1,0 +1,10 @@
+actions = [
+    "src",
+]
+
+[[process]]
+name = 'src'
+processor = 'source'
+sources = [
+    { file ="core.h", language="c"}
+]

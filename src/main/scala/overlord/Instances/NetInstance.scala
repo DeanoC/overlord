@@ -1,23 +1,24 @@
 package overlord.Instances
 
 import ikuy_utils.Variant
-import overlord.Definitions.DefinitionTrait
+import overlord.ChipDefinitionTrait
 import toml.Value
 
 case class NetInstance(ident: String,
-                       private val defi: DefinitionTrait
-                      ) extends Instance {
-	override def definition:DefinitionTrait = defi
-
-	override def copyMutate[A <: Instance](nid: String): NetInstance =
+                       override val definition: ChipDefinitionTrait,
+                      ) extends ChipInstance {
+	override def copyMutate[A <: ChipInstance](nid: String): NetInstance =
 		copy(ident = nid)
 }
 
 object NetInstance {
 	def apply(ident: String,
-	          definition: DefinitionTrait,
+	          definition: ChipDefinitionTrait,
 	          attribs: Map[String, Variant]
 	         ): Option[NetInstance] = {
-		Some(NetInstance(ident, definition))
+		val net = NetInstance(ident, definition)
+		net.mergeAllAttributes(attribs)
+		Some(net)
+
 	}
 }

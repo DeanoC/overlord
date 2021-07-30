@@ -1,10 +1,9 @@
 package output
 
 import ikuy_utils.Utils
-import overlord.Game
-import overlord.Gateware.BitsDesc
+import overlord.{Game, GatewareDefinitionTrait}
+import overlord.Chip.{BitsDesc, GatewareDefinition, RegisterList}
 import overlord.Instances.{BridgeInstance, BusInstance, CpuInstance, RamInstance}
-import overlord.Software.RegisterList
 
 import java.nio.file.Path
 import scala.collection.mutable
@@ -47,13 +46,12 @@ object BaseCHeaders {
 			       '"' + s"${cpu.triple}" + '"' + f"%n"
 			sb ++= f"%n"
 
-			cpu.definition.gateware match {
-				case Some(value) =>
-					sb ++= f"#define CPU_IS_SOFT_CORE 1%n"
-					sb ++= f"#define CPU_IS_HARD_CORE 0%n"
-				case None        =>
-					sb ++= f"#define CPU_IS_SOFT_CORE 0%n"
-					sb ++= f"#define CPU_IS_HARD_CORE 1%n"
+			if( cpu.definition.isInstanceOf[GatewareDefinitionTrait] ) {
+				sb ++= f"#define CPU_IS_SOFT_CORE 1%n"
+				sb ++= f"#define CPU_IS_HARD_CORE 0%n"
+			} else {
+				sb ++= f"#define CPU_IS_SOFT_CORE 0%n"
+				sb ++= f"#define CPU_IS_HARD_CORE 1%n"
 			}
 
 			// find all ram linked to this cpu

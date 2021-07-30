@@ -1,8 +1,8 @@
 package overlord.Connections
 
-import overlord.Definitions.DefinitionTrait
-import overlord.Gateware.Port
-import overlord.Instances.{ClockInstance, Instance, PinGroupInstance}
+import overlord.Chip.Port
+import overlord.{ChipDefinitionTrait, GatewareDefinitionTrait}
+import overlord.Instances.{ChipInstance, ClockInstance, PinGroupInstance}
 import toml.Value
 
 sealed trait ConnectionPriority
@@ -11,11 +11,12 @@ case class GroupConnectionPriority() extends ConnectionPriority
 case class WildCardConnectionPriority() extends ConnectionPriority
 case class ExplicitConnectionPriority() extends ConnectionPriority
 
-case class InstanceLoc(instance: Instance,
+case class InstanceLoc(instance: ChipInstance,
                        port: Option[Port],
                        fullName: String) {
-	def definition: DefinitionTrait = instance.definition
+	def definition: ChipDefinitionTrait = instance.definition
 
+	def isGateware: Boolean = instance.isInstanceOf[GatewareDefinitionTrait]
 	def isPin: Boolean = instance.isInstanceOf[PinGroupInstance]
 	def isClock: Boolean = instance.isInstanceOf[ClockInstance]
 	def isChip:Boolean = !(isPin || isClock)
@@ -25,7 +26,7 @@ case class InstanceLoc(instance: Instance,
 trait Connected extends Connection {
 	val connectionPriority: ConnectionPriority
 
-	def connectsToInstance(inst: Instance): Boolean
+	def connectsToInstance(inst: ChipInstance): Boolean
 
 	def first: Option[InstanceLoc]
 

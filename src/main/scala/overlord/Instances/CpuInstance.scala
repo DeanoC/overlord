@@ -1,12 +1,12 @@
 package overlord.Instances
 
 import ikuy_utils.{Utils, Variant}
-import overlord.Definitions.DefinitionTrait
+import overlord.ChipDefinitionTrait
 import toml.Value
 
 case class CpuInstance(ident: String,
-                       private val defi: DefinitionTrait
-                      ) extends Instance {
+                       override val definition: ChipDefinitionTrait,
+                      ) extends ChipInstance {
 	lazy val primaryBoot: Boolean =
 		Utils.lookupBoolean(attributes, "primary_boot", or = false)
 	lazy val width : Int = Utils.lookupInt(attributes, "width", 32)
@@ -15,9 +15,7 @@ case class CpuInstance(ident: String,
 	lazy val sanitizedTriple: String = triple.replace("-", "_")
 	lazy val cpuCount : Int = Utils.lookupInt(attributes, "core_count", 1)
 
-	override def definition: DefinitionTrait = defi
-
-	override def copyMutate[A <: Instance](nid: String): CpuInstance =
+	override def copyMutate[A <: ChipInstance](nid: String): CpuInstance =
 		copy(ident = nid)
 
 
@@ -25,14 +23,12 @@ case class CpuInstance(ident: String,
 
 object CpuInstance {
 	def apply(ident: String,
-	          definition: DefinitionTrait,
+	          definition: ChipDefinitionTrait,
 	          attribs: Map[String, Variant]
 	         ): Option[CpuInstance] = {
 
 		val cpu  = CpuInstance(ident, definition)
-
-		cpu.mergeParameter(attribs, "cpu_count")
-		cpu.mergeParameter(attribs, "primary_boot")
+		cpu.mergeAllAttributes(attribs)
 
 		Some(cpu)
 	}

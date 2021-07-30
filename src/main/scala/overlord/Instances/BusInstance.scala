@@ -1,13 +1,13 @@
 package overlord.Instances
 
 import ikuy_utils._
-import overlord.Definitions.DefinitionTrait
+import overlord.ChipDefinitionTrait
 
 import scala.collection.mutable
 
 case class BusInstance(ident: String,
-                       private val defi: DefinitionTrait
-                      ) extends Instance {
+                       override val definition: ChipDefinitionTrait,
+                      ) extends ChipInstance {
 
 	lazy val busDataWidth    : Int         =
 		Utils.lookupInt(attributes, "bus_data_width", 32)
@@ -22,13 +22,13 @@ case class BusInstance(ident: String,
 	lazy val consumerPrefix  : String      =
 		Utils.lookupString(attributes, "consumer_prefix", "consumer${index}_")
 
-	private val fixedAddrConsumers    = mutable.ArrayBuffer[(Instance, BigInt, BigInt)]()
-	private val variableAddrConsumers = mutable.ArrayBuffer[(Instance, BigInt)]()
+	private val fixedAddrConsumers    = mutable.ArrayBuffer[(ChipInstance, BigInt, BigInt)]()
+	private val variableAddrConsumers = mutable.ArrayBuffer[(ChipInstance, BigInt)]()
 
-	def addFixedAddressConsumer(instance: Instance, address: BigInt, size: BigInt): Unit =
+	def addFixedAddressConsumer(instance: ChipInstance, address: BigInt, size: BigInt): Unit =
 		fixedAddrConsumers += ((instance, address, size))
 
-	def addVariableAddressConsumer(instance: Instance, size: BigInt): Unit =
+	def addVariableAddressConsumer(instance: ChipInstance, size: BigInt): Unit =
 		variableAddrConsumers += ((instance, size))
 
 	def computeConsumerAddresses(): Unit = {
@@ -63,13 +63,13 @@ case class BusInstance(ident: String,
 		}
 	}
 
-	def getFirstIndex(instance: Instance): Int = {
+	def getFirstIndex(instance: ChipInstance): Int = {
 		if (consumerIndices.contains((instance,0)))
 			consumerIndices((instance,0))
 		else
 			-1
 	}
-	def getIndices(instance: Instance): Seq[Int] = {
+	def getIndices(instance: ChipInstance): Seq[Int] = {
 		consumerIndices.filter(_._1._1 == instance).values.toSeq
 	}
 
@@ -79,43 +79,33 @@ case class BusInstance(ident: String,
 		case (addr, size) => Seq(BigIntV(addr), BigIntV(size))
 	}.toArray)
 
-	def getFirstConsumerAddressAndSize(instance: Instance): (BigInt, BigInt) = {
+	def getFirstConsumerAddressAndSize(instance: ChipInstance): (BigInt, BigInt) = {
 		val index = getFirstIndex(instance)
 		if (index == -1) return (0, 0)
 		consumers(index)
 	}
-	def getConsumerAddressesAndSizes(instance: Instance): Seq[(BigInt, BigInt)] = {
+	def getConsumerAddressesAndSizes(instance: ChipInstance): Seq[(BigInt, BigInt)] = {
 		getIndices(instance).map(consumers(_))
 	}
 
-	def consumerInstances: Seq[Instance] =
+	def consumerInstances: Seq[ChipInstance] =
 		consumerIndices.keysIterator.map(_._1).distinct.toSeq
 
 	private var consumers       = mutable.ArrayBuffer[(BigInt, BigInt)]()
-	private var consumerIndices = mutable.HashMap[(Instance, Int), Int]()
+	private var consumerIndices = mutable.HashMap[(ChipInstance, Int), Int]()
 
-	override def definition: DefinitionTrait = defi
-
-	override def copyMutate[A <: Instance](nid: String): BusInstance =
+	override def copyMutate[A <: ChipInstance](nid: String): BusInstance =
 		copy(ident = nid)
 }
 
 object BusInstance {
 	def apply(ident: String,
-	          definition: DefinitionTrait,
+	          definition: ChipDefinitionTrait,
 	          attribs: Map[String, Variant]
 	         ): Option[BusInstance] = {
 
 		val bus = BusInstance(ident, definition)
-
-		bus.mergeParameter(attribs, "bus_data_width")
-		bus.mergeParameter(attribs, "bus_address_width")
-		bus.mergeParameter(attribs, "bus_base_address")
-		bus.mergeParameter(attribs, "bus_bank_alignment")
-		bus.mergeParameter(attribs, "supplier_prefix")
-		bus.mergeParameter(attribs, "consumer_prefix")
-
-
+		bus.mergeAllAttributes(attribs)
 		Some(bus)
 	}
 }

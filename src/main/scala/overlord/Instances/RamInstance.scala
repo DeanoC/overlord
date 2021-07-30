@@ -1,7 +1,7 @@
 package overlord.Instances
 
 import ikuy_utils.{Utils, Variant}
-import overlord.Definitions.DefinitionTrait
+import overlord.ChipDefinitionTrait
 
 sealed trait RamFillType
 
@@ -12,11 +12,9 @@ case class PrimaryBootFillType() extends RamFillType
 case class RamInstance(ident: String,
                        private val sizeInBytes: Option[BigInt],
                        fillType: RamFillType,
-                       private val defi: DefinitionTrait
-                      ) extends Instance {
-	override def definition: DefinitionTrait = defi
-
-	override def copyMutate[A <: Instance](nid: String): RamInstance =
+                       override val definition: ChipDefinitionTrait,
+                      ) extends ChipInstance {
+	override def copyMutate[A <: ChipInstance](nid: String): RamInstance =
 		copy(ident = nid)
 
 	def getSizeInBytes: BigInt = sizeInBytes match {
@@ -28,7 +26,7 @@ case class RamInstance(ident: String,
 
 object RamInstance {
 	def apply(ident: String,
-	          definition: DefinitionTrait,
+	          definition: ChipDefinitionTrait,
 	          attribs: Map[String, Variant]
 	         ): Option[RamInstance] = {
 

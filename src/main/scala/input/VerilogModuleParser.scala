@@ -1,6 +1,6 @@
 package input
 
-import overlord.Gateware.BitsDesc
+import overlord.Chip.BitsDesc
 
 import java.nio.file.{Files, Path}
 import scala.collection.mutable

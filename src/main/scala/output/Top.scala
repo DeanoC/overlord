@@ -8,8 +8,8 @@ import overlord.Connections.{
 	InstanceLoc, WildCardConnectionPriority, Wire,
 	Wires
 }
-import overlord.Gateware.{Port, WireDirection}
-import overlord.Instances.{ClockInstance, Instance, PinGroupInstance}
+import overlord.Chip.{Port, WireDirection}
+import overlord.Instances.{ClockInstance, ChipInstance, PinGroupInstance}
 import overlord._
 
 import scala.collection.mutable
@@ -29,16 +29,14 @@ object Top {
 		sb ++= writeChipToChipWires(game.wires)
 
 		// instantiation
-		for ((instance, gw) <- game.setOfGateware.map(
-			i => (i, i.definition.gateware.get))) {
-
+		for (instance <- game.setOfGateware) {
 			sb ++=
 			s"""
 				 |  (*dont_touch = "true"*) ${instance.ident}""".stripMargin
 
 			val merged = game.constants
 				.map(_.asParameter)
-				.fold(gw.parameters)((o, n) => o ++ n)
+				.fold(instance.attributes)((o, n) => o ++ n)
 				.filter(c => instance.parameterKeys.contains(c._1))
 
 			if (merged.nonEmpty) {
@@ -139,7 +137,7 @@ object Top {
 		sb.result()
 	}
 
-	private def writeChipWires(instance: Instance,
+	private def writeChipWires(instance: ChipInstance,
 	                           wires: Seq[Wire]): String = {
 		val sb: StringBuilder = new StringBuilder
 

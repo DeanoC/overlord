@@ -1,32 +1,31 @@
-package overlord.Gateware.GatewareAction
+package actions
 
-import overlord.Instances.Instance
+import overlord.Instances.ChipInstance
 import overlord.Game
 import ikuy_utils._
 
 import java.nio.file.Path
 
 case class ReadTomlRegistersAction(filename: String,
-                                   pathOp: GatewareActionPathOp)
+                                   pathOp: ActionPathOp)
 	extends GatewareAction {
 
-	override val phase: GatewareActionPhase = GatewareActionPhase2()
+	override val phase: Int = 2
 
-	override def execute(instance: Instance,
+	override def execute(instance: ChipInstance,
 	                     parameters: Map[String, Variant],
 	                     outPath: Path): Unit = {
 		val name = filename.replace("${name}", instance.ident)
-		input.TomlRegistersParser(outPath, name.split("/").last) match {
-			case Some(v) => instance.instanceRegisterLists ++= v.registerLists
-			case None    =>
-		}
+		val registers = input.TomlRegistersParser(outPath, name.split("/").last)
+		instance.instanceRegisterBanks ++= registers.banks
+		instance.instanceRegisterLists ++= registers.lists
 	}
 }
 
 object ReadTomlRegistersAction {
 	def apply(name: String,
 	          process: Map[String, Variant],
-	          pathOp: GatewareActionPathOp): Option[ReadTomlRegistersAction] = {
+	          pathOp: ActionPathOp): Option[ReadTomlRegistersAction] = {
 		if (!process.contains("source")) {
 			println(s"Read Toml Registers process $name doesn't have a source field")
 			return None

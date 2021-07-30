@@ -1,8 +1,6 @@
 package overlord
 
 import java.nio.file.{Files, Path}
-import overlord.Definitions.{Definition, DefinitionTrait, DefinitionType}
-
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import ikuy_utils._
@@ -64,11 +62,11 @@ object DefinitionCatalog {
 			spath.resolve(Utils.toString(parsed("path")))
 		} else spath
 
-		val defs = ArrayBuffer[DefinitionTrait]()
 		val defaults = if (parsed.contains("defaults"))
 				Utils.mergeAintoB(Utils.toTable(parsed("defaults")), defaultMap)
 			else defaultMap
 
+		val defs = ArrayBuffer[DefinitionTrait]()
 		if (parsed.contains("definition")) {
 			val tdef = Utils.toArray(parsed("definition"))
 			for (defi <- tdef) defs += Definition(defi, path, defaults)

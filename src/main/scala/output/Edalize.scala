@@ -1,16 +1,11 @@
 package output
 
-import java.nio.file.Path
-import overlord.Gateware.GatewareAction.{
-	CopyAction, GitCloneAction,
-	SourcesAction
-}
-import overlord.Instances.{
-	AlteraBoard, LatticeBoard, PrimaryBootFillType,
-	XilinxBoard, ZeroFillType
-}
-import overlord._
+import actions.{CopyAction, SourcesAction}
 import ikuy_utils._
+import overlord.Instances._
+import overlord._
+
+import java.nio.file.Path
 
 object Edalize {
 	def apply(game: Game, out: Path): Unit = {
@@ -83,7 +78,7 @@ object Edalize {
 					}
 
 
-					val inPath  =
+					val inPath =
 						s"../soft/build/bootroms/riscv32noneelf_primary_boot" +
 						s"/riscv32noneelf_boot.bin"
 
@@ -112,8 +107,9 @@ object Edalize {
 		}
 
 		sb ++= "files = [\n"
-		for ((_, defi) <- game.gatewares) {
-			defi.actions.foreach {
+		for {gw <- game.gatewares
+		     defi = gw.definition.asInstanceOf[GatewareDefinitionTrait]} {
+			defi.actionsFile.actions.foreach {
 				case action: CopyAction =>
 					sb ++=
 					// @formatter:off
@@ -136,20 +132,6 @@ s"""    {'name': os.path.relpath('${game.name}.xdc', work_root), 'file_type': 'x
 		// @formatter:on
 
 		sb ++= "]\n"
-
-		/* Currently parameters are handled by Overlord not Edalize
-		Its quite likely in future this will change so here is my original code
-
-		sb ++= "parameters = {\n"
-		for ((gateware, defi) <- game.gatewares)
-			defi.parameters.foreach(
-				// @formatter:off
-				p => sb ++=
-s"""    '${p._1}': {'datatype': 'string', 'default': "${p._2}", 'paramtype': 'vlogparam'},\n"""
-				// @formatter:on
-				)
-		sb ++= "}\n"
-*/
 
 		board.boardType match {
 			case XilinxBoard(_, device) =>

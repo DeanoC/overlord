@@ -1,31 +1,28 @@
 package overlord.Instances
 
-import overlord.Definitions.DefinitionTrait
-import overlord.Gateware.{BitsDesc, Port, WireDirection}
-import overlord.{DiffPinConstraint, PinConstraint, PinConstraintType}
+import overlord.Chip.{BitsDesc, Port, WireDirection}
+import overlord.{ChipDefinitionTrait, DiffPinConstraint, PinConstraint, PinConstraintType}
 import ikuy_utils._
 import toml.Value
 
 import scala.collection.immutable.Map
+import scala.collection.mutable
 
 case class PinGroupInstance(ident: String,
                             constraint: PinConstraintType,
-                            private val defi: DefinitionTrait
-                           ) extends Instance {
-	override def definition: DefinitionTrait = defi
+                            override val definition: ChipDefinitionTrait,
+                           ) extends ChipInstance {
 
-	override def copyMutate[A <: Instance](nid: String): PinGroupInstance =
+	override def copyMutate[A <: ChipInstance](nid: String): PinGroupInstance =
 		copy(ident = nid)
 
-	private lazy val allPorts: Map[String, Port] =
-		super.ports ++ constraint.ports.map(p => p.name -> p)
-
-	override def ports: Map[String, Port] = allPorts
+	override lazy val ports: mutable.HashMap[String, Port] =
+		mutable.HashMap.from(definition.ports ++ constraint.ports.map(p => p.name -> p))
 }
 
 object PinGroupInstance {
 	def apply(ident: String,
-	          definition: DefinitionTrait,
+	          definition: ChipDefinitionTrait,
 	          attributes: Map[String, Variant]): Option[PinGroupInstance] = {
 
 		val hasPin      = attributes.contains("pin")

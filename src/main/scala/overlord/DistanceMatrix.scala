@@ -1,21 +1,19 @@
 package overlord
 
 import overlord.Connections.{BiDirectionConnection, Connected, ExplicitConnectionPriority, FirstToSecondConnection, InstanceLoc, PortConnectionType, PortGroupConnectionType, SecondToFirstConnection}
-import overlord.Instances.{Container, Instance}
+import overlord.Instances.{Container, ChipInstance}
 
 import scala.collection.mutable
 
-case class DistanceMatrix(instanceArray: Array[Instance]) {
+case class DistanceMatrix(instanceArray: Array[ChipInstance]) {
 	val dim: Int = instanceArray.length
 
-	private var virtualContainers = Seq[Instance]()
+	private var virtualContainers = Seq[ChipInstance]()
 
 	private val distanceMatrix = Array.fill[Int](dim, dim) { DistanceMatrix.NotComputed }
 	private val routeMatrix    = Array.ofDim[Seq[Int]](dim, dim)
 
-	def distanceBetween(s: Int, e: Int): Int = {
-		distanceMatrix(s)(e)
-	}
+	def distanceBetween(s: Int, e: Int): Int = distanceMatrix(s)(e)
 
 	def routeBetween(s: Int, e: Int): Seq[Int] = routeMatrix(s)(e)
 
@@ -36,16 +34,16 @@ case class DistanceMatrix(instanceArray: Array[Instance]) {
 	def columnBetween(c: Int): Seq[Seq[Int]] =
 		for (i <- 0 until dim) yield routeMatrix(i)(c)
 
-	def instanceOf(i: Int): Instance = instanceArray(i)
+	def instanceOf(i: Int): ChipInstance = instanceArray(i)
 
-	def indexOf(c: Instance): Int = instanceArray.indexOf(c)
+	def indexOf(c: ChipInstance): Int = instanceArray.indexOf(c)
 
 	def indexOf(c: InstanceLoc): Int = indexOf(c.instance)
 
-	def distanceBetween(a:Instance, b:Instance): Int =
+	def distanceBetween(a:ChipInstance, b:ChipInstance): Int =
 		distanceBetween(indexOf(a), indexOf(b))
 
-	def connected(a:Instance, b:Instance): Boolean = distanceBetween(a, b) > 0
+	def connected(a:ChipInstance, b:ChipInstance): Boolean = distanceBetween(a, b) > 0
 
 	def indicesOf(c: Connected): (Int, Int) = (
 		if (c.first.nonEmpty) indexOf(c.first.get) else -1,
@@ -106,18 +104,18 @@ case class DistanceMatrix(instanceArray: Array[Instance]) {
 object DistanceMatrix {
 	private val NotComputed = -1
 
-	private def flattenInstances(instances: Seq[Instance]): Array[Instance] = {
+	private def flattenInstances(instances: Seq[ChipInstance]): Array[ChipInstance] = {
 		(for (instance <- instances) yield
 			instance match {
 				case container: Container =>
-					flattenInstances(container.children) ++
+					flattenInstances(container.chipChildren) ++
 					(if (container.physical) Array(instance) else Array())
 				case _                    => Array(instance)
 			}
 			).toArray.flatten
 	}
 
-	def apply(instances: Seq[Instance], connected: Seq[Connected]): DistanceMatrix = {
+	def apply(instances: Seq[ChipInstance], connected: Seq[Connected]): DistanceMatrix = {
 		val instancesArray = flattenInstances(instances)
 		val dm             = DistanceMatrix(instancesArray)
 
@@ -171,7 +169,7 @@ object DistanceMatrix {
 		}
 	}
 	private def computeRouteBetweens(dm: DistanceMatrix,
-	                                 instancesArray: Seq[Instance],
+	                                 instancesArray: Seq[ChipInstance],
 	                                 connected: Seq[Connected]): Unit = {
 		val neighbours = Array.ofDim[mutable.ArrayBuffer[Int]](instancesArray.length)
 		for{i <- 0 until dm.dim} neighbours(i) = mutable.ArrayBuffer[Int]()

@@ -1,33 +1,27 @@
 package overlord.Instances
 
-import ikuy_utils.{BigIntV, IntV, Variant}
-import overlord.Definitions.DefinitionTrait
+import ikuy_utils.{BigIntV, IntV, Utils, Variant}
+import overlord.ChipDefinitionTrait
 
 case class BridgeInstance(ident: String,
-                          private val localParams: Map[String, Variant],
-                          private val defi: DefinitionTrait
-                         ) extends Instance {
+                          override val definition: ChipDefinitionTrait,
+                         ) extends ChipInstance {
 
 	lazy val addressWindowWidth: Int =
-		localParams("address_window_width").asInstanceOf[BigIntV].value.toInt
+		Utils.lookupInt(attributes, "address_window_width", 16)
 
-	override def definition:DefinitionTrait = defi
-
-	override def copyMutate[A <: Instance](nid: String): BridgeInstance =
+	override def copyMutate[A <: ChipInstance](nid: String): BridgeInstance =
 		copy(ident = nid)
 
 }
 
 object BridgeInstance {
 	def apply(ident: String,
-	          definition: DefinitionTrait,
+	          definition: ChipDefinitionTrait,
 	          attribs: Map[String, Variant]
 	         ): Option[BridgeInstance] = {
-		//@formatter:off
-		val iParams = Map[String, Variant]( elems =
-	      "address_window_width" -> attribs.getOrElse("address_window_width", BigIntV(16)),
-	    )
-		//@formatter:on
-		Some(BridgeInstance(ident, iParams, definition))
+		val bridge = BridgeInstance(ident, definition)
+		bridge.mergeAllAttributes(attribs)
+		Some(bridge)
 	}
 }

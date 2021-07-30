@@ -1,23 +1,25 @@
 package overlord.Instances
 
 import ikuy_utils.Variant
-import overlord.Definitions.DefinitionTrait
+import overlord.ChipDefinitionTrait
 import toml.Value
 
 case class StorageInstance(ident: String,
-                           private val defi: DefinitionTrait
-                          ) extends Instance {
-	override def definition:DefinitionTrait = defi
-	override def copyMutate[A <: Instance](nid: String) : StorageInstance =
+                           private val defi: ChipDefinitionTrait
+                          ) extends ChipInstance {
+	override def definition:ChipDefinitionTrait = defi
+	override def copyMutate[A <: ChipInstance](nid: String) : StorageInstance =
 		copy(ident = nid)
 
 }
 
 object StorageInstance {
 	def apply(ident: String,
-	          definition: DefinitionTrait,
+	          definition: ChipDefinitionTrait,
 	          attribs: Map[String, Variant]
 	         ): Option[StorageInstance] = {
-		Some(StorageInstance(ident, definition))
+		val storage  = StorageInstance(ident, definition)
+		storage.mergeAllAttributes(attribs)
+		Some(storage)
 	}
 }

@@ -1,16 +1,16 @@
-package overlord.Gateware.GatewareAction
+package actions
 
 import java.nio.file.Path
-import overlord.Instances.Instance
+import overlord.Instances.ChipInstance
 import ikuy_utils._
 
 case class GitCloneAction(url: String,
-                          pathOp: GatewareActionPathOp)
+                          pathOp: ActionPathOp)
 	extends GatewareAction {
 
-	override val phase: GatewareActionPhase = GatewareActionPhase1()
+	override val phase: Int = 1
 
-	override def execute(gateware: Instance, parameters: Map[String, Variant], outPath: Path): Unit = {
+	override def execute(instance: ChipInstance, parameters: Map[String, Variant], outPath: Path): Unit = {
 		import scala.language.postfixOps
 		import scala.sys.process._
 
@@ -28,7 +28,7 @@ case class GitCloneAction(url: String,
 object GitCloneAction {
 	def apply(name: String,
 	          process: Map[String, Variant],
-	          pathOp: GatewareActionPathOp): Seq[GitCloneAction] = {
+	          pathOp: ActionPathOp): Seq[GitCloneAction] = {
 		if (!process.contains("url")) {
 			println(s"Git Clone process $name doesn't have a url field")
 			None

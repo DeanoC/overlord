@@ -1,8 +1,6 @@
 package output
 
-import overlord.Connections.Connected
-import overlord.Definitions._
-import overlord.Instances.{BoardInstance, Container, Instance}
+import overlord.Instances.{BoardInstance, ChipInstance, Container, InstanceTrait}
 
 import java.nio.file.Path
 import overlord._
@@ -81,7 +79,7 @@ object Report {
 		container.children.map(reportInstance(_, indentLevel)).mkString("")
 	}
 
-	private def reportInstance(instance: Instance,
+	private def reportInstance(instance: InstanceTrait,
 	                           indentLevel: Int = 0): String = {
 		val sb = new StringBuilder
 
@@ -102,9 +100,12 @@ object Report {
 			case BoardDefinitionType(ident)    => "board."
 		}) + id
 		sb ++= (indent + f"type: $name%n")
-		for(rl <- instance.registerLists)
-			sb ++= f"   ${rl.name} - ${rl.description}%n"
-
+		instance match {
+			case ci: ChipInstance =>
+				for (rl <- ci.registerLists)
+					sb ++= f"   ${rl.name} - ${rl.description}%n"
+			case _                       =>
+		}
 		instance match {
 			case c: Container =>
 				sb ++= reportContainer(c, indentLevel + 1)

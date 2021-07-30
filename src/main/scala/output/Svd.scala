@@ -1,12 +1,11 @@
 package output
 
 import ikuy_utils.Utils
-import overlord.Gateware.BitsDesc
+import overlord.Chip.{BitsDesc, Register}
 
 import java.io.{BufferedWriter, FileWriter}
 import java.nio.file.Path
-import overlord.Instances.{CpuInstance, Instance}
-import overlord.Software.Register
+import overlord.Instances.{ChipInstance, CpuInstance}
 import overlord._
 
 import scala.collection.mutable
@@ -73,7 +72,7 @@ object Svd {
 
 	private val definitionsWritten = mutable.HashMap[String, String]()
 
-	private def outputRegisters(s: Instance) : Seq[xml.Elem] = {
+	private def outputRegisters(s: ChipInstance) : Seq[xml.Elem] = {
 		if(s.registerBanks.isEmpty) return Seq[xml.Elem]()
 
 		for(bank <- s.registerBanks.toIndexedSeq) yield {
@@ -127,7 +126,7 @@ object Svd {
 
 		val cpus = for (cpu <- game.cpus) yield <cpu>{outputCpu(cpu)}</cpu>
 
-		val instances = for (p <- game.allInstances) yield outputRegisters(p)
+		val instances = for (p <- game.allChipInstances) yield outputRegisters(p)
 
 		val deviceXml: xml.Elem =
 			<device schemaVersion="1.3"

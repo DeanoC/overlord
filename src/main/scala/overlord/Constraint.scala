@@ -1,6 +1,6 @@
 package overlord
 
-import overlord.Gateware.Port
+import overlord.Chip.Port
 
 sealed trait PinConstraintType{
 	val ports: Seq[Port]

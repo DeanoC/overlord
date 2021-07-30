@@ -1,4 +1,4 @@
-package overlord.Gateware
+package overlord.Chip
 
 import ikuy_utils._
 import toml.Value

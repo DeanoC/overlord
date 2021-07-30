@@ -1,7 +1,7 @@
-package overlord.Gateware.GatewareAction
+package actions
 
 import java.nio.file.Path
-import overlord.Instances.Instance
+import overlord.Instances.ChipInstance
 import overlord.Game
 import ikuy_utils._
 
@@ -9,12 +9,12 @@ case class SbtAction(mainScala: String,
                      args: String,
                      withBuildSbt: Boolean,
                      srcPath: String,
-                     pathOp: GatewareActionPathOp)
+                     pathOp: ActionPathOp)
 	extends GatewareAction {
 
-	override val phase: GatewareActionPhase = GatewareActionPhase1()
+	override val phase: Int = 1
 
-	override def execute(instance: Instance,
+	override def execute(instance: ChipInstance,
 	                     parameters: Map[String, Variant],
 	                     outPath: Path): Unit = {
 		import scala.language.postfixOps
@@ -62,7 +62,7 @@ case class SbtAction(mainScala: String,
 object SbtAction {
 	def apply(name: String,
 	          process: Map[String, Variant],
-	          pathOp: GatewareActionPathOp): Seq[SbtAction] = {
+	          pathOp: ActionPathOp): Seq[SbtAction] = {
 		if (!process.contains("args")) {
 			println(s"SBT process $name doesn't have a args field")
 			None

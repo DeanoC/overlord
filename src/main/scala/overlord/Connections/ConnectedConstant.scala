@@ -1,6 +1,6 @@
 package overlord.Connections
 
-import overlord.Instances.Instance
+import overlord.Instances.ChipInstance
 
 import ikuy_utils.Variant
 
@@ -10,7 +10,7 @@ case class ConnectedConstant(connectionType: ConnectionType,
                              direction: ConnectionDirection,
                              to: InstanceLoc)
 	extends Connected {
-	override def connectsToInstance(inst: Instance): Boolean =
+	override def connectsToInstance(inst: ChipInstance): Boolean =
 		to.instance == inst
 
 	override def first: Option[InstanceLoc] = None

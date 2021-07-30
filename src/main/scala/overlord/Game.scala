@@ -1,68 +1,67 @@
 package overlord
 
-import overlord.Connections.{Connected, ConnectedConstant, Connection, Wire, Wires}
-import overlord.Definitions.{Definition, GatewareTrait}
-import overlord.Instances._
 import ikuy_utils._
-import overlord.Software.RegisterBank
+import overlord.Chip.RegisterBank
+import overlord.Connections._
+import overlord.Instances._
 
 import java.nio.file.Path
 import scala.collection.mutable
 
 case class Game(name: String,
-                children: Seq[Instance],
+                children: Seq[ChipInstance],
                 connected: Seq[Connected],
                 distanceMatrix: DistanceMatrix,
                 wires: Seq[Wire]
-               ){
-	lazy val setOfGateware: Set[Instance] = {
-		val setOfGateware = mutable.HashSet[Instance]()
+               ) {
+	lazy val setOfGateware: Set[ChipInstance] = {
+		val setOfGateware = mutable.HashSet[ChipInstance]()
 		connected.foreach { c =>
-			if (c.first.nonEmpty && c.first.get.instance.isGateware)
+			if (c.first.nonEmpty && c.first.get.isGateware)
 				setOfGateware += c.first.get.instance
-			if (c.second.nonEmpty && c.second.get.instance.isGateware)
+			if (c.second.nonEmpty && c.second.get.isGateware)
 				setOfGateware += c.second.get.instance
 		}
 		setOfGateware.toSet
 	}
 
-	lazy val flatChildren: Seq[Instance] =
+	lazy val flatChipChildren: Seq[ChipInstance] =
 		children.filter(_.isInstanceOf[Container])
-			.map(_.asInstanceOf[Container]).flatMap(_.flatChildren) ++ children
+			.map(_.asInstanceOf[Container])
+			.flatMap(_.flatChildren.map(_.asInstanceOf[ChipInstance])) ++ children
 
-	lazy val allInstances: Seq[Instance] = flatChildren
+	lazy val allChipInstances: Seq[ChipInstance] = flatChipChildren
 
-	lazy val cpus: Seq[CpuInstance] = flatChildren
+	lazy val cpus: Seq[CpuInstance] = flatChipChildren
 		.filter(_.isInstanceOf[CpuInstance])
 		.map(_.asInstanceOf[CpuInstance])
 
 	lazy val rams: Seq[RamInstance] =
-		flatChildren.filter(_.isInstanceOf[RamInstance])
+		flatChipChildren.filter(_.isInstanceOf[RamInstance])
 			.map(_.asInstanceOf[RamInstance])
 
 	lazy val buses: Seq[BusInstance] =
-		flatChildren.filter(_.isInstanceOf[BusInstance])
+		flatChipChildren.filter(_.isInstanceOf[BusInstance])
 			.map(_.asInstanceOf[BusInstance])
 
 	lazy val storages: Seq[StorageInstance] =
-		flatChildren.filter(_.isInstanceOf[StorageInstance])
+		flatChipChildren.filter(_.isInstanceOf[StorageInstance])
 			.map(_.asInstanceOf[StorageInstance])
 
 	lazy val nets: Seq[NetInstance] =
-		flatChildren.filter(_.isInstanceOf[NetInstance])
+		flatChipChildren.filter(_.isInstanceOf[NetInstance])
 			.map(_.asInstanceOf[NetInstance])
 
 	lazy val pins: Seq[PinGroupInstance] =
-		flatChildren.filter(_.isInstanceOf[PinGroupInstance])
+		flatChipChildren.filter(_.isInstanceOf[PinGroupInstance])
 			.map(_.asInstanceOf[PinGroupInstance])
 
 	lazy val clocks: Seq[ClockInstance] =
-		flatChildren.filter(_.isInstanceOf[ClockInstance])
+		flatChipChildren.filter(_.isInstanceOf[ClockInstance])
 			.map(_.asInstanceOf[ClockInstance])
 
-	lazy val gatewares: Seq[(Instance, GatewareTrait)] =
-		flatChildren.filter(_.definition.gateware.nonEmpty)
-			.map(g => (g, g.definition.gateware.get))
+	lazy val gatewares: Seq[ChipInstance] =
+		flatChipChildren.filter(_.definition.isInstanceOf[GatewareDefinitionTrait])
 
 	lazy val constants: Seq[ConnectedConstant] =
 		connected.filter(_.isInstanceOf[ConnectedConstant])
@@ -72,22 +71,22 @@ case class Game(name: String,
 		children.find(_.isInstanceOf[BoardInstance])
 			.asInstanceOf[Option[BoardInstance]]
 
-	def getBusesConnectedTo(instance: Instance) : Seq[BusInstance] =
-		buses.filter(distanceMatrix.connected(instance,_))
+	def getDirectBusesConnectedTo(instance: ChipInstance): Seq[BusInstance] =
+		buses.filter(distanceMatrix.distanceBetween(instance, _) == 1)
 
-	def getDirectBusesConnectedTo(instance: Instance) : Seq[BusInstance] =
-		buses.filter(distanceMatrix.distanceBetween(instance,_) == 1)
-
-	def getEndBusesConnecting(start:Instance, end:Instance) : Seq[BusInstance] = {
+	def getEndBusesConnecting(start: ChipInstance, end: ChipInstance): Seq[BusInstance] = {
 		val startBuses = getBusesConnectedTo(start)
-		(for(bus <- startBuses) yield {
+		(for (bus <- startBuses) yield {
 			val connected = distanceMatrix.connected(bus, end)
-			if(connected) Some(bus) else None
+			if (connected) Some(bus) else None
 		}).flatten
 	}
 
-	def getRAMConnectedTo(instance: Instance) : Seq[RamInstance] =
-		rams.filter(distanceMatrix.connected(instance,_))
+	def getBusesConnectedTo(instance: ChipInstance): Seq[BusInstance] =
+		buses.filter(distanceMatrix.connected(instance, _))
+
+	def getRAMConnectedTo(instance: ChipInstance): Seq[RamInstance] =
+		rams.filter(distanceMatrix.connected(instance, _))
 
 }
 
@@ -112,6 +111,55 @@ object Game {
 
 
 		process(gamePath, catalogs)
+
+		def toGame(out: Path,
+		           doPhase1: Boolean = true,
+		           doPhase2: Boolean = true): Option[Game] = {
+			val softPath = out.resolve("soft")
+			val gatePath = out.resolve("gate")
+			Utils.ensureDirectories(softPath)
+			Utils.ensureDirectories(gatePath)
+
+			val top = containerStack.head
+			for (c <- containerStack.tail) {
+				top.children ++= c.children
+				top.connections ++= c.connections
+			}
+			containerStack.clear()
+
+			val chipInstances = top.children.
+				filter(_.isInstanceOf[ChipInstance]).
+				map(_.asInstanceOf[ChipInstance]).toSeq
+
+			Connection.preConnect(top.connections.toSeq, chipInstances)
+
+			OutputGateware(top, gatePath, 1)
+			OutputGateware(top, gatePath, 2)
+
+			val connected = Connection.connect(top.connections.toSeq, chipInstances)
+
+			// instances that are connected to buses need a register bank
+			val buses = connected.filter(_.isInstanceOf[BusInstance])
+				.map(_.asInstanceOf[BusInstance])
+			for (bus <- buses;
+			     inst <- bus.consumerInstances;
+			     rl <- inst.instanceRegisterLists
+			     if !inst.instanceRegisterBanks.exists(_.name == rl.name)) {
+
+				val (address, _) = bus.getFirstConsumerAddressAndSize(inst)
+				inst.instanceRegisterBanks +=
+				RegisterBank(s"${bus.ident}_${inst.ident}", address, rl.name)
+			}
+
+			val setOfConnected = connected
+				.filter(_.isConnected)
+				.map(_.asConnected).toSet
+
+			val dm: DistanceMatrix = DistanceMatrix(chipInstances, setOfConnected.toSeq)
+			val wires              = Wires(dm, setOfConnected.toSeq)
+
+			Some(Game(gameName, chipInstances, setOfConnected.toSeq, dm, wires))
+		}
 
 		private def process(path: Path, catalogs: DefinitionCatalog): Unit = {
 
@@ -153,56 +201,6 @@ object Game {
 				val connections = Utils.toArray(parsed("connection"))
 				container.connections ++= connections.flatMap(Connection(_, catalogs))
 			}
-		}
-
-		def toGame(out: Path,
-		           doPhase1: Boolean = true,
-		           doPhase2: Boolean = true): Option[Game] = {
-			val softPath = out.resolve("soft")
-			val gatePath = out.resolve("gate")
-			Utils.ensureDirectories(softPath)
-			Utils.ensureDirectories(gatePath)
-
-			val top = containerStack.head
-			for(c <- containerStack.tail) {
-				top.children ++= c.children
-				top.connections ++= c.connections
-			}
-			containerStack.clear()
-
-			Connection.preConnect(top.connections.toSeq, top.children.toSeq)
-
-			OutputGateware(top, gatePath, {
-				_.isPhase1
-			})
-
-			OutputGateware(top, gatePath, {
-				_.isPhase2
-			})
-
-			val connected = Connection.connect(top.connections.toSeq, top.children.toSeq)
-
-			// instances that are connected to buses need a register bank
-			val buses = connected.filter(_.isInstanceOf[BusInstance])
-				.map(_.asInstanceOf[BusInstance])
-			for(bus <- buses;
-			    inst <- bus.consumerInstances;
-			    rl <- inst.instanceRegisterLists
-			    if !inst.instanceRegisterBanks.exists(_.name == rl.name)) {
-
-				val (address, _) = bus.getFirstConsumerAddressAndSize(inst)
-				inst.instanceRegisterBanks +=
-					RegisterBank(s"${bus.ident}_${inst.ident}",address, rl.name)
-			}
-
-			val setOfConnected = connected
-				.filter(_.isConnected)
-				.map(_.asConnected).toSet
-
-			val dm: DistanceMatrix = DistanceMatrix(top.children.toSeq, setOfConnected.toSeq)
-			val wires = Wires(dm, setOfConnected.toSeq)
-
-			Some(Game(gameName, top.children.toSeq, setOfConnected.toSeq, dm, wires))
 		}
 	}
 

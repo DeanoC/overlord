@@ -1,13 +1,13 @@
 package overlord.Instances
 
-import overlord.Definitions.DefinitionTrait
-import overlord.Gateware.{BitsDesc, Port}
+import overlord.Chip.{BitsDesc, Port}
 import ikuy_utils._
+import overlord.ChipDefinitionTrait
 import toml.Value
 
 case class ClockInstance(ident: String,
-                         private val defi: DefinitionTrait)
-	extends Instance {
+                         override val definition: ChipDefinitionTrait)
+	extends ChipInstance {
 
 	lazy val pin: String =
 		Utils.lookupString(attributes, "pin", or = "INVALID")
@@ -18,16 +18,14 @@ case class ClockInstance(ident: String,
 	lazy val waveform: String =
 		Utils.lookupString(attributes, "waveform", "{0 5}")
 
-	override def definition: DefinitionTrait = defi
-
-	override def copyMutate[A <: Instance](nid: String): ClockInstance =
+	override def copyMutate[A <: ChipInstance](nid: String): ClockInstance =
 		copy(ident = nid)
 
 }
 
 object ClockInstance {
 	def apply(name: String,
-	          definition: DefinitionTrait,
+	          definition: ChipDefinitionTrait,
 	          attribs: Map[String, Variant]): Option[ClockInstance] = {
 
 		if(!definition.attributes.contains("pin") && attribs.contains("pin")) {
@@ -35,10 +33,10 @@ object ClockInstance {
 			None
 		} else {
 			val clock  = ClockInstance(name, definition)
-			clock.mergeParameter(attribs, "pin")
-			clock.mergeParameter(attribs, "standard")
-			clock.mergeParameter(attribs, "period")
-			clock.mergeParameter(attribs, "waveform")
+			clock.mergeAttribute(attribs, "pin")
+			clock.mergeAttribute(attribs, "standard")
+			clock.mergeAttribute(attribs, "period")
+			clock.mergeAttribute(attribs, "waveform")
 
 			Some(clock)
 		}

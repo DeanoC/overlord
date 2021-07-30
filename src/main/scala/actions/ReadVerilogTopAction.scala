@@ -1,38 +1,36 @@
-package overlord.Gateware.GatewareAction
+package actions
 
-import input.{VerilogParameterKey, VerilogPort}
-import overlord.Gateware.{Port, WireDirection}
-import overlord.Instances.Instance
-import overlord.Game
 import ikuy_utils._
+import input.{VerilogParameterKey, VerilogPort}
+import overlord.Chip.{Port, WireDirection}
+import overlord.Game
+import overlord.Instances.ChipInstance
 
 import java.nio.file.Path
 
 case class ReadVerilogTopAction(filename: String,
-                                pathOp: GatewareActionPathOp)
+                                pathOp: ActionPathOp)
 	extends GatewareAction {
 
-	override val phase: GatewareActionPhase = GatewareActionPhase2()
+	override val phase: Int = 2
 
-	override def execute(instance: Instance,
+	override def execute(instance: ChipInstance,
 	                     parameters: Map[String, Variant],
 	                     outPath: Path): Unit = {
 		val name = filename.replace("${name}", instance.ident)
 		val bs   = input.VerilogModuleParser(
 			outPath.resolve(name + ".v"), name.split("/").last)
 
-		if (instance.isGateware) {
-			bs.filter(_.isInstanceOf[VerilogPort])
-				.map(_.asInstanceOf[VerilogPort])
-				.foreach(p => instance.mergePort(p.name,
-				                                 Port(p.name,
-				                                      p.bits,
-				                                      WireDirection(p.direction))))
+		bs.filter(_.isInstanceOf[VerilogPort])
+			.map(_.asInstanceOf[VerilogPort])
+			.foreach(p => instance.mergePort(p.name,
+			                                 Port(p.name,
+			                                      p.bits,
+			                                      WireDirection(p.direction))))
 
-			bs.filter(_.isInstanceOf[VerilogParameterKey])
-				.map(_.asInstanceOf[VerilogParameterKey])
-				.foreach(p => instance.mergeParameterKey(p.parameter))
-		}
+		bs.filter(_.isInstanceOf[VerilogParameterKey])
+			.map(_.asInstanceOf[VerilogParameterKey])
+			.foreach(p => instance.mergeParameterKey(p.parameter))
 
 		updatePath(outPath)
 	}
@@ -41,7 +39,7 @@ case class ReadVerilogTopAction(filename: String,
 object ReadVerilogTopAction {
 	def apply(name: String,
 	          process: Map[String, Variant],
-	          pathOp: GatewareActionPathOp): Option[ReadVerilogTopAction] = {
+	          pathOp: ActionPathOp): Option[ReadVerilogTopAction] = {
 		if (!process.contains("source")) {
 			println(s"Read Verilog Top process $name doesn't have a source field")
 			None
@@ -50,7 +48,7 @@ object ReadVerilogTopAction {
 		val filename = process("source") match {
 			case s: StringV => s.value
 			case t: TableV  => Utils.toString(t.value("file"))
-			case _ => println("Source is an invalid type"); ""
+			case _          => println("Source is an invalid type"); ""
 		}
 
 		val srcPath = if (filename.contains("${src}")) {

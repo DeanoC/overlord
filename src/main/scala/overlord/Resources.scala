@@ -3,7 +3,6 @@ package overlord
 import ikuy_utils.{ArrayV, Utils, Variant}
 
 import java.nio.file.{Files, Path}
-import overlord.Definitions.{DefinitionTrait, DefinitionType}
 import overlord.Instances.BoardInstance
 
 import scala.language.postfixOps

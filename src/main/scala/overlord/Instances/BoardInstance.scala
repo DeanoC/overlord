@@ -1,7 +1,7 @@
 package overlord.Instances
 
-import overlord.Definitions.DefinitionTrait
 import ikuy_utils._
+import overlord.ChipDefinitionTrait
 import toml.Value
 
 import scala.collection.immutable
@@ -33,21 +33,19 @@ case class LatticeBoard() extends BoardType {
 
 case class BoardInstance(ident: String,
                          boardType: BoardType,
-                         private val defi: DefinitionTrait,
-                         override val children: Seq[Instance]
-                        ) extends Instance with Container {
-
-	override def definition: DefinitionTrait = defi
+                         override val definition: ChipDefinitionTrait,
+                         override val children: Seq[InstanceTrait]
+                        ) extends ChipInstance with Container {
 
 	override val physical: Boolean = false
 
-	override def copyMutate[A <: Instance](nid: String): BoardInstance =
+	override def copyMutate[A <: ChipInstance](nid: String): BoardInstance =
 		copy(ident = nid)
 
 	override def copyMutateContainer(copy: MutContainer): Container = {
 		BoardInstance(ident = ident,
 		              boardType = boardType,
-		              defi = definition,
+		              definition = definition,
 		              children = copy.children.toSeq)
 	}
 }
@@ -55,7 +53,7 @@ case class BoardInstance(ident: String,
 object BoardInstance {
 
 	def apply(name: String,
-	          definition: DefinitionTrait,
+	          definition: ChipDefinitionTrait,
 	          iattribs: Map[String, Variant]): Option[BoardInstance] = {
 
 		val attribs = Utils.mergeAintoB(iattribs, definition.attributes)
@@ -84,7 +82,7 @@ object BoardInstance {
 
 		Some(BoardInstance(name,
 		                   boardType = boardType,
-		                   defi = definition,
+		                   definition = definition,
 		                   children = Seq() // we be fixed up in post
 		                   ))
 	}

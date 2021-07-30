@@ -1,21 +1,21 @@
-package overlord.Gateware.GatewareAction
+package actions
 
 import java.nio.file.Path
-import overlord.Instances.Instance
+import overlord.Instances.ChipInstance
 import overlord.Game
 import ikuy_utils._
 
 case class SourcesAction(filename: String,
                          language: String,
                          srcPath: String,
-                         pathOp: GatewareActionPathOp)
+                         pathOp: ActionPathOp)
 	extends GatewareAction {
 
-	override val phase: GatewareActionPhase = GatewareActionPhase1()
+	override val phase: Int = 1
 
 	private var actualSrcPath = srcPath
 
-	override def execute(instance: Instance,
+	override def execute(instance: ChipInstance,
 	                     parameters: Map[String, Variant],
 	                     outPath: Path): Unit = {
 		actualSrcPath = srcPath.replace("${name}", instance.ident)
@@ -29,7 +29,7 @@ case class SourcesAction(filename: String,
 object SourcesAction {
 	def apply(name: String,
 	          process: Map[String, Variant],
-	          pathOp: GatewareActionPathOp): Seq[SourcesAction] = {
+	          pathOp: ActionPathOp): Seq[SourcesAction] = {
 		if (!process.contains("sources")) {
 			println(s"Sources process $name doesn't have a sources field")
 			None

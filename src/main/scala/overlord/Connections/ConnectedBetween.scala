@@ -1,7 +1,7 @@
 package overlord.Connections
 
-import overlord.Definitions.DefinitionType
-import overlord.Instances.Instance
+import overlord.DefinitionType
+import overlord.Instances.ChipInstance
 
 case class ConnectedBetween(connectionType: ConnectionType,
                             connectionPriority: ConnectionPriority,
@@ -14,7 +14,7 @@ case class ConnectedBetween(connectionType: ConnectionType,
 
 	def secondaryType: DefinitionType = secondary.definition.defType
 
-	override def connectsToInstance(inst: Instance): Boolean =
+	override def connectsToInstance(inst: ChipInstance): Boolean =
 		(main.instance.ident == inst.ident ||
 		 secondary.instance.ident == inst.ident)
 

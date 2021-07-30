@@ -2,7 +2,7 @@ package overlord.Connections
 
 import ikuy_utils.{BigIntV, Utils, Variant}
 import overlord.Connections
-import overlord.Gateware._
+import overlord.Chip._
 import overlord.Instances._
 
 import scala.math.BigDecimal.double2bigDecimal
@@ -26,7 +26,7 @@ case class Unconnected(connectionType: ConnectionType,
 		case _                         => false
 	}
 
-	def connect(unexpanded: Seq[Instance]): Seq[Connected] = {
+	def connect(unexpanded: Seq[ChipInstance]): Seq[Connected] = {
 		connectionType match {
 			case _: PortConnectionType      => connectPortConnection(unexpanded)
 			case _: ClockConnectionType     => connectClockConnection(unexpanded)
@@ -36,7 +36,7 @@ case class Unconnected(connectionType: ConnectionType,
 		}
 	}
 
-	def preConnect(unexpanded: Seq[Instance]): Unit = {
+	def preConnect(unexpanded: Seq[ChipInstance]): Unit = {
 		connectionType match {
 			case _: BusConnectionType => preConnectBusConnection(unexpanded)
 			case _                    =>
@@ -44,19 +44,19 @@ case class Unconnected(connectionType: ConnectionType,
 	}
 
 	private def matchInstances(name: String,
-	                           unexpanded: Seq[Instance]):
+	                           unexpanded: Seq[ChipInstance]):
 	Seq[InstanceLoc] = {
 		unexpanded.flatMap(c => {
 			val (nm, port) = c.getMatchNameAndPort(name)
 			if (nm.nonEmpty) Some(InstanceLoc(c, port, nm.get))
 			else c match {
-				case container: Container => matchInstances(name, container.children)
+				case container: Container => matchInstances(name, container.chipChildren)
 				case _                    => None
 			}
 		})
 	}
 
-	private def connectPortConnection(unexpanded: Seq[Instance]) = {
+	private def connectPortConnection(unexpanded: Seq[ChipInstance]) = {
 		val mo = matchInstances(main, unexpanded)
 		val so = matchInstances(second, unexpanded)
 
@@ -69,7 +69,7 @@ case class Unconnected(connectionType: ConnectionType,
 		}
 	}
 
-	private def connectClockConnection(unexpanded: Seq[Instance]) = {
+	private def connectClockConnection(unexpanded: Seq[ChipInstance]) = {
 		val mo = matchInstances(main, unexpanded)
 		val so = matchInstances(second, unexpanded)
 
@@ -130,7 +130,7 @@ case class Unconnected(connectionType: ConnectionType,
 		                             cbp, fmloc, direction, fsloc)
 	}
 
-	private def connectConstantConnection(unexpanded: Seq[Instance]) = {
+	private def connectConstantConnection(unexpanded: Seq[ChipInstance]) = {
 		val to       = matchInstances(second, unexpanded)
 		val constant = connectionType.asInstanceOf[ConstantConnectionType]
 		val ccp      = if (to.length > 1) WildCardConnectionPriority()
@@ -141,10 +141,10 @@ case class Unconnected(connectionType: ConnectionType,
 			                  constant.constant, direction, tloc)
 	}
 
-	private def ConnectPortGroupBetween(fi: Instance,
+	private def ConnectPortGroupBetween(fi: ChipInstance,
 	                                    fp: Port,
 	                                    fn: String,
-	                                    si: Instance,
+	                                    si: ChipInstance,
 	                                    sp: Port) = {
 		var firstDirection  = fp.direction
 		var secondDirection = sp.direction
@@ -169,7 +169,7 @@ case class Unconnected(connectionType: ConnectionType,
 	}
 
 
-	private def connectPortGroupConnection(unexpanded: Seq[Instance]) = {
+	private def connectPortGroupConnection(unexpanded: Seq[ChipInstance]) = {
 		val mo = matchInstances(main, unexpanded)
 		val so = matchInstances(second, unexpanded)
 
@@ -190,7 +190,7 @@ case class Unconnected(connectionType: ConnectionType,
 		                                     sp)
 	}
 
-	private def preConnectBusConnection(unexpanded: Seq[Instance]): Unit = {
+	private def preConnectBusConnection(unexpanded: Seq[ChipInstance]): Unit = {
 		val mo = matchInstances(main, unexpanded)
 		val so = matchInstances(second, unexpanded)
 
@@ -203,7 +203,7 @@ case class Unconnected(connectionType: ConnectionType,
 
 		if (mo.length != 1 || so.length != 1) {
 			println(s"connection $main between $second count error")
-			Seq[Instance]()
+			Seq[ChipInstance]()
 		}
 
 		val mainIL      = mo.head
@@ -225,7 +225,7 @@ case class Unconnected(connectionType: ConnectionType,
 
 			val other = if (!isMainABus) mainIL.instance else otherIL.instance
 
-			val busBankAlignment = Utils.lookupBigInt(bus.attributes,
+			val busBankAlignment = Utils.lookupBigInt(bus.attributes.toMap,
 			                                          "bus_bank_alignment",
 			                                          1024)
 
@@ -261,13 +261,13 @@ case class Unconnected(connectionType: ConnectionType,
 		}
 	}
 
-	private def connectBusConnection(unexpanded: Seq[Instance]): Seq[ConnectedBetween] = {
+	private def connectBusConnection(unexpanded: Seq[ChipInstance]): Seq[ConnectedBetween] = {
 		val mo = matchInstances(main, unexpanded)
 		val so = matchInstances(second, unexpanded)
 
 		if (mo.length != 1 || so.length != 1) {
 			println(s"connection $main between $second count error")
-			Seq[Instance]()
+			Seq[ChipInstance]()
 		}
 
 		val mainIL      = mo.head
