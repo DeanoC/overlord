@@ -1,21 +1,24 @@
 package actions
 
-import java.nio.file.Path
-import overlord.Instances.ChipInstance
-import overlord.Game
 import ikuy_utils._
+import overlord.Game
+import overlord.Instances.InstanceTrait
+
+import java.nio.file.Path
 
 case class CopyAction(filename: String,
                       language: String,
                       srcPath: String,
                       pathOp: ActionPathOp)
-	extends GatewareAction {
+	extends Action {
 
 	override val phase: Int = 1
 
 	private var dstAbsPath: Path = Path.of("")
 
-	override def execute(instance: ChipInstance, parameters: Map[String, Variant], outPath: Path): Unit = {
+	override def execute(instance: InstanceTrait,
+	                     parameters: Map[String, () => Variant],
+	                     outPath: Path): Unit = {
 		val fn         = filename.split('/').last
 		val pathString = s"${instance.ident}/$fn"
 		dstAbsPath = outPath.resolve(pathString.replace("${dest}/", ""))

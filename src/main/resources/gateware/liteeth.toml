@@ -1,6 +1,0 @@
-provisioner = "git"
-processor = 'migen'
-
-sources = [{git = "https://github.com/enjoy-digital/liteeth"}]
-#ports = [ "q", "clk" ]
-#parameters = [ "clk_freq_hz" ]

@@ -1,8 +1,86 @@
 path = "socs/zynqps8"
 
+[[include]]
+resource = "software"
+
 [[definition]]
 type = "other.zynqps8.rawps8"
 gateware = "gateware/ps8.toml"
+registers = [
+    { resource = "registers/afifm" },
+    { resource = "registers/ams" },
+    { resource = "registers/apu" },
+    { resource = "registers/axipcie_dma" },
+    { resource = "registers/axipcie_egress" },
+    { resource = "registers/axipcie_ingress" },
+    { resource = "registers/axipcie_main" },
+    { resource = "registers/bbram" },
+    { resource = "registers/can" },
+    { resource = "registers/cci400" },
+    { resource = "registers/cci_reg" },
+    { resource = "registers/crf_apb" },
+    { resource = "registers/crl_apb" },
+    { resource = "registers/csu" },
+    { resource = "registers/csudma" },
+    { resource = "registers/ddr_phy" },
+    { resource = "registers/ddr_qos_ctrl" },
+    { resource = "registers/ddrc" },
+    { resource = "registers/dp" },
+    { resource = "registers/dpdma" },
+    { resource = "registers/efuse" },
+    { resource = "registers/etf4k" },
+    { resource = "registers/etf8k" },
+    { resource = "registers/etr" },
+    { resource = "registers/fpd_gpv" },
+    { resource = "registers/fpd_slcr_secure" },
+    { resource = "registers/fpd_slcr" },
+    { resource = "registers/ftm" },
+    { resource = "registers/funnel3p" },
+    { resource = "registers/funnel4p" },
+    { resource = "registers/gic400" },
+    { resource = "registers/gpio" },
+    { resource = "registers/iou_gpv" },
+    { resource = "registers/iou_scntr" },
+    { resource = "registers/iou_scntrs" },
+    { resource = "registers/iou_secure_slcr" },
+    { resource = "registers/iou_slcr" },
+    { resource = "registers/ipi" },
+    { resource = "registers/ipi_buffer" },
+    { resource = "registers/lpd_gpv" },
+    { resource = "registers/lpd_slcr_secure" },
+    { resource = "registers/lpd_slcr" },
+    { resource = "registers/mbistjtag" },
+    { resource = "registers/ocm" },
+    { resource = "registers/pcie_attrib" },
+    { resource = "registers/pl390" },
+    { resource = "registers/plsysmon" },
+    { resource = "registers/pmu_global" },
+    { resource = "registers/pssysmon" },
+    { resource = "registers/replic" },
+    { resource = "registers/rpu" },
+    { resource = "registers/rsa" },
+    { resource = "registers/rsa_core" },
+    { resource = "registers/rtc" },
+    { resource = "registers/serdes" },
+    { resource = "registers/serdes_pll" },
+    { resource = "registers/siou" },
+    { resource = "registers/smmu500" },
+    { resource = "registers/smmu_reg" },
+    { resource = "registers/stm" },
+    { resource = "registers/swdt" },
+    { resource = "registers/tpiu" },
+    { resource = "registers/tsgen" },
+    { resource = "registers/ttc" },
+    { resource = "registers/usb3_regs" },
+    { resource = "registers/usb3_xhci" },
+    { resource = "registers/xmpu_ddr" },
+    { resource = "registers/xmpu_fpd" },
+    { resource = "registers/xmpu_ocm" },
+    { resource = "registers/xmpu_sink" },
+    { resource = "registers/xppu" },
+    { resource = "registers/xppu_sink" },
+    { resource = "registers/zdma" },
+]
 
 [[definition]]
 type = "cpu.a53"
@@ -17,6 +95,7 @@ registers = [
     { resource = "registers/a53_etm" },
     { resource = "registers/a53_pmu" },
     { resource = "registers/a53_rom" },
+    { resource = "registers/a53_system" },
 ]
 
 [[definition]]
@@ -38,8 +117,8 @@ triple = "microblaze-none-elf"
 width = 32
 core_count = 1
 registers = [
-    { resource = "registers/pmu_global" },
     { resource = "registers/pmu_iomodule" },
+    { resource = "registers/pmu_lmb_bram" },
     { resource = "registers/pmu_local" },
 ]
 
@@ -54,10 +133,6 @@ size_in_bytes = "128 KiB"
 [[definition]]
 type = "ram.sram.ocp"
 size_in_bytes = "256 KiB"
-
-[[definition]]
-type = "ram.ddr.ddr4.MT40A256M16LY"
-size_in_bytes = "4 GiB"
 
 [[definition]]
 type = "bus.axi4"
@@ -88,5 +163,4 @@ hardware = [{max_cores = 2}]
 
 [[definition]]
 type = "storage.qspi.zynqps8"
-software = [{registers = "registers/qspi", bankPrefix = "QSPI"}]
-
+registers = [{ resource = "registers/qspi", bankPrefix = "QSPI" }]

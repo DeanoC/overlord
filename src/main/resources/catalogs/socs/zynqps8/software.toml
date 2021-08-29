@@ -1,0 +1,20 @@
+[[definition]]
+name = "core"
+type = "library.core.zynqps8"
+cpus = ["a53", "r5f", "pmu"]
+software = "software/lib/core/core.toml"
+
+[[definition]]
+name = "hw"
+type = "library.hw.zynqps8"
+software = "software/lib/hw/hw.toml"
+
+[[definition]]
+name = "dbg"
+type = "library.dbg.zynqps8"
+software = "software/lib/dbg/dbg.toml"
+
+[[definition]]
+name = "ikuy_boot"
+type = "program.bootrom.zynqps8"
+software = "software/programs_a53/ikuy_boot/ikuy_boot.toml"

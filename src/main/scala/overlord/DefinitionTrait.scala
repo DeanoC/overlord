@@ -1,13 +1,13 @@
 package overlord
 
 import actions.ActionsFile
-import ikuy_utils.Utils.VariantTable
 import ikuy_utils.{Utils, Variant}
-import overlord.Chip.{ChipDefinition, GatewareDefinition, Port, Registers}
+import overlord.Chip.{ChipDefinition, Port, Registers}
 import overlord.Instances._
 import overlord.Software.SoftwareDefinition
 
 import java.nio.file.Path
+import scala.sys.exit
 
 trait DefinitionTrait {
 	val defType   : DefinitionType
@@ -20,8 +20,8 @@ object Definition {
 	def apply(defi: Variant,
 	          path: Path,
 	          defaults: Map[String, Variant]): DefinitionTrait = {
-		val table = Utils.mergeAintoB(Utils.toTable(defi), defaults)
-		DefinitionType(Utils.toString(table("type"))) match {
+		val table   = Utils.mergeAintoB(Utils.toTable(defi), defaults)
+		val deftype = DefinitionType(Utils.toString(table("type"))) match {
 			case _: RamDefinitionType      => ChipDefinition(table, path)
 			case _: CpuDefinitionType      => ChipDefinition(table, path)
 			case _: BusDefinitionType      => ChipDefinition(table, path)
@@ -32,8 +32,14 @@ object Definition {
 			case _: PinGroupDefinitionType => ChipDefinition(table, path)
 			case _: ClockDefinitionType    => ChipDefinition(table, path)
 			case _: BoardDefinitionType    => ChipDefinition(table, path)
-			case _: BootRomDefinitionType => SoftwareDefinition(table, path)
-			case _: LibraryDefinitionType => ChipDefinition(table, path)
+			case _: ProgramDefinitionType  => SoftwareDefinition(table, path)
+			case _: LibraryDefinitionType  => SoftwareDefinition(table, path)
+		}
+		deftype match {
+			case Some(value) => value
+			case None        =>
+				println(s"Invalid definition type $path")
+				exit()
 		}
 
 	}
@@ -69,11 +75,17 @@ trait GatewareDefinitionTrait extends ChipDefinitionTrait {
 }
 
 trait SoftwareDefinitionTrait extends DefinitionTrait {
+	val actionsFile: ActionsFile
+	val parameters : Map[String, Variant]
+
 	def createInstance(name: String,
 	                   attribs: Map[String, Variant]
-	                  ): Option[ChipInstance] = {
+	                  ): Option[InstanceTrait] = {
 		defType match {
-			case _ => println(s"$defType is invalid for software\n"); None
+			case _: LibraryDefinitionType => LibraryInstance(name, this, attribs)
+			case _: ProgramDefinitionType => ProgramInstance(name, this, attribs)
+			case _                        => println(s"$defType is invalid for software\n");
+				None
 		}
 	}
 }

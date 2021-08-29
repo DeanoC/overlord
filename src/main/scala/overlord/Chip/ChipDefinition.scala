@@ -19,7 +19,7 @@ case class HardwareDefinition(defType: DefinitionType,
 extends ChipDefinition
 
 object ChipDefinition {
-	def apply(table: Map[String, Variant], path: Path): ChipDefinitionTrait = {
+	def apply(table: Map[String, Variant], path: Path): Option[ChipDefinitionTrait] = {
 		val gw = table.contains("gateware")
 
 		val defTypeName = Utils.toString(table("type"))
@@ -49,13 +49,13 @@ object ChipDefinition {
 			                   ports,
 			                   registers,
 			                   name.last,
-			                   path.resolve(Utils.toString(table("gateware")))).get
+			                   path.resolve(Utils.toString(table("gateware"))))
 
 		} else {
 			Some(HardwareDefinition(defType,
-			               attribs,
-			               ports,
-			               registers)).get
+			                        attribs,
+			                        ports,
+			                        registers))
 		}
 	}
 }

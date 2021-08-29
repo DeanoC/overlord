@@ -11,6 +11,10 @@ board_family = "UltraScale+"
 board_device = "xczu3eg-sfvc784-1-e"
 
 [[definition]]
+type = "ram.ddr.ddr4.MT40A256M16LY"
+size_in_bytes = "4 GiB"
+
+[[definition]]
 type = "clock.ref.25MHz"
 pin = "M6"
 standard = "LVCMOS18"

@@ -1,25 +1,25 @@
 package actions
 
-import java.nio.file.Path
-import overlord.Instances.ChipInstance
-import overlord.Game
 import ikuy_utils._
-import toml.Value
+import overlord.Game
+import overlord.Instances.InstanceTrait
+
+import java.nio.file.Path
 
 case class YamlAction(parameterKeys: Seq[String],
                       filename: String,
                       pathOp: ActionPathOp)
-	extends GatewareAction {
+	extends Action {
 
 	override val phase: Int = 1
 
-	override def execute(instance: ChipInstance,
-	                     parameters: Map[String, Variant],
+	override def execute(instance: InstanceTrait,
+	                     parameters: Map[String, () => Variant],
 	                     outPath: Path): Unit = {
 		val sb = new StringBuilder()
-		for {k <- parameterKeys
-		     if parameters.contains(k)}
-			sb ++= (parameters(k) match {
+		for {(k, v) <- parameters
+		     parameter = v()}
+			sb ++= (parameter match {
 				case ArrayV(arr)       => "TODO"
 				case BigIntV(bigInt)   => s"$k: $bigInt\n"
 				case BooleanV(boolean) => s"$k: $boolean\n"
@@ -46,19 +46,19 @@ object YamlAction {
 	          pathOp: ActionPathOp): Seq[YamlAction] = {
 		if (!process.contains("parameters")) {
 			println(s"Yaml process $name doesn't have a parameters field")
-			None
+			return Seq()
 		}
-		if (!process("parameters").isInstanceOf[Value.Arr]) {
+		if (!process("parameters").isInstanceOf[ArrayV]) {
 			println(s"Yaml process $name parameters isn't an array")
-			None
+			return Seq()
 		}
 		if (!process.contains("filename")) {
 			println(s"Yaml process $name doesn't have a filename field")
-			None
+			return Seq()
 		}
-		if (!process("filename").isInstanceOf[Value.Str]) {
+		if (!process("filename").isInstanceOf[StringV]) {
 			println(s"Yaml process $name filename isn't a string")
-			None
+			return Seq()
 		}
 
 		val filename   = Utils.toString(process("filename"))

@@ -1,9 +1,10 @@
 package overlord
 
+import ikuy_utils._
+
 import java.nio.file.{Files, Path}
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
-import ikuy_utils._
 
 class DefinitionCatalog {
 	type key = DefinitionType
@@ -44,10 +45,10 @@ object DefinitionCatalog {
 	             defaultMap: Map[String,Variant]): Option[Seq[DefinitionTrait]] = {
 		println(s"Reading $name catalog")
 
-		val path = spath.resolve(s"${name}.toml")
+		val path = spath.resolve(s"$name.toml")
 
 		if (!Files.exists(path.toAbsolutePath)) {
-			println(s"${name} catalog at ${path} not found");
+			println(s"$name catalog at $path not found")
 			return None
 		}
 
@@ -63,8 +64,8 @@ object DefinitionCatalog {
 		} else spath
 
 		val defaults = if (parsed.contains("defaults"))
-				Utils.mergeAintoB(Utils.toTable(parsed("defaults")), defaultMap)
-			else defaultMap
+			Utils.mergeAintoB(Utils.toTable(parsed("defaults")), defaultMap)
+		else defaultMap
 
 		val defs = ArrayBuffer[DefinitionTrait]()
 		if (parsed.contains("definition")) {
@@ -72,11 +73,24 @@ object DefinitionCatalog {
 			for (defi <- tdef) defs += Definition(defi, path, defaults)
 		}
 
-		if(parsed.contains("resources")) {
+		if (parsed.contains("include")) {
+			val tincs = Utils.toArray(parsed("include"))
+			for (include <- tincs) {
+				val table = Utils.toTable(include)
+				val name  = Utils.toString(table("resource"))
+				val cat   = DefinitionCatalog.fromFile(s"$name", path, defaults)
+				cat match {
+					case Some(value) => defs ++= value
+					case None        =>
+				}
+			}
+		}
+
+		if (parsed.contains("resources")) {
 			val resources = Utils.lookupArray(parsed, "resources")
 			for (resource <- resources) {
 				val name = Utils.toString(resource)
-				val cat = DefinitionCatalog.fromFile(s"$name",spath, defaults)
+				val cat  = DefinitionCatalog.fromFile(s"$name", path, defaults)
 				cat match {
 					case Some(value) => defs ++= value
 					case None        =>

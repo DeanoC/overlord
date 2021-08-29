@@ -9,28 +9,53 @@ import java.nio.file.Path
 import scala.collection.mutable
 
 case class Game(name: String,
-                children: Seq[ChipInstance],
+                children: Seq[InstanceTrait],
                 connected: Seq[Connected],
                 distanceMatrix: DistanceMatrix,
-                wires: Seq[Wire]
+                wires: Seq[Wire],
+                out: Path
                ) {
-	lazy val setOfGateware: Set[ChipInstance] = {
+	lazy val setOfConnectedGateware: Set[ChipInstance] = {
 		val setOfGateware = mutable.HashSet[ChipInstance]()
 		connected.foreach { c =>
 			if (c.first.nonEmpty && c.first.get.isGateware)
-				setOfGateware += c.first.get.instance
+				setOfGateware += c.first.get.instance.asInstanceOf[ChipInstance]
 			if (c.second.nonEmpty && c.second.get.isGateware)
-				setOfGateware += c.second.get.instance
+				setOfGateware += c.second.get.instance.asInstanceOf[ChipInstance]
 		}
 		setOfGateware.toSet
 	}
 
+	lazy val setOfConnectedSoftware: Set[SoftwareInstance] = {
+		val setOfSoftware = mutable.HashSet[SoftwareInstance]()
+		connected.foreach { c =>
+			if (c.first.nonEmpty && c.first.get.isSoftware)
+				setOfSoftware += c.first.get.instance.asInstanceOf[SoftwareInstance]
+			if (c.second.nonEmpty && c.second.get.isSoftware)
+				setOfSoftware += c.second.get.instance.asInstanceOf[SoftwareInstance]
+		}
+		setOfSoftware.toSet
+	}
+
 	lazy val flatChipChildren: Seq[ChipInstance] =
+		children
+			.filter(_.isInstanceOf[ChipInstance])
+			.map(_.asInstanceOf[ChipInstance]) ++
 		children.filter(_.isInstanceOf[Container])
 			.map(_.asInstanceOf[Container])
-			.flatMap(_.flatChildren.map(_.asInstanceOf[ChipInstance])) ++ children
+			.flatMap(_.flatChildren.map(_.asInstanceOf[ChipInstance]))
+
+	lazy val flatSoftwareChildren: Seq[SoftwareInstance] =
+		children
+			.filter(_.isInstanceOf[SoftwareInstance])
+			.map(_.asInstanceOf[SoftwareInstance]) ++
+		children.filter(_.isInstanceOf[Container])
+			.map(_.asInstanceOf[Container])
+			.flatMap(_.flatChildren.map(_.asInstanceOf[SoftwareInstance]))
 
 	lazy val allChipInstances: Seq[ChipInstance] = flatChipChildren
+
+	lazy val allSoftwareInstances: Seq[SoftwareInstance] = flatSoftwareChildren
 
 	lazy val cpus: Seq[CpuInstance] = flatChipChildren
 		.filter(_.isInstanceOf[CpuInstance])
@@ -63,6 +88,14 @@ case class Game(name: String,
 	lazy val gatewares: Seq[ChipInstance] =
 		flatChipChildren.filter(_.definition.isInstanceOf[GatewareDefinitionTrait])
 
+	lazy val libraries: Seq[LibraryInstance] =
+		flatSoftwareChildren.filter(_.isInstanceOf[LibraryInstance])
+			.map(_.asInstanceOf[LibraryInstance])
+
+	lazy val programs: Seq[ProgramInstance] =
+		flatSoftwareChildren.filter(_.isInstanceOf[ProgramInstance])
+			.map(_.asInstanceOf[ProgramInstance])
+
 	lazy val constants: Seq[ConnectedConstant] =
 		connected.filter(_.isInstanceOf[ConnectedConstant])
 			.map(_.asInstanceOf[ConnectedConstant])
@@ -88,6 +121,15 @@ case class Game(name: String,
 	def getRAMConnectedTo(instance: ChipInstance): Seq[RamInstance] =
 		rams.filter(distanceMatrix.connected(instance, _))
 
+	private val tmp = out
+		.resolve("soft")
+		.resolve("build")
+		.resolve("tmp")
+
+	Utils.ensureDirectories(tmp)
+	OutputSoftware.hardwareRegistersOutput(this, tmp)
+	OutputSoftware.cpuInvariantActions(this, tmp)
+	OutputSoftware.cpuSpecificActions(this, tmp)
 }
 
 object Game {
@@ -108,18 +150,18 @@ object Game {
 	                          catalogs: DefinitionCatalog) {
 
 		private val defaults = mutable.Map[String, Variant]()
-
-
 		process(gamePath, catalogs)
 
-		def toGame(out: Path,
-		           doPhase1: Boolean = true,
-		           doPhase2: Boolean = true): Option[Game] = {
+		def toGame(out: Path): Option[Game] = {
 			val softPath = out.resolve("soft")
-			val gatePath = out.resolve("gate")
 			Utils.ensureDirectories(softPath)
-			Utils.ensureDirectories(gatePath)
 
+			if (containerStack.isEmpty) {
+				println("Previous Errors mean game cannot be created\n")
+				return None
+			}
+
+			// flatten all containers
 			val top = containerStack.head
 			for (c <- containerStack.tail) {
 				top.children ++= c.children
@@ -127,15 +169,39 @@ object Game {
 			}
 			containerStack.clear()
 
-			val chipInstances = top.children.
+			// get chips (hardware or gateware)
+			val chipInstances               = top.children.
 				filter(_.isInstanceOf[ChipInstance]).
 				map(_.asInstanceOf[ChipInstance]).toSeq
+			val (setOfConnected, dm, wires) = DoChips(chipInstances, out, top)
 
+			// get software (libraries, boot rooms)
+			val softInstances = top.children.
+				filter(_.isInstanceOf[SoftwareInstance]).
+				map(_.asInstanceOf[SoftwareInstance]).toSeq
+
+			Some(Game(gameName,
+			          chipInstances ++ softInstances,
+			          setOfConnected.toSeq,
+			          dm,
+			          wires,
+			          out))
+		}
+
+		private def DoChips(chipInstances: Seq[ChipInstance],
+		                    out: Path,
+		                    top: MutContainer) = {
+			val gatePath = out.resolve("gate")
+			Utils.ensureDirectories(gatePath)
+
+			// preconnect for bus address allocations
 			Connection.preConnect(top.connections.toSeq, chipInstances)
 
+			// run gateware actions
 			OutputGateware(top, gatePath, 1)
 			OutputGateware(top, gatePath, 2)
 
+			// connect chips
 			val connected = Connection.connect(top.connections.toSeq, chipInstances)
 
 			// instances that are connected to buses need a register bank
@@ -151,14 +217,15 @@ object Game {
 				RegisterBank(s"${bus.ident}_${inst.ident}", address, rl.name)
 			}
 
+			// get connections to pass into the distance matrix
 			val setOfConnected = connected
 				.filter(_.isConnected)
 				.map(_.asConnected).toSet
 
+			// produce  distance matrix and wires
 			val dm: DistanceMatrix = DistanceMatrix(chipInstances, setOfConnected.toSeq)
 			val wires              = Wires(dm, setOfConnected.toSeq)
-
-			Some(Game(gameName, chipInstances, setOfConnected.toSeq, dm, wires))
+			(setOfConnected, dm, wires)
 		}
 
 		private def process(path: Path, catalogs: DefinitionCatalog): Unit = {
@@ -172,13 +239,17 @@ object Game {
 			if (parsed.contains("defaults"))
 				defaults ++= Utils.toTable(parsed("defaults"))
 
+			val includePath = if (parsed.contains("path")) {
+				Utils.toString(parsed("path"))
+			} else "."
+
 			// includes
 			if (parsed.contains("include")) {
 				val tincs = Utils.toArray(parsed("include"))
 				for (include <- tincs) {
 					val table           = Utils.toTable(include)
 					val incResourceName = Utils.toString(table("resource"))
-					val incResourcePath = Path.of(incResourceName)
+					val incResourcePath = Path.of(includePath).resolve(incResourceName)
 
 					Utils.readFile(incResourceName, incResourcePath, getClass) match {
 						case Some(d) => process(incResourcePath, catalogs)

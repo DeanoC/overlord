@@ -1,7 +1,7 @@
 package overlord
 
-import overlord.Connections.{BiDirectionConnection, Connected, ExplicitConnectionPriority, FirstToSecondConnection, InstanceLoc, PortConnectionType, PortGroupConnectionType, SecondToFirstConnection}
-import overlord.Instances.{Container, ChipInstance}
+import overlord.Connections._
+import overlord.Instances.{ChipInstance, Container}
 
 import scala.collection.mutable
 
@@ -10,7 +10,9 @@ case class DistanceMatrix(instanceArray: Array[ChipInstance]) {
 
 	private var virtualContainers = Seq[ChipInstance]()
 
-	private val distanceMatrix = Array.fill[Int](dim, dim) { DistanceMatrix.NotComputed }
+	private val distanceMatrix = Array.fill[Int](dim, dim) {
+		DistanceMatrix.NotComputed
+	}
 	private val routeMatrix    = Array.ofDim[Seq[Int]](dim, dim)
 
 	def distanceBetween(s: Int, e: Int): Int = distanceMatrix(s)(e)
@@ -38,7 +40,7 @@ case class DistanceMatrix(instanceArray: Array[ChipInstance]) {
 
 	def indexOf(c: ChipInstance): Int = instanceArray.indexOf(c)
 
-	def indexOf(c: InstanceLoc): Int = indexOf(c.instance)
+	def indexOf(c: InstanceLoc): Int = indexOf(c.instance.asInstanceOf[ChipInstance])
 
 	def distanceBetween(a:ChipInstance, b:ChipInstance): Int =
 		distanceBetween(indexOf(a), indexOf(b))

@@ -24,7 +24,7 @@ case class ClockDefinitionType(ident: Seq[String]) extends DefinitionType
 
 case class BoardDefinitionType(ident: Seq[String]) extends DefinitionType
 
-case class BootRomDefinitionType(ident: Seq[String]) extends DefinitionType
+case class ProgramDefinitionType(ident: Seq[String]) extends DefinitionType
 
 case class LibraryDefinitionType(ident: Seq[String]) extends DefinitionType
 
@@ -42,12 +42,13 @@ object DefinitionType {
 			case "net"      => NetDefinitionType(tt)
 			case "board"    => BoardDefinitionType(tt)
 			case "pin"      => PinGroupDefinitionType(tt)
+			case "pingroup" => PinGroupDefinitionType(tt)
 			case "clock"    => ClockDefinitionType(tt)
 			case "other"    => OtherDefinitionType(tt)
-			case "bootroom" => BootRomDefinitionType(tt)
+			case "program"  => ProgramDefinitionType(tt)
 			case "library"  => LibraryDefinitionType(tt)
 			case _          =>
-				println(s"$defTypeName unknown definition type\n")
+				println(s"${defTypeName.head} unknown definition type\n")
 				OtherDefinitionType(tt)
 		}
 	}

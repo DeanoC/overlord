@@ -1,0 +1,34 @@
+[[instance]]
+type = "cpu.pmu"
+
+[[instance]]
+name = "PMUInternalBus"
+type = "bus.axi4"
+
+[[connection]]
+type = "bus"
+connection = "cpu.pmu -> PMUInternalBus"
+
+[[connection]]
+type = "bus"
+connection = "PMUInternalBus -> ram.sram.pmuram"
+fixed_address = "0xFFDC_0000"
+
+[[instance]]
+name = "PMU_to_MainBus"
+type = "bridge.internal"
+address_window_width = 32
+
+[[connection]]
+type = "bus"
+connection = "PMUInternalBus -> PMU_to_MainBus"
+fixed_address = "0"
+
+[[connection]]
+type = "bus"
+connection = "PMU_to_MainBus -> MainBus"
+
+[[connection]]
+type = "bus"
+connection = "PMUInternalBus -> ram.ddr.ddr4"
+fixed_address = [["0x0000_0000", "2 GiB"]]

@@ -1,10 +1,8 @@
 package overlord.Connections
 
+import ikuy_utils._
 import overlord.Instances.{BusInstance, ChipInstance}
 import overlord.{Connections, DefinitionCatalog}
-import ikuy_utils._
-
-import scala.collection.mutable
 
 sealed trait ConnectionDirection {
 	override def toString: String =
@@ -43,6 +41,8 @@ case class PortGroupConnectionType(first_prefix: String,
 
 case class BusConnectionType() extends ConnectionType
 
+case class LogicalConnectionType() extends ConnectionType
+
 trait Connection {
 
 	val connectionType: ConnectionType
@@ -63,24 +63,6 @@ trait Connection {
 }
 
 object Connection {
-
-	def toConnectionType(first: String,
-	                     ctype: String,
-	                     table: Map[String, Variant]): ConnectionType = {
-		ctype match {
-			case "port"       => PortConnectionType()
-			case "clock"      => ClockConnectionType()
-			case "constant"   => ConstantConnectionType(Utils.stringToVariant(first))
-			case "port_group" => PortGroupConnectionType(
-				Utils.lookupString(table, "first_prefix", ""),
-				Utils.lookupString(table, "second_prefix", ""),
-				Utils.lookupArray(table, "excludes").toSeq.map(Utils.toString))
-			case "bus"        => BusConnectionType()
-			case _            =>
-				println(s"$ctype is an unknown connection type")
-				PortConnectionType()
-		}
-	}
 
 	def apply(connection: Variant,
 	          catalogs: DefinitionCatalog): Option[Connection] = {
@@ -116,8 +98,27 @@ object Connection {
 			first, dir, secondary, table))
 	}
 
+	def toConnectionType(first: String,
+	                     ctype: String,
+	                     table: Map[String, Variant]): ConnectionType = {
+		ctype match {
+			case "port"       => PortConnectionType()
+			case "clock"      => ClockConnectionType()
+			case "constant"   => ConstantConnectionType(Utils.stringToVariant(first))
+			case "port_group" => PortGroupConnectionType(
+				Utils.lookupString(table, "first_prefix", ""),
+				Utils.lookupString(table, "second_prefix", ""),
+				Utils.lookupArray(table, "excludes").toSeq.map(Utils.toString))
+			case "bus"        => BusConnectionType()
+			case "logical"    => LogicalConnectionType()
+			case _            =>
+				println(s"$ctype is an unknown connection type")
+				PortConnectionType()
+		}
+	}
+
 	def connect(unconnected: Seq[Connection],
-	                    unexpanded: Seq[ChipInstance]): Seq[Connection] =
+	            unexpanded: Seq[ChipInstance]): Seq[Connection] =
 		(for (c <- unconnected.filter(_.isUnconnected).map(_.asUnconnected)) yield {
 			c.connect(unexpanded)
 		}).flatten

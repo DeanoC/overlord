@@ -4,68 +4,143 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="73b7f681-932b-4979-9f4f-6aee48997ac8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libraries/core/libcore.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/actions/ActionsFile.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/overlord/Chip/ChipDefinition.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/overlord/Chip/GatewareDefinition.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/overlord/Chip/Registers.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/overlord/DefinitionTrait.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/overlord/DefinitionType.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/SoftwareInstance.scala" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/scala/overlord/Software/SoftwareDefinition.scala" afterDir="false" />
+    <list default="true" id="73b7f681-932b-4979-9f4f-6aee48997ac8" name="Default Changelist" comment="source processor renamed to sources&#10;gic400 register definition updated&#10;a53 system registers added&#10;ipi buffer registers added&#10;pmu ecc local memory bus register added&#10;Serdes PLL registers added&#10;lib core added with aarch64 and microblaze support&#10;a53 ikuy_boot boot fsbl/rom added&#10;overlord SoftSource action for symbolic links&#10;overlord Template action for templated source file&#10;Software instances and output added&#10;cpu passed into actions for cpu specific sources">
+      <change afterPath="$PROJECT_DIR$/.idea/runConfigurations.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/registers/a53_system.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/registers/ipi_buffer.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/registers/pmu_lmb_bram.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/registers/serdes_pll.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/core/CMakeLists.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/core/core.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/core/include/core.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/core/include/internal_math.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/core/include/math.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/core/include/math_real.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/core/include/snprintf.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/core/src/aarch64/memcmp.S" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/core/src/aarch64/memcpy.S" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/core/src/aarch64/memmove.S" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/core/src/aarch64/memset.S" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/core/src/atoi.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/core/src/microblaze/memcmp.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/core/src/microblaze/memcpy.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/core/src/microblaze/memmove.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/core/src/microblaze/memset.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/core/src/snprintf.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/dbg/CMakeLists.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/dbg/dbg.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/dbg/include/assert.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/dbg/include/print.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/dbg/src/assert.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/dbg/src/zynqmp_print.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/hw/CMakeLists.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/hw/hw.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/hw/include/aarch64/intrinsics_gcc.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/hw/include/boot_psi.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/hw/include/cache.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/hw/include/cpu_percpu.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/hw/include/memory_map.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/hw/include/memory_map_percpu.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/hw/include/microblaze/intrinsics_gcc.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/hw/include/reg_access.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/hw/src/aarch64/cache.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/hw/src/boot_psi.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/hw/src/microblaze/disable_exceptions.S" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/hw/src/microblaze/disable_interrupts.S" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/hw/src/microblaze/enable_exceptions.S" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/hw/src/microblaze/enable_interrupts.S" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/hw/src/pmu/cache.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/.idea/.name" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/.idea/zynqmp_fsbl.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/CMakeLists.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/boot.S" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/clock_init.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/crt0.S" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/ddr_init.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/debug_script.tcl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/handoff.S" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/ikuy_boot.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/lscript.ld" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/main.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/misc_init.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/peripherals_init.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/pll_init.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/serdes_init.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/translation_table.S" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/vector_table.S" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/prefabs/socs/MinZynqPs8.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/software/empty-file.ld" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/software/ikuy_root.cmake" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/software/subdir.cmake" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/software/toolchain_pmu.cmake" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/actions/SoftSourceAction.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/actions/TemplateAction.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/output/Software.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/Container.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/Instance.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/LibraryInstance.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/ProgramInstance.scala" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/scala/overlord/OutputSoftware.scala" afterDir="false" />
       <change beforePath="$USER_HOME$/.sbt/1.0/staging/a7772c47d5d7e84d3e85/ikuy_utils/src/main/scala/ikuy_utils/Utils.scala" beforeDir="false" afterPath="$USER_HOME$/.sbt/1.0/staging/a7772c47d5d7e84d3e85/ikuy_utils/src/main/scala/ikuy_utils/Utils.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/boards/MyirFZ3.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/boards/MyirFZ3.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/bridges/pmb_to_apb/pmb_to_apb.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/bridges/pmb_to_apb/pmb_to_apb.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/advanced_peripheral_bus/advanced_peripheral_bus.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/advanced_peripheral_bus/advanced_peripheral_bus.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/pipelined_memory_bus/pipelined_memory_bus.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/pipelined_memory_bus/pipelined_memory_bus.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/cpus/vexriscv/vexriscv_smallest.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/cpus/vexriscv/vexriscv_smallest.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/ios/uart/apb_ctrl/apb_ctrl.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ios/uart/apb_ctrl/apb_ctrl.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/others/resetti/resetti.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/others/resetti/resetti.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/ram/spinal/pmb_bram/pmb_bram.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ram/spinal/pmb_bram/pmb_bram.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/registers/gic400.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/registers/gic400.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/zynqps8_ps8.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/zynqps8_ps8.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libraries/core/libcore.toml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/gateware/liteeth.toml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/socs/FullZynqPs8.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/prefabs/socs/FullZynqPs8.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/socs/MinZynqPs8.toml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/socs/SaxonSoC.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/prefabs/socs/SaxonSoC.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/socs/zynqps8/a53.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/prefabs/socs/zynqps8/a53.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/socs/zynqps8/pmu.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/prefabs/socs/zynqps8/pmu.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/socs/zynqps8/r5f.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/prefabs/socs/zynqps8/r5f.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/software/generate_compilers.sh" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/software/generate_compilers.sh" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/software/toolchain_template.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/software/toolchain_template.cmake" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/actions/ActionsFile.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/actions/ActionsFile.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/actions/CopyAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/actions/CopyAction.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/actions/GitCloneAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/actions/GitCloneAction.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/actions/PythonAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/actions/PythonAction.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/actions/ReadTomlRegistersAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/actions/ReadTomlRegistersAction.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/actions/ReadVerilogTopAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/actions/ReadVerilogTopAction.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/actions/SbtAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/actions/SbtAction.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/actions/ShellAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/actions/ShellAction.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/actions/SourcesAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/actions/SourcesAction.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/actions/TomlAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/actions/TomlAction.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/actions/YamlAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/actions/YamlAction.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/input/TomlRegistersParser.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/input/TomlRegistersParser.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/input/VerilogModuleParser.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/input/VerilogModuleParser.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/output/BaseCHeaders.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/BaseCHeaders.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/output/Edalize.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Edalize.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/output/BaseCHeaders.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/output/BootRom.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/output/Compiler.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Compiler.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/output/Project.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Project.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/output/Report.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Report.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/output/Svd.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Svd.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/output/Top.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Top.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Chip/ChipDefinition.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Chip/ChipDefinition.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Chip/GatewareDefinition.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Chip/GatewareDefinition.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Connected.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Connected.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/ConnectedBetween.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/ConnectedBetween.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/ConnectedConstant.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/ConnectedConstant.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Connection.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Connection.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Unconnected.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Unconnected.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Wire.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Wire.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Constraint.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Constraint.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/DefinitionCatalog.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/DefinitionCatalog.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Definitions/Definition.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Definitions/DefinitionTrait.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Definitions/GatewareTrait.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Definitions/HardwareTrait.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/DefinitionTrait.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/DefinitionTrait.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/DefinitionType.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/DefinitionType.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/DistanceMatrix.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/DistanceMatrix.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Game.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Game.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/Gateware.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/CopyAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/actions/CopyAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/GatewareAction.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/GitCloneAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/actions/GitCloneAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/PythonAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/actions/PythonAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/ReadTomlRegistersAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/actions/ReadTomlRegistersAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/ReadVerilogTopAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/actions/ReadVerilogTopAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/SbtAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/actions/SbtAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/ShellAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/actions/ShellAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/SourcesAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/actions/SourcesAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/TomlAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/actions/TomlAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/GatewareAction/YamlAction.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/actions/YamlAction.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Gateware/Port.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Chip/Port.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Hardware/Hardware.scala" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/BoardInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/BoardInstance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/BridgeInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/BridgeInstance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/BusInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/BusInstance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/ClockInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/ClockInstance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/CpuInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/CpuInstance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/Instance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/ChipInstance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/NetInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/NetInstance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/OtherInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/OtherInstance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/PinGroupInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/PinGroupInstance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/RamInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/RamInstance.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/StorageInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/StorageInstance.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/ChipInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/ChipInstance.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Instances/SoftwareInstance.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Instances/SoftwareInstance.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/OutputGateware.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/OutputGateware.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Resources.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Resources.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Software/Software.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Software/Software.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Software/Software.scala" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Software/SoftwareDefinition.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Software/SoftwareDefinition.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -124,7 +199,9 @@
     <option name="version" value="1" />
   </component>
   <component name="ProjectId" id="1kINZ5DmCv3a43NpxvEXhce3v7Y" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="autoscrollToSource" value="true" />
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -133,13 +210,14 @@
     <option name="showMembers" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="ScalaMemberFindUsagesOptions.isSearchForTextOccurrences" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../xmasdemo/xmasdemo.toml" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/hw/include/pmu" />
     <property name="ml.local.models.training.notification.expired" value="true" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
@@ -153,22 +231,22 @@
     <property name="project.structure.side.proportion" value="0.234375" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
     <property name="scala_project_settings_configurable.last_selected_tab_index" value="0" />
-    <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src/main/scala/overlord/Instances" />
-      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/io/uart/apb_ctrl" />
-      <recent name="$PROJECT_DIR$/src/main/resources/catalogs" />
-      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/bridges/pmb_to_apb" />
-      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/buses/spinal/advanced_peripheral_bus" />
+      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/hw/include/pmu" />
+      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/core/include" />
+      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/hw/src" />
+      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/core/src/microblaze" />
+      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/core/src" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/socs" />
-      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8" />
-      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/ZynqPs8/registers" />
-      <recent name="$PROJECT_DIR$/src/main/resources/catalogs" />
-      <recent name="$PROJECT_DIR$/src/main/resources" />
+      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/hw/src/microblaze" />
+      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/hw/src/pmu" />
+      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/hw/include/microblaze" />
+      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/hw/include/pmu" />
+      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/lib/dbg/include" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="overlord.Definitions" />
@@ -326,7 +404,18 @@
       <workItem from="1627468597371" duration="2049000" />
       <workItem from="1627472713221" duration="7042000" />
       <workItem from="1627481104800" duration="26194000" />
-      <workItem from="1627657440784" duration="4534000" />
+      <workItem from="1627657440784" duration="44206000" />
+      <workItem from="1628015878666" duration="41242000" />
+      <workItem from="1628274322914" duration="47456000" />
+      <workItem from="1628871175296" duration="7351000" />
+      <workItem from="1629030814622" duration="11000" />
+      <workItem from="1629039837232" duration="221000" />
+      <workItem from="1629040085296" duration="1254000" />
+      <workItem from="1629195307733" duration="2241000" />
+      <workItem from="1629373730682" duration="4849000" />
+      <workItem from="1629711484037" duration="41244000" />
+      <workItem from="1629877138302" duration="2853000" />
+      <workItem from="1629915077847" duration="34407000" />
     </task>
     <task id="LOCAL-00001" summary="Major work on connection expansion and block connections&#10;Refactor and reorg instances, constraits, actions etc.&#10;moved ps8 docs to lower case">
       <created>1605964442645</created>
@@ -510,7 +599,14 @@
       <option name="project" value="LOCAL" />
       <updated>1627482286359</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="Major refactor of definitions, hardware, gateware and software classes&#10;Instance is now a interface, with ChipInstance being the parent to both Hardware and Gateware Instances&#10;Added mutable version of the utils toXXX&#10;previous software toml definition is now register and uses a resource subname&#10;Action system now outside of Gateware to be used by Software as well">
+      <created>1627674120337</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1627674120337</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -541,12 +637,11 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <ignored-roots>
       <path value="$PROJECT_DIR$/gate/litedram" />
       <path value="$PROJECT_DIR$/../ikuy_utils" />
     </ignored-roots>
-    <MESSAGE value="Fixed definition matching too short names&#10;Added cpus catalogs&#10;Improved gateware definition pathing&#10;Added VexRiscV_smallest to catalog, added ability to customize verilog name and top module name&#10;Improved port handling for pingroup&#10;and clock instances&#10;Computed direction better (refine from inout to uni directional when possible)&#10;Xdc writes more info and only outputs used constraints" />
-    <MESSAGE value="Added spinal pipelined memory bus to resources&#10;added buses to resource catalogs&#10;Improved directory handling to Toml and Yaml&#10;Better parameter handling, still too verbose and no arrays yet" />
     <MESSAGE value="Updated sbt to use similar style across the chip&#10;Updated the chip scala to a style style and&#10;Added resetti chip&#10;Moved ikuy_utils to seperate git repro&#10;added + to runMain sbt process to enable fetch compile to work&#10;Constant is now number only and now a BigInt to enable unsigned 64 bit &#10;Fixed pathing for some cases in Edalize&#10;Removed module_name from gateware now is the actual name of the instance&#10;Added pmb ram chip&#10;Added ${name} to read verilog sources, and sbt action&#10;Added 64 bit decoder to toml and yaml. For unsigned 64 bit has to be a string&#10;Fixed module name decoding from VerilogModuleParser (now has to be exact)&#10;Removed incorrect warnings from Wire.scala due to automagic hook up" />
     <MESSAGE value="Missed resetti added file from last commit" />
     <MESSAGE value="Renamed NXMinterconnect to bus&#10;added Advanced Peripheral Bus from Spinal to catalog&#10;added PipelinedMemoryBus to APB Bridge to Spinal&#10;Added bridges catalog&#10;Fixed compile in Report.scala" />
@@ -570,7 +665,9 @@
     <MESSAGE value="Fixed Game lookup (RAM etc.) due to directional connection now in use" />
     <MESSAGE value="Fixed board instance and directional connections" />
     <MESSAGE value="Moved board resource files&#10;Moved ultrascale+ docs&#10;Added clean ZynqMP PS8 gateware&#10;Added soc section to resources&#10;Added basic PMU def&#10;Improved verilog module parser using regex&#10;Tidied up C header paths&#10;Made report print each instance register banks&#10;Removed replicationCount and shared from connections&#10;Fixed/improved unconnected connecting logic&#10;Fixed improved wire connecting logic&#10;More attrib merging in a few places&#10;Clock now inherits attribs properly&#10;Defination Catalog can now include other catalogs&#10;Tidy and container fixes" />
-    <option name="LAST_COMMIT_MESSAGE" value="Moved board resource files&#10;Moved ultrascale+ docs&#10;Added clean ZynqMP PS8 gateware&#10;Added soc section to resources&#10;Added basic PMU def&#10;Improved verilog module parser using regex&#10;Tidied up C header paths&#10;Made report print each instance register banks&#10;Removed replicationCount and shared from connections&#10;Fixed/improved unconnected connecting logic&#10;Fixed improved wire connecting logic&#10;More attrib merging in a few places&#10;Clock now inherits attribs properly&#10;Defination Catalog can now include other catalogs&#10;Tidy and container fixes" />
+    <MESSAGE value="Major refactor of definitions, hardware, gateware and software classes&#10;Instance is now a interface, with ChipInstance being the parent to both Hardware and Gateware Instances&#10;Added mutable version of the utils toXXX&#10;previous software toml definition is now register and uses a resource subname&#10;Action system now outside of Gateware to be used by Software as well" />
+    <MESSAGE value="source processor renamed to sources&#10;gic400 register definition updated&#10;a53 system registers added&#10;ipi buffer registers added&#10;pmu ecc local memory bus register added&#10;Serdes PLL registers added&#10;lib core added with aarch64 and microblaze support&#10;a53 ikuy_boot boot fsbl/rom added&#10;overlord SoftSource action for symbolic links&#10;overlord Template action for templated source file&#10;Software instances and output added&#10;cpu passed into actions for cpu specific sources" />
+    <option name="LAST_COMMIT_MESSAGE" value="source processor renamed to sources&#10;gic400 register definition updated&#10;a53 system registers added&#10;ipi buffer registers added&#10;pmu ecc local memory bus register added&#10;Serdes PLL registers added&#10;lib core added with aarch64 and microblaze support&#10;a53 ikuy_boot boot fsbl/rom added&#10;overlord SoftSource action for symbolic links&#10;overlord Template action for templated source file&#10;Software instances and output added&#10;cpu passed into actions for cpu specific sources" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

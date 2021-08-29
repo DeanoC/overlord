@@ -1,8 +1,7 @@
 package input
 
 import ikuy_utils.{StringV, TableV}
-import overlord.Chip.{RegisterBank, RegisterList, Registers}
-import overlord.Software.Software
+import overlord.Chip.Registers
 
 import java.nio.file.Path
 

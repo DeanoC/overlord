@@ -1,0 +1,35 @@
+[[instance]]
+name = "cpu.zynqps8.a53"
+type = "cpu.a53"
+
+[[instance]]
+name = "A53InternalBus"
+type = "bus.axi4"
+
+[[instance]]
+name = "A53_to_MainBus"
+type = "bridge.internal"
+address_window_width = 64
+
+[[connection]]
+type = "bus"
+connection = "cpu.zynqps8.a53 -> A53InternalBus"
+
+[[connection]]
+type = "bus"
+connection = "A53InternalBus -> A53_to_MainBus"
+fixed_address = "0"
+
+[[connection]]
+type = "bus"
+connection = "A53_to_MainBus -> MainBus"
+
+[[connection]]
+type = "bus"
+connection = "A53InternalBus -> ram.ddr.ddr4"
+fixed_address = [["0x0000_0000", "2 GiB"],["0x8_0000_0000", "2 GiB"],]
+
+[[connection]]
+type = "bus"
+connection = "A53InternalBus -> ram.sram.ocp"
+fixed_address = "0xFFFC_0000"

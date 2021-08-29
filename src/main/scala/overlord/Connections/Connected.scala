@@ -1,25 +1,31 @@
 package overlord.Connections
 
 import overlord.Chip.Port
-import overlord.{ChipDefinitionTrait, GatewareDefinitionTrait}
-import overlord.Instances.{ChipInstance, ClockInstance, PinGroupInstance}
-import toml.Value
+import overlord.Instances.{ChipInstance, ClockInstance, InstanceTrait, PinGroupInstance}
+import overlord.{DefinitionTrait, GatewareDefinitionTrait, SoftwareDefinitionTrait}
 
 sealed trait ConnectionPriority
 
 case class GroupConnectionPriority() extends ConnectionPriority
+
 case class WildCardConnectionPriority() extends ConnectionPriority
+
 case class ExplicitConnectionPriority() extends ConnectionPriority
 
-case class InstanceLoc(instance: ChipInstance,
+case class InstanceLoc(instance: InstanceTrait,
                        port: Option[Port],
                        fullName: String) {
-	def definition: ChipDefinitionTrait = instance.definition
+	def definition: DefinitionTrait = instance.definition
 
 	def isGateware: Boolean = instance.isInstanceOf[GatewareDefinitionTrait]
+
+	def isSoftware: Boolean = instance.isInstanceOf[SoftwareDefinitionTrait]
+
 	def isPin: Boolean = instance.isInstanceOf[PinGroupInstance]
+
 	def isClock: Boolean = instance.isInstanceOf[ClockInstance]
-	def isChip:Boolean = !(isPin || isClock)
+
+	def isChip: Boolean = !(isPin || isClock)
 
 }
 

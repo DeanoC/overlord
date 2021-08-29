@@ -24,8 +24,8 @@ path_op = 'push'
 
 [[process]]
 name = 'src'
-processor = 'source'
-sources = [{ file ="${name}.v", language="verilog"}]
+processor = 'sources'
+sources = [{ file = "${name}.v", language = "verilog" }]
 
 [[process]]
 name = 'read_verilog_top'

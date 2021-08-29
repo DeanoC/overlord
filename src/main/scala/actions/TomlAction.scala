@@ -1,25 +1,23 @@
 package actions
 
-import overlord.Instances.ChipInstance
-import overlord.Game
 import ikuy_utils._
+import overlord.Game
+import overlord.Instances.InstanceTrait
 
 import java.nio.file.Path
 
-case class TomlAction(parameterKeys: Seq[String],
-                      filename: String,
+case class TomlAction(filename: String,
                       pathOp: ActionPathOp)
-	extends GatewareAction {
+	extends Action {
 
 	override val phase: Int = 1
 
-	override def execute(instance: ChipInstance,
-	                     parameters: Map[String, Variant],
+	override def execute(instance: InstanceTrait,
+	                     parameters: Map[String, () => Variant],
 	                     outPath: Path): Unit = {
 		val sb = new StringBuilder()
-		for {k <- parameterKeys
-		     if parameters.contains(k)} {
-			sb ++= s"$k = ${parameters(k).toTomlString}\n"
+		for {(k, vf) <- parameters} {
+			sb ++= s"$k] = ${vf().toTomlString}\n"
 		}
 
 		val moddedOutPath = Game.pathStack.top.resolve(instance.ident)
@@ -40,24 +38,21 @@ object TomlAction {
 	          pathOp: ActionPathOp): Seq[TomlAction] = {
 		if (!process.contains("parameters")) {
 			println(s"Toml process $name doesn't have a parameters field")
-			None
+			return Seq()
 		}
 		if (!process("parameters").isInstanceOf[ArrayV]) {
 			println(s"Toml process $name parameters isn't an array")
-			None
+			return Seq()
 		}
 		if (!process.contains("filename")) {
 			println(s"Toml process $name doesn't have a filename field")
-			None
+			return Seq()
 		}
 		if (!process("filename").isInstanceOf[StringV]) {
 			println(s"Toml process $name filename isn't a string")
-			None
+			return Seq()
 		}
 
-		val filename   = Utils.toString(process("filename"))
-		val parameters = Utils.toArray(process("parameters")).map(Utils.toString)
-
-		Seq(TomlAction(parameters, filename, pathOp))
+		Seq(TomlAction(Utils.toString(process("filename")), pathOp))
 	}
 }

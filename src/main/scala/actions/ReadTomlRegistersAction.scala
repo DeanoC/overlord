@@ -1,8 +1,8 @@
 package actions
 
-import overlord.Instances.ChipInstance
-import overlord.Game
 import ikuy_utils._
+import overlord.Game
+import overlord.Instances.{ChipInstance, InstanceTrait}
 
 import java.nio.file.Path
 
@@ -12,10 +12,23 @@ case class ReadTomlRegistersAction(filename: String,
 
 	override val phase: Int = 2
 
+	def execute(instance: InstanceTrait,
+	            parameters: Map[String, () => Variant],
+	            outPath: Path): Unit = {
+		if (!instance.isInstanceOf[ChipInstance]) {
+			println(s"${
+				instance
+					.ident
+			} is not a chip but is being processed by a gateware action")
+		} else {
+			execute(instance.asInstanceOf[ChipInstance], parameters, outPath)
+		}
+	}
+
 	override def execute(instance: ChipInstance,
-	                     parameters: Map[String, Variant],
+	                     parameters: Map[String, () => Variant],
 	                     outPath: Path): Unit = {
-		val name = filename.replace("${name}", instance.ident)
+		val name      = filename.replace("${name}", instance.ident)
 		val registers = input.TomlRegistersParser(outPath, name.split("/").last)
 		instance.instanceRegisterBanks ++= registers.banks
 		instance.instanceRegisterLists ++= registers.lists

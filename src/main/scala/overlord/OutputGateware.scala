@@ -1,7 +1,7 @@
 package overlord
 
 import ikuy_utils.Variant
-import overlord.Connections.{ConnectedConstant, Connection, ConstantConnectionType}
+import overlord.Connections.{Connection, ConstantConnectionType}
 import overlord.Instances.{BusInstance, ChipInstance, MutContainer}
 
 import java.nio.file.Path
@@ -14,18 +14,17 @@ object OutputGateware {
 
 		for (instance <- top.children
 			.filter(_.definition.isInstanceOf[GatewareDefinitionTrait])
-			.map(_.asInstanceOf[ChipInstance])) {
-			OutputGateware.executePhase(instance, top.connections.toSeq, phase)
-		}
+			.map(_.asInstanceOf[ChipInstance]))
+			executePhase(instance, top.connections.toSeq, phase)
 	}
 
-	def executePhase(instance: ChipInstance,
-	                 connections: Seq[Connection],
-	                 phase: Int): Unit = {
+	private def executePhase(instance: ChipInstance,
+	                         connections: Seq[Connection],
+	                         phase: Int): Unit = {
 		val backupStack = Game.pathStack.clone()
 
 		val gateware = instance.definition.asInstanceOf[GatewareDefinitionTrait]
-		val actions = gateware.actionsFile.actions
+		val actions  = gateware.actionsFile.actions
 
 		for {
 			action <- actions.filter(_.phase == phase)
@@ -52,7 +51,11 @@ object OutputGateware {
 			                 conParameters ++
 			                 instanceSpecificParameters
 
-			action.execute(instance, parameters, Game.pathStack.top)
+			instance.mergeAllAttributes(parameters)
+
+			val parametersTbl = for ((k, v) <- parameters) yield k -> (() => v)
+
+			action.execute(instance, parametersTbl, Game.pathStack.top)
 		}
 
 		Game.pathStack = backupStack

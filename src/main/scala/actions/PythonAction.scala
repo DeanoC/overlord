@@ -1,17 +1,20 @@
 package actions
 
-import java.nio.file.Path
-import overlord.Instances.ChipInstance
 import ikuy_utils._
+import overlord.Instances.InstanceTrait
+
+import java.nio.file.Path
 
 case class PythonAction(script: String,
                         args: String,
                         pathOp: ActionPathOp)
-	extends GatewareAction {
+	extends Action {
 
 	override val phase: Int = 1
 
-	override def execute(instance: ChipInstance, parameters: Map[String, Variant], outPath: Path): Unit = {
+	override def execute(instance: InstanceTrait,
+	                     parameters: Map[String, () => Variant],
+	                     outPath: Path): Unit = {
 		import scala.language.postfixOps
 
 		val result = sys.process.Process(

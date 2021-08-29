@@ -1,12 +1,11 @@
 package output
 
+import ikuy_utils._
 import overlord.Instances.{BoardInstance, ChipInstance, Container, InstanceTrait}
-
-import java.nio.file.Path
 import overlord._
 
+import java.nio.file.Path
 import scala.collection.mutable
-import ikuy_utils._
 
 object Report {
 
@@ -98,6 +97,8 @@ object Report {
 			case PinGroupDefinitionType(ident) => "pin."
 			case ClockDefinitionType(ident)    => "clock."
 			case BoardDefinitionType(ident)    => "board."
+			case ProgramDefinitionType(ident)  => "bootrom."
+			case LibraryDefinitionType(ident)  => "library."
 		}) + id
 		sb ++= (indent + f"type: $name%n")
 		instance match {

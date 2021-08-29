@@ -1,8 +1,33 @@
 package output
 
+import ikuy_utils.Utils
+import overlord.Game
+
 import java.nio.file.Path
 
-import overlord.Game
+// Projects structure
+// build
+//       soft
+//              src
+//                 $triple
+//                     hw
+//                        include
+//                               registers
+//                        src
+//                        CMakeLists.txt
+//                     core
+//                        include
+//                               core
+//                        src
+//                        CMakeLists.txt
+//              etc
+//                     CMSIS-SVD.xsd
+//              compilers
+//              ${cpu}_toolchain.cmake
+//              ${gamename}.svd
+//              generate_compilers.sh
+//       gate
+//
 
 object Project {
 	def apply(game: Game, out: Path): Unit = {
@@ -11,17 +36,13 @@ object Project {
 		val softPath = out.resolve("soft")
 		val gatePath = out.resolve("gate")
 
+		Utils.ensureDirectories(gatePath)
+
 		output.Report(game, out)
 		output.Xdc(game, gatePath)
 		output.Top(game, gatePath)
 		output.Edalize(game, gatePath)
-
-		if (game.cpus.nonEmpty) {
-			output.Compiler(game, softPath)
-			output.BaseCHeaders(game, softPath.resolve("include"))
-			output.BootRom(game, softPath.resolve("bootroms"))
-			output.Svd(game, softPath)
-		}
+		output.Software(game, softPath)
 	}
 }
 

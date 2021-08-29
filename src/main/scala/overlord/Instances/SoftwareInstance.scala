@@ -1,21 +1,11 @@
 package overlord.Instances
 
-import ikuy_utils.{Utils, Variant}
-import overlord.{DefinitionTrait}
+import ikuy_utils.Utils
+import overlord.SoftwareDefinitionTrait
 
-case class SoftwareInstance(ident: String,
-                            override val definition: DefinitionTrait,
-                          ) extends InstanceTrait {
-}
+trait SoftwareInstance extends InstanceTrait {
+	lazy val name: String = Utils.lookupString(attributes, "name", "NONAME")
+	val folder: String = ""
 
-object SoftwareInstance {
-	def apply(ident: String,
-	          definition: DefinitionTrait,
-	          attribs: Map[String, Variant]
-	         ) : Option[SoftwareInstance] = {
-
-		val sw = SoftwareInstance(ident, definition)
-		sw.mergeAllAttributes(attribs)
-		Some(sw)
-	}
+	override def definition: SoftwareDefinitionTrait
 }

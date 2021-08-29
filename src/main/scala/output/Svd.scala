@@ -2,12 +2,10 @@ package output
 
 import ikuy_utils.Utils
 import overlord.Chip.{BitsDesc, Register}
-
-import java.io.{BufferedWriter, FileWriter}
-import java.nio.file.Path
 import overlord.Instances.{ChipInstance, CpuInstance}
 import overlord._
 
+import java.nio.file.Path
 import scala.collection.mutable
 import scala.xml.PrettyPrinter
 
@@ -157,7 +155,7 @@ object Svd {
 		// copy etc/CMSIS-SVD.xsd
 		val etc     = out.resolve("etc")
 		Utils.ensureDirectories(etc)
-		Utils.copy(Path.of("etc/CMSIS-SVD.xsd"), etc.resolve("CMSIS-SVD.xsd"))
+		Utils.copy(Path.of("etc/CMSIS-SVD.xsd"), etc.resolve("CMSIS-SVD.xsd"), getClass)
 
 		val path = if (out.toFile.isDirectory)
 			out.resolve(s"${game.name}.svd")

@@ -1,7 +1,10 @@
-get_filename_component(IKUY_PATH ../.. REALPATH)
+get_filename_component(IKUY_PATH ./programs_host/ REALPATH)
+
 get_filename_component(COMPILER_PATH ${IKUY_PATH}/compilers/${triple} REALPATH)
 
 set(GCC_VERSION "10.2.0")
+set(CMAKE_SYSTEM_NAME Generic)
+
 set(CMAKE_ADDR2LINE ${COMPILER_PATH}/bin/${triple}-addr2line)
 set(CMAKE_AR ${COMPILER_PATH}/bin/${triple}-ar)
 set(CMAKE_RANLIB ${COMPILER_PATH}/bin/${triple}-ranlib)
@@ -18,7 +21,7 @@ set(CMAKE_C_COMPILER_RANLIB ${COMPILER_PATH}/bin/${triple}-ranlib)
 set(CMAKE_LINKER ${COMPILER_PATH}/bin/${triple}-ld)
 
 # TODO 
-set(CPU_SETTINGS "")
+set(CPU_SETTINGS "-Wl,--build-id")
 
 set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} -ggdb")
 set(CMAKE_ASM_FLAGS "${CMAKE_C_FLAGS} -flto -ffat-lto-objects")
@@ -34,4 +37,4 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -nostartfiles -nostdlib -nostdinc -ffreestan
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wpedantic -Wno-builtin-declaration-mismatch")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CPU_SETTINGS} -std=gnu18")
 
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -nostartfiles -nostdlib -nostdinc")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -nostartfiles -nostdlib -nostdinc -lgcc")

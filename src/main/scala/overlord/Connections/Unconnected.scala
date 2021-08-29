@@ -1,8 +1,8 @@
 package overlord.Connections
 
 import ikuy_utils.{BigIntV, Utils, Variant}
-import overlord.Connections
 import overlord.Chip._
+import overlord.Connections
 import overlord.Instances._
 
 import scala.math.BigDecimal.double2bigDecimal
@@ -33,6 +33,7 @@ case class Unconnected(connectionType: ConnectionType,
 			case _: ConstantConnectionType  => connectConstantConnection(unexpanded)
 			case _: PortGroupConnectionType => connectPortGroupConnection(unexpanded)
 			case _: BusConnectionType       => connectBusConnection(unexpanded)
+			case _: LogicalConnectionType   => connectLogicalConnection(unexpanded)
 		}
 	}
 
@@ -79,6 +80,20 @@ case class Unconnected(connectionType: ConnectionType,
 
 		for {mloc <- mo; sloc <- so} yield {
 			ConnectPortBetween(cbp, mloc, sloc)
+		}
+	}
+
+	private def connectLogicalConnection(unexpanded: Seq[ChipInstance]) = {
+		val mo = matchInstances(main, unexpanded)
+		val so = matchInstances(second, unexpanded)
+
+		val cbp = if (mo.length > 1 || so.length > 1)
+			WildCardConnectionPriority()
+		else ExplicitConnectionPriority()
+
+		for {mloc <- mo; sloc <- so} yield {
+			Connections.ConnectedBetween(LogicalConnectionType(),
+			                             cbp, mloc, direction, sloc)
 		}
 	}
 
@@ -176,89 +191,18 @@ case class Unconnected(connectionType: ConnectionType,
 		val ct = connectionType.asInstanceOf[PortGroupConnectionType]
 
 		for {mloc <- mo; sloc <- so
-		     fp <- mloc.instance.ports.values
+		     fp <- mloc.instance.asInstanceOf[ChipInstance].ports.values
 			     .filter(_.name.startsWith(ct.first_prefix))
-		     sp <- sloc.instance.ports.values
+		     sp <- sloc.instance.asInstanceOf[ChipInstance].ports.values
 			     .filter(_.name.startsWith(ct.second_prefix))
 		     if fp.name.stripPrefix(ct.first_prefix) ==
 		        sp.name.stripPrefix(ct.second_prefix)
 		     if !(ct.excludes.contains(fp.name) || ct.excludes.contains(sp.name))
-		     } yield ConnectPortGroupBetween(mloc.instance,
+		     } yield ConnectPortGroupBetween(mloc.instance.asInstanceOf[ChipInstance],
 		                                     fp,
 		                                     mloc.fullName,
-		                                     sloc.instance,
+		                                     sloc.instance.asInstanceOf[ChipInstance],
 		                                     sp)
-	}
-
-	private def preConnectBusConnection(unexpanded: Seq[ChipInstance]): Unit = {
-		val mo = matchInstances(main, unexpanded)
-		val so = matchInstances(second, unexpanded)
-
-		if (mo.isEmpty) {
-			println(s"$main instance can't be found")
-		}
-		if (so.isEmpty) {
-			println(s"$second instance can't be found")
-		}
-
-		if (mo.length != 1 || so.length != 1) {
-			println(s"connection $main between $second count error")
-			Seq[ChipInstance]()
-		}
-
-		val mainIL      = mo.head
-		val otherIL     = so.head
-		val isMainABus  = mo.head.instance.isInstanceOf[BusInstance]
-
-		// main = bus and first to second so main is supplier, other is consumer
-		// main = bus and second to first so main is consumer, other is supplier
-		// other = bus and first to second so main is consumer, other is supplier
-		// other = bus and second to first so main is supplier, other is consumer
-		val mainIsSupplier =
-			(isMainABus && direction == FirstToSecondConnection()) ||
-			(!isMainABus && direction == SecondToFirstConnection())
-
-		if (mainIsSupplier) {
-			val bus: BusInstance =
-				if (isMainABus) mainIL.instance.asInstanceOf[BusInstance]
-				else otherIL.instance.asInstanceOf[BusInstance]
-
-			val other = if (!isMainABus) mainIL.instance else otherIL.instance
-
-			val busBankAlignment = Utils.lookupBigInt(bus.attributes.toMap,
-			                                          "bus_bank_alignment",
-			                                          1024)
-
-			val connectionSize = Utils.lookupBigInt(attributes,
-			                                        key = "size_in_bytes",
-			                                        busBankAlignment)
-
-
-			val size    = other match {
-				case bridge: BridgeInstance => Utils.pow2(bridge.addressWindowWidth).toBigInt
-				case ram: RamInstance => ram.getSizeInBytes
-				case _                => connectionSize
-			}
-			if(attributes.contains("fixed_address")) {
-				val faAttrib = attributes("fixed_address")
-				if(faAttrib.isInstanceOf[BigIntV]) {
-					val address = Utils.toBigInt(faAttrib)
-					bus.addFixedAddressConsumer(other, address, size)
-				} else {
-					val fixedAddresses = Utils.toArray(faAttrib)
-					for(fixedAddress <- fixedAddresses) {
-						val fa = Utils.toArray(fixedAddress)
-						val address = Utils.toBigInt(fa(0))
-						val size    = Utils.toBigInt(fa(1))
-
-						bus.addFixedAddressConsumer(other, address, size)
-					}
-
-				}
-			} else {
-				if(!other.isHardware) bus.addVariableAddressConsumer(other, size)
-			}
-		}
 	}
 
 	private def connectBusConnection(unexpanded: Seq[ChipInstance]): Seq[ConnectedBetween] = {
@@ -277,7 +221,10 @@ case class Unconnected(connectionType: ConnectionType,
 		val bus: BusInstance =
 			if (isMainBus) mainIL.instance.asInstanceOf[BusInstance]
 			else secondaryIL.instance.asInstanceOf[BusInstance]
-		val other = if (!isMainBus) mainIL.instance else secondaryIL.instance
+		val other            = if (!isMainBus)
+			mainIL.instance.asInstanceOf[ChipInstance]
+		else
+			secondaryIL.instance.asInstanceOf[ChipInstance]
 
 		val busLoc = if (isMainBus) mainIL else secondaryIL
 
@@ -332,8 +279,81 @@ case class Unconnected(connectionType: ConnectionType,
 				sp <- other.ports.values.filter(_.name.startsWith(op))
 				if fp.name.stripPrefix(bp) == sp.name.stripPrefix(op)
 			} yield {
-				if(isMainBus) ConnectPortGroupBetween(bus, fp, busLoc.fullName, other, sp)
+				if (isMainBus) ConnectPortGroupBetween(bus, fp, busLoc.fullName, other, sp)
 				else ConnectPortGroupBetween(other, sp, busLoc.fullName, bus, fp)
+			}
+		}
+	}
+
+	private def preConnectBusConnection(unexpanded: Seq[ChipInstance]): Unit = {
+		val mo = matchInstances(main, unexpanded)
+		val so = matchInstances(second, unexpanded)
+
+		if (mo.isEmpty) {
+			println(s"$main instance can't be found")
+		}
+		if (so.isEmpty) {
+			println(s"$second instance can't be found")
+		}
+
+		if (mo.length != 1 || so.length != 1) {
+			println(s"connection $main between $second count error")
+			Seq[ChipInstance]()
+		}
+
+		val mainIL     = mo.head
+		val otherIL    = so.head
+		val isMainABus = mo.head.instance.isInstanceOf[BusInstance]
+
+		// main = bus and first to second so main is supplier, other is consumer
+		// main = bus and second to first so main is consumer, other is supplier
+		// other = bus and first to second so main is consumer, other is supplier
+		// other = bus and second to first so main is supplier, other is consumer
+		val mainIsSupplier =
+			(isMainABus && direction == FirstToSecondConnection()) ||
+			(!isMainABus && direction == SecondToFirstConnection())
+
+		if (mainIsSupplier) {
+			val bus: BusInstance =
+				if (isMainABus) mainIL.instance.asInstanceOf[BusInstance]
+				else otherIL.instance.asInstanceOf[BusInstance]
+
+			val other = if (!isMainABus) mainIL.instance else otherIL.instance
+
+			val busBankAlignment = Utils.lookupBigInt(bus.attributes.toMap,
+			                                          "bus_bank_alignment",
+			                                          1024)
+
+			val connectionSize = Utils.lookupBigInt(attributes,
+			                                        key = "size_in_bytes",
+			                                        busBankAlignment)
+
+
+			val size = other match {
+				case bridge: BridgeInstance => Utils.pow2(bridge.addressWindowWidth).toBigInt
+				case ram: RamInstance       => ram.getSizeInBytes
+				case _                      => connectionSize
+			}
+			if (attributes.contains("fixed_address")) {
+				val faAttrib = attributes("fixed_address")
+				if (faAttrib.isInstanceOf[BigIntV]) {
+					val address = Utils.toBigInt(faAttrib)
+					bus.addFixedAddressConsumer(other.asInstanceOf[ChipInstance], address, size)
+				} else {
+					val fixedAddresses = Utils.toArray(faAttrib)
+					for (fixedAddress <- fixedAddresses) {
+						val fa      = Utils.toArray(fixedAddress)
+						val address = Utils.toBigInt(fa(0))
+						val size    = Utils.toBigInt(fa(1))
+
+						bus.addFixedAddressConsumer(other.asInstanceOf[ChipInstance], address, size)
+					}
+
+				}
+			} else {
+				if (!other.definition.isInstanceOf[HardwareDefinition])
+					bus.addVariableAddressConsumer(other.asInstanceOf[ChipInstance], size)
+				else println(f"${other.ident} is hardware so needs a fixed_address")
 			}
 		}
 	}

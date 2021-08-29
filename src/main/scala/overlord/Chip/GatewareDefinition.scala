@@ -11,20 +11,20 @@ case class GatewareDefinition(defType: DefinitionType,
                               attributes: Map[String, Variant],
                               ports: Map[String, Port],
                               registers: Option[Registers],
-                              parameters: Map[String,Variant],
+                              parameters: Map[String, Variant],
                               actionsFile: ActionsFile
                              ) extends GatewareDefinitionTrait {
 }
 
 object GatewareDefinition {
-	def apply(table: VariantTable,  path:Path): Option[GatewareDefinition] = {
-		if(!table.contains("gateware")) return None
+	def apply(table: VariantTable, path: Path): Option[GatewareDefinition] = {
+		if (!table.contains("gateware")) return None
 
 		val defTypeName = Utils.toString(table("type"))
 
 		val attribs = table.filter(a => a._1 match {
-			case "type" | "software" | "gateware" | "hardware" | "ports" | "registers" => false
-			case _                                                                     => true
+			case "type" | "gateware" | "ports" | "registers" => false
+			case _                                           => true
 		})
 
 		val name = defTypeName.split('.')
@@ -41,12 +41,12 @@ object GatewareDefinition {
 
 		val defType = DefinitionType(defTypeName)
 
-		Some( GatewareDefinition(defType,
-		                   attribs,
-		                   ports,
-		                   registers,
-		                   name.last,
-		                   path.resolve(Utils.toString(table("gateware")))).get)
+		Some(GatewareDefinition(defType,
+		                        attribs,
+		                        ports,
+		                        registers,
+		                        name.last,
+		                        path.resolve(Utils.toString(table("gateware")))).get)
 
 	}
 

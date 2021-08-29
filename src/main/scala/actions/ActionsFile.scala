@@ -2,7 +2,7 @@ package actions
 
 import ikuy_utils.{ArrayV, Utils, Variant}
 import overlord.Game
-import overlord.Instances.{ChipInstance, MutContainer}
+import overlord.Instances.{ChipInstance, InstanceTrait}
 
 import java.nio.file.Path
 
@@ -27,22 +27,21 @@ trait Action {
 		}
 	}
 
-	def execute(instance: ChipInstance,
-	            parameters: Map[String, Variant],
+	def execute(instance: InstanceTrait,
+	            parameters: Map[String, () => Variant],
 	            outPath: Path): Unit
 }
 
-trait GatewareAction extends Action
+trait GatewareAction extends Action {
+	def execute(instance: ChipInstance,
+	            parameters: Map[String, () => Variant],
+	            outPath: Path): Unit
+
+}
 
 trait SoftwareAction extends Action
 
-case class ActionsFile(actions: Seq[Action]) {
-
-	def execute(top: MutContainer, path: Path) = {
-		Game.pathStack.push(path.toRealPath())
-		//		for {instance <- top.children.definition.isInstanceOf[SoftwareTrait]} {}
-	}
-}
+case class ActionsFile(actions: Seq[Action])
 
 object ActionsFile {
 	def apply(name: String, parsed: Map[String, Variant]): Option[ActionsFile] = {
@@ -86,17 +85,19 @@ object ActionsFile {
 
 				Utils.toString(process("processor")) match {
 					case "copy"                => CopyAction(name, process, pathOp)
-					case "source"              => SourcesAction(name, process, pathOp)
+					case "sources"             => SourcesAction(name, process, pathOp)
 					case "git"                 => GitCloneAction(name, process, pathOp)
 					case "python"              => PythonAction(name, process, pathOp)
 					case "yaml"                => YamlAction(name, process, pathOp)
 					case "toml"                => TomlAction(name, process, pathOp)
 					case "sbt"                 => SbtAction(name, process, pathOp)
-					case "read_verilog_top"    =>
-						ReadVerilogTopAction(name, process, pathOp)
-					case "read_toml_registers" =>
-						ReadTomlRegistersAction(name, process, pathOp)
-					case _                     => None
+					case "read_verilog_top"    => ReadVerilogTopAction(name, process, pathOp)
+					case "read_toml_registers" => ReadTomlRegistersAction(name, process, pathOp)
+					case "templates"           => TemplateAction(name, process, pathOp)
+					case "software_sources"    => SoftSourceAction(name, process, pathOp)
+					case _                     =>
+						println(f"Unknown action processor in $name")
+						None
 				}
 			}).flatten
 

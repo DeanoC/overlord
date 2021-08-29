@@ -4,7 +4,7 @@ import ikuy_utils._
 import input.{VerilogParameterKey, VerilogPort}
 import overlord.Chip.{Port, WireDirection}
 import overlord.Game
-import overlord.Instances.ChipInstance
+import overlord.Instances.{ChipInstance, InstanceTrait}
 
 import java.nio.file.Path
 
@@ -14,8 +14,21 @@ case class ReadVerilogTopAction(filename: String,
 
 	override val phase: Int = 2
 
+	def execute(instance: InstanceTrait,
+	            parameters: Map[String, () => Variant],
+	            outPath: Path): Unit = {
+		if (!instance.isInstanceOf[ChipInstance]) {
+			println(s"${
+				instance
+					.ident
+			} is not a chip but is being processed by a gateware action")
+		} else {
+			execute(instance.asInstanceOf[ChipInstance], parameters, outPath)
+		}
+	}
+
 	override def execute(instance: ChipInstance,
-	                     parameters: Map[String, Variant],
+	                     parameters: Map[String, () => Variant],
 	                     outPath: Path): Unit = {
 		val name = filename.replace("${name}", instance.ident)
 		val bs   = input.VerilogModuleParser(
@@ -42,7 +55,7 @@ object ReadVerilogTopAction {
 	          pathOp: ActionPathOp): Option[ReadVerilogTopAction] = {
 		if (!process.contains("source")) {
 			println(s"Read Verilog Top process $name doesn't have a source field")
-			None
+			return None
 		}
 
 		val filename = process("source") match {

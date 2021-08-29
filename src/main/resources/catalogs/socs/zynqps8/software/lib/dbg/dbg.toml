@@ -1,0 +1,14 @@
+actions = [
+    "templates"
+]
+
+[[process]]
+name = 'templates'
+processor = 'templates'
+sources = [
+    { in = "CMakeLists.txt", out = "CMakeLists.txt" },
+    { in = "include/assert.h", out = "include/dbg/assert.h" },
+    { in = "include/print.h", out = "include/dbg/print.h" },
+    { in = "src/assert.c", out = "src/assert.c" },
+    { in = "src/zynqmp_print.c", out = "src/zynqmp/print.c" },
+]

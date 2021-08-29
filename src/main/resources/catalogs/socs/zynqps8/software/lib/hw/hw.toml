@@ -1,0 +1,25 @@
+actions = [
+    "templates"
+]
+
+[[process]]
+name = 'templates'
+processor = 'templates'
+sources = [
+    { in = "CMakeLists.txt", out = "CMakeLists.txt" },
+    { in = "include/reg_access.h", out = "include/hw/reg_access.h" },
+    { in = "include/boot_psi.h", out = "include/hw/boot_psi.h" },
+    { in = "include/cache.h", out = "include/hw/cache.h" },
+    { in = "include/memory_map.h", out = "include/hw/memory_map.h" },
+    { in = "include/cpu_percpu.h", out = "include/hw/${cpuName}/cpu.h", cpus = "_" },
+    { in = "include/memory_map_percpu.h", out = "include/hw/${cpuName}/memory_map.h", cpus = "_" },
+    { in = "include/aarch64/intrinsics_gcc.h", out = "include/hw/aarch64/intrinsics_gcc.h" },
+    { in = "include/microblaze/intrinsics_gcc.h", out = "include/hw/microblaze/intrinsics_gcc.h" },
+    { in = "src/boot_psi.c", out = "src/boot_psi.c" },
+    { in = "src/aarch64/cache.c", out = "src/aarch64/cache.c" },
+    { in = "src/pmu/cache.c", out = "src/pmu/cache.c" },
+    { in = "src/microblaze/disable_exceptions.S", out = "src/microblaze/disable_exceptions.S" },
+    { in = "src/microblaze/enable_exceptions.S", out = "src/microblaze/enable_exceptions.S" },
+    { in = "src/microblaze/disable_interrupts.S", out = "src/microblaze/disable_interrupts.S" },
+    { in = "src/microblaze/enable_interrupts.S", out = "src/microblaze/enable_interrupts.S" },
+]

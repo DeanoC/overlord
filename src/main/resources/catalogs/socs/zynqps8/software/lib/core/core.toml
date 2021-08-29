@@ -1,0 +1,25 @@
+actions = [
+    "templates"
+]
+
+[[process]]
+name = 'templates'
+processor = 'templates'
+sources = [
+    { in = "CMakeLists.txt", out = "CMakeLists.txt" },
+    { in = "include/core.h", out = "include/core/core.h" },
+    { in = "include/internal_math.h", out = "include/core/internal_math.h" },
+    { in = "include/math.h", out = "include/core/math.h" },
+    { in = "include/math_real.h", out = "include/core/math_real.h" },
+    { in = "include/snprintf.h", out = "include/core/snprintf.h" },
+    { in = "src/atoi.c", out = "src/atoi.c" },
+    { in = "src/snprintf.c", out = "src/snprintf.c" },
+    { in = "src/aarch64/memcmp.S", out = "src/aarch64/memcmp.S" },
+    { in = "src/aarch64/memcpy.S", out = "src/aarch64/memcpy.S" },
+    { in = "src/aarch64/memmove.S", out = "src/aarch64/memmove.S" },
+    { in = "src/aarch64/memset.S", out = "src/aarch64/memset.S" },
+    { in = "src/microblaze/memcmp.c", out = "src/microblaze/memcmp.c" },
+    { in = "src/microblaze/memcpy.c", out = "src/microblaze/memcpy.c" },
+    { in = "src/microblaze/memmove.c", out = "src/microblaze/memmove.c" },
+    { in = "src/microblaze/memset.c", out = "src/microblaze/memset.c" },
+]

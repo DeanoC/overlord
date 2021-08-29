@@ -1,21 +1,22 @@
 package actions
 
-import java.nio.file.Path
-import overlord.Instances.ChipInstance
-import overlord.Game
 import ikuy_utils._
+import overlord.Game
+import overlord.Instances.InstanceTrait
+
+import java.nio.file.Path
 
 case class SbtAction(mainScala: String,
                      args: String,
                      withBuildSbt: Boolean,
                      srcPath: String,
                      pathOp: ActionPathOp)
-	extends GatewareAction {
+	extends Action {
 
 	override val phase: Int = 1
 
-	override def execute(instance: ChipInstance,
-	                     parameters: Map[String, Variant],
+	override def execute(instance: InstanceTrait,
+	                     parameters: Map[String, () => Variant],
 	                     outPath: Path): Unit = {
 		import scala.language.postfixOps
 

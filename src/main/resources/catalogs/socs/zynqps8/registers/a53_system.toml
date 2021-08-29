@@ -1,0 +1,95 @@
+description = "A53 EL3 System registers"
+
+[[bank]]
+name = "A53_SYS"
+address = "-1"
+
+[[register]]
+name = "CCSIDR_EL1"
+type = "rw"
+width = 32
+description = "Current Cache Size ID Register."
+default = "0x00000000"
+offset = "0x00000000"
+
+[[register.field]]
+name = "LINESIZE"
+description = "Log2(num bytes in cache line) - 4, 0 = 16 byte cache line"
+bits = "[2:0]"
+type = "r"
+
+[[register.field]]
+name = "ASSOCIATIVITY"
+description = "Associativity bit of cache - 1, 0 = 1 bit"
+bits = "[12:3]"
+type = "r"
+
+[[register.field]]
+name = "NUMSETS"
+description = "Num sets in cache - 1, 0 = 1 set"
+bits = "[27:13]"
+type = "r"
+
+[[register]]
+name = "CSSELR_EL1"
+type = "rw"
+width = 32
+description = "Cache Size Selection Register."
+default = "0x00000000"
+offset = "0x00000000"
+
+[[register.field]]
+name = "LEVEL"
+description = "Cache level 0 = L1 upto L7"
+bits = "[3:1]"
+type = "rw"
+
+[[register.field]]
+name = "INOTD"
+description = "Instruction not Data 0 = D Cache, 1 = I Cache"
+bits = "0"
+type = "rw"
+
+[[register]]
+name = "SCTLR_EL3"
+type = "rw"
+width = 32
+description = "The SCTLR_EL3 controls cache and other system function."
+default = "0x00000000"
+offset = "0x00000000"
+
+[[register.field]]
+name = "WXN"
+description = "Enable XN (Execute-never) for all EL3 translation regions"
+bits = "19"
+type = "rw"
+
+[[register.field]]
+name = "I"
+description = "0 = all EL3 Normal regions are not instruction cachable"
+bits = "12"
+type = "rw"
+
+[[register.field]]
+name = "SA"
+description = "SP Alignment check enable"
+bits = "3"
+type = "rw"
+
+[[register.field]]
+name = "C"
+description = "0 = all EL3 Normal regions are not data cachable"
+bits = "2"
+type = "rw"
+
+[[register.field]]
+name = "A"
+description = "Alignment fault checking enable"
+bits = "1"
+type = "rw"
+
+[[register.field]]
+name = "M"
+description = "E3 stage 1 MMU enable"
+bits = "0"
+type = "rw"

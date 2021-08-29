@@ -1,19 +1,11 @@
 package output
 
 import ikuy_utils._
-
-import java.io.{BufferedWriter, FileWriter}
-import java.nio.file.Path
-import overlord.Connections.{
-	InstanceLoc, WildCardConnectionPriority, Wire,
-	Wires
-}
-import overlord.Chip.{Port, WireDirection}
-import overlord.Instances.{ClockInstance, ChipInstance, PinGroupInstance}
+import overlord.Connections.{InstanceLoc, WildCardConnectionPriority, Wire}
+import overlord.Instances.{ChipInstance, ClockInstance, PinGroupInstance}
 import overlord._
 
-import scala.collection.mutable
-import scala.util.{Failure, Success, Try}
+import java.nio.file.Path
 
 object Top {
 	def apply(game: Game, out: Path): Unit = {
@@ -29,7 +21,7 @@ object Top {
 		sb ++= writeChipToChipWires(game.wires)
 
 		// instantiation
-		for (instance <- game.setOfGateware) {
+		for (instance <- game.setOfConnectedGateware) {
 			sb ++=
 			s"""
 				 |  (*dont_touch = "true"*) ${instance.ident}""".stripMargin
