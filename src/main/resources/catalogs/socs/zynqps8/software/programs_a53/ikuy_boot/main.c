@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 
 #include "core/core.h"
-#include "dbg/print.h"
+#include "dbg/raw_print.h"
+#include "dbg/ansi_escapes.h"
 #include "hw/reg_access.h"
 #include "hw/cache.h"
 #include "hw/aarch64/intrinsics_gcc.h"
@@ -71,7 +72,7 @@ int main(void)
 	clockRunInitProgram();
 	peripheralsRunInitProgram();
 
-	debug_printf("\nUART ready to be used\n");
+	raw_debug_printf("\nUART ready to be used\n");
 	PrintBanner();
 
 	ddrRunInitProgram();
@@ -86,7 +87,7 @@ int main(void)
 	MarkDdrAsMemory();
 	TcmInit();
 
-	debug_printf("Initialization Done\n");
+	raw_debug_printf("Initialization Done\n");
 
 	/*
 	 * Write 1U to PMU GLOBAL general storage register 5 to indicate
@@ -94,15 +95,15 @@ int main(void)
 	 */
 //	HW_REG_MERGE(PMU_GLOBAL, GLOBAL_GEN_STORAGE5, 0x1, 0x1);
 
-	debug_printf("Boot program Finished\n");
+	raw_debug_printf("Boot program Finished\n");
 
-	debug_printf("PMU Download Start\n");
+	raw_debug_printf("PMU Download Start\n");
 
 	// clear heap
 	memset(HeapBase, 0, HeapLimit - HeapBase);
 	PmuSleep();
 	PmuDownload();
-	debug_printf("Switching to PMU\n");
+	raw_debug_printf("Switching to PMU\n");
 	PmuWakeup();
 
 	Handoff();
@@ -110,20 +111,20 @@ int main(void)
 }
 void PrintBanner(void )
 {
-	debug_printf(DEBUG_CLR_SCREEN DEBUG_YELLOW_PEN "IKUY Boot Loader\n"DEBUG_RESET_COLOURS);
-	debug_printf("Silicon Version %d\n", HW_REG_GET_FIELD(CSU, VERSION, PS_VERSION)+1);
-	debug_printf( "A53 L1 Cache Size %dKiB, LineSize %d, Number of Ways %d, Number of Sets %d\n",
+	raw_debug_printf(DEBUG_CLR_SCREEN DEBUG_YELLOW_PEN "IKUY Boot Loader\n"DEBUG_RESET_COLOURS);
+	raw_debug_printf("Silicon Version %d\n", HW_REG_GET_FIELD(CSU, VERSION, PS_VERSION)+1);
+	raw_debug_printf( "A53 L1 Cache Size %dKiB, LineSize %d, Number of Ways %d, Number of Sets %d\n",
 								(GetDCacheLineSizeInBytes(1) * GetDCacheNumWays(1) * GetDCacheNumSets(1)) / 1024,
 								GetDCacheLineSizeInBytes(1),
 								GetDCacheNumWays(1),
 								GetDCacheNumSets(1) );
-	debug_printf( "A53 L2 Cache Size %dKiB, LineSize %d, Number of Ways %d, Number of Sets %d\n",
+	raw_debug_printf( "A53 L2 Cache Size %dKiB, LineSize %d, Number of Ways %d, Number of Sets %d\n",
 								(GetDCacheLineSizeInBytes(2) * GetDCacheNumWays(2) * GetDCacheNumSets(2)) / 1024,
 								GetDCacheLineSizeInBytes(2),
 								GetDCacheNumWays(2),
 								GetDCacheNumSets(2) );
 
-	debug_print( "~`TEST`~\n");
+	raw_debug_print( "~`TEST`~\n");
 }
 
 typedef enum {
@@ -188,8 +189,8 @@ void PmuDownload() {
 	uint32_t download_size = 0;
 	uint32_t current_count = 0;
 
-	debug_printf("Heap Address 0x%p\n", (void*)buffer);
-	debug_printf( "~`START_PMU_DOWNLOAD 0x%x`~\n", buffer_size);
+	raw_debug_printf("Heap Address 0x%p\n", (void*)buffer);
+	raw_debug_printf( "~`START_PMU_DOWNLOAD 0x%x`~\n", buffer_size);
 
 	DCacheDisable();
 
@@ -227,12 +228,12 @@ void PmuDownload() {
 						pmu_safe_memcpy(download_addr, HeapBase, (uint32_t)(buffer - HeapBase));
 						buffer = HeapBase;
 						state = PDS_Done;
-						debug_print("END");
+						raw_debug_print("END");
 					} else if(buffer - HeapBase == buffer_size) {
 						pmu_safe_memcpy(download_addr, HeapBase, buffer_size);
 						download_addr += buffer_size;
 						buffer = HeapBase;
-						debug_print("NEXT");
+						raw_debug_print("NEXT");
 					}
 					break;
 				}
@@ -240,7 +241,7 @@ void PmuDownload() {
 					*buffer = (uint8_t) HW_REG_GET(UART0, TX_RX_FIFO);
 					if(*buffer == 0) {
 						if( memcmp(HeapBase, "PMU_DONE", 7) != 0) {
-							debug_printf("Host sent %s rather then PMU_DONE", buffer);
+							raw_debug_printf("Host sent %s rather then PMU_DONE", buffer);
 						}
 						DCacheEnable();
 						return;
@@ -446,7 +447,7 @@ void EccInit(uint64_t DestAddr, uint64_t LengthBytes)
 		// Read the channel status for errors
 		if (HW_REG_GET_FIELD(LPD_DMA_CH0, ZDMA_CH_STATUS, STATE) == 0x3) {
 			DCacheEnable();
-			debug_print("LPD_DMA_CH0 ZDMA Error!");
+			raw_debug_print("LPD_DMA_CH0 ZDMA Error!");
 			return;
 		}
 
@@ -468,7 +469,7 @@ void EccInit(uint64_t DestAddr, uint64_t LengthBytes)
 	HW_REG_SET(LPD_DMA_CH0, ZDMA_CH_DST_DSCR_WORD2, 0x00000000U);
 	HW_REG_SET(LPD_DMA_CH0, ZDMA_CH_CTRL0_TOTAL_BYTE,0x00000000U);
 
-	debug_printf( "Address 0x%0x%08x, Length 0x%0x%08x, ECC initialized \r\n",
+	raw_debug_printf( "Address 0x%0x%08x, Length 0x%0x%08x, ECC initialized \r\n",
 		(uint32_t)(DestAddr >> 32U), (uint32_t)DestAddr,
 		(uint32_t)(LengthBytes >> 32U), (uint32_t)LengthBytes);
 }
@@ -482,7 +483,7 @@ void TcmInit()
 	uint32_t ATcmAddr;
 	uint32_t PwrStateMask;
 
-	debug_printf("Initializing TCM ECC\r\n");
+	raw_debug_printf("Initializing TCM ECC\r\n");
 
 	// power it up
 	PwrStateMask = (PMU_GLOBAL_PWR_STATE_R5_0_MASK |
@@ -525,20 +526,20 @@ void TcmInit()
 }
 
 void SynchronousInterrupt(void) {
-	debug_printf("SynchronousInterrupt\n");
+	raw_debug_printf("SynchronousInterrupt\n");
 	asm volatile("wfe");
 }
 
 void IRQInterrupt(void) {
-	debug_printf("IRQInterrupt\n");
+	raw_debug_printf("IRQInterrupt\n");
 	asm volatile("wfe");
 }
 
 void FIQInterrupt(void) {
-	debug_printf("FIQInterrupt\n");
+	raw_debug_printf("FIQInterrupt\n");
 	asm volatile("wfe");
 }
 void SErrorInterrupt(void) {
-	debug_printf("SErrorInterruptHandler\n");
+	raw_debug_printf("SErrorInterruptHandler\n");
 	asm volatile("wfe");
 }

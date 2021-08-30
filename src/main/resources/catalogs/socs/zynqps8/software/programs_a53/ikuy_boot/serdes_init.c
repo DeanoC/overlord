@@ -2,7 +2,7 @@
 #include "hw/boot_psi.h"
 #include "hw/memory_map.h"
 #include "hw/reg_access.h"
-#include "dbg/print.h"
+#include "dbg/raw_print.h"
 #include "hw_regs/crl_apb.h"
 #include "hw_regs/crf_apb.h"
 #include "hw_regs/dp.h"
@@ -302,7 +302,7 @@ void serdes_fixcal(void)
 		count = 0;
 		do {
 			if (count == MASK_POLL_TIME ) {
-				debug_printf("SERDES initialization timed out\n\r");
+				raw_debug_printf("SERDES initialization timed out\n\r");
 				return;
 			}
 			rdata = HW_REG_GET(SERDES, L3_CALIB_DONE_STATUS) & 0x2;
@@ -394,7 +394,7 @@ void serdes_fixcal(void)
 
 void serdesRunInitProgram(void)
 {
-	debug_printf("TODO: USB3 PLL is not locking, so disabled for now\r\n");
+	raw_debug_printf("TODO: USB3 PLL is not locking, so disabled for now\r\n");
 
 	psi_run_register_program(put_serdes_in_reset_init);
 

@@ -15,6 +15,11 @@ type = "library.dbg.zynqps8"
 software = "software/lib/dbg/dbg.toml"
 
 [[definition]]
+name = "osservices"
+type = "library.osservices.zynqps8"
+software = "software/lib/osservices/osservices.toml"
+
+[[definition]]
 name = "ikuy_boot"
 type = "program.bootrom.zynqps8"
 software = "software/programs_a53/ikuy_boot/ikuy_boot.toml"

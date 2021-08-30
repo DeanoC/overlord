@@ -22,6 +22,8 @@
 #define NON_NULL(...) __attribute__((nonnull(__VA_ARGS__)))
 #define FORMAT_PRINT(...) __attribute__((format(printf, __VA_ARGS__)))
 
+#define static_assert(...) _Static_assert(__VA_ARGS__)
+
 typedef uint32_t uintptr_lo_t;
 typedef uint64_t uintptr_all_t;
 
@@ -31,3 +33,4 @@ WARN_UNUSED_RESULT int32_t atoi( const char* str) NON_NULL(1);
 void * memset ( void *destination, int c, size_t num ) NON_NULL(1);
 void * memcpy ( void * destination, const void * source, size_t num ) NON_NULL(1, 2);
 void * memmove ( void * destination, const void * source, size_t num ) NON_NULL(1,2);
+

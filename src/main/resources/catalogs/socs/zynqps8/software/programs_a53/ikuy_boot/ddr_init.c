@@ -2,7 +2,7 @@
 #include "hw/boot_psi.h"
 #include "hw/memory_map.h"
 #include "hw/reg_access.h"
-#include "dbg/print.h"
+#include "dbg/raw_print.h"
 
 #include "hw_regs/afifm.h"
 #include "hw_regs/crf_apb.h"
@@ -347,7 +347,7 @@ static void ddrPhybringup(void)
 	HW_REG_MERGE(DDR_PHY, GPR1, 0x00000001U, 0x00000001U);
 
 	if(!pll_locked) {
-		debug_printf("DDR PLL did not lock, DDR Init failed!!!\n");
+		raw_debug_printf("DDR PLL did not lock, DDR Init failed!!!\n");
 		return;
 	}
 
@@ -382,7 +382,7 @@ static void ddrPhybringup(void)
 
 	regval = ((HW_REG_GET(DDR_PHY, PGSR0) & 0x1FFF0000) >>18);
 	if(regval != 0) {
-		debug_printf("DDR PGSR0 != 0, DDR Init failed!!!\n");
+		raw_debug_printf("DDR PGSR0 != 0, DDR Init failed!!!\n");
 		return;
 	}
 
@@ -409,7 +409,7 @@ static void ddrPhybringup(void)
 // Check if any training errors then exit
 	regval = ((HW_REG_GET(DDR_PHY, PGSR0) & 0x1FFF0000) >>18);
 	if(regval != 0) {
-		debug_printf("DDR PGSR0 != 0 2, DDR Init failed!!!\n");
+		raw_debug_printf("DDR PGSR0 != 0 2, DDR Init failed!!!\n");
 		return;
 	}
 

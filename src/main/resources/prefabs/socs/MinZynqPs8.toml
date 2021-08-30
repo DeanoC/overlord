@@ -20,6 +20,9 @@ type = "library.hw.zynqps8"
 [[instance]]
 type = "library.dbg.zynqps8"
 
+[[instance]]
+type = "library.osservices.zynqps8"
+
 # boot rom
 [[instance]]
 type = "program.bootrom.zynqps8"

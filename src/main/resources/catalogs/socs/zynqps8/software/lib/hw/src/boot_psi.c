@@ -2,7 +2,7 @@
 #include "hw/boot_psi.h"
 
 void USleep(uint64_t useconds);
-void debug_printf(const char *format, ...);
+void raw_debug_printf(const char *format, ...);
 
 #define PSI_INIT_TIMEOUT 100000000
 
@@ -166,7 +166,7 @@ PSIC_POLL_MASKED_32BIT_label:;
       {
         if (timeout > PSI_INIT_TIMEOUT)
         {
-        	debug_printf("init program timeout! ERROR at instruction %d\r\n", instructionCount);
+        	raw_debug_printf("init program timeout! ERROR at instruction %d\r\n", instructionCount);
           break;
         }
         timeout++;

@@ -55,30 +55,30 @@
 
 
 #define MATH_FM_CREATE_UNSIGNED(postfix, type) 																				\
-INLINE type Math_Min##postfix(type const v, type const a) { return (v < a) ? v : a; } \
-INLINE type Math_Max##postfix(type const v, type const a) { return (v > a) ? v : a; } \
-INLINE type Math_Clamp##postfix(type const v, type const a, type const b) { return Math_Min##postfix(Math_Max##postfix(v, a), b); } \
-INLINE bool Math_Equal##postfix(type const a, type const b) { return a == b; } 				\
-INLINE type Math_RoundUpTo##postfix(type const v, type const m) { return ((v + m - 1) / m) * m; }
+ALWAYS_INLINE type Math_Min##postfix(type const v, type const a) { return (v < a) ? v : a; } \
+ALWAYS_INLINE type Math_Max##postfix(type const v, type const a) { return (v > a) ? v : a; } \
+ALWAYS_INLINE type Math_Clamp##postfix(type const v, type const a, type const b) { return Math_Min##postfix(Math_Max##postfix(v, a), b); } \
+ALWAYS_INLINE bool Math_Equal##postfix(type const a, type const b) { return a == b; } 				\
+ALWAYS_INLINE type Math_RoundUpTo##postfix(type const v, type const m) { return ((v + m - 1) / m) * m; }
 
 #define MATH_FM_CREATE_SIGNED(postfix, type) \
 MATH_FM_CREATE_UNSIGNED(postfix, type) \
-INLINE type Math_Abs##postfix(type const a) { return (a < 0) ? -a : a; }
+ALWAYS_INLINE type Math_Abs##postfix(type const a) { return (a < 0) ? -a : a; }
 
 #define MATH_FM_CREATE_REAL(postfix, type) 																						\
 MATH_FM_CREATE_SIGNED(postfix, type) 																									\
-INLINE bool Math_ApproxEqual##postfix(type const a, type const b, type const epsilon) { return (Math_Abs##postfix(b - a) <= epsilon); } \
-INLINE bool Math_IsNan##postfix(type const a) { return a != a; } 											\
-INLINE type Math_Saturate##postfix(type const x) { return Math_Clamp##postfix(x, (type)0, (type)1); } \
-INLINE type Math_Pi##postfix() { return (type) (3.14159265358979323846264338327950L); } \
-INLINE type Math_PiOver2##postfix() { return Math_Pi##postfix() / 2; } 								\
-INLINE type Math_TwoPi##postfix() { return 2 * Math_Pi##postfix(); } 									\
-INLINE type Math_DegreesToRadians##postfix(type const val) { return val * (Math_Pi##postfix() / 180); } \
-INLINE type Math_RadiansToDegrees##postfix(type const val) { return (180 * val) / Math_Pi##postfix(); } \
-INLINE type Math_Reciprocal##postfix(type const a) { return 1 / a; } 									\
-INLINE int Math_Sign##postfix(type val) { return (0 < val) - (val < 0); } 						\
-INLINE type Math_Sqrt##postfix(type const a) { return (type)sqrt((double)a); } 				\
-INLINE type Math_ReciprocalSqrt##postfix(type const a) { return 1 / (type)sqrt((double)a); }
+ALWAYS_INLINE bool Math_ApproxEqual##postfix(type const a, type const b, type const epsilon) { return (Math_Abs##postfix(b - a) <= epsilon); } \
+ALWAYS_INLINE bool Math_IsNan##postfix(type const a) { return a != a; } 											\
+ALWAYS_INLINE type Math_Saturate##postfix(type const x) { return Math_Clamp##postfix(x, (type)0, (type)1); } \
+ALWAYS_INLINE type Math_Pi##postfix() { return (type) (3.14159265358979323846264338327950L); } \
+ALWAYS_INLINE type Math_PiOver2##postfix() { return Math_Pi##postfix() / 2; } 								\
+ALWAYS_INLINE type Math_TwoPi##postfix() { return 2 * Math_Pi##postfix(); } 									\
+ALWAYS_INLINE type Math_DegreesToRadians##postfix(type const val) { return val * (Math_Pi##postfix() / 180); } \
+ALWAYS_INLINE type Math_RadiansToDegrees##postfix(type const val) { return (180 * val) / Math_Pi##postfix(); } \
+ALWAYS_INLINE type Math_Reciprocal##postfix(type const a) { return 1 / a; } 									\
+ALWAYS_INLINE int Math_Sign##postfix(type val) { return (0 < val) - (val < 0); } 						\
+ALWAYS_INLINE type Math_Sqrt##postfix(type const a) { return (type)sqrt((double)a); } 				\
+ALWAYS_INLINE type Math_ReciprocalSqrt##postfix(type const a) { return 1 / (type)sqrt((double)a); }
 
 #if MATH_FM_USE_BUILTIN == 1
 
@@ -103,7 +103,7 @@ ALWAYS_INLINE uint8_t Math_Log2##postfix(type const v) { 			\
 // Use generic not builtin functions
 
 #define MATH_FM_CREATE_UNSIGNED_INTEGER_MAYBE_BUILTIN(postfix, type) 	\
-INLINE type Math_NextPowerOfTwo##postfix(type x) { 										\
+ALWAYS_INLINE type Math_NextPowerOfTwo##postfix(type x) { 										\
 	if(x == 0) return 1; 																								\
 	x = x - 1; 																													\
 	if(sizeof(type) >= 8) { x |= ((uint64_t)x) >> 32; } 								\
@@ -114,7 +114,7 @@ INLINE type Math_NextPowerOfTwo##postfix(type x) { 										\
 	x |= x >> 1; 																												\
 	return x + 1; 																											\
 } 																																		\
-INLINE uint8_t Math_Log2##postfix(type const v) { 										\
+ALWAYS_INLINE uint8_t Math_Log2##postfix(type const v) { 										\
 	uint8_t r = 0; 																											\
 	type t = v; 																												\
 	if(sizeof(type) >= 8) { 																						\
@@ -144,8 +144,8 @@ INLINE uint8_t Math_Log2##postfix(type const v) { 										\
 #define MATH_FM_CREATE_UNSIGNED_INTEGER(postfix, type)							 	\
 MATH_FM_CREATE_UNSIGNED(postfix, type)                 								\
 MATH_FM_CREATE_UNSIGNED_INTEGER_MAYBE_BUILTIN(postfix, type) 					\
-INLINE bool Math_IsPowerOf2##postfix(type const x) { return (x & (x - 1)) == 0; } \
-INLINE type Math_ClosestPowerOfTwo##postfix(type const x) { 					\
+ALWAYS_INLINE bool Math_IsPowerOf2##postfix(type const x) { return (x & (x - 1)) == 0; } \
+ALWAYS_INLINE type Math_ClosestPowerOfTwo##postfix(type const x) { 					\
 	type upow2 = Math_NextPowerOfTwo##postfix(x); 											\
 	if (4 * x < 3 * upow2) return upow2 >> 1; 													\
 	else return upow2; 																									\
@@ -153,5 +153,4 @@ INLINE type Math_ClosestPowerOfTwo##postfix(type const x) { 					\
 
 #define MATH_FM_CREATE_SIGNED_INTEGER(postfix, type) \
 MATH_FM_CREATE_SIGNED(postfix, type)
-
 

@@ -7,8 +7,10 @@ name = 'templates'
 processor = 'templates'
 sources = [
     { in = "CMakeLists.txt", out = "CMakeLists.txt" },
+    { in = "include/ansi_escapes.h", out = "include/dbg/ansi_escapes.h" },
     { in = "include/assert.h", out = "include/dbg/assert.h" },
+    { in = "include/raw_print.h", out = "include/dbg/raw_print.h" },
     { in = "include/print.h", out = "include/dbg/print.h" },
     { in = "src/assert.c", out = "src/assert.c" },
-    { in = "src/zynqmp_print.c", out = "src/zynqmp/print.c" },
+    { in = "src/zynqmp_print.c", out = "src/zynqmp/raw_print.c" },
 ]
