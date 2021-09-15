@@ -19,5 +19,6 @@ static PSI_IWord const misc_init[] = {
 
 void miscRunInitProgram(void)
 {
-	psi_run_register_program(misc_init);
+	psi_RunRegisterProgram(misc_init);
 }
+

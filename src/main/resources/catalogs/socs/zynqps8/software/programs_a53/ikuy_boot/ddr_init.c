@@ -436,11 +436,11 @@ static void ddrPhybringup(void)
 
 void ddrRunInitProgram()
 {
-  psi_run_register_program(ddr_init);
+  psi_RunRegisterProgram(ddr_init);
   ddrPhybringup();
 }
 
 void ddrQosRunInitProgram()
 {
-  psi_run_register_program(ddr_qos_init);
+  psi_RunRegisterProgram(ddr_qos_init);
 }

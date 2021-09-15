@@ -88,6 +88,8 @@ object OutputSoftware {
 					"${cpuName}" -> (() => StringV(cpu.ident.split('.').last)),
 					"${CPUNAME}" -> (() => StringV(cpu.ident.split('.').last.toUpperCase)),
 					"${cpuWidth}" -> (() => IntV(cpu.width)),
+					"${maxAtomicWidth}" -> (() => IntV(cpu.maxAtomicWidth)),
+					"${maxBitOpTypeWidth}" -> (() => IntV(cpu.maxBitOpTypeWidth)),
 					"${isSoftCore}" -> (() => BooleanV(!cpu.isHardware)),
 					"${isHardCore}" -> (() => BooleanV(cpu.isHardware)),
 					"${memoryMap}" -> (() => StringV(generateMemoryMapFor(game, cpu))),
@@ -324,6 +326,15 @@ object OutputSoftware {
 				sb ++= f"#define $prefix${name}_${fieldName}_MASK ${bits.mask}%#010xU%n"
 				if (bits.singleBit)
 					sb ++= f"#define $prefix${name}_$fieldName ${bits.mask}%#10xU%n"
+
+				for (elem <- f.enums) {
+					if (elem.description.isDefined)
+						sb ++= f"// ${elem.description}%n"
+					sb ++= f"#define $prefix${name}_${fieldName}_${elem.name.toUpperCase()} ${
+						elem.value
+							.toString()
+					}%n"
+				}
 			})
 			if (totalUserMask != 0)
 				sb ++=

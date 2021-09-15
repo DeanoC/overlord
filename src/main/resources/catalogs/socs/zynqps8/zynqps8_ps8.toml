@@ -88,7 +88,9 @@ arch = "arm8-a"
 triple = "aarch64-none-elf"
 width = 64
 core_count = 4
-
+max_atomic_width = 128
+max_bitop_type_width = 128
+gcc_flags = "-march=armv8-a -Wl,--build-id"
 registers = [
     { resource = "registers/a53_cti" },
     { resource = "registers/a53_dbg" },
@@ -104,6 +106,9 @@ arch = "arm7-a"
 triple = "arm-none-eabi"
 width = 32
 core_count = 2
+gcc_flags = "-mcpu=cortex-r5 -mfloat-abi=hard -mfpu=vfpv3-d16 -Wl,--build-id"
+max_atomic_width = 64
+max_bitop_type_width = 128
 registers = [
     { resource = "registers/r5_dbg" },
     { resource = "registers/r5_etm" },
@@ -116,6 +121,9 @@ arch = "microblaze"
 triple = "microblaze-none-elf"
 width = 32
 core_count = 1
+gcc_flags = "-mlittle-endian -mxl-barrel-shift -mxl-pattern-compare -mcpu=v9.2 -mxl-soft-mul -Wl,--build-id -Wl,-dT=${CMAKE_CURRENT_LIST_DIR}/empty-file.ld"
+max_atomic_width = 32
+max_bitop_type_width = 32
 registers = [
     { resource = "registers/pmu_iomodule" },
     { resource = "registers/pmu_lmb_bram" },

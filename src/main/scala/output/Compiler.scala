@@ -12,18 +12,22 @@ object Compiler {
 		println(s"Creating Compiler scripts at $out")
 		Utils.ensureDirectories(out)
 
-		val triples_and_name: Set[(String, String)] = {
-			game.cpus.map(cpu => (cpu.splitIdent.last, cpu.triple))
+		val cpu_info: Set[(String, String, String)] = {
+			game.cpus.map(cpu => (
+				cpu.splitIdent.last,
+				cpu.triple,
+				Utils.lookupString(cpu.attributes, "gcc_flags", "")))
 		}.toSet
 
-		genCompilerScript(triples_and_name.map(_._2), out)
-		genCMakeToolChains(triples_and_name, out)
+		genCompilerScript(cpu_info, out)
+		genCMakeToolChains(cpu_info, out)
 	}
 	private def sanatizeTriple(triple:String) : String = {
 		triple.replace("-", "_")
 	}
 
-	private def genCompilerScript(triples: Set[String], out: Path): Unit = {
+	private def genCompilerScript(cpu_info: Set[(String, String, String)],
+	                              out: Path): Unit = {
 		val sb = new StringBuilder
 
 		sb ++= (Utils.readFile("generate_compilers",
@@ -35,17 +39,20 @@ object Compiler {
 				return
 		})
 
-		triples.foreach(triple => sb ++=
-		                          s"""
-			                           |build_binutils $triple $$PWD/compilers
-			                           |build_gcc $triple $$PWD/compilers
-			                           |""".stripMargin)
+		cpu_info.foreach { case (_, triple, gcc_flags) => sb ++=
+		                                                  s"""
+			                                                   |build_binutils $triple
+																												 |$$PWD/compilers
+			                                                   |build_gcc $triple $$PWD/compilers "$gcc_flags"
+			                                                   |""".stripMargin
+		}
 
 
 		Utils.writeFile(out.resolve("generate_compilers.sh"), sb.result())
 	}
 
-	private def genCMakeToolChains(triples: Set[(String, String)], out: Path): Unit = {
+	private def genCMakeToolChains(cpu_info: Set[(String, String, String)],
+	                               out: Path): Unit = {
 
 		val template = Utils.readFile(
 			"toolchain_template",
@@ -57,7 +64,7 @@ object Compiler {
 				return
 		}
 
-		for ((name, triple) <- triples) {
+		for ((name, triple, gcc_flags) <- cpu_info) {
 			// try to read a specialist toolchain file, if none exist use template
 			val tt = Utils.readFile(
 				name = "toolchain_" + name,
@@ -65,7 +72,11 @@ object Compiler {
 				klass = getClass
 				) match {
 				case Some(s) => s
-				case None    => template.replace("""${triple}""", triple)
+				case None    => {
+					template
+						.replace("""${triple}""", triple)
+						.replace("""${GCC_FLAGS}""", gcc_flags)
+				}
 			}
 
 			Utils.writeFile(out.resolve("..").resolve(name + "_toolchain.cmake"), tt)

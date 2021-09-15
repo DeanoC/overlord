@@ -17,7 +17,7 @@ typedef struct psi_InternalState
 #define WRITE_REG(state, reg, value) *(state.curBankAddr + reg) = value
 #define READ_REG(state, reg) *(state.curBankAddr + reg)
 
-void psi_run_register_program(PSI_IWord const *program)
+void psi_RunRegisterProgram(PSI_IWord const *program)
 {
   psi_InternalState state = {0};
   uint32_t instructionCount = 0;

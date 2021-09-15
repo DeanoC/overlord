@@ -92,7 +92,8 @@ function build()
 {
 	pushd "build/compilers/$2/$1" || exit 1
 
-	make -j"$CORES" all$3 CFLAGS_FOR_TARGET=$4
+	make -j"$CORES" all"$3" CFLAGS_FOR_TARGET="$4"
+	echo "$4"
 	if [ $? != 0 ]
 	then
 	  echo "Failed to build"
@@ -121,9 +122,8 @@ function build_binutils()
 
 function build_gcc()
 {
-	prep_build $GCC $1 $2 "--enable-languages=c --disable-nls --without-headers --disable-multilib --disable-libssp --with-endian=little" $DISTCLEAN
+	prep_build $GCC $1 $2 "--enable-languages=c,c++ --disable-nls --without-headers --disable-multilib --disable-libssp --with-endian=little" $DISTCLEAN
 	build $GCC $1 "-host"
 	build $GCC $1 "-gcc"
-	build $GCC $1 "-target-libgcc" "\"-mlittle-endian\""
+	build $GCC $1 "-target-libgcc" "$3"
 }
-

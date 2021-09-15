@@ -52,9 +52,16 @@
 
 #define mtshr(v) ({ asm volatile ("mts\trshr,%0\n\tnop\n" :: "d" (v) ); })
 
-void microblaze_enable_exceptions(void);
-void microblaze_disable_exceptions(void);
-void microblaze_enable_interrupts(void);
-void microblaze_disable_interrupts(void);
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
+	void microblaze_enable_exceptions(void);
+	void microblaze_disable_exceptions(void);
+	void microblaze_enable_interrupts(void);
+	void microblaze_disable_interrupts(void);
 
+#ifdef __cplusplus
+}
+#endif

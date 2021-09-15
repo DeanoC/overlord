@@ -11,6 +11,7 @@ sources = [
     { in = "include/boot_psi.h", out = "include/hw/boot_psi.h" },
     { in = "include/cache.h", out = "include/hw/cache.h" },
     { in = "include/memory_map.h", out = "include/hw/memory_map.h" },
+    { in = "include/cpu.h", out = "include/hw/cpu.h" },
     { in = "include/cpu_percpu.h", out = "include/hw/${cpuName}/cpu.h", cpus = "_" },
     { in = "include/memory_map_percpu.h", out = "include/hw/${cpuName}/memory_map.h", cpus = "_" },
     { in = "include/aarch64/intrinsics_gcc.h", out = "include/hw/aarch64/intrinsics_gcc.h" },

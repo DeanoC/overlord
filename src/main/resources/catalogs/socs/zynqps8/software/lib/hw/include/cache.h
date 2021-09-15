@@ -1,24 +1,37 @@
-#pragma once
 /******************************************************************************
-* Copyright (c) 2014 - 2021 Xilinx, Inc.  All rights reserved.
 * SPDX-License-Identifier: MIT
 ******************************************************************************/
 
-void DCacheEnable(void);
-void ICacheEnable(void);
-void DCacheDisable(void);
-void ICacheDisable(void);
+#pragma once
 
-void DCacheCleanAndInvalidate(void);
-void DCacheCleanAndInvalidateRange(uintptr_t adr, uintptr_t  len);
-void DDCacheCleanAndInvalidateLine(uintptr_t  adr);
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
-void ICacheCleanAndInvalidate(void);
-void ICacheCleanAndInvalidateRange(uintptr_t adr, uintptr_t  len);
-void ICacheCleanAndInvalidateLine(uintptr_t  adr);
+void Cache_DCacheEnable(void);
+void Cache_ICacheEnable(void);
+void Cache_DCacheDisable(void);
+void Cache_ICacheDisable(void);
 
-uint32_t GetDCacheLineSizeInBytes(uint32_t level);
+void Cache_DCacheClean(void);
+void Cache_DCacheCleanRange(uintptr_t adr, uintptr_t  len);
+void Cache_DDCacheCleanLine(uintptr_t  adr);
 
-uint32_t GetDCacheNumWays(uint32_t level);
+void Cache_DCacheCleanAndInvalidate(void);
+void Cache_DCacheCleanAndInvalidateRange(uintptr_t adr, uintptr_t  len);
+void Cache_DDCacheCleanAndInvalidateLine(uintptr_t  adr);
 
-uint32_t GetDCacheNumSets(uint32_t level);
+void Cache_ICacheCleanAndInvalidate(void);
+void Cache_ICacheCleanAndInvalidateRange(uintptr_t adr, uintptr_t  len);
+void Cache_ICacheCleanAndInvalidateLine(uintptr_t  adr);
+
+uint32_t Cache_GetDCacheLineSizeInBytes(uint32_t level);
+
+uint32_t Cache_GetDCacheNumWays(uint32_t level);
+
+uint32_t Cache_GetDCacheNumSets(uint32_t level);
+
+#ifdef __cplusplus
+}
+#endif

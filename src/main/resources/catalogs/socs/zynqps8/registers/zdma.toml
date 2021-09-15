@@ -325,30 +325,50 @@ description = "FPD DMA Channel 0"
     name = "RESERVED"
     bits = "31:8"
     type = "raz"
-  [[register.field]]
-    name = "OVR_FETCH"
-    bits = "7"
-    type = "rw"
-  [[register.field]]
-    name = "POINT_TYPE"
-    bits = "6"
-    type = "rw"
-    shortdesc = '''0: Simple mode DMA.'''
-    longdesc = '''Descriptor (DMA command) from APB register space. 1: Scatter-gather mode DMA. Descriptor are stored in Memory. This field must remain stable while DMA Channel is enabled'''
-  [[register.field]]
-    name = "MODE"
-    bits = "5:4"
-    type = "rw"
-  [[register.field]]
-    name = "RATE_CTRL"
-    bits = "3"
-    type = "rw"
-  [[register.field]]
-    name = "CONT_ADDR"
-    bits = "2"
-    type = "rw"
-  [[register.field]]
-    name = "CONT"
+[[register.field]]
+name = "OVR_FETCH"
+bits = "7"
+type = "rw"
+[[register.field]]
+name = "POINT_TYPE"
+bits = "6"
+type = "rw"
+shortdesc = '''Simple mode or in memory descriptors'''
+longdesc = '''Descriptor (DMA command) from APB register space. 1: Scatter-gather mode DMA. Descriptor are stored in Memory. This field must remain stable while DMA Channel is enabled'''
+[[register.field.enum]]
+name = "SIMPLE"
+value = 0
+description = "Use register descriptor"
+[[register.field.enum]]
+name = "MEMORY"
+value = 0
+description = "Use memory (scatter-gather) based descriptors"
+[[register.field]]
+name = "MODE"
+bits = "5:4"
+type = "rw"
+[[register.field.enum]]
+name = "NORMAL"
+value = 0
+description = "Normal read & write DMA (default)"
+[[register.field.enum]]
+name = "WRITE_ONLY"
+value = 1
+description = "Write only(uses data from WR_DMA_DATA*)"
+[[register.field.enum]]
+name = "READ_ONLY"
+value = 2
+description = "Read only"
+[[register.field]]
+name = "RATE_CTRL"
+bits = "3"
+type = "rw"
+[[register.field]]
+name = "CONT_ADDR"
+bits = "2"
+type = "rw"
+[[register.field]]
+name = "CONT"
     bits = "1"
     type = "wo"
     shortdesc = '''Setting to 1 unpause (restarts from current position) the pauseed DMA SW sets this 1 to trigger.'''

@@ -28,9 +28,13 @@ case class RegisterList(name: String,
 case class RegisterField(name: String,
                          bits: String,
                          accessType: String,
+                         enums: Array[RegisterFieldEnum],
                          shortDesc: Option[String],
                          longDesc: Option[String])
 
+case class RegisterFieldEnum(name: String,
+                             value: BigInt,
+                             description: Option[String])
 
 case class Registers(banks: Seq[RegisterBank], lists: Seq[RegisterList])
 
@@ -93,7 +97,9 @@ object Registers {
 					val fieldBits = Utils.toString(table("bits"))
 					val fieldType = if (table.contains("type")) {
 						Utils.toString(table("type"))
-					} else { "" }
+					} else {
+						""
+					}
 
 					val shortDesc = if (table.contains("shortdesc"))
 						Some(Utils.toString(table("shortdesc")))
@@ -103,7 +109,19 @@ object Registers {
 						Some(Utils.toString(table("longdesc")))
 					else None
 
-					RegisterField(fieldName, fieldBits, fieldType, shortDesc, longDesc)
+					val enums = if (table.contains("enum")) {
+						for (enum <- Utils.toArray(table("enum"))) yield {
+							val table     = Utils.toTable(enum)
+							val enumName  = Utils.toString(table("name"))
+							val enumValue = Utils.toBigInt(table("value"))
+							val enumDesc  = if (table.contains("description"))
+								Some(Utils.toString(table("description")))
+							else None
+							RegisterFieldEnum(enumName, enumValue, enumDesc)
+						}
+					} else Array[RegisterFieldEnum]()
+
+					RegisterField(fieldName, fieldBits, fieldType, enums, shortDesc, longDesc)
 				}
 			} else Array[RegisterField]()
 

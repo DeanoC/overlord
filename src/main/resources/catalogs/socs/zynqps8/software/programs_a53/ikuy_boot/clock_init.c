@@ -92,5 +92,5 @@ static PSI_IWord const clock_init[] = {
 };
 
 void clockRunInitProgram() {
-	psi_run_register_program(clock_init);
+	psi_RunRegisterProgram(clock_init);
 }

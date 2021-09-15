@@ -59,8 +59,8 @@ int main(void)
 
 	write_counter_timer_frequency_register(CPU_CORTEXA53_0_TIMESTAMP_CLK_FREQ);
 
-	DCacheEnable();
-	ICacheEnable();
+	Cache_DCacheEnable();
+	Cache_ICacheEnable();
 
 	EnablePSToPL();
 	ClearPendingInterrupts();
@@ -114,15 +114,16 @@ void PrintBanner(void )
 	raw_debug_printf(DEBUG_CLR_SCREEN DEBUG_YELLOW_PEN "IKUY Boot Loader\n"DEBUG_RESET_COLOURS);
 	raw_debug_printf("Silicon Version %d\n", HW_REG_GET_FIELD(CSU, VERSION, PS_VERSION)+1);
 	raw_debug_printf( "A53 L1 Cache Size %dKiB, LineSize %d, Number of Ways %d, Number of Sets %d\n",
-								(GetDCacheLineSizeInBytes(1) * GetDCacheNumWays(1) * GetDCacheNumSets(1)) / 1024,
-								GetDCacheLineSizeInBytes(1),
-								GetDCacheNumWays(1),
-								GetDCacheNumSets(1) );
+										(Cache_GetDCacheLineSizeInBytes(1) * Cache_GetDCacheNumWays(1) * Cache_GetDCacheNumSets(1)) / 1024,
+										Cache_GetDCacheLineSizeInBytes(1),
+										Cache_GetDCacheNumWays(1),
+										Cache_GetDCacheNumSets(1) );
 	raw_debug_printf( "A53 L2 Cache Size %dKiB, LineSize %d, Number of Ways %d, Number of Sets %d\n",
-								(GetDCacheLineSizeInBytes(2) * GetDCacheNumWays(2) * GetDCacheNumSets(2)) / 1024,
-								GetDCacheLineSizeInBytes(2),
-								GetDCacheNumWays(2),
-								GetDCacheNumSets(2) );
+										(Cache_GetDCacheLineSizeInBytes(2) * Cache_GetDCacheNumWays(2) * Cache_GetDCacheNumSets(2)) / 1024,
+										Cache_GetDCacheLineSizeInBytes(2),
+										Cache_GetDCacheNumWays(2),
+										Cache_GetDCacheNumSets(2) );
+	raw_debug_printf("A53 NEON = %d, FMA = %d FP = 0x%x", __ARM_NEON, __ARM_FEATURE_FMA, __ARM_FP);
 
 	raw_debug_print( "~`TEST`~\n");
 }
@@ -178,6 +179,7 @@ void PmuDownload() {
 // TODO get from memory map
 #define PMU_RAM_ADDR 0xFFDC0000
 
+reset:;
 	uint8_t* buffer = HeapBase;
 
 	uint8_t* argv[8] = { 0 };
@@ -188,17 +190,22 @@ void PmuDownload() {
 	uint8_t* download_addr = (uint8_t*) PMU_RAM_ADDR;
 	uint32_t download_size = 0;
 	uint32_t current_count = 0;
+	uint32_t reset_counter = 0;
+	const uint32_t maxResetCount = 100000000;
 
-	raw_debug_printf("Heap Address 0x%p\n", (void*)buffer);
 	raw_debug_printf( "~`START_PMU_DOWNLOAD 0x%x`~\n", buffer_size);
 
-	DCacheDisable();
+	Cache_DCacheDisable();
 
 	while(true) {
 		if(!HW_REG_GET_BIT(UART0, CHANNEL_STS, REMPTY)) {
+			if( reset_counter++ > maxResetCount) {
+				goto reset;
+			}
 			switch (state) {
 				case PDS_WaitingForCommand:; {
 					*buffer = (uint8_t) HW_REG_GET(UART0, TX_RX_FIFO);
+
 					if(*buffer == 0) {
 						buffer = HeapBase;
 						while(*buffer != 0) {
@@ -243,7 +250,7 @@ void PmuDownload() {
 						if( memcmp(HeapBase, "PMU_DONE", 7) != 0) {
 							raw_debug_printf("Host sent %s rather then PMU_DONE", buffer);
 						}
-						DCacheEnable();
+						Cache_DCacheEnable();
 						return;
 					}
 				}
@@ -367,7 +374,7 @@ void MarkDdrAsMemory()
 		SetTlbAttributes(DDR_DDR4_1_BASE_ADDR + BlockNum * BLOCK_SIZE_A53_HIGH, ATTRIB_MEMORY_A53);
 	}
 
-	DCacheCleanAndInvalidate();
+	Cache_DCacheCleanAndInvalidate();
 }
 
 #define TIMESTAMP_COUNTS_PER_SECOND     CPU_CORTEXA53_0_TIMESTAMP_CLK_FREQ
@@ -395,7 +402,7 @@ void EccInit(uint64_t DestAddr, uint64_t LengthBytes)
 	uint64_t StartAddr = DestAddr;
 	uint64_t NumBytes = LengthBytes;
 
-	DCacheDisable();
+	Cache_DCacheDisable();
 
 	while (NumBytes > 0U) {
 		if (NumBytes > ZDMA_TRANSFER_MAX_LEN) {
@@ -414,9 +421,7 @@ void EccInit(uint64_t DestAddr, uint64_t LengthBytes)
 		HW_REG_MERGE(LPD_DMA_CH0,
 				ZDMA_CH_CTRL0,
 				HW_REG_FIELD_MASK(LPD_DMA_CH0, ZDMA_CH_CTRL0, POINT_TYPE) | HW_REG_FIELD_MASK(LPD_DMA_CH0, ZDMA_CH_CTRL0, MODE),
-				0U);
-		// TODO enum support these equal 0
-//		(ADMA_CH0_ZDMA_CH_CTRL0_POINT_TYPE_NORMAL | ADMA_CH0_ZDMA_CH_CTRL0_MODE_WR_ONLY);
+				ZDMA_ZDMA_CH_CTRL0_MODE_WRITE_ONLY);
 
 
 		// Fill in the data to be written
@@ -446,7 +451,7 @@ void EccInit(uint64_t DestAddr, uint64_t LengthBytes)
 
 		// Read the channel status for errors
 		if (HW_REG_GET_FIELD(LPD_DMA_CH0, ZDMA_CH_STATUS, STATE) == 0x3) {
-			DCacheEnable();
+			Cache_DCacheEnable();
 			raw_debug_print("LPD_DMA_CH0 ZDMA Error!");
 			return;
 		}
@@ -455,7 +460,7 @@ void EccInit(uint64_t DestAddr, uint64_t LengthBytes)
 		StartAddr += Length;
 	}
 
-	DCacheEnable();
+	Cache_DCacheEnable();
 
 	// Restore reset values for the DMA registers used
 	HW_REG_SET(LPD_DMA_CH0, ZDMA_CH_CTRL0, 0x00000080U);

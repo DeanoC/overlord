@@ -63,4 +63,14 @@ typedef uint32_t PSI_IWord;
 #define PSI_FAR_WRITE_32(type, reg, val) (PSIC_FAR_WRITE_32BIT | (1 << PSIC_LOOP_SHIFT) | PSI_REG(type,reg)), ((type##_BASE_ADDR) & 0xFFFF0000), (val)
 #define PSI_FAR_WRITE_MASKED_32(type, reg, mask, val) (PSIC_FAR_WRITE_MASKED_32BIT  | (1 << PSIC_LOOP_SHIFT) | PSI_REG(type,reg)), ((type##_BASE_ADDR) & 0xFFFF0000), (mask), (val)
 
-void psi_run_register_program(PSI_IWord const *program);
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+void psi_RunRegisterProgram(PSI_IWord const *program);
+
+#ifdef __cplusplus
+}
+#endif
+

@@ -44,3 +44,4 @@ void debug_printf(const char *format, ...) {
 	buffer[255] = 0;
 	OsService_Print(buffer);
 }
+

@@ -12,5 +12,5 @@ sources = [
     { in = "include/raw_print.h", out = "include/dbg/raw_print.h" },
     { in = "include/print.h", out = "include/dbg/print.h" },
     { in = "src/assert.c", out = "src/assert.c" },
-    { in = "src/zynqmp_print.c", out = "src/zynqmp/raw_print.c" },
+    { in = "src/zynqmp_print.c", out = "src/zynqmp/print.c" },
 ]

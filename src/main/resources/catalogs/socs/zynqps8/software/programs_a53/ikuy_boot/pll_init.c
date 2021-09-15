@@ -100,5 +100,5 @@ static PSI_IWord const pll_init[] = {
 		PSI_END_PROGRAM
 };
 void pllRunInitProgram() {
-	psi_run_register_program(pll_init);
+	psi_RunRegisterProgram(pll_init);
 }

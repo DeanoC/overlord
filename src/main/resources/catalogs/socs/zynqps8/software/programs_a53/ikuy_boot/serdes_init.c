@@ -396,12 +396,12 @@ void serdesRunInitProgram(void)
 {
 	raw_debug_printf("TODO: USB3 PLL is not locking, so disabled for now\r\n");
 
-	psi_run_register_program(put_serdes_in_reset_init);
+	psi_RunRegisterProgram(put_serdes_in_reset_init);
 
 	serdes_fixcal();
 
-	psi_run_register_program(serdes_init);
+	psi_RunRegisterProgram(serdes_init);
 
-	psi_run_register_program(take_serdes_out_of_reset_init);
+	psi_RunRegisterProgram(take_serdes_out_of_reset_init);
 
 }

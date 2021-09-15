@@ -164,10 +164,10 @@ static PSI_IWord const peripherals_init[] = {
 
 void mioRunInitProgram()
 {
-  psi_run_register_program(mio_init);
+  psi_RunRegisterProgram(mio_init);
 }
 
 void peripheralsRunInitProgram()
 {
-  psi_run_register_program(peripherals_init);
+  psi_RunRegisterProgram(peripherals_init);
 }

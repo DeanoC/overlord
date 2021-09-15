@@ -1,6 +1,8 @@
 #pragma once
 
 #include "stdint.h"
+#include <arm_acle.h>
+#include <arm_neon.h>
 
 #define read_CCSIDR_EL1_register() __extension__ ({ uint64_t rval = 0U; asm volatile("mrs %0,  CCSIDR_EL1" : "=r" (rval)); rval; })
 #define write_CCSIDR_EL1_register(v) asm volatile("msr CCSIDR_EL1, %0" : : "r" (v))
