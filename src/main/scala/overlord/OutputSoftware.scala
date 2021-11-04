@@ -232,6 +232,8 @@ object OutputSoftware {
 		sb ++= f"#define ${rb.name}_FIELD_MASK(reg, field) ${uname}_##reg##_##field##_MASK%n"
 		sb ++=
 		f"#define ${rb.name}_FIELD_LSHIFT(reg, field) ${uname}_##reg##_##field##_LSHIFT%n"
+		sb ++=
+		f"#define ${rb.name}_FIELD_ENUM(reg, field, enm) ${uname}_##reg##_##field##_##enm%n"
 		sb.result()
 	}
 
@@ -329,7 +331,7 @@ object OutputSoftware {
 
 				for (elem <- f.enums) {
 					if (elem.description.isDefined)
-						sb ++= f"// ${elem.description}%n"
+						sb ++= f"// ${elem.description.get.toString}%n"
 					sb ++= f"#define $prefix${name}_${fieldName}_${elem.name.toUpperCase()} ${
 						elem.value
 							.toString()

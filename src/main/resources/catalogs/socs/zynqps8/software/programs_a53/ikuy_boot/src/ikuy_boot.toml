@@ -1,0 +1,26 @@
+actions = [
+    "templates"
+]
+
+[[process]]
+name = 'templates'
+processor = 'templates'
+cpus = "a53"
+sources = [
+    { in = "boot.S", out = "boot.S" },
+    { in = "clock_init.c", out = "clock_init.c" },
+    { in = "crt0.S", out = "crt0.S" },
+    { in = "CMakeLists.txt", out = "CMakeLists.txt" },
+    { in = "ddr_init.c", out = "ddr_init.c" },
+    { in = "clock_init.c", out = "clock_init.c" },
+    { in = "debug_script.tcl", out = "debug_script.tcl" },
+    { in = "handoff.S", out = "handoff.S" },
+    { in = "lscript.ld", out = "lscript.ld" },
+    { in = "main.c", out = "main.c" },
+    { in = "misc_init.c", out = "misc_init.c" },
+    { in = "peripherals_init.c", out = "peripherals_init.c" },
+    { in = "pll_init.c", out = "pll_init.c" },
+    { in = "serdes_init.c", out = "serdes_init.c" },
+    { in = "translation_table.S", out = "translation_table.S" },
+    { in = "vector_table.S", out = "vector_table.S" },
+]

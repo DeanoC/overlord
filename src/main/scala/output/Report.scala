@@ -97,7 +97,7 @@ object Report {
 			case PinGroupDefinitionType(ident) => "pin."
 			case ClockDefinitionType(ident)    => "clock."
 			case BoardDefinitionType(ident)    => "board."
-			case ProgramDefinitionType(ident)  => "bootrom."
+			case ProgramDefinitionType(ident)  => "program."
 			case LibraryDefinitionType(ident)  => "library."
 		}) + id
 		sb ++= (indent + f"type: $name%n")

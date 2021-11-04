@@ -3,31 +3,44 @@ description = "DisplayPort Controller"
   name = "DP"
   address = "0xfd4a0000"
 [[register]]
-  name = "DP_LINK_BW_SET"
-  type = "mixed"
+  name = "LINK_BW_SET"
+type = "mixed"
   width = 32
   description = "Sets the value of the main link bandwidth for the sink device."
   default = "0x00000000"
   offset = "0x00000000"
-  [[register.field]]
-    name = "RESERVED"
-    bits = "31:8"
-    type = "raz"
-  [[register.field]]
-    name = "BW"
-    bits = "7:0"
-    type = "rw"
-    shortdesc = '''Sets the value of the main link bandwidth for the sink device.'''
-    longdesc = '''o 0x06 = 1.62 Gbps o 0x0A = 2.7 Gbps o 0x14 = 5.4 Gbps'''
+[[register.field]]
+name = "RESERVED"
+bits = "31:8"
+type = "raz"
+[[register.field]]
+name = "BW"
+bits = "7:0"
+type = "rw"
+shortdesc = '''Sets the value of the main link bandwidth for the sink device.'''
+longdesc = '''o 0x06 = 1.62 Gbps o 0x0A = 2.7 Gbps o 0x14 = 5.4 Gbps'''
+[[register.field.enum]]
+name = "LINK_5_4GBS"
+value = "0x14"
+description = "5.4Gb/s link speed"
+[[register.field.enum]]
+name = "LINK_2_7GBS"
+value = "0x0A"
+description = "2.7Gb/s link speed"
+[[register.field.enum]]
+name = "LINK_1_62GBS"
+value = "0x06"
+description = "1.62Gb/s link speed"
+
 [[register]]
-  name = "DP_LANE_COUNT_SET"
-  type = "mixed"
-  width = 32
-  description = "To set the lane count"
-  default = "0x00000000"
-  offset = "0x00000004"
-  [[register.field]]
-    name = "RESERVED"
+name = "LANE_COUNT_SET"
+type = "mixed"
+width = 32
+description = "To set the lane count"
+default = "0x00000000"
+offset = "0x00000004"
+[[register.field]]
+name = "RESERVED"
     bits = "31:5"
     type = "raz"
   [[register.field]]
@@ -35,8 +48,8 @@ description = "DisplayPort Controller"
     bits = "4:0"
     type = "rw"
 [[register]]
-  name = "DP_ENHANCED_FRAME_EN"
-  type = "mixed"
+name = "ENHANCED_FRAME_EN"
+type = "mixed"
   width = 32
   description = "To enable enhanced framing"
   default = "0x00000000"
@@ -50,8 +63,8 @@ description = "DisplayPort Controller"
     bits = "0"
     type = "rw"
 [[register]]
-  name = "DP_TRAINING_PATTERN_SET"
-  type = "mixed"
+name = "TRAINING_PATTERN_SET"
+type = "mixed"
   width = 32
   description = "To force training pattern"
   default = "0x00000000"
@@ -67,8 +80,8 @@ description = "DisplayPort Controller"
     shortdesc = '''Sets the link training mode.'''
     longdesc = '''[1:0] - Set the link training pattern according to the two bit code. o 00 = Training off o 01 = Training pattern 1, used for clock recovery o 10 = Training pattern 2, used for channel equalization o 11 = Training pattern 3, used for channel equalization for cores with DisplayPort v1.2.'''
 [[register]]
-  name = "DP_LINK_QUAL_PATTERN_SET"
-  type = "mixed"
+name = "LINK_QUAL_PATTERN_SET"
+type = "mixed"
   width = 32
   description = "To transmit the link quality pattern"
   default = "0x00000000"
@@ -90,11 +103,11 @@ description = "DisplayPort Controller"
     shortdesc = '''Transmit the link quality pattern.'''
     longdesc = '''- [1:0] - Enable transmission of the link quality test patterns. o 00 = Link quality test pattern not transmitted o 01 = D10.2 test pattern (unscrambled) transmitted(Reserved. This feature can be enabled using TP1 selection) o 10 = Symbol Error Rate measurement pattern o 11 = PRBS7 transmitted (Reserved. This feature can be enabled using PRBS7 transmit feature Reg 0x230)'''
 [[register]]
-  name = "DP_SCRAMBLING_DISABLE"
-  type = "mixed"
-  width = 32
-  description = "DP_SCRAMBLING_DISABLE"
-  default = "0x00000000"
+name = "SCRAMBLING_DISABLE"
+type = "mixed"
+width = 32
+description = "SCRAMBLING_DISABLE"
+default = "0x00000000"
   offset = "0x00000014"
   [[register.field]]
     name = "RESERVED"
@@ -107,8 +120,8 @@ description = "DisplayPort Controller"
     shortdesc = '''Set to '1' when the transmitter has disabled the scrambler and transmits all symbols.'''
     longdesc = '''[0] - Disable scrambling.'''
 [[register]]
-  name = "DP_DOWNSPREAD_CTRL"
-  type = "mixed"
+name = "DOWNSPREAD_CTRL"
+type = "mixed"
   width = 32
   description = "For down-spreading control"
   default = "0x00000000"
@@ -124,8 +137,8 @@ description = "DisplayPort Controller"
     shortdesc = '''Down-spreading control - [0] -Set to '1' to enable a 0.'''
     longdesc = '''5% spreading of the clock or '0' for none.'''
 [[register]]
-  name = "DP_SOFTWARE_RESET"
-  type = "mixed"
+name = "SOFTWARE_RESET"
+type = "mixed"
   width = 32
   description = "Soft reset of DP Core"
   default = "0x00000000"
@@ -141,33 +154,33 @@ description = "DisplayPort Controller"
     shortdesc = '''Reads will return zeros.'''
     longdesc = '''[0] - Soft Video Reset: When set, video logic will be reset (stream 1). Software need NOT update this bit to '0'for deassertion of reset'''
 [[register]]
-  name = "DP_COMP_PATTERN_80BIT_1"
-  type = "rw"
-  width = 32
-  description = "32 bits of 80-bit custom pattern that is used for LINK quality test. These bits are valid when Bit 2 of DP_LINK_QUAL_PATTERN_SET 0x10 register is set to '1"
-  default = "0x00000000"
+name = "COMP_PATTERN_80BIT_1"
+type = "rw"
+width = 32
+description = "32 bits of 80-bit custom pattern that is used for LINK quality test. These bits are valid when Bit 2 of LINK_QUAL_PATTERN_SET 0x10 register is set to '1"
+default = "0x00000000"
   offset = "0x00000020"
   [[register.field]]
     name = "BITS_31_0"
     bits = "31:0"
     type = "rw"
 [[register]]
-  name = "DP_COMP_PATTERN_80BIT_2"
-  type = "rw"
-  width = 32
-  description = "Description same as DP_COMP_PATTERN_80BIT_1 (0x20)"
-  default = "0x00000000"
+name = "COMP_PATTERN_80BIT_2"
+type = "rw"
+width = 32
+description = "Description same as COMP_PATTERN_80BIT_1 (0x20)"
+default = "0x00000000"
   offset = "0x00000024"
   [[register.field]]
     name = "BITS_63_32"
     bits = "31:0"
     type = "rw"
 [[register]]
-  name = "DP_COMP_PATTERN_80BIT_3"
-  type = "mixed"
-  width = 32
-  description = "Description same as DP_COMP_PATTERN_80BIT_1 (0x20)"
-  default = "0x00000000"
+name = "COMP_PATTERN_80BIT_3"
+type = "mixed"
+width = 32
+description = "Description same as COMP_PATTERN_80BIT_1 (0x20)"
+default = "0x00000000"
   offset = "0x00000028"
   [[register.field]]
     name = "RESERVED"
@@ -178,8 +191,8 @@ description = "DisplayPort Controller"
     bits = "15:0"
     type = "rw"
 [[register]]
-  name = "DP_TRANSMITTER_ENABLE"
-  type = "mixed"
+name = "TRANSMITTER_ENABLE"
+type = "mixed"
   width = 32
   description = "Enable the basic operations of the transmitter."
   default = "0x00000000"
@@ -193,8 +206,8 @@ description = "DisplayPort Controller"
     bits = "0"
     type = "rw"
 [[register]]
-  name = "DP_MAIN_STREAM_ENABLE"
-  type = "mixed"
+name = "MAIN_STREAM_ENABLE"
+type = "mixed"
   width = 32
   description = "Enable the transmission of main link video information."
   default = "0x00000000"
@@ -208,8 +221,8 @@ description = "DisplayPort Controller"
     bits = "0"
     type = "rw"
 [[register]]
-  name = "DP_FORCE_SCRAMBLER_RESET"
-  type = "mixed"
+name = "FORCE_SCRAMBLER_RESET"
+type = "mixed"
   width = 32
   description = "Reads from this register always return 0x0."
   default = "0x00000000"
@@ -223,8 +236,8 @@ description = "DisplayPort Controller"
     bits = "0"
     type = "wo"
 [[register]]
-  name = "DP_VERSION_REGISTER"
-  type = "ro"
+name = "VERSION_REGISTER"
+type = "ro"
   width = 32
   description = "Core version register"
   default = "0x04010000"
@@ -234,8 +247,8 @@ description = "DisplayPort Controller"
     bits = "31:0"
     type = "ro"
 [[register]]
-  name = "DP_CORE_ID"
-  type = "ro"
+name = "CORE_ID"
+type = "ro"
   width = 32
   description = "Returns the unique identification code of the core and the current revision level"
   default = "0x01020000"
@@ -245,37 +258,66 @@ description = "DisplayPort Controller"
     bits = "31:0"
     type = "ro"
 [[register]]
-  name = "DP_AUX_COMMAND_REGISTER"
-  type = "mixed"
-  width = 32
-  description = "DP_AUX_COMMAND_REGISTER"
-  default = "0x00000000"
-  offset = "0x00000100"
-  [[register.field]]
-    name = "RESERVED"
-    bits = "31:13"
-    type = "raz"
-  [[register.field]]
-    name = "ADDR_TRANSFER_EN"
-    bits = "12"
-    type = "rw"
-  [[register.field]]
-    name = "AUD_CH_COMMAND"
-    bits = "11:8"
-    type = "rw"
-  [[register.field]]
-    name = "RESERVED"
-    bits = "7:4"
-    type = "raz"
-  [[register.field]]
-    name = "NUM_OF_BYTES"
-    bits = "3:0"
-    type = "rw"
-    shortdesc = '''Specifies the number of bytes to transfer with the current command.'''
+name = "AUX_COMMAND_REGISTER"
+type = "mixed"
+width = 32
+description = "AUX_COMMAND_REGISTER"
+default = "0x00000000"
+offset = "0x00000100"
+[[register.field]]
+name = "RESERVED"
+bits = "31:13"
+type = "raz"
+[[register.field]]
+name = "ADDR_TRANSFER_EN"
+bits = "12"
+type = "rw"
+[[register.field]]
+name = "AUX_CH_COMMAND"
+bits = "11:8"
+type = "rw"
+[[register.field.enum]]
+name = "I2C_WRITE"
+value = 0
+description = "I2C over Aux Write"
+[[register.field.enum]]
+name = "I2C_READ"
+value = 1
+description = "I2C over Aux Read"
+[[register.field.enum]]
+name = "I2C_WRITE_STATUS"
+value = 2
+description = "I2C over Aux Write Status"
+[[register.field.enum]]
+name = "I2C_WRITE_MOT"
+value = 4
+description = "I2C over Aux Write Middle Of Transfer"
+[[register.field.enum]]
+name = "I2C_READ_MOT"
+value = 5
+description = "I2C over Aux Read Middle Of Transfer"
+[[register.field.enum]]
+name = "AUX_WRITE"
+value = 8
+description = "Aux Write"
+[[register.field.enum]]
+name = "AUX_READ"
+value = 9
+description = "Aux Read"
+
+[[register.field]]
+name = "RESERVED"
+bits = "7:4"
+type = "raz"
+[[register.field]]
+name = "NUM_OF_BYTES"
+bits = "3:0"
+type = "rw"
+shortdesc = '''Specifies the number of bytes to transfer with the current command.'''
     longdesc = '''The range of the register is 0 to 15 indicating between 1 and 16 bytes of data.'''
 [[register]]
-  name = "DP_AUX_WRITE_FIFO"
-  type = "mixed"
+name = "AUX_WRITE_FIFO"
+type = "mixed"
   width = 32
   description = ". FIFO containing up to 16 bytes of write data for the current AUX channel command"
   default = "0x00000000"
@@ -289,8 +331,8 @@ description = "DisplayPort Controller"
     bits = "7:0"
     type = "wo"
 [[register]]
-  name = "DP_AUX_ADDRESS"
-  type = "mixed"
+name = "AUX_ADDRESS"
+type = "mixed"
   width = 32
   description = "Specifies the address for the current AUX channel command."
   default = "0x00000000"
@@ -304,8 +346,8 @@ description = "DisplayPort Controller"
     bits = "19:0"
     type = "rw"
 [[register]]
-  name = "DP_AUX_CLOCK_DIVIDER"
-  type = "mixed"
+name = "AUX_CLOCK_DIVIDER"
+type = "mixed"
   width = 32
   description = ". Contains the clock divider value for generating the internal 1MHz clock from the APB host interface clock. The clock divider register provides integer division only and does not support fractional APB clock rates (for example, set to 75 for a 75 MHz APB clock)."
   default = "0x00000000"
@@ -325,8 +367,8 @@ description = "DisplayPort Controller"
     bits = "7:0"
     type = "rw"
 [[register]]
-  name = "DP_TX_USER_FIFO_OVERFLOW"
-  type = "mixed"
+name = "TX_USER_FIFO_OVERFLOW"
+type = "mixed"
   width = 32
   description = ". Indicates an overflow in the user FIFO. The event may occur if the video rate does not match the TU size programming."
   default = "0x00000000"
@@ -342,8 +384,8 @@ description = "DisplayPort Controller"
     shortdesc = ''': A '1' indicates that the internal FIFO has detected an overflow condition.'''
     longdesc = '''This bit clears upon read.'''
 [[register]]
-  name = "DP_INTERRUPT_SIGNAL_STATE"
-  type = "mixed"
+name = "INTERRUPT_SIGNAL_STATE"
+type = "mixed"
   width = 32
   description = "Contains the raw signal values for those conditions which may cause an interrupt."
   default = "0x00000000"
@@ -369,8 +411,8 @@ description = "DisplayPort Controller"
     bits = "0"
     type = "ro"
 [[register]]
-  name = "DP_AUX_REPLY_DATA"
-  type = "mixed"
+name = "AUX_REPLY_DATA"
+type = "mixed"
   width = 32
   description = "Maps to the internal FIFO which contains up to 16 bytes of information received during the AUX channel reply. Reply data is read from the FIFO starting with byte 0. The number of bytes in the FIFO corresponds to the number of bytes requested."
   default = "0x00000000"
@@ -384,33 +426,52 @@ description = "DisplayPort Controller"
     bits = "7:0"
     type = "ro"
 [[register]]
-  name = "DP_AUX_REPLY_CODE"
-  type = "mixed"
+name = "AUX_REPLY_CODE"
+type = "mixed"
   width = 32
   description = "Reply code received from the most recent AUX Channel request. The AUX Reply Code corresponds to the code from the DisplayPort specification"
-  default = "0x00000000"
-  offset = "0x00000138"
-  [[register.field]]
-    name = "RESERVED"
-    bits = "31:4"
-    type = "raz"
-  [[register.field]]
-    name = "CODE1"
-    bits = "3:2"
-    type = "ro"
-  [[register.field]]
-    name = "CODE0"
-    bits = "1:0"
-    type = "ro"
+default = "0x00000000"
+offset = "0x00000138"
+[[register.field]]
+name = "RESERVED"
+bits = "31:4"
+type = "raz"
+[[register.field]]
+name = "CODE1"
+bits = "3:2"
+type = "ro"
+[[register.field.enum]]
+name = "I2C_ACK"
+value = 0
+[[register.field.enum]]
+name = "I2C_NACK"
+value = 1
+[[register.field.enum]]
+name = "I2C_DEFER"
+value = 2
+[[register.field]]
+name = "CODE0"
+bits = "1:0"
+type = "ro"
+[[register.field.enum]]
+name = "AUX_ACK"
+value = 0
+[[register.field.enum]]
+name = "AUX_NACK"
+value = 1
+[[register.field.enum]]
+name = "AUX_DEFER"
+value = 2
+
 [[register]]
-  name = "DP_AUX_REPLY_COUNT"
-  type = "mixed"
-  width = 32
-  description = "Provides an internal counter of the number of AUX reply transactions received on the AUX Channel. Writing to this register clears the count."
-  default = "0x00000000"
-  offset = "0x0000013C"
-  [[register.field]]
-    name = "RESERVED"
+name = "AUX_REPLY_COUNT"
+type = "mixed"
+width = 32
+description = "Provides an internal counter of the number of AUX reply transactions received on the AUX Channel. Writing to this register clears the count."
+default = "0x00000000"
+offset = "0x0000013C"
+[[register.field]]
+name = "RESERVED"
     bits = "31:8"
     type = "raz"
   [[register.field]]
@@ -418,8 +479,8 @@ description = "DisplayPort Controller"
     bits = "7:0"
     type = "clronwr"
 [[register]]
-  name = "DP_REPLY_DATA_COUNT"
-  type = "mixed"
+name = "REPLY_DATA_COUNT"
+type = "mixed"
   width = 32
   description = "Returns the total number of data bytes actually received during a transaction. This register does not use the length byte of the transaction header."
   default = "0x00000000"
@@ -433,11 +494,11 @@ description = "DisplayPort Controller"
     bits = "4:0"
     type = "ro"
 [[register]]
-  name = "DP_REPLY_STATUS"
-  type = "mixed"
-  width = 32
-  description = "DP_REPLY_STATUS"
-  default = "0x00000010"
+name = "REPLY_STATUS"
+type = "mixed"
+width = 32
+description = "REPLY_STATUS"
+default = "0x00000010"
   offset = "0x0000014C"
   [[register.field]]
     name = "RESERVED"
@@ -470,11 +531,11 @@ description = "DisplayPort Controller"
     shortdesc = '''This bit is set to '0' when the AUX request controller begins sending bits on the AUX serial bus.'''
     longdesc = '''The AUX reply controller sets this bit to '1' when a complete and valid reply transaction has been received'''
 [[register]]
-  name = "DP_HPD_DURATION"
-  type = "mixed"
-  width = 32
-  description = "DP_HPD_DURATION"
-  default = "0x00000000"
+name = "HPD_DURATION"
+type = "mixed"
+width = 32
+description = "HPD_DURATION"
+default = "0x00000000"
   offset = "0x00000150"
   [[register.field]]
     name = "RESERVED"
@@ -485,8 +546,8 @@ description = "DisplayPort Controller"
     bits = "15:0"
     type = "ro"
 [[register]]
-  name = "DP_MAIN_STREAM_HTOTAL"
-  type = "mixed"
+name = "MAIN_STREAM_HTOTAL"
+type = "mixed"
   width = 32
   description = "Specifies the total number of clocks in the horizontal framing period for the main stream video signal."
   default = "0x00000000"
@@ -500,8 +561,8 @@ description = "DisplayPort Controller"
     bits = "15:0"
     type = "rw"
 [[register]]
-  name = "DP_MAIN_STREAM_VTOTAL"
-  type = "mixed"
+name = "MAIN_STREAM_VTOTAL"
+type = "mixed"
   width = 32
   description = "Provides the total number of lines in the main stream video frame"
   default = "0x00000000"
@@ -515,8 +576,8 @@ description = "DisplayPort Controller"
     bits = "15:0"
     type = "rw"
 [[register]]
-  name = "DP_MAIN_STREAM_POLARITY"
-  type = "mixed"
+name = "MAIN_STREAM_POLARITY"
+type = "mixed"
   width = 32
   description = "Provides the polarity values for the video sync signals"
   default = "0x00000000"
@@ -534,8 +595,8 @@ description = "DisplayPort Controller"
     bits = "0"
     type = "rw"
 [[register]]
-  name = "DP_MAIN_STREAM_HSWIDTH"
-  type = "mixed"
+name = "MAIN_STREAM_HSWIDTH"
+type = "mixed"
   width = 32
   description = "Sets the width of the horizontal sync pulse."
   default = "0x00000000"
@@ -549,8 +610,8 @@ description = "DisplayPort Controller"
     bits = "14:0"
     type = "rw"
 [[register]]
-  name = "DP_MAIN_STREAM_VSWIDTH"
-  type = "mixed"
+name = "MAIN_STREAM_VSWIDTH"
+type = "mixed"
   width = 32
   description = "Sets the width of the vertical sync pulse."
   default = "0x00000000"
@@ -564,8 +625,8 @@ description = "DisplayPort Controller"
     bits = "14:0"
     type = "rw"
 [[register]]
-  name = "DP_MAIN_STREAM_HRES"
-  type = "mixed"
+name = "MAIN_STREAM_HRES"
+type = "mixed"
   width = 32
   description = "Horizontal resolution of the main stream video source"
   default = "0x00000000"
@@ -579,8 +640,8 @@ description = "DisplayPort Controller"
     bits = "15:0"
     type = "rw"
 [[register]]
-  name = "DP_MAIN_STREAM_VRES"
-  type = "mixed"
+name = "MAIN_STREAM_VRES"
+type = "mixed"
   width = 32
   description = "Vertical resolution of the main stream video source"
   default = "0x00000000"
@@ -594,8 +655,8 @@ description = "DisplayPort Controller"
     bits = "15:0"
     type = "rw"
 [[register]]
-  name = "DP_MAIN_STREAM_HSTART"
-  type = "mixed"
+name = "MAIN_STREAM_HSTART"
+type = "mixed"
   width = 32
   description = "Number of clocks between the leading edge of the horizontal sync and the start of active data"
   default = "0x00000000"
@@ -609,8 +670,8 @@ description = "DisplayPort Controller"
     bits = "15:0"
     type = "rw"
 [[register]]
-  name = "DP_MAIN_STREAM_VSTART"
-  type = "mixed"
+name = "MAIN_STREAM_VSTART"
+type = "mixed"
   width = 32
   description = "Number of lines between the leading edge of the vertical sync and the first line of active data."
   default = "0x00000000"
@@ -624,8 +685,8 @@ description = "DisplayPort Controller"
     bits = "15:0"
     type = "rw"
 [[register]]
-  name = "DP_MAIN_STREAM_MISC0"
-  type = "mixed"
+name = "MAIN_STREAM_MISC0"
+type = "mixed"
   width = 32
   description = "Miscellaneous stream attributes.Implements the attribute information contained in the DisplayPort MISC0 register described in section 2.2.4 of the standard."
   default = "0x00000000"
@@ -655,8 +716,8 @@ description = "DisplayPort Controller"
     bits = "0"
     type = "rw"
 [[register]]
-  name = "DP_MAIN_STREAM_MISC1"
-  type = "mixed"
+name = "MAIN_STREAM_MISC1"
+type = "mixed"
   width = 32
   description = "MAIN_STREAM_MISC1. Miscellaneous stream attributes.Implements the attribute information contained in the DisplayPort MISC1 register described in section 2.2.4 of the standard."
   default = "0x00000000"
@@ -682,8 +743,8 @@ description = "DisplayPort Controller"
     bits = "0"
     type = "rw"
 [[register]]
-  name = "DP_MAIN_STREAM_M_VID"
-  type = "mixed"
+name = "MAIN_STREAM_M_VID"
+type = "mixed"
   width = 32
   description = "M value for the video stream as computed by the source core. If synchronous clocking mode is used, this register must be written with the M value."
   default = "0x00000000"
@@ -697,8 +758,8 @@ description = "DisplayPort Controller"
     bits = "23:0"
     type = "rw"
 [[register]]
-  name = "DP_MSA_TRANSFER_UNIT_SIZE"
-  type = "mixed"
+name = "MSA_TRANSFER_UNIT_SIZE"
+type = "mixed"
   width = 32
   description = "Sets the size of a transfer unit in the framing logic On reset, transfer size is set to 64."
   default = "0x00000040"
@@ -714,8 +775,8 @@ description = "DisplayPort Controller"
     shortdesc = '''This number should be in the range of 32 to 64 and is set to a fixed value that depends on the inbound video mode.'''
     longdesc = '''Note that bit 0 cannot be written (the transfer unit size is always even).'''
 [[register]]
-  name = "DP_MAIN_STREAM_N_VID"
-  type = "mixed"
+name = "MAIN_STREAM_N_VID"
+type = "mixed"
   width = 32
   description = "N value for the video stream as computed by the source core. If synchronous clocking mode is used, this register must be written with the N value."
   default = "0x00000000"
@@ -729,8 +790,8 @@ description = "DisplayPort Controller"
     bits = "23:0"
     type = "rw"
 [[register]]
-  name = "DP_USER_PIX_WIDTH"
-  type = "mixed"
+name = "USER_PIX_WIDTH"
+type = "mixed"
   width = 32
   description = "User pixel width size"
   default = "0x00000001"
@@ -746,8 +807,8 @@ description = "DisplayPort Controller"
     shortdesc = '''DP Tx core is used in single pixel mode.'''
     longdesc = '''This may be used in driver to maintain compatibility with soft IP'''
 [[register]]
-  name = "DP_USER_DATA_COUNT_PER_LANE"
-  type = "mixed"
+name = "USER_DATA_COUNT_PER_LANE"
+type = "mixed"
   width = 32
   description = "This register is used to translate the number of pixels per line to the native internal 16-bit datapath."
   default = "0x00000000"
@@ -761,8 +822,8 @@ description = "DisplayPort Controller"
     bits = "17:0"
     type = "rw"
 [[register]]
-  name = "DP_MIN_BYTES_PER_TU"
-  type = "mixed"
+name = "MIN_BYTES_PER_TU"
+type = "mixed"
   width = 32
   description = "Programs source to use MIN number of bytes per transfer unit. The calculation should be done based on the DisplayPort specification."
   default = "0x00000000"
@@ -776,8 +837,8 @@ description = "DisplayPort Controller"
     bits = "6:0"
     type = "rw"
 [[register]]
-  name = "DP_FRAC_BYTES_PER_TU"
-  type = "mixed"
+name = "FRAC_BYTES_PER_TU"
+type = "mixed"
   width = 32
   description = "Calculating MIN bytes per TU will often not be a whole number.This register is used to hold the fractional component"
   default = "0x00000000"
@@ -791,8 +852,8 @@ description = "DisplayPort Controller"
     bits = "9:0"
     type = "rw"
 [[register]]
-  name = "DP_INIT_WAIT"
-  type = "mixed"
+name = "INIT_WAIT"
+type = "mixed"
   width = 32
   description = "This register defines the number of initial wait cycles at the start of a new line by the Framing logic. This allows enough data to be buffered in the input FIFO."
   default = "0x00000020"
@@ -806,8 +867,8 @@ description = "DisplayPort Controller"
     bits = "6:0"
     type = "rw"
 [[register]]
-  name = "DP_PHY_RESET"
-  type = "mixed"
+name = "PHY_RESET"
+type = "mixed"
   width = 32
   description = "Reset the transmitter PHY."
   default = "0x00010003"
@@ -820,25 +881,32 @@ description = "DisplayPort Controller"
     name = "EN_8B_10B"
     bits = "16"
     type = "rw"
-  [[register.field]]
-    name = "RESERVED"
-    bits = "15:2"
-    type = "raz"
-  [[register.field]]
-    name = "GT_RESET"
-    bits = "1"
-    type = "rw"
-    shortdesc = '''Set to '1' to hold the GT in reset.'''
-    longdesc = '''Clear to release.'''
+[[register.field]]
+name = "RESERVED"
+bits = "15:2"
+type = "raz"
+[[register.field]]
+name = "GT_RESET"
+bits = "1"
+type = "rw"
+shortdesc = '''Set to '1' to hold the GT in reset.'''
+longdesc = '''Clear to release.'''
+[[register.field]]
+name = "PHY_RESET"
+bits = "0"
+type = "rw"
+shortdesc = '''Set to '1' to hold the PHY in reset.'''
+longdesc = '''Clear to release.'''
+
 [[register]]
-  name = "DP_TRANSMIT_PRBS7"
-  type = "mixed"
-  width = 32
-  description = "Enable the pseudo random bit sequence 7 pattern transmission for link quality assessment. PRBS is generated by the DP transmit controller only. Note: PRBS feature of GT is unused"
-  default = "0x00000000"
-  offset = "0x00000230"
-  [[register.field]]
-    name = "RESERVED"
+name = "TRANSMIT_PRBS7"
+type = "mixed"
+width = 32
+description = "Enable the pseudo random bit sequence 7 pattern transmission for link quality assessment. PRBS is generated by the DP transmit controller only. Note: PRBS feature of GT is unused"
+default = "0x00000000"
+offset = "0x00000230"
+[[register.field]]
+name = "RESERVED"
     bits = "31:1"
     type = "raz"
   [[register.field]]
@@ -846,8 +914,8 @@ description = "DisplayPort Controller"
     bits = "0"
     type = "rw"
 [[register]]
-  name = "DP_PHY_CLOCK_SELECT"
-  type = "mixed"
+name = "PHY_CLOCK_SELECT"
+type = "mixed"
   width = 32
   description = "Instructs the PHY PLL to generate the proper clock frequency for the required link rate"
   default = "0x00000000"
@@ -856,26 +924,38 @@ description = "DisplayPort Controller"
     name = "RESERVED"
     bits = "31:8"
     type = "raz"
-  [[register.field]]
-    name = "RESERVED"
-    bits = "7:3"
-    type = "rw"
-  [[register.field]]
-    name = "SEL"
-    bits = "2:0"
-    type = "rw"
-    shortdesc = '''o 0x05 = 5.'''
-    longdesc = '''40 Gb/s link o 0x03 = 2.70 Gb/s link o 0x01 = 1.62 Gb/s link'''
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''o 0x05 = 5.'''
+longdesc = '''40 Gb/s link o 0x03 = 2.70 Gb/s link o 0x01 = 1.62 Gb/s link'''
+[[register.field.enum]]
+name = "LINK_5_4GBS"
+value = 5
+description = "5.4Gb/s link speed"
+[[register.field.enum]]
+name = "LINK_2_7GBS"
+value = 3
+description = "2.7Gb/s link speed"
+[[register.field.enum]]
+name = "LINK_1_62GBS"
+value = 1
+description = "1.62Gb/s link speed"
 [[register]]
-  name = "DP_TX_PHY_POWER_DOWN"
-  type = "mixed"
-  width = 32
-  description = "Control PHY Power down"
-  default = "0x00000000"
-  offset = "0x00000238"
-  [[register.field]]
-    name = "RESERVED"
-    bits = "31:4"
+name = "TX_PHY_POWER_DOWN"
+type = "mixed"
+width = 32
+description = "Control PHY Power down"
+default = "0x00000000"
+offset = "0x00000238"
+[[register.field]]
+name = "RESERVED"
+bits = "31:4"
     type = "raz"
   [[register.field]]
     name = "POWER_DWN"
@@ -884,8 +964,8 @@ description = "DisplayPort Controller"
     shortdesc = '''Two bits per lane.'''
     longdesc = '''When set to 11, moves the GT to power down mode. When set to 00, GT will be in active state. bits [1:0] - lane0 Bits [3:2] - lane 1'''
 [[register]]
-  name = "DP_PHY_PRECURSOR_LANE_0"
-  type = "mixed"
+name = "PHY_PRECURSOR_LANE_0"
+type = "mixed"
   width = 32
   description = "Set the pre-cursor level(post cursor 1 for GT) for lane 0 of the DisplayPort link"
   default = "0x00000000"
@@ -901,8 +981,8 @@ description = "DisplayPort Controller"
     shortdesc = '''Controls the pre-cursor level for lane 0 of the transmitter.'''
     longdesc = '''The mapping of the four levels supported by the DisplayPort standard to the 32 levels indicated here is implementation specific'''
 [[register]]
-  name = "DP_PHY_PRECURSOR_LANE_1"
-  type = "mixed"
+name = "PHY_PRECURSOR_LANE_1"
+type = "mixed"
   width = 32
   description = "Set the pre-cursor level(post cursor 1 for GT) for lane 1 of the DisplayPort link"
   default = "0x00000000"
@@ -916,8 +996,8 @@ description = "DisplayPort Controller"
     bits = "4:0"
     type = "rw"
 [[register]]
-  name = "DP_PHY_STATUS"
-  type = "mixed"
+name = "PHY_STATUS"
+type = "mixed"
   width = 32
   description = "Provides the current status from the PHY."
   default = "0x00000000"
@@ -943,8 +1023,8 @@ description = "DisplayPort Controller"
     bits = "1:0"
     type = "ro"
 [[register]]
-  name = "DP_TX_AUDIO_CONTROL"
-  type = "mixed"
+name = "TX_AUDIO_CONTROL"
+type = "mixed"
   width = 32
   description = "Enables audio stream packets in main link and provides buffer control."
   default = "0x00000000"
@@ -962,8 +1042,8 @@ description = "DisplayPort Controller"
     bits = "0"
     type = "rw"
 [[register]]
-  name = "DP_TX_AUDIO_CHANNELS"
-  type = "rw"
+name = "TX_AUDIO_CHANNELS"
+type = "rw"
   width = 32
   description = "TX_AUDIO_CHANNELS. Used to input active channel count. Transmitter collects audio samples based on this information."
   default = "0x00000000"
@@ -973,8 +1053,8 @@ description = "DisplayPort Controller"
     bits = "0"
     type = "rw"
 [[register]]
-  name = "DP_TX_AUDIO_INFO_DATA0"
-  type = "wo"
+name = "TX_AUDIO_INFO_DATA0"
+type = "wo"
   width = 32
   description = "Word formatted as per CEA 861-C Info Frame."
   default = "0x00000000"
@@ -986,8 +1066,8 @@ description = "DisplayPort Controller"
     shortdesc = '''Total of eight words should be written in following order: - 1st word - o [7:0] = HB0 o [15:8] = HB1 o [23:16] = HB2 o [31:24] = HB3 - 2nd word - DB3,DB2,DB1,DB0 .'''
     longdesc = '''. - 8th word -DB27,DB26,DB25,DB24 The data bytes DB1..DBN of CEA Info frame are mapped as DB0-DBN-1. No protection is provided for wrong operations by software'''
 [[register]]
-  name = "DP_TX_AUDIO_INFO_DATA1"
-  type = "wo"
+name = "TX_AUDIO_INFO_DATA1"
+type = "wo"
   width = 32
   description = "Word formatted as per CEA 861-C Info Frame."
   default = "0x00000000"
@@ -996,11 +1076,11 @@ description = "DisplayPort Controller"
     name = "INFO_DATA"
     bits = "31:0"
     type = "wo"
-    shortdesc = '''Second word of the 8 words.'''
-    longdesc = '''Similar to register DP_TX_AUDIO_INFO_DATA0'''
+  shortdesc = '''Second word of the 8 words.'''
+  longdesc = '''Similar to register TX_AUDIO_INFO_DATA0'''
 [[register]]
-  name = "DP_TX_AUDIO_INFO_DATA2"
-  type = "wo"
+name = "TX_AUDIO_INFO_DATA2"
+type = "wo"
   width = 32
   description = "Word formatted as per CEA 861-C Info Frame."
   default = "0x00000000"
@@ -1009,11 +1089,11 @@ description = "DisplayPort Controller"
     name = "INFO_DATA"
     bits = "31:0"
     type = "wo"
-    shortdesc = '''Third word of the 8 words.'''
-    longdesc = '''Similar to register DP_TX_AUDIO_INFO_DATA0'''
+  shortdesc = '''Third word of the 8 words.'''
+  longdesc = '''Similar to register TX_AUDIO_INFO_DATA0'''
 [[register]]
-  name = "DP_TX_AUDIO_INFO_DATA3"
-  type = "wo"
+name = "TX_AUDIO_INFO_DATA3"
+type = "wo"
   width = 32
   description = "Word formatted as per CEA 861-C Info Frame."
   default = "0x00000000"
@@ -1022,11 +1102,11 @@ description = "DisplayPort Controller"
     name = "INFO_DATA"
     bits = "31:0"
     type = "wo"
-    shortdesc = '''Fourth word of the 8 words.'''
-    longdesc = '''Similar to register DP_TX_AUDIO_INFO_DATA0'''
+  shortdesc = '''Fourth word of the 8 words.'''
+  longdesc = '''Similar to register TX_AUDIO_INFO_DATA0'''
 [[register]]
-  name = "DP_TX_AUDIO_INFO_DATA4"
-  type = "wo"
+name = "TX_AUDIO_INFO_DATA4"
+type = "wo"
   width = 32
   description = "Word formatted as per CEA 861-C Info Frame."
   default = "0x00000000"
@@ -1035,11 +1115,11 @@ description = "DisplayPort Controller"
     name = "INFO_DATA"
     bits = "31:0"
     type = "wo"
-    shortdesc = '''5th word of the 8 words.'''
-    longdesc = '''Similar to register DP_TX_AUDIO_INFO_DATA0'''
+  shortdesc = '''5th word of the 8 words.'''
+  longdesc = '''Similar to register TX_AUDIO_INFO_DATA0'''
 [[register]]
-  name = "DP_TX_AUDIO_INFO_DATA5"
-  type = "wo"
+name = "TX_AUDIO_INFO_DATA5"
+type = "wo"
   width = 32
   description = "Word formatted as per CEA 861-C Info Frame."
   default = "0x00000000"
@@ -1048,11 +1128,11 @@ description = "DisplayPort Controller"
     name = "INFO_DATA"
     bits = "31:0"
     type = "wo"
-    shortdesc = '''6th word of the 8 words.'''
-    longdesc = '''Similar to register DP_TX_AUDIO_INFO_DATA0'''
+  shortdesc = '''6th word of the 8 words.'''
+  longdesc = '''Similar to register TX_AUDIO_INFO_DATA0'''
 [[register]]
-  name = "DP_TX_AUDIO_INFO_DATA6"
-  type = "wo"
+name = "TX_AUDIO_INFO_DATA6"
+type = "wo"
   width = 32
   description = "Word formatted as per CEA 861-C Info Frame."
   default = "0x00000000"
@@ -1061,11 +1141,11 @@ description = "DisplayPort Controller"
     name = "INFO_DATA"
     bits = "31:0"
     type = "wo"
-    shortdesc = '''7th word of the 8 words.'''
-    longdesc = '''Similar to register DP_TX_AUDIO_INFO_DATA0'''
+  shortdesc = '''7th word of the 8 words.'''
+  longdesc = '''Similar to register TX_AUDIO_INFO_DATA0'''
 [[register]]
-  name = "DP_TX_AUDIO_INFO_DATA7"
-  type = "wo"
+name = "TX_AUDIO_INFO_DATA7"
+type = "wo"
   width = 32
   description = "Word formatted as per CEA 861-C Info Frame."
   default = "0x00000000"
@@ -1074,11 +1154,11 @@ description = "DisplayPort Controller"
     name = "INFO_DATA"
     bits = "31:0"
     type = "wo"
-    shortdesc = '''8th word of the 8 words.'''
-    longdesc = '''Similar to register DP_TX_AUDIO_INFO_DATA0'''
+  shortdesc = '''8th word of the 8 words.'''
+  longdesc = '''Similar to register TX_AUDIO_INFO_DATA0'''
 [[register]]
-  name = "DP_TX_M_AUD"
-  type = "mixed"
+name = "TX_M_AUD"
+type = "mixed"
   width = 32
   description = "M value of audio stream as computed by transmitter"
   default = "0x00000000"
@@ -1092,8 +1172,8 @@ description = "DisplayPort Controller"
     bits = "23:0"
     type = "rw"
 [[register]]
-  name = "DP_TX_N_AUD"
-  type = "mixed"
+name = "TX_N_AUD"
+type = "mixed"
   width = 32
   description = "TX_AUDIO_NAUD. N value of audio stream as computed by transmitter."
   default = "0x00000000"
@@ -1107,8 +1187,8 @@ description = "DisplayPort Controller"
     bits = "23:0"
     type = "rw"
 [[register]]
-  name = "DP_TX_AUDIO_EXT_DATA0"
-  type = "wo"
+name = "TX_AUDIO_EXT_DATA0"
+type = "wo"
   width = 32
   description = "Word formatted as per Extension packet described in protocol specification. Extended packet is fixed to 32 Bytes length. The controller has buffer space for only one extended packet."
   default = "0x00000000"
@@ -1118,8 +1198,8 @@ description = "DisplayPort Controller"
     bits = "31:0"
     type = "wo"
 [[register]]
-  name = "DP_TX_AUDIO_EXT_DATA1"
-  type = "wo"
+name = "TX_AUDIO_EXT_DATA1"
+type = "wo"
   width = 32
   description = "2nd word of the 9 words of the extended packet"
   default = "0x00000000"
@@ -1129,8 +1209,8 @@ description = "DisplayPort Controller"
     bits = "31:0"
     type = "wo"
 [[register]]
-  name = "DP_TX_AUDIO_EXT_DATA2"
-  type = "wo"
+name = "TX_AUDIO_EXT_DATA2"
+type = "wo"
   width = 32
   description = "3rd word of the 9 words of the extended packet"
   default = "0x00000000"
@@ -1140,8 +1220,8 @@ description = "DisplayPort Controller"
     bits = "31:0"
     type = "wo"
 [[register]]
-  name = "DP_TX_AUDIO_EXT_DATA3"
-  type = "wo"
+name = "TX_AUDIO_EXT_DATA3"
+type = "wo"
   width = 32
   description = "4th word of the 9 words of the extended packet"
   default = "0x00000000"
@@ -1151,8 +1231,8 @@ description = "DisplayPort Controller"
     bits = "31:0"
     type = "wo"
 [[register]]
-  name = "DP_TX_AUDIO_EXT_DATA4"
-  type = "wo"
+name = "TX_AUDIO_EXT_DATA4"
+type = "wo"
   width = 32
   description = "5th word of the 9 words of the extended packet"
   default = "0x00000000"
@@ -1162,8 +1242,8 @@ description = "DisplayPort Controller"
     bits = "31:0"
     type = "wo"
 [[register]]
-  name = "DP_TX_AUDIO_EXT_DATA5"
-  type = "wo"
+name = "TX_AUDIO_EXT_DATA5"
+type = "wo"
   width = 32
   description = "6th word of the 9 words of the extended packet"
   default = "0x00000000"
@@ -1173,8 +1253,8 @@ description = "DisplayPort Controller"
     bits = "31:0"
     type = "wo"
 [[register]]
-  name = "DP_TX_AUDIO_EXT_DATA6"
-  type = "wo"
+name = "TX_AUDIO_EXT_DATA6"
+type = "wo"
   width = 32
   description = "7th word of the 9 words of the extended packet"
   default = "0x00000000"
@@ -1184,8 +1264,8 @@ description = "DisplayPort Controller"
     bits = "31:0"
     type = "wo"
 [[register]]
-  name = "DP_TX_AUDIO_EXT_DATA7"
-  type = "wo"
+name = "TX_AUDIO_EXT_DATA7"
+type = "wo"
   width = 32
   description = "8th word of the 9 words of the extended packet"
   default = "0x00000000"
@@ -1195,8 +1275,8 @@ description = "DisplayPort Controller"
     bits = "31:0"
     type = "wo"
 [[register]]
-  name = "DP_TX_AUDIO_EXT_DATA8"
-  type = "wo"
+name = "TX_AUDIO_EXT_DATA8"
+type = "wo"
   width = 32
   description = "9th word of the 9 words of the extended packet"
   default = "0x00000000"
@@ -1206,8 +1286,8 @@ description = "DisplayPort Controller"
     bits = "31:0"
     type = "wo"
 [[register]]
-  name = "DP_INT_STATUS"
-  type = "mixed"
+name = "INT_STATUS"
+type = "mixed"
   width = 32
   description = "Interrupt Status Register for intrN. This is a sticky register that holds the value of the interrupt until cleared by a value of 1."
   default = "0x00000000"
@@ -1331,8 +1411,8 @@ description = "DisplayPort Controller"
     bits = "0"
     type = "wtc"
 [[register]]
-  name = "DP_INT_MASK"
-  type = "mixed"
+name = "INT_MASK"
+type = "mixed"
   width = 32
   description = "Interrupt Mask Register for intrN. This is a read-only location and can be atomically altered by either the IDR or the IER."
   default = "0xFFFFF03F"
@@ -1446,8 +1526,8 @@ description = "DisplayPort Controller"
     bits = "0"
     type = "ro"
 [[register]]
-  name = "DP_INT_EN"
-  type = "mixed"
+name = "INT_EN"
+type = "mixed"
   width = 32
   description = "Interrupt Enable Register. A write of to this location will unmask the interrupt. (IMR: 0)"
   default = "0x00000000"
@@ -1561,8 +1641,8 @@ description = "DisplayPort Controller"
     bits = "0"
     type = "wo"
 [[register]]
-  name = "DP_INT_DS"
-  type = "mixed"
+name = "INT_DS"
+type = "mixed"
   width = 32
   description = "Interrupt Disable Register. A write of one to this location will mask the interrupt. (IMR: 1)"
   default = "0x00000000"
@@ -1758,25 +1838,38 @@ description = "DisplayPort Controller"
     type = "rw"
     shortdesc = '''Set to '1' to force downsampling on blender output.'''
     longdesc = '''This bit must be set when the blended output VID_FORMAT is set to YUV4222'''
-  [[register.field]]
-    name = "RESERVED"
-    bits = "3"
-    type = "raz"
-  [[register.field]]
-    name = "VID_FORMAT"
-    bits = "2:0"
-    type = "rw"
-    shortdesc = '''Blended video Format.'''
-    longdesc = '''o 0: RGB o 1: YCbCr444 o 2: YCbCr422 o 3: Y-Only'''
+[[register.field]]
+name = "RESERVED"
+bits = "3"
+type = "raz"
+[[register.field]]
+name = "VID_FORMAT"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Blended video Format.'''
+longdesc = '''o 0: RGB o 1: YCbCr444 o 2: YCbCr422 o 3: Y-Only'''
+[[register.field.enum]]
+name = "RGB"
+value = 0
+[[register.field.enum]]
+name = "YCBCR_444"
+value = 1
+[[register.field.enum]]
+name = "YCBCR_422"
+value = 2
+[[register.field.enum]]
+name = "Y_ONLY"
+value = 3
+
 [[register]]
-  name = "V_BLEND_LAYER0_CONTROL"
-  type = "mixed"
-  width = 32
-  description = "V_BLEND_LAYER0_CONTROL: Layer 0 is always video pixel"
-  default = "0x00000000"
-  offset = "0x0000A018"
-  [[register.field]]
-    name = "RESERVED"
+name = "V_BLEND_LAYER0_CONTROL"
+type = "mixed"
+width = 32
+description = "V_BLEND_LAYER0_CONTROL: Layer 0 is always video pixel"
+default = "0x00000000"
+offset = "0x0000A018"
+[[register.field]]
+name = "RESERVED"
     bits = "31:9"
     type = "raz"
   [[register.field]]

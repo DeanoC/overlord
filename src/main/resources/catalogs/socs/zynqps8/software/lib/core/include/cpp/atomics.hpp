@@ -2,25 +2,16 @@
 
 namespace Atomic {
 template<typename type>
-	ALWAYS_INLINE NON_NULL(1) type Load(const type* ptr)  { type val; __atomic_load(ptr, &val, __ATOMIC_SEQ_CST); return val; }
+ALWAYS_INLINE NON_NULL(1) type Load(const type* ptr)  { type val; __atomic_load(ptr, &val, __ATOMIC_SEQ_CST); return val; }
 template<typename type>
-	ALWAYS_INLINE NON_NULL(1) void Store(type* ptr, const type val) { __atomic_store(ptr, (type*) &val, __ATOMIC_SEQ_CST); }
+ALWAYS_INLINE NON_NULL(1) void Store(type* ptr, const type val) { __atomic_store(ptr, (type*) &val, __ATOMIC_SEQ_CST); }
 template<typename type>
-	ALWAYS_INLINE NON_NULL(1, 2) void StorePtr(type* ptr, const type* val) { __atomic_store(ptr, (type*) val, __ATOMIC_SEQ_CST); }
-
-	// PMU versions seems to flipping the return value??
-#if CPU_pmu == 1
+ALWAYS_INLINE NON_NULL(1, 2) void StorePtr(type* ptr, const type* val) { __atomic_store(ptr, (type*) val, __ATOMIC_SEQ_CST); }
 template<typename type>
-	ALWAYS_INLINE NON_NULL(1, 2) bool CompareExchange(type* ptr, const type* compare, const type exchange) { return !__atomic_compare_exchange_n(ptr, (type*)compare, exchange, false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST); }
+ALWAYS_INLINE NON_NULL(1, 2) bool CompareExchange(type* ptr, const type* compare, const type exchange) { return __atomic_compare_exchange_n(ptr, (type*)compare, exchange, false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST); }
 template<typename type>
-	ALWAYS_INLINE NON_NULL(1, 2) bool CompareExchangePtr(type* ptr, const type* compare, const type* exchange) { return !__atomic_compare_exchange(ptr, (type*)compare, (type*)exchange, false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST); }
-#else
+ALWAYS_INLINE NON_NULL(1, 2) bool CompareExchangePtr(type* ptr, const type* compare, const type* exchange) { return __atomic_compare_exchange(ptr, (type*)compare, (type*)exchange, false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST); }
 template<typename type>
-	ALWAYS_INLINE NON_NULL(1, 2) bool CompareExchange(type* ptr, const type* compare, const type exchange) { return __atomic_compare_exchange_n(ptr, (type*)compare, exchange, false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST); }
-template<typename type>
-	ALWAYS_INLINE NON_NULL(1, 2) bool CompareExchangePtr(type* ptr, const type* compare, const type* exchange) { return __atomic_compare_exchange(ptr, (type*)compare, (type*)exchange, false, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST); }
-#endif
-	template<typename type>
 ALWAYS_INLINE NON_NULL(1) type Swap(type* ptr, const type swap) { return __atomic_exchange_n(ptr, swap, __ATOMIC_SEQ_CST); }
 template<typename type>
 ALWAYS_INLINE NON_NULL(1, 2) type SwapPtr(type* ptr, const type* swap) { return __atomic_exchange_n(ptr, (type*)swap, __ATOMIC_SEQ_CST); }

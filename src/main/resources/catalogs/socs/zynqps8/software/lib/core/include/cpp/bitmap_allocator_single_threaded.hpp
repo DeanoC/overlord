@@ -29,9 +29,10 @@ struct BitmapAllocator_SingleThreaded {
 	uint32_t lastBitBlockWithSpace;
 
 	void Init(uintptr_t baseBlockAddr);
-	uintptr_t AllocOne();
-	uintptr_t Alloc(uint32_t blockCount);
+	WARN_UNUSED_RESULT uintptr_t AllocOne();
+	WARN_UNUSED_RESULT	uintptr_t Alloc(uint32_t blockCount);
 	void Free(uintptr_t address);
+	void Reset();
 	void DebugDumpMasks();
 
 };
@@ -39,6 +40,11 @@ struct BitmapAllocator_SingleThreaded {
 template<int BLOCKSIZE_IN_BYTES, int BMA_BLOCK_COUNT>
 void BitmapAllocator_SingleThreaded<BLOCKSIZE_IN_BYTES, BMA_BLOCK_COUNT>::Init(uintptr_t baseBlockAddr) {
 	this->blockBaseAddr = baseBlockAddr;
+	Reset();
+}
+
+template<int BLOCKSIZE_IN_BYTES, int BMA_BLOCK_COUNT>
+void BitmapAllocator_SingleThreaded<BLOCKSIZE_IN_BYTES, BMA_BLOCK_COUNT>::Reset() {
 	memset(&this->bitmap, 0xFF, sizeof(this->bitmap));
 	memset(&this->allocCount, 0, sizeof(this->allocCount));
 	this->lastBitBlockWithSpace = 0;
@@ -150,7 +156,7 @@ void BitmapAllocator_SingleThreaded<BLOCKSIZE_IN_BYTES, BMA_BLOCK_COUNT>::Free(u
 
 		const BitMapType first = ((sizeof(BitMapType) * 8) - ((index - (blockIndex * BitMapTypeBits))) - maskWidth);
 //		debug_printf("FREE bitmap 0x%x blockIndex %d first %d, actual mask 0x%x\n", this->bitmap[blockIndex], blockIndex, first, (mask << first));
-		assert(!(this->bitmap[blockIndex] & (mask << first)));
+		assert_msg(!(this->bitmap[blockIndex] & (mask << first)), "Double Free");
 		this->bitmap[blockIndex] |= (mask << first);
 		this->lastBitBlockWithSpace = blockIndex;
 //		debug_printf("FREE bitmap 0x%x mask 0x%x\n", this->bitmap[blockIndex], mask);

@@ -1,6 +1,7 @@
 #pragma once
 #include "hw_regs/ipi.h"
 #include "hw_regs/ipi_buffer.h"
+#include "hw/memory_map.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -39,7 +40,20 @@ typedef enum PACKED {
 	IA_PMU = 7
 } IPI_Agent;
 
-WARN_UNUSED_RESULT ALWAYS_INLINE IPI_Agent IPI_ChannelToAgent(IPI_Channel channel) {
+typedef enum PACKED {
+	IBO_APU 				= 0x400,
+	IBO_R5F_0				= 0x0,
+	IBO_R5F_1				= 0x200,
+
+	IBO_PL_0				= 0x600,
+	IBO_PL_1				= 0x800,
+	IBO_PL_2				= 0xA00,
+	IBO_PL_3				= 0xC00,
+
+	IBO_PMU					= 0xE00,
+} IPI_BUFFER_OFFSET;
+
+WARN_UNUSED_RESULT CONST_EXPR ALWAYS_INLINE IPI_Agent IPI_ChannelToAgent(IPI_Channel channel) {
 	switch(channel) {
 		case IC_APU: return IA_APU;
 		case IC_R5F_0: return IA_R5F_0;
@@ -49,25 +63,28 @@ WARN_UNUSED_RESULT ALWAYS_INLINE IPI_Agent IPI_ChannelToAgent(IPI_Channel channe
 		case IC_PL_2: return IA_PL_2;
 		case IC_PL_3: return IA_PL_3;
 		case IC_PMU_0:
-			case IC_PMU_1:
-				case IC_PMU_2:
-					case IC_PMU_3:
-						return IA_PMU;
-						default: return IA_APU;
+		case IC_PMU_1:
+		case IC_PMU_2:
+		case IC_PMU_3:
+			return IA_PMU;
+		default: return IA_APU;
 	}
 }
-WARN_UNUSED_RESULT ALWAYS_INLINE IPI_Channel IPI_AgentToChannel(IPI_Agent agent) {
-	switch(agent) {
-		case IA_APU: return IC_APU;
-		case IA_R5F_0: return IC_R5F_0;
-		case IA_R5F_1: return IC_R5F_1;
-		case IA_PL_0: return IC_PL_0;
-		case IA_PL_1: return IC_PL_1;
-		case IA_PL_2: return IC_PL_2;
-		case IA_PL_3: return IC_PL_3;
-		case IA_PMU: return IC_PMU_0;
-		default:
-			return IC_APU;
+WARN_UNUSED_RESULT CONST_EXPR ALWAYS_INLINE IPI_BUFFER_OFFSET IPI_ChannelToBuffer(IPI_Channel channel) {
+	switch(channel) {
+		case IC_APU: return IBO_APU;
+		case IC_R5F_0: return IBO_R5F_0;
+		case IC_R5F_1: return IBO_R5F_1;
+		case IC_PL_0: return IBO_PL_0;
+		case IC_PL_1: return IBO_PL_1;
+		case IC_PL_2: return IBO_PL_2;
+		case IC_PL_3: return IBO_PL_3;
+		case IC_PMU_0:
+		case IC_PMU_1:
+		case IC_PMU_2:
+		case IC_PMU_3:
+			return IBO_PMU;
+		default: return IBO_APU;
 	}
 }
 #ifdef __cplusplus
@@ -78,11 +95,13 @@ WARN_UNUSED_RESULT ALWAYS_INLINE IPI_Channel IPI_AgentToChannel(IPI_Agent agent)
 	OSF_RESPONSE_BUFFER_FREE = 0, // lets the server know response buffer is free
 
 	OSF_FIRE_AND_FORGET_BIT = 0x80,
-	OSF_INLINE_PRINT = OSF_FIRE_AND_FORGET_BIT | 0, // inline print <= 29 bytes
+	OSF_INLINE_PRINT = OSF_FIRE_AND_FORGET_BIT | 0, 			// inline print <= 29 bytes
+	OSF_DDR_LO_BLOCK_FREE = OSF_FIRE_AND_FORGET_BIT | 1,  // free previously allocated lo chunks
+	OSF_DDR_HI_BLOCK_FREE = OSF_FIRE_AND_FORGET_BIT | 2,  // free previously allocated hi chunks
 
 	OSF_PTR_PRINT = 1,					// from a ddr buffer, ptr must be valid until response
-	OSF_DDR_LO_BLOCK_ALLOC = 2, // allocate 1MB chunks of DDR
-	OSF_DDR_LO_BLOCK_FREE = 3,  // free previously allocated chunks
+	OSF_DDR_LO_BLOCK_ALLOC, 		// allocate 1MB chunks of DDR in low (32bit) range
+	OSF_DDR_HI_BLOCK_ALLOC, 		// allocate 1MB chunks of DDR in high (64bit) range
 
 } OS_ServiceFunc;
 
@@ -96,6 +115,10 @@ typedef struct PACKED {
 		union {
 			uint8_t _padd[30];				// IPI3_Msg always 32 bytes
 			struct PACKED {
+				// the ddr address can be above the 32 bit boundray but unless noted in the function
+				// should be bigger than 64K (possible 128K depending on the os server state)
+				// for lower 32 bit Ddr addresses can be upto 2GB packets
+				uint8_t _padd_0[6];	// padd to 64 bit alignment
 				uintptr_all_t packetDdrAddress; // only valid for non fire and forget
 				uint32_t packetSize; // packetSize includes first 32 bytes which is an IPI3_Msg
 			} DdrPacket;
@@ -115,6 +138,14 @@ typedef struct PACKED {
 				uint8_t _padd_0[2]; 	// align to 32 bit boundary as we have the space to spare
 				uint16_t free_blocks_starting_at; 		// offset in 1M blocks to free
 			} DdrLoBlockFree;
+			struct PACKED {
+				uint8_t _padd_0[2]; 	// align to 32 bit boundary as we have the space to spare
+				uint16_t blocks1MB;   // how many blocks (each 1MB) to allocate
+			} DdrHiBlockAlloc;
+			struct PACKED {
+				uint8_t _padd_0[2]; 	// align to 32 bit boundary as we have the space to spare
+				uint16_t free_blocks_starting_at; 		// offset in 1M blocks to free
+			} DdrHiBlockFree;
 		};
 	} Payload;
 } IPI3_Msg;
@@ -132,6 +163,9 @@ typedef struct PACKED {
 		struct PACKED {
 			uint16_t block_1MB_Offset; // offset in 1M block from DDR LO base of our RAM
 		} DdrLoBlockAlloc;
+		struct PACKED {
+			uint16_t block_1MB_Offset; // offset in 1M block from DDR Hi base of our RAM
+		} DdrHiBlockAlloc;
 
 	};
 } IPI3_Response;
@@ -139,11 +173,11 @@ typedef struct PACKED {
 static_assert(sizeof(IPI3_Msg) == 32, "IPI3_Msg must be exactly 32 bytes");
 static_assert(sizeof(IPI3_Response) == 32, "IPI3_Response must be exactly 32 bytes");
 
-#define IPI_MSG_BEGIN(chan) (uint8_t*)((uintptr_t)(IPI_BUFFER_CH0_MSG_CH0_OFFSET + ((chan) * 0x200)))
-#define IPI_RESPONSE_BEGIN(chan) (uint8_t*)((uintptr_t)(IPI_BUFFER_CH0_RESPONSE_CH0_OFFSET + ((chan) * 0x200)))
+#define IPI_MSG(buffer, target) (uint8_t*)(IPI_BUFFER_BASE_ADDR + (buffer) + ((target)*0x40))
+#define IPI_RESPONSE(buffer, target) (uint8_t*)(IPI_BUFFER_BASE_ADDR + (buffer) + 0x20 + ((target)*0x40))
 
 void IPI3_OsService_Submit(const IPI3_Msg *msg);
-void IPI3_OnService_FetchResponse(IPI3_Response * reply);
+void IPI3_OnService_SubmitAndFetchResponse(const IPI3_Msg *const msg, IPI3_Response * reply);
 
 #ifdef __cplusplus
 }

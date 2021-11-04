@@ -1,7 +1,7 @@
 description = "Inter-Processor buffers"
 [[bank]]
-name = "IPIBuffers"
-address = "0xff990000U"
+name = "IPI_BUFFER"
+address = "0xff990000"
 
 [[register]]
 name = "CH0_MSG_CH0"

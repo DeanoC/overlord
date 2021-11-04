@@ -147,4 +147,3 @@ return 1 << v;																																					\
 #define MATH_FM_CREATE_SIGNED_INTEGER(postfix, type) \
 MATH_FM_CREATE_SIGNED(postfix, type)
 
-

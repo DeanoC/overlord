@@ -1,40 +1,57 @@
+#include <dbg/raw_print.h>
 #include "core/core.h"
 #include "hw/memory_map.h"
 #include "hw/reg_access.h"
 #include "osservices/ipi3_transport.h"
+#include "hw/cache.h"
 
-void IPI3_OsService_Submit(const IPI3_Msg *const msg) {
-	// is the pmu ipi buffer clear? PMU shares the buffer amongst all 4 IPI channels
-	// if the observation bits are clear, then the pmu buffer is ready to use
-	while ((HW_REG_GET_BIT(IPI, PMU_0_OBS, CH3) ||
-					HW_REG_GET_BIT(IPI, PMU_1_OBS, CH4) ||
-					HW_REG_GET_BIT(IPI, PMU_2_OBS, CH5) ||
-					HW_REG_GET_BIT(IPI, PMU_3_OBS, CH6))) {
-		// stall till buffer is free to use
-	}
+// Manual is wrong,
+// see https://forums.xilinx.com/t5/Processor-System-Design-and-AXI/Error-in-UG1085-Zynq-UltraScale-Device-TRM-IPI-Buffers/m-p/1281937
+#if CPU_a53
+#define IPI_OBS CH0_OBS
+#define IPI_TRIG CH0_TRIG
+#define IPI_BUFFER IBO_APU
 
-	memcpy(IPI_MSG_BEGIN(IA_PMU), msg, 32);
-	HW_REG_SET_BIT(IPI, PMU_3_TRIG, CH6);
-}
+#elif CPU_r5f
+#warning TODO R5F need to use core hart for buffer
+#define IPI_OBS CH1_OBS
+#define IPI_TRIG CH1_TRIG
+#define IPI_BUFFER IBO_R5F_0
 
-void IPI3_OnService_FetchResponse(IPI3_Response * reply) {
-	while ((HW_REG_GET_BIT(IPI, PMU_0_OBS, CH3) ||
-					HW_REG_GET_BIT(IPI, PMU_1_OBS, CH4) ||
-					HW_REG_GET_BIT(IPI, PMU_2_OBS, CH5) ||
-					HW_REG_GET_BIT(IPI, PMU_3_OBS, CH6))) {
-		// stall till buffer is free to use
-	}
-#if CPU_pmu == 1
-	memcpy(reply, IPI_RESPONSE_BEGIN(IA_PMU), 32);
-#elif CPU_a53 == 1
-	memcpy(reply, IPI_RESPONSE_BEGIN(IA_APU), 32);
-#elif CPU_r5f == 1
-#error TODO R5F needs to check which core its on
+#elif CPU_pmu
+#define IPI_OBS PMU_3_OBS
+#define IPI_TRIG PMU_3_TRIG
+#define IPI_BUFFER IBO_PMU
+
+
 #else
-#error Unknown CPU
+#error CPU not supported for IPI
 #endif
 
-	*IPI_MSG_BEGIN(IA_PMU) = OSF_RESPONSE_BUFFER_FREE;
-	HW_REG_SET_BIT(IPI, PMU_3_TRIG, CH6);
+#define WAIT_FOR_ACK(a,b) while (HW_REG_GET(IPI, a) & (b)) {}
+
+void IPI3_OsService_Submit(const IPI3_Msg *const msg) {
+	WAIT_FOR_ACK(IPI_OBS, IC_PMU_3)
+
+	memcpy(IPI_MSG(IPI_BUFFER, IA_PMU), msg, 32);
+	Cache_DCacheCleanAndInvalidateLine((uintptr_t)IPI_MSG(IPI_BUFFER, IA_PMU));
+	HW_REG_SET(IPI, IPI_TRIG, IC_PMU_3);
+
+}
+
+void IPI3_OnService_SubmitAndFetchResponse(const IPI3_Msg *const msg, IPI3_Response * reply) {
+	WAIT_FOR_ACK(IPI_OBS, IC_PMU_3)
+
+	memcpy(IPI_MSG(IPI_BUFFER, IA_PMU), msg, 32);
+	Cache_DCacheCleanLine((uintptr_t)IPI_MSG(IPI_BUFFER, IA_PMU));
+	HW_REG_SET(IPI, IPI_TRIG, IC_PMU_3);
+
+	WAIT_FOR_ACK(IPI_OBS, IC_PMU_3)
+
+	memcpy(reply, IPI_RESPONSE(IPI_BUFFER, IA_PMU), 32);
+
+	*IPI_MSG(IPI_BUFFER, IA_PMU) = OSF_RESPONSE_BUFFER_FREE;
+	Cache_DCacheCleanLine((uintptr_t)IPI_MSG(IPI_BUFFER, IA_PMU));
+	HW_REG_SET(IPI, IPI_TRIG, IC_PMU_3);
 }
 

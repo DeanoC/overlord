@@ -43,12 +43,15 @@ object Compiler {
 		                                                  s"""
 			                                                   |build_binutils $triple
 																												 |$$PWD/compilers
-			                                                   |build_gcc $triple $$PWD/compilers "$gcc_flags"
+			                                                   |build_gcc $triple
+																												 |$$PWD/compilers "$gcc_flags"
 			                                                   |""".stripMargin
 		}
 
 
 		Utils.writeFile(out.resolve("generate_compilers.sh"), sb.result())
+		Utils.setFileExecutable(out.resolve(s"generate_compilers.sh"))
+
 	}
 
 	private def genCMakeToolChains(cpu_info: Set[(String, String, String)],

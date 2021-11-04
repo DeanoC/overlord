@@ -33,6 +33,7 @@ add_library(${project} ${CLIST} ${ASMLIST} ${HEADERLIST})
 
 target_include_directories(${project} PUBLIC include)
 target_link_libraries(${project} PRIVATE core)
+target_link_libraries(${project} PRIVATE utils)
 target_link_libraries(${project} PRIVATE dbg)
 target_link_libraries(${project} PRIVATE hw)
 add_compile_definitions(${project} BOARD_${BOARD}=1 SOC_${SOC}=1 CPU_${CPU}=1 CPU_ARCH_${CPU_ARCH}=1)

@@ -20,6 +20,9 @@ case class SourcesAction(filename: String,
 	                     parameters: Map[String, () => Variant],
 	                     outPath: Path): Unit = {
 		actualSrcPath = srcPath.replace("${name}", instance.ident)
+		if (!Path.of(actualSrcPath).toFile.exists()) {
+			println(f"$actualSrcPath not found%n")
+		}
 	}
 
 	def getSrcPath: String = actualSrcPath

@@ -82,9 +82,13 @@ object Registers {
 		val registers  = for (reg <- tregisters) yield {
 			val table   = Utils.toTable(reg)
 			val regName = Utils.toString(table("name"))
-			val regType = Utils.toString(table("type"))
+			val regType = if (table.contains("type")) Utils.toString(table("type")) else {
+				"rw"
+			}
 			val width   = Utils.toInt(table("width"))
-			val default = Utils.toBigInt(table("default"))
+			val default = if (table.contains("type")) Utils.toBigInt(table("default")) else {
+				BigInt(0)
+			}
 			val offset  = Utils.toBigInt(table("offset"))
 			val desc    = if (table.contains("description")) {
 				Utils.toString(table("description"))
@@ -103,6 +107,8 @@ object Registers {
 
 					val shortDesc = if (table.contains("shortdesc"))
 						Some(Utils.toString(table("shortdesc")))
+					else if (table.contains("description"))
+						Some(Utils.toString(table("description")))
 					else None
 
 					val longDesc = if (table.contains("longdesc"))

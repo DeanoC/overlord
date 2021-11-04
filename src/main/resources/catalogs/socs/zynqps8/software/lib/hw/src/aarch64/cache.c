@@ -170,17 +170,17 @@ void Cache_DCacheCleanLine(uintptr_t adr)
 	write_DAIF_register(currmask | IRQ_FIQ_MASK);
 
 	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYS, CSSELR_EL1, LEVEL, 0) );
-	write_data_cache_register(CIVAC,(adr & (~0x3F)));
+	write_data_cache_register(CVAC,(adr & (~0x3F)));
 	dsb();
 
 	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYS, CSSELR_EL1, LEVEL, 1) );
-	write_data_cache_register(IVAC,(adr & (~0x3F)));
+	write_data_cache_register(CVAC,(adr & (~0x3F)));
 	dsb();
 
 	write_DAIF_register(currmask);
 }
 
-void Cache_DCacheCleanInvalidateLine(uintptr_t adr)
+void Cache_DCacheCleanAndInvalidateLine(uintptr_t adr)
 {
 	uint32_t currmask = read_DAIF_register();
 	write_DAIF_register(currmask | IRQ_FIQ_MASK);
@@ -190,14 +190,14 @@ void Cache_DCacheCleanInvalidateLine(uintptr_t adr)
 	dsb();
 
 	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYS, CSSELR_EL1, LEVEL, 1) );
-	write_data_cache_register(IVAC,(adr & (~0x3F)));
+	write_data_cache_register(CIVAC,(adr & (~0x3F)));
 	dsb();
 
 	write_DAIF_register(currmask);
 
 }
 
-void Cache_DCacheCleanInvalidateRange(uintptr_t  adr, uintptr_t len)
+void Cache_DCacheCleanAndInvalidateRange(uintptr_t  adr, uintptr_t len)
 {
 	DCacheCleanAndMaybeInvalidateRange(adr, len, true);
 }

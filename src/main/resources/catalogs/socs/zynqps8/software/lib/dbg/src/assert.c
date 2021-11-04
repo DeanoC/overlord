@@ -10,4 +10,3 @@ NO_RETURN void assert_printf(char const *file, int line, char const *txt)
 		; // do nothing
 	}
 }
-

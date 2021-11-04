@@ -11,9 +11,13 @@ void Cache_ICacheEnable(void){}
 void Cache_DCacheDisable(void){}
 void Cache_ICacheDisable(void){}
 
+void Cache_DCacheClean(void){}
+void Cache_DCacheCleanRange(uintptr_t adr, uintptr_t  len){}
+void Cache_DCacheCleanLine(uintptr_t  adr){}
+
 void Cache_DCacheCleanAndInvalidate(void){}
 void Cache_DCacheCleanAndInvalidateRange(uintptr_t adr, uintptr_t  len){}
-void Cache_DDCacheCleanAndInvalidateLine(uintptr_t  adr){}
+void Cache_DCacheCleanAndInvalidateLine(uintptr_t  adr){}
 
 void Cache_ICacheCleanAndInvalidate(void){}
 void Cache_ICacheCleanAndInvalidateRange(uintptr_t adr, uintptr_t  len){}
@@ -29,4 +33,3 @@ uint32_t Cache_GetDCacheNumSets(uint32_t level) { return 0; }
 #ifdef __cplusplus
 }
 #endif
-

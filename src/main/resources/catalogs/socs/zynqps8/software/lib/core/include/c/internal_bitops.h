@@ -20,10 +20,12 @@ CONST_EXPR ALWAYS_INLINE type BitOp_Cto##_##postfix(const type a) { return  BitO
 CONST_EXPR ALWAYS_INLINE type BitOp_Pop##_##postfix(const type a) {      	\
 	if(sizeof(type) >= 8) return __builtin_popcountl(a);     								\
 	else if(sizeof(type) >= 4) return __builtin_popcount(a);      					\
-	else if(sizeof(type) >= 2) return (type)__builtin_popcount(a);					\
 	else if(sizeof(type) >= 1) return (type)__builtin_popcount(a);					\
 }                                                                         \
-CONST_EXPR ALWAYS_INLINE type BitOp_CountToRightmostMask##_##postfix(const type a) { return ((1 << a)-1); }       \
+CONST_EXPR ALWAYS_INLINE type BitOp_PowerOfTwoContaining##_##postfix(type x) { return x <= 1 ? 1 : ((type)1) << ((sizeof(type) * 8) - BitOp_Clz##_##postfix(x-1)); } \
+CONST_EXPR ALWAYS_INLINE type BitOp_LogTwo##_##postfix(type const v) { return (sizeof(type) * 8) - BitOp_Clz##_##postfix(v) - 1; } \
+CONST_EXPR ALWAYS_INLINE type BitOp_PowerOfTwoToMask##_##postfix(type const v) { return v - 1; } \
+CONST_EXPR ALWAYS_INLINE type BitOp_CountToRightmostMask##_##postfix(const type a) { return ((1 << a)-1); }          \
 CONST_EXPR ALWAYS_INLINE type BitOp_RightmostMaskToCount##_##postfix(const type a) { return BitOp_Clz##_##postfix(a+1); }    \
 CONST_EXPR ALWAYS_INLINE type BitOp_SingleBitToCount##_##postfix(const type a) { return BitOp_Clz##_##postfix(a); }       \
 CONST_EXPR ALWAYS_INLINE type BitOp_CountLeadingZeros##_##postfix(const type a) { return BitOp_Clz##_##postfix(a); }       \
@@ -32,15 +34,16 @@ CONST_EXPR ALWAYS_INLINE type BitOp_CountTrailingZeros##_##postfix(const type a)
 CONST_EXPR ALWAYS_INLINE type BitOp_CountTrailingOnes##_##postfix(const type a) { return BitOp_Cto##_##postfix(a); }       \
 CONST_EXPR ALWAYS_INLINE type BitOp_FindFirstSet##_##postfix(const type a) { return BitOp_Ctz##_##postfix(a); }   \
 CONST_EXPR ALWAYS_INLINE type BitOp_PopulationCount##_##postfix(const type a) { return BitOp_Pop##_##postfix(a); } \
-/* algorithm from Hackers Delight revision 2 Figure 6-5 */ \
+/* Basic algorithm from Hackers Delight revision 2 Figure 6-5 */ \
+/* We however define as the inverse of 1 << (n-1), so modify the clz */ \
+/* Not found will return ~0 */ \
 CONST_EXPR ALWAYS_INLINE type BitOp_FindFirstStringOfOnes##_##postfix(type x, unsigned int n) { \
 	type s;																																			\
 	while (n > 1) {																															\
-		s = n >> 1;																																\
+		s = n >> 1;																 																\
 		x = x & (x >> s);																													\
 		n = n - s;																																\
 	}																																						\
-	return BitOp_Clz##_##postfix(x);																						\
+	return (sizeof(type)*8) - BitOp_Clz##_##postfix(x) - 1;											\
 }
-
 

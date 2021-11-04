@@ -1,0 +1,148 @@
+path = "prefabs/socs/zynqps8"
+
+# all 3 types hard CPUs
+[[include]]
+resource = "a53.toml"
+
+[[include]]
+resource = "r5f.toml"
+
+[[include]]
+resource = "pmu.toml"
+
+# standard platform libraries
+[[instance]]
+type = "library.core.zynqps8"
+
+[[instance]]
+type = "library.hw.zynqps8"
+
+[[instance]]
+type = "library.dbg.zynqps8"
+
+[[instance]]
+type = "library.osservices.zynqps8"
+
+[[instance]]
+type = "library.utils.zynqps8"
+
+[[instance]]
+type = "library.display_port.zynqps8"
+
+[[instance]]
+type = "library.dma.zynqps8"
+
+# boot rom
+[[instance]]
+type = "program.bootrom.zynqps8"
+
+[[instance]]
+type = "program.pmu_monitor"
+
+# the main SoC with lots of registers
+[[instance]]
+name = "RawPS8"
+type = "other.zynqps8.rawps8"
+
+[[instance]]
+type = "bus.apb"
+
+[[instance]]
+name = "MainBus"
+type = "bus.axi4"
+
+[[instance]]
+type = "ram.ddr.ddr4"
+
+[[instance]]
+type = "ram.sram.ocp"
+
+[[instance]]
+type = "ram.sram.pmuram"
+
+[[instance]]
+name = "uart0"
+type = "other.uart.zynqps8"
+instance = 0
+
+[[instance]]
+name = "storage.sdio.sdcard"
+type = "storage.sdio.zynqps8"
+instance = 0
+
+[[instance]]
+name = "storage.sdio.emmc.MTFC8GAKAJCN"
+type = "storage.sdio.zynqps8"
+instance = 1
+size = "8 GiB"
+
+[[instance]]
+name = "storage.qspi.MT25QU256ABA1EW9"
+type = "storage.qspi.zynqps8"
+size = "32 MiB"
+
+[[instance]]
+name = "MainBus_to_APB"
+type = "bridge.internal"
+
+[[connection]]
+type = "logical"
+connection = "RawPS8 <-> cpu.zynqps8.a53"
+
+[[connection]]
+type = "bus"
+connection = "bus.apb -> RawPS8"
+
+[[connection]]
+type = "bus"
+connection = "MainBus_to_APB -> bus.apb"
+
+[[connection]]
+type = "bus"
+connection = "MainBus -> MainBus_to_APB"
+fixed_address = "0"
+
+[[connection]]
+type = "bus"
+connection = "bus.apb -> uart0"
+fixed_address = "0xFF00_0000"
+
+[[connection]]
+type = "port"
+connection = "SDIO0 <> storage.sdio.sdcard"
+
+[[connection]]
+type = "port"
+connection = "SDIO1 <> storage.sdio.emmc"
+
+[[connection]]
+type = "bus"
+connection = "bus.apb -> storage.sdio.sdcard"
+
+[[connection]]
+type = "bus"
+connection = "bus.apb -> storage.qspi.MT25QU256ABA1EW9"
+
+[[connection]]
+type = "bus"
+connection = "MainBus -> ram.ddr.ddr4"
+fixed_address = [["0x0000_0000", "2 GiB"], ["0x8_0000_0000", "2 GiB"], ]
+
+[[connection]]
+type = "bus"
+connection = "MainBus -> ram.sram.ocp"
+
+[[connection]]
+type = "bus"
+connection = "MainBus -> ram.sram.tcm"
+fixed_address = [
+    ["0xFFE0_0000", "64 KiB"],
+    ["0xFFE2_0000", "64 KiB"],
+    ["0xFFE9_0000", "64 KiB"],
+    ["0xFFEB_0000", "64 KiB"]
+]
+
+[[connection]]
+type = "bus"
+connection = "MainBus -> ram.sram.pmuram"
+fixed_address = "0xFFDC_0000"
