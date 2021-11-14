@@ -2,7 +2,7 @@
 #include "core/cpp/compile_time_hash.hpp"
 #include "host_interface.hpp"
 #include "osservices/osservices.h"
-#include "os_heap.h"
+#include "os_heap.hpp"
 #include "utils/string_utils.hpp"
 #include "dbg/ansi_escapes.h"
 #include "zynqps8/dma/lpddma.hpp"
@@ -13,8 +13,8 @@
 #include "hw_regs/crl_apb.h"
 #include "hw_regs/crf_apb.h"
 #include "hw_regs/uart.h"
-#include "ipi3_os_server.h"
-#include "zmodem.h"
+#include "ipi3_os_server.hpp"
+#include "zmodem.hpp"
 
 
 extern uint32_t uart0ReceiveLast;
@@ -67,7 +67,7 @@ reget:
 }
 
 void writeByte(uint8_t c) {
-	PutByte(c);
+	IPI3_OsServer::PutByte(c);
 }
 
 
@@ -153,7 +153,7 @@ WaitForUart:
 						break;
 					}
 					default: {
-						debug_printf(DEBUG_MAGENTA_PEN "Unknown Command %s\n" DEBUG_RESET_COLOURS, cmdBuffer);
+						debug_printf(ANSI_MAGENTA_PEN "Unknown Command %s\n" ANSI_RESET_ATTRIBUTES, cmdBuffer);
 						this->currentState = State::RECEIVING_COMMAND;
 						break;
 					}
@@ -238,7 +238,7 @@ void HostInterface::DownloadCmd(uint8_t *cmdBuffer,
 			break;
 		}
 		default: cmdBuffer[cmdBufferHead] = 0;
-			debug_printf(DEBUG_MAGENTA_PEN "Unknown download target %s\n" DEBUG_RESET_COLOURS, cmdBuffer);
+			debug_printf(ANSI_MAGENTA_PEN "Unknown download target %s\n" ANSI_RESET_ATTRIBUTES, cmdBuffer);
 			this->currentState = State::RECEIVING_COMMAND;
 			return;
 	}

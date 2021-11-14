@@ -40,4 +40,6 @@ target_link_libraries(${project} PRIVATE hw)
 target_link_libraries(${project} PRIVATE dbg)
 target_link_libraries(${project} PRIVATE osservices)
 target_link_libraries(${project} PRIVATE zynqps8_display_port)
+target_link_libraries(${project} PRIVATE gfxdebug)
+
 add_dependencies(${project} pmu_monitor)

@@ -15,6 +15,7 @@ target_link_libraries(${project} PRIVATE hw)
 target_link_libraries(${project} PRIVATE dbg)
 target_link_libraries(${project} PRIVATE osservices)
 target_link_libraries(${project} PRIVATE zynqps8_dma)
+target_link_libraries(${project} PRIVATE gfxdebug)
 target_link_libraries(${project} PRIVATE -lgcc)
 
 add_custom_command(TARGET ${project}

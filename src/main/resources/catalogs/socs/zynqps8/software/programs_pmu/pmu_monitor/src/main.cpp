@@ -16,16 +16,15 @@
 #include "dbg/ansi_escapes.h"
 #include "dbg/print.h"
 
-#include "interrupts.h"
-#include "interrupt_handlers.h"
-#include "ipi3_os_server.h"
-#include "gic_proxy.h"
+#include "interrupts.hpp"
+#include "interrupt_handlers.hpp"
+#include "ipi3_os_server.hpp"
+#include "gic_proxy.hpp"
 #include "host_interface.hpp"
 #include "rom_extensions.h"
-
-#define MICROBLAZE_FREQ 180000000
-#define TICK_MILLISECONDS	25U
-#define COUNT_PER_TICK ((MICROBLAZE_FREQ / 1000U)* TICK_MILLISECONDS )
+#include "timers.hpp"
+#include "os_heap.hpp"
+#include "main_loop.hpp"
 
 typedef struct {
 	uint32_t namesz;
@@ -33,20 +32,18 @@ typedef struct {
 	uint32_t type;
 } ElfNoteSection_t;
 
+MainLoop loopy;
+
 extern const ElfNoteSection_t g_note_build_id;
 void PrintBanner(void)
 {
-	raw_debug_print(DEBUG_YELLOW_PEN "IKUY PMU Monitor\n" DEBUG_RESET_COLOURS);
+	raw_debug_print(ANSI_YELLOW_PEN "IKUY PMU Monitor\n" ANSI_RESET_ATTRIBUTES);
 	const uint8_t *build_id_data = &((uint8_t*)(&g_note_build_id)+1)[g_note_build_id.namesz];
 
 	// print Build ID
 	raw_debug_print("Build ID: ");
 	for (uint32_t i = 0; i < g_note_build_id.descsz; ++i) raw_debug_printf("%02x", build_id_data[i]);
 	raw_debug_print("\n");
-}
-
-void PIT0_Handler(Interrupt_Names irq_name) {
-//	raw_debug_printf("PIT0 - 0x%lx\n", HW_REG_GET(TTC0, COUNTER_VALUE_1) );
 }
 
 void ttc0_1_setup(void) {
@@ -74,18 +71,20 @@ void ttc0_1_setup(void) {
 }
 
 
-int main(void) __attribute__((noreturn));
+void main() __attribute__((noreturn));
 
-int main(void)
+void main()
 {
 	HW_REG_CLR_BIT(PMU_GLOBAL, SAFETY_GATE, SCAN_ENABLE);
 
 	// init disables interrupts and exceptions, start will enable them
-	Interrupts_Init();
+	Interrupts::Init();
 
 	HW_REG_CLR_BIT(PMU_GLOBAL, GLOBAL_CNTRL, DONT_SLEEP);
 
 	PrintBanner();
+
+	loopy.Init();
 
 	// sleep all other hard core processors in SoC
 	// xsct fails with power down error if ACPU0 is asleep
@@ -96,33 +95,35 @@ int main(void)
 	RomServiceTable[REN_R50SLEEP]();
 	RomServiceTable[REN_R51SLEEP]();
 
+	OsHeap::Init();
+	IPI3_OsServer::Init();
 
 	// install IPI0 as PMU sleep handlers (TODO seems a waste of an entire IPI...)
 	HW_REG_SET(IPI, PMU_0_ISR, IPI_PMU_0_ISR_USERMASK);
 	HW_REG_SET(IPI, PMU_0_IER, IPI_PMU_0_IER_USERMASK);
-	Interrupts_SetHandler(IN_IPI0, &IPI0_Handler);
-	Interrupts_Enable(IN_IPI0);
+	Interrupts::SetHandler(Interrupts::Name::IN_IPI0, &IPI0_Handler);
+	Interrupts::Enable(Interrupts::Name::IN_IPI0);
 
 	// IPI3 OS service handler
 	HW_REG_SET(IPI, PMU_3_ISR, IPI_PMU_3_ISR_USERMASK);
 	HW_REG_SET(IPI, PMU_3_IER, IPI_PMU_3_IER_USERMASK);
-	Interrupts_SetHandler(IN_IPI3, &IPI3_Handler);
-	Interrupts_Enable(IN_IPI3);
+	Interrupts::SetHandler(Interrupts::Name::IN_IPI3, &IPI3_Handler);
+	Interrupts::Enable(Interrupts::Name::IN_IPI3);
 
 	// ECC correctable interrupt
 	HW_REG_SET_BIT(PMU_LMB_BRAM, ECC_STATUS, CE);
 	HW_REG_SET_BIT(PMU_LMB_BRAM, ECC_IRQ_EN, CE);
-	Interrupts_SetHandler(IN_CORRECTABLE_ECC, &CorrectableECCErrors_Handler);
-	Interrupts_Enable(IN_CORRECTABLE_ECC);
+	Interrupts::SetHandler(Interrupts::Name::IN_CORRECTABLE_ECC, &CorrectableECCErrors_Handler);
+	Interrupts::Enable(Interrupts::Name::IN_CORRECTABLE_ECC);
 
 	// GPI0 (Fault tolerance events) (always enabled)
-	Interrupts_SetHandler(IN_GPI0, &GPI0_Handler);
-	Interrupts_Enable(IN_GPI0);
+	Interrupts::SetHandler(Interrupts::Name::IN_GPI0, &GPI0_Handler);
+	Interrupts::Enable(Interrupts::Name::IN_GPI0);
 
 	// GPI1 (Wakeup events)
 	HW_REG_SET(PMU_LOCAL, GPI1_ENABLE, PMU_LOCAL_GPI1_ENABLE_USERMASK);
-	Interrupts_SetHandler(IN_GPI1, &GPI1_Handler);
-	Interrupts_Enable(IN_GPI1);
+	Interrupts::SetHandler(Interrupts::Name::IN_GPI1, &GPI1_Handler);
+	Interrupts::Enable(Interrupts::Name::IN_GPI1);
 
 	// GPI1 is also used for GIC_PROXY
 	HW_REG_SET(LPD_SLCR, GICP0_IRQ_ENABLE, LPD_SLCR_GICP0_IRQ_ENABLE_SRC21);
@@ -135,36 +136,31 @@ int main(void)
 
 	// GPI2 (Reset and sleep events)
 	HW_REG_SET(PMU_LOCAL, GPI2_ENABLE, PMU_LOCAL_GPI2_ENABLE_USERMASK);
-	Interrupts_SetHandler(IN_GPI2, &GPI2_Handler);
-	Interrupts_Enable(IN_GPI2);
+	Interrupts::SetHandler(Interrupts::Name::IN_GPI2, &GPI2_Handler);
+	Interrupts::Enable(Interrupts::Name::IN_GPI2);
 
 	// GPI3 (PL to PMU events)
 	HW_REG_SET(PMU_LOCAL, GPI3_ENABLE, PMU_LOCAL_GPI3_ENABLE_USERMASK);
-	Interrupts_SetHandler(IN_GPI3, &GPI3_Handler);
-	Interrupts_Enable(IN_GPI3);
+	Interrupts::SetHandler(Interrupts::Name::IN_GPI3, &GPI3_Handler);
+	Interrupts::Enable(Interrupts::Name::IN_GPI3);
 
-	// PIT0 (25 ms timer callback)
-	HW_REG_SET(PMU_IOMODULE, PIT0_PRELOAD, COUNT_PER_TICK);
-	HW_REG_SET(PMU_IOMODULE, PIT0_CONTROL, 0); // disable till ready
-	Interrupts_SetHandler(IN_PIT0, &PIT0_Handler);
-	Interrupts_Enable(IN_PIT0);
+	Timers::Init();
 
-	Interrupts_Start();
-
-	IPI3_OSServiceInit();
-
-	// kick off the timer
-	HW_REG_SET(PMU_IOMODULE, PIT0_CONTROL,
-						 HW_REG_FIELD(PMU_IOMODULE, PIT0_CONTROL, PRELOAD) |
-						 HW_REG_FIELD(PMU_IOMODULE, PIT0_CONTROL, EN) );
+	Interrupts::Start();
 
 	HW_REG_SET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0, 1);
 
 	debug_print("IKUY PMU Firmware setup complete\n");
+	Timers::Start();
 
 	HW_REG_SET_BIT(PMU_GLOBAL, GLOBAL_CNTRL, FW_IS_PRESENT);
 
-	HostInterface hi{};
-	hi.Loop();
+	loopy.Loop();
+
+	while(true) {
+	}
 
 }
+
+
+

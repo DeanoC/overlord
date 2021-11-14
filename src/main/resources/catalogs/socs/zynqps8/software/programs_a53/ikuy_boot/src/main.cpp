@@ -17,9 +17,13 @@
 #include "hw_regs/zdma.h"
 #include "hw_regs/rpu.h"
 #include "hw_regs/crl_apb.h"
+#include "hw_regs/a53/a53_system.h"
 #include "zynqps8/display_port/display.hpp"
 #include "osservices/osservices.h"
-#include "gfxdebug_rgba8.hpp"
+#include "gfxdebug/rgba8.hpp"
+#include "gfxdebug/console.hpp"
+#include "utils/busy_sleep.h"
+#include "core/snprintf.h"
 
 void PrintBanner(void);
 void EnablePSToPL(void);
@@ -71,6 +75,9 @@ DisplayPort::Display::Display display;
 DisplayPort::Display::Mixer mixer;
 
 void BringUpDisplayPort();
+
+uintptr_lo_t videoBlock;
+uintptr_lo_t FrameBuffer;
 
 extern "C" int main(void)
 {
@@ -126,28 +133,30 @@ extern "C" int main(void)
 													(void*)_binary_pmu_monitor_bin_start,
 													(size_t)_binary_pmu_monitor_bin_end - (size_t)_binary_pmu_monitor_bin_start);
 	PmuWakeup();
+	Utils_BusyMilliSleep(100);
 	debug_force_raw_print(false);
+
 	BringUpDisplayPort();
 
 	debug_printf("Boot program Finished\n");
 
 	// clear heap
 	memset(HeapBase, 0, HeapLimit - HeapBase);
-	/*
-	debug_printf("PMU Download Start\n");
-	PmuSleep();
-	PmuDownload();
-	debug_printf("Switching to PMU\n");
-	PmuWakeup();
-*/
-	while(1){};
+	Utils_BusyMilliSleep(100);
 
-	return 0;
+	OsServer_EnableScreenConsole(FrameBuffer, 1280, 720);
+
+	OsService_ScreenConsolePrint(ANSI_CLR_SCREEN ANSI_CURSOR_HOME ANSI_BLINK ANSI_BRIGHT ANSI_GREEN_PEN "Welcome to Intex Systems\n" "\x1b[0m");
+
+	while(1) {
+		OsService_ScreenConsolePrint( ANSI_CURSOR_POSITION(0, 10) ANSI_BRIGHT "Welcome to Intex Systems\n" ANSI_RESET_ATTRIBUTES);
+		Utils_BusyMilliSleep(100);
+	}
 }
 
 void PrintBanner(void )
 {
-	debug_printf(DEBUG_CLR_SCREEN DEBUG_YELLOW_PEN "IKUY Boot Loader\n" DEBUG_RESET_COLOURS);
+	debug_printf(ANSI_CLR_SCREEN ANSI_YELLOW_PEN "IKUY Boot Loader\n" ANSI_RESET_ATTRIBUTES);
 	debug_printf("Silicon Version %d\n", HW_REG_GET_FIELD(CSU, VERSION, PS_VERSION)+1);
 	debug_printf( "A53 L1 Cache Size %dKiB, LineSize %d, Number of Ways %d, Number of Sets %d\n",
 										(Cache_GetDCacheLineSizeInBytes(1) * Cache_GetDCacheNumWays(1) * Cache_GetDCacheNumSets(1)) / 1024,
@@ -168,40 +177,17 @@ void PrintBanner(void )
 
 }
 
-uint8_t *GraphicsOverlay(uint8_t* Frame, uint64_t bufferSize)
-{
-	uint64_t Index;
-	uint32_t *RGBA = (uint32_t *) Frame;
-	//
-	// Red at the top half
-	// Alpha = 0x0F
-	//
-	for(Index = 0; Index < (bufferSize/4) /2; Index ++) {
-		RGBA[Index] = 0x0F0000FF;
-	}
-	for(; Index < bufferSize/4; Index ++) {
-		//
-		// Green at the bottom half
-		// Alpha = 0x80
-		//
-		RGBA[Index] = 0x8000FF00;
-	}
-	return Frame;
-}
-
 void BringUpDisplayPort()
 {
 	using namespace DisplayPort::Display;
-	Init(&link);
+
 	Init(&display);
 	Init(&mixer);
 
-
 	CopyStandardVideoMode(DisplayPort::Display::StandardVideoMode::VM_1280_720_60, &display.videoTiming);
-
-	auto videoBlock = (uintptr_all_t)OsService_DdrLoBlockAlloc(4);
-	auto dmaDesc = (DMADescriptor*) videoBlock;
-	auto FrameBuffer = (uint8_t*)(videoBlock + 4096);
+	videoBlock = OsService_DdrLoBlockAlloc(4);
+	auto dmaDesc = (DMADescriptor*) (uintptr_t)videoBlock;
+	FrameBuffer = (uintptr_lo_t)(uintptr_t)(videoBlock + 4096);
 
 	Init(dmaDesc);
 	dmaDesc->enableDescriptorUpdate = true;
@@ -210,7 +196,7 @@ void BringUpDisplayPort()
 	dmaDesc->stride = (1280 * 4) >> 4;
 	dmaDesc->nextDescriptorAddress = (uint32_t)(uintptr_t)dmaDesc;
 	dmaDesc->nextDescriptorAddressExt = (uint32_t)(((uintptr_t)dmaDesc) >> 32ULL);
-	dmaDesc->sourceAddress = (uint32_t)(uintptr_t)FrameBuffer;
+	dmaDesc->sourceAddress = (uint32_t)FrameBuffer;
 	dmaDesc->sourceAddressExt = (uint32_t)(((uintptr_t)FrameBuffer) >> 32ULL);
 
 	mixer.function = DisplayPort::Display::MixerFunction::GFX;
@@ -223,15 +209,13 @@ void BringUpDisplayPort()
 	mixer.gfxPlane.source = DisplayPort::Display::DisplayGfxPlane::Source::BUFFER;
 	mixer.gfxPlane.format = DisplayPort::Display::DisplayGfxPlane::Format::RGBA8;
 	mixer.gfxPlane.simpleDescBufferAddress = (uintptr_t)dmaDesc;
-
-	auto gfx = GfxDebugRGBA8(1280, 720, (uint8_t*)FrameBuffer);
-	gfx.Clear(0x0, 0xFF, 0, 0xFF);
-	gfx.PutString(78, 0, "Screen\nText");
-	gfx.PutString(0, 44, "Screen\nText");
-
 	Cache_DCacheCleanAndInvalidateRange(videoBlock, 4 * 1024 * 1024);
 
+	if(!IsDisplayConnected(&link)) return;
+
+	Init(&link);
 	SetDisplay(&link, &display, &mixer);
+
 /*
  * #define DP_AV_BUF_PALETTE_MEMORY_OFFSET 0x0000b400U
 	for(int i = 0; i < 256;i++) {
@@ -650,8 +634,124 @@ void TcmInit()
 }
 
 extern "C" void SynchronousInterrupt(void) {
-	raw_debug_printf("SynchronousInterrupt\n");
-	asm volatile("wfe");
+	uint64_t const esr = read_ESR_EL3_register();
+	uint64_t const elr = read_ELR_EL3_register();
+	uint32_t const ec = HW_REG_DECODE_FIELD(A53_SYSTEM, ESR_EL3, EC, esr);
+	uint64_t const far = read_FAR_EL3_register();
+	switch(ec) {
+		case A53_SYSTEM_ESR_EL3_EC_UNKNOWN:
+		case A53_SYSTEM_ESR_EL3_EC_WFX:
+		case A53_SYSTEM_ESR_EL3_EC_COP15_AARCH32:
+		case A53_SYSTEM_ESR_EL3_EC_TRAPPED_MCRR_MRRC_AARCH32:
+		case A53_SYSTEM_ESR_EL3_EC_COP14_AARCH32:
+		case A53_SYSTEM_ESR_EL3_EC_LDC_SRC_AARCH32:
+		case A53_SYSTEM_ESR_EL3_EC_SVE_SIMD_FP:
+		case A53_SYSTEM_ESR_EL3_EC_PAUTH:
+		case A53_SYSTEM_ESR_EL3_EC_MRRC_COP14_AARCH32:
+		case A53_SYSTEM_ESR_EL3_EC_BTI:
+		case A53_SYSTEM_ESR_EL3_EC_ILLEGAL_EXECUTION:
+		case A53_SYSTEM_ESR_EL3_EC_SVC:
+		case A53_SYSTEM_ESR_EL3_EC_HVC:
+		case A53_SYSTEM_ESR_EL3_EC_SMC:
+		case A53_SYSTEM_ESR_EL3_EC_MSR_MRS:
+		case A53_SYSTEM_ESR_EL3_EC_SVE:
+		case A53_SYSTEM_ESR_EL3_EC_FPAC:
+		case A53_SYSTEM_ESR_EL3_EC_IMPLEMENTATION_DEFINED:
+		case A53_SYSTEM_ESR_EL3_EC_PC_ALIGNMENT_FAULT:
+		case A53_SYSTEM_ESR_EL3_EC_SP_ALIGNMENT_FAULT:
+		case A53_SYSTEM_ESR_EL3_EC_FLOATING_POINT:
+		case A53_SYSTEM_ESR_EL3_EC_SERROR:
+		case A53_SYSTEM_ESR_EL3_EC_BRK:
+			raw_debug_printf(ANSI_RED_PEN "SynchronousInterrupt %#010lx ec %d %#010lx\n" ANSI_RESET_ATTRIBUTES,esr, ec, far);
+			break;
+		case A53_SYSTEM_ESR_EL3_EC_INSTRUCTION_ABORT_FROM_LOWER_EL:
+		case A53_SYSTEM_ESR_EL3_EC_INSTRUCTION_ABORT:
+			raw_debug_printf(ANSI_RED_PEN "Instruction Abort %#010lx ec %d %#010lx\n" ANSI_RESET_ATTRIBUTES,esr, ec, far);
+			break;
+		case A53_SYSTEM_ESR_EL3_EC_DATA_ABORT_FROM_LOWER_EL:
+		case A53_SYSTEM_ESR_EL3_EC_DATA_ABORT: {
+			uint32_t iss = HW_REG_DECODE_FIELD(A53_SYSTEM, ESR_EL3, ISS, esr);
+			uint32_t dfsc = HW_REG_DECODE_FIELD(A53_SYSTEM, ISS_DATA_ABORT, DFSC, iss);
+			raw_debug_printf(ANSI_RED_PEN "Data Abort @ %#018lx from instruction @ %#018lx: ", far, elr);
+			int level = 0;
+			switch(dfsc) {
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_ADDRESS_SIZE_FAULT_L3: level++;
+					[[fallthrough]];
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_ADDRESS_SIZE_FAULT_L2: level++;
+					[[fallthrough]];
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_ADDRESS_SIZE_FAULT_L1: level++;
+					[[fallthrough]];
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_ADDRESS_SIZE_FAULT_L0:
+					raw_debug_printf(ANSI_RED_PEN "Address Size fault Level %d\n" ANSI_RESET_ATTRIBUTES, level);
+					break;
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_TRANSLATION_FAULT_L3: level++;
+					[[fallthrough]];
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_TRANSLATION_FAULT_L2: level++;
+					[[fallthrough]];
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_TRANSLATION_FAULT_L1: level++;
+					[[fallthrough]];
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_TRANSLATION_FAULT_L0:
+					raw_debug_printf(ANSI_RED_PEN "Translation fault Level %d\n" ANSI_RESET_ATTRIBUTES, level);
+					break;
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_ACCESS_FLAG_FAULT_L3: level++;
+					[[fallthrough]];
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_ACCESS_FLAG_FAULT_L2: level++;
+					[[fallthrough]];
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_ACCESS_FLAG_FAULT_L1:
+					raw_debug_printf(ANSI_RED_PEN "Access Flag fault Level %d\n" ANSI_RESET_ATTRIBUTES, level);
+					break;
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_PERMISSION_FLAG_FAULT_L3: level++;
+					[[fallthrough]];
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_PERMISSION_FLAG_FAULT_L2: level++;
+					[[fallthrough]];
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_PERMISSION_FLAG_FAULT_L1:
+					raw_debug_printf(ANSI_RED_PEN "Permission Flag fault Level %d\n" ANSI_RESET_ATTRIBUTES, level);
+					break;
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_SYNCHRONOUS_EXTERNAL_ABORT_NOT_TTW:
+					raw_debug_print(ANSI_RED_PEN "Synchronous External Abort Not TTW\n" ANSI_RESET_ATTRIBUTES);
+					break;
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_SYNCHRONOUS_EXTERNAL_ABORT_L3: level++;
+					[[fallthrough]];
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_SYNCHRONOUS_EXTERNAL_ABORT_L2: level++;
+					[[fallthrough]];
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_SYNCHRONOUS_EXTERNAL_ABORT_L1: level++;
+					[[fallthrough]];
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_SYNCHRONOUS_EXTERNAL_ABORT_L0:
+					raw_debug_printf(ANSI_RED_PEN "Synchronous External Abort Level %d\n" ANSI_RESET_ATTRIBUTES, level);
+					break;
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_ECC_ERROR_ABORT_NOT_TTW:
+					raw_debug_print(ANSI_RED_PEN "ECC Error Abort Not TTW\n" ANSI_RESET_ATTRIBUTES);
+					break;
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_ECC_ERROR_ABORT_L3: level++;
+					[[fallthrough]];
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_ECC_ERROR_ABORT_L2: level++;
+					[[fallthrough]];
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_ECC_ERROR_ABORT_L1: level++;
+					[[fallthrough]];
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_ECC_ERROR_ABORT_L0:
+					raw_debug_printf(ANSI_RED_PEN "ECC Error Abort Level %d\n" ANSI_RESET_ATTRIBUTES, level);
+					break;
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_ALIGNMENT_FAULT:
+					raw_debug_print(ANSI_RED_PEN "Alignment Fault\n" ANSI_RESET_ATTRIBUTES);
+					break;
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_TLB_CONFLICT:
+					raw_debug_print(ANSI_RED_PEN "TLB Conflict\n" ANSI_RESET_ATTRIBUTES);
+					break;
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_UNSUPPORTED_ATOMIC_HARDWARE_FAULT:
+					raw_debug_print(ANSI_RED_PEN "Unsupported Atomic Hardware Fault\n" ANSI_RESET_ATTRIBUTES);
+					break;
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_LOCKDOWN:
+					raw_debug_print(ANSI_RED_PEN "Lockdown Fault\n" ANSI_RESET_ATTRIBUTES);
+					break;
+				case A53_SYSTEM_ISS_DATA_ABORT_DFSC_UNSUPPORTED_EXCLUSIVE_OR_ATOMIC:
+					raw_debug_print(ANSI_RED_PEN "Unsupported Exclusive or Atomic Fault\n" ANSI_RESET_ATTRIBUTES);
+					break;
+			}
+			break;
+		}
+	}
+	while(true) {
+	}
 }
 
 extern "C" void IRQInterrupt(void) {

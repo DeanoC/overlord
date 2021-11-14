@@ -6,12 +6,12 @@
 #include "hw_regs/ipi.h"
 #include "dbg/raw_print.h"
 
-#include "interrupt_handlers.h"
+#include "interrupt_handlers.hpp"
 #include "rom_extensions.h"
-#include "ipi3_os_server.h"
-#include "gic_proxy.h"
+#include "ipi3_os_server.hpp"
+#include "gic_proxy.hpp"
 
-void IPI0_Handler(Interrupt_Names irq_name) {
+void IPI0_Handler(Interrupts::Name irq_name) {
 	uint32_t isr = HW_REG_GET(IPI, PMU_0_ISR);
 	// write to clear to inform IPI PMU buffer is free to use now
 	HW_REG_SET(IPI, PMU_0_ISR, isr);
@@ -20,8 +20,7 @@ void IPI0_Handler(Interrupt_Names irq_name) {
 	RomServiceTable[REN_IPI0]();
 }
 
-void IPI3_Handler(Interrupt_Names irq_name) {
-redo:
+void IPI3_Handler(Interrupts::Name irq_name) {
 	uint32_t isr = HW_REG_GET(IPI, PMU_3_ISR);
 //	raw_debug_printf ("irq_name 0x%x IPI3_Handler 0x%lx\n", irq_name, isr);
 
@@ -30,21 +29,19 @@ redo:
 			continue;
 		}
 
-		bool cleared = IPI3_OSServiceHandler((IPI_Channel)name);
-		if(cleared) isr ^= name;
+		IPI3_OsServer::Handler((IPI_Channel) name);
 	}
 
 	// write to clear interrupt
 	HW_REG_SET(IPI, PMU_3_ISR, isr);
-	if(HW_REG_GET(IPI, PMU_3_ISR) != 0) goto redo;
 }
 
-void CorrectableECCErrors_Handler(Interrupt_Names irq_name) {
+void CorrectableECCErrors_Handler(Interrupts::Name irq_name) {
 	// write to clear status bit
 	HW_REG_SET_BIT(PMU_LMB_BRAM, ECC_STATUS, CE);
 }
 
-void GPI0_Handler(Interrupt_Names irq_name) {
+void GPI0_Handler(Interrupts::Name irq_name) {
 	uint32_t gpi0 = HW_REG_GET(PMU_IOMODULE, GPI0);
 	// TODO use find first bit
 	for (uint32_t name = 0x80000000U; name != 0; name >>= 1) {
@@ -85,14 +82,13 @@ void GPI0_Handler(Interrupt_Names irq_name) {
 	}
 }
 
-void GPI1_Handler(Interrupt_Names irq_name) {
+void GPI1_Handler(Interrupts::Name irq_name) {
 	uint32_t gpi1 = HW_REG_GET(PMU_IOMODULE, GPI1);
 //	raw_debug_printf("GPI1 0x%lx\n", HW_REG_GET(PMU_IOMODULE, GPI1));
 
 	// TODO use find first bit
 	for (uint32_t name = 0x80000000U; name != 0; name >>= 1) {
 		if ((gpi1 & name) == 0) continue;
-//		raw_debug_printf("GPI1_Handler 0x%lx\n", name);
 
 		switch (name) {
 			case PMU_IOMODULE_GPI1_APB_AIB_ERROR: RomServiceTable[REN_APBAIBERR]();
@@ -152,7 +148,7 @@ void GPI1_Handler(Interrupt_Names irq_name) {
 
 }
 
-void GPI2_Handler(Interrupt_Names irq_name) {
+void GPI2_Handler(Interrupts::Name irq_name) {
 	uint32_t gpi2 = HW_REG_GET(PMU_IOMODULE, GPI2);
 
 	// TODO use find first bit
@@ -206,7 +202,7 @@ void GPI2_Handler(Interrupt_Names irq_name) {
 	}
 }
 
-void GPI3_Handler(Interrupt_Names irq_name) {
+void GPI3_Handler(Interrupts::Name irq_name) {
 	uint32_t gpi3 = HW_REG_GET(PMU_IOMODULE, GPI3);
 
 	// TODO use find first bit
@@ -222,10 +218,10 @@ void GPI3_Handler(Interrupt_Names irq_name) {
 	}
 }
 
-void RTCAlarms_Handler(Interrupt_Names irq_name) {
+void RTCAlarms_Handler(Interrupts::Name irq_name) {
 }
 
-void RTCSeconds_Handler(Interrupt_Names irq_name) {
+void RTCSeconds_Handler(Interrupts::Name irq_name) {
 	static bool tick = true;
 	if(tick) {
 		raw_debug_print("tick\n");
@@ -236,15 +232,3 @@ void RTCSeconds_Handler(Interrupt_Names irq_name) {
 	}
 
 }
-/*
-void PwrDown_Handler(void) {
-	uint32_t gpi2 = HW_REG_GET(PMU_IOMODULE, );
-
-	// TODO use find first bit
-	for (uint32_t name = 0x80000000U; name != 0; name >>= 1) {
-		if ((gpi2 & name) == 0) {
-			continue;
-		}
-	}
-}
-*/

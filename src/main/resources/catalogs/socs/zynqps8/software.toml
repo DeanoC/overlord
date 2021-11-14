@@ -2,42 +2,47 @@
 name = "core"
 type = "library.core.zynqps8"
 cpus = ["a53", "r5f", "pmu"]
-software = "software/lib/core/core.toml"
+software = "software/libraries/core/core.toml"
 
 [[definition]]
 name = "utils"
 type = "library.utils"
-software = "software/lib/utils/utils.toml"
+software = "software/libraries/utils/utils.toml"
 
 [[definition]]
 name = "hw"
 type = "library.hw.zynqps8"
-software = "software/lib/hw/hw.toml"
+software = "software/libraries/hw/hw.toml"
 
 [[definition]]
 name = "dbg"
 type = "library.dbg.zynqps8"
-software = "software/lib/dbg/dbg.toml"
+software = "software/libraries/dbg/dbg.toml"
 
 [[definition]]
 name = "osservices"
 type = "library.osservices.zynqps8"
-software = "software/lib/osservices/osservices.toml"
+software = "software/libraries/osservices/osservices.toml"
 
 [[definition]]
 name = "utils"
 type = "library.utils.zynqps8"
-software = "software/lib/utils/utils.toml"
+software = "software/libraries/utils/utils.toml"
 
 [[definition]]
 name = "zynqps8_display_port"
 type = "library.display_port.zynqps8"
-software = "software/lib/display_port/display_port.toml"
+software = "software/libraries/display_port/display_port.toml"
 
 [[definition]]
 name = "zynqps8_dma"
 type = "library.dma.zynqps8"
-software = "software/lib/dma/dma.toml"
+software = "software/libraries/dma/dma.toml"
+
+[[definition]]
+name = "gfxdebug"
+type = "library.gfxdebug.zynqps8"
+software = "software/libraries/gfxdebug/gfxdebug.toml"
 
 [[definition]]
 name = "ikuy_boot"

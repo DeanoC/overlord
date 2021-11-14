@@ -32,6 +32,9 @@ type = "library.display_port.zynqps8"
 [[instance]]
 type = "library.dma.zynqps8"
 
+[[instance]]
+type = "library.gfxdebug.zynqps8"
+
 # boot rom
 [[instance]]
 type = "program.bootrom.zynqps8"

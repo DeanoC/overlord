@@ -1,8 +1,8 @@
 #include "core/core.h"
-#include "zmodem.h"
+#include "zmodem.hpp"
 #include "crc.h"
 #include "dbg/print.h"
-#include "ipi3_os_server.h"
+#include "ipi3_os_server.hpp"
 
 extern "C" uint8_t readNextByte();
 extern "C" void writeByte(uint8_t c);

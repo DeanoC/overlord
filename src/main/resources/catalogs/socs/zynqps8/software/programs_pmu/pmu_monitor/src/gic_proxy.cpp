@@ -1,12 +1,12 @@
 #include "core/core.h"
-#include "gic_proxy.h"
+#include "gic_proxy.hpp"
 #include "hw/memory_map.h"
 #include "hw/reg_access.h"
 #include "hw_regs/lpd_slcr.h"
 #include "hw_regs/uart.h"
 #include "hw_regs/ttc.h"
 #include "dbg/raw_print.h"
-#include "os_heap.h"
+#include "os_heap.hpp"
 
 #define IsTransmitFull() (HW_REG_GET_BIT(UART0, CHANNEL_STS, TNFUL))
 #define IsReceiveEmpty() (HW_REG_GET_BIT(UART0, CHANNEL_STS, REMPTY))
@@ -64,6 +64,7 @@ static void UART0_Interrupt() {
 }
 
 static void TTC0_1_Interrupt() {
+//	raw_debug_print("TTC\n");
 	// gcc warns that the get isn't used BUT in this case its a clear on
 	// read register, so turn the warning off.
 #pragma GCC diagnostic push
