@@ -128,7 +128,7 @@ static PSI_IWord const pll_init[] = {
 												HW_REG_ENCODE_ENUM(CRF_APB, VPLL_CTRL, POST_SRC, PS_REF_CLK) |
 												HW_REG_ENCODE_ENUM(CRF_APB, VPLL_CTRL, PRE_SRC, PS_REF_CLK) |
 												HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, DIV2, 1)|				// / 2
-												HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, FBDIV, 0x5A) |  // / 90 = 33.3 * 45 = 1500Mhz
+												HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, FBDIV, 90) |  // / 90 = 33.3 * 45 = 1500Mhz
 												HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, BYPASS, 1) |
 												HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, RESET, 1)
 												),

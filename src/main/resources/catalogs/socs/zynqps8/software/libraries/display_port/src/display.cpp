@@ -22,19 +22,6 @@
 
 namespace DisplayPort::Display {
 
-#define XAVBUF_INPUT_REF_CLK		3333333333ULL
-
-//Frequency of VCO before divider to meet jitter requirement
-#define XAVBUF_PLL_OUT_FREQ		1450000000ULL
-
-// Precision of Input Ref Frequency for PLL
-#define XAVBUF_INPUT_FREQ_PRECISION	100
-
-// 16 bit  fractional shift to get Integer
-#define XAVBUF_PRECISION		16
-#define XAVBUF_SHIFT_DECIMAL		(1 <<  XAVBUF_PRECISION)
-#define XAVBUF_PRECISION_MASK		(XAVBUF_SHIFT_DECIMAL - 1)
-
 #if 0
 static void DumpDPCD_0_16(Connection* display) {
 	uint8_t dpcd[16];
@@ -156,41 +143,57 @@ static void DumpDPCD_256_272(Connection* display) {
 #endif
 void SetPixelClock(uint64_t const FreqHz)
 {
-	uint64_t const ExtDivider =  XAVBUF_PLL_OUT_FREQ / FreqHz;
+//Input Frequency for the PLL with precision upto two decimals
+#define XAVBUF_INPUT_REF_CLK		3333333333ULL
+//Frequency of VCO before divider to meet jitter requirement
+#define XAVBUF_PLL_OUT_FREQ		1450000000ULL
+
+// Precision of Input Ref Frequency for PLL
+#define XAVBUF_INPUT_FREQ_PRECISION	100ULL
+
+// 16 bit fractional shift to get Integer
+#define XAVBUF_PRECISION		16ULL
+#define XAVBUF_SHIFT_DECIMAL		(1ULL <<  XAVBUF_PRECISION)
+#define XAVBUF_PRECISION_MASK		(XAVBUF_SHIFT_DECIMAL - 1ULL)
+
+	uint64_t const ExtDivider =  (XAVBUF_PLL_OUT_FREQ / FreqHz);
 	uint32_t const ExtDivider0 = (ExtDivider > 63) ? 63 : ExtDivider;
 	uint32_t const ExtDivider1 = (ExtDivider > 63) ? ExtDivider / 63 : 1;
-//	debug_printf("FreqHz %lu ExtDivider %lu ExtDivider0 %d ExtDivider1 %d\n", FreqHz, ExtDivider, ExtDivider0, ExtDivider1);
+	debug_printf("FreqHz %llu ExtDivider %llu ExtDivider0 %lu ExtDivider1 %lu\n", FreqHz, ExtDivider, ExtDivider0, ExtDivider1);
 
 	// Calculate integer and fractional parts
-	uint64_t const Vco = FreqHz * (ExtDivider1 * ExtDivider0 * 2);
+	uint64_t const Vco = FreqHz * (uint64_t)(ExtDivider1 * ExtDivider0 * 2);
 	uint64_t const VcoIntFrac = (Vco * XAVBUF_INPUT_FREQ_PRECISION * XAVBUF_SHIFT_DECIMAL) / XAVBUF_INPUT_REF_CLK;
 	uint32_t const Fractional = VcoIntFrac & XAVBUF_PRECISION_MASK;
 	uint32_t const FracIntegerFBDIV = VcoIntFrac >> XAVBUF_PRECISION;
+	debug_printf("Vco %llu VcoIntFrac %llu Fractional %lu FracIntegerFBDIV %lu\n", Vco, VcoIntFrac, Fractional, FracIntegerFBDIV);
 
 	hw_ZynqmpPllHelper const cfg = hw_GetZynqmpPllHelper(FracIntegerFBDIV);
 	PSI_IWord const SetVPLL[] = {
 			PSI_SET_REGISTER_BANK(CRF_APB),
 			PSI_WRITE_32(CRF_APB, VPLL_CTRL,
 									 HW_REG_ENCODE_ENUM(CRF_APB, VPLL_CTRL, POST_SRC, PS_REF_CLK) |
-											 HW_REG_ENCODE_ENUM(CRF_APB, VPLL_CTRL, PRE_SRC, PS_REF_CLK) |
-											 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, FBDIV, FracIntegerFBDIV) |
-											 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, DIV2, 1) |
-											 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, BYPASS, 1) |
-											 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, RESET, 1) |
-											 0),
-			PSI_DELAY_US(20),
-
+									 HW_REG_ENCODE_ENUM(CRF_APB, VPLL_CTRL, PRE_SRC, PS_REF_CLK) |
+									 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, FBDIV, FracIntegerFBDIV) |
+									 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, DIV2, 1) |
+									 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, BYPASS, 1) |
+									 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, RESET, 1) |
+									 0),
 			PSI_WRITE_32(CRF_APB, VPLL_CFG,
 									 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CFG, LOCK_DLY, (uint32_t)cfg.lock_dly) |
-											 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CFG, LOCK_CNT, (uint32_t)cfg.lock_cnt) |
-											 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CFG, LFHF, (uint32_t)cfg.lfhf) |
-											 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CFG, CP, (uint32_t)cfg.cp) |
-											 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CFG, RES, (uint32_t)cfg.res) |
-											 0),
+									 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CFG, LOCK_CNT, (uint32_t)cfg.lock_cnt) |
+									 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CFG, LFHF, (uint32_t)cfg.lfhf) |
+									 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CFG, CP, (uint32_t)cfg.cp) |
+									 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CFG, RES, (uint32_t)cfg.res) |
+									 0),
 			PSI_WRITE_32(CRF_APB, VPLL_FRAC_CFG,
 									 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_FRAC_CFG, ENABLED, 1) |
-											 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_FRAC_CFG, DATA, Fractional) |
-											 0),
+									 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_FRAC_CFG, DATA, Fractional) |
+									 0),
+			PSI_WRITE_MASKED_32(CRF_APB, VPLL_CTRL,
+													HW_REG_FIELD_MASK(CRF_APB, VPLL_CTRL, RESET),
+													HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, RESET, 1)),
+			PSI_DELAY_US(20),
 			PSI_WRITE_MASKED_32(CRF_APB, VPLL_CTRL,
 													HW_REG_FIELD_MASK(CRF_APB, VPLL_CTRL, RESET),
 													HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, RESET, 0)),
@@ -206,10 +209,10 @@ void SetPixelClock(uint64_t const FreqHz)
 
 			PSI_WRITE_32(CRF_APB, DP_VIDEO_REF_CTRL,
 									 HW_REG_ENCODE_FIELD(CRF_APB, DP_VIDEO_REF_CTRL, DIVISOR1, ExtDivider1) |
-											 HW_REG_ENCODE_FIELD(CRF_APB, DP_VIDEO_REF_CTRL, DIVISOR0, ExtDivider0) |
-											 HW_REG_ENCODE_FIELD(CRF_APB, DP_VIDEO_REF_CTRL, SRCSEL, CRF_APB_DP_VIDEO_REF_CTRL_SRCSEL_VPLL) |
-											 HW_REG_ENCODE_FIELD(CRF_APB, DP_VIDEO_REF_CTRL, CLKACT, 1) |
-											 0),
+									 HW_REG_ENCODE_FIELD(CRF_APB, DP_VIDEO_REF_CTRL, DIVISOR0, ExtDivider0) |
+									 HW_REG_ENCODE_FIELD(CRF_APB, DP_VIDEO_REF_CTRL, SRCSEL, CRF_APB_DP_VIDEO_REF_CTRL_SRCSEL_VPLL) |
+									 HW_REG_ENCODE_FIELD(CRF_APB, DP_VIDEO_REF_CTRL, CLKACT, 1) |
+									 0),
 
 			PSI_END_PROGRAM,
 	};
@@ -462,7 +465,7 @@ void SetDisplay(Connection *link, Display *display, Mixer *mixer) {
 	uint16_t const vStart = display->videoTiming.vSyncPulseWidth + display->videoTiming.vBackPorch;
 	uint16_t const initWait = (minBytesPerTransferUnit <= 4) ? transferUnitSize : transferUnitSize - minBytesPerTransferUnit;
 
-	debug_printf("TSU %d pixelClockKHz %d videoBandwith %d linkBandwidth %d initWait %d\n",
+	debug_printf("TSU %ld pixelClockKHz %ld videoBandwith %ld linkBandwidth %ld initWait %d\n",
 							 transferUnitSize, pixelClockKHz, videoBandwidth, linkBandwidth, initWait);
 	debug_printf("H Addressable %d H total %d H Start %d H Sync Pulse %d H Polarity %d\n",
 							 display->videoTiming.width, display->videoTiming.hTotal, hStart, display->videoTiming.hSyncPulseWidth, display->videoTiming.hSyncPolarity);
@@ -762,7 +765,11 @@ void SetMixerDMA(Mixer* mixer) {
 							 (uint32_t) (mixer->videoPlane.simpleDescPlane0Address >> 32ULL));
 		HW_REG_SET(DPDMA, CH0_DSCR_STRT_ADDR,
 								 (uint32_t) (mixer->videoPlane.simpleDescPlane0Address & 0xFFFFFFFF));
-		HW_REG_SET(DPDMA, CH0_CNTL, HW_REG_ENCODE_FIELD(DPDMA, CH0_CNTL, EN, 1));
+		HW_REG_SET(DPDMA, CH0_CNTL,
+							 HW_REG_ENCODE_FIELD(DPDMA, CH0_CNTL, QOS_DATA_RD, 11) |
+							 HW_REG_ENCODE_FIELD(DPDMA, CH0_CNTL, QOS_DSCR_RD, 11) |
+							 HW_REG_ENCODE_FIELD(DPDMA, CH0_CNTL, QOS_DSCR_WR, 11) |
+							 HW_REG_ENCODE_FIELD(DPDMA, CH0_CNTL, EN, 1));
 		HW_REG_SET(DPDMA, GBL, HW_REG_ENCODE_FIELD(DPDMA, GBL , TRG_CH0, 1));
 	}
 
@@ -773,7 +780,11 @@ void SetMixerDMA(Mixer* mixer) {
 							 (uint32_t) (mixer->videoPlane.simpleDescPlane1Address >> 32ULL));
 		HW_REG_SET(DPDMA, CH1_DSCR_STRT_ADDR,
 							 (uint32_t) (mixer->videoPlane.simpleDescPlane1Address & 0xFFFFFFFF));
-		HW_REG_SET(DPDMA, CH1_CNTL, HW_REG_ENCODE_FIELD(DPDMA, CH1_CNTL, EN, 1));
+		HW_REG_SET(DPDMA, CH1_CNTL,
+							 HW_REG_ENCODE_FIELD(DPDMA, CH1_CNTL, QOS_DATA_RD, 11) |
+							 HW_REG_ENCODE_FIELD(DPDMA, CH1_CNTL, QOS_DSCR_RD, 11) |
+							 HW_REG_ENCODE_FIELD(DPDMA, CH1_CNTL, QOS_DSCR_WR, 11) |
+							 HW_REG_ENCODE_FIELD(DPDMA, CH1_CNTL, EN, 1));
 		HW_REG_SET(DPDMA, GBL, HW_REG_ENCODE_FIELD(DPDMA, GBL , TRG_CH1, 1));
 	}
 
@@ -784,7 +795,11 @@ void SetMixerDMA(Mixer* mixer) {
 							 (uint32_t) (mixer->videoPlane.simpleDescPlane2Address >> 32ULL));
 		HW_REG_SET(DPDMA, CH2_DSCR_STRT_ADDR,
 							 (uint32_t) (mixer->videoPlane.simpleDescPlane2Address & 0xFFFFFFFF));
-		HW_REG_SET(DPDMA, CH2_CNTL, HW_REG_ENCODE_FIELD(DPDMA, CH2_CNTL, EN, 1));
+		HW_REG_SET(DPDMA, CH2_CNTL,
+							 HW_REG_ENCODE_FIELD(DPDMA, CH2_CNTL, QOS_DATA_RD, 11) |
+							 HW_REG_ENCODE_FIELD(DPDMA, CH2_CNTL, QOS_DSCR_RD, 11) |
+							 HW_REG_ENCODE_FIELD(DPDMA, CH2_CNTL, QOS_DSCR_WR, 11) |
+							 HW_REG_ENCODE_FIELD(DPDMA, CH2_CNTL, EN, 1));
 		HW_REG_SET(DPDMA, GBL, HW_REG_ENCODE_FIELD(DPDMA, GBL , TRG_CH2, 1));
 	}
 
@@ -795,7 +810,11 @@ void SetMixerDMA(Mixer* mixer) {
 							 (uint32_t) (mixer->gfxPlane.simpleDescBufferAddress >> 32ULL));
 		HW_REG_SET(DPDMA, CH3_DSCR_STRT_ADDR,
 							 (uint32_t) (mixer->gfxPlane.simpleDescBufferAddress & 0xFFFFFFFF));
-		HW_REG_SET(DPDMA, CH3_CNTL, HW_REG_ENCODE_FIELD(DPDMA, CH3_CNTL, EN, 1));
+		HW_REG_SET(DPDMA, CH3_CNTL,
+							 HW_REG_ENCODE_FIELD(DPDMA, CH3_CNTL, QOS_DATA_RD, 11) |
+							 HW_REG_ENCODE_FIELD(DPDMA, CH3_CNTL, QOS_DSCR_RD, 11) |
+							 HW_REG_ENCODE_FIELD(DPDMA, CH3_CNTL, QOS_DSCR_WR, 11) |
+							 HW_REG_ENCODE_FIELD(DPDMA, CH3_CNTL, EN, 1));
 		HW_REG_SET(DPDMA, GBL, HW_REG_ENCODE_FIELD(DPDMA, GBL , TRG_CH3, 1));
 	}
 
@@ -826,10 +845,22 @@ bool CopyStandardVideoMode(StandardVideoMode videoMode, VideoTiming *videoTiming
 				 .height = 480, .vFrontPorch= 10, .vSyncPulseWidth = 2, .vBackPorch = 33, .vTotal = 525,
 				 .hSyncPolarity = false, .vSyncPolarity= false, .frameRateHz = 60 };
 			 return true;
+		case StandardVideoMode::VM_800_600_60:
+			*videoTiming = VideoTiming {
+					.width = 800, .hFrontPorch = 40, .hSyncPulseWidth = 128, .hBackPorch= 88, .hTotal = 1056,
+					.height = 600, .vFrontPorch= 1, .vSyncPulseWidth = 4, .vBackPorch = 23, .vTotal = 628,
+					.hSyncPolarity = true, .vSyncPolarity= true, .frameRateHz = 60 };
+			return true;
 		case StandardVideoMode::VM_1280_720_60:
 			*videoTiming = VideoTiming {
 					.width = 1280, .hFrontPorch = 110, .hSyncPulseWidth = 40, .hBackPorch= 220, .hTotal = 1650,
 					.height = 720, .vFrontPorch= 5, .vSyncPulseWidth = 5, .vBackPorch = 20, .vTotal = 750,
+					.hSyncPolarity = true, .vSyncPolarity= true, .frameRateHz = 60 };
+			return true;
+		case StandardVideoMode::VM_1920_1080_60:
+			*videoTiming = VideoTiming {
+					.width = 1920, .hFrontPorch = 88, .hSyncPulseWidth = 44, .hBackPorch= 148, .hTotal = 2200,
+					.height = 1080, .vFrontPorch= 4, .vSyncPulseWidth = 5, .vBackPorch = 36, .vTotal = 1125,
 					.hSyncPolarity = true, .vSyncPolarity= true, .frameRateHz = 60 };
 			return true;
 	}

@@ -14,11 +14,18 @@
 // PIT1 is 30Hz
 #define PIT1_TICK_MILLISECONDS	33U
 #define PIT1_COUNT_PER_TICK (MICROBLAZE_FREQ_KHZ * PIT1_TICK_MILLISECONDS)
+// PIT2 is 100Hz
+#define PIT2_TICK_MILLISECONDS	10U
+#define PIT2_COUNT_PER_TICK (MICROBLAZE_FREQ_KHZ * PIT2_TICK_MILLISECONDS)
 
 namespace Timers {
 
 static void PIT1_Handler(Interrupts::Name irq_name) {
-	loopy.ThirtyHertzTrigger = true;
+	loopy.thirtyHertzTrigger = true;
+}
+
+static void PIT2_Handler(Interrupts::Name irq_name) {
+	loopy.hundredHertzTrigger = true;
 }
 
 void Init() {
@@ -27,15 +34,26 @@ void Init() {
 	HW_REG_SET(PMU_IOMODULE, PIT1_PRELOAD, PIT1_COUNT_PER_TICK);
 	Interrupts::SetHandler(Interrupts::Name::IN_PIT1, &PIT1_Handler);
 	Interrupts::Enable(Interrupts::Name::IN_PIT1);
+	// PIT2 (100Hz timer callback)
+	HW_REG_SET(PMU_IOMODULE, PIT2_CONTROL, 0); // disable till ready
+	HW_REG_SET(PMU_IOMODULE, PIT2_PRELOAD, PIT2_COUNT_PER_TICK);
+	Interrupts::SetHandler(Interrupts::Name::IN_PIT2, &PIT2_Handler);
+	Interrupts::Enable(Interrupts::Name::IN_PIT2);
 
 }
 
 void Start() {
-	// kick off the timer
+	// kick off the timers
 	HW_REG_SET(PMU_IOMODULE, PIT1_PRELOAD, PIT1_COUNT_PER_TICK);
 	HW_REG_SET(PMU_IOMODULE, PIT1_CONTROL,
 						 HW_REG_FIELD(PMU_IOMODULE, PIT1_CONTROL, PRELOAD) |
 						 HW_REG_FIELD(PMU_IOMODULE, PIT1_CONTROL, EN) );
+
+	HW_REG_SET(PMU_IOMODULE, PIT2_PRELOAD, PIT2_COUNT_PER_TICK);
+	HW_REG_SET(PMU_IOMODULE, PIT2_CONTROL,
+						 HW_REG_FIELD(PMU_IOMODULE, PIT2_CONTROL, PRELOAD) |
+						 HW_REG_FIELD(PMU_IOMODULE, PIT2_CONTROL, EN) );
+
 }
 
 }

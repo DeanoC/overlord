@@ -55,6 +55,7 @@ enum ZModemResult : uint16_t {
 
 	EOF = 0x8000,
 	SKIP = 0x8001,
+	CONTINUE = 0x8002,
 
 	SUCCESS = 0,
 	ERROR = 0xFFFF,
@@ -130,46 +131,47 @@ enum ZModemResult : uint16_t {
 #ifndef HOWMANY
 #define HOWMANY 133
 #endif
-#define KSIZE 1024
-
-#define zperr
-//debug_printf
 
 struct ZModem {
-	int Topipe = 0;
-	uint8_t sectorBuffer[KSIZE + 1];
-	int Zctlesc;    /* Encode control characters */
-	int Zrwindow = 1400;  /* RX window size (controls garbage count) */
+	enum class Result {
+		FAIL,
+		CONTINUE,
+		SUCCESS
+	};
+	enum class State {
+		INITIAL_HEADER,
+		RECEIVE_FILE,
+		NEXT_HEADER,
+		MORE_DATA,
+		NEXT_FILE,
+	} state;
 
-	/* Globals used by ZMODEM functions */
-	uint32_t Rxcount;    // Count of data bytes received
-	uint8_t Rxhdr[4];  // Received header
-	uint8_t Txhdr[4];  // Transmitted header
-	uint32_t Rxpos;    	// Received file position
-	bool Crc32t; 		// 32 bit CRC being transmitted
-	bool Crc32;    	// Display flag indicating 32 bit CRC being received
-	int Znulls;    	// Number of nulls to send at beginning of ZDATA hdr
-	uint8_t Attn[ZATTNLEN + 1];  // Attention string rx sends to tx on err
+	void Init();
+	void ReInit();
+	void Fini();
+	uint8_t ReadNextByte();
+	void WriteByte(uint8_t c);
 
-	FrameType Rxtype;    // Type of header received
-	FrameType tryzhdrtype = FrameType::ZRINIT;  // Header type to send corresponding to Last rx close
-	HeaderType Rxframeind;    // ZBIN ZBIN32, or ZHEX type of frame received
+	Result Receive();
+	FrameType Try();
+	Result NextFile();
+	void PutHex(uint8_t bin);
+	Result NextHeader();
+	Result MoreData();
 
-	FrameType tryz();
 	ZModemResult zrdata(uint8_t *buf, uint32_t length);
 	ZModemResult zrdat32(uint8_t *buf, uint32_t length);
 
-	uint8_t noxrd7() const;
-	uint8_t zgeth1() const;
-	uint8_t zgethex() const;
+	uint8_t noxrd7();
+	uint8_t zgethex();
 
-	ZModemResult zdlread() const;
+	ZModemResult zdlread();
 
-	static void zputhex(uint8_t bin);
 	FrameType zrhhdr(uint8_t *hdr);
 	FrameType zrbhdr(uint8_t *hdr);
 	FrameType zrbhdr32(uint8_t *hdr);
 	FrameType zgethdr(uint8_t *hdr);
+
 
 	void ackbibi();
 
@@ -192,11 +194,28 @@ struct ZModem {
 		return l;
 	}
 	void zmputs(uint8_t const* s);
+	void zshhdr(FrameType type, uint8_t const *hdr);
 
-	void zWriteByte(uint8_t c) const;
-	void zshhdr(FrameType type, uint8_t *hdr);
+	uint8_t *sectorBuffer;
+	uint8_t tryCount;
+	uintptr_t tmpBufferAddr;
+	uint32_t tmpBufferSize;
+	uint32_t tmpBufferIndex;
+	uint32_t fileBytesRecv;
 
-	ZModemResult rzfile();
-	ZModemResult rzfiles();
 
+	int Topipe = 0;
+	int Zctlesc;    /* Encode control characters */
+	int Zrwindow = 1400;  /* RX window size (controls garbage count) */
+
+	/* Globals used by ZMODEM functions */
+	uint32_t Rxcount;    // Count of data bytes received
+	uint8_t Rxhdr[4];  // Received header
+	uint8_t Txhdr[4];  // Transmitted header
+	uint32_t Rxpos;    	// Received file position
+	uint8_t Attn[ZATTNLEN + 1];  // Attention string rx sends to tx on err
+
+	FrameType Rxtype;    			// Type of header received
+	HeaderType Rxframeind;    // ZBIN ZBIN32, or ZHEX type of frame received
+	void MoveReceivedData(uint32_t size);
 };

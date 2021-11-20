@@ -20,6 +20,8 @@ void OsHeap::Init() {
 	memset((void *) (osHeap->nullBlock), 0xDC, sizeof(osHeap->nullBlock));
 
 	osHeap->tmpOsBufferAllocator.Init((uintptr_lo_t) (uintptr_t)osHeap->tmpBuffer);
+}
 
+[[maybe_unused]] void OsHeap::Fini() {
 
 }

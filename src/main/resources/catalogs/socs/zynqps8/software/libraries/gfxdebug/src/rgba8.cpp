@@ -26,13 +26,10 @@ RGBA8::RGBA8(uint16_t	width, uint16_t height, uint8_t *framebuffer) :
 void RGBA8::Clear() const {
 	auto ptr = (uint32_t *) this->frameBuffer;
 
-	auto lineBuf = (uint32_t*) ALLOCA(width * 4);
-	for(int i = 0;i < width;++i){
-		lineBuf[i] = backgroundColour;
-	}
 	for (int i = 0; i < height; ++i) {
-		memcpy(ptr, lineBuf, width * 4);
-		ptr += width;
+		for(int j = 0;j < width; ++j) {
+			memcpy(ptr++, &backgroundColour, 4);
+		}
 	}
 }
 void RGBA8::PutChar(int col, int row, char c) const {
@@ -50,6 +47,8 @@ void RGBA8::PutChar(int col, int row, char c) const {
 void RGBA8::PutChar8(int col, int row, char c) const {
 	if (c < GFXDEBUG_FONTS_MIN_CHAR || c >= GFXDEBUG_FONTS_MAX_CHAR)
 		return;
+	if(this->fontZoom > MaxFontZoom)
+		return;
 
 	const int rowInLines = (row * 8 * this->fontZoom);
 	const int colInPixels = (col * 8 * this->fontZoom);
@@ -58,7 +57,7 @@ void RGBA8::PutChar8(int col, int row, char c) const {
 	if(rowInLines >= this->height) return;
 	if(colInPixels >= this->width) return;
 
-	auto charLineBuf = (uint32_t*) ALLOCA(8 * 4 * this->fontZoom);
+	auto charLineBuf = (uint32_t*) fontTmpBuffer;
 	for (int y = 0; y < 8; ++y) {
 		int ac = ((int)c) - GFXDEBUG_FONTS_MIN_CHAR;
 		uint8_t const fd = font8x8[(ac * 8) + y];
@@ -90,6 +89,9 @@ void RGBA8::PutChar8(int col, int row, char c) const {
 void RGBA8::PutChar8x16(int col, int row, char c) const {
 	if (c < GFXDEBUG_FONTS_MIN_CHAR || c >= GFXDEBUG_FONTS_MAX_CHAR)
 		return;
+	if(this->fontZoom > MaxFontZoom)
+		return;
+
 
 	int const fz = this->fontZoom/2;
 	const int rowInLines = (row * 16 * fz);
@@ -101,7 +103,9 @@ void RGBA8::PutChar8x16(int col, int row, char c) const {
 
 	tl += (rowInLines * this->width) + colInPixels;
 
-	auto charLineBuf = (uint32_t*) ALLOCA(8 * 4 * this->fontZoom);
+	auto charLineBuf = (uint32_t*) fontTmpBuffer;
+	memset(charLineBuf, 0xFF, 8*4*this->fontZoom);
+
 	for (int y = 0; y < 16; ++y) {
 		int ac = ((int)c) - GFXDEBUG_FONTS_MIN_CHAR;
 		uint8_t const fd = font8x16[(ac * 16) + y];
@@ -109,13 +113,18 @@ void RGBA8::PutChar8x16(int col, int row, char c) const {
 		for (int x = 0; x < 8; ++x) {
 			bool const bit = !!(fd & (1 << (7-x)));
 			uint32_t const colour = bit ? penColour : backgroundColour;
+
 			switch(this->fontZoom) {
-				case 2: charLineBuf[(x*2)+1] = charLineBuf[(x*2)] = colour; break;
+				case 2:
+					charLineBuf[(x*2)+0] = colour;
+					charLineBuf[(x*2)+1] = colour;
+					break;
 				case 1: charLineBuf[x] = colour; break;
 				default:
 					for (int i = 0; i < this->fontZoom; ++i) {
-						charLineBuf[x*this->fontZoom] = colour;
+						charLineBuf[(x*this->fontZoom)+i] = colour;
 					}
+					break;
 			}
 		}
 

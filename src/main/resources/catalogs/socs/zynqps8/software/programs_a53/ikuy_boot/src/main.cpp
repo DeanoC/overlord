@@ -146,10 +146,9 @@ extern "C" int main(void)
 
 	OsServer_EnableScreenConsole(FrameBuffer, 1280, 720);
 
-	OsService_ScreenConsolePrint(ANSI_CLR_SCREEN ANSI_CURSOR_HOME ANSI_BLINK ANSI_BRIGHT ANSI_GREEN_PEN "Welcome to Intex Systems\n" "\x1b[0m");
+	OsService_ScreenConsolePrint( ANSI_GREEN_PEN ANSI_BRIGHT "Welcome to Intex Systems\n" ANSI_RESET_ATTRIBUTES);
 
 	while(1) {
-		OsService_ScreenConsolePrint( ANSI_CURSOR_POSITION(0, 10) ANSI_BRIGHT "Welcome to Intex Systems\n" ANSI_RESET_ATTRIBUTES);
 		Utils_BusyMilliSleep(100);
 	}
 }

@@ -16,18 +16,37 @@
 #include "ipi3_os_server.hpp"
 #include "zmodem.hpp"
 
+#define SIZED_TEXT(text) sizeof(text), (uint8_t const*)text
+extern uint8_t textConsoleSkip;
 
 extern uint32_t uart0ReceiveLast;
 extern uint32_t uart0ReceiveHead;
-extern "C" {
+static void HostInputCallback() {
+	HostInterface* host = &osHeap->hostInterface;
+	assert(host);
+	host->InputCallback();
+}
+static void HostCommandCallback() {
+	HostInterface* host = &osHeap->hostInterface;
+	assert(host);
+	host->CommandCallback();
+}
 
-uintptr_t tmpBufferAddr = 0;
-uint32_t tmpBufferSize = 0;
-uint32_t tmpBufferIndex = 0;
+void HostInterface::Init() {
+	this->currentState = State::RECEIVING_COMMAND;
+	this->cmdBuffer = (uint8_t*) osHeap->tmpOsBufferAllocator.Alloc(CMD_BUF_SIZE/64);
+	this->cmdBufferHead = 0;
+	osHeap->hundredHzCallbacks[(int)HundredHzTasks::HOST_INPUT] = &HostInputCallback;
+	osHeap->hundredHzCallbacks[(int)HundredHzTasks::HOST_COMMANDS_PROCESSING] = &HostCommandCallback;
+	zModem.Init();
+}
 
-static void tmpBufferRefill() {
-	assert(tmpBufferSize == 0);
+[[maybe_unused]] void HostInterface::Fini() {
+	zModem.Fini();
+	osHeap->tmpOsBufferAllocator.Free((uintptr_t)this->cmdBuffer);
+}
 
+void HostInterface::TmpBufferRefill(uintptr_t& tmpBufferAddr, uint32_t& tmpBufferSize) {
 	if (uart0ReceiveLast != uart0ReceiveHead) {
 		uint32_t last = uart0ReceiveLast;
 		uint32_t head = uart0ReceiveHead;
@@ -46,127 +65,125 @@ static void tmpBufferRefill() {
 			memcpy((char *) tmpBufferAddr, &osHeap->uart0ReceiveBuffer[last], tmpBufferSize);
 		}
 		uart0ReceiveLast = head;
-		tmpBufferIndex = 0;
 	}
 }
 
-uint8_t readNextByte() {
-reget:
-	if (tmpBufferSize != 0) {
-		auto const startOfBuffer = (uint8_t *) tmpBufferAddr;
-		uint8_t b = startOfBuffer[tmpBufferIndex++];
-		if (tmpBufferIndex == tmpBufferSize) {
-			osHeap->tmpOsBufferAllocator.Free(tmpBufferAddr);
-			tmpBufferSize = 0;
-			tmpBufferAddr = 0;
+void HostInterface::InputCallback() {
+	if(this->currentState != State::RECEIVING_COMMAND)
+		return;
+
+	uintptr_t tmpBufferAddr = 0;
+	uint32_t tmpBufferSize = 0;
+	uint32_t tmpBufferIndex = 0;
+
+	TmpBufferRefill(tmpBufferAddr, tmpBufferSize);
+
+	while(true) {
+		uint8_t c;
+		if (tmpBufferSize != 0) {
+			auto const startOfBuffer = (uint8_t *) tmpBufferAddr;
+			if (tmpBufferIndex == tmpBufferSize) {
+				osHeap->tmpOsBufferAllocator.Free(tmpBufferAddr);
+				tmpBufferSize = 0;
+				tmpBufferAddr = 0;
+				return;
+			}
+			c = startOfBuffer[tmpBufferIndex++];
+		} else {
+			return;
 		}
-		return b;
+
+		switch (c) {
+			case ASCII_BACKSPACE: // backspace
+				this->cmdBufferHead--;
+				IPI3_OsServer::PutByte('\b');
+				continue;
+			case ASCII_EOT: // Control C should send this...
+				this->cmdBufferHead = 0;
+				continue;
+			case ASCII_LF: continue;
+			case ASCII_CR: this->currentState = State::PROCESSING_COMMAND;
+				continue;
+			default:
+				// normal keys
+				// echo
+				IPI3_OsServer::PutByte(c);
+				if (this->cmdBufferHead >= CMD_BUF_SIZE - 1) {
+					debug_print("\nCommand too long\n");
+					this->cmdBufferHead = 0;
+					continue;
+				}
+				this->cmdBuffer[this->cmdBufferHead++] = c;
+				continue;
+		}
 	}
-	tmpBufferRefill();
-	goto reget;
-}
-
-void writeByte(uint8_t c) {
-	IPI3_OsServer::PutByte(c);
-}
-
 
 }
-
-void HostInterface::Loop() {
-	OsService_InlinePrint(OSS_INLINE_TEXT("HostInterface Start\n"));
-
-	this->currentState = State::RECEIVING_COMMAND;
-	static const int CMD_BUF_SIZE = 256;
-	uint8_t cmdBuffer[CMD_BUF_SIZE];
-	uint32_t cmdBufferHead = 0;
-	uint32_t cmdBufferHeadTmp;
-
-	ZModem zModem;
-
-	while (true) {
-WaitForUart:
-		uint8_t b = readNextByte();
-
-		switch (this->currentState) {
-			case State::RECEIVING_COMMAND: {
-				switch (b) {
-					case ASCII_BACKSPACE: // backspace
-						cmdBufferHead--;
-						debug_print("\b");
-						goto WaitForUart;
-					case ASCII_EOT: // Control C should send this...
-						cmdBufferHead = 0;
-						goto WaitForUart;
-
-					case ASCII_LF:
-						goto WaitForUart;
-
-					case ASCII_CR:
-						this->currentState = State::PROCESSING_COMMAND;
-						goto ProcessCommand;
-
-					default: // normal keys echo
-						debug_printf("%c", b);
-						if (cmdBufferHead >= CMD_BUF_SIZE - 1) {
-							debug_print("\nCommand too long\n");
-							cmdBufferHead = 0;
-							goto WaitForUart;
-						}
-						cmdBuffer[cmdBufferHead++] = b;
-						goto WaitForUart;
-				}
+void HostInterface::CommandCallback() {
+	switch (this->currentState) {
+		case State::PROCESSING_COMMAND:
+			this->WhatCommand();
+			return;
+		case State::ZMODEM: {
+			ZModem::Result result = zModem.Receive();
+			switch (result) {
+				case ZModem::Result::FAIL:
+					osHeap->console.console.NewLine();
+					osHeap->console.console.PrintLn(ANSI_RED_PEN ANSI_BRIGHT "ZModem FAIL" ANSI_RESET_ATTRIBUTES);
+					this->currentState = State::RECEIVING_COMMAND;
+					textConsoleSkip = 0;
+					return;
+				case ZModem::Result::CONTINUE:
+					return;
+				case ZModem::Result::SUCCESS:
+					osHeap->console.console.NewLine();
+					osHeap->console.console.PrintLn(ANSI_GREEN_PEN ANSI_BRIGHT "ZModem SUCCESS" ANSI_RESET_ATTRIBUTES);
+					this->currentState = State::RECEIVING_COMMAND;
+					textConsoleSkip = 0;
+					return;
 			}
+		}
+		default:
+			return;
+	}
+}
 
-			case State::PROCESSING_COMMAND: {
-				ProcessCommand:
-				static const unsigned int MaxFinds = 16;
-				unsigned int finds[MaxFinds];
-				cmdBufferHeadTmp = cmdBufferHead;
-				cmdBuffer[cmdBufferHeadTmp] = 0;
-				cmdBufferHead = 0;
-				finds[0] = cmdBufferHeadTmp;
+void HostInterface::WhatCommand() {
+	static const unsigned int MaxFinds = 16;
+	unsigned int finds[MaxFinds];
+	uint32_t cmdBufferHeadTmp = this->cmdBufferHead;
+	this->cmdBuffer[cmdBufferHeadTmp] = 0;
+	this->cmdBufferHead = 0;
+	finds[0] = cmdBufferHeadTmp;
 
-				const auto findCount = Utils::StringFindMultiple(cmdBufferHeadTmp, (char *) cmdBuffer, ' ', MaxFinds, finds);
-				if (findCount != Utils::StringNotFound) {
-					Utils::StringScatterChar(cmdBufferHeadTmp, (char *) cmdBuffer, findCount, finds, 0);
-				}
+	// special case Zmodem receive code first
+	if(cmdBufferHeadTmp > 4 && this->cmdBuffer[4] == 0x18) {
+		if(Utils::RuntimeHash(4, (char *) this->cmdBuffer) == "rz**"_hash) {
+			// zmodem download start
+			osHeap->console.console.PrintLn("ZModem download started");
+			textConsoleSkip = 30;
+			this->zModem.ReInit();
+			this->currentState = State::ZMODEM;
+			return;
+		}
+	}
 
-				switch (Utils::RuntimeHash(finds[0], (char *) cmdBuffer)) {
-					case "echo"_hash: {
-						EchoCmd(cmdBuffer, finds, findCount);
-						break;
-					}
-					case "download"_hash: {
-						DownloadCmd(cmdBuffer, cmdBufferHeadTmp, finds, findCount);
-						break;
-					}
-					case "zmodem"_hash: { // zmodem download start
-						//						this->currentState = State::RECEIVING_ZMODEM_IDLE;
-						FrameType ft = zModem.tryz();
-						if(ft == FrameType::ZCOMPL) {
-							this->currentState = State::RECEIVING_COMMAND;
-						} else {
-							zModem.rzfiles();
-							this->currentState = State::RECEIVING_COMMAND;
-						}
-						break;
-					}
-					default: {
-						debug_printf(ANSI_MAGENTA_PEN "Unknown Command %s\n" ANSI_RESET_ATTRIBUTES, cmdBuffer);
-						this->currentState = State::RECEIVING_COMMAND;
-						break;
-					}
-				}
-				goto WaitForUart;
-			}
+	const auto findCount = Utils::StringFindMultiple(cmdBufferHeadTmp, (char *) this->cmdBuffer, ' ', MaxFinds, finds);
+	if (findCount != Utils::StringNotFound) {
+		Utils::StringScatterChar(cmdBufferHeadTmp, (char *) this->cmdBuffer, findCount, finds, 0);
+	}
+	osHeap->console.console.PrintWithSize(finds[0], (char *) this->cmdBuffer);
+	osHeap->console.console.PrintLn(" command received");
 
-			case State::POST_RECEIVE_DATA: {
-				PostReceiveData:
-				PostDownload();
-				this->currentState = State::RECEIVING_COMMAND;
-				break;
-			}
+	switch (Utils::RuntimeHash(finds[0], (char *) this->cmdBuffer)) {
+		case "echo"_hash: {
+			EchoCmd(cmdBuffer, finds, findCount);
+			break;
+		}
+		default: {
+			debug_printf(ANSI_MAGENTA_PEN "Unknown Command %s\n" ANSI_RESET_ATTRIBUTES, cmdBuffer);
+			this->currentState = State::RECEIVING_COMMAND;
+			break;
 		}
 	}
 }
@@ -183,6 +200,8 @@ void HostInterface::EchoCmd(uint8_t const *cmdBuffer, unsigned int const *finds,
 	debug_print("\n");
 	this->currentState = State::RECEIVING_COMMAND;
 }
+
+#if 0
 
 static void A53Sleep() {
 	RomServiceTable[REN_ACPU0SLEEP]();
@@ -291,3 +310,4 @@ void HostInterface::PostDownload() {
 		case DownloadTarget::DATA: break;
 	}
 }
+#endif

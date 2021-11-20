@@ -1,200 +1,264 @@
 #include "core/core.h"
 #include "zmodem.hpp"
 #include "crc.h"
-#include "dbg/print.h"
+#include "os_heap.hpp"
+#include "host_interface.hpp"
 #include "ipi3_os_server.hpp"
+#include "dbg/ansi_escapes.h"
 
-extern "C" uint8_t readNextByte();
-extern "C" void writeByte(uint8_t c);
+static const int MaxHeaderPerQuantum = 10;
+
+void ZModem::WriteByte(uint8_t c) {
+	IPI3_OsServer::PutByte(c);
+}
+
+uint8_t ZModem::ReadNextByte() {
+	reget:
+	if (this->tmpBufferSize != 0) {
+		auto const startOfBuffer = (uint8_t *) this->tmpBufferAddr;
+		uint8_t b = startOfBuffer[this->tmpBufferIndex++];
+		if (this->tmpBufferIndex == this->tmpBufferSize) {
+			osHeap->tmpOsBufferAllocator.Free(this->tmpBufferAddr);
+			this->tmpBufferSize = 0;
+			this->tmpBufferAddr = 0;
+			this->tmpBufferIndex = 0;
+		}
+		return b;
+	}
+	HostInterface::TmpBufferRefill(this->tmpBufferAddr, this->tmpBufferSize);
+	goto reget;
+}
+
+// 1024+1 bytes buffer needed, rounded up to nearest 64 byte chunk
+#define KSIZE (1024+64)
+
+void ZModem::Init() {
+	this->sectorBuffer = (uint8_t *) osHeap->tmpOsBufferAllocator.Alloc((KSIZE + 1) / 64);
+	ReInit();
+}
+
+void ZModem::ReInit() {
+	this->state = State::INITIAL_HEADER;
+	this->tryCount = 20;
+	this->fileBytesRecv = 0;
+	this->Rxframeind = HeaderType::ZHEX;
+	if (this->tmpBufferSize != 0) {
+		osHeap->tmpOsBufferAllocator.Free(this->tmpBufferAddr);
+		this->tmpBufferSize = 0;
+		this->tmpBufferAddr = 0;
+		this->tmpBufferIndex = 0;
+	}
+#ifdef CANBREAK
+	Txhdr[ZF0] = CANFC32|CANFDX|CANOVIO|CANBRK;
+#else
+	Txhdr[ZF0] = CANFC32 | CANFDX | CANOVIO;
+#endif
+	if (Zctlesc) {
+		Txhdr[ZF0] |= TESCCTL;
+	}
+}
+
+void ZModem::Fini() {
+	osHeap->tmpOsBufferAllocator.Free((uintptr_t) this->sectorBuffer);
+}
+
+ZModem::Result ZModem::Receive() {
+	for (int i = 0; i < MaxHeaderPerQuantum; ++i) {
+		switch (this->state) {
+			case State::INITIAL_HEADER:
+				if (this->tryCount-- == 0) {
+					return Result::FAIL;
+				}
+				if (Try() != FrameType::ZFILE) {
+					continue;
+				}
+				this->state = State::RECEIVE_FILE;
+				[[fallthrough]];
+			case State::RECEIVE_FILE: stohdr(this->fileBytesRecv);
+				zshhdr(FrameType::ZRPOS, Txhdr);
+				this->state = State::NEXT_HEADER;
+				[[fallthrough]];
+			case State::NEXT_HEADER: {
+				auto result = NextHeader();
+				if (result != Result::CONTINUE) {
+					return result;
+				}
+				continue;
+			}
+			case State::MORE_DATA: {
+				auto result = MoreData();
+				switch(result) {
+					case Result::CONTINUE:
+						continue;
+					case Result::FAIL:
+						return result;
+					case Result::SUCCESS:
+						return result;
+				}
+			}
+			case State::NEXT_FILE: return NextFile();
+			default: return Result::CONTINUE;
+		}
+	}
+	return Result::CONTINUE;
+}
+
+ZModem::Result ZModem::NextFile() {
+	if (this->tryCount-- == 0) {
+		return Result::FAIL;
+	}
+	switch (Try()) {
+		case FrameType::ZCOMPL: return Result::SUCCESS;
+		case FrameType::ZFILE: this->state = State::RECEIVE_FILE;
+			return Result::CONTINUE;
+		default: return Result::CONTINUE;
+	}
+}
+
+FrameType ZModem::Try() {
+	this->fileBytesRecv = 0;
+	// Set buffer length (0) and capability flags */
+	stohdr(0L);
+	zshhdr(FrameType::ZRINIT, Txhdr);
+	again:
+	FrameType const headerType = zgethdr(Rxhdr);
+	//	osHeap->console.console.Printf("Try Frame Type %d %lu\n", (int) headerType, this->fileBytesRecv);
+	switch (headerType) {
+		case FrameType::ZRQINIT: return headerType;
+		case FrameType::ZEOF: return headerType;
+		case FrameType::ZFILE:
+			if (zrdata(sectorBuffer, KSIZE) == GOTCRCW) {
+				return FrameType::ZFILE;
+			}
+			zshhdr(FrameType::ZNAK, Txhdr);
+			goto again;
+		case FrameType::ZSINIT:
+			Zctlesc = TESCCTL & Rxhdr[ZF0];
+			if (zrdata(Attn, ZATTNLEN) == GOTCRCW) {
+				zshhdr(FrameType::ZACK, Txhdr);
+				goto again;
+			}
+			zshhdr(FrameType::ZNAK, Txhdr);
+			goto again;
+		case FrameType::ZCOMMAND: return FrameType::ZCOMPL;
+		case FrameType::ZCOMPL: goto again;
+		default: return headerType;
+		case FrameType::ZFIN: ackbibi();
+			return FrameType::ZCOMPL;
+		case FrameType::ZCAN: return FrameType::ZCAN;
+	}
+}
+
+ZModem::Result ZModem::NextHeader() {
+	FrameType const headerType = zgethdr(Rxhdr);
+//	osHeap->console.console.Printf("RF Frame Type %d %lu\n", (int) headerType, this->fileBytesRecv);
+	switch (headerType) {
+		default: return Result::FAIL;
+		case FrameType::ZNAK:
+			if (--this->tryCount < 0) {
+				return Result::FAIL;
+			}
+		[[fallthrough]];
+		case FrameType::ZFILE: zrdata(sectorBuffer, KSIZE);
+			return Result::CONTINUE;
+		case FrameType::ZEOF:
+			if (rclhdr(Rxhdr) != this->fileBytesRecv) {
+				return Result::CONTINUE;
+			}
+			osHeap->console.console.Print(ANSI_YELLOW_PEN "EOF" ANSI_RESET_ATTRIBUTES);
+			this->state = State::NEXT_FILE;
+			return Result::CONTINUE;
+		case FrameType::ZSKIP: this->state = State::NEXT_FILE;
+			return Result::CONTINUE;
+		case FrameType::ZFERR:
+			if (--this->tryCount < 0) {
+				return Result::FAIL;
+			}
+			zmputs(Attn);
+			return Result::CONTINUE;
+		case FrameType::ZDATA:
+			if (rclhdr(Rxhdr) != this->fileBytesRecv) {
+				if (--this->tryCount < 0) {
+					return Result::FAIL;
+				}
+				zmputs(Attn);
+				return Result::CONTINUE;
+			}
+			this->state = State::MORE_DATA;
+	}
+	return Result::CONTINUE;
+}
+void ZModem::MoveReceivedData(uint32_t size) {
+	//	osHeap->console.console.PutChar('#');
+	this->fileBytesRecv += size;
+}
+
+ZModem::Result ZModem::MoreData() {
+	ZModemResult const dataResult = zrdata(sectorBuffer, KSIZE);
+	switch (dataResult) {
+		case ZModemResult::GOTCAN: return Result::FAIL;
+		case ZModemResult::GOTCRCW: this->tryCount = 20;
+			this->MoveReceivedData(Rxcount);
+			stohdr(this->fileBytesRecv);
+			zshhdr(FrameType::ZACK, Txhdr);
+			WriteByte(MODEM_XON);
+			this->state = State::NEXT_HEADER;
+			osHeap->console.console.PutChar('W');
+			return Result::CONTINUE;
+		case ZModemResult::GOTCRCQ: this->tryCount = 20;
+			osHeap->console.console.PutChar('Q');
+			this->MoveReceivedData(Rxcount);
+			stohdr(this->fileBytesRecv);
+			zshhdr(FrameType::ZACK, Txhdr);
+			return Result::CONTINUE;
+		case ZModemResult::GOTCRCG: this->tryCount = 20;
+			osHeap->console.console.PutChar('G');
+			this->MoveReceivedData(Rxcount);
+			return Result::CONTINUE;
+		case ZModemResult::GOTCRCE: this->tryCount = 20;
+			osHeap->console.console.PutChar('E');
+			this->MoveReceivedData(Rxcount);
+			this->state = State::NEXT_HEADER;
+			return Result::CONTINUE;
+		case ZModemResult::ERROR:
+			if (--this->tryCount < 0) {
+				return Result::FAIL;
+			}
+			osHeap->console.console.PrintLn("ZModemResult::ERROR");
+			this->state = State::RECEIVE_FILE;
+			return Result::CONTINUE;
+		default: return Result::CONTINUE;
+	}
+}
 
 // Send ZMODEM HEX header hdr of type type
-void ZModem::zshhdr(FrameType type, uint8_t *hdr) {
+void ZModem::zshhdr(FrameType type, uint8_t const *hdr) {
 	uint16_t crc;
-
-	//		vfile("zshhdr: %s %lx", frametypes[type+FTOFFSET], rclhdr(hdr));
-	writeByte(ZMODEM_PAD);
-	writeByte(ZMODEM_PAD);
-	writeByte(ZMODEM_IDLE);
-	writeByte((char) HeaderType::ZHEX);
-	zputhex((uint8_t) type);
-	Crc32t = false;
+	WriteByte(ZMODEM_PAD);
+	WriteByte(ZMODEM_PAD);
+	WriteByte(ZMODEM_IDLE);
+	WriteByte((char) HeaderType::ZHEX);
+	PutHex((uint8_t) type);
 
 	crc = updcrc((uint8_t) type, 0);
-	for (int n = 4; --n >= 0; ++hdr) {
-		zputhex(*hdr);
+	for (int32_t n = 4; --n >= 0; ++hdr) {
+		PutHex(*hdr);
 		crc = updcrc((0377 & *hdr), crc);
 	}
 	crc = updcrc(0, updcrc(0, crc));
-	zputhex((char) (crc >> 8));
-	zputhex((char) crc);
+	PutHex((char) (crc >> 8));
+	PutHex((char) crc);
 
 	/* Make it printable on remote machine */
-	writeByte(015);
-	writeByte(012);
+	WriteByte(015);
+	WriteByte(0212);
 	/*
 	 * Uncork the remote in case a fake XOFF has stopped data flow
 	 */
 	if (type != FrameType::ZFIN && type != FrameType::ZACK) {
-		writeByte(021);
+		WriteByte(021);
 	}
 	//		flushmo();
-}
-
-/*
- * Receive a file with ZMODEM protocol
- *  Assumes file name frame is in secbuf
- */
-ZModemResult ZModem::rzfile() {
-	int n = 20;
-	uint32_t rxbytes = 0;
-
-	for (;;) {
-		stohdr(rxbytes);
-		zshhdr(FrameType::ZRPOS, Txhdr);
-
-		nxthdr:
-		switch (zgethdr(Rxhdr)) {
-			default:
-				return ZModemResult::ERROR;
-			case FrameType::ZNAK:
-				if ( --n < 0) {
-					return ZModemResult::ERROR;
-				}
-			case FrameType::ZFILE:
-				zrdata(sectorBuffer, KSIZE);
-				continue;
-			case FrameType::ZEOF:
-				if (rclhdr(Rxhdr) != rxbytes) {
-					goto nxthdr;
-				}
-//				if (closeit()) {
-//					tryzhdrtype = FrameType::ZFERR;
-//					return ZModemResult::ERROR;
-//				}
-				//vfile("rzfile: normal EOF");
-				return ZModemResult::EOF;
-			case FrameType::ZDATA:
-				if (rclhdr(Rxhdr) != rxbytes) {
-					if (--n < 0) {
-						return ZModemResult::ERROR;
-					}
-					zmputs(Attn);
-					continue;
-				}
-moredata:
-				switch (zrdata(sectorBuffer, KSIZE)) {
-					case ZModemResult::GOTCAN:
-						return ZModemResult::ERROR;
-					case ZModemResult::GOTCRCW:
-						n = 20;
-//						PutSizedData(Rxcount, sectorBuffer);
-						rxbytes += Rxcount;
-						stohdr(rxbytes);
-						zshhdr(FrameType::ZACK, Txhdr);
-						writeByte(MODEM_XON);
-						goto nxthdr;
-					case ZModemResult::GOTCRCQ:
-						n = 20;
-//						PutSizedData(Rxcount, sectorBuffer);
-						rxbytes += Rxcount;
-						stohdr(rxbytes);
-						zshhdr(FrameType::ZACK, Txhdr);
-						goto moredata;
-					case ZModemResult::GOTCRCG:
-						n = 20;
-//						PutSizedData(Rxcount, sectorBuffer);
-						rxbytes += Rxcount;
-						goto moredata;
-					case ZModemResult::GOTCRCE: n = 20;
-//						PutSizedData(Rxcount, sectorBuffer);
-						rxbytes += Rxcount;
-						goto nxthdr;
-					case ZModemResult::ERROR:
-						if (--n < 0) {
-							return ZModemResult::ERROR;
-						}
-						continue;
-					default:
-						break;
-				}
-		}
-	}
-}
-/*
- * Receive 1 or more files with ZMODEM protocol
- */
-ZModemResult ZModem::rzfiles() {
-	ZModemResult c;
-	for (;;) {
-		switch (c = rzfile()) {
-			case ZModemResult::EOF:
-			case ZModemResult::SKIP:
-				switch (tryz()) {
-					case FrameType::ZCOMPL: return ZModemResult::SUCCESS;
-					case FrameType::ZFILE: break;
-					default:
-						return ZModemResult::ERROR;
-				}
-				continue;
-			case ZModemResult::ERROR:
-				return ZModemResult::ERROR;
-			default:
-				return c;
-		}
-	}
-}
-
-FrameType ZModem::tryz() {
-	for (int n = 15; --n >= 0;) {
-		/* Set buffer length (0) and capability flags */
-		stohdr(0L);
-#ifdef CANBREAK
-		Txhdr[ZF0] = CANFC32|CANFDX|CANOVIO|CANBRK;
-#else
-		Txhdr[ZF0] = CANFC32 | CANFDX | CANOVIO;
-#endif
-		if (Zctlesc) {
-			Txhdr[ZF0] |= TESCCTL;
-		}
-		zshhdr(tryzhdrtype, Txhdr);
-		if (tryzhdrtype == FrameType::ZSKIP) {  /* Don't skip too far */
-			tryzhdrtype = FrameType::ZRINIT;
-		}  /* CAF 8-21-87 */
-again:
-		switch (zgethdr(Rxhdr)) {
-			case FrameType::ZRQINIT: continue;
-			case FrameType::ZEOF: continue;
-			case FrameType::ZFILE:
-				tryzhdrtype = FrameType::ZRINIT;
-				if (zrdata(sectorBuffer, KSIZE) == GOTCRCW) {
-					return FrameType::ZFILE;
-				}
-				zshhdr(FrameType::ZNAK, Txhdr);
-				goto again;
-			case FrameType::ZSINIT:
-				Zctlesc = TESCCTL & Rxhdr[ZF0];
-				if (zrdata(Attn, ZATTNLEN) == GOTCRCW) {
-					zshhdr(FrameType::ZACK, Txhdr);
-					goto again;
-				}
-				zshhdr(FrameType::ZNAK, Txhdr);
-				goto again;
-			case FrameType::ZFREECNT:
-				stohdr(0xFFFFFFFF);
-				zshhdr(FrameType::ZNAK, Txhdr);
-				goto again;
-			case FrameType::ZCOMMAND:
-				return FrameType::ZCOMPL;
-			case FrameType::ZCOMPL: goto again;
-			default: continue;
-			case FrameType::ZFIN:
-				ackbibi();
-				return FrameType::ZCOMPL;
-			case FrameType::ZCAN:
-				return FrameType::ZCAN;
-		}
-	}
-	return FrameType::ZRQINIT;
 }
 
 /*
@@ -208,8 +272,8 @@ void ZModem::ackbibi() {
 	for (n = 3; --n >= 0;) {
 		//		purgeline();
 		zshhdr(FrameType::ZFIN, Txhdr);
-		switch (readNextByte()) {
-			case 'O': readNextByte();  /* Discard 2nd 'O' */
+		switch (ReadNextByte()) {
+			case 'O': ReadNextByte();  /* Discard 2nd 'O' */
 				return;
 		}
 	}
@@ -224,60 +288,65 @@ FrameType ZModem::zgethdr(uint8_t *hdr) {
 
 startover:
 	cancount = 5;
-again:
+	again:
 	// Return immediate ERROR if ZCRCW sequence seen
-	uint8_t c = readNextByte();
-	if( c != (ZMODEM_PAD | 0200) && c != ZMODEM_PAD) {
-		if(c == ASCII_CAN) {
-gotcan:
-			if (--cancount <= 0) { return FrameType::ZCAN; }
-			switch (readNextByte()) {
+	uint8_t const c = ReadNextByte();
+	switch (c) {
+		case ASCII_CAN: {
+			gotcan:
+			if (--cancount <= 0) {
+				return FrameType::ZCAN;
+			}
+			switch (ReadNextByte()) {
 				case ASCII_CAN:
-					if (--cancount <= 0) { return FrameType::ZCAN; }
+					if (--cancount <= 0) {
+						return FrameType::ZCAN;
+					}
 					goto again;
-				case ZCRCW:
-					return FrameType::ZCAN;
-				default: break;
+				case ZCRCW: return FrameType::ZFERR;
 			}
 		}
-		// skip garbage
-		if (--n == 0) { return FrameType::ZFERR; }
-		goto startover;
+			[[fallthrough]];
+		default:
+			// skip garbage
+			if (--n == 0) {
+				return FrameType::ZFERR;
+			}
+			goto startover;
+		case ZMODEM_PAD:
+		case ZMODEM_PAD | 0200: break;
 	}
 
 	cancount = 5;
-splat:
+	splat:
 	switch (noxrd7()) {
 		case ZMODEM_PAD: goto splat;
 		default:
-			if (--n == 0) { return FrameType::ZFERR; }
+			if (--n == 0) {
+				return FrameType::ZFERR;
+			}
 			goto startover;
 		case ZMODEM_IDLE:    // This is what we want.
 			break;
 	}
 
-
-	switch (noxrd7()) {
-		case (char) HeaderType::ZBIN:
-			Rxframeind = HeaderType::ZBIN;
-			Crc32 = false;
+	uint8_t const type = noxrd7();
+	switch (type) {
+		case (char) HeaderType::ZBIN: Rxframeind = HeaderType::ZBIN;
 			hdrType = zrbhdr(hdr);
 			break;
-		case (char) HeaderType::ZBIN32:
-			Crc32 = true;
-			Rxframeind = HeaderType::ZBIN32;
+		case (char) HeaderType::ZBIN32: Rxframeind = HeaderType::ZBIN32;
 			hdrType = zrbhdr32(hdr);
 			break;
-		case (char) HeaderType::ZHEX:
-			Rxframeind = HeaderType::ZHEX;
-			Crc32 = false;
+		case (char) HeaderType::ZHEX: Rxframeind = HeaderType::ZHEX;
 			hdrType = zrhhdr(hdr);
 			break;
-		case ASCII_CAN:
-			goto gotcan;
+		case ASCII_CAN: goto gotcan;
 		default:
 			// skip garbage
-			if (--n == 0) { return FrameType::ZFERR; }
+			if (--n == 0) {
+				return FrameType::ZFERR;
+			}
 			goto startover;
 	}
 
@@ -290,28 +359,28 @@ splat:
 
 /* Receive a binary style header (type and position) */
 FrameType ZModem::zrbhdr(uint8_t *hdr) {
-	uint8_t c;
-	uint16_t crc;
-
-	c = zdlread();
-	Rxtype = (FrameType) c;
-	crc = updcrc(c, 0);
+	ZModemResult c = zdlread();
+	if(c & ~0xFF) return FrameType::ZFERR;
+	Rxtype = (FrameType) ((uint16_t) c & 0xFF);
+	uint16_t crc = updcrc(c, 0);
 
 	for (int n = 4; --n >= 0; ++hdr) {
 		c = zdlread();
+		if(c & ~0xFF) return FrameType::ZFERR;
 		crc = updcrc(c, crc);
 		*hdr = c;
 	}
 	c = zdlread();
+	if(c & ~0xFF) return FrameType::ZFERR;
 	crc = updcrc(c, crc);
 
 	c = zdlread();
+	if(c & ~0xFF) return FrameType::ZFERR;
 	crc = updcrc(c, crc);
 	if (crc & 0xFFFF) {
+		osHeap->console.console.PrintLn(ANSI_RED_PEN "Bad Header CRC" ANSI_RESET_ATTRIBUTES);
 		return FrameType::ZFERR;
 	}
-
-
 	return Rxtype;
 }
 
@@ -321,51 +390,55 @@ FrameType ZModem::zrbhdr32(uint8_t *hdr) {
 	uint32_t crc;
 
 	c = zdlread();
+	if(c & ~0xFF) return FrameType::ZFERR;
 	Rxtype = (FrameType) c;
 	crc = 0xFFFFFFFFL;
 	crc = UPDC32(c, crc);
 
 	for (int n = 4; --n >= 0; ++hdr) {
 		c = zdlread();
+		if(c & ~0xFF) return FrameType::ZFERR;
 		crc = UPDC32(c, crc);
 		*hdr = c;
 	}
 	for (int n = 4; --n >= 0;) {
 		c = zdlread();
+		if(c & ~0xFF) return FrameType::ZFERR;
 		crc = UPDC32(c, crc);
 	}
 	if (crc != 0xDEBB20E3) {
-		zperr("Bad Header CRC");
+		osHeap->console.console.Print(ANSI_RED_PEN ANSI_BRIGHT "Bad Header CRC\n" ANSI_RESET_ATTRIBUTES);
 		return FrameType::ZFERR;
 	}
 	return Rxtype;
 }
 
-/* Receive a hex style header (type and position) */
+// Receive a hex style header (type and position)
 FrameType ZModem::zrhhdr(uint8_t *hdr) {
-	uint8_t c;
-	unsigned short crc;
-	int n;
-
-	c = zgethex();
+	uint8_t c = zgethex();
+	if(c & ~0xFF) return FrameType::ZFERR;
 	Rxtype = (FrameType) c;
-	crc = updcrc(c, 0);
+	uint16_t crc = updcrc(c, 0);
 
-	for (n = 4; --n >= 0; ++hdr) {
+	for (int n = 4; --n >= 0; ++hdr) {
 		c = zgethex();
+		if(c & ~0xFF) return FrameType::ZFERR;
 		crc = updcrc(c, crc);
 		*hdr = c;
 	}
 	c = zgethex();
+	if(c & ~0xFF) return FrameType::ZFERR;
 	crc = updcrc(c, crc);
 	c = zgethex();
+	if(c & ~0xFF) return FrameType::ZFERR;
 	crc = updcrc(c, crc);
 	if (crc & 0xFFFF) {
+		osHeap->console.console.Print(ANSI_RED_PEN ANSI_BRIGHT "Bad Header CRC\n" ANSI_RESET_ATTRIBUTES);
 		return FrameType::ZFERR;
 	}
 
-	if (readNextByte() == '\r') {  /* Throw away possible cr/lf */
-		readNextByte();
+	if (ReadNextByte() == '\r') {  /* Throw away possible cr/lf */
+		ReadNextByte();
 	}
 	return Rxtype;
 }
@@ -376,16 +449,12 @@ FrameType ZModem::zrhhdr(uint8_t *hdr) {
  *  NB: On errors may store length+1 bytes!
  */
 ZModemResult ZModem::zrdata(uint8_t *buf, uint32_t length) {
-	ZModemResult c;
-	uint16_t crc;
-	ZModemResult d;
-	uint8_t b;
-
 	if (Rxframeind == HeaderType::ZBIN32) {
 		return zrdat32(buf, length);
 	}
-
-	crc = 0;
+	ZModemResult c;
+	ZModemResult d;
+	uint16_t crc = 0;
 	Rxcount = 0;
 	uint8_t *const end = buf + length;
 	while (buf <= end) {
@@ -395,52 +464,42 @@ crcfoo:
 				case GOTCRCE:
 				case GOTCRCG:
 				case GOTCRCQ:
-				case GOTCRCW: d = c;
-					b = c & 0xFF;
-					crc = updcrc(b, crc);
-					if ((c = zdlread()) & ~0xFF) {
+				case GOTCRCW: crc = updcrc((d = c) & 0377, crc);
+					if ((c = zdlread()) & ~0377) {
 						goto crcfoo;
 					}
-					b = c & 0xFF;
-					crc = updcrc(b, crc);
-					if ((c = zdlread()) & ~0xFF) {
+					crc = updcrc(c, crc);
+					if ((c = zdlread()) & ~0377) {
 						goto crcfoo;
 					}
-					b = c & 0xFF;
-					crc = updcrc(b, crc);
-					if ((c = zdlread()) & ~0xFF) {
-						goto crcfoo;
-					}
-					b = c & 0xFF;
-					crc = updcrc(b, crc);
-					if ((c = zdlread()) & ~0xFF) {
-						goto crcfoo;
-					}
-					b = c & 0xFF;
-					crc = updcrc(b, crc);
-					if (crc != 0xFFFF) {
+					crc = updcrc(c, crc);
+					if (crc & 0xFFFF) {
+						osHeap->console.console.Printf(ANSI_RED_PEN ANSI_BRIGHT "CRC ERROR %#06x\n" ANSI_RESET_ATTRIBUTES, crc);
 						return ZModemResult::CRC_ERROR;
 					}
 					Rxcount = length - (end - buf);
 					return d;
+				case GOTCAN:
+					osHeap->console.console.PrintLn(ANSI_RED_PEN ANSI_BRIGHT "Send Cancelled" ANSI_RESET_ATTRIBUTES);
+					return ZModemResult::GOTCAN;
 				default:
+					osHeap->console.console.PrintLn(ANSI_RED_PEN ANSI_BRIGHT "Bad data subpacket" ANSI_RESET_ATTRIBUTES);
 					return c;
 			}
 		}
 		*buf++ = c;
 		crc = updcrc(c, crc);
 	}
-	zperr("Data subpacket too long");
-	return GOTCAN;
+	osHeap->console.console.Print(ANSI_RED_PEN ANSI_BRIGHT "Data subpacket too long\n" ANSI_RESET_ATTRIBUTES);
+	return ZModemResult::ERROR;
 }
 
 ZModemResult ZModem::zrdat32(uint8_t *buf, uint32_t length) {
 	ZModemResult c;
-	uint32_t crc;
 	ZModemResult d;
 	uint8_t b;
 
-	crc = 0xFFFFFFFFL;
+	uint32_t crc = 0xFFFFFFFFL;
 	Rxcount = 0;
 	uint8_t *const end = buf + length;
 	while (buf <= end) {
@@ -474,38 +533,42 @@ ZModemResult ZModem::zrdat32(uint8_t *buf, uint32_t length) {
 					b = c & 0xFF;
 					crc = UPDC32(b, crc);
 					if (crc != 0xDEBB20E3) {
+						osHeap->console.console.Printf(ANSI_RED_PEN ANSI_BRIGHT "CRC ERROR %#010lx\n" ANSI_RESET_ATTRIBUTES, crc);
 						return ZModemResult::CRC_ERROR;
 					}
 					Rxcount = length - (end - buf);
 					return d;
+				case GOTCAN:
+					osHeap->console.console.PrintLn(ANSI_RED_PEN ANSI_BRIGHT "Send Cancelled" ANSI_RESET_ATTRIBUTES);
+					return ZModemResult::GOTCAN;
 				default:
+					osHeap->console.console.PrintLn(ANSI_RED_PEN ANSI_BRIGHT "Bad data subpacket" ANSI_RESET_ATTRIBUTES);
 					return c;
 			}
 		}
 		*buf++ = c;
 		crc = UPDC32(c, crc);
 	}
-	zperr("Data subpacket too long");
+	osHeap->console.console.PrintLn("Data subpacket too long");
 	return GOTCAN;
 }
 
 // Send a byte as two hex digits
-void ZModem::zputhex(uint8_t bin) {
+void ZModem::PutHex(uint8_t bin) {
 	static char digits[] = "0123456789abcdef";
 
-	writeByte(digits[(bin & 0xF0) >> 4]);
-	writeByte(digits[(bin) & 0xF]);
+	WriteByte(digits[(bin & 0xF0) >> 4]);
+	WriteByte(digits[(bin) & 0xF]);
 }
 
 /*
  * Read a byte, checking for ZMODEM escape encoding
  *  including CAN*5 which represents a quick abort
  */
-ZModemResult ZModem::zdlread() const {
-	uint8_t c;
-
+ZModemResult ZModem::zdlread() {
+	uint16_t c;
 	again:
-	switch (c = readNextByte()) {
+	switch (c = ReadNextByte()) {
 		case ZMODEM_IDLE: break;
 		case 023:
 		case 0223:
@@ -519,17 +582,17 @@ ZModemResult ZModem::zdlread() const {
 	}
 
 	again2:
-	c = readNextByte();
+	c = ReadNextByte();
 
 	// if canceled read a few more to make sure
 	if (c == ASCII_CAN) {
-		c = readNextByte();
+		c = ReadNextByte();
 	}
 	if (c == ASCII_CAN) {
-		c = readNextByte();
+		c = ReadNextByte();
 	}
 	if (c == ASCII_CAN) {
-		c = readNextByte();
+		c = ReadNextByte();
 	}
 
 	switch (c) {
@@ -553,7 +616,7 @@ ZModemResult ZModem::zdlread() const {
 			}
 			break;
 	}
-	zperr("Bad escape sequence %x", c);
+	osHeap->console.console.Printf("Bad escape sequence %#x\n", c);
 	return GOTCAN;
 }
 
@@ -561,13 +624,11 @@ ZModemResult ZModem::zdlread() const {
  * Read a character from the modem line with timeout.
  *  Eat parity, XON and XOFF characters.
  */
-uint8_t ZModem::noxrd7() const {
+uint8_t ZModem::noxrd7() {
 	uint8_t c;
-
 	for (;;) {
-		if ((c = readNextByte()) < 0) {
-			return c;
-		}
+		c = ReadNextByte();
+
 		switch (c &= 0177) {
 			case MODEM_XON:
 			case MODEM_XOFF: continue;
@@ -581,50 +642,35 @@ uint8_t ZModem::noxrd7() const {
 		}
 	}
 }
-uint8_t ZModem::zgeth1() const {
-	uint8_t c0, c1;
+uint8_t ZModem::zgethex() {
+	uint8_t const c0 = noxrd7();
+	uint8_t const c1 = noxrd7();
 
-	c0 = noxrd7();
-	c1 = noxrd7();
-	uint8_t c = c0;
-	for (int i = 0; i < 2; i++) {
-		uint8_t n = c - '0';
-		if (n > 9) {
-			n -= ('a' - ':');
-		}
-		if (n & ~0xF) {
-			return 0; // ERROR
-		}
-		if (i == 1) {
-			return c0 + (n << 4);
-		} else {
-			c0 = n;
-			c = c1;
-		}
+	uint8_t n0 = c0 - '0';
+	uint8_t n1 = c1 - '0';
+	if (n0 > 9) {
+		n0 -= ('a' - ':');
 	}
-	return 0; // never reached
+	if (n1 > 9) {
+		n1 -= ('a' - ':');
+	}
+	if (n0 & ~0xF || n1 & ~0xF) {
+		return 0;
+	} // ERROR
+	uint8_t const result = n1 + (n0 << 4);
+	return result;
 }
 
-uint8_t ZModem::zgethex() const {
+void ZModem::zmputs(uint8_t const *s) {
 	uint8_t c;
-
-	c = zgeth1();
-	return c;
-}
-
-void ZModem::zmputs(uint8_t const * s)
-{
-	char c;
 
 	while (*s) {
 		switch (c = *s++) {
-			case '\336':
-//				Utils_BusySecondSleep(1);
+			case (uint8_t)'\336':
+				//				Utils_BusySecondSleep(1);
 				continue;
-			case '\335':
-				continue;
-			default:
-				writeByte(c);
+			case (uint8_t)'\335': continue;
+			default: WriteByte(c);
 		}
 	}
 }

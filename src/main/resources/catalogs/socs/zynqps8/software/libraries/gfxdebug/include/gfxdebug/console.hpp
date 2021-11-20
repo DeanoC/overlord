@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/snprintf.h"
 #include "utils/string_utils.hpp"
 #include "gfxdebug/rgba8.hpp"
 #include "dbg/assert.h"
@@ -89,6 +90,7 @@ struct Console : ConsoleBase {
 		if (!dirty && !flashUpdate) {
 			return;
 		}
+
 		Attribute attrib = DefaultAttribute;
 		for (int y = 0; y < HEIGHT; ++y) {
 			for (int x = 0; x < WIDTH; ++x) {
@@ -109,7 +111,6 @@ struct Console : ConsoleBase {
 						}
 						attrib = a;
 					}
-
 					char const c = textBuffer[x + (y * WIDTH)];
 					drawer->PutChar(offsetX + x, offsetY + y, c);
 				}
@@ -122,6 +123,8 @@ struct Console : ConsoleBase {
 		if (curRow == HEIGHT - 1) {
 			memcpy(&textBuffer[0], &textBuffer[1 * WIDTH], WIDTH * (HEIGHT - 1));
 			memset(&textBuffer[WIDTH * (HEIGHT - 1)], 0, WIDTH);
+			memcpy(&attributeBuffer[0], &attributeBuffer[1 * WIDTH], WIDTH * (HEIGHT - 1));
+			memset(&attributeBuffer[WIDTH * (HEIGHT - 1)], *(uint8_t *) &DefaultAttribute, WIDTH);
 			dirty = true;
 		} else {
 			curRow++;
@@ -133,7 +136,6 @@ struct Console : ConsoleBase {
 		if (str == nullptr) {
 			return;
 		}
-
 		uint32_t i = 0U;
 		while (i < size) {
 			char const c = str[i];
@@ -151,6 +153,9 @@ struct Console : ConsoleBase {
 					textBuffer[(curRow * WIDTH) + curCol] = c;
 					attributeBuffer[(curRow * WIDTH) + curCol] = currentAttribute;
 					curCol++;
+					if(curCol >= WIDTH) {
+						NewLine();
+					}
 					break;
 			}
 			i++;
@@ -158,16 +163,28 @@ struct Console : ConsoleBase {
 		dirty = true;
 	}
 
-	void PrintWithSizeLn(uint32_t size, char const *str) {
+	void PrintWithSizeLn(uint32_t size, char const *str)  NON_NULL(3){
 		PrintWithSize(size, str);
 		NewLine();
 	}
-	void Print(char const *str) {
-		PrintWithSize(Utils::StringLength(str));
+	void Print(char const *str)  NON_NULL(2) {
+		PrintWithSize(Utils::StringLength(str), str);
 	}
 
-	void PrintLn(char const *str) {
+	void PrintLn(char const *str)  NON_NULL(2) {
 		PrintWithSizeLn(Utils::StringLength(str), str);
+	}
+	void Printf(const char *format, ...) NON_NULL(2) __attribute__((format(printf, 2, 3))) {
+		char buffer[256]; // 256 byte max string (on stack)
+		va_list va;
+		va_start(va, format);
+		int len = vsnprintf(buffer, 256, format, va);
+		va_end(va);
+		buffer[255] = 0;
+		PrintWithSize(len, buffer);
+	}
+	void PutChar(char c) {
+		PrintWithSize(1, &c);
 	}
 
 	uint8_t ThirtyHzCounter;

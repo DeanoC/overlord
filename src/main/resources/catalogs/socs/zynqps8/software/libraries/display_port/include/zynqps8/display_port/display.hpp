@@ -332,7 +332,9 @@ enum class MixerFunction {
 
 enum class StandardVideoMode {
 	VM_640_480_60,
-	VM_1280_720_60
+	VM_800_600_60,
+	VM_1280_720_60,
+	VM_1920_1080_60,
 };
 
 // mixer takes a background colour + 2 planes (1 video + 1 gfx)

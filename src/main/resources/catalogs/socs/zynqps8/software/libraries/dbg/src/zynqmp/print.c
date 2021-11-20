@@ -27,15 +27,30 @@ void raw_debug_print(char const *const text) {
 		cur++;
 	}
 }
+void raw_debug_sized_print(uint32_t size, char const * text) {
+	char const *cur = text;
+	for(int i=0;i < size;++i)
+	{
+		if(*cur == '\n') {
+			while (IsTransmitFull()){}
+			HW_REG_SET(UART0, TX_RX_FIFO, '\r');
+		}
+
+		// stall
+		while (IsTransmitFull()){}
+		HW_REG_SET(UART0, TX_RX_FIFO, *cur);
+		cur++;
+	}
+}
 
 void raw_debug_printf(const char *format, ...) {
 	char buffer[256]; // 256 byte max string (on stack)
 	va_list va;
 	va_start(va, format);
-	vsnprintf(buffer, 256, format, va);
+	int len = vsnprintf(buffer, 256, format, va);
 	va_end(va);
 	buffer[255] = 0;
-	raw_debug_print(buffer);
+	raw_debug_sized_print(len, buffer);
 }
 
 void debug_print(char const *const text){
@@ -62,10 +77,7 @@ void debug_printf(const char *format, ...) {
 
 void debug_sized_print(uint32_t size, char const * text) {
 	if (force_raw_print) {
-		char * tmp = ALLOCA(size+1);
-		memcpy(tmp, text, size);
-		tmp[size] = 0;
-		raw_debug_print(tmp);
+		raw_debug_sized_print(size, text);
 	} else {
 		OsService_PrintWithSize(size, text);
 	}

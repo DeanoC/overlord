@@ -84,8 +84,6 @@ void main()
 
 	PrintBanner();
 
-	loopy.Init();
-
 	// sleep all other hard core processors in SoC
 	// xsct fails with power down error if ACPU0 is asleep
 //	RomServiceTable[REN_ACPU0SLEEP]();
@@ -96,6 +94,8 @@ void main()
 	RomServiceTable[REN_R51SLEEP]();
 
 	OsHeap::Init();
+	loopy.Init();
+
 	IPI3_OsServer::Init();
 
 	// install IPI0 as PMU sleep handlers (TODO seems a waste of an entire IPI...)

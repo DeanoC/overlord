@@ -16,14 +16,22 @@ extern uint32_t uart0TransmitHead;
 
 OsHeap *osHeap;
 
+uint8_t textConsoleSkip;
+uint8_t textConsoleSkipCurrent;
+
 static void TextConsoleDrawCallback() {
 	if(osHeap->console.framebuffer != nullptr) {
-		auto const frameBuffer = osHeap->console.framebuffer;
-		auto const width = osHeap->console.frameBufferWidth;
-		auto const height = osHeap->console.frameBufferHeight;
+		if(textConsoleSkipCurrent == textConsoleSkip) {
+			textConsoleSkipCurrent = 0;
+			auto const frameBuffer = osHeap->console.framebuffer;
+			auto const width = osHeap->console.frameBufferWidth;
+			auto const height = osHeap->console.frameBufferHeight;
 
-		GfxDebug::RGBA8 drawer(width, height, frameBuffer);
-		osHeap->console.console.Display(&drawer, 0, 0);
+			GfxDebug::RGBA8 drawer(width, height, frameBuffer);
+			osHeap->console.console.Display(&drawer, 0, 0);
+		} else {
+			textConsoleSkipCurrent++;
+		}
 	}
 }
 
@@ -31,7 +39,7 @@ namespace IPI3_OsServer {
 
 void Init() {
 	osHeap->console.Init();
-	osHeap->ThirtyHzCallbacks[0] = &TextConsoleDrawCallback;
+	osHeap->thirtyHzCallbacks[(int)ThirtyHzTasks::TEXT_CONSOLE] = &TextConsoleDrawCallback;
 }
 
 static bool IsFireAndForget(OS_ServiceFunc func) {

@@ -2,6 +2,7 @@
 
 #include "core/cpp/bitmap_allocator_single_threaded.hpp"
 #include "text_console.hpp"
+#include "host_interface.hpp"
 #include "timers.hpp"
 
 // the os heap is a 2MB chunk of DDR (at ddr base) that the pmu reserves
@@ -12,6 +13,7 @@
 // its available once IPI3_OSServiceInit is finished
 struct OsHeap {
 	static void Init();
+	[[maybe_unused]] static void Fini();
 	const uint32_t nullBlock[1024]; // 4K poisoned to 0xDCDCDCDC for null page
 
 	static const unsigned int TotalSize = 2 * 1024*1024;
@@ -30,10 +32,21 @@ struct OsHeap {
 	uint8_t bounceBuffer[BounceBufferSize];
 
 	TextConsole console;
+	HostInterface hostInterface;
 
-	Timers::Callback ThirtyHzCallbacks[Timers::MaxThirtyHzCallbacks];
+	Timers::Callback hundredHzCallbacks[Timers::MaxHundredHzCallbacks];
+	Timers::Callback thirtyHzCallbacks[Timers::MaxThirtyHzCallbacks];
 
 
+};
+
+enum class HundredHzTasks {
+	HOST_INPUT = 0,
+	HOST_COMMANDS_PROCESSING = 1
+};
+
+enum class ThirtyHzTasks {
+	TEXT_CONSOLE = 0,
 };
 
 static_assert(sizeof(OsHeap) < (OsHeap::TotalSize));
