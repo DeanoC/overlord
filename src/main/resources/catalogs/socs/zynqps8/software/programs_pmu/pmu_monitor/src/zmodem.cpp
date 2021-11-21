@@ -5,6 +5,7 @@
 #include "host_interface.hpp"
 #include "ipi3_os_server.hpp"
 #include "dbg/ansi_escapes.h"
+#include "zynqps8/dma/lpddma.hpp"
 
 static const int MaxHeaderPerQuantum = 10;
 
@@ -56,6 +57,7 @@ void ZModem::ReInit() {
 	if (Zctlesc) {
 		Txhdr[ZF0] |= TESCCTL;
 	}
+	this->destinationAddress = 0x8'0000'0000;
 }
 
 void ZModem::Fini() {
@@ -190,7 +192,12 @@ ZModem::Result ZModem::NextHeader() {
 }
 void ZModem::MoveReceivedData(uint32_t size) {
 	//	osHeap->console.console.PutChar('#');
+	Dma::LpdDma::SimpleDmaCopy(Dma::LpdDma::Channels::ChannelSevern,
+														 (uintptr_all_t)sectorBuffer,
+														 (uintptr_all_t)this->destinationAddress + this->fileBytesRecv,
+														 size);
 	this->fileBytesRecv += size;
+	Dma::LpdDma::Stall(Dma::LpdDma::Channels::ChannelSevern);
 }
 
 ZModem::Result ZModem::MoreData() {

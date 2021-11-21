@@ -36,6 +36,7 @@ void HostInterface::Init() {
 	this->currentState = State::RECEIVING_COMMAND;
 	this->cmdBuffer = (uint8_t*) osHeap->tmpOsBufferAllocator.Alloc(CMD_BUF_SIZE/64);
 	this->cmdBufferHead = 0;
+	this->downloadAddress = 0x8'0000'0000;
 	osHeap->hundredHzCallbacks[(int)HundredHzTasks::HOST_INPUT] = &HostInputCallback;
 	osHeap->hundredHzCallbacks[(int)HundredHzTasks::HOST_COMMANDS_PROCESSING] = &HostCommandCallback;
 	zModem.Init();
@@ -160,9 +161,10 @@ void HostInterface::WhatCommand() {
 	if(cmdBufferHeadTmp > 4 && this->cmdBuffer[4] == 0x18) {
 		if(Utils::RuntimeHash(4, (char *) this->cmdBuffer) == "rz**"_hash) {
 			// zmodem download start
-			osHeap->console.console.PrintLn("ZModem download started");
+			osHeap->console.console.PrintLn(ANSI_BLUE_PAPER "ZModem download started" ANSI_RESET_ATTRIBUTES);
 			textConsoleSkip = 30;
 			this->zModem.ReInit();
+			this->zModem.destinationAddress = this->downloadAddress;
 			this->currentState = State::ZMODEM;
 			return;
 		}
@@ -180,8 +182,23 @@ void HostInterface::WhatCommand() {
 			EchoCmd(cmdBuffer, finds, findCount);
 			break;
 		}
+		case "download_at"_hash: {
+			DownloadAt(cmdBuffer, finds, findCount);
+			break;
+		}
+		case "sleep_cpu"_hash: {
+			SleepCpu(cmdBuffer, finds, findCount);
+			break;
+		}
+		case "wake_cpu"_hash: {
+			WakeUpCpu(cmdBuffer, finds, findCount);
+			break;
+		}
+		case "boot_cpu"_hash: {
+			BootCpu(cmdBuffer, finds, findCount);
+		}
 		default: {
-			debug_printf(ANSI_MAGENTA_PEN "Unknown Command %s\n" ANSI_RESET_ATTRIBUTES, cmdBuffer);
+			debug_printf(ANSI_MAGENTA_PEN "\nUnknown Command %s\n" ANSI_RESET_ATTRIBUTES, cmdBuffer);
 			this->currentState = State::RECEIVING_COMMAND;
 			break;
 		}
@@ -190,7 +207,7 @@ void HostInterface::WhatCommand() {
 
 void HostInterface::EchoCmd(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int const findCount) {
 	if (findCount != 2) {
-		debug_print("\nARG ERROR: echo arg\n");
+		debug_print(ANSI_RED_PEN ANSI_BRIGHT "\nARG ERROR: echo arg\n" ANSI_RESET_ATTRIBUTES);
 		this->currentState = State::RECEIVING_COMMAND;
 		return;
 	}
@@ -201,8 +218,19 @@ void HostInterface::EchoCmd(uint8_t const *cmdBuffer, unsigned int const *finds,
 	this->currentState = State::RECEIVING_COMMAND;
 }
 
-#if 0
+void HostInterface::DownloadAt(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int const findCount) {
+	if (findCount != 2) {
+		debug_print(ANSI_RED_PEN ANSI_BRIGHT "\nARG ERROR: download_at address\n" ANSI_RESET_ATTRIBUTES);
+		this->currentState = State::RECEIVING_COMMAND;
+		return;
+	}
+	assert(findCount == 2);
+	uint64_t address = Utils::StringToU64(finds[1] - finds[0] - 1, (char const *) (cmdBuffer + finds[0] + 1));
+	debug_printf("\nDownload address 0x%llx\n", address);
 
+	this->downloadAddress = address;
+	this->currentState = State::RECEIVING_COMMAND;
+}
 static void A53Sleep() {
 	RomServiceTable[REN_ACPU0SLEEP]();
 	RomServiceTable[REN_ACPU1SLEEP]();
@@ -226,51 +254,64 @@ static void R5FWakeUp() {
 	RomServiceTable[REN_R51WAKE]();
 }
 
-void HostInterface::DownloadCmd(uint8_t *cmdBuffer,
-																uint32_t cmdBufferHead,
-																unsigned int const *finds,
-																unsigned int const findCount) {
-	if (findCount != 3) {
-		debug_print("ARG ERROR: download [A53|R5F|DATA] address\n");
+void HostInterface::SleepCpu(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int const findCount) {
+	if (findCount != 2) {
+		debug_print(ANSI_RED_PEN ANSI_BRIGHT "\nARG ERROR: sleep_cpu [A53|R5F]\n");
 		this->currentState = State::RECEIVING_COMMAND;
 		return;
 	}
-	uint64_t address = Utils::DecimalStringToU64(finds[2] - finds[1] - 1, (char const *) (cmdBuffer + finds[1] + 1));
-	debug_printf("Download address 0x%llx\n", address);
-
 	switch (Utils::RuntimeHash(finds[1] - finds[0] - 1, (char *) cmdBuffer + finds[0] + 1)) {
 		case "A53"_hash: {
-			currentDownloadTarget = DownloadTarget::A53;
 			A53Sleep();
-			debug_print("DownloadTarget::A53\n");
+			debug_print("\nA53s going to sleep\n");
 			break;
 		}
 		case "R5F"_hash: {
-			currentDownloadTarget = DownloadTarget::R5F;
 			R5FSleep();
-			debug_print("DownloadTarget::R5F\n");
+			debug_print("\nR5Fs going to sleep\n");
 			break;
 		}
-		case "DATA"_hash: {
-			currentDownloadTarget = DownloadTarget::DATA;
-			debug_print("DownloadTarget::DATA\n");
-			break;
-		}
-		default: cmdBuffer[cmdBufferHead] = 0;
-			debug_printf(ANSI_MAGENTA_PEN "Unknown download target %s\n" ANSI_RESET_ATTRIBUTES, cmdBuffer);
+		default:
+			debug_printf(ANSI_RED_PEN ANSI_BRIGHT "\nUnknown CPU target\n" ANSI_RESET_ATTRIBUTES);
 			this->currentState = State::RECEIVING_COMMAND;
 			return;
 	}
-
-	this->downloadAddress = this->currentDownloadAddress = address;
-	this->currentState = State::RECEIVING_COMMAND;
 }
 
-void HostInterface::PostDownload() {
-	debug_print("PostDownload\n");
+void HostInterface::WakeUpCpu(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int const findCount) {
+	if (findCount != 2) {
+		debug_print(ANSI_RED_PEN ANSI_BRIGHT "\nARG ERROR: wake_cpu [A53|R5F]\n" ANSI_RESET_ATTRIBUTES);
+		this->currentState = State::RECEIVING_COMMAND;
+		return;
+	}
+	switch (Utils::RuntimeHash(finds[1] - finds[0] - 1, (char *) cmdBuffer + finds[0] + 1)) {
+		case "A53"_hash: {
+			A53WakeUp();
+			debug_print("\nA53s waking up\n");
+			break;
+		}
+		case "R5F"_hash: {
+			R5FWakeUp();
+			debug_print("\nR5Fs waking up\n");
+			break;
+		}
+		default:
+			debug_printf(ANSI_RED_PEN ANSI_BRIGHT "\nUnknown CPU target\n" ANSI_RESET_ATTRIBUTES);
+			this->currentState = State::RECEIVING_COMMAND;
+			return;
+	}
+}
 
-	switch (currentDownloadTarget) {
-		case DownloadTarget::A53: {
+void HostInterface::BootCpu(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int const findCount) {
+	if (findCount != 2) {
+		debug_print(ANSI_RED_PEN ANSI_BRIGHT "\nARG ERROR: boot_cpu [A53|R5F]\n" ANSI_RESET_ATTRIBUTES);
+		this->currentState = State::RECEIVING_COMMAND;
+		return;
+	}
+	switch (Utils::RuntimeHash(finds[1] - finds[0] - 1, (char *) cmdBuffer + finds[0] + 1)) {
+		case "A53"_hash: {
+			debug_print("\nA53s booting\n");
+			A53Sleep();
 			auto const lowAddress = (uint32_t) (downloadAddress & 0x0000'0000'FFFF'FFFFull);
 			auto const hiAddress = (uint32_t) ((downloadAddress & 0xFFFF'FFFF'0000'0000ull) >> 32ull);
 			HW_REG_MERGE_FIELD(APU, RVBARADDR0L, ADDR, lowAddress);
@@ -300,14 +341,14 @@ void HostInterface::PostDownload() {
 										 HW_REG_ENCODE_FIELD(CRF_APB, RST_FPD_APU, ACPU1_RESET, 0) |
 										 HW_REG_ENCODE_FIELD(CRF_APB, RST_FPD_APU, ACPU2_RESET, 0) |
 										 HW_REG_ENCODE_FIELD(CRF_APB, RST_FPD_APU, ACPU3_RESET, 0));
-
+			break;
 		}
-			break;
-		case DownloadTarget::R5F:
-			// wakey wakey rise and shine
-			R5FWakeUp();
-			break;
-		case DownloadTarget::DATA: break;
+//		case "R5F"_hash: {
+//			break;
+//		}
+		default:
+			debug_printf(ANSI_RED_PEN ANSI_BRIGHT "\nUnknown CPU target\n" ANSI_RESET_ATTRIBUTES);
+			this->currentState = State::RECEIVING_COMMAND;
+			return;
 	}
 }
-#endif

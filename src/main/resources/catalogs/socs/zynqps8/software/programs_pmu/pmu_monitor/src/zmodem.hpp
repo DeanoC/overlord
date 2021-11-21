@@ -158,6 +158,7 @@ struct ZModem {
 	void PutHex(uint8_t bin);
 	Result NextHeader();
 	Result MoreData();
+	void MoveReceivedData(uint32_t size);
 
 	ZModemResult zrdata(uint8_t *buf, uint32_t length);
 	ZModemResult zrdat32(uint8_t *buf, uint32_t length);
@@ -217,5 +218,6 @@ struct ZModem {
 
 	FrameType Rxtype;    			// Type of header received
 	HeaderType Rxframeind;    // ZBIN ZBIN32, or ZHEX type of frame received
-	void MoveReceivedData(uint32_t size);
+
+	uintptr_all_t destinationAddress;
 };

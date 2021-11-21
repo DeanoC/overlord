@@ -29,6 +29,9 @@ struct HostInterface {
 	uint8_t* cmdBuffer;
 	uint32_t cmdBufferHead;
 	uintptr_all_t downloadAddress;
-	uintptr_all_t currentDownloadAddress;
 	ZModem zModem;
+	void DownloadAt(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int const findCount);
+	void SleepCpu(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int const findCount);
+	void WakeUpCpu(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int const findCount);
+	void BootCpu(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int const findCount);
 };

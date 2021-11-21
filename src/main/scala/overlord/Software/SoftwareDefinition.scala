@@ -26,7 +26,7 @@ object SoftwareDefinition {
 		val software    = Utils.toString(table("software"))
 
 		Some(SoftwareDefinition(DefinitionType(defTypeName),
-		                        table,
+		                        attribs,
 		                        defTypeName,
 		                        path.resolve(software)).get)
 	}

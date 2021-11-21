@@ -1,13 +1,12 @@
 package overlord.Instances
 
-import ikuy_utils.{Utils, Variant}
+import ikuy_utils.Variant
 import overlord.SoftwareDefinitionTrait
 
 case class ProgramInstance(ident: String,
                            override val definition: SoftwareDefinitionTrait,
                           ) extends SoftwareInstance {
-	override val folder = "programs_" +
-	                      Utils.lookupString(definition.attributes, "cpus", "host")
+	override val folder = "programs"
 }
 
 object ProgramInstance {

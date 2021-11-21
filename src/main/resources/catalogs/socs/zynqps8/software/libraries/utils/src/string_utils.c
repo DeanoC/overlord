@@ -24,16 +24,95 @@ int32_t Utils_DecimalStringToI32(unsigned int length, const char * str)
 	return (neg ? -val : val);
 }
 
-uint32_t Utils_DecimalStringToU32(unsigned int length, const char * str)
+NON_NULL(2) uint32_t Utils_BinaryStringToU32(unsigned int length, const char * str)
+{
+	const char* start = str;
+	uint64_t val = 0;
+
+	while((str-start) < length) {
+		uint8_t c = *str++;
+		if(c == '_' || c =='\'') continue;
+
+		uint8_t n = c - '0';
+		if(n > 1) return val;
+		val = (2 * val) + n;
+	}
+
+	return val;
+}
+
+NON_NULL(2) uint32_t Utils_OctalStringToU32(unsigned int length, const char * str)
 {
 	const char* start = str;
 	uint32_t val = 0;
 
-	while((str-start) < length && *str >= '0' && *str <= '9') {
-		val = (10 * val) + (*str++ - '0');
+	while((str-start) < length) {
+		uint8_t c = *str++;
+		if(c == '_' || c =='\'') continue;
+
+		uint8_t n = c - '0';
+		if(n > 7) return val;
+		val = (8 * val) + n;
 	}
 
 	return val;
+}
+
+
+NON_NULL(2) uint32_t Utils_DecimalStringToU32(unsigned int length, const char * str)
+{
+	const char* start = str;
+	uint32_t val = 0;
+
+	while((str-start) < length) {
+		uint8_t c = *str++;
+		if(c == '_' || c =='\'') continue;
+
+		uint8_t n = c - '0';
+		if(n > 9) return val;
+		val = (10 * val) + n;
+	}
+
+	return val;
+}
+
+NON_NULL(2) uint32_t Utils_HexStringToU32(unsigned int length, const char * str)
+{
+	const char* start = str;
+	uint32_t val = 0;
+
+	while((str-start) < length) {
+		uint8_t c = *str++;
+		if(c == '_' || c =='\'') continue;
+
+		uint8_t n = c - '0';
+		if (n > 9) {
+			n -= ('a' - ':');
+		}
+		if(n > 15) return val;
+		val = (16 * val) + n;
+	}
+
+	return val;
+}
+
+NON_NULL(2) uint32_t Utils_StringToU32(unsigned int length, const char * str)
+{
+	const char* start = str;
+	if(*str++ == '0') {
+		// octal, hex or binary
+		switch(*str) {
+			case 'x':
+				return Utils_HexStringToU32(length-2, str+1);
+			case 'b':
+				return Utils_BinaryStringToU32(length-2, str+1);
+			default:
+				return Utils_OctalStringToU32(length-1, str);
+		}
+	} else {
+		//decimal
+		return Utils_DecimalStringToU32(length, start);
+	}
 }
 
 
@@ -59,17 +138,97 @@ int64_t Utils_DecimalStringToI64(unsigned int length, const char * str)
 	return (neg ? -val : val);
 }
 
-uint64_t Utils_DecimalStringToU64(unsigned int length, const char * str)
+NON_NULL(2) uint64_t Utils_BinaryStringToU64(unsigned int length, const char * str)
 {
 	const char* start = str;
 	uint64_t val = 0;
 
-	while((str-start) < length && *str >= '0' && *str <= '9') {
-		val = (10 * val) + (*str++ - '0');
+	while((str-start) < length) {
+		uint8_t c = *str++;
+		if(c == '_' || c =='\'') continue;
+
+		uint8_t n = c - '0';
+		if(n > 1) return val;
+		val = (2 * val) + n;
 	}
 
 	return val;
 }
+
+NON_NULL(2) uint64_t Utils_OctalStringToU64(unsigned int length, const char * str)
+{
+	const char* start = str;
+	uint64_t val = 0;
+
+	while((str-start) < length) {
+		uint8_t c = *str++;
+		if(c == '_' || c =='\'') continue;
+
+		uint8_t n = c - '0';
+		if(n > 7) return val;
+		val = (8 * val) + n;
+	}
+
+	return val;
+}
+
+
+NON_NULL(2) uint64_t Utils_DecimalStringToU64(unsigned int length, const char * str)
+{
+	const char* start = str;
+	uint64_t val = 0;
+
+	while((str-start) < length) {
+		uint8_t c = *str++;
+		if(c == '_' || c =='\'') continue;
+
+		uint8_t n = c - '0';
+		if(n > 9) return val;
+		val = (10 * val) + n;
+	}
+
+	return val;
+}
+
+NON_NULL(2) uint64_t Utils_HexStringToU64(unsigned int length, const char * str)
+{
+	const char* start = str;
+	uint64_t val = 0;
+
+	while((str-start) < length) {
+		uint8_t c = *str++;
+		if(c == '_' || c =='\'') continue;
+
+		uint8_t n = c - '0';
+		if (n > 9) {
+			n -= ('a' - ':');
+		}
+		if(n > 15) return val;
+		val = (16 * val) + n;
+	}
+
+	return val;
+}
+
+NON_NULL(2) uint64_t Utils_StringToU64(unsigned int length, const char * str)
+{
+	const char* start = str;
+	if(*str++ == '0') {
+		// octal, hex or binary
+		switch(*str) {
+			case 'x':
+				return Utils_HexStringToU64(length-2, str+1);
+			case 'b':
+				return Utils_BinaryStringToU64(length-2, str+1);
+			default:
+				return Utils_OctalStringToU64(length-1, str);
+		}
+	} else {
+		//decimal
+		return Utils_DecimalStringToU64(length, start);
+	}
+}
+
 
 NON_NULL(2) unsigned int Utils_StringFindNext(unsigned int strLen, const char* string, char c) {
 	const char* ptr = string;

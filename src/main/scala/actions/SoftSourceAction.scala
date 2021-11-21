@@ -67,12 +67,14 @@ object SoftSourceAction {
 		}
 		val srcs = Utils.toArray(process("sources")).map(Utils.toTable)
 
+		// per process cpu target lists
 		val all_cpus = if (process.contains("cpus")) {
 			val cpusString = Utils.toString(process("cpus"))
 			if (cpusString == "_") Some(Seq())
 			else Some(cpuRegEx.split(cpusString).toSeq)
 		} else None
 
+		// pre source cpu target lists
 		for (entry <- srcs) yield {
 			val (phase, cpus) =
 				if (entry.contains("cpus")) {

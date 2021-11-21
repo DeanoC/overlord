@@ -4,10 +4,21 @@
 extern "C" {
 #endif
 
-WARN_UNUSED_RESULT uint32_t Utils_DecimalStringToU32(unsigned int length, const char* str) NON_NULL(2);
 WARN_UNUSED_RESULT int32_t Utils_DecimalStringToI32(unsigned int length, const char* str) NON_NULL(2);
-WARN_UNUSED_RESULT uint64_t Utils_DecimalStringToU64(unsigned int length, const char* str) NON_NULL(2);
 WARN_UNUSED_RESULT int64_t Utils_DecimalStringToI64(unsigned int length, const char* str) NON_NULL(2);
+
+// 0x (Hex), 0b (biinary), 0 (octal) or decimal prefixed string to uintXX_t
+// _ or ' can be used as spacers
+WARN_UNUSED_RESULT uint32_t Utils_BinaryStringToU32(unsigned int length, const char * str) NON_NULL(2);
+WARN_UNUSED_RESULT uint32_t Utils_OctalStringToU32(unsigned int length, const char * str) NON_NULL(2);
+WARN_UNUSED_RESULT uint32_t Utils_HexStringToU32(unsigned int length, const char * str) NON_NULL(2);
+WARN_UNUSED_RESULT uint32_t Utils_DecimalStringToU32(unsigned int length, const char* str) NON_NULL(2);
+WARN_UNUSED_RESULT uint32_t Utils_StringToU32(unsigned int length, const char* str) NON_NULL(2);
+WARN_UNUSED_RESULT uint64_t Utils_BinaryStringToU64(unsigned int length, const char * str) NON_NULL(2);
+WARN_UNUSED_RESULT uint64_t Utils_OctalStringToU64(unsigned int length, const char * str) NON_NULL(2);
+WARN_UNUSED_RESULT uint64_t Utils_HexStringToU64(unsigned int length, const char * str) NON_NULL(2);
+WARN_UNUSED_RESULT uint64_t Utils_DecimalStringToU64(unsigned int length, const char* str) NON_NULL(2);
+WARN_UNUSED_RESULT uint64_t Utils_StringToU64(unsigned int length, const char* str) NON_NULL(2);
 
 WARN_UNUSED_RESULT CONST_EXPR ALWAYS_INLINE NON_NULL(1) unsigned int Utils_StringLength(const char* string) {
 	const char* ptr = string;
