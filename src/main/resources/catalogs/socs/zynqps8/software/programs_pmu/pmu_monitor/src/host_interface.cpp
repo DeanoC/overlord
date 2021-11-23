@@ -5,16 +5,14 @@
 #include "os_heap.hpp"
 #include "utils/string_utils.hpp"
 #include "dbg/ansi_escapes.h"
-#include "zynqps8/dma/lpddma.hpp"
-#include "rom_extensions.h"
 #include "hw/reg_access.h"
 #include "hw/memory_map.h"
 #include "hw_regs/apu.h"
-#include "hw_regs/crl_apb.h"
 #include "hw_regs/crf_apb.h"
-#include "hw_regs/uart.h"
-#include "ipi3_os_server.hpp"
+#include "os/ipi3_os_server.hpp"
+#include "cpuwake.hpp"
 #include "zmodem.hpp"
+#include "zynqps8/dma/lpddma.hpp"
 
 #define SIZED_TEXT(text) sizeof(text), (uint8_t const*)text
 extern uint8_t textConsoleSkip;
@@ -196,6 +194,11 @@ void HostInterface::WhatCommand() {
 		}
 		case "boot_cpu"_hash: {
 			BootCpu(cmdBuffer, finds, findCount);
+			break;
+		}
+		case "reset"_hash: {
+			Reset(cmdBuffer, finds, findCount);
+			break;
 		}
 		default: {
 			debug_printf(ANSI_MAGENTA_PEN "\nUnknown Command %s\n" ANSI_RESET_ATTRIBUTES, cmdBuffer);
@@ -230,28 +233,6 @@ void HostInterface::DownloadAt(uint8_t const *cmdBuffer, unsigned int const *fin
 
 	this->downloadAddress = address;
 	this->currentState = State::RECEIVING_COMMAND;
-}
-static void A53Sleep() {
-	RomServiceTable[REN_ACPU0SLEEP]();
-	RomServiceTable[REN_ACPU1SLEEP]();
-	RomServiceTable[REN_ACPU2SLEEP]();
-	RomServiceTable[REN_ACPU3SLEEP]();
-}
-static void R5FSleep() {
-	RomServiceTable[REN_R50SLEEP]();
-	RomServiceTable[REN_R51SLEEP]();
-}
-
-static void A53WakeUp() {
-	RomServiceTable[REN_ACPU0WAKE]();
-	RomServiceTable[REN_ACPU1WAKE]();
-	RomServiceTable[REN_ACPU2WAKE]();
-	RomServiceTable[REN_ACPU3WAKE]();
-}
-
-static void R5FWakeUp() {
-	RomServiceTable[REN_R50WAKE]();
-	RomServiceTable[REN_R51WAKE]();
 }
 
 void HostInterface::SleepCpu(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int const findCount) {
@@ -351,4 +332,22 @@ void HostInterface::BootCpu(uint8_t const *cmdBuffer, unsigned int const *finds,
 			this->currentState = State::RECEIVING_COMMAND;
 			return;
 	}
+}
+void HostInterface::Reset(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int const findCount) {
+	debug_print("\nSoft Reset in Progress\n");
+	A53Sleep();
+	R5FSleep();
+	// restore boot program
+	using namespace Dma::LpdDma;
+	Stall(Channels::ChannelSevern);
+	SimpleDmaCopy(Channels::ChannelSevern,
+								(uintptr_all_t) osHeap->bootOCMStore,
+								osHeap->bootData.bootCodeStart,
+								osHeap->bootData.bootCodeSize);
+	Stall(Channels::ChannelSevern);
+	auto const lowAddress = (uint32_t) (osHeap->bootData.bootCodeStart & 0x0000'0000'FFFF'FFFFull);
+	auto const hiAddress = (uint32_t) ((osHeap->bootData.bootCodeStart & 0xFFFF'FFFF'0000'0000ull) >> 32ull);
+	HW_REG_MERGE_FIELD(APU, RVBARADDR0L, ADDR, lowAddress);
+	HW_REG_MERGE_FIELD(APU, RVBARADDR0H, ADDR, hiAddress);
+	A53WakeUp0();
 }

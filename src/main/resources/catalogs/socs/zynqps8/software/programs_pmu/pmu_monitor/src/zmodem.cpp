@@ -3,7 +3,7 @@
 #include "crc.h"
 #include "os_heap.hpp"
 #include "host_interface.hpp"
-#include "ipi3_os_server.hpp"
+#include "os/ipi3_os_server.hpp"
 #include "dbg/ansi_escapes.h"
 #include "zynqps8/dma/lpddma.hpp"
 

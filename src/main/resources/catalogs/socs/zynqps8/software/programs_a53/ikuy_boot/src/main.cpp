@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 
 #include "core/core.h"
-#include "utils/string_utils.h"
 #include "dbg/raw_print.h"
 #include "dbg/print.h"
 #include "dbg/ansi_escapes.h"
@@ -9,7 +8,6 @@
 #include "hw/cache.h"
 #include "hw/aarch64/intrinsics_gcc.h"
 #include "hw/memory_map.h"
-#include "hw_regs/uart.h"
 #include "hw_regs/csu.h"
 #include "hw_regs/ipi.h"
 #include "hw_regs/pmu_global.h"
@@ -20,8 +18,6 @@
 #include "hw_regs/a53/a53_system.h"
 #include "zynqps8/display_port/display.hpp"
 #include "osservices/osservices.h"
-#include "gfxdebug/rgba8.hpp"
-#include "gfxdebug/console.hpp"
 #include "utils/busy_sleep.h"
 #include "core/snprintf.h"
 
@@ -31,14 +27,9 @@ void ClearPendingInterrupts(void);
 void MarkDdrAsMemory(void);
 
 void EccInit(uint64_t DestAddr, uint64_t LengthBytes);
-void TcmInit(void);
-
-void USleep(uint64_t useconds);
 void PmuSleep();
-void PmuDownload();
 void PmuWakeup();
 void PmuSafeMemcpy(void * destination, const void* source, size_t num_in_bytes );
-
 
 extern "C" {
 	extern char _binary_pmu_monitor_bin_start[];
@@ -60,7 +51,6 @@ extern "C" {
 	extern uint8_t MMUTableL2[];
 }
 
-#define CPU_CORTEXA53_0_CPU_CLK_FREQ_HZ 1199988037
 #define CPU_CORTEXA53_0_TIMESTAMP_CLK_FREQ 33333000
 
 #define PSSYSMON_ANALOG_BUS_OFFSET		0x114U
@@ -81,10 +71,17 @@ uintptr_lo_t FrameBuffer;
 
 extern "C" int main(void)
 {
-	if(HW_REG_GET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) == 1) {
+	// if boot has completed once then this is a soft reset and we do nothing
+	// we leave it in state so that XSCT can access A53_0 for remote reset
+	if(HW_REG_GET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) & OS_GLOBAL0_BOOT_COMPLETE) {
+		debug_force_raw_print(false);
+		debug_printf("Soft Boot Finished\n");
 		while(1) {
 		}
 	}
+
+	// clear the boot status register
+	HW_REG_SET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0, 0);
 
 	debug_force_raw_print(true);
 
@@ -133,23 +130,31 @@ extern "C" int main(void)
 													(void*)_binary_pmu_monitor_bin_start,
 													(size_t)_binary_pmu_monitor_bin_end - (size_t)_binary_pmu_monitor_bin_start);
 	PmuWakeup();
-	Utils_BusyMilliSleep(100);
+
+	// stall until pmu says it loaded and ready to go
+	while(!(HW_REG_GET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) & OS_GLOBAL0_PMU_READY)) {}
+
 	debug_force_raw_print(false);
-
 	BringUpDisplayPort();
-
 	debug_printf("Boot program Finished\n");
 
 	// clear heap
 	memset(HeapBase, 0, HeapLimit - HeapBase);
-	Utils_BusyMilliSleep(100);
+	BootData bootData = {
+			.frameBufferWidth = 1280,
+			.frameBufferHeight = 720,
+			.frameBufferHertz = 60,
+			.videoBlockSizeInMB = 4,
+			.bootCodeSize = SRAM_OCP_0_SIZE_IN_BYTES,
+			.videoBlock = videoBlock,
+			.bootCodeStart = SRAM_OCP_0_BASE_ADDR,
+	};
+	HW_REG_SET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0,
+						 HW_REG_GET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) | OS_GLOBAL0_BOOT_COMPLETE);
 
-	OsServer_EnableScreenConsole(FrameBuffer, 1280, 720);
-
-	OsService_ScreenConsolePrint( ANSI_GREEN_PEN ANSI_BRIGHT "Welcome to Intex Systems\n" ANSI_RESET_ATTRIBUTES);
+	OsService_BootComplete(&bootData);
 
 	while(1) {
-		Utils_BusyMilliSleep(100);
 	}
 }
 
@@ -233,11 +238,6 @@ void BringUpDisplayPort()
 	}
 */
 }
-typedef enum {
-	PDS_WaitingForCommand = 0,
-	PDS_Receive,
-	PDS_Done
-} PmuDownloadState;
 
 void PmuSleep() {
 	// Enable PMU_0 IPI
@@ -263,7 +263,6 @@ void PmuWakeup() {
 	while(HW_REG_GET_BIT(PMU_GLOBAL, GLOBAL_CNTRL, FW_IS_PRESENT) == 0) {
 		// stall
 	}
-
 }
 
 // pmu ram only accepts 32 bit access, this ensure thats true
@@ -277,92 +276,6 @@ void PmuSafeMemcpy(void * destination, const void* source, size_t num_in_bytes )
 		*(dst + copy_count) = *(src + copy_count);
 	}
 }
-
-void PmuDownload() {
-	PmuDownloadState state = PDS_WaitingForCommand;
-
-reset:;
-	uint8_t* buffer = HeapBase;
-
-	uint8_t* argv[8] = { 0 };
-	uint8_t* last_arg_end = buffer;
-	uint32_t argc = 0;
-
-	uint32_t buffer_size = 4096;
-	uint8_t* download_addr = (uint8_t*) PMU_RAM_ADDR;
-	uint32_t download_size = 0;
-	uint32_t current_count = 0;
-	uint32_t reset_counter = 0;
-	const uint32_t maxResetCount = 100000000;
-
-	raw_debug_printf( "~`START_PMU_DOWNLOAD 0x%x`~\n", buffer_size);
-
-	Cache_DCacheDisable();
-
-	while(true) {
-		if(!HW_REG_GET_BIT(UART0, CHANNEL_STS, REMPTY)) {
-			if( reset_counter++ > maxResetCount) {
-				goto reset;
-			}
-			switch (state) {
-				case PDS_WaitingForCommand:; {
-					*buffer = (uint8_t) HW_REG_GET(UART0, TX_RX_FIFO);
-
-					if(*buffer == 0) {
-						buffer = HeapBase;
-						while(*buffer != 0) {
-							if(*buffer == ' ') {
-								*buffer = 0; // space to 0
-								argv[argc++] = last_arg_end;
-								last_arg_end = buffer+1;
-							}
-							buffer++;
-						}
-
-						argv[argc++] = last_arg_end;
-						buffer_size = Utils_DecimalStringToU32(Utils_StringLength( (char*) argv[1]), (char*) argv[1]);
-						download_size = Utils_DecimalStringToU32(Utils_StringLength( (char*) argv[2]),(char*) argv[2]);
-						buffer = HeapBase;
-						state = PDS_Receive;
-					} else {
-						buffer++;
-					}
-				}
-				break;
-				case PDS_Receive: {
-					*buffer = (uint8_t) HW_REG_GET(UART0, TX_RX_FIFO);
-					buffer++;
-					current_count++;
-					if(current_count == download_size) {
-						PmuSafeMemcpy(download_addr, HeapBase, (uint32_t) (buffer - HeapBase));
-						buffer = HeapBase;
-						state = PDS_Done;
-						raw_debug_print("END");
-					} else if(buffer - HeapBase == buffer_size) {
-						PmuSafeMemcpy(download_addr, HeapBase, buffer_size);
-						download_addr += buffer_size;
-						buffer = HeapBase;
-						raw_debug_print("NEXT");
-					}
-					break;
-				}
-				case PDS_Done: {
-					*buffer = (uint8_t) HW_REG_GET(UART0, TX_RX_FIFO);
-					if(*buffer == 0) {
-						if( memcmp(HeapBase, "PMU_DONE", 7) != 0) {
-							raw_debug_printf("Host sent %s rather then PMU_DONE", buffer);
-						}
-						Cache_DCacheEnable();
-						return;
-					}
-				}
-			}
-		}
-	}
-
-#undef PMU_RAM_ADDR
-}
-
 
 void EnablePSToPL(void)
 {
@@ -477,21 +390,6 @@ void MarkDdrAsMemory()
 	}
 
 	Cache_DCacheCleanAndInvalidate();
-}
-
-#define TIMESTAMP_COUNTS_PER_SECOND     CPU_CORTEXA53_0_TIMESTAMP_CLK_FREQ
-#define TIMESTAMP_COUNTS_PER_USECOND  ((TIMESTAMP_COUNTS_PER_SECOND + 500000)/1000000)
-
-void USleep(uint64_t useconds)
-{
-	uint64_t tEnd, tCur;
-
-	tCur = read_counter_timer_register();
-	tEnd = tCur + (useconds * TIMESTAMP_COUNTS_PER_USECOND);
-	do
-	{
-		tCur = read_counter_timer_register();
-	} while (tCur < tEnd);
 }
 
 #define XFSBL_ECC_INIT_VAL_WORD 0xDEADBEEFU
@@ -613,7 +511,7 @@ void TcmInit()
 	HW_REG_SET_BIT(CRL_APB, CPU_R5_CTRL, CLKACT);
 
 	// Provide some delay, so that clock propagates properly.
-	USleep(0x50U);
+	Utils_BusyMicroSleep(0x50U);
 
 	// Release reset to R5-0, R5-1 and amba
 	HW_REG_CLR_BIT(CRL_APB, RST_LPD_TOP, RPU_R50_RESET);

@@ -19,15 +19,15 @@ static void DCacheCleanAndMaybeInvalidate(bool invalidate)
 
 	for(uint32_t cacheLevel = 0; cacheLevel < 2;++cacheLevel) {
 		// Select cache level D cache in CSSELR
-		write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYS, CSSELR_EL1, LEVEL, cacheLevel) );
+		write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYSTEM, CSSELR_EL1, LEVEL, cacheLevel) );
 		isb();
 
 		uint32_t CsidReg = read_CCSIDR_EL1_register();
 
 		// Get the cacheline size, way size, index size from csidr
-		uint32_t LineSize = HW_REG_DECODE_FIELD(A53_SYS, CCSIDR_EL1, LINESIZE, CsidReg) + 4;
-		uint32_t NumWays = HW_REG_DECODE_FIELD(A53_SYS, CCSIDR_EL1, ASSOCIATIVITY, CsidReg) + 1;
-		uint32_t NumSet = HW_REG_DECODE_FIELD(A53_SYS, CCSIDR_EL1, NUMSETS, CsidReg) + 1;
+		uint32_t LineSize = HW_REG_DECODE_FIELD(A53_SYSTEM, CCSIDR_EL1, LINESIZE, CsidReg) + 4;
+		uint32_t NumWays = HW_REG_DECODE_FIELD(A53_SYSTEM, CCSIDR_EL1, ASSOCIATIVITY, CsidReg) + 1;
+		uint32_t NumSet = HW_REG_DECODE_FIELD(A53_SYSTEM, CCSIDR_EL1, NUMSETS, CsidReg) + 1;
 
 		// Flush all the cachelines
 		for (uint32_t Way = 0U; Way < NumWays; Way++) {
@@ -55,7 +55,7 @@ static void DCacheCleanAndMaybeInvalidateRange(uintptr_t  adr, uintptr_t len, bo
 	uintptr_t end = adr + len;
 	adr = adr & (~0x3F);
 
-	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYS, CSSELR_EL1, LEVEL, 0) );
+	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYSTEM, CSSELR_EL1, LEVEL, 0) );
 	if (len != 0U) {
 		while (adr < end) {
 			if(invalidate)
@@ -67,7 +67,7 @@ static void DCacheCleanAndMaybeInvalidateRange(uintptr_t  adr, uintptr_t len, bo
 	}
 	dsb();
 
-	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYS, CSSELR_EL1, LEVEL, 1) );
+	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYSTEM, CSSELR_EL1, LEVEL, 1) );
 	if (len != 0U) {
 		while (adr < end) {
 			if(invalidate)
@@ -86,29 +86,29 @@ static void DCacheCleanAndMaybeInvalidateRange(uintptr_t  adr, uintptr_t len, bo
 void Cache_DCacheEnable(void)
 {
 	// enable caches only if they are disabled
-	if(!HW_REG_DECODE_FIELD(A53_SYS, SCTLR_EL3, C, read_SCTLR_EL3_register())){
+	if(!HW_REG_DECODE_FIELD(A53_SYSTEM, SCTLR_EL3, C, read_SCTLR_EL3_register())){
 		// invalidate the Data cache
 		Cache_DCacheCleanAndInvalidate();
 		// enable the Data cache for el3
-		write_SCTLR_EL3_register(read_SCTLR_EL3_register() | HW_REG_ENCODE_FIELD(A53_SYS, SCTLR_EL3, C, 0x1));
+		write_SCTLR_EL3_register(read_SCTLR_EL3_register() | HW_REG_ENCODE_FIELD(A53_SYSTEM, SCTLR_EL3, C, 0x1));
 	}
 }
 
 void Cache_ICacheEnable(void)
 {
 	// enable caches only if they are disabled
-	if(!HW_REG_DECODE_FIELD(A53_SYS, SCTLR_EL3, I, read_SCTLR_EL3_register())){
+	if(!HW_REG_DECODE_FIELD(A53_SYSTEM, SCTLR_EL3, I, read_SCTLR_EL3_register())){
 		// invalidate the I cache
 		Cache_ICacheCleanAndInvalidate();
 		// enable the I cache for el3
-		write_SCTLR_EL3_register(read_SCTLR_EL3_register() | HW_REG_ENCODE_FIELD(A53_SYS, SCTLR_EL3, I, 0x1));
+		write_SCTLR_EL3_register(read_SCTLR_EL3_register() | HW_REG_ENCODE_FIELD(A53_SYSTEM, SCTLR_EL3, I, 0x1));
 	}
 }
 
 void Cache_DCacheDisable(void)
 {
 	// if dcache is enabled disable and flush
-	if(!HW_REG_DECODE_FIELD(A53_SYS, SCTLR_EL3, C, read_SCTLR_EL3_register())) {
+	if(!HW_REG_DECODE_FIELD(A53_SYSTEM, SCTLR_EL3, C, read_SCTLR_EL3_register())) {
 		asm(
 				"dsb sy\n\t"
 				"mov 	x0, #0\n\t"
@@ -130,27 +130,27 @@ void Cache_ICacheDisable(void)
 {
 	// invalidate the instruction cache
 	Cache_ICacheCleanAndInvalidate();
-	write_SCTLR_EL3_register(read_SCTLR_EL3_register() | HW_REG_ENCODE_FIELD(A53_SYS, SCTLR_EL3, I, 0x0));
+	write_SCTLR_EL3_register(read_SCTLR_EL3_register() | HW_REG_ENCODE_FIELD(A53_SYSTEM, SCTLR_EL3, I, 0x0));
 }
 
 uint32_t Cache_GetDCacheLineSizeInBytes(uint32_t level) {
-	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYS, CSSELR_EL1, LEVEL, (level - 1) ) );
+	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYSTEM, CSSELR_EL1, LEVEL, (level - 1) ) );
 	uint32_t CsidReg = read_CCSIDR_EL1_register();
-	uint32_t LineSize = HW_REG_DECODE_FIELD(A53_SYS, CCSIDR_EL1, LINESIZE, CsidReg) + 4;
+	uint32_t LineSize = HW_REG_DECODE_FIELD(A53_SYSTEM, CCSIDR_EL1, LINESIZE, CsidReg) + 4;
 	return 1 << LineSize;
 }
 
 uint32_t Cache_GetDCacheNumWays(uint32_t level) {
-	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYS, CSSELR_EL1, LEVEL, (level - 1) ) );
+	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYSTEM, CSSELR_EL1, LEVEL, (level - 1) ) );
 	uint32_t CsidReg = read_CCSIDR_EL1_register();
-	uint32_t NumWays = HW_REG_DECODE_FIELD(A53_SYS, CCSIDR_EL1, ASSOCIATIVITY, CsidReg) + 1;
+	uint32_t NumWays = HW_REG_DECODE_FIELD(A53_SYSTEM, CCSIDR_EL1, ASSOCIATIVITY, CsidReg) + 1;
 	return NumWays;
 }
 
 uint32_t Cache_GetDCacheNumSets(uint32_t level) {
-	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYS, CSSELR_EL1, LEVEL, (level - 1) ) );
+	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYSTEM, CSSELR_EL1, LEVEL, (level - 1) ) );
 	uint32_t CsidReg = read_CCSIDR_EL1_register();
-	uint32_t NumSets = HW_REG_DECODE_FIELD(A53_SYS, CCSIDR_EL1, NUMSETS, CsidReg) + 1;
+	uint32_t NumSets = HW_REG_DECODE_FIELD(A53_SYSTEM, CCSIDR_EL1, NUMSETS, CsidReg) + 1;
 	return NumSets;
 }
 
@@ -169,11 +169,11 @@ void Cache_DCacheCleanLine(uintptr_t adr)
 	uint32_t currmask = read_DAIF_register();
 	write_DAIF_register(currmask | IRQ_FIQ_MASK);
 
-	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYS, CSSELR_EL1, LEVEL, 0) );
+	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYSTEM, CSSELR_EL1, LEVEL, 0) );
 	write_data_cache_register(CVAC,(adr & (~0x3F)));
 	dsb();
 
-	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYS, CSSELR_EL1, LEVEL, 1) );
+	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYSTEM, CSSELR_EL1, LEVEL, 1) );
 	write_data_cache_register(CVAC,(adr & (~0x3F)));
 	dsb();
 
@@ -185,11 +185,11 @@ void Cache_DCacheCleanAndInvalidateLine(uintptr_t adr)
 	uint32_t currmask = read_DAIF_register();
 	write_DAIF_register(currmask | IRQ_FIQ_MASK);
 
-	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYS, CSSELR_EL1, LEVEL, 0) );
+	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYSTEM, CSSELR_EL1, LEVEL, 0) );
 	write_data_cache_register(CIVAC,(adr & (~0x3F)));
 	dsb();
 
-	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYS, CSSELR_EL1, LEVEL, 1) );
+	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYSTEM, CSSELR_EL1, LEVEL, 1) );
 	write_data_cache_register(CIVAC,(adr & (~0x3F)));
 	dsb();
 
@@ -212,8 +212,8 @@ void Cache_ICacheCleanAndInvalidate(void)
 	uint32_t currmask = read_DAIF_register();
 	write_DAIF_register(currmask | IRQ_FIQ_MASK);
 
-	write_CSSELR_EL1_register(	HW_REG_ENCODE_FIELD(A53_SYS, CSSELR_EL1, LEVEL, 0) |
-																HW_REG_ENCODE_FIELD(A53_SYS, CSSELR_EL1, INOTD, 1));
+	write_CSSELR_EL1_register(	HW_REG_ENCODE_FIELD(A53_SYSTEM, CSSELR_EL1, LEVEL, 0) |
+																HW_REG_ENCODE_FIELD(A53_SYSTEM, CSSELR_EL1, INOTD, 1));
 
 	dsb();
 	invalid_all_ICache();
@@ -247,8 +247,8 @@ void Cache_ICacheCleanAndInvalidateRange(uintptr_t  adr, uintptr_t len)
 		tempend = end;
 		tempadr &= ~(cacheline - 0x00000001U);
 
-		write_CSSELR_EL1_register(	HW_REG_ENCODE_FIELD(A53_SYS, CSSELR_EL1, LEVEL, 0) |
-																	HW_REG_ENCODE_FIELD(A53_SYS, CSSELR_EL1, INOTD, 1));
+		write_CSSELR_EL1_register(	HW_REG_ENCODE_FIELD(A53_SYSTEM, CSSELR_EL1, LEVEL, 0) |
+																	HW_REG_ENCODE_FIELD(A53_SYSTEM, CSSELR_EL1, INOTD, 1));
 		while (tempadr < tempend) {
 			write_instuction_cache_register(IVAU,adr & (~0x3F));
 			tempadr += cacheline;

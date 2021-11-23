@@ -64,8 +64,8 @@ enum RomExtension_Name {
 	REN_ACPU1WAKE                   = 33U,
 	REN_ACPU2WAKE                   = 34U,
 	REN_ACPU3WAKE                   = 35U,
-	REN_R50WAKE                     = 36U,
-	REN_R51WAKE                     = 37U,
+	REN_R5F0WAKE                     = 36U,
+	REN_R5F1WAKE                     = 37U,
 	REN_USB0WAKE                    = 38U,
 	REN_USB1WAKE                    = 39U,
 	REN_DAPFPDWAKE                  = 40U,
@@ -96,8 +96,8 @@ enum RomExtension_Name {
 	REN_ACPU1SLEEP                  = 65U,
 	REN_ACPU2SLEEP                  = 66U,
 	REN_ACPU3SLEEP                  = 67U,
-	REN_R50SLEEP                    = 68U,
-	REN_R51SLEEP                    = 69U,
+	REN_R5F0SLEEP                    = 68U,
+	REN_R5F1SLEEP                    = 69U,
 	// RESERVED                       70U
 	// RESERVED                       71U
 	REN_RCPU0_DBG_RST               = 72U,

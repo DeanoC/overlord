@@ -139,7 +139,7 @@ void DumpBlock0(uint8_t const *data) {
 				if(i == 0 && PTMIsNative) debug_print("Native DTD\n");
 				else debug_printf("DTD %d\n", i);
 
-				debug_printf("Pixel Clock %uKhz\n", pixelClock);
+				debug_printf("Pixel Clock %uKhz\n", (unsigned int)pixelClock);
 
 				uint8_t const hfp_hsp_vfp_vsp = DTD_REG(HFP_HSP_VFP_VSP_MSB_1);
 

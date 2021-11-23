@@ -1,18 +1,12 @@
 #include "core/core.h"
-#include "core/snprintf.h"
 #include "hw/memory_map.h"
-#include "hw/reg_access.h"
-#include "hw_regs/ipi.h"
-#include "hw_regs/uart.h"
 #include "osservices/ipi3_transport.h"
 #include "ipi3_os_server.hpp"
-#include "os_heap.hpp"
+#include "../os_heap.hpp"
 #include "dbg/assert.h"
 #include "zynqps8/dma/lpddma.hpp"
 #include "osservices/osservices.h"
-
-extern uint32_t uart0TransmitLast;
-extern uint32_t uart0TransmitHead;
+#include "dbg/ansi_escapes.h"
 
 OsHeap *osHeap;
 
@@ -20,7 +14,7 @@ uint8_t textConsoleSkip;
 uint8_t textConsoleSkipCurrent;
 
 static void TextConsoleDrawCallback() {
-	if(osHeap->console.framebuffer != nullptr) {
+	if(osHeap->console.framebuffer != nullptr && osHeap->screenConsoleEnabled) {
 		if(textConsoleSkipCurrent == textConsoleSkip) {
 			textConsoleSkipCurrent = 0;
 			auto const frameBuffer = osHeap->console.framebuffer;
@@ -55,11 +49,14 @@ void HandleFireAndForget(const IPI3_Msg *const msgBuffer) {
 			break;
 		case OSF_DDR_HI_BLOCK_FREE: DdrHiBlockFree(msgBuffer);
 			break;
-		case OSF_SCREEN_CONSOLE_CONFIG: ScreenConsoleConfig(msgBuffer);
-			break;
 		case OSF_SCREEN_CONSOLE_INLINE_PRINT: ScreenConsoleInlinePrint(msgBuffer);
 			break;
-
+		case OSF_BOOT_COMPLETE: BootComplete(msgBuffer);
+			break;
+		case OSF_SCREEN_CONSOLE_ENABLE: ScreenConsoleEnable(msgBuffer);
+			break;
+		case OSF_CPU_WAKE_OR_SLEEP: CpuWakeOrSleep(msgBuffer);
+			break;
 		default: debug_printf("Invalid function 0x%x in fire and forget handler IPI3\n", msgBuffer->function);
 	}
 }
@@ -143,45 +140,6 @@ void Handler(IPI_Channel senderChannel) {
 	}
 }
 
-void PutSizedData(uint32_t size, const uint8_t *text) {
-	if (size == 0)
-		return;
-
-	//put text into to transmit buffer, interrupts will send it to host
-
-	// split at buffer end
-	if (uart0TransmitHead + size >= OsHeap::UartBufferSize) {
-		const uint32_t firstBlockSize = OsHeap::UartBufferSize - uart0TransmitHead;
-		if (firstBlockSize > 0) {
-			memcpy(&osHeap->uart0TransmitBuffer[uart0TransmitHead], text, firstBlockSize);
-			text += firstBlockSize;
-			size -= firstBlockSize;
-		}
-		uart0TransmitHead = 0;
-	}
-
-	if (size > 0) {
-		memcpy(&osHeap->uart0TransmitBuffer[uart0TransmitHead], text, size);
-		uart0TransmitHead += (uint32_t) size;
-	}
-
-	HW_REG_SET(UART0, INTRPT_EN, UART_INTRPT_EN_TEMPTY);
-}
-
-#define IsTransmitFull() (HW_REG_GET_BIT(UART0, CHANNEL_STS, TNFUL))
-
-void DebugInlinePrint(IPI3_Msg const *msgBuffer) {
-	uint8_t size = msgBuffer->Payload.InlinePrint.size;
-	const auto *text = (const uint8_t *) msgBuffer->Payload.InlinePrint.text;
-	PutSizedData(size, text);
-}
-
-void DebugPtrPrint(IPI_Channel senderChannel, IPI3_Msg const *msgBuffer) {
-	uint32_t size = msgBuffer->Payload.DdrPacket.packetSize - IPI3_HEADER_SIZE - sizeof(IPI3_DdrPacket);
-	const auto *text = (const uint8_t *) (msgBuffer->Payload.PtrPrint.text);
-	PutSizedData(size, text);
-}
-
 void DdrLoBlockAlloc(IPI_Channel senderChannel, IPI3_Msg const *msgBuffer) {
 	IPI3_Response responseBuffer;
 	const uint32_t blocksWanted = msgBuffer->Payload.DdrLoBlockAlloc.blocks1MB;
@@ -231,19 +189,35 @@ void ScreenConsoleInlinePrint(IPI3_Msg const *msgBuffer) {
 	const auto *text = (const char *) msgBuffer->Payload.InlinePrint.text;
 	osHeap->console.console.PrintWithSize(size, text);
 }
-void ScreenConsoleConfig(IPI3_Msg const *msgBuffer) {
-	osHeap->console.frameBufferWidth = msgBuffer->Payload.ScreenConsoleConfig.width;
-	osHeap->console.frameBufferHeight = msgBuffer->Payload.ScreenConsoleConfig.height;
-	osHeap->console.framebuffer = (uint8_t*) msgBuffer->Payload.ScreenConsoleConfig.address;
+
+void BootComplete(IPI3_Msg const *msgBuffer) {
+	memcpy(&osHeap->bootData, &msgBuffer->Payload.BootData, sizeof(BootData));
+
+	osHeap->console.frameBufferWidth = msgBuffer->Payload.BootData.bootData.frameBufferWidth;
+	osHeap->console.frameBufferHeight = msgBuffer->Payload.BootData.bootData.frameBufferHeight;
+	osHeap->console.framebuffer = (uint8_t*) msgBuffer->Payload.BootData.bootData.videoBlock + 4096;
 	if(osHeap->console.framebuffer != nullptr) {
 		auto const frameBuffer = osHeap->console.framebuffer;
 		auto const width = osHeap->console.frameBufferWidth;
 		auto const height = osHeap->console.frameBufferHeight;
-
+		osHeap->screenConsoleEnabled = true;
 		GfxDebug::RGBA8 drawer(width, height, frameBuffer);
-		drawer.backgroundColour = 0xFF00FF00;
+		drawer.backgroundColour = 0xFF808080;
 		drawer.Clear();
+		osHeap->console.console.PrintLn( ANSI_GREEN_PEN ANSI_BRIGHT "Welcome to Intex Systems" ANSI_RESET_ATTRIBUTES);
+	} else {
+		osHeap->screenConsoleEnabled = false;
 	}
+	// back up boot program
+	using namespace Dma::LpdDma;
+	Stall(Channels::ChannelSevern);
+	SimpleDmaCopy(Channels::ChannelSevern, osHeap->bootData.bootCodeStart, (uintptr_all_t) osHeap->bootOCMStore, osHeap->bootData.bootCodeSize);
+//	Stall(Channels::ChannelSevern);
+//	SimpleDmaSet8(Channels::ChannelSevern, 0, osHeap->bootData.bootCodeStart, osHeap->bootData.bootCodeSize);
+}
+
+void ScreenConsoleEnable(IPI3_Msg const *msgBuffer) {
+	osHeap->screenConsoleEnabled  = msgBuffer->Payload.ScreenConsoleEnable.enabled;
 }
 
 void ScreenConsolePtrPrint(IPI_Channel senderChannel, IPI3_Msg const *msgBuffer) {
@@ -253,45 +227,3 @@ void ScreenConsolePtrPrint(IPI_Channel senderChannel, IPI3_Msg const *msgBuffer)
 }
 
 } // end namespace
-
-
-// override the weak prints, to write directly into the buffer
-extern "C" WEAK_LINKAGE void OsService_InlinePrint(uint8_t size, const char *const text) {
-	IPI3_OsServer::PutSizedData(size, (const uint8_t *)text);
-}
-
-extern "C" WEAK_LINKAGE void OsService_Print(const char *const text) {
-	OsService_PrintWithSize(Utils_StringLength(text), text);
-}
-
-extern "C" WEAK_LINKAGE void OsService_PrintWithSize(unsigned int count, const char *const text) {
-	IPI3_OsServer::PutSizedData(count, (const uint8_t *) text);
-}
-
-extern "C" WEAK_LINKAGE void OsService_Printf(const char *format, ...) {
-	char buffer[256]; // 256 byte max string (on stack)
-	va_list va;
-	va_start(va, format);
-	int const len = vsnprintf(buffer, 256, format, va);
-	va_end(va);
-	buffer[255] = 0;
-
-	OsService_PrintWithSize(len,buffer);
-}
-
-extern "C" WEAK_LINKAGE void debug_print(char const * text){
-	OsService_Print(text);
-}
-extern "C" WEAK_LINKAGE void debug_printf(const char *format, ...) {
-	char buffer[256]; // 256 byte max string (on stack)
-	va_list va;
-	va_start(va, format);
-	int const len = vsnprintf(buffer, 256, format, va);
-	va_end(va);
-	buffer[255] = 0;
-
-	OsService_PrintWithSize(len,buffer);
-}
-extern "C" WEAK_LINKAGE void debug_sized_print(uint32_t size, char const * text) {
-	OsService_PrintWithSize(size, text);
-}

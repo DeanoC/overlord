@@ -114,27 +114,25 @@ WEAK_LINKAGE void OsService_ScreenConsolePrintf(const char *format, ...) {
 	OsService_ScreenConsolePrintWithSize(len, buffer);
 }
 
-void OsServer_EnableScreenConsole(uintptr_lo_t framebuffer, uint16_t fbWidth, uint16_t fbHeight) {
+void OsService_EnableScreenConsole(bool enabled) {
 	// TODO we copy into the IPI3_Msg and then copy that to the HW
 	// buffer. could write directly to HW buffer.
 	IPI3_Msg msg = {
 			.ddrPtrFlag = false,
-			.function = OSF_SCREEN_CONSOLE_CONFIG,
-			.Payload.ScreenConsoleConfig.address = framebuffer,
-			.Payload.ScreenConsoleConfig.width = fbWidth,
-			.Payload.ScreenConsoleConfig.height = fbHeight
+			.function = OSF_SCREEN_CONSOLE_ENABLE,
+			.Payload.ScreenConsoleEnable.enabled = enabled,
 	};
 	IPI3_OsService_Submit(&msg);
 }
 
-void OsServer_DisableScreenConsole() {
+void OsService_BootComplete(BootData* bootData) {
 	// TODO we copy into the IPI3_Msg and then copy that to the HW
 	// buffer. could write directly to HW buffer.
 	IPI3_Msg msg = {
-			.ddrPtrFlag = false,
-			.function = OSF_SCREEN_CONSOLE_CONFIG,
-			.Payload.ScreenConsoleConfig.address = 0,
+		.ddrPtrFlag = false,
+		.function = OSF_BOOT_COMPLETE,
 	};
+	memcpy(&msg.Payload.BootData.bootData, bootData, sizeof(BootData));
 	IPI3_OsService_Submit(&msg);
 }
 

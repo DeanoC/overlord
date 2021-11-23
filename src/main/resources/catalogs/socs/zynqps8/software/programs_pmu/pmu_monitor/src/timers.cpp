@@ -3,7 +3,7 @@
 //
 #include "core/core.h"
 #include "timers.hpp"
-#include "interrupts.hpp"
+#include "interrupts/interrupts.hpp"
 #include "hw/reg_access.h"
 #include "hw/memory_map.h"
 #include "hw_regs/pmu/pmu_iomodule.h"

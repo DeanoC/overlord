@@ -2,8 +2,8 @@ set(project pmu_monitor)
 project(${project} C ASM CXX)
 
 file(GLOB LINKSCRIPT CONFIGURE_DEPENDS src/lscript.ld)
-file(GLOB ASMFILES CONFIGURE_DEPENDS src/*.S)
-file(GLOB SRCLIST CONFIGURE_DEPENDS src/*.c src/*.cpp)
+file(GLOB_RECURSE ASMFILES CONFIGURE_DEPENDS src/*.S)
+file(GLOB_RECURSE SRCLIST CONFIGURE_DEPENDS src/*.c src/*.cpp)
 
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}  -Wl,-M=${project}.map -T ${LINKSCRIPT}")
 

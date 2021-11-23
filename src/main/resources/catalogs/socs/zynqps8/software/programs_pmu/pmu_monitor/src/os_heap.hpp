@@ -4,6 +4,7 @@
 #include "text_console.hpp"
 #include "host_interface.hpp"
 #include "timers.hpp"
+#include "osservices/osservices.h"
 
 // the os heap is a 2MB chunk of DDR (at ddr base) that the pmu reserves
 // for itself.
@@ -31,12 +32,15 @@ struct OsHeap {
 
 	uint8_t bounceBuffer[BounceBufferSize];
 
-	TextConsole console;
-	HostInterface hostInterface;
 
 	Timers::Callback hundredHzCallbacks[Timers::MaxHundredHzCallbacks];
 	Timers::Callback thirtyHzCallbacks[Timers::MaxThirtyHzCallbacks];
 
+	uint8_t bootOCMStore[256*1024];
+	TextConsole console;
+	HostInterface hostInterface;
+	BootData bootData;
+	bool screenConsoleEnabled;
 
 };
 

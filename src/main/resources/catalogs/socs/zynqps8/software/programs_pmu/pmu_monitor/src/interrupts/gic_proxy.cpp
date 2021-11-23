@@ -6,7 +6,7 @@
 #include "hw_regs/uart.h"
 #include "hw_regs/ttc.h"
 #include "dbg/raw_print.h"
-#include "os_heap.hpp"
+#include "../os_heap.hpp"
 
 #define IsTransmitFull() (HW_REG_GET_BIT(UART0, CHANNEL_STS, TNFUL))
 #define IsReceiveEmpty() (HW_REG_GET_BIT(UART0, CHANNEL_STS, REMPTY))

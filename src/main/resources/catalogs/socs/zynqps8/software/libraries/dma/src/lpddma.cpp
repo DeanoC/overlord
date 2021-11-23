@@ -18,7 +18,7 @@
 
 namespace Dma::LpdDma {
 
-AsyncToken SimpleDmaSet(const Channels channel, const uint32_t data, uintptr_all_t address, uint32_t size) {
+AsyncToken SimpleDmaSet32(Channels channel, uint32_t data, uintptr_all_t address, uint32_t size) {
 	assert(size < ZDMA_TRANSFER_MAX_LEN)
 
 	uintptr_lo_t baseAddr = LPD_DMA_CH0_BASE_ADDR;
@@ -58,13 +58,13 @@ AsyncToken SimpleDmaSet(const Channels channel, const uint32_t data, uintptr_all
 
 	return channel;
 }
-AsyncToken SimpleDmaSet(const Channels channel, const uint8_t data, uintptr_all_t address, uint32_t size) {
+AsyncToken SimpleDmaSet8(Channels channel, uint8_t data, uintptr_all_t address, uint32_t size) {
 	const uint32_t data32 = (const uint32_t) data << 24 |
 			(const uint32_t) data << 16 |
 			(const uint32_t) data << 8 |
 			(const uint32_t) data << 0;
 
-	return SimpleDmaSet(channel, data32, address,size);
+	return SimpleDmaSet32(channel, data32, address, size);
 }
 
 AsyncToken SimpleDmaCopy(const Channels channel, uintptr_all_t src, uintptr_all_t dest, uint32_t size) {

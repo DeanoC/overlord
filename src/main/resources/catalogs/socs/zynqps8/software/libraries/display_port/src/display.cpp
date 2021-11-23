@@ -159,14 +159,14 @@ void SetPixelClock(uint64_t const FreqHz)
 	uint64_t const ExtDivider =  (XAVBUF_PLL_OUT_FREQ / FreqHz);
 	uint32_t const ExtDivider0 = (ExtDivider > 63) ? 63 : ExtDivider;
 	uint32_t const ExtDivider1 = (ExtDivider > 63) ? ExtDivider / 63 : 1;
-	debug_printf("FreqHz %llu ExtDivider %llu ExtDivider0 %lu ExtDivider1 %lu\n", FreqHz, ExtDivider, ExtDivider0, ExtDivider1);
+//	debug_printf("FreqHz %llu ExtDivider %llu ExtDivider0 %lu ExtDivider1 %lu\n", FreqHz, ExtDivider, ExtDivider0, ExtDivider1);
 
 	// Calculate integer and fractional parts
 	uint64_t const Vco = FreqHz * (uint64_t)(ExtDivider1 * ExtDivider0 * 2);
 	uint64_t const VcoIntFrac = (Vco * XAVBUF_INPUT_FREQ_PRECISION * XAVBUF_SHIFT_DECIMAL) / XAVBUF_INPUT_REF_CLK;
 	uint32_t const Fractional = VcoIntFrac & XAVBUF_PRECISION_MASK;
 	uint32_t const FracIntegerFBDIV = VcoIntFrac >> XAVBUF_PRECISION;
-	debug_printf("Vco %llu VcoIntFrac %llu Fractional %lu FracIntegerFBDIV %lu\n", Vco, VcoIntFrac, Fractional, FracIntegerFBDIV);
+//	debug_printf("Vco %llu VcoIntFrac %llu Fractional %lu FracIntegerFBDIV %lu\n", Vco, VcoIntFrac, Fractional, FracIntegerFBDIV);
 
 	hw_ZynqmpPllHelper const cfg = hw_GetZynqmpPllHelper(FracIntegerFBDIV);
 	PSI_IWord const SetVPLL[] = {
@@ -465,12 +465,12 @@ void SetDisplay(Connection *link, Display *display, Mixer *mixer) {
 	uint16_t const vStart = display->videoTiming.vSyncPulseWidth + display->videoTiming.vBackPorch;
 	uint16_t const initWait = (minBytesPerTransferUnit <= 4) ? transferUnitSize : transferUnitSize - minBytesPerTransferUnit;
 
-	debug_printf("TSU %ld pixelClockKHz %ld videoBandwith %ld linkBandwidth %ld initWait %d\n",
-							 transferUnitSize, pixelClockKHz, videoBandwidth, linkBandwidth, initWait);
-	debug_printf("H Addressable %d H total %d H Start %d H Sync Pulse %d H Polarity %d\n",
-							 display->videoTiming.width, display->videoTiming.hTotal, hStart, display->videoTiming.hSyncPulseWidth, display->videoTiming.hSyncPolarity);
-	debug_printf("V Addressable %d V total %d V Start %d V Sync Pulse %d V Polarity %d\n",
-							 display->videoTiming.height, display->videoTiming.vTotal, vStart, display->videoTiming.vSyncPulseWidth, display->videoTiming.vSyncPolarity);
+//	debug_printf("TSU %ld pixelClockKHz %ld videoBandwith %ld linkBandwidth %ld initWait %d\n",
+//							 transferUnitSize, pixelClockKHz, videoBandwidth, linkBandwidth, initWait);
+//	debug_printf("H Addressable %d H total %d H Start %d H Sync Pulse %d H Polarity %d\n",
+//							 display->videoTiming.width, display->videoTiming.hTotal, hStart, display->videoTiming.hSyncPulseWidth, display->videoTiming.hSyncPolarity);
+//	debug_printf("V Addressable %d V total %d V Start %d V Sync Pulse %d V Polarity %d\n",
+//							 display->videoTiming.height, display->videoTiming.vTotal, vStart, display->videoTiming.vSyncPulseWidth, display->videoTiming.vSyncPolarity);
 
 
 	PSI_IWord const setMixerProgram[] = {

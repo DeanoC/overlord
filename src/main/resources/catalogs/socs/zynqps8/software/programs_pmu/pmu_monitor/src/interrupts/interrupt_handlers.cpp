@@ -7,8 +7,8 @@
 #include "dbg/raw_print.h"
 
 #include "interrupt_handlers.hpp"
-#include "rom_extensions.h"
-#include "ipi3_os_server.hpp"
+#include "../rom_extensions.h"
+#include "../os/ipi3_os_server.hpp"
 #include "gic_proxy.hpp"
 
 void IPI0_Handler(Interrupts::Name irq_name) {
@@ -129,9 +129,9 @@ void GPI1_Handler(Interrupts::Name irq_name) {
 				break;
 			case PMU_IOMODULE_GPI1_USB_0_WAKE: RomServiceTable[REN_USB0WAKE]();
 				break;
-			case PMU_IOMODULE_GPI1_R5_1_WAKE: RomServiceTable[REN_R51WAKE]();
+			case PMU_IOMODULE_GPI1_R5_1_WAKE: RomServiceTable[REN_R5F1WAKE]();
 				break;
-			case PMU_IOMODULE_GPI1_R5_0_WAKE: RomServiceTable[REN_R50WAKE]();
+			case PMU_IOMODULE_GPI1_R5_0_WAKE: RomServiceTable[REN_R5F0WAKE]();
 				break;
 			case PMU_IOMODULE_GPI1_ACPU_3_WAKE: RomServiceTable[REN_ACPU3WAKE]();
 				break;
@@ -167,9 +167,9 @@ void GPI2_Handler(Interrupts::Name irq_name) {
 				break;
 			case PMU_IOMODULE_GPI2_ACPU_3_SLEEP: RomServiceTable[REN_ACPU3SLEEP]();
 				break;
-			case PMU_IOMODULE_GPI2_R5_0_SLEEP: RomServiceTable[REN_R50SLEEP]();
+			case PMU_IOMODULE_GPI2_R5_0_SLEEP: RomServiceTable[REN_R5F0SLEEP]();
 				break;
-			case PMU_IOMODULE_GPI2_R5_1_SLEEP: RomServiceTable[REN_R51SLEEP]();
+			case PMU_IOMODULE_GPI2_R5_1_SLEEP: RomServiceTable[REN_R5F1SLEEP]();
 				break;
 			case PMU_IOMODULE_GPI2_DBG_RCPU0_RST_REQ: RomServiceTable[REN_RCPU0_DBG_RST]();
 				break;

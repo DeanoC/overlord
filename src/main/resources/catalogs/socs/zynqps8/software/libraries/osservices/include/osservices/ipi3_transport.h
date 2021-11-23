@@ -2,6 +2,7 @@
 #include "hw_regs/ipi.h"
 #include "hw_regs/ipi_buffer.h"
 #include "hw/memory_map.h"
+#include "osservices.h"
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -101,10 +102,10 @@ WARN_UNUSED_RESULT CONST_EXPR ALWAYS_INLINE IPI_BUFFER_OFFSET IPI_ChannelToBuffe
 	OSF_INLINE_PRINT = OSF_FIRE_AND_FORGET_BIT | 0, 			// inline debug print <= 29 bytes
 	OSF_DDR_LO_BLOCK_FREE = OSF_FIRE_AND_FORGET_BIT | 1,  // free previously allocated lo chunks
 	OSF_DDR_HI_BLOCK_FREE = OSF_FIRE_AND_FORGET_BIT | 2,  // free previously allocated hi chunks
-	OSF_SCREEN_CONSOLE_CONFIG = OSF_FIRE_AND_FORGET_BIT | 3, 				// enable or disable the screen console
-	OSF_SCREEN_CONSOLE_INLINE_PRINT = OSF_FIRE_AND_FORGET_BIT | 4,	// inline print <= 29 bytes to screen console
-
-
+	OSF_SCREEN_CONSOLE_INLINE_PRINT = OSF_FIRE_AND_FORGET_BIT | 3,	// inline print <= 29 bytes to screen console
+	OSF_BOOT_COMPLETE = OSF_FIRE_AND_FORGET_BIT | 4,			// boot loader is done, passing some parameters upto PMU
+	OSF_SCREEN_CONSOLE_ENABLE = OSF_FIRE_AND_FORGET_BIT | 5, // switch the screen console on or off
+	OSF_CPU_WAKE_OR_SLEEP = OSF_FIRE_AND_FORGET_BIT | 6, 			// power down or up CPUs
 } OS_ServiceFunc;
 
 typedef struct PACKED {
@@ -154,10 +155,27 @@ typedef struct PACKED {
 				uint16_t free_blocks_starting_at; 		// offset in 1M blocks to free
 			} DdrHiBlockFree;
 			struct PACKED {
-				uintptr_lo_t address; // lo ddr address, 0 to disable screen console
-				uint16_t width;
-				uint16_t height;
-			} ScreenConsoleConfig;
+				BootData bootData;
+			} BootData;
+			struct PACKED {
+				uint8_t enabled; // turn the text console on or off
+			} ScreenConsoleEnable;
+			struct PACKED {
+				uint8_t wake_a53_0 : 1;
+				uint8_t wake_a53_1 : 1;
+				uint8_t wake_a53_2 : 1;
+				uint8_t wake_a53_3 : 1;
+				uint8_t wake_r5f_0 : 1;
+				uint8_t wake_r5f_1 : 1;
+				uint8_t :0;
+				uint8_t sleep_a53_0 : 1;
+				uint8_t sleep_a53_1 : 1;
+				uint8_t sleep_a53_2 : 1;
+				uint8_t sleep_a53_3 : 1;
+				uint8_t sleep_r5f_0 : 1;
+				uint8_t sleep_r5f_1 : 1;
+				uint8_t :0;
+			} CPUWakeOrSleep;
 		};
 	} Payload;
 } IPI3_Msg;

@@ -16,15 +16,16 @@
 #include "dbg/ansi_escapes.h"
 #include "dbg/print.h"
 
-#include "interrupts.hpp"
-#include "interrupt_handlers.hpp"
-#include "ipi3_os_server.hpp"
-#include "gic_proxy.hpp"
+#include "interrupts/interrupts.hpp"
+#include "interrupts/interrupt_handlers.hpp"
+#include "os/ipi3_os_server.hpp"
+#include "interrupts/gic_proxy.hpp"
 #include "host_interface.hpp"
 #include "rom_extensions.h"
 #include "timers.hpp"
 #include "os_heap.hpp"
 #include "main_loop.hpp"
+#include "osservices/osservices.h"
 
 typedef struct {
 	uint32_t namesz;
@@ -90,8 +91,8 @@ void main()
 	RomServiceTable[REN_ACPU1SLEEP]();
 	RomServiceTable[REN_ACPU2SLEEP]();
 	RomServiceTable[REN_ACPU3SLEEP]();
-	RomServiceTable[REN_R50SLEEP]();
-	RomServiceTable[REN_R51SLEEP]();
+	RomServiceTable[REN_R5F0SLEEP]();
+	RomServiceTable[REN_R5F1SLEEP]();
 
 	OsHeap::Init();
 	loopy.Init();
@@ -148,7 +149,8 @@ void main()
 
 	Interrupts::Start();
 
-	HW_REG_SET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0, 1);
+	HW_REG_SET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0,
+						 HW_REG_GET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) | OS_GLOBAL0_PMU_READY);
 
 	debug_print("IKUY PMU Firmware setup complete\n");
 	Timers::Start();
