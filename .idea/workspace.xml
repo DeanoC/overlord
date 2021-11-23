@@ -4,46 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="73b7f681-932b-4979-9f4f-6aee48997ac8" name="Default Changelist" comment="Add String to binary, hex, octal and C style decoder (0x,0b, 0)&#10;Added download address to zmodem and dma each chunk&#10;Added monitor commands for download_at, sleep cpu, wake cpu and boot cpu&#10;Fixed bug in overload related to pathing programs">
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libraries/osservices/src/cpu.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/cpuwake.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/cpuwake.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/interrupts/gic_proxy.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/interrupts/gic_proxy.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/interrupts/interrupt_handlers.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/interrupts/interrupt_handlers.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/interrupts/interrupts.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/interrupts/interrupts.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os/ipi3_os_server.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os/ipi3_os_server.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os/os_cpu.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os/os_print.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libraries/display_port/src/display.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libraries/display_port/src/display.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libraries/display_port/src/edid.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libraries/display_port/src/edid.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libraries/dma/include/zynqps8/dma/lpddma.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libraries/dma/include/zynqps8/dma/lpddma.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libraries/dma/src/lpddma.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libraries/dma/src/lpddma.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libraries/hw/src/aarch64/cache.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libraries/hw/src/aarch64/cache.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libraries/osservices/include/osservices/ipi3_transport.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libraries/osservices/include/osservices/ipi3_transport.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libraries/osservices/include/osservices/osservices.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libraries/osservices/include/osservices/osservices.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libraries/osservices/src/ipi3_transport.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libraries/osservices/src/ipi3_transport.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libraries/osservices/src/print.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libraries/osservices/src/print.c" afterDir="false" />
+    <list default="true" id="73b7f681-932b-4979-9f4f-6aee48997ac8" name="Default Changelist" comment="Fixed up cache system SYS -&gt; SYSTEM change&#10;Added RECURSE to pmu CMakeLists.txt&#10;Added subdirectories to tidy in various places&#10;Added cpu wake and sleep to os services&#10;Added reset to pmu">
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/gic_proxy.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/gic_proxy.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/cpuwake.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/cpuwake.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/host_interface.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/host_interface.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/host_interface.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/host_interface.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/interrupt_handlers.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/interrupt_handlers.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/interrupts.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/interrupts.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/ipi3_os_server.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/ipi3_os_server.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os_heap.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os_heap.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/rom_extensions.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/rom_extensions.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/timers.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/timers.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/zmodem.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/zmodem.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -333,7 +297,7 @@
       <workItem from="1636032589151" duration="10445000" />
       <workItem from="1636706702727" duration="12718000" />
       <workItem from="1636877571819" duration="3172000" />
-      <workItem from="1637436848637" duration="7935000" />
+      <workItem from="1637436848637" duration="8875000" />
     </task>
     <task id="LOCAL-00001" summary="Major work on connection expansion and block connections&#10;Refactor and reorg instances, constraits, actions etc.&#10;moved ps8 docs to lower case">
       <created>1605964442645</created>
@@ -573,7 +537,14 @@
       <option name="project" value="LOCAL" />
       <updated>1637483525248</updated>
     </task>
-    <option name="localTasksCounter" value="35" />
+    <task id="LOCAL-00035" summary="Fixed up cache system SYS -&gt; SYSTEM change&#10;Added RECURSE to pmu CMakeLists.txt&#10;Added subdirectories to tidy in various places&#10;Added cpu wake and sleep to os services&#10;Added reset to pmu">
+      <created>1637697192533</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1637697192533</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -619,7 +590,6 @@
       <path value="$PROJECT_DIR$/gate/litedram" />
       <path value="$PROJECT_DIR$/../ikuy_utils" />
     </ignored-roots>
-    <MESSAGE value="Buses now take array of address, size as input&#10;Instances can now optionally specify address and size else use generated ones&#10;Generate cmake scripts for boot roms&#10;Moved compiler script to resource file for better editing&#10;Generate cmake tool chain files for the compilers that it builds&#10;cpus now take a primary_boot tag to say they will boot the SoC&#10;cpus now take a triple element to say which compiler etc. they use&#10;WIP crt file for riscv32 metal cpus&#10;Edalize now has a function to update boot rom from compiled rom&#10;Support for bus consumer array and ram size in game&#10;Dummy bootrom main.c to check linking okay&#10;Not finished update and instance only cli driver&#10;linker script for riscv32 metal&#10;Our Variant supports toString&#10;TomlAction can now output arrays&#10;Removed UnconnectionTrait into Unconnected&#10;Moved bus connection to preconnect&#10;Fixed bus connection bug for direct non-prefixed ports" />
     <MESSAGE value="renamed some bus parameter to be more consistant&#10;Fixed issues with prep_rom and now issues the calls as require.&#10;TODO the naming of prop_rom calls is slightly hardcoded&#10;rams are now required to provide data including defaults from toml so prep_rom&#10;Added RamFillType enum, so far just zero and boot_primary. TODO file and other code&#10;renamed toml variant toString to toTomlString" />
     <MESSAGE value="Output clock period and waveform for constraint&#10;HACK: Added dont_touch as vivido is stripping things and I can't figure out why...&#10;Utils toDouble and lookupDouble" />
     <MESSAGE value="Finding my way around again after break" />
@@ -644,7 +614,8 @@
     <MESSAGE value="Moved most software libraries to soft_src&#10;rearranged include/src of most software projects&#10;Added assert_msg macro&#10;Added zynqmp display port library&#10;added zynqmp dma library&#10;ikuy_boot now packages pmu_monitor code and uploads its to pmu&#10;ikuy_boot sets up a 720p RGBA framebuffer&#10;utils library busy_sleep for aarch64, string utils, c++ compile time hash&#10;basic gfxdebug code with vga screen print&#10;Added ANSI screen console&#10;Fixed some pmu interrupt problems due to fast interrupts&#10;Added aarch64 exception registers and logger to ikuy_boot" />
     <MESSAGE value="Text Console improvements&#10;Extra Standard Video Modes&#10;Some DP timing cleanup&#10;Rework of host interface to using timer&#10;ZModem now working via host interface&#10;pmu_monitor now has 8K stack not 16K&#10;pmu_monitor as hundred hertz timer&#10;rgba8 have temp buffer no alloca" />
     <MESSAGE value="Add String to binary, hex, octal and C style decoder (0x,0b, 0)&#10;Added download address to zmodem and dma each chunk&#10;Added monitor commands for download_at, sleep cpu, wake cpu and boot cpu&#10;Fixed bug in overload related to pathing programs" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add String to binary, hex, octal and C style decoder (0x,0b, 0)&#10;Added download address to zmodem and dma each chunk&#10;Added monitor commands for download_at, sleep cpu, wake cpu and boot cpu&#10;Fixed bug in overload related to pathing programs" />
+    <MESSAGE value="Fixed up cache system SYS -&gt; SYSTEM change&#10;Added RECURSE to pmu CMakeLists.txt&#10;Added subdirectories to tidy in various places&#10;Added cpu wake and sleep to os services&#10;Added reset to pmu" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed up cache system SYS -&gt; SYSTEM change&#10;Added RECURSE to pmu CMakeLists.txt&#10;Added subdirectories to tidy in various places&#10;Added cpu wake and sleep to os services&#10;Added reset to pmu" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />

@@ -201,7 +201,19 @@ void HostInterface::WhatCommand() {
 			break;
 		}
 		default: {
-			debug_printf(ANSI_MAGENTA_PEN "\nUnknown Command %s\n" ANSI_RESET_ATTRIBUTES, cmdBuffer);
+			bool hasPrintable = false;
+			uint8_t const * ptr  = this->cmdBuffer;
+			while(*ptr) {
+				uint8_t const c = *ptr++;
+				if(c > ' ' && c <= 127) {
+					hasPrintable = true;
+					break;
+				}
+			}
+
+			if(hasPrintable) {
+				debug_printf(ANSI_MAGENTA_PEN "\nUnknown Command %s\n" ANSI_RESET_ATTRIBUTES, cmdBuffer);
+			}
 			this->currentState = State::RECEIVING_COMMAND;
 			break;
 		}
@@ -295,33 +307,10 @@ void HostInterface::BootCpu(uint8_t const *cmdBuffer, unsigned int const *finds,
 			A53Sleep();
 			auto const lowAddress = (uint32_t) (downloadAddress & 0x0000'0000'FFFF'FFFFull);
 			auto const hiAddress = (uint32_t) ((downloadAddress & 0xFFFF'FFFF'0000'0000ull) >> 32ull);
-			HW_REG_MERGE_FIELD(APU, RVBARADDR0L, ADDR, lowAddress);
-			HW_REG_MERGE_FIELD(APU, RVBARADDR0H, ADDR, hiAddress);
-			/*		HW_REG_MERGE_FIELD(APU, RVBARADDR1L, ADDR, lowAddress);
-					HW_REG_MERGE_FIELD(APU, RVBARADDR1H, ADDR, hiAddress);
-					HW_REG_MERGE_FIELD(APU, RVBARADDR2L, ADDR, lowAddress);
-					HW_REG_MERGE_FIELD(APU, RVBARADDR2H, ADDR, hiAddress);
-					HW_REG_MERGE_FIELD(APU, RVBARADDR3L, ADDR, lowAddress);
-					HW_REG_MERGE_FIELD(APU, RVBARADDR3H, ADDR, hiAddress);
-		*/
-			// put apu in reset
-			HW_REG_SET(CRF_APB, RST_FPD_APU,
-								 HW_REG_ENCODE_FIELD(CRF_APB, RST_FPD_APU, APU_L2_RESET, 1) |
-										 HW_REG_ENCODE_FIELD(CRF_APB, RST_FPD_APU, ACPU0_RESET, 1) |
-										 HW_REG_ENCODE_FIELD(CRF_APB, RST_FPD_APU, ACPU1_RESET, 1) |
-										 HW_REG_ENCODE_FIELD(CRF_APB, RST_FPD_APU, ACPU2_RESET, 1) |
-										 HW_REG_ENCODE_FIELD(CRF_APB, RST_FPD_APU, ACPU3_RESET, 1));
-
+			HW_REG_SET(APU, RVBARADDR0L, lowAddress);
+			HW_REG_SET(APU, RVBARADDR0H, hiAddress);
 			// wakey wakey rise and shine
-			A53WakeUp();
-
-			// take them out
-			HW_REG_SET(CRF_APB, RST_FPD_APU,
-								 HW_REG_ENCODE_FIELD(CRF_APB, RST_FPD_APU, APU_L2_RESET, 0) |
-										 HW_REG_ENCODE_FIELD(CRF_APB, RST_FPD_APU, ACPU0_RESET, 0) |
-										 HW_REG_ENCODE_FIELD(CRF_APB, RST_FPD_APU, ACPU1_RESET, 0) |
-										 HW_REG_ENCODE_FIELD(CRF_APB, RST_FPD_APU, ACPU2_RESET, 0) |
-										 HW_REG_ENCODE_FIELD(CRF_APB, RST_FPD_APU, ACPU3_RESET, 0));
+			A53WakeUp0();
 			break;
 		}
 //		case "R5F"_hash: {
@@ -347,7 +336,8 @@ void HostInterface::Reset(uint8_t const *cmdBuffer, unsigned int const *finds, u
 	Stall(Channels::ChannelSevern);
 	auto const lowAddress = (uint32_t) (osHeap->bootData.bootCodeStart & 0x0000'0000'FFFF'FFFFull);
 	auto const hiAddress = (uint32_t) ((osHeap->bootData.bootCodeStart & 0xFFFF'FFFF'0000'0000ull) >> 32ull);
-	HW_REG_MERGE_FIELD(APU, RVBARADDR0L, ADDR, lowAddress);
-	HW_REG_MERGE_FIELD(APU, RVBARADDR0H, ADDR, hiAddress);
+	HW_REG_SET(APU, RVBARADDR0L, lowAddress);
+	HW_REG_SET(APU, RVBARADDR0H, hiAddress);
 	A53WakeUp0();
+
 }

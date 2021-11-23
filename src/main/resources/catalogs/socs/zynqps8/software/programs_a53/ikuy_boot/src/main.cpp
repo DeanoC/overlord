@@ -74,8 +74,7 @@ extern "C" int main(void)
 	// if boot has completed once then this is a soft reset and we do nothing
 	// we leave it in state so that XSCT can access A53_0 for remote reset
 	if(HW_REG_GET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) & OS_GLOBAL0_BOOT_COMPLETE) {
-		debug_force_raw_print(false);
-		debug_printf("Soft Boot Finished\n");
+		debug_printf("Soft Reset Finished\n");
 		while(1) {
 		}
 	}
