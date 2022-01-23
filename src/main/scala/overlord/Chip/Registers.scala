@@ -44,11 +44,11 @@ object Registers {
 
 		val tomls = mutable.ArrayBuffer[(String, Map[String, Variant])]()
 
-		for (inlineTable <- registerDefs) yield {
+		for (inlineTable <- registerDefs) {
 			val item = inlineTable.asInstanceOf[TableV].value
-			if(!item.contains("resource")) {
+			if (!item.contains("resource")) {
 				println(s"No resource in register table\n")
-				return Registers(Seq(),Seq())
+				return Registers(Seq(), Seq())
 			}
 			val resource = item("resource").asInstanceOf[StringV].value
 

@@ -1,0 +1,7 @@
+resources = [
+    "socs/zynqps8/fabric",
+    "socs/zynqps8/a53",
+    "socs/zynqps8/r5f",
+    "socs/zynqps8/pmu",
+    "socs/zynqps8/all",
+]

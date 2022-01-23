@@ -73,6 +73,8 @@ void HandleNeedResponse(IPI_Channel const senderChannel, const IPI3_Msg *const m
 			break;
 		case OSF_SCREEN_CONSOLE_PTR_PRINT: ScreenConsolePtrPrint(senderChannel, msgBuffer);
 			break;
+		case OSF_FETCH_BOOT_DATA: FetchBootData(senderChannel, msgBuffer);
+			break;
 
 		default: debug_printf("Invalid function 0x%x in need response handler IPI3\n", msgBuffer->function);
 	}
@@ -138,92 +140,6 @@ void Handler(IPI_Channel senderChannel) {
 		}
 		HandleNeedResponse(senderChannel, (IPI3_Msg *) addr);
 	}
-}
-
-void DdrLoBlockAlloc(IPI_Channel senderChannel, IPI3_Msg const *msgBuffer) {
-	IPI3_Response responseBuffer;
-	const uint32_t blocksWanted = msgBuffer->Payload.DdrLoBlockAlloc.blocks1MB;
-	if(blocksWanted >= 128) {
-		responseBuffer.result = IRR_BAD_PARAMETERS;
-	} else {
-		responseBuffer.result = IRR_SUCCESS;
-		uintptr_t address = osHeap->ddrLoAllocator.Alloc(blocksWanted);
-		if (address == (uintptr_t) ~0) {
-			responseBuffer.result = IRR_OUT_OF_MEMORY;
-		} else {
-			responseBuffer.DdrLoBlockAlloc.block_1MB_Offset = address / (1024 * 1024);
-		}
-	}
-	SubmitResponse(senderChannel, &responseBuffer);
-}
-
-void DdrLoBlockFree(IPI3_Msg const *msgBuffer) {
-	uintptr_t address = msgBuffer->Payload.DdrLoBlockFree.free_blocks_starting_at * (1024 * 1024);
-	osHeap->ddrLoAllocator.Free(address);
-}
-
-void DdrHiBlockAlloc(IPI_Channel senderChannel, IPI3_Msg const *msgBuffer) {
-	IPI3_Response responseBuffer;
-	const uint32_t blocksWanted = msgBuffer->Payload.DdrHiBlockAlloc.blocks1MB;
-	if(blocksWanted >= 128) {
-		responseBuffer.result = IRR_BAD_PARAMETERS;
-	} else {
-		responseBuffer.result = IRR_SUCCESS;
-		uintptr_t address = osHeap->ddrHiAllocator.Alloc(blocksWanted);
-		if (address == (uintptr_t) ~0) {
-			responseBuffer.result = IRR_OUT_OF_MEMORY;
-		} else {
-			responseBuffer.DdrHiBlockAlloc.block_1MB_Offset = address / (1024 * 1024);
-		}
-	}
-	SubmitResponse(senderChannel, &responseBuffer);
-}
-
-void DdrHiBlockFree(IPI3_Msg const *msgBuffer) {
-	uintptr_t address = msgBuffer->Payload.DdrHiBlockFree.free_blocks_starting_at * (1024 * 1024);
-	osHeap->ddrHiAllocator.Free(address);
-}
-
-void ScreenConsoleInlinePrint(IPI3_Msg const *msgBuffer) {
-	uint8_t size = msgBuffer->Payload.InlinePrint.size;
-	const auto *text = (const char *) msgBuffer->Payload.InlinePrint.text;
-	osHeap->console.console.PrintWithSize(size, text);
-}
-
-void BootComplete(IPI3_Msg const *msgBuffer) {
-	memcpy(&osHeap->bootData, &msgBuffer->Payload.BootData, sizeof(BootData));
-
-	osHeap->console.frameBufferWidth = msgBuffer->Payload.BootData.bootData.frameBufferWidth;
-	osHeap->console.frameBufferHeight = msgBuffer->Payload.BootData.bootData.frameBufferHeight;
-	osHeap->console.framebuffer = (uint8_t*) msgBuffer->Payload.BootData.bootData.videoBlock + 4096;
-	if(osHeap->console.framebuffer != nullptr) {
-		auto const frameBuffer = osHeap->console.framebuffer;
-		auto const width = osHeap->console.frameBufferWidth;
-		auto const height = osHeap->console.frameBufferHeight;
-		osHeap->screenConsoleEnabled = true;
-		GfxDebug::RGBA8 drawer(width, height, frameBuffer);
-		drawer.backgroundColour = 0xFF808080;
-		drawer.Clear();
-		osHeap->console.console.PrintLn( ANSI_GREEN_PEN ANSI_BRIGHT "Welcome to Intex Systems" ANSI_RESET_ATTRIBUTES);
-	} else {
-		osHeap->screenConsoleEnabled = false;
-	}
-	// back up boot program
-	using namespace Dma::LpdDma;
-	Stall(Channels::ChannelSevern);
-	SimpleDmaCopy(Channels::ChannelSevern, osHeap->bootData.bootCodeStart, (uintptr_all_t) osHeap->bootOCMStore, osHeap->bootData.bootCodeSize);
-//	Stall(Channels::ChannelSevern);
-//	SimpleDmaSet8(Channels::ChannelSevern, 0, osHeap->bootData.bootCodeStart, osHeap->bootData.bootCodeSize);
-}
-
-void ScreenConsoleEnable(IPI3_Msg const *msgBuffer) {
-	osHeap->screenConsoleEnabled  = msgBuffer->Payload.ScreenConsoleEnable.enabled;
-}
-
-void ScreenConsolePtrPrint(IPI_Channel senderChannel, IPI3_Msg const *msgBuffer) {
-	uint32_t size = msgBuffer->Payload.DdrPacket.packetSize - IPI3_HEADER_SIZE - sizeof(IPI3_DdrPacket);
-	const auto *text = (const char *) (msgBuffer->Payload.PtrPrint.text);
-	osHeap->console.console.PrintWithSize(size, text);
 }
 
 } // end namespace

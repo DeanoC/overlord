@@ -1,0 +1,4 @@
+[[definition]]
+type = "net.ethernet.zynqps8"
+registers = [{ resource = "zynqps8/gem", bankPrefix = "GEM" }]
+hardware = [{ max_cores = 4 }]

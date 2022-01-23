@@ -93,6 +93,7 @@ object OutputSoftware {
 					"${isSoftCore}" -> (() => BooleanV(!cpu.isHardware)),
 					"${isHardCore}" -> (() => BooleanV(cpu.isHardware)),
 					"${memoryMap}" -> (() => StringV(generateMemoryMapFor(game, cpu))),
+					"${board}" -> (() => StringV(game.board.get.ident))
 					)
 
 				val parametersTbl = keywords
@@ -142,7 +143,7 @@ object OutputSoftware {
 		for ((ram, bus) <- ramByBus.sortWith((a, b) => a._1.getSizeInBytes >
 		                                               b._1.getSizeInBytes)) {
 			sb ++= f"%n"
-			val si = ram.ident.split('.').tail.mkString("_").replace('.', '_')
+			val si = ram.ident.replace('.', '_')
 
 			val asplits = bus.getConsumerAddressesAndSizes(ram)
 			if (asplits.nonEmpty) {
@@ -166,7 +167,7 @@ object OutputSoftware {
 		for ((ram, i, address, size) <- ramByRange) {
 			sb ++= f"%n"
 
-			val si   = ram.ident.split('.').tail.mkString("_").replace('.', '_')
+			val si   = ram.ident.replace('.', '_')
 			val name = s"${si}_$i".toUpperCase
 			sb ++= f"#define ${name}_BASE_ADDR 0x$address%x${cPostFix(size)}%n"
 			sb ++= f"#define ${name}_SIZE_IN_BYTES $size${cPostFix(size)}%n"
@@ -201,8 +202,14 @@ object OutputSoftware {
 							val obuses = game.getDirectBusesConnectedTo(bridge).filter(_ != bus)
 							for (obus <- obuses) busStack.push((obus, address))
 						case _                      =>
-
-							for (rb <- instance.registerBanks) sb ++= writeRegisterBank(busAddr, rb)
+							if (instance.registerBanks.isEmpty && instance.registerLists.nonEmpty) {
+								sb ++= writeRegisterBank(busAddr,
+								                         RegisterBank(instance.ident.toUpperCase,
+								                                      address,
+								                                      instance.registerLists(0).name))
+							} else {
+								for (rb <- instance.registerBanks) sb ++= writeRegisterBank(busAddr, rb)
+							}
 
 					}
 				}
@@ -290,7 +297,7 @@ object OutputSoftware {
 			.resolve("hw")
 			.resolve("include")
 			.resolve("hw_regs")
-			.resolve(cpu.splitIdent.last)
+			.resolve(cpu.definition.defType.ident.last)
 
 	private def filePath(out: Path, name: String): Path = {
 		val fn       = s"${name.replace('.', '_')}.h".toLowerCase()
@@ -367,7 +374,11 @@ object OutputSoftware {
 							val obuses = game.getDirectBusesConnectedTo(bridge).filter(_ != bus)
 							for (obus <- obuses) busStack.push((obus, address))
 						case _                      =>
-							val rbs = instance.registerBanks
+							val rbs = if (instance.registerBanks.isEmpty &&
+							              instance.registerLists.nonEmpty) {
+								for (rl <- instance.registerLists) yield
+									RegisterBank(instance.ident.toUpperCase, address, rl.name)
+							} else instance.registerBanks
 							val rls = instance.registerLists
 
 							for (rb <- rbs) {

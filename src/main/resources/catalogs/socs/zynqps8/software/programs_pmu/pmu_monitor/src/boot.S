@@ -27,7 +27,6 @@ _vector_break:
 _vector_hw_exception:
 		brai	XPfw_Exception
 
-
 		.section .text
 		.globl _boot
 		.align 2

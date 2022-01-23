@@ -96,7 +96,8 @@ object ActionsFile {
 					case "templates"           => TemplateAction(name, process, pathOp)
 					case "software_sources"    => SoftSourceAction(name, process, pathOp)
 					case _                     =>
-						println(f"Unknown action processor in $name")
+						println(f"Unknown action processor (${Utils.toString(process("processor"))})" +
+						        f" in $name")
 						None
 				}
 			}).flatten

@@ -1,0 +1,5 @@
+path = "qspi"
+
+[[definition]]
+type = "storage.qspi.zynqps8"
+registers = [{ resource = "zynqps8/qspi", bankPrefix = "QSPI" }]

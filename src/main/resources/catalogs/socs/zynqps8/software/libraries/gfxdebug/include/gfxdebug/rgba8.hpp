@@ -29,6 +29,10 @@ struct RGBA8 {
 	void PutString(int col, int row, char const *str) const;
 	void PutChar(int col, int row, char c) const;
 
+	void SetPixel(int x, int y, uint32_t val);
+	void SetPixel(int x, int y, uint8_t r, uint8_t g, uint8_t b, uint8_t a);
+
+
 private:
 	void PutChar8(int col, int row, char c) const;
 	void PutChar8x16(int col, int row, char c) const;

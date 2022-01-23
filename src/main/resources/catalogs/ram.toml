@@ -1,4 +1,6 @@
-path = "ram"
+resources = [
+    "ram/ram",
+]
 
 [[definition]]
   type = "ram.ddr.ddr4.MT40A256M16LY"
@@ -6,9 +8,3 @@ path = "ram"
 [[definition]]
   type = "ram.ddr.ddr3.MT41K512M16HA"
 
-[[definition]]
-  type = "ram.sram"
-
-[[definition]]
-type = "ram.spinal_pmb_bram"
-gateware = "spinal/pmb_bram/pmb_bram.toml"

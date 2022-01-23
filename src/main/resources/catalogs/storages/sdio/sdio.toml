@@ -1,0 +1,9 @@
+path = "sdio"
+
+[[definition]]
+type = "storage.sdio.sdcard.slot"
+
+[[definition]]
+type = "storage.sdio.zynqps8"
+registers = [{ resource = "zynqps8/sdio", bankPrefix = "SD" }]
+hardware = [{ max_instances = 2, address_offsets = ["0x160000", "0x170000"] }]

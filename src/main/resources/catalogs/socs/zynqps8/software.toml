@@ -45,6 +45,16 @@ type = "library.gfxdebug.zynqps8"
 software = "software/libraries/gfxdebug/gfxdebug.toml"
 
 [[definition]]
+name = "musl_math"
+type = "library.musl_math.zynqps8"
+software = "software/libraries/musl_math/musl_math.toml"
+
+[[definition]]
+name = "xilinx"
+type = "library.xilinx.zynqps8"
+software = "software/libraries/xilinx/xilinx.toml"
+
+[[definition]]
 name = "ikuy_boot"
 type = "program.bootrom.zynqps8"
 software = "software/programs_a53/ikuy_boot/ikuy_boot.toml"

@@ -2,12 +2,12 @@ package overlord
 
 import ikuy_utils.Variant
 import overlord.Connections.{Connection, ConstantConnectionType}
-import overlord.Instances.{BusInstance, ChipInstance, MutContainer}
+import overlord.Instances.{BusInstance, ChipInstance, Container}
 
 import java.nio.file.Path
 
 object OutputGateware {
-	def apply(top: MutContainer,
+	def apply(top: Container,
 	          gatePath: Path,
 	          phase: Int): Unit = {
 		Game.pathStack.push(gatePath.toRealPath())

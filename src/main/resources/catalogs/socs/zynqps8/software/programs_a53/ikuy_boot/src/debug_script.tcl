@@ -1,6 +1,12 @@
 connect -url tcp:127.0.0.1:3121
-targets
 source /home/deano/fpga_drive/Xilinx/Vitis/2021.1/scripts/vitis/util/zynqmp_utils.tcl
+
+targets
+
+targets -set -nocase -filter {name =~ "*PSU*"}
+stop
+mwr  0xff5e0200 0x0100
+rst -system
 
 #Disable Security gates to view PMU MB target
 targets -set -filter {name =~ "PSU"}

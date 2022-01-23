@@ -1,0 +1,53 @@
+path = "prefabs/socs/zynqps8"
+
+[[prefab]]
+name = "socs.zynqps8.fabric"
+
+[[prefab]]
+name = "socs.zynqps8.a53"
+
+[[prefab]]
+name = "socs.zynqps8.r5f"
+
+[[prefab]]
+name = "socs.zynqps8.pmu"
+
+# standard platform libraries
+[[instance]]
+type = "library.core.zynqps8"
+
+[[instance]]
+type = "library.hw.zynqps8"
+
+[[instance]]
+type = "library.dbg.zynqps8"
+
+[[instance]]
+type = "library.osservices.zynqps8"
+
+[[instance]]
+type = "library.utils.zynqps8"
+
+[[instance]]
+type = "library.display_port.zynqps8"
+
+[[instance]]
+type = "library.dma.zynqps8"
+
+[[instance]]
+type = "library.gfxdebug.zynqps8"
+
+[[instance]]
+type = "library.musl_math.zynqps8"
+
+[[instance]]
+type = "library.xilinx.zynqps8"
+
+# boot rom
+[[instance]]
+type = "program.bootrom.zynqps8"
+
+[[instance]]
+type = "program.pmu_monitor"
+
+

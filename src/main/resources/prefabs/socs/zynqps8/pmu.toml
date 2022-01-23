@@ -1,34 +1,40 @@
-[[instance]]
-type = "cpu.pmu"
+path = "prefabs/socs/zynqps8"
 
 [[instance]]
-name = "PMUInternalBus"
-type = "bus.axi4"
-
-[[connection]]
-type = "bus"
-connection = "cpu.pmu -> PMUInternalBus"
-
-[[connection]]
-type = "bus"
-connection = "PMUInternalBus -> ram.sram.pmuram"
-fixed_address = "0xFFDC_0000"
+name = "pmu"
+type = "cpu.zynqps8.pmu"
 
 [[instance]]
-name = "PMU_to_MainBus"
-type = "bridge.internal"
-address_window_width = 32
+name = "pmuRAM"
+type = "ram.sram.pmuram"
+
+[[instance]]
+name = "pmuInternalBus"
+type = "bus.internal.pmu"
+
+[[instance]]
+name = "pmu_to_mainBus"
+type = "bridge.internal.pmu_to_mainbus"
+
+[[connection]]
+type = "logical"
+connection = "pmu -> pmuInternalBus"
 
 [[connection]]
 type = "bus"
-connection = "PMUInternalBus -> PMU_to_MainBus"
-fixed_address = "0"
+connection = "pmuInternalBus -> pmuRAM"
+address_offset = "0xFFDC_0000"
+
+[[connection]]
+type = "logical"
+connection = "pmuInternalBus -> pmu_to_mainBus"
 
 [[connection]]
 type = "bus"
-connection = "PMU_to_MainBus -> MainBus"
+connection = "pmu_to_mainBus -> mainBus"
+address_offset = "0"
 
 [[connection]]
 type = "bus"
-connection = "PMUInternalBus -> ram.ddr.ddr4"
-fixed_address = [["0x0000_0000", "2 GiB"]]
+connection = "mainBus -> pmuRAM"
+address_offset = "0xFFDC_0000"

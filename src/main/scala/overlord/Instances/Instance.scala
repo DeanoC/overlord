@@ -52,7 +52,7 @@ object Instance {
 
 		val defType = DefinitionType(defTypeString)
 
-		val defi = catalogs.FindDefinition(defType) match {
+		val defi = catalogs.findDefinition(defType) match {
 			case Some(d) => d
 			case None    => definitionFrom(catalogs, table, defType) match {
 				case Some(value) => value

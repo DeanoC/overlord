@@ -1,9 +1,11 @@
 package overlord.Instances
 
 import ikuy_utils._
-import overlord.ChipDefinitionTrait
+import overlord.Connections.Connection
+import overlord.{ChipDefinitionTrait, Definition}
 import toml.Value
 
+import java.nio.file.Path
 import scala.collection.immutable
 
 sealed trait BoardType {
@@ -34,20 +36,14 @@ case class LatticeBoard() extends BoardType {
 case class BoardInstance(ident: String,
                          boardType: BoardType,
                          override val definition: ChipDefinitionTrait,
-                         override val children: Seq[InstanceTrait]
+                         override var children: Seq[InstanceTrait] = Seq()
                         ) extends ChipInstance with Container {
 
-	override val physical: Boolean = false
+	override val physical   : Boolean         = true
+	override var connections: Seq[Connection] = Seq()
 
 	override def copyMutate[A <: ChipInstance](nid: String): BoardInstance =
 		copy(ident = nid)
-
-	override def copyMutateContainer(copy: MutContainer): Container = {
-		BoardInstance(ident = ident,
-		              boardType = boardType,
-		              definition = definition,
-		              children = copy.children.toSeq)
-	}
 }
 
 object BoardInstance {
@@ -60,6 +56,16 @@ object BoardInstance {
 
 		if (!attribs.contains("board_type")) {
 			println(s"${name} board requires a type value");
+			return None
+		}
+
+		if (!attribs.contains("clocks")) {
+			println(s"${name} board requires some clocks");
+			return None
+		}
+
+		if (!attribs.contains("pingroups")) {
+			println(s"${name} board requires some pingroups");
 			return None
 		}
 
@@ -79,11 +85,23 @@ object BoardInstance {
 			case _         => println(s"$name board has a unknown type");
 				return None
 		}
+		val defaults  = if (attribs.contains("defaults")) {
+			Utils.toTable(attribs("defaults"))
+		} else Map[String, Variant]()
+
+		// instiatiate all pingroups
+		val pingroups = (for (pinv <- Utils.toArray(attribs("pingroups"))) yield {
+			val table    = Utils.toTable(pinv)
+			val name     = Utils.toString(table("name"))
+			val pingroup = table ++ Map[String, Variant]("type" -> StringV(s"pingroup.$name"))
+			Definition(TableV(pingroup), Path.of("."), defaults).createInstance(s"$name",
+			                                                                    pingroup)
+		}).flatten.toSeq
 
 		Some(BoardInstance(name,
 		                   boardType = boardType,
 		                   definition = definition,
-		                   children = Seq() // we be fixed up in post
+		                   children = pingroups
 		                   ))
 	}
 }

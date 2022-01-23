@@ -1,11 +1,9 @@
-import java.nio.file.{Files, Path}
-import overlord.Instances.BoardInstance
+import ikuy_utils._
 import overlord._
 
+import java.nio.file.{Files, Path}
 import scala.annotation.tailrec
 import scala.collection.immutable.Map
-
-import ikuy_utils._
 
 object Main {
 	private val usage =
@@ -14,9 +12,10 @@ object Main {
 		   |     : report - prints some info about over structure
 		   |     : svd    - produce a CMSIS-SVD file on its own
 		   |     : --out  - path where generated files should be placed
+		   |     : --board - board defination to use
 		   |     : --nostdresources - don't use any build in resource toml files
 		   |     : --resources - TODO use specified path a root of resources tomls
-		   |		 : filename should be a .over file with a chip layout"""
+		   |		 : filename should be a .over file to use for the project"""
 			.stripMargin
 
 	def main(args: Array[String]): Unit = {
@@ -45,6 +44,10 @@ object Main {
 					nextOption(map ++ Map(Symbol("out") -> value), tail)
 				case "--nostdresources" :: tail        =>
 					nextOption(map ++ Map(Symbol("nostdresources") -> true), tail)
+				case "--nostdprefabs" :: tail          =>
+					nextOption(map ++ Map(Symbol("nostdresources") -> true), tail)
+				case "--board" :: value :: tail        =>
+					nextOption(map ++ Map(Symbol("board") -> value), tail)
 				case "--resources" :: value :: tail    =>
 					nextOption(map ++ Map(Symbol("resources") -> value), tail)
 				case "--instance" :: value :: tail     =>
@@ -67,6 +70,15 @@ object Main {
 			sys.exit(1)
 		}
 
+		if (!options.contains(Symbol("board"))) {
+			println(usage)
+			println("board name is required")
+			println(options)
+			sys.exit(1)
+		}
+
+		val board = options(Symbol("board")).asInstanceOf[String]
+
 		val filename = options(Symbol("infile")).asInstanceOf[String]
 		if (!Files.exists(Path.of(filename))) {
 			println(usage)
@@ -83,16 +95,21 @@ object Main {
 			else Some(overlord.Resources(Path.of(options(Symbol("resources"))
 				                                     .asInstanceOf[String])))
 
-		val chipCatalogs = new DefinitionCatalog
 
 		val filePath = Path.of(filename)
 		Game.pathStack.push(filePath.getParent.toAbsolutePath)
 
+		val chipCatalog = new DefinitionCatalog
 		if (!options.contains(Symbol("nostdresources")))
-			chipCatalogs.catalogs ++= stdResources.loadCatalogs()
-
+			chipCatalog.catalogs ++= stdResources.loadCatalogs()
 		if (resources.isDefined)
-			chipCatalogs.catalogs ++= resources.get.loadCatalogs()
+			chipCatalog.catalogs ++= resources.get.loadCatalogs()
+
+		val prefabCatalog = new PrefabCatalog
+		if (!options.contains(Symbol("nostdprefabs")))
+			prefabCatalog.prefabs ++= stdResources.loadPrefabs()
+		if (resources.isDefined)
+			prefabCatalog.prefabs ++= resources.get.loadPrefabs()
 
 
 		val out = Path.of(
@@ -103,7 +120,7 @@ object Main {
 
 		val gameName = filename.split('/').last.split('.').head
 
-		val game = Game(gameName, filePath, out, chipCatalogs) match {
+		val game = Game(gameName, board, filePath, out, chipCatalog, prefabCatalog) match {
 			case Some(game) => game
 			case None       =>
 				println(s"Error parsing $filename")

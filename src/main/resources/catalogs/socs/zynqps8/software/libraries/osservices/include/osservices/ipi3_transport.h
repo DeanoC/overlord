@@ -93,18 +93,20 @@ WARN_UNUSED_RESULT CONST_EXPR ALWAYS_INLINE IPI_BUFFER_OFFSET IPI_ChannelToBuffe
 #else
 	typedef enum PACKED  {
 #endif
-	OSF_PTR_PRINT = 0,					// debug print from a ddr buffer, ptr must be valid until response
-	OSF_DDR_LO_BLOCK_ALLOC, 		// allocate 1MB chunks of DDR in low (32bit) range
-	OSF_DDR_HI_BLOCK_ALLOC, 		// allocate 1MB chunks of DDR in high (64bit) range
+	OSF_PTR_PRINT = 0,						// debug print from a ddr buffer, ptr must be valid until response
+	OSF_DDR_LO_BLOCK_ALLOC, 			// allocate 1MB chunks of DDR in low (32bit) range
+	OSF_DDR_HI_BLOCK_ALLOC, 			// allocate 1MB chunks of DDR in high (64bit) range
 	OSF_SCREEN_CONSOLE_PTR_PRINT, // screen console print from a ddr buffer, ptr must be valid until response
+	OSF_FETCH_BOOT_DATA,					// retrieve the stored boot data
 
 	OSF_FIRE_AND_FORGET_BIT = 0x80,
-	OSF_INLINE_PRINT = OSF_FIRE_AND_FORGET_BIT | 0, 			// inline debug print <= 29 bytes
-	OSF_DDR_LO_BLOCK_FREE = OSF_FIRE_AND_FORGET_BIT | 1,  // free previously allocated lo chunks
-	OSF_DDR_HI_BLOCK_FREE = OSF_FIRE_AND_FORGET_BIT | 2,  // free previously allocated hi chunks
+
+	OSF_INLINE_PRINT = OSF_FIRE_AND_FORGET_BIT | 0, 					// inline debug print <= 29 bytes
+	OSF_DDR_LO_BLOCK_FREE = OSF_FIRE_AND_FORGET_BIT | 1,  		// free previously allocated lo chunks
+	OSF_DDR_HI_BLOCK_FREE = OSF_FIRE_AND_FORGET_BIT | 2,  		// free previously allocated hi chunks
 	OSF_SCREEN_CONSOLE_INLINE_PRINT = OSF_FIRE_AND_FORGET_BIT | 3,	// inline print <= 29 bytes to screen console
-	OSF_BOOT_COMPLETE = OSF_FIRE_AND_FORGET_BIT | 4,			// boot loader is done, passing some parameters upto PMU
-	OSF_SCREEN_CONSOLE_ENABLE = OSF_FIRE_AND_FORGET_BIT | 5, // switch the screen console on or off
+	OSF_BOOT_COMPLETE = OSF_FIRE_AND_FORGET_BIT | 4,					// boot loader is done, passing some parameters upto PMU
+	OSF_SCREEN_CONSOLE_ENABLE = OSF_FIRE_AND_FORGET_BIT | 5, 	// switch the screen console on or off
 	OSF_CPU_WAKE_OR_SLEEP = OSF_FIRE_AND_FORGET_BIT | 6, 			// power down or up CPUs
 } OS_ServiceFunc;
 
@@ -197,7 +199,9 @@ typedef struct PACKED {
 		struct PACKED {
 			uint16_t block_1MB_Offset; // offset in 1M block from DDR Hi base of our RAM
 		} DdrHiBlockAlloc;
-
+		struct PACKED {
+			BootData bootData;
+		} BootData;
 	};
 } IPI3_Response;
 

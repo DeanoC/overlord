@@ -14,7 +14,25 @@ ExternalProject_Get_Property(pmu_monitor binary_dir)
 
 file(GLOB LINKSCRIPT CONFIGURE_DEPENDS src/lscript.ld)
 file(GLOB ASMFILES CONFIGURE_DEPENDS src/*.S)
-file(GLOB SRCLIST CONFIGURE_DEPENDS src/*.c src/*.cpp)
+file(GLOB HEADERLIST CONFIGURE_DEPENDS
+		src/*.h
+		src/${BOARD}/*.h
+		src/${SOC}/*.h
+		src/${CPU_ARCH}/*.h
+		src/${CPU}/*.h )
+
+file(GLOB CLIST CONFIGURE_DEPENDS
+		src/*.c
+		src/${BOARD}/*.c
+		src/${SOC}/*.c
+		src/${CPU_ARCH}/*.c
+		src/${CPU}/*.c )
+file(GLOB CPPLIST CONFIGURE_DEPENDS
+		src/*.cpp
+		src/${BOARD}/*.cpp
+		src/${SOC}/*.cpp
+		src/${CPU_ARCH}/*.cpp
+		src/${CPU}/*.cpp )
 
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-M=${project}.map -T ${LINKSCRIPT}")
 
@@ -32,7 +50,7 @@ foreach(FILENAME ${PROJECT_EMBED_FILES})
 endforeach(FILENAME)
 
 
-add_executable(${project} ${SRCLIST} ${ASMFILES} ${LINKSCRIPT} ${PROJECT_EMBED_OBJ_FILES})
+add_executable(${project} ${CLIST} ${CPPLIST} ${ASMFILES} ${HEADERLIST} ${LINKSCRIPT} ${PROJECT_EMBED_OBJ_FILES})
 add_compile_definitions(${project} BOARD_${BOARD}=1 SOC_${SOC}=1 CPU_${CPU}=1 CPU_${CPU_ARCH}=1)
 target_link_libraries(${project} PRIVATE core)
 target_link_libraries(${project} PRIVATE utils)
@@ -41,5 +59,6 @@ target_link_libraries(${project} PRIVATE dbg)
 target_link_libraries(${project} PRIVATE osservices)
 target_link_libraries(${project} PRIVATE zynqps8_display_port)
 target_link_libraries(${project} PRIVATE gfxdebug)
+target_link_libraries(${project} PRIVATE xilinx)
 
 add_dependencies(${project} pmu_monitor)

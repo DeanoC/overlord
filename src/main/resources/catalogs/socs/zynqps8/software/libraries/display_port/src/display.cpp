@@ -141,80 +141,98 @@ static void DumpDPCD_256_272(Connection* display) {
 	}
 }
 #endif
-void SetPixelClock(uint64_t const FreqHz)
+void SetPixelClock(uint64_t FreqHz)
 {
 //Input Frequency for the PLL with precision upto two decimals
-#define XAVBUF_INPUT_REF_CLK		3333333333ULL
+#define XAVBUF_INPUT_REF_CLK		33333333.33333
+//#define XAVBUF_INPUT_REF_CLK 27000000.0
 //Frequency of VCO before divider to meet jitter requirement
-#define XAVBUF_PLL_OUT_FREQ		1450000000ULL
-
-// Precision of Input Ref Frequency for PLL
-#define XAVBUF_INPUT_FREQ_PRECISION	100ULL
-
-// 16 bit fractional shift to get Integer
-#define XAVBUF_PRECISION		16ULL
-#define XAVBUF_SHIFT_DECIMAL		(1ULL <<  XAVBUF_PRECISION)
-#define XAVBUF_PRECISION_MASK		(XAVBUF_SHIFT_DECIMAL - 1ULL)
+//#define XAVBUF_PLL_OUT_FREQ		1'485'325'000ULL
+//#define XAVBUF_PLL_OUT_FREQ		1'450'000'000ULL
+#define XAVBUF_PLL_OUT_FREQ	1'433'333'333ULL
 
 	uint64_t const ExtDivider =  (XAVBUF_PLL_OUT_FREQ / FreqHz);
 	uint32_t const ExtDivider0 = (ExtDivider > 63) ? 63 : ExtDivider;
 	uint32_t const ExtDivider1 = (ExtDivider > 63) ? ExtDivider / 63 : 1;
-//	debug_printf("FreqHz %llu ExtDivider %llu ExtDivider0 %lu ExtDivider1 %lu\n", FreqHz, ExtDivider, ExtDivider0, ExtDivider1);
+	debug_printf("FreqHz %llu ExtDivider %llu ExtDivider0 %lu ExtDivider1 %lu\n", FreqHz, ExtDivider, ExtDivider0, ExtDivider1);
 
 	// Calculate integer and fractional parts
 	uint64_t const Vco = FreqHz * (uint64_t)(ExtDivider1 * ExtDivider0 * 2);
-	uint64_t const VcoIntFrac = (Vco * XAVBUF_INPUT_FREQ_PRECISION * XAVBUF_SHIFT_DECIMAL) / XAVBUF_INPUT_REF_CLK;
-	uint32_t const Fractional = VcoIntFrac & XAVBUF_PRECISION_MASK;
-	uint32_t const FracIntegerFBDIV = VcoIntFrac >> XAVBUF_PRECISION;
-//	debug_printf("Vco %llu VcoIntFrac %llu Fractional %lu FracIntegerFBDIV %lu\n", Vco, VcoIntFrac, Fractional, FracIntegerFBDIV);
+	double const VcoF = (double)Vco / XAVBUF_INPUT_REF_CLK;
+	auto const FracIntegerFBDIV = (uint32_t)VcoF;
+	auto const Fractional = (uint32_t)((VcoF - (float)FracIntegerFBDIV) * 65536.0);
+	debug_printf("Vco %llu VcoF %f FracF %f FracIntegerFBDIV %u Fractional %u\n", Vco, VcoF, Fractional / 65536.0, FracIntegerFBDIV, Fractional );
 
 	hw_ZynqmpPllHelper const cfg = hw_GetZynqmpPllHelper(FracIntegerFBDIV);
 	PSI_IWord const SetVPLL[] = {
-			PSI_SET_REGISTER_BANK(CRF_APB),
-			PSI_WRITE_32(CRF_APB, VPLL_CTRL,
-									 HW_REG_ENCODE_ENUM(CRF_APB, VPLL_CTRL, POST_SRC, PS_REF_CLK) |
-									 HW_REG_ENCODE_ENUM(CRF_APB, VPLL_CTRL, PRE_SRC, PS_REF_CLK) |
-									 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, FBDIV, FracIntegerFBDIV) |
-									 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, DIV2, 1) |
-									 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, BYPASS, 1) |
-									 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, RESET, 1) |
-									 0),
-			PSI_WRITE_32(CRF_APB, VPLL_CFG,
-									 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CFG, LOCK_DLY, (uint32_t)cfg.lock_dly) |
-									 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CFG, LOCK_CNT, (uint32_t)cfg.lock_cnt) |
-									 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CFG, LFHF, (uint32_t)cfg.lfhf) |
-									 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CFG, CP, (uint32_t)cfg.cp) |
-									 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CFG, RES, (uint32_t)cfg.res) |
-									 0),
-			PSI_WRITE_32(CRF_APB, VPLL_FRAC_CFG,
-									 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_FRAC_CFG, ENABLED, 1) |
-									 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_FRAC_CFG, DATA, Fractional) |
-									 0),
-			PSI_WRITE_MASKED_32(CRF_APB, VPLL_CTRL,
-													HW_REG_FIELD_MASK(CRF_APB, VPLL_CTRL, RESET),
-													HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, RESET, 1)),
-			PSI_DELAY_US(20),
-			PSI_WRITE_MASKED_32(CRF_APB, VPLL_CTRL,
-													HW_REG_FIELD_MASK(CRF_APB, VPLL_CTRL, RESET),
-													HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, RESET, 0)),
-			PSI_POLL_MASKED_32(CRF_APB, PLL_STATUS, 0x00000004U),
-			PSI_WRITE_MASKED_32(CRF_APB, VPLL_CTRL,
-													HW_REG_FIELD_MASK(CRF_APB, VPLL_CTRL, BYPASS),
-													HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, BYPASS, 0)),
-			PSI_DELAY_US(20),
+		PSI_SET_REGISTER_BANK(CRF_APB),
+		PSI_WRITE_32(CRF_APB, VPLL_CTRL,
+								 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, BYPASS, 1) |
+								 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, RESET, 1)),
+		PSI_WRITE_MASKED_32(CRF_APB, VPLL_CTRL,
+												HW_REG_FIELD_MASK(CRF_APB, VPLL_CTRL, POST_SRC) |
+												HW_REG_FIELD_MASK(CRF_APB, VPLL_CTRL, PRE_SRC) |
+												HW_REG_FIELD_MASK(CRF_APB, VPLL_CTRL, FBDIV) |
+												HW_REG_FIELD_MASK(CRF_APB, VPLL_CTRL, DIV2),
+											 	HW_REG_ENCODE_ENUM(CRF_APB, VPLL_CTRL, POST_SRC, PS_REF_CLK) |
+											 	HW_REG_ENCODE_ENUM(CRF_APB, VPLL_CTRL, PRE_SRC, PS_REF_CLK) |
+											 	HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, FBDIV, FracIntegerFBDIV) |
+											 	HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, DIV2, 1 ) |
+											 	0),
+		PSI_WRITE_32(CRF_APB, VPLL_CFG,
+								 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CFG, LOCK_DLY, (uint32_t)cfg.lock_dly) |
+								 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CFG, LOCK_CNT, (uint32_t)cfg.lock_cnt) |
+								 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CFG, LFHF, (uint32_t)cfg.lfhf) |
+								 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CFG, CP, (uint32_t)cfg.cp) |
+								 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CFG, RES, (uint32_t)cfg.res) |
+								 0),
+		PSI_WRITE_32(CRF_APB, VPLL_FRAC_CFG,
+								 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_FRAC_CFG, ENABLED, (Fractional != 0)) |
+								 HW_REG_ENCODE_FIELD(CRF_APB, VPLL_FRAC_CFG, DATA, Fractional) |
+								 0),
+		PSI_WRITE_MASKED_32(CRF_APB, VPLL_CTRL,
+												HW_REG_FIELD_MASK(CRF_APB, VPLL_CTRL, RESET),
+												HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, RESET, 1)),
+		PSI_DELAY_US(20),
+		PSI_WRITE_MASKED_32(CRF_APB, VPLL_CTRL,
+												HW_REG_FIELD_MASK(CRF_APB, VPLL_CTRL, RESET),
+												HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, RESET, 0)),
 
-			PSI_WRITE_32(CRF_APB, DP_VIDEO_REF_CTRL,
-									 HW_REG_ENCODE_FIELD(CRF_APB, DP_VIDEO_REF_CTRL, CLKACT, 0) | 0),
-			PSI_DELAY_US(20),
+		PSI_POLL_MASKED_32(CRF_APB, PLL_STATUS, CRF_APB_PLL_STATUS_VPLL_LOCK),
 
-			PSI_WRITE_32(CRF_APB, DP_VIDEO_REF_CTRL,
-									 HW_REG_ENCODE_FIELD(CRF_APB, DP_VIDEO_REF_CTRL, DIVISOR1, ExtDivider1) |
-									 HW_REG_ENCODE_FIELD(CRF_APB, DP_VIDEO_REF_CTRL, DIVISOR0, ExtDivider0) |
-									 HW_REG_ENCODE_FIELD(CRF_APB, DP_VIDEO_REF_CTRL, SRCSEL, CRF_APB_DP_VIDEO_REF_CTRL_SRCSEL_VPLL) |
-									 HW_REG_ENCODE_FIELD(CRF_APB, DP_VIDEO_REF_CTRL, CLKACT, 1) |
-									 0),
+		PSI_WRITE_MASKED_32(CRF_APB, VPLL_CTRL,
+												HW_REG_FIELD_MASK(CRF_APB, VPLL_CTRL, BYPASS),
+												HW_REG_ENCODE_FIELD(CRF_APB, VPLL_CTRL, BYPASS, 0)),
 
-			PSI_END_PROGRAM,
+		PSI_POLL_MASKED_32(CRF_APB, PLL_STATUS, CRF_APB_PLL_STATUS_VPLL_STABLE),
+		PSI_DELAY_US(20),
+
+		PSI_WRITE_MASKED_32(CRF_APB, VPLL_TO_LPD_CTRL,
+												HW_REG_FIELD_MASK(CRF_APB, VPLL_TO_LPD_CTRL, DIVISOR0),
+												HW_REG_ENCODE_FIELD(CRF_APB, VPLL_TO_LPD_CTRL, DIVISOR0, 1)),
+
+		PSI_WRITE_32(CRF_APB, DP_VIDEO_REF_CTRL,
+								 HW_REG_ENCODE_FIELD(CRF_APB, DP_VIDEO_REF_CTRL, CLKACT, 0) | 0),
+		PSI_DELAY_US(20),
+
+		PSI_WRITE_MASKED_32(CRF_APB, DP_VIDEO_REF_CTRL,
+								 HW_REG_FIELD_MASK(CRF_APB, DP_VIDEO_REF_CTRL,  CLKACT),
+								 HW_REG_ENCODE_FIELD(CRF_APB, DP_VIDEO_REF_CTRL, CLKACT, 0)),
+
+		PSI_WRITE_MASKED_32(CRF_APB, DP_VIDEO_REF_CTRL,
+								HW_REG_FIELD_MASK(CRF_APB, DP_VIDEO_REF_CTRL, DIVISOR1) |
+								HW_REG_FIELD_MASK(CRF_APB, DP_VIDEO_REF_CTRL, DIVISOR0) |
+								HW_REG_FIELD_MASK(CRF_APB, DP_VIDEO_REF_CTRL, SRCSEL),
+								HW_REG_ENCODE_FIELD(CRF_APB, DP_VIDEO_REF_CTRL, DIVISOR1, ExtDivider1) |
+								HW_REG_ENCODE_FIELD(CRF_APB, DP_VIDEO_REF_CTRL, DIVISOR0, ExtDivider0) |
+								HW_REG_ENCODE_FIELD(CRF_APB, DP_VIDEO_REF_CTRL, SRCSEL, CRF_APB_DP_VIDEO_REF_CTRL_SRCSEL_VPLL) |
+								0),
+
+		PSI_WRITE_MASKED_32(CRF_APB, DP_VIDEO_REF_CTRL,
+												HW_REG_FIELD_MASK(CRF_APB, DP_VIDEO_REF_CTRL,  CLKACT),
+												HW_REG_ENCODE_FIELD(CRF_APB, DP_VIDEO_REF_CTRL, CLKACT, 1)),
+
+		PSI_END_PROGRAM,
 	};
 
 	psi_RunRegisterProgram(SetVPLL);
@@ -444,33 +462,36 @@ void SetDisplay(Connection *link, Display *display, Mixer *mixer) {
 	assert(bitsPerPixel > 0);
 
 	uint32_t const wordsPerLine = ((display->videoTiming.width * bitsPerPixel) + 15) / 16;
-	uint32_t userDataCountPerLane = wordsPerLine - link->numLanes;
-	if ((wordsPerLine % link->numLanes) != 0) {
-		userDataCountPerLane += wordsPerLine % link->numLanes;
-	}
+	uint32_t const userDataCountPerLane = wordsPerLine +
+																	((wordsPerLine % link->numLanes) != 0 ? (wordsPerLine % link->numLanes) : 0) -
+																	link->numLanes;
+	debug_printf("wordsPerLine %d bitsPerPixel %d userDataCountPerLane %d\n", wordsPerLine, bitsPerPixel, userDataCountPerLane);
 
 	uint32_t const transferUnitSize = 64;
 	uint32_t const pixelClockKHz = (display->videoTiming.vTotal * display->videoTiming.hTotal * display->videoTiming.frameRateHz) / 1000;
 
 	uint32_t const videoBandwidth = (pixelClockKHz * bitsPerPixel) / 8;
-	uint32_t const linkBandwidth = link->numLanes * (int) link->linkRate * 27;
-	uint32_t const vl = ((10 * (videoBandwidth * transferUnitSize) / linkBandwidth) + 5) / 10;
-	uint32_t const minBytesPerTransferUnit = vl / 1000;
-	uint32_t const fractionBytesPerTransferUnit = (vl % 1000) * 1000;
+	uint32_t const linkBandwidth = link->numLanes * (int) link->linkRate * 27000;
+	double const bw = (videoBandwidth / (double)linkBandwidth) * transferUnitSize;
+	uint32_t const minBytesPerTransferUnit = (uint32_t)bw;
+	uint32_t const fractionBytesPerTransferUnit = (uint32_t)((bw - (double)minBytesPerTransferUnit)*1024.0);
 
 	uint32_t const mClockFactor = pixelClockKHz;
-	uint32_t const nClockFactor = 27000 * (int) link->linkRate;
+	uint32_t const nClockFactor = (int) link->linkRate * 27000;
+
+	debug_printf("bw %f minBPTU %d fractionBPTU %d M %d N %d\n",
+							 bw, minBytesPerTransferUnit, fractionBytesPerTransferUnit, mClockFactor, nClockFactor);
 
 	uint16_t const hStart = display->videoTiming.hSyncPulseWidth + display->videoTiming.hBackPorch;
 	uint16_t const vStart = display->videoTiming.vSyncPulseWidth + display->videoTiming.vBackPorch;
 	uint16_t const initWait = (minBytesPerTransferUnit <= 4) ? transferUnitSize : transferUnitSize - minBytesPerTransferUnit;
 
-//	debug_printf("TSU %ld pixelClockKHz %ld videoBandwith %ld linkBandwidth %ld initWait %d\n",
-//							 transferUnitSize, pixelClockKHz, videoBandwidth, linkBandwidth, initWait);
-//	debug_printf("H Addressable %d H total %d H Start %d H Sync Pulse %d H Polarity %d\n",
-//							 display->videoTiming.width, display->videoTiming.hTotal, hStart, display->videoTiming.hSyncPulseWidth, display->videoTiming.hSyncPolarity);
-//	debug_printf("V Addressable %d V total %d V Start %d V Sync Pulse %d V Polarity %d\n",
-//							 display->videoTiming.height, display->videoTiming.vTotal, vStart, display->videoTiming.vSyncPulseWidth, display->videoTiming.vSyncPolarity);
+	debug_printf("TSU %ld pixelClockKHz %ld videoBandwith %ld linkBandwidth %ld initWait %d\n",
+							 transferUnitSize, pixelClockKHz, videoBandwidth, linkBandwidth, initWait);
+	debug_printf("H Addressable %d H total %d H Start %d H Sync Pulse %d H Polarity %d\n",
+							 display->videoTiming.width, display->videoTiming.hTotal, hStart, display->videoTiming.hSyncPulseWidth, display->videoTiming.hSyncPolarity);
+	debug_printf("V Addressable %d V total %d V Start %d V Sync Pulse %d V Polarity %d\n",
+							 display->videoTiming.height, display->videoTiming.vTotal, vStart, display->videoTiming.vSyncPulseWidth, display->videoTiming.vSyncPolarity);
 
 
 	PSI_IWord const setMixerProgram[] = {
@@ -649,7 +670,7 @@ void SetDisplay(Connection *link, Display *display, Mixer *mixer) {
 			PSI_WRITE_32(DP, MSA_TRANSFER_UNIT_SIZE, transferUnitSize),
 			PSI_WRITE_32(DP, MAIN_STREAM_N_VID, nClockFactor),
 			PSI_WRITE_32(DP, USER_DATA_COUNT_PER_LANE, userDataCountPerLane),
-			PSI_WRITE_32(DP, USER_PIX_WIDTH, 1),
+			PSI_WRITE_32(DP, USER_PIX_WIDTH, link->numLanes),
 			PSI_WRITE_32(DP, MIN_BYTES_PER_TU, minBytesPerTransferUnit),
 			PSI_WRITE_32(DP, FRAC_BYTES_PER_TU, fractionBytesPerTransferUnit),
 			PSI_WRITE_32(DP, INIT_WAIT, initWait),
@@ -843,7 +864,7 @@ bool CopyStandardVideoMode(StandardVideoMode videoMode, VideoTiming *videoTiming
 			*videoTiming = VideoTiming {
 				 .width = 640, .hFrontPorch = 16, .hSyncPulseWidth = 96, .hBackPorch= 48, .hTotal = 800,
 				 .height = 480, .vFrontPorch= 10, .vSyncPulseWidth = 2, .vBackPorch = 33, .vTotal = 525,
-				 .hSyncPolarity = false, .vSyncPolarity= false, .frameRateHz = 60 };
+				 .hSyncPolarity = true, .vSyncPolarity= true, .frameRateHz = 59.94 };
 			 return true;
 		case StandardVideoMode::VM_800_600_60:
 			*videoTiming = VideoTiming {

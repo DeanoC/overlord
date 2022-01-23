@@ -16,6 +16,8 @@ case class BridgeDefinitionType(ident: Seq[String]) extends DefinitionType
 
 case class NetDefinitionType(ident: Seq[String]) extends DefinitionType
 
+case class IoDefinitionType(ident: Seq[String]) extends DefinitionType
+
 case class OtherDefinitionType(ident: Seq[String]) extends DefinitionType
 
 case class PinGroupDefinitionType(ident: Seq[String]) extends DefinitionType
@@ -31,7 +33,9 @@ case class LibraryDefinitionType(ident: Seq[String]) extends DefinitionType
 object DefinitionType {
 	def apply(in: String): DefinitionType = {
 		val defTypeName = in.split('.')
-		val tt          = defTypeName.tail.toSeq
+		val tt          = defTypeName.map {
+			_.toLowerCase
+		}.toSeq
 
 		defTypeName.head.toLowerCase match {
 			case "ram"      => RamDefinitionType(tt)
@@ -40,6 +44,7 @@ object DefinitionType {
 			case "storage"  => StorageDefinitionType(tt)
 			case "bridge"   => BridgeDefinitionType(tt)
 			case "net"      => NetDefinitionType(tt)
+			case "io"       => IoDefinitionType(tt)
 			case "board"    => BoardDefinitionType(tt)
 			case "pin"      => PinGroupDefinitionType(tt)
 			case "pingroup" => PinGroupDefinitionType(tt)

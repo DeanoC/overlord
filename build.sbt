@@ -19,7 +19,11 @@ ThisBuild / libraryDependencies := Seq(
 	"tech.sparse" %% "toml-scala" % "0.2.2",
 	"org.scalactic" %% "scalactic" % "3.2.2",
 	"org.scalatest" %% "scalatest" % "3.2.2" % "test",
-	"org.scala-lang.modules" %% "scala-xml" % "1.2.0"
+	"org.scala-lang.modules" %% "scala-xml" % "1.2.0",
+	"org.scala-graph" %% "graph-core" % "1.13.0",
+	"org.scala-graph" %% "graph-dot" % "1.13.0",
+	"org.scala-graph" %% "graph-json" % "1.13.0",
+	"ca.mrvisser" %% "sealerate" % "0.0.6",
 	)
 lazy val overlord = (project in file("."))
 	.dependsOn(ikuy_utils)

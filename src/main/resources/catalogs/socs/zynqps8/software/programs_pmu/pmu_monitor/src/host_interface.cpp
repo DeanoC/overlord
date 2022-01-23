@@ -155,6 +155,11 @@ void HostInterface::WhatCommand() {
 	this->cmdBufferHead = 0;
 	finds[0] = cmdBufferHeadTmp;
 
+	if(*this->cmdBuffer == 0) {
+		this->currentState = State::RECEIVING_COMMAND;
+		return;
+	}
+
 	// special case Zmodem receive code first
 	if(cmdBufferHeadTmp > 4 && this->cmdBuffer[4] == 0x18) {
 		if(Utils::RuntimeHash(4, (char *) this->cmdBuffer) == "rz**"_hash) {
@@ -167,6 +172,7 @@ void HostInterface::WhatCommand() {
 			return;
 		}
 	}
+
 
 	const auto findCount = Utils::StringFindMultiple(cmdBufferHeadTmp, (char *) this->cmdBuffer, ' ', MaxFinds, finds);
 	if (findCount != Utils::StringNotFound) {
@@ -303,7 +309,7 @@ void HostInterface::BootCpu(uint8_t const *cmdBuffer, unsigned int const *finds,
 	}
 	switch (Utils::RuntimeHash(finds[1] - finds[0] - 1, (char *) cmdBuffer + finds[0] + 1)) {
 		case "A53"_hash: {
-			debug_print("\nA53s booting\n");
+			debug_printf("\nA53s booting from %#018llx\n", downloadAddress);
 			A53Sleep();
 			auto const lowAddress = (uint32_t) (downloadAddress & 0x0000'0000'FFFF'FFFFull);
 			auto const hiAddress = (uint32_t) ((downloadAddress & 0xFFFF'FFFF'0000'0000ull) >> 32ull);
@@ -333,6 +339,8 @@ void HostInterface::Reset(uint8_t const *cmdBuffer, unsigned int const *finds, u
 								(uintptr_all_t) osHeap->bootOCMStore,
 								osHeap->bootData.bootCodeStart,
 								osHeap->bootData.bootCodeSize);
+	debug_printf("\nSoft reset from %#010lx\n", osHeap->bootData.bootCodeStart);
+
 	Stall(Channels::ChannelSevern);
 	auto const lowAddress = (uint32_t) (osHeap->bootData.bootCodeStart & 0x0000'0000'FFFF'FFFFull);
 	auto const hiAddress = (uint32_t) ((osHeap->bootData.bootCodeStart & 0xFFFF'FFFF'0000'0000ull) >> 32ull);

@@ -1,9 +1,9 @@
 package output
 
-import java.nio.file.Path
-import overlord.{DiffPinConstraint, Game, PinConstraint}
 import ikuy_utils._
-import overlord.Connections.WildCardConnectionPriority
+import overlord.{DiffPinConstraint, Game, PinConstraint}
+
+import java.nio.file.Path
 
 object Xdc {
 	def apply(game: Game, out: Path): Unit = {
@@ -15,7 +15,6 @@ object Xdc {
 		for {pinGrp <- game.pins
 		     oconnected = game.connected.find(_.connectsToInstance(pinGrp))
 		     if oconnected.nonEmpty
-		     if oconnected.get.connectionPriority != WildCardConnectionPriority()
 		     } {
 			pinGrp.constraint match {
 				case PinConstraint(pins, _, standard, names, directions, pullups) =>

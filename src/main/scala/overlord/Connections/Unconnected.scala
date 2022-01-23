@@ -108,8 +108,8 @@ case class Unconnected(connectionType: ConnectionType,
 			} else if (fil.isClock) {
 				Port(fil.fullName, BitsDesc(1), InWireDirection())
 			} else {
-				println(s"${fil.fullName} unable to get port")
-				Port(fil.fullName, BitsDesc(1), InOutWireDirection())
+				if (fil.isGateware) println(s"${fil.fullName} unable to get port")
+				Port(fil.fullName, BitsDesc(1), InWireDirection())
 			}
 		}
 		val sp = {
@@ -117,10 +117,10 @@ case class Unconnected(connectionType: ConnectionType,
 			else if (sil.isPin) {
 				sil.instance.asInstanceOf[PinGroupInstance].constraint.ports.head
 			} else if (sil.isClock) {
-				Port(sil.fullName, BitsDesc(1), InWireDirection())
+				Port(sil.fullName, BitsDesc(1), OutWireDirection())
 			} else {
-				println(s"${sil.fullName} unable to get port")
-				Port(sil.fullName, BitsDesc(1), InOutWireDirection())
+				if (sil.isGateware) println(s"${sil.fullName} unable to get port")
+				Port(sil.fullName, fp.width, InWireDirection())
 			}
 		}
 
@@ -286,6 +286,7 @@ case class Unconnected(connectionType: ConnectionType,
 	}
 
 	private def preConnectBusConnection(unexpanded: Seq[ChipInstance]): Unit = {
+
 		val mo = matchInstances(main, unexpanded)
 		val so = matchInstances(second, unexpanded)
 
@@ -330,21 +331,28 @@ case class Unconnected(connectionType: ConnectionType,
 
 
 			val size = other match {
-				case bridge: BridgeInstance => Utils.pow2(bridge.addressWindowWidth).toBigInt
-				case ram: RamInstance       => ram.getSizeInBytes
-				case _                      => connectionSize
+				case bridge: BridgeInstance =>
+					if (!attributes.contains("address_offset"))
+						println(f"${bus.ident.mkString} -> ${other.ident}: " +
+						        "Bridge ending connections require a address_offset")
+
+					Utils.pow2(bridge.addressWindowWidth).toBigInt
+
+				case ram: RamInstance => ram.getSizeInBytes
+				case _                => connectionSize
 			}
-			if (attributes.contains("fixed_address")) {
-				val faAttrib = attributes("fixed_address")
+
+			if (attributes.contains("address_offset")) {
+				val faAttrib = attributes("address_offset")
 				if (faAttrib.isInstanceOf[BigIntV]) {
 					val address = Utils.toBigInt(faAttrib)
 					bus.addFixedAddressConsumer(other.asInstanceOf[ChipInstance], address, size)
 				} else {
 					val fixedAddresses = Utils.toArray(faAttrib)
 					for (fixedAddress <- fixedAddresses) {
-						val fa      = Utils.toArray(fixedAddress)
+						val fa = Utils.toArray(fixedAddress)
 						val address = Utils.toBigInt(fa(0))
-						val size    = Utils.toBigInt(fa(1))
+						val size = Utils.toBigInt(fa(1))
 
 						bus.addFixedAddressConsumer(other.asInstanceOf[ChipInstance], address, size)
 					}
@@ -353,7 +361,26 @@ case class Unconnected(connectionType: ConnectionType,
 			} else {
 				if (!other.definition.isInstanceOf[HardwareDefinition])
 					bus.addVariableAddressConsumer(other.asInstanceOf[ChipInstance], size)
-				else println(f"${other.ident} is hardware so needs a fixed_address")
+				else {
+					val hw = other.definition.asInstanceOf[HardwareDefinition]
+					if (!other.attributes.contains("instance") ||
+					    hw.instanceAddressOffsets.isEmpty) {
+						println(f"${other.ident}: hardware needs instances setup correctly")
+					} else {
+						val instanceNo = Utils.toInt(other.attributes("instance"))
+						if (instanceNo >= hw.maxInstances) {
+							println(s"${other.ident}: ${
+								hw
+									.defType
+									.ident
+									.mkString
+							} not enough instances\n");
+						} else {
+							val address = hw.instanceAddressOffsets(instanceNo)
+							bus.addFixedAddressConsumer(other.asInstanceOf[ChipInstance], address, size)
+						}
+					}
+				}
 			}
 		}
 	}

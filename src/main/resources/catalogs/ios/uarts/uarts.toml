@@ -1,0 +1,11 @@
+path = "uarts"
+
+[[definition]]
+type = "io.uart.apb_ctrl"
+gateware = "apb_ctrl/apb_ctrl.toml"
+consumer_prefix = "apb_"
+
+[[definition]]
+type = "io.uart.zynqps8"
+registers = [{ resource = "zynqps8/uart", bankPrefix = "UART" }]
+hardware = [{ max_instances = 2, address_offsets = ["0x00000", "0x10000"] }]

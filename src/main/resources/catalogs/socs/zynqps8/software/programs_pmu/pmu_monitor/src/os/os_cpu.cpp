@@ -43,7 +43,6 @@ void CpuWakeOrSleep(IPI3_Msg const *const msgBuffer) {
 	if(msgBuffer->Payload.CPUWakeOrSleep.wake_r5f_1) {
 		R5FWakeUp1();
 	}
-
 }
 
-}
+} // end namespace

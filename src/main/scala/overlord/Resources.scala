@@ -1,10 +1,10 @@
 package overlord
 
 import ikuy_utils.{ArrayV, Utils, Variant}
-
-import java.nio.file.{Files, Path}
 import overlord.Instances.BoardInstance
 
+import java.nio.file.Path
+import scala.collection.mutable
 import scala.language.postfixOps
 
 object Resources {
@@ -44,5 +44,33 @@ case class Resources(path: Path) {
 			                           path.resolve("catalogs/"),
 			                           Map[String, Variant]())
 		}).flatten.flatten.map(f => f.defType -> f).toMap
+	}
+
+	def loadPrefabs(): Map[String, Prefab] = {
+		val parsed =
+			Utils.readToml("prefabs.toml",
+			               path.resolve("prefabs.toml"),
+			               getClass)
+
+		if (!parsed.contains("resources")) {
+			println("no resources array in prefabs.toml")
+			return Map()
+		}
+
+		if (!parsed("resources").isInstanceOf[ArrayV]) {
+			println("resources in prefabs.toml isn't an array")
+			return Map()
+		}
+
+		val resources = Utils.toArray(parsed("resources"))
+		val prefabs   = mutable.Map[String, Prefab]()
+		for (resource <- resources) {
+			val name = Utils.toString(resource)
+			prefabs ++= PrefabCatalog.fromFile(s"$name",
+			                                   path.resolve("prefabs/")).map(f => (f.name ->
+			                                                                       f))
+		}
+
+		prefabs.toMap
 	}
 }

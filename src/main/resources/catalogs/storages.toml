@@ -1,0 +1,4 @@
+path = "storages"
+resources = [
+    "storages",
+]

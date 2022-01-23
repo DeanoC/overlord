@@ -41,7 +41,7 @@ object Project {
 		output.Report(game, out)
 		output.Xdc(game, gatePath)
 		output.Top(game, gatePath)
-		output.Edalize(game, gatePath)
+//		output.Edalize(game, gatePath)
 		output.Software(game, softPath)
 	}
 }

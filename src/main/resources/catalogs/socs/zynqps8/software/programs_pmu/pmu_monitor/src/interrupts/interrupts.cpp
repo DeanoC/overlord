@@ -18,8 +18,6 @@ extern "C" WEAK_LINKAGE void NullHandler(Interrupts::Name name) {
 	using namespace Interrupts;
 	if(name == Name::IN_IPI3) return;
 
-	raw_debug_print("BOB\n");
-
 	const char *in = "UNKNOWN INTERRUPT";
 	switch (name) {
 		case Name::IN_PIT0: in = "PIT0";

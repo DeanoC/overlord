@@ -5,6 +5,7 @@ namespace IPI3_OsServer {
 
 void Init();
 void Handler(IPI_Channel senderChannel);
+void SubmitResponse(IPI_Channel senderChannel, const IPI3_Response *const response);
 
 void DebugInlinePrint(const IPI3_Msg *msgBuffer) NON_NULL(1);
 void DebugPtrPrint(IPI_Channel senderChannel, const IPI3_Msg *msgBuffer) NON_NULL(2);
@@ -19,6 +20,7 @@ void ScreenConsoleInlinePrint(const IPI3_Msg *msgBuffer) NON_NULL(1);
 void ScreenConsolePtrPrint(IPI_Channel senderChannel, const IPI3_Msg *msgBuffer) NON_NULL(2);
 
 void BootComplete(const IPI3_Msg *msgBuffer) NON_NULL(1);
+void FetchBootData(IPI_Channel senderChannel, const IPI3_Msg *msgBuffer) NON_NULL(2);
 void CpuWakeOrSleep(IPI3_Msg const *msgBuffer) NON_NULL(1);
 
 // for faster pmu direct send to to the UART

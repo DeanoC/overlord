@@ -1,10 +1,7 @@
 path = "bridges"
 
 [[definition]]
-type = "bridge.internal"
-
-[[definition]]
-type = "bridge.pmb_to_apb"
+type = "bridge.pmb_to_apb.spinal"
 gateware = "pmb_to_apb/pmb_to_apb.toml"
 advanced_peripheral_bus = "apb_"
 pipelined_memory_bus = "pipelinedMemoryBus_"

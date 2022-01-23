@@ -20,6 +20,7 @@
 #include "osservices/osservices.h"
 #include "utils/busy_sleep.h"
 #include "core/snprintf.h"
+#include "xdpdma_video_example.h"
 
 void PrintBanner(void);
 void EnablePSToPL(void);
@@ -71,17 +72,6 @@ uintptr_lo_t FrameBuffer;
 
 extern "C" int main(void)
 {
-	// if boot has completed once then this is a soft reset and we do nothing
-	// we leave it in state so that XSCT can access A53_0 for remote reset
-	if(HW_REG_GET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) & OS_GLOBAL0_BOOT_COMPLETE) {
-		debug_printf("Soft Reset Finished\n");
-		while(1) {
-		}
-	}
-
-	// clear the boot status register
-	HW_REG_SET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0, 0);
-
 	debug_force_raw_print(true);
 
 	HW_REG_SET(CSU, AES_RESET, CSU_AES_RESET_RESET);
@@ -92,66 +82,79 @@ extern "C" int main(void)
 	Cache_DCacheEnable();
 	Cache_ICacheEnable();
 
-	EnablePSToPL();
 	ClearPendingInterrupts();
 
-	// Register data is prefilled into the heap, so don't use
-	// the heap until you have programmed the registers!
-	mioRunInitProgram();
-	pllRunInitProgram();
+	if(!(HW_REG_GET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) & OS_GLOBAL0_BOOT_COMPLETE)) {
+		EnablePSToPL();
 
-	clockRunInitProgram();
-	peripheralsRunInitProgram();
+		// Register data is prefilled into the heap, so don't use
+		// the heap until you have programmed the registers!
+		mioRunInitProgram();
+		pllRunInitProgram();
 
-	raw_debug_printf("\nUART ready to be used\n");
-	PrintBanner();
+		clockRunInitProgram();
+		peripheralsRunInitProgram();
 
-	ddrRunInitProgram();
-	serdesRunInitProgram();
-	miscRunInitProgram();
+		raw_debug_printf("\nUART ready to be used\n");
+		PrintBanner();
 
-	ddrQosRunInitProgram();
+		ddrRunInitProgram();
+		serdesRunInitProgram();
+		miscRunInitProgram();
+
+		ddrQosRunInitProgram();
+		// this is a silicon bug fix
+		HW_REG_SET(AMS_PS_SYSMON, ANALOG_BUS, 0X00003210U);
+	}
+
 	MarkDdrAsMemory();
-
-	PrintBanner();
-
-	// this is a silicon bug fix
-	HW_REG_SET(AMS_PS_SYSMON, ANALOG_BUS, 0X00003210U);
 
 //	TcmInit();
 
-	debug_printf("Initialization Done\n");
+	if(!(HW_REG_GET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) & OS_GLOBAL0_BOOT_COMPLETE)) {
+		debug_printf("PMU size = %lu\n", (size_t) _binary_pmu_monitor_bin_end - (size_t) _binary_pmu_monitor_bin_start);
+		debug_printf("PMU load started\n");
+		PmuSleep();
 
-	debug_printf("PMU load started\n");
-	PmuSleep();
+		PmuSafeMemcpy((void *) PMU_RAM_ADDR,
+									(void *) _binary_pmu_monitor_bin_start,
+									(size_t) _binary_pmu_monitor_bin_end - (size_t) _binary_pmu_monitor_bin_start);
+		PmuWakeup();
 
-	PmuSafeMemcpy((void*)PMU_RAM_ADDR,
-													(void*)_binary_pmu_monitor_bin_start,
-													(size_t)_binary_pmu_monitor_bin_end - (size_t)_binary_pmu_monitor_bin_start);
-	PmuWakeup();
+		// stall until pmu says it loaded and ready to go
+		while (!(HW_REG_GET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) & OS_GLOBAL0_PMU_READY)) {
+		}
+	}
 
-	// stall until pmu says it loaded and ready to go
-	while(!(HW_REG_GET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) & OS_GLOBAL0_PMU_READY)) {}
-
-	debug_force_raw_print(false);
-	BringUpDisplayPort();
-	debug_printf("Boot program Finished\n");
-
-	// clear heap
-	memset(HeapBase, 0, HeapLimit - HeapBase);
 	BootData bootData = {
 			.frameBufferWidth = 1280,
 			.frameBufferHeight = 720,
 			.frameBufferHertz = 60,
 			.videoBlockSizeInMB = 4,
 			.bootCodeSize = SRAM_OCP_0_SIZE_IN_BYTES,
-			.videoBlock = videoBlock,
+			.videoBlock = 0,
 			.bootCodeStart = SRAM_OCP_0_BASE_ADDR,
 	};
-	HW_REG_SET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0,
-						 HW_REG_GET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) | OS_GLOBAL0_BOOT_COMPLETE);
 
-	OsService_BootComplete(&bootData);
+	if(!(HW_REG_GET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) & OS_GLOBAL0_BOOT_COMPLETE)) {
+		debug_force_raw_print(false);
+		BringUpDisplayPort();
+		bootData.videoBlock = videoBlock;
+	} else {
+		OsService_FetchBootData(&bootData);
+		videoBlock = bootData.videoBlock;
+	}
+	debug_force_raw_print(false);
+
+	Cache_DCacheCleanAndInvalidate();
+	if(!(HW_REG_GET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) & OS_GLOBAL0_BOOT_COMPLETE)) {
+		debug_printf("Hard Boot Complete VideoBlock @ %#010x\n", videoBlock);
+		OsService_BootComplete(&bootData);
+		HW_REG_SET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0,
+							 HW_REG_GET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) | OS_GLOBAL0_BOOT_COMPLETE);
+	} else {
+		debug_printf("Soft Boot Finished VideoBlock @ %#010x\n", videoBlock);
+	}
 
 	while(1) {
 	}
@@ -180,15 +183,39 @@ void PrintBanner(void )
 
 }
 
+void SetupVideo(Run_Config& runConfig);
+
+Run_Config RunConfig;
+extern "C" int run_dppsu(Run_Config *RunCfgPtr);
+
 void BringUpDisplayPort()
 {
+	if(videoBlock == 0) videoBlock = OsService_DdrLoBlockAlloc(4);
+	FrameBuffer = (uintptr_lo_t)(uintptr_t)(videoBlock + 4096);
+
+	RunConfig.VideoMode = XVIDC_VM_640x480_60_P;
+	RunConfig.Bpc = XVIDC_BPC_8;
+	RunConfig.ColorEncode = XDPPSU_CENC_RGB;
+	RunConfig.UseMaxCfgCaps = 1;
+	RunConfig.LaneCount = LANE_COUNT_2;
+	RunConfig.LinkRate = LINK_RATE_540GBPS;
+	RunConfig.EnSynchClkMode = 1;
+	RunConfig.UseMaxLaneCount = 1;
+	RunConfig.UseMaxLinkRate = 1;
+
+	run_dppsu(&RunConfig);
+
+	//	SetupVideo(RunConfig);
+
+	/*
 	using namespace DisplayPort::Display;
 
 	Init(&display);
 	Init(&mixer);
 
-	CopyStandardVideoMode(DisplayPort::Display::StandardVideoMode::VM_1280_720_60, &display.videoTiming);
-	videoBlock = OsService_DdrLoBlockAlloc(4);
+//	CopyStandardVideoMode(DisplayPort::Display::StandardVideoMode::VM_1280_720_60, &display.videoTiming);
+	CopyStandardVideoMode(DisplayPort::Display::StandardVideoMode::VM_640_480_60, &display.videoTiming);
+	if(videoBlock == 0) videoBlock = OsService_DdrLoBlockAlloc(4);
 	auto dmaDesc = (DMADescriptor*) (uintptr_t)videoBlock;
 	FrameBuffer = (uintptr_lo_t)(uintptr_t)(videoBlock + 4096);
 
@@ -202,10 +229,10 @@ void BringUpDisplayPort()
 	dmaDesc->sourceAddress = (uint32_t)FrameBuffer;
 	dmaDesc->sourceAddressExt = (uint32_t)(((uintptr_t)FrameBuffer) >> 32ULL);
 
-	mixer.function = DisplayPort::Display::MixerFunction::GFX;
+	mixer.function = DisplayPort::Display::MixerFunction::VIDEO;
 	mixer.globalAlpha = 0xFF;
 
-	mixer.videoPlane.source = DisplayPort::Display::DisplayVideoPlane::Source::DISABLED;
+	mixer.videoPlane.source = DisplayPort::Display::DisplayVideoPlane::Source::TEST_GENERATOR;
 	mixer.videoPlane.format = DisplayPort::Display::DisplayVideoPlane::Format::RGBX8;
 	mixer.videoPlane.simpleDescPlane0Address = (uintptr_t)dmaDesc;
 
@@ -214,11 +241,14 @@ void BringUpDisplayPort()
 	mixer.gfxPlane.simpleDescBufferAddress = (uintptr_t)dmaDesc;
 	Cache_DCacheCleanAndInvalidateRange(videoBlock, 4 * 1024 * 1024);
 
-	if(!IsDisplayConnected(&link)) return;
+	if(videoBlock == 0) {
+		if (!IsDisplayConnected(&link))
+			return;
+	}
 
 	Init(&link);
 	SetDisplay(&link, &display, &mixer);
-
+*/
 /*
  * #define DP_AV_BUF_PALETTE_MEMORY_OFFSET 0x0000b400U
 	for(int i = 0; i < 256;i++) {
@@ -663,3 +693,4 @@ extern "C" void SErrorInterrupt(void) {
 	raw_debug_printf("SErrorInterruptHandler\n");
 	asm volatile("wfe");
 }
+

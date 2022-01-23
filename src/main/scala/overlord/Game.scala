@@ -121,6 +121,7 @@ case class Game(name: String,
 	def getRAMConnectedTo(instance: ChipInstance): Seq[RamInstance] =
 		rams.filter(distanceMatrix.connected(instance, _))
 
+
 	private val tmp = out
 		.resolve("soft")
 		.resolve("build")
@@ -134,23 +135,29 @@ case class Game(name: String,
 
 object Game {
 	// these are mutable for easy backup and restore
-	var pathStack     : mutable.Stack[Path]         = mutable.Stack()
-	var containerStack: mutable.Stack[MutContainer] = mutable.Stack()
+	var pathStack     : mutable.Stack[Path]      = mutable.Stack()
+	var containerStack: mutable.Stack[Container] = mutable.Stack()
 
 	def apply(gameName: String,
+	          board: String,
 	          gamePath: Path,
 	          out: Path,
-	          catalogs: DefinitionCatalog): Option[Game] = {
-		val gb = new GameBuilder(gameName, gamePath, catalogs)
-		gb.toGame(out)
+	          catalogs: DefinitionCatalog,
+	          prefabs: PrefabCatalog): Option[Game] = {
+		val gb   = new GameBuilder(gameName, board, gamePath, catalogs, prefabs)
+		val game = gb.toGame(out)
+
+		game
 	}
 
 	private class GameBuilder(gameName: String,
+	                          board: String,
 	                          gamePath: Path,
-	                          catalogs: DefinitionCatalog) {
+	                          catalogs: DefinitionCatalog,
+	                          prefabs: PrefabCatalog) {
 
 		private val defaults = mutable.Map[String, Variant]()
-		process(gamePath, catalogs)
+		process(gamePath, catalogs, prefabs)
 
 		def toGame(out: Path): Option[Game] = {
 			val softPath = out.resolve("soft")
@@ -160,14 +167,32 @@ object Game {
 				println("Previous Errors mean game cannot be created\n")
 				return None
 			}
+			var rootContainer = new RootContainer
 
+
+			// pass the board as if it had been a prefab in the main project file
+			val boardInsertV = Map[String, Variant](
+				("instance" -> ArrayV(Array(
+					TableV(
+						Map[String, Variant](
+							"name" -> StringV(s"$board"),
+							"type" -> StringV(s"board.$board"))
+						)))
+					),
+				("prefab" -> ArrayV(Array(
+					TableV(
+						Map[String, Variant]("name" -> StringV(s"boards.$board"))
+						)))
+					))
+			ProcessInstantiation(boardInsertV, rootContainer)
+			//			containerStack.push(rootContainer.children(0).asInstanceOf[Container])
 			// flatten all containers
-			val top = containerStack.head
-			for (c <- containerStack.tail) {
-				top.children ++= c.children
-				top.connections ++= c.connections
+			for (c <- containerStack.popAll()) {
+				rootContainer.children ++= c.children
+				rootContainer.connections ++= c.connections
 			}
 			containerStack.clear()
+			val top = rootContainer
 
 			// get chips (hardware or gateware)
 			val chipInstances               = top.children.
@@ -190,7 +215,7 @@ object Game {
 
 		private def DoChips(chipInstances: Seq[ChipInstance],
 		                    out: Path,
-		                    top: MutContainer) = {
+		                    top: Container) = {
 			val gatePath = out.resolve("gate")
 			Utils.ensureDirectories(gatePath)
 
@@ -228,16 +253,8 @@ object Game {
 			(setOfConnected, dm, wires)
 		}
 
-		private def process(path: Path, catalogs: DefinitionCatalog): Unit = {
-
-			val container = new MutContainer
-
-			containerStack.push(container)
-
-			val parsed = Utils.readToml(gameName, path, getClass)
-
-			if (parsed.contains("defaults"))
-				defaults ++= Utils.toTable(parsed("defaults"))
+		private def ProcessInstantiation(parsed: Map[String, Variant],
+		                                 container: Container): Boolean = {
 
 			val includePath = if (parsed.contains("path")) {
 				Utils.toString(parsed("path"))
@@ -252,11 +269,11 @@ object Game {
 					val incResourcePath = Path.of(includePath).resolve(incResourceName)
 
 					Utils.readFile(incResourceName, incResourcePath, getClass) match {
-						case Some(d) => process(incResourcePath, catalogs)
+						case Some(d) => process(incResourcePath, catalogs, prefabs)
 						case _       =>
 							println(s"Include resource file $incResourceName not found")
 							containerStack.pop()
-							return
+							return false
 					}
 				}
 			}
@@ -272,8 +289,45 @@ object Game {
 				val connections = Utils.toArray(parsed("connection"))
 				container.connections ++= connections.flatMap(Connection(_, catalogs))
 			}
+
+			var okay = true
+
+			// bring in wanted prefabs
+			if (parsed.contains("prefab")) {
+				val tpfs = Utils.toArray(parsed("prefab"))
+				for (prefab <- tpfs) {
+					val table = Utils.toTable(prefab)
+					val ident = Utils.toString(table("name"))
+					prefabs.findPrefab(ident) match {
+						case Some(pf) =>
+							okay &= ProcessInstantiation(pf.instances, container)
+						case None     =>
+							println(s"prefab $ident not found")
+							containerStack.pop()
+							return false
+					}
+				}
+			}
+			okay
+		}
+
+		private def process(path: Path,
+		                    catalogs: DefinitionCatalog,
+		                    prefabs: PrefabCatalog): Unit = {
+
+			val container: RootContainer = new RootContainer
+
+			containerStack.push(container.asInstanceOf[Container])
+
+			val parsed = Utils.readToml(gameName, path, getClass)
+
+			if (parsed.contains("defaults"))
+				defaults ++= Utils.toTable(parsed("defaults"))
+
+			if (!ProcessInstantiation(parsed, container)) {
+				println(s"Instantiation failed")
+			}
 		}
 	}
-
 }
 

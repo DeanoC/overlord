@@ -35,7 +35,8 @@ void OsService_DdrLoBlockFree(uintptr_lo_t ptr);
 WARN_UNUSED_RESULT uintptr_all_t OsService_DdrHiBlockAlloc(uint16_t blocks1MB);
 void OsService_DdrHiBlockFree(uintptr_all_t ptr);
 
-void OsService_BootComplete(BootData* bootData);
+void OsService_BootComplete(BootData const* bootData);
+void OsService_FetchBootData(BootData* bootData);
 
 typedef enum OSS_CPU {
 	OSSC_A53_0 = (1 << 0),

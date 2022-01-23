@@ -14,12 +14,22 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="ikuy_utils" exported="" />
+    <orderEntry type="library" name="sbt: ca.mrvisser:sealerate_2.13:0.0.6:jar" level="project" />
     <orderEntry type="library" name="sbt: com.chuusai:shapeless_2.13:2.3.3:jar" level="project" />
     <orderEntry type="library" name="sbt: com.lihaoyi:sourcecode_2.13:0.1.7:jar" level="project" />
+    <orderEntry type="library" name="sbt: com.thoughtworks.paranamer:paranamer:2.8:jar" level="project" />
+    <orderEntry type="library" name="sbt: net.java.dev.jna:jna:5.3.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: net.liftweb:lift-json_2.13:3.4.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.jline:jline:3.15.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-graph:graph-core_2.13:1.13.1:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-graph:graph-dot_2.13:1.13.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-graph:graph-json_2.13:1.13.0:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-collection-compat_2.13:2.3.1:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang.modules:scala-xml_2.13:1.2.0:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang:scala-compiler:2.13.3:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang:scala-library:2.13.3:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scala-lang:scala-reflect:2.13.3:jar" level="project" />
+    <orderEntry type="library" name="sbt: org.scala-lang:scalap:2.13.3:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scalactic:scalactic_2.13:3.2.2:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scalameta:fastparse-utils_2.13:1.0.1:jar" level="project" />
     <orderEntry type="library" name="sbt: org.scalameta:fastparse_2.13:1.0.1:jar" level="project" />

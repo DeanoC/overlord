@@ -1,0 +1,4 @@
+resources = [
+    "qspi/qspi",
+    "sdio/sdio",
+]

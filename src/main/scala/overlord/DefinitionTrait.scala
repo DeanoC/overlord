@@ -28,6 +28,7 @@ object Definition {
 			case _: StorageDefinitionType  => ChipDefinition(table, path)
 			case _: BridgeDefinitionType   => ChipDefinition(table, path)
 			case _: NetDefinitionType      => ChipDefinition(table, path)
+			case _: IoDefinitionType       => ChipDefinition(table, path)
 			case _: OtherDefinitionType    => ChipDefinition(table, path)
 			case _: PinGroupDefinitionType => ChipDefinition(table, path)
 			case _: ClockDefinitionType    => ChipDefinition(table, path)
@@ -46,7 +47,7 @@ object Definition {
 }
 
 trait ChipDefinitionTrait extends DefinitionTrait {
-	val ports: Map[String, Port]
+	val ports    : Map[String, Port]
 	val registers: Option[Registers]
 
 	def createInstance(name: String,
@@ -58,6 +59,7 @@ trait ChipDefinitionTrait extends DefinitionTrait {
 			case _: StorageDefinitionType  => StorageInstance(name, this, attribs)
 			case _: BridgeDefinitionType   => BridgeInstance(name, this, attribs)
 			case _: NetDefinitionType      => NetInstance(name, this, attribs)
+			case _: IoDefinitionType       => IoInstance(name, this, attribs)
 			case _: OtherDefinitionType    => OtherInstance(name, this, attribs)
 			case _: PinGroupDefinitionType => PinGroupInstance(name, this, attribs)
 			case _: ClockDefinitionType    => ClockInstance(name, this, attribs)
@@ -71,7 +73,7 @@ trait ChipDefinitionTrait extends DefinitionTrait {
 
 trait GatewareDefinitionTrait extends ChipDefinitionTrait {
 	val actionsFile: ActionsFile
-	val parameters: Map[String,Variant]
+	val parameters : Map[String, Variant]
 }
 
 trait SoftwareDefinitionTrait extends DefinitionTrait {

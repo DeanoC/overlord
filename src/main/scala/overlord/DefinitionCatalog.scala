@@ -13,7 +13,7 @@ class DefinitionCatalog {
 
 	val catalogs: keyStore = mutable.HashMap()
 
-	def FindDefinition(defType: key): Option[value] = {
+	def findDefinition(defType: key): Option[value] = {
 		var bestMatch           = 0
 		var defi: Option[value] = None
 
@@ -53,11 +53,18 @@ object DefinitionCatalog {
 		}
 
 		val source = Utils.readToml(name, path, getClass)
-		parse(source, spath, defaultMap)
+		parse(name, source, spath, defaultMap)
 	}
-	private def parse(parsed: Map[String, Variant],
+
+	private def parse(name: String,
+	                  parsed: Map[String, Variant],
 	                  spath: Path,
-	                  defaultMap: Map[String,Variant]): Option[Seq[DefinitionTrait]] = {
+	                  defaultMap: Map[String, Variant]): Option[Seq[DefinitionTrait]] = {
+
+		if (parsed.contains("instance")) {
+			println(s"$name contains an Instance which are not allowed in definitions")
+			return None
+		};
 
 		val path = if (parsed.contains("path")) {
 			spath.resolve(Utils.toString(parsed("path")))

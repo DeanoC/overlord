@@ -1,6 +1,7 @@
 #include "core/core.h"
 #include "gfxdebug/rgba8.hpp"
 #include "gfxdebug/fonts.hpp"
+#include "dbg/print.h"
 
 namespace GfxDebug {
 
@@ -25,13 +26,30 @@ RGBA8::RGBA8(uint16_t	width, uint16_t height, uint8_t *framebuffer) :
 
 void RGBA8::Clear() const {
 	auto ptr = (uint32_t *) this->frameBuffer;
+	auto const end = ptr + width * height;
 
-	for (int i = 0; i < height; ++i) {
-		for(int j = 0;j < width; ++j) {
-			memcpy(ptr++, &backgroundColour, 4);
-		}
+	while(ptr < end) {
+		memcpy(ptr++, &backgroundColour, 4);
 	}
 }
+
+void RGBA8::SetPixel(int x, int y, uint32_t val) {
+	auto *tl = (uint32_t *) this->frameBuffer;
+	if(y >= this->height) return;
+	if(x >= this->width) return;
+	tl += (y * this->width) + x;
+	*tl = val;
+}
+void RGBA8::SetPixel(int x, int y, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
+	uint32_t val = a << 24 | b << 16 | g << 8 | r << 0;
+
+	auto *tl = (uint32_t *) this->frameBuffer;
+	if(y >= this->height) return;
+	if(x >= this->width) return;
+	tl += (y * this->width) + x;
+	*tl = val;
+}
+
 void RGBA8::PutChar(int col, int row, char c) const {
 #if GFXDEBUG_FONTS_MINIMAL_MEMORY != 0
 	PutChar8(col, row, c);

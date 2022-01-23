@@ -1,7 +1,7 @@
 package output
 
 import ikuy_utils.Utils
-import overlord.Game
+import overlord.{Game, Resources}
 
 import java.nio.file.Path
 
@@ -14,7 +14,7 @@ object Compiler {
 
 		val cpu_info: Set[(String, String, String)] = {
 			game.cpus.map(cpu => (
-				cpu.splitIdent.last,
+				cpu.definition.defType.ident.last,
 				cpu.triple,
 				Utils.lookupString(cpu.attributes, "gcc_flags", "")))
 		}.toSet
@@ -31,7 +31,8 @@ object Compiler {
 		val sb = new StringBuilder
 
 		sb ++= (Utils.readFile("generate_compilers",
-		                       Path.of("software/generate_compilers.sh"),
+		                       Resources.stdResourcePath()
+			                       .resolve("software/generate_compilers.sh"),
 		                       getClass) match {
 			case Some(script) => script
 			case None         =>
@@ -59,7 +60,7 @@ object Compiler {
 
 		val template = Utils.readFile(
 			"toolchain_template",
-			Path.of("software/toolchain_template.cmake"),
+			Resources.stdResourcePath().resolve("software/toolchain_template.cmake"),
 			getClass) match {
 			case Some(script) => script
 			case None         =>
@@ -71,7 +72,7 @@ object Compiler {
 			// try to read a specialist toolchain file, if none exist use template
 			val tt = Utils.readFile(
 				name = "toolchain_" + name,
-				path = Path.of(s"software/toolchain_$name.cmake"),
+				path = Resources.stdResourcePath().resolve(s"software/toolchain_$name.cmake"),
 				klass = getClass
 				) match {
 				case Some(s) => s

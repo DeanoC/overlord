@@ -6,3 +6,11 @@ triple = "riscv32-none-elf"
 width = 32
 gateware = "vexriscv/vexriscv_smallest.toml"
 supplier_prefix = ["dBus_", "iBus_"]
+
+# 3 types hard CPUs for zynqps8
+[[include]]
+resource = "zynqps8/a53"
+[[include]]
+resource = "zynqps8/r5f"
+[[include]]
+resource = "zynqps8/pmu"

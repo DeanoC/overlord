@@ -14,6 +14,7 @@
 #define WEAK_LINKAGE __attribute__((weak))
 #define WARN_UNUSED_RESULT __attribute__((warn_unused_result))
 #define PACKED  __attribute__((__packed__))
+#define HIDDEN __attribute__((__visibility__("hidden")))
 
 #define ALIGN(x) __attribute__((aligned(x)))
 #define KEEP __attribute((used))
@@ -41,6 +42,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef float float_t;
+typedef double double_t;
 
 typedef uint32_t uintptr_lo_t;
 typedef uint64_t uintptr_all_t;

@@ -1,0 +1,9 @@
+path = "ddr4"
+[[definition]]
+type = "ram.ddr.ddr4.zynqps8"
+registers = [
+    { resource = "zynqps8/ddr_phy" },
+    { resource = "zynqps8/ddr_qos_ctrl" },
+    { resource = "zynqps8/ddrc" }
+]
+hardware = [{ max_cores = 1 }]

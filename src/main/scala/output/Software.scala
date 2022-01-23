@@ -1,7 +1,7 @@
 package output
 
 import ikuy_utils.Utils
-import overlord.Game
+import overlord.{Game, Resources}
 
 import java.nio.file.Path
 
@@ -18,10 +18,10 @@ object Software {
 		Utils.ensureDirectories(libraryPath)
 
 		val in_program_paths       = game.cpus
-			.map("programs_" + _.splitIdent.last)
+			.map("programs_" + _.definition.defType.ident.last)
 			.map(tmp_program_path(out).resolve)
 		val out_program_paths      = game.cpus
-			.map("programs_" + _.splitIdent.last)
+			.map("programs_" + _.definition.defType.ident.last)
 			.map(out.resolve)
 		val programs_folder_exists = in_program_paths.map(Utils.doesFileOrDirectoryExist)
 		for ((exists, i) <- programs_folder_exists.zipWithIndex) {
@@ -52,7 +52,8 @@ object Software {
 			             .resolve("soft")
 			             .resolve("libraries"),
 		             out.resolve("libraries"))
-		Utils.copy(Path.of("software/subdir.cmake"),
+
+		Utils.copy(Resources.stdResourcePath().resolve("software/subdir.cmake"),
 		           out.resolve("libraries").resolve("CMakeLists.txt"),
 		           getClass)
 		//		Utils.rename(out.resolve("build")
@@ -62,7 +63,7 @@ object Software {
 		//		             out.resolve("programs_host"))
 
 		for (cpu <- game.cpus) {
-			val targetPrograms = s"programs_${cpu.splitIdent.last}"
+			val targetPrograms = s"programs_${cpu.definition.defType.ident.last}"
 			Utils.deleteDirectories(out.resolve(targetPrograms))
 
 			Utils.rename(out.resolve("build")
@@ -83,7 +84,7 @@ object Software {
 				val sbpm = new StringBuilder
 				val sbm  = new StringBuilder
 
-				val cpu_name     = cpu.splitIdent.last
+				val cpu_name     = cpu.definition.defType.ident.last
 				val program_name = "programs_" + cpu_name
 
 				Utils.rename(program_paths(i), out.resolve(program_name))
@@ -104,18 +105,18 @@ object Software {
 				Utils.writeFile(makePath, sbm.result())
 				Utils.setFileExecutable(makePath)
 
-				Utils.copy(Path.of("software/subdir.cmake"),
+				Utils.copy(Resources.stdResourcePath().resolve("software/subdir.cmake"),
 				           out.resolve(s"$program_name").resolve("CMakeLists.txt"),
 				           getClass)
 			}
 		}
 		Utils.writeFile(out.resolve(s"make_programs.sh"), sb.result())
 		Utils.setFileExecutable(out.resolve(s"make_programs.sh"))
-		Utils.copy(Path.of("software/ikuy_root.cmake"),
+		Utils.copy(Resources.stdResourcePath().resolve("software/ikuy_root.cmake"),
 		           out.resolve("CMakeLists.txt"),
 		           getClass)
 		// workaround for microblaze gcc
-		Utils.copy(Path.of("software/empty-file.ld"),
+		Utils.copy(Resources.stdResourcePath().resolve("software/empty-file.ld"),
 		           out.resolve("empty-file.ld"),
 		           getClass)
 
@@ -126,7 +127,7 @@ object Software {
 			} else Array[String]()
 
 			for (cpu <- game.cpus) {
-				val cpuName = cpu.splitIdent.last
+				val cpuName = cpu.definition.defType.ident.last
 
 				val forThisCpu = if(cpus.nonEmpty)
 					cpus.contains(cpuName)
@@ -137,11 +138,11 @@ object Software {
 					sb ++=
 					f"cmake -D CMAKE_TOOLCHAIN_FILE=$$PWD/${cpuName}_toolchain.cmake " +
 					f"-G Ninja " +
-					f"-S programs_${cpu.splitIdent.last} " +
-					f"-B build/programs_${cpu.splitIdent.last} " +
+					f"-S programs_${cpu.definition.defType.ident.last} " +
+					f"-B build/programs_${cpu.definition.defType.ident.last} " +
 					"\n"
 
-					sb ++= f"cmake --build build/programs_${cpu.splitIdent.last}%n"
+					sb ++= f"cmake --build build/programs_${cpu.definition.defType.ident.last}%n"
 				}
 			}
 		}*/

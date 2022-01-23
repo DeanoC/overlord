@@ -318,7 +318,7 @@ struct VideoTiming {
 	uint16_t vTotal;
 	bool hSyncPolarity;
 	bool vSyncPolarity;
-	uint16_t frameRateHz;
+	float frameRateHz;
 };
 
 enum class MixerFunction {

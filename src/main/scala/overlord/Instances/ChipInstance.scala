@@ -46,25 +46,19 @@ trait ChipInstance extends InstanceTrait {
 	def getPort(lastName: String): Option[Port] =
 		if (ports.contains(lastName)) Some(ports(lastName)) else None
 
-	def getMatchNameAndPort(a: String): (Option[String], Option[Port]) = {
-		val withoutBits = a.split('[').head
-		if (a == ident)
-			(Some(a), getPort(a.split('.').last))
-		else if (withoutBits == ident)
-			(Some(withoutBits), getPort(withoutBits.split('.').last))
-		else {
-			val splitWithoutBits = withoutBits.split('.')
+	def getMatchNameAndPort(name: String): (Option[String], Option[Port]) = {
+		val nameWithoutBits = name.split('[').head
 
-			// wildcard match both ident and match
-			val is = for ((id, i) <- splitIdentWidthIndex) yield
-				if ((i < splitWithoutBits.length) && (id == "_" || id == "*"))
-					splitWithoutBits(i)
+		def WildCardMatch(nameId: Array[String], instanceId: Array[String]) = {
+			// wildcard match
+			val is = for ((id, i) <- instanceId.zipWithIndex) yield
+				if ((i < nameId.length) && (id == "_" || id == "*"))
+					nameId(i)
 				else id
 
-			val ms =
-				for ((id, i) <- withoutBits.split('.').zipWithIndex) yield
-					if ((i < is.length) && (id == "_" || id == "*")) is(i)
-					else id
+			val ms = for ((id, i) <- nameId.zipWithIndex) yield
+				if ((i < is.length) && (id == "_" || id == "*")) is(i)
+				else id
 
 			if (ms sameElements is)
 				(Some(ms.mkString(".")), getPort(ms(0)))
@@ -78,6 +72,16 @@ trait ChipInstance extends InstanceTrait {
 					(Some(s"${ms.mkString(".")}"), port)
 				else (None, None)
 			}
+		}
+
+		if (name == ident)
+			(Some(name), getPort(name.split('.').last))
+		else if (nameWithoutBits == ident)
+			(Some(nameWithoutBits), getPort(nameWithoutBits.split('.').last))
+		else {
+			val match0 = WildCardMatch(nameWithoutBits.split('.'), ident.split('.'))
+			if (match0._1.isDefined) return match0
+			WildCardMatch(nameWithoutBits.split('.'), definition.defType.ident.toArray)
 		}
 	}
 }
