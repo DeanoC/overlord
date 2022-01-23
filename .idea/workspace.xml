@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="73b7f681-932b-4979-9f4f-6aee48997ac8" name="Default Changelist" comment="Fix for incorrect A53 base address register&#10;A53 resets now down in WakeUp&#10;Fix for wrong &quot;Unknown Command&quot; and empty strings">
+    <list default="true" id="73b7f681-932b-4979-9f4f-6aee48997ac8" name="Default Changelist" comment="Added musl_math software library&#10;Re-organising cpu register banks (WIP)&#10;Re-organising zynqmp and SOCs tomls&#10;Changed and fixed bit rotten board handling&#10;Redid ident to require (in most games) 3 seperates, also both name and Definition Ident useable from project files&#10;Implemented hardware max instances/max cores and address offsets&#10;Fixed to new way ports and pin matches&#10;CPU folders named after cpu type not name&#10;Refactored Containers&#10;Added hidden attribute to CPP core header&#10;Refactor DDR structure&#10;Added IoDefinitionType&#10;Support fraction frame rates in zynqmp display port&#10;Made DistanceMatrix print more verbose (hiding unconnected chips)&#10;Added isIsolated to DistanceMatrix to test for unconnected chips&#10;Added FetchBootData to pmu_monitor&#10;Added board as command line parameters to overlord&#10;Added prefabs support&#10;Changed how pingroups are defined (in a table in the board object)&#10;refactored os functions in pmu_monitor&#10;Added board ident to software macro system&#10;Write register lists without register banks that have been used&#10;Added graph output to Report (outputs a graphviz dot file of the project)&#10;Added Xilinx software library for using the MIT libraries">
       <change afterPath="$PROJECT_DIR$/.idea/libraries/sbt__ca_mrvisser_sealerate_2_13_0_0_6_jar.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/.idea/libraries/sbt__com_thoughtworks_paranamer_paranamer_2_8_jar.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/.idea/libraries/sbt__net_java_dev_jna_jna_5_3_1_jar.xml" afterDir="false" />
@@ -389,9 +389,14 @@
       <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libraries/xilinx/src/video_common/xvidc_parse_edid.c" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libraries/xilinx/src/video_common/xvidc_timings_table.c" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libraries/xilinx/xilinx.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/kv260/psu_init.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/kv260/psu_init.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/myir_fz3/psu_init.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/myir_fz3/psu_init.h" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/xdpdma_video_example.c" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/xdpdma_video_example.h" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/xdppsu_interrupt.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/xilinx_psu_init.h" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os/os_boot.cpp" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os/os_memory.cpp" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os/os_screenconsole.cpp" afterDir="false" />
@@ -485,6 +490,7 @@
       <change beforePath="$PROJECT_DIR$/src/main/scala/output/Project.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Project.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/output/Report.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Report.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/output/Software.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Software.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/output/Xdc.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Xdc.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Chip/ChipDefinition.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Chip/ChipDefinition.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Chip/Registers.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Chip/Registers.scala" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Unconnected.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Connections/Unconnected.scala" afterDir="false" />
@@ -801,6 +807,7 @@
       <workItem from="1640868999759" duration="515000" />
       <workItem from="1640869542930" duration="190000" />
       <workItem from="1640869762470" duration="115870000" />
+      <workItem from="1642938612444" duration="1722000" />
     </task>
     <task id="LOCAL-00001" summary="Major work on connection expansion and block connections&#10;Refactor and reorg instances, constraits, actions etc.&#10;moved ps8 docs to lower case">
       <created>1605964442645</created>
@@ -1054,7 +1061,14 @@
       <option name="project" value="LOCAL" />
       <updated>1637699739852</updated>
     </task>
-    <option name="localTasksCounter" value="37" />
+    <task id="LOCAL-00037" summary="Added musl_math software library&#10;Re-organising cpu register banks (WIP)&#10;Re-organising zynqmp and SOCs tomls&#10;Changed and fixed bit rotten board handling&#10;Redid ident to require (in most games) 3 seperates, also both name and Definition Ident useable from project files&#10;Implemented hardware max instances/max cores and address offsets&#10;Fixed to new way ports and pin matches&#10;CPU folders named after cpu type not name&#10;Refactored Containers&#10;Added hidden attribute to CPP core header&#10;Refactor DDR structure&#10;Added IoDefinitionType&#10;Support fraction frame rates in zynqmp display port&#10;Made DistanceMatrix print more verbose (hiding unconnected chips)&#10;Added isIsolated to DistanceMatrix to test for unconnected chips&#10;Added FetchBootData to pmu_monitor&#10;Added board as command line parameters to overlord&#10;Added prefabs support&#10;Changed how pingroups are defined (in a table in the board object)&#10;refactored os functions in pmu_monitor&#10;Added board ident to software macro system&#10;Write register lists without register banks that have been used&#10;Added graph output to Report (outputs a graphviz dot file of the project)&#10;Added Xilinx software library for using the MIT libraries">
+      <created>1642939887264</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1642939887264</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1100,7 +1114,6 @@
       <path value="$PROJECT_DIR$/gate/litedram" />
       <path value="$PROJECT_DIR$/../ikuy_utils" />
     </ignored-roots>
-    <MESSAGE value="Output clock period and waveform for constraint&#10;HACK: Added dont_touch as vivido is stripping things and I can't figure out why...&#10;Utils toDouble and lookupDouble" />
     <MESSAGE value="Finding my way around again after break" />
     <MESSAGE value="Added gateware register definitions and banks handling&#10;ReadTomlRegistersAction can read toml files produced by sbt into gateware" />
     <MESSAGE value="Added gateware register definitions and banks handling&#10;ReadTomlRegistersAction can read toml files produced by sbt into gateware&#10;Cleanup code analysis warnings" />
@@ -1125,7 +1138,8 @@
     <MESSAGE value="Add String to binary, hex, octal and C style decoder (0x,0b, 0)&#10;Added download address to zmodem and dma each chunk&#10;Added monitor commands for download_at, sleep cpu, wake cpu and boot cpu&#10;Fixed bug in overload related to pathing programs" />
     <MESSAGE value="Fixed up cache system SYS -&gt; SYSTEM change&#10;Added RECURSE to pmu CMakeLists.txt&#10;Added subdirectories to tidy in various places&#10;Added cpu wake and sleep to os services&#10;Added reset to pmu" />
     <MESSAGE value="Fix for incorrect A53 base address register&#10;A53 resets now down in WakeUp&#10;Fix for wrong &quot;Unknown Command&quot; and empty strings" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix for incorrect A53 base address register&#10;A53 resets now down in WakeUp&#10;Fix for wrong &quot;Unknown Command&quot; and empty strings" />
+    <MESSAGE value="Added musl_math software library&#10;Re-organising cpu register banks (WIP)&#10;Re-organising zynqmp and SOCs tomls&#10;Changed and fixed bit rotten board handling&#10;Redid ident to require (in most games) 3 seperates, also both name and Definition Ident useable from project files&#10;Implemented hardware max instances/max cores and address offsets&#10;Fixed to new way ports and pin matches&#10;CPU folders named after cpu type not name&#10;Refactored Containers&#10;Added hidden attribute to CPP core header&#10;Refactor DDR structure&#10;Added IoDefinitionType&#10;Support fraction frame rates in zynqmp display port&#10;Made DistanceMatrix print more verbose (hiding unconnected chips)&#10;Added isIsolated to DistanceMatrix to test for unconnected chips&#10;Added FetchBootData to pmu_monitor&#10;Added board as command line parameters to overlord&#10;Added prefabs support&#10;Changed how pingroups are defined (in a table in the board object)&#10;refactored os functions in pmu_monitor&#10;Added board ident to software macro system&#10;Write register lists without register banks that have been used&#10;Added graph output to Report (outputs a graphviz dot file of the project)&#10;Added Xilinx software library for using the MIT libraries" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added musl_math software library&#10;Re-organising cpu register banks (WIP)&#10;Re-organising zynqmp and SOCs tomls&#10;Changed and fixed bit rotten board handling&#10;Redid ident to require (in most games) 3 seperates, also both name and Definition Ident useable from project files&#10;Implemented hardware max instances/max cores and address offsets&#10;Fixed to new way ports and pin matches&#10;CPU folders named after cpu type not name&#10;Refactored Containers&#10;Added hidden attribute to CPP core header&#10;Refactor DDR structure&#10;Added IoDefinitionType&#10;Support fraction frame rates in zynqmp display port&#10;Made DistanceMatrix print more verbose (hiding unconnected chips)&#10;Added isIsolated to DistanceMatrix to test for unconnected chips&#10;Added FetchBootData to pmu_monitor&#10;Added board as command line parameters to overlord&#10;Added prefabs support&#10;Changed how pingroups are defined (in a table in the board object)&#10;refactored os functions in pmu_monitor&#10;Added board ident to software macro system&#10;Write register lists without register banks that have been used&#10;Added graph output to Report (outputs a graphviz dot file of the project)&#10;Added Xilinx software library for using the MIT libraries" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
@@ -1153,11 +1167,6 @@
           <properties class="java.util.NoSuchElementException" package="java.util" />
           <option name="timeStamp" value="94" />
         </breakpoint>
-        <line-breakpoint enabled="true" type="scala-line">
-          <url>file://$PROJECT_DIR$/src/main/scala/output/Xdc.scala</url>
-          <line>17</line>
-          <option name="timeStamp" value="261" />
-        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <pin-to-top-manager>
