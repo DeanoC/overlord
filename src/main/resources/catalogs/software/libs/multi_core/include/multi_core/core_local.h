@@ -15,7 +15,9 @@
 
 #else
 
-#define CORE_LOCAL(type, name) thread_local type name
+#include "host_platform/host_platform.h"
+
+#define CORE_LOCAL(type, name) HOST_PLATFORM_THREAD_LOCAL type name
 #define READ_CORE_LOCAL(name) name
 #define WRITE_CORE_LOCAL(name, value) name = value
 

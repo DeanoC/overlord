@@ -38,8 +38,15 @@ file(GLOB HEADERLIST CONFIGURE_DEPENDS
 
 add_library(${project} ${CLIST} ${CPPLIST} ${ASMLIST} ${HEADERLIST})
 target_link_libraries(${project} PRIVATE core)
-target_link_libraries(${project} PRIVATE hw)
 target_link_libraries(${project} PRIVATE dbg)
+
 
 target_include_directories(${project} PUBLIC include)
 target_compile_definitions(${project} PRIVATE BOARD_${BOARD}=1 SOC_${SOC}=1 CPU_${CPU}=1 CPU_ARCH_${CPU_ARCH}=1)
+
+if(${CPU} STREQUAL "host")
+	list(APPEND PRIVATE_LIBRARIES host_platform)
+else()
+	target_link_libraries(${project} PRIVATE hw)
+endif()
+

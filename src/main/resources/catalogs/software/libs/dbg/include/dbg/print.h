@@ -12,6 +12,10 @@ WEAK_LINKAGE void debug_printf(const char *format, ...) NON_NULL(1) __attribute_
 WEAK_LINKAGE void debug_sized_print(uint32_t size, char const * text) NON_NULL(2);
 void debug_force_raw_print(bool enabled);
 
+#define LOGERROR(txt, ...) debug_printf("ERROR: "txt __VA_OPT__(,) __VA_ARGS__ )
+#define LOGWARNING(txt, ...) debug_printf("WARNING: "txt __VA_OPT__(,) __VA_ARGS__ )
+#define LOGINFO(txt, ...) debug_printf("INFO: "txt __VA_OPT__(,) __VA_ARGS__ )
+
 #ifdef __cplusplus
 }
 #endif

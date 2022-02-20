@@ -41,6 +41,7 @@ struct OutputPixelConfig {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpedantic"
 
+// must be 256 byte aligned
 struct PACKED DMADescriptor {
 	union {
 		uint32_t CONTROL;
@@ -163,7 +164,7 @@ struct PACKED DMADescriptor {
 			uint32_t crc;
 		};
 	};
-} ALIGN(256);
+};
 #pragma GCC diagnostic pop
 
 static_assert( offsetof(DMADescriptor, CONTROL) == 0);

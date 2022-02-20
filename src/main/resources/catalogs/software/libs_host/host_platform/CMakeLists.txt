@@ -1,4 +1,4 @@
-set(project dbg)
+set(project host_platform)
 project(${project} C ASM)
 
 set(CMAKE_C_STANDARD 11)
@@ -26,10 +26,23 @@ file(GLOB HEADERLIST CONFIGURE_DEPENDS
 		include/${CPU}/*.h
 		)
 
-add_library(${project} ${CLIST} ${ASMLIST} ${HEADERLIST})
+set( SRCS ${CLIST} ${ASMLIST})
+if(DEFINED SRCS)
+	list(LENGTH SRCS SRCS_LENGTH)
+endif()
 
-target_include_directories(${project} PUBLIC include)
+set(PRIVATE_LIBRARIES
+		core
+		)
+
+if(SRCS_LENGTH)
+	add_library(${project} ${SRC} ${HEADERLIST})
+	target_include_directories(${project} PUBLIC include)
+	target_link_libraries(${project} PRIVATE ${PRIVATE_LIBRARIES})
+else()
+	add_library(${project} INTERFACE ${HEADERLIST} )
+	target_include_directories(${project} INTERFACE include)
+	target_link_libraries(${project} INTERFACE ${PRIVATE_LIBRARIES})
+endif()
+
 add_compile_definitions(${project} BOARD_${BOARD}=1 SOC_${SOC}=1 CPU_${CPU}=1 CPU_ARCH_${CPU_ARCH}=1)
-target_link_libraries(${project} PRIVATE core)
-target_link_libraries(${project} PRIVATE hw)
-target_link_libraries(${project} PRIVATE osservices)

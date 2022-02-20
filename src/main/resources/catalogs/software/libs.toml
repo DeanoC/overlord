@@ -5,6 +5,12 @@ software = "libs/core/core.toml"
 shared_with_host = true
 
 [[definition]]
+name = "dbg"
+type = "library.dbg"
+software = "libs/dbg/dbg.toml"
+shared_with_host = true
+
+[[definition]]
 name = "multi_core"
 type = "library.multi_core"
 software = "libs/multi_core/multi_core.toml"

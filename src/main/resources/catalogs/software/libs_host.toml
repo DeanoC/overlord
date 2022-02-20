@@ -1,0 +1,5 @@
+[[definition]]
+name = "host_platform"
+type = "library.host_platform"
+software = "libs_host/host_platform/host_platform.toml"
+host_only = true

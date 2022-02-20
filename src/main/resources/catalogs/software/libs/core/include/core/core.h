@@ -16,7 +16,7 @@
 #define PACKED  __attribute__((__packed__))
 #define HIDDEN __attribute__((__visibility__("hidden")))
 
-#define ALIGN(x) __attribute__((aligned(x)))
+#define ALIGN(x) alignas(x)
 #define KEEP __attribute((used))
 #define ALIAS(x) __attribute((alias(#x)))
 
@@ -52,3 +52,4 @@ EXTERN_C void * memset ( void *destination, int c, size_t num ) NON_NULL(1);
 EXTERN_C void * memcpy ( void * destination, const void * source, size_t bytes ) NON_NULL(1, 2);
 EXTERN_C void * memmove ( void * destination, const void * source, size_t bytes ) NON_NULL(1,2);
 
+#define IKUY_DEBUG_BREAK() __builtin_trap();

@@ -1,0 +1,41 @@
+set(project dbg)
+project(${project} C ASM)
+
+set(CMAKE_C_STANDARD 11)
+
+# requires parent cmake project to set BOARD_ SOC_ CPU_ and CPU_ARCH
+file(GLOB CLIST CONFIGURE_DEPENDS
+		src/*.c
+		src/${BOARD}/*.c
+		src/${SOC}/*.c
+		src/${CPU_ARCH}/*.c
+		src/${CPU}/*.c )
+
+file(GLOB ASMLIST CONFIGURE_DEPENDS
+		src/*.S
+		src/${BOARD}/*.S
+		src/${SOC}/*.S
+		src/${CPU_ARCH}/*.S
+		src/${CPU}/*.S )
+
+file(GLOB HEADERLIST CONFIGURE_DEPENDS
+		include/*.h
+		include/${BOARD}/*.h
+		include/${SOC}/*.h
+		include/${CPU_ARCH}/*.h
+		include/${CPU}/*.h
+		)
+
+add_library(${project} ${CLIST} ${ASMLIST} ${HEADERLIST})
+
+add_compile_definitions(${project} BOARD_${BOARD}=1 SOC_${SOC}=1 CPU_${CPU}=1 CPU_ARCH_${CPU_ARCH}=1)
+target_link_libraries(${project} PRIVATE core)
+target_include_directories(${project} PUBLIC include)
+
+if(${CPU} STREQUAL "host")
+	list(APPEND PRIVATE_LIBRARIES host_platform)
+else()
+	target_link_libraries(${project} PRIVATE hw)
+	target_link_libraries(${project} PRIVATE osservices)
+endif()
+

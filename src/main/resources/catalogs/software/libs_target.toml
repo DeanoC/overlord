@@ -4,11 +4,6 @@ type = "library.hw"
 software = "libs_target/hw/hw.toml"
 
 [[definition]]
-name = "dbg"
-type = "library.dbg"
-software = "libs_target/dbg/dbg.toml"
-
-[[definition]]
 name = "osservices"
 type = "library.osservices"
 software = "libs_target/osservices/osservices.toml"

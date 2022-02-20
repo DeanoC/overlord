@@ -1,10 +1,16 @@
 // License Summary: MIT see LICENSE file
-#include "al2o3_memory/memory.h"
-#include "al2o3_platform/utf8.h"
+#include "core/core.h"
+#include <stdlib.h>
+#include "host_platform/host_platform.h"
+#include "dbg/assert.h"
+#include "dbg/print.h"
+#include "memory/memory.h"
+#include "multi_core/core_local.h"
+#include "core/utf8.h"
 
-AL2O3_THREAD_LOCAL char const *g_lastSourceFile = NULL;
-AL2O3_THREAD_LOCAL unsigned int g_lastSourceLine = 0;
-AL2O3_THREAD_LOCAL char const *g_lastSourceFunc = NULL;
+static CORE_LOCAL(char const*, g_lastSourceFile);
+static CORE_LOCAL(unsigned int, g_lastSourceLine);
+static CORE_LOCAL(char const*, g_lastSourceFunc);
 static uint64_t g_allocCounter = 0;
 uint64_t Memory_TrackerBreakOnAllocNumber = 0; // set this here or in code before the allocation occurs to break
 
@@ -19,8 +25,7 @@ uint64_t Memory_TrackerBreakOnAllocNumber = 0; // set this here or in code befor
 #error MEMORY_TRACKING requires MEMORY_TRACKING_SETUP == 1
 #endif
 
-AL2O3_EXTERN_C bool
-Memory_TrackerPushNextSrcLoc(const char *sourceFile,
+EXTERN_C bool Memory_TrackerPushNextSrcLoc(const char *sourceFile,
                              const unsigned int sourceLine,
                              const char *sourceFunc) {
     g_lastSourceFile = sourceFile;
@@ -29,20 +34,20 @@ Memory_TrackerPushNextSrcLoc(const char *sourceFile,
     return true;
 }
 
-#if AL2O3_PLATFORM == AL2O3_PLATFORM_WINDOWS
+#if IKUY_HOST_PLATFORM == IKUY_HOST_PLATFORM_WINDOWS
 #include "malloc.h"
 // on win32 we only have 8-byte alignment guaranteed, but the CRT provides special aligned allocation fns
-AL2O3_FORCE_INLINE AL2O3_EXTERN_C
+AL2O3_FORCE_INLINE EXTERN_C
 void *platformMalloc(size_t size) {
     return _aligned_malloc(size, 16);
 }
 
-AL2O3_FORCE_INLINE AL2O3_EXTERN_C
+AL2O3_FORCE_INLINE EXTERN_C
 void *platformAalloc(size_t size, size_t align) {
     return _aligned_malloc(size, align);
 }
 
-AL2O3_FORCE_INLINE AL2O3_EXTERN_C
+AL2O3_FORCE_INLINE EXTERN_C
 void *platformCalloc(size_t count, size_t size) {
     if (count == 0) {
         return NULL;
@@ -54,33 +59,33 @@ void *platformCalloc(size_t count, size_t size) {
     return mem;
 }
 
-AL2O3_FORCE_INLINE AL2O3_EXTERN_C
+AL2O3_FORCE_INLINE EXTERN_C
 void *platformRealloc(void *ptr, size_t size) {
     return _aligned_realloc(ptr, size, 16);
 }
 
-AL2O3_FORCE_INLINE AL2O3_EXTERN_C
+AL2O3_FORCE_INLINE EXTERN_C
 void platformFree(void *ptr) {
     _aligned_free(ptr);
 }
 
-#elif AL2O3_PLATFORM == AL2O3_PLATFORM_UNIX || AL2O3_PLATFORM_OS == AL2O3_OS_OSX
+#elif IKUY_HOST_PLATFORM == IKUY_HOST_PLATFORM_UNIX || IKUY_HOST_PLATFORM_OS == IKUY_HOST_OS_OSX
 
-AL2O3_EXTERN_C void* platformMalloc(size_t size)
+EXTERN_C void* platformMalloc(size_t size)
 {
 	void* mem;
 	posix_memalign(&mem, 16, size);
 	return mem;
 }
 
-AL2O3_EXTERN_C void* platformAalloc(size_t size, size_t align)
+EXTERN_C void* platformAalloc(size_t size, size_t align)
 {
 	void* mem;
 	posix_memalign(&mem, align, size);
 	return mem;
 }
 
-AL2O3_EXTERN_C void* platformCalloc(size_t count, size_t size)
+EXTERN_C void* platformCalloc(size_t count, size_t size)
 {
 	if(count == 0) {
 		return NULL;
@@ -94,24 +99,24 @@ AL2O3_EXTERN_C void* platformCalloc(size_t count, size_t size)
 	return mem;
 }
 
-AL2O3_EXTERN_C void* platformRealloc(void* ptr, size_t size) {
+EXTERN_C void* platformRealloc(void* ptr, size_t size) {
 	// technically this appears to be a bit dodgy but given
 	// chromium and ffmpeg do this according to
 	// https://trac.ffmpeg.org/ticket/6403
 	// i'll live with it and assert it
 	ptr = realloc(ptr, size);
-	ASSERT(((uintptr_t) ptr & 0xFUL) == 0);
+	assert(((uintptr_t) ptr & 0xFUL) == 0);
 	return ptr;
 }
 
-AL2O3_EXTERN_C void platformFree(void* ptr)
+EXTERN_C void platformFree(void* ptr)
 {
 	free(ptr);
 }
 
 #else
 
-AL2O3_EXTERN_C void* platformAalloc(size_t size, size_t align)
+EXTERN_C void* platformAalloc(size_t size, size_t align)
 {
 		int const offset = align - 1 + sizeof(void*);
 		void* p1 = malloc(size + offset);
@@ -124,12 +129,12 @@ AL2O3_EXTERN_C void* platformAalloc(size_t size, size_t align)
 		return p2;
 }
 
-AL2O3_EXTERN_C void* platformMalloc(size_t size)
+EXTERN_C void* platformMalloc(size_t size)
 {
 	return platformAalloc(size, 16);
 }
 
-AL2O3_EXTERN_C void* platformCalloc(size_t count, size_t size)
+EXTERN_C void* platformCalloc(size_t count, size_t size)
 {
 	if(count == 0) {
 		return NULL;
@@ -142,7 +147,7 @@ AL2O3_EXTERN_C void* platformCalloc(size_t count, size_t size)
 	return mem;
 }
 
-AL2O3_EXTERN_C void* platformRealloc(void* ptr, size_t size) {
+EXTERN_C void* platformRealloc(void* ptr, size_t size) {
 
 	// TODO store align? or at least warn if realloc on unknown with align != 16
 	int const align = 16;
@@ -157,7 +162,7 @@ AL2O3_EXTERN_C void* platformRealloc(void* ptr, size_t size) {
 
 }
 
-AL2O3_EXTERN_C void platformFree(void* ptr)
+EXTERN_C void platformFree(void* ptr)
 {
 	free(((void**)ptr)[-1]);
 }
@@ -166,12 +171,8 @@ AL2O3_EXTERN_C void platformFree(void* ptr)
 
 #if MEMORY_TRACKING == 1
 
-#if AL2O3_PLATFORM_OS == AL2O3_OS_OSX || AL2O3_PLATFORM == AL2O3_PLATFORM_UNIX
+#if IKUY_HOST_PLATFORM_OS == IKUY_HOST_OS_OSX || IKUY_HOST_PLATFORM == IKUY_HOST_PLATFORM_UNIX
 #include <unistd.h>
-#include <sys/sysctl.h>
-#if defined(__linux__)
-#include <sys/sysinfo.h>
-#endif
 #include <pthread.h>
 
 static pthread_mutex_t g_allocMutex = PTHREAD_MUTEX_INITIALIZER;
@@ -180,7 +181,7 @@ static pthread_mutex_t g_allocMutex = PTHREAD_MUTEX_INITIALIZER;
 #define MUTEX_LOCK   pthread_mutex_lock(&g_allocMutex);
 #define MUTEX_UNLOCK pthread_mutex_unlock(&g_allocMutex);
 
-#elif AL2O3_PLATFORM == AL2O3_PLATFORM_WINDOWS
+#elif IKUY_HOST_PLATFORM == IKUY_HOST_PLATFORM_WINDOWS
 #include "al2o3_platform/windows.h"
 
 static CRITICAL_SECTION g_allocMutex;
@@ -222,11 +223,11 @@ static AllocUnit *reservoir;
 static AllocUnit **reservoirBuffer = NULL;
 static uint32_t reservoirBufferSize = 0;
 
-AL2O3_FORCE_INLINE size_t calculateReportedSize(const size_t actualSize) {
+ALWAYS_INLINE size_t calculateReportedSize(const size_t actualSize) {
 	return actualSize - Memory_TrackingPaddingSize * sizeof(uint32_t) * 2;
 }
 
-AL2O3_FORCE_INLINE void *Memory_TrackerCalculateActualAddress(const void *reportedAddress) {
+ALWAYS_INLINE void *Memory_TrackerCalculateActualAddress(const void *reportedAddress) {
 	// We allow this...
 	if (!reportedAddress) {
 		return NULL;
@@ -239,7 +240,7 @@ AL2O3_FORCE_INLINE void *Memory_TrackerCalculateActualAddress(const void *report
 	return (void *) (((uint8_t const *) (reportedAddress)) - sizeof(uint32_t) * Memory_TrackingPaddingSize);
 }
 
-AL2O3_FORCE_INLINE void *calculateReportedAddress(const void *actualAddress) {
+ALWAYS_INLINE void *calculateReportedAddress(const void *actualAddress) {
 	// We allow this...
 	if (!actualAddress) {
 		return NULL;
@@ -266,7 +267,7 @@ static const char *sourceFileStripper(const char *sourceFile) {
 
 static AllocUnit *findAllocUnit(const void *reportedAddress) {
 	// Just in case...
-	ASSERT(reportedAddress != NULL);
+	assert(reportedAddress != NULL);
 
 	// Use the address to locate the hash index. Note that we shift off the lower four bits. This is because most allocated
 	// addresses will be on four-, eight- or even sixteen-byte boundaries. If we didn't do this, the hash index would not have
@@ -298,7 +299,7 @@ static bool GrowReservoir() {
 
 	// Add this address to our reservoirBuffer so we can free it later
 	AllocUnit **temp = (AllocUnit **) platformRealloc(reservoirBuffer, (reservoirBufferSize + 1) * sizeof(AllocUnit *));
-	ASSERT(temp);
+	assert(temp);
 	if (temp) {
 		reservoirBuffer = temp;
 		reservoirBuffer[reservoirBufferSize++] = reservoir;
@@ -307,7 +308,7 @@ static bool GrowReservoir() {
 	return true;
 }
 
-AL2O3_EXTERN_C void *Memory_TrackedAlloc(const char *sourceFile,
+EXTERN_C void *Memory_TrackedAlloc(const char *sourceFile,
 													const unsigned int sourceLine,
 													const char *sourceFunc,
 													const size_t reportedSize,
@@ -332,16 +333,16 @@ AL2O3_EXTERN_C void *Memory_TrackedAlloc(const char *sourceFile,
 
 	if (Memory_TrackerBreakOnAllocNumber != 0 && Memory_TrackerBreakOnAllocNumber == g_allocCounter + 1) {
 		LOGWARNING("Break on allocation number hit");
-		AL2O3_DEBUG_BREAK();
+		IKUY_DEBUG_BREAK();
 	}
 
 	if(sourceFile == NULL) {
 		LOGWARNING("Allocation without tracking file/line/function info");
-		AL2O3_DEBUG_BREAK();
+		IKUY_DEBUG_BREAK();
 	}
 
 	// Logical flow says this should never happen...
-	ASSERT(reservoir != NULL);
+	assert(reservoir != NULL);
 
 	// Grab a new allocaton unit from the front of the reservoir
 	AllocUnit *au = reservoir;
@@ -374,7 +375,7 @@ AL2O3_EXTERN_C void *Memory_TrackedAlloc(const char *sourceFile,
 	return CLEAN_REPORTED_ADDRESS(au->uncleanReportedAddress);
 }
 
-AL2O3_EXTERN_C void *Memory_TrackedAAlloc(const char *sourceFile,
+EXTERN_C void *Memory_TrackedAAlloc(const char *sourceFile,
 													 const unsigned int sourceLine,
 													 const char *sourceFunc,
 													 const size_t reportedSize,
@@ -392,12 +393,12 @@ AL2O3_EXTERN_C void *Memory_TrackedAAlloc(const char *sourceFile,
 
 	if(Memory_TrackerBreakOnAllocNumber != 0 && Memory_TrackerBreakOnAllocNumber == g_allocCounter+1) {
 		LOGWARNING("Break on allocation number hit");
-		AL2O3_DEBUG_BREAK();
+		IKUY_DEBUG_BREAK();
 	}
 
 	if(sourceFile == NULL) {
 		LOGWARNING("Allocation without tracking file/line/function info");
-		AL2O3_DEBUG_BREAK();
+		IKUY_DEBUG_BREAK();
 	}
 
 	// If necessary, grow the reservoir of unused allocation units
@@ -409,7 +410,7 @@ AL2O3_EXTERN_C void *Memory_TrackedAAlloc(const char *sourceFile,
 	}
 
 	// Logical flow says this should never happen...
-	ASSERT(reservoir != NULL);
+	assert(reservoir != NULL);
 
 	// Grab a new allocaton unit from the front of the reservoir
 	AllocUnit *au = reservoir;
@@ -445,7 +446,7 @@ AL2O3_EXTERN_C void *Memory_TrackedAAlloc(const char *sourceFile,
 	return CLEAN_REPORTED_ADDRESS(au->uncleanReportedAddress);
 }
 
-AL2O3_EXTERN_C void *Memory_TrackedRealloc(const char *sourceFile,
+EXTERN_C void *Memory_TrackedRealloc(const char *sourceFile,
 														const unsigned int sourceLine,
 														const char *sourceFunc,
 														const size_t reportedSize,
@@ -465,12 +466,12 @@ AL2O3_EXTERN_C void *Memory_TrackedRealloc(const char *sourceFile,
 
 	if(Memory_TrackerBreakOnAllocNumber != 0 && Memory_TrackerBreakOnAllocNumber == g_allocCounter+1) {
 		LOGWARNING("Break on allocation number hit");
-		AL2O3_DEBUG_BREAK();
+		IKUY_DEBUG_BREAK();
 	}
 
 	if(sourceFile == NULL) {
 		LOGWARNING("Allocation without tracking file/line/function info");
-		AL2O3_DEBUG_BREAK();
+		IKUY_DEBUG_BREAK();
 	}
 
 	// Locate the existing allocation unit
@@ -537,7 +538,7 @@ AL2O3_EXTERN_C void *Memory_TrackedRealloc(const char *sourceFile,
 	return CLEAN_REPORTED_ADDRESS(au->uncleanReportedAddress);
 }
 
-AL2O3_EXTERN_C bool Memory_TrackedFree(const void *reportedAddress) {
+EXTERN_C bool Memory_TrackedFree(const void *reportedAddress) {
 	if (!reportedAddress) {
 		return false;
 	}
@@ -586,12 +587,12 @@ AL2O3_EXTERN_C bool Memory_TrackedFree(const void *reportedAddress) {
 	return adjustPtr;
 }
 
-AL2O3_EXTERN_C void *trackedMalloc(size_t size) {
+EXTERN_C void *trackedMalloc(size_t size) {
 	void *mem = platformMalloc(Memory_TrackerCalculateActualSize(size));
 	return Memory_TrackedAlloc(g_lastSourceFile, g_lastSourceLine, g_lastSourceFunc, size, mem);
 }
 
-AL2O3_EXTERN_C void *trackedAalloc(size_t size, size_t align) {
+EXTERN_C void *trackedAalloc(size_t size, size_t align) {
 	if( align <= 16) {
 		return trackedMalloc(size);
 	}
@@ -599,7 +600,7 @@ AL2O3_EXTERN_C void *trackedAalloc(size_t size, size_t align) {
 	return Memory_TrackedAAlloc(g_lastSourceFile, g_lastSourceLine, g_lastSourceFunc, size, mem);
 }
 
-AL2O3_EXTERN_C void *trackedCalloc(size_t count, size_t size) {
+EXTERN_C void *trackedCalloc(size_t count, size_t size) {
 	void *mem = platformMalloc(Memory_TrackerCalculateActualSize(count * size));
 	if (mem) {
 		memset(mem, 0, Memory_TrackerCalculateActualSize(count * size));
@@ -607,12 +608,12 @@ AL2O3_EXTERN_C void *trackedCalloc(size_t count, size_t size) {
 	return Memory_TrackedAlloc(g_lastSourceFile, g_lastSourceLine, g_lastSourceFunc, count * size, mem);
 }
 
-AL2O3_EXTERN_C void *trackedRealloc(void *ptr, size_t size) {
+EXTERN_C void *trackedRealloc(void *ptr, size_t size) {
 	void *mem = platformRealloc(Memory_TrackerCalculateActualAddress(ptr), Memory_TrackerCalculateActualSize(size));
 	return Memory_TrackedRealloc(g_lastSourceFile, g_lastSourceLine, g_lastSourceFunc, size, ptr, mem);
 }
 
-AL2O3_EXTERN_C void trackedFree(void *ptr) {
+EXTERN_C void trackedFree(void *ptr) {
 	bool const adjustPtr = Memory_TrackedFree(ptr);
 	if (adjustPtr) {
 		platformFree(Memory_TrackerCalculateActualAddress(ptr));
@@ -621,7 +622,7 @@ AL2O3_EXTERN_C void trackedFree(void *ptr) {
 	}
 }
 
-AL2O3_EXTERN_C Memory_Allocator Memory_GlobalAllocator = {
+EXTERN_C Memory_Allocator Memory_GlobalAllocator = {
 		&trackedMalloc,
 		&trackedAalloc,
 		&trackedCalloc,
@@ -629,7 +630,7 @@ AL2O3_EXTERN_C Memory_Allocator Memory_GlobalAllocator = {
 		&trackedFree
 };
 
-AL2O3_EXTERN_C void Memory_TrackerDestroyAndLogLeaks() {
+EXTERN_C void Memory_TrackerDestroyAndLogLeaks() {
 	MUTEX_LOCK
 	bool loggedHeader = 0;
 	for (int i = 0; i < hashSize; ++i) {
@@ -641,9 +642,9 @@ AL2O3_EXTERN_C void Memory_TrackerDestroyAndLogLeaks() {
 			}
 			if(au->sourceFile) {
 				char const *fileNameOnly = sourceFileStripper(au->sourceFile);
-				LOGINFO("%u bytes from %s(%u): %s number: %u", au->reportedSize, fileNameOnly, au->sourceLine, au->sourceFunc, au->allocationNumber);
+				LOGINFO("%u bytes from %s(%u): %s number: %lu", au->reportedSize, fileNameOnly, au->sourceLine, au->sourceFunc, au->allocationNumber);
 			} else {
-				LOGINFO("%u bytes from an unknown caller number: %u", au->reportedSize, au->allocationNumber);
+				LOGINFO("%u bytes from an unknown caller number: %lu", au->reportedSize, au->allocationNumber);
 			}
 			au = au->next;
 		}
@@ -665,7 +666,7 @@ AL2O3_EXTERN_C void Memory_TrackerDestroyAndLogLeaks() {
 
 #else
 
-AL2O3_EXTERN_C Memory_Allocator
+EXTERN_C Memory_Allocator
 Memory_GlobalAllocator = {
         &platformMalloc,
         &platformAalloc,
@@ -673,17 +674,17 @@ Memory_GlobalAllocator = {
         &platformRealloc,
         &platformFree
 };
-AL2O3_EXTERN_C void Memory_TrackerDestroyAndLogLeaks() {}
+EXTERN_C void Memory_TrackerDestroyAndLogLeaks() {}
 
-AL2O3_EXTERN_C void *Memory_TrackedAlloc(const char *a, const unsigned int b, const char *c, const size_t d, void *e) {
+EXTERN_C void *Memory_TrackedAlloc(const char *a, const unsigned int b, const char *c, const size_t d, void *e) {
     LOGERROR("Memory_TrackedAlloc called in non tracking build");
     return NULL;
 };
-AL2O3_EXTERN_C void *Memory_TrackedAAlloc(const char *a, const unsigned int b, const char *c, const size_t d, void *e) {
+EXTERN_C void *Memory_TrackedAAlloc(const char *a, const unsigned int b, const char *c, const size_t d, void *e) {
     LOGERROR("Memory_TrackedAAlloc called in non tracking build");
     return NULL;
 }
-AL2O3_EXTERN_C void *Memory_TrackedRealloc(const char *a,
+EXTERN_C void *Memory_TrackedRealloc(const char *a,
                                            const unsigned int b,
                                            const char *c,
                                            const size_t d,
