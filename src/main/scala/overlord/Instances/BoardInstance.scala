@@ -91,11 +91,26 @@ object BoardInstance {
 
 		// instiatiate all pingroups
 		val pingroups = (for (pinv <- Utils.toArray(attribs("pingroups"))) yield {
-			val table    = Utils.toTable(pinv)
-			val name     = Utils.toString(table("name"))
-			val pingroup = table ++ Map[String, Variant]("type" -> StringV(s"pingroup.$name"))
-			Definition(TableV(pingroup), Path.of("."), defaults).createInstance(s"$name",
-			                                                                    pingroup)
+			val table = Utils.toTable(pinv)
+			if (table.contains("name")) {
+				val name     = Utils.toString(table("name"))
+				val pingroup = table ++ Map[String, Variant]("type" -> StringV(s"pingroup" +
+				                                                               s".$name"))
+				Definition(TableV(pingroup), Path.of("."), defaults).createInstance(s"$name",
+				                                                                    pingroup)
+			} else if (table.contains("names")) {
+				val names = Utils.toArray(table("names"))
+				(for (nameV <- names) yield {
+					val name     = Utils.toString(nameV)
+					val pingroup = table ++
+					               Map[String, Variant]("type" -> StringV(s"pingroup.$name"))
+					Definition(TableV(pingroup), Path.of("."), defaults).createInstance(s"$name",
+					                                                                    pingroup)
+				}).flatten.toSeq
+			} else {
+				println(s"pin groups must either have a name or names field")
+				return None
+			}
 		}).flatten.toSeq
 
 		Some(BoardInstance(name,

@@ -1,0 +1,24 @@
+[[definition]]
+name = "hw"
+type = "library.hw"
+software = "libs_target/hw/hw.toml"
+
+[[definition]]
+name = "dbg"
+type = "library.dbg"
+software = "libs_target/dbg/dbg.toml"
+
+[[definition]]
+name = "osservices"
+type = "library.osservices"
+software = "libs_target/osservices/osservices.toml"
+
+[[definition]]
+name = "gfxdebug"
+type = "library.gfxdebug"
+software = "libs_target/gfxdebug/gfxdebug.toml"
+
+[[definition]]
+name = "musl_math"
+type = "library.musl_math"
+software = "libs_target/musl_math/musl_math.toml"

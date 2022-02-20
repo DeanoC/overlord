@@ -1,12 +1,12 @@
-import java.io.InputStream
-
 import org.scalatest.flatspec.AnyFlatSpec
+
+import java.io.InputStream
 
 
 class MyirOverTest extends AnyFlatSpec {
 
 	val stream: InputStream = getClass.getResourceAsStream("/myir.over")
-	val gameOver = scala.io.Source.fromInputStream(stream).mkString
+	val gameOver            = scala.io.Source.fromInputStream(stream).mkString
 
 	"game.over" should "exist" in {
 		assert(gameOver.nonEmpty)

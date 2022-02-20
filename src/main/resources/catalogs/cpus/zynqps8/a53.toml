@@ -6,7 +6,7 @@ width = 64
 core_count = 4
 max_atomic_width = 128
 max_bitop_type_width = 128
-gcc_flags = "-march=armv8-a -Wl,--build-id"
+gcc_flags = "-march=armv8-a -Wl,--build-id -mno-outline-atomics"
 registers = [
     { resource = "zynqps8/registers/a53_cti" },
     { resource = "zynqps8/registers/a53_dbg" },

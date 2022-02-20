@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/cpp/bitmap_allocator_single_threaded.hpp"
+#include "core/bitmap_allocator_single_threaded.hpp"
 #include "text_console.hpp"
 #include "host_interface.hpp"
 #include "timers.hpp"
@@ -21,8 +21,8 @@ struct OsHeap {
 	static const unsigned int UartBufferSize = 32 * 1024;
 	static const unsigned int BounceBufferSize = 64 * 1024;
 
-	uint8_t uart0TransmitBuffer[UartBufferSize]; // filled in an interrupt!
-	uint8_t uart0ReceiveBuffer[UartBufferSize]; // filled in an interrupt!
+	uint8_t uartDEBUGTransmitBuffer[UartBufferSize]; // filled in an interrupt!
+	uint8_t uartDEBUGReceiveBuffer[UartBufferSize]; // filled in an interrupt!
 
 	BitmapAllocator_SingleThreaded<1024*1024, 2046> ddrLoAllocator;
 	BitmapAllocator_SingleThreaded<1024*1024, 2048> ddrHiAllocator;
@@ -42,11 +42,17 @@ struct OsHeap {
 	BootData bootData;
 	bool screenConsoleEnabled;
 
+	static const int MaxMainCalls = 50;
+	typedef void (*MainCallCallback)();
+	MainCallCallback mainCallCallbacks[MaxMainCalls];
+	uint32_t mainCallCallbacksIndex;
+
 };
 
 enum class HundredHzTasks {
-	HOST_INPUT = 0,
-	HOST_COMMANDS_PROCESSING = 1
+	HOST_MAIN_CALLS = 0,
+	HOST_INPUT,
+	HOST_COMMANDS_PROCESSING
 };
 
 enum class ThirtyHzTasks {

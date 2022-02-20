@@ -1,6 +1,0 @@
-
-void irqCallback() {
-}
-
-void main() {
-}

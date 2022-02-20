@@ -1,8 +1,7 @@
 package overlord.Connections
 
-import overlord.Instances.ChipInstance
-
 import ikuy_utils.Variant
+import overlord.Instances.ChipInstance
 
 case class ConnectedConstant(connectionType: ConnectionType,
                              connectionPriority: ConnectionPriority,

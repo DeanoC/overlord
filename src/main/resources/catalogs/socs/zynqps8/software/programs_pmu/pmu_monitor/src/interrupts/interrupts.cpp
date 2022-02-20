@@ -4,7 +4,7 @@
 * SPDX-License-Identifier: MIT
 ******************************************************************************/
 #include "core/core.h"
-#include "core/c/math.h"
+#include "core/math.h"
 #include "dbg/raw_print.h"
 #include "hw/reg_access.h"
 #include "hw/memory_map.h"
@@ -14,7 +14,7 @@
 #include "hw_regs/pmu_global.h"
 #include "interrupts.hpp"
 
-extern "C" WEAK_LINKAGE void NullHandler(Interrupts::Name name) {
+EXTERN_C WEAK_LINKAGE void NullHandler(Interrupts::Name name) {
 	using namespace Interrupts;
 	if(name == Name::IN_IPI3) return;
 
@@ -136,7 +136,7 @@ __attribute__((noreturn)) void XPfw_Exception_Handler(void) {
 
 } // end namespace
 
-extern "C" void Interrupt_Handler() {
+EXTERN_C void Interrupt_Handler() {
 	using namespace Interrupts;
 	// Latch the IRQ_PENDING register into a local variable
 	const uint32_t irqReg = HW_REG_GET(PMU_IOMODULE, IRQ_PENDING);

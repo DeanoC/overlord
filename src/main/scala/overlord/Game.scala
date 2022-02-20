@@ -48,10 +48,7 @@ case class Game(name: String,
 	lazy val flatSoftwareChildren: Seq[SoftwareInstance] =
 		children
 			.filter(_.isInstanceOf[SoftwareInstance])
-			.map(_.asInstanceOf[SoftwareInstance]) ++
-		children.filter(_.isInstanceOf[Container])
-			.map(_.asInstanceOf[Container])
-			.flatMap(_.flatChildren.map(_.asInstanceOf[SoftwareInstance]))
+			.map(_.asInstanceOf[SoftwareInstance])
 
 	lazy val allChipInstances: Seq[ChipInstance] = flatChipChildren
 
@@ -167,8 +164,7 @@ object Game {
 				println("Previous Errors mean game cannot be created\n")
 				return None
 			}
-			var rootContainer = new RootContainer
-
+			val rootContainer = new RootContainer
 
 			// pass the board as if it had been a prefab in the main project file
 			val boardInsertV = Map[String, Variant](
@@ -185,7 +181,6 @@ object Game {
 						)))
 					))
 			ProcessInstantiation(boardInsertV, rootContainer)
-			//			containerStack.push(rootContainer.children(0).asInstanceOf[Container])
 			// flatten all containers
 			for (c <- containerStack.popAll()) {
 				rootContainer.children ++= c.children
@@ -230,8 +225,9 @@ object Game {
 			val connected = Connection.connect(top.connections.toSeq, chipInstances)
 
 			// instances that are connected to buses need a register bank
-			val buses = connected.filter(_.isInstanceOf[BusInstance])
+			val buses = chipInstances.filter(_.isInstanceOf[BusInstance])
 				.map(_.asInstanceOf[BusInstance])
+
 			for (bus <- buses;
 			     inst <- bus.consumerInstances;
 			     rl <- inst.instanceRegisterLists

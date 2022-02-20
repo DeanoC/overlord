@@ -10,7 +10,7 @@
 /*                                                                 */
 /*******************************************************************/
 _STACK_SIZE = DEFINED(_STACK_SIZE) ? _STACK_SIZE : 1K;
-_HEAP_SIZE = DEFINED(_HEAP_SIZE) ? _HEAP_SIZE : 64K ; /* Enough for registers + PMU Monitor */
+_HEAP_SIZE = DEFINED(_HEAP_SIZE) ? _HEAP_SIZE : 50K ; /* Enough for registers + PMU Monitor */
 
 /* Define Memories in the system */
 

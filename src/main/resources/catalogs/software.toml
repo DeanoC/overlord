@@ -1,0 +1,4 @@
+path = "software"
+resources = [
+    "software",
+]

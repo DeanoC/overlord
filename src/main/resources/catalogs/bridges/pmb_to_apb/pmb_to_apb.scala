@@ -1,17 +1,11 @@
-import toml.Value
-import spinal.core._
-import spinal.lib._
-import spinal.lib.bus.misc.SizeMapping
-import spinal.lib.bus.amba3.apb._
-import spinal.lib.bus.simple._
-import java.nio.file.Path
-
 import ikuy_utils._
+
+import java.nio.file.Path
 
 object PMBToAPBBridge {
 
-	var apbAddressWidth : Int     = 20
-	var apbDataWidth    : Int     = 32
+	var apbAddressWidth : Int = 20
+	var apbDataWidth    : Int = 32
 	var apbUseSlaveError: Int = 1
 	var apbPipeline     : Int = 1
 

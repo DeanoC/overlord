@@ -5,7 +5,6 @@ resource = "software"
 
 [[definition]]
 type = "other.zynqps8.rawps8"
-singular = true
 gateware = "gateware/ps8.toml"
 registers = [
     { resource = "registers/afifm" },
@@ -79,6 +78,7 @@ registers = [
     { resource = "registers/xppu" },
     { resource = "registers/xppu_sink" },
     { resource = "registers/zdma" },
+    { resource = "registers/pmu_global" },
 ]
 
 [[definition]]

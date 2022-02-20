@@ -8,32 +8,32 @@
 #include "dbg/raw_print.h"
 #include "../os_heap.hpp"
 
-#define IsTransmitFull() (HW_REG_GET_BIT(UART0, CHANNEL_STS, TNFUL))
-#define IsReceiveEmpty() (HW_REG_GET_BIT(UART0, CHANNEL_STS, REMPTY))
+#define IsTransmitFull() (HW_REG_GET_BIT(UART_DEBUG, CHANNEL_STS, TNFUL))
+#define IsReceiveEmpty() (HW_REG_GET_BIT(UART_DEBUG, CHANNEL_STS, REMPTY))
 
-uint32_t uart0TransmitLast;
-uint32_t uart0TransmitHead;
-uint32_t uart0ReceiveLast;
-uint32_t uart0ReceiveHead;
+uint32_t uartDebugTransmitLast;
+uint32_t uartDebugTransmitHead;
+uint32_t uartDebugReceiveLast;
+uint32_t uartDebugReceiveHead;
 
-static void UART0_Interrupt() {
-	uint32_t status = HW_REG_GET(UART0, CHNL_INT_STS) & HW_REG_GET(UART0, INTRPT_MASK);
-	// disabled UART interupts
-	HW_REG_SET(UART0, INTRPT_DIS, status);
-	HW_REG_SET(UART0, CHNL_INT_STS, status);
+static void UART_DEBUG_Interrupt() {
+	uint32_t status = HW_REG_GET(UART_DEBUG, CHNL_INT_STS) & HW_REG_GET(UART_DEBUG, INTRPT_MASK);
+	// disabled UART interrupts
+	HW_REG_SET(UART_DEBUG, INTRPT_DIS, status);
+	HW_REG_SET(UART_DEBUG, CHNL_INT_STS, status);
 
 	// if the transmit fifo is empty, or new data has been submitted
 	// push from the os heap buff until the fifo is full again
-	if(status & UART_CHNL_INT_STS_TEMPTY || uart0TransmitLast != uart0TransmitHead) {
+	if(status & UART_CHNL_INT_STS_TEMPTY || uartDebugTransmitLast != uartDebugTransmitHead) {
 		while(!IsTransmitFull())
 		{
-			if(uart0TransmitLast != uart0TransmitHead) {
-				HW_REG_SET(UART0, TX_RX_FIFO, osHeap->uart0TransmitBuffer[uart0TransmitLast]);
+			if(uartDebugTransmitLast != uartDebugTransmitHead) {
+				HW_REG_SET(UART_DEBUG, TX_RX_FIFO, osHeap->uartDEBUGTransmitBuffer[uartDebugTransmitLast]);
 				// expand newline inline
-				if(osHeap->uart0TransmitBuffer[uart0TransmitLast] == '\n') {
-					osHeap->uart0TransmitBuffer[uart0TransmitLast] = '\r';
+				if(osHeap->uartDEBUGTransmitBuffer[uartDebugTransmitLast] == '\n') {
+					osHeap->uartDEBUGTransmitBuffer[uartDebugTransmitLast] = '\r';
 				} else {
-					uart0TransmitLast = (uart0TransmitLast + 1 >= OsHeap::UartBufferSize) ? 0 : uart0TransmitLast + 1;
+					uartDebugTransmitLast = (uartDebugTransmitLast + 1 >= OsHeap::UartBufferSize) ? 0 : uartDebugTransmitLast + 1;
 				}
 			} else {
 				status &= ~UART_INTRPT_DIS_TEMPTY;
@@ -45,9 +45,9 @@ static void UART0_Interrupt() {
 	if(status & UART_CHNL_INT_STS_RFUL || status & UART_CHNL_INT_STS_TIMEOUT) {
 		// receive FIFO is full, copy fifo out to buffer
 		while(!IsReceiveEmpty()) {
-			uint32_t head = uart0ReceiveHead + 1;
-			uart0ReceiveHead = (head >= OsHeap::UartBufferSize) ? 0 : head;
-			osHeap->uart0ReceiveBuffer[head - 1] = HW_REG_GET(UART0, TX_RX_FIFO);
+			uint32_t head = uartDebugReceiveHead + 1;
+			uartDebugReceiveHead = (head >= OsHeap::UartBufferSize) ? 0 : head;
+			osHeap->uartDEBUGReceiveBuffer[head - 1] = HW_REG_GET(UART_DEBUG, TX_RX_FIFO);
 		}
 	}
 	if(status & UART_CHNL_INT_STS_REMPTY) {
@@ -60,7 +60,7 @@ static void UART0_Interrupt() {
 		status &= ~UART_INTRPT_DIS_RTRIG;
 	}
 
-	HW_REG_SET(UART0, INTRPT_EN, status); // enable interrupts
+	HW_REG_SET(UART_DEBUG, INTRPT_EN, status); // enable interrupts
 }
 
 static void TTC0_1_Interrupt() {
@@ -92,7 +92,11 @@ restart:;
 			const GICInterrupt_Names name = GIC_ProxyToName(group, gicbits);
 			switch(name) {
 				case GICIN_TTC0_1: TTC0_1_Interrupt(); break;
-				case GICIN_UART0: UART0_Interrupt(); break;
+#if UART_DEBUG_BASE_ADDR == 0xff010000
+				case GICIN_UART1: UART_DEBUG_Interrupt(); break;
+#else
+				case GICIN_UART0: UART_DEBUG_Interrupt(); break;
+#endif
 				default:
 					break;
 			}

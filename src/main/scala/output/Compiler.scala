@@ -22,7 +22,8 @@ object Compiler {
 		genCompilerScript(cpu_info, out)
 		genCMakeToolChains(cpu_info, out)
 	}
-	private def sanatizeTriple(triple:String) : String = {
+
+	private def sanatizeTriple(triple: String): String = {
 		triple.replace("-", "_")
 	}
 
@@ -32,7 +33,7 @@ object Compiler {
 
 		sb ++= (Utils.readFile("generate_compilers",
 		                       Resources.stdResourcePath()
-			                       .resolve("software/generate_compilers.sh"),
+			                       .resolve("catalogs/software/generate_compilers.sh"),
 		                       getClass) match {
 			case Some(script) => script
 			case None         =>
@@ -40,13 +41,15 @@ object Compiler {
 				return
 		})
 
-		cpu_info.foreach { case (_, triple, gcc_flags) => sb ++=
-		                                                  s"""
-			                                                   |build_binutils $triple
-																												 |$$PWD/compilers
-			                                                   |build_gcc $triple
-																												 |$$PWD/compilers "$gcc_flags"
-			                                                   |""".stripMargin
+		cpu_info.foreach { case (_, triple, gcc_flags) =>
+			// only build compilers for none os (not hosts)
+			if (triple.contains("none")) {
+				sb ++=
+				s"""
+					 |build_binutils $triple $$PWD/compilers
+					 |build_gcc $triple $$PWD/compilers "$gcc_flags"
+					 |""".stripMargin
+			}
 		}
 
 
@@ -60,7 +63,7 @@ object Compiler {
 
 		val template = Utils.readFile(
 			"toolchain_template",
-			Resources.stdResourcePath().resolve("software/toolchain_template.cmake"),
+			Resources.stdResourcePath().resolve("catalogs/software/toolchain_template.cmake"),
 			getClass) match {
 			case Some(script) => script
 			case None         =>
@@ -68,11 +71,14 @@ object Compiler {
 				return
 		}
 
-		for ((name, triple, gcc_flags) <- cpu_info) {
+		for ((name, triple, gcc_flags) <- cpu_info
+		     // only build compilers for none os (not hosts)
+		     if triple.contains("none")) {
 			// try to read a specialist toolchain file, if none exist use template
 			val tt = Utils.readFile(
 				name = "toolchain_" + name,
-				path = Resources.stdResourcePath().resolve(s"software/toolchain_$name.cmake"),
+				path = Resources.stdResourcePath().resolve(
+					s"catalogs/software/toolchain_$name.cmake"),
 				klass = getClass
 				) match {
 				case Some(s) => s

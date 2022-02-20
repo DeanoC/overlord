@@ -214,9 +214,13 @@ case class Unconnected(connectionType: ConnectionType,
 			Seq[ChipInstance]()
 		}
 
-		val mainIL      = mo.head
+		val mainIL = mo.head
 		val secondaryIL = so.head
-		val isMainBus   = mo.head.instance.isInstanceOf[BusInstance]
+		val isMainBus = mo.head.instance.isInstanceOf[BusInstance]
+
+		if (mainIL.fullName == "RawPS8") {
+			println(s"${mainIL.fullName} ${secondaryIL.fullName}")
+		}
 
 		val bus: BusInstance =
 			if (isMainBus) mainIL.instance.asInstanceOf[BusInstance]

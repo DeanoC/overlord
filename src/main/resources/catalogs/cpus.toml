@@ -1,5 +1,9 @@
 path = "cpus"
 
+[[include]]
+resource = "x86_64_linux_host"
+
+
 [[definition]]
 type = "cpu.riscv32im.vexriscv_smallest"
 triple = "riscv32-none-elf"
@@ -14,3 +18,4 @@ resource = "zynqps8/a53"
 resource = "zynqps8/r5f"
 [[include]]
 resource = "zynqps8/pmu"
+

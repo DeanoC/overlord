@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/c/math.h"
+#include "core/math.h"
 
 typedef enum {
 	GICIN_RPU0_PERF_MON 	= 40, // GICP0 bit 0

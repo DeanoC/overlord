@@ -1,5 +1,5 @@
 #include "core/core.h"
-#include "core/cpp/compile_time_hash.hpp"
+#include "core/compile_time_hash.hpp"
 #include "host_interface.hpp"
 #include "osservices/osservices.h"
 #include "os_heap.hpp"
@@ -17,8 +17,8 @@
 #define SIZED_TEXT(text) sizeof(text), (uint8_t const*)text
 extern uint8_t textConsoleSkip;
 
-extern uint32_t uart0ReceiveLast;
-extern uint32_t uart0ReceiveHead;
+extern uint32_t uartDebugReceiveLast;
+extern uint32_t uartDebugReceiveHead;
 static void HostInputCallback() {
 	HostInterface* host = &osHeap->hostInterface;
 	assert(host);
@@ -46,9 +46,9 @@ void HostInterface::Init() {
 }
 
 void HostInterface::TmpBufferRefill(uintptr_t& tmpBufferAddr, uint32_t& tmpBufferSize) {
-	if (uart0ReceiveLast != uart0ReceiveHead) {
-		uint32_t last = uart0ReceiveLast;
-		uint32_t head = uart0ReceiveHead;
+	if (uartDebugReceiveLast != uartDebugReceiveHead) {
+		uint32_t last = uartDebugReceiveLast;
+		uint32_t head = uartDebugReceiveHead;
 
 		if (last > head) {
 			// wrapped
@@ -56,14 +56,14 @@ void HostInterface::TmpBufferRefill(uintptr_t& tmpBufferAddr, uint32_t& tmpBuffe
 			tmpBufferSize = firstSize + head;
 			assert(BitOp::PowerOfTwoContaining(tmpBufferSize / 64) < 128);
 			tmpBufferAddr = osHeap->tmpOsBufferAllocator.Alloc(BitOp::PowerOfTwoContaining(tmpBufferSize / 64));
-			memcpy((char *) tmpBufferAddr, &osHeap->uart0ReceiveBuffer[last], firstSize);
-			memcpy((char *) tmpBufferAddr + firstSize, &osHeap->uart0ReceiveBuffer[0], head);
+			memcpy((char *) tmpBufferAddr, &osHeap->uartDEBUGReceiveBuffer[last], firstSize);
+			memcpy((char *) tmpBufferAddr + firstSize, &osHeap->uartDEBUGReceiveBuffer[0], head);
 		} else {
 			tmpBufferSize = head - last;
 			tmpBufferAddr = osHeap->tmpOsBufferAllocator.Alloc(BitOp::PowerOfTwoContaining(tmpBufferSize / 64));
-			memcpy((char *) tmpBufferAddr, &osHeap->uart0ReceiveBuffer[last], tmpBufferSize);
+			memcpy((char *) tmpBufferAddr, &osHeap->uartDEBUGReceiveBuffer[last], tmpBufferSize);
 		}
-		uart0ReceiveLast = head;
+		uartDebugReceiveLast = head;
 	}
 }
 
@@ -261,12 +261,16 @@ void HostInterface::SleepCpu(uint8_t const *cmdBuffer, unsigned int const *finds
 	}
 	switch (Utils::RuntimeHash(finds[1] - finds[0] - 1, (char *) cmdBuffer + finds[0] + 1)) {
 		case "A53"_hash: {
-			A53Sleep();
+			A53Sleep0();
+			A53Sleep1();
+			A53Sleep2();
+			A53Sleep3();
 			debug_print("\nA53s going to sleep\n");
 			break;
 		}
 		case "R5F"_hash: {
-			R5FSleep();
+			R5FSleep0();
+			R5FSleep1();
 			debug_print("\nR5Fs going to sleep\n");
 			break;
 		}
@@ -285,12 +289,16 @@ void HostInterface::WakeUpCpu(uint8_t const *cmdBuffer, unsigned int const *find
 	}
 	switch (Utils::RuntimeHash(finds[1] - finds[0] - 1, (char *) cmdBuffer + finds[0] + 1)) {
 		case "A53"_hash: {
-			A53WakeUp();
+			A53WakeUp0();
+			A53WakeUp1();
+			A53WakeUp2();
+			A53WakeUp3();
 			debug_print("\nA53s waking up\n");
 			break;
 		}
 		case "R5F"_hash: {
-			R5FWakeUp();
+			R5FWakeUp0();
+			R5FWakeUp1();
 			debug_print("\nR5Fs waking up\n");
 			break;
 		}
@@ -310,13 +318,25 @@ void HostInterface::BootCpu(uint8_t const *cmdBuffer, unsigned int const *finds,
 	switch (Utils::RuntimeHash(finds[1] - finds[0] - 1, (char *) cmdBuffer + finds[0] + 1)) {
 		case "A53"_hash: {
 			debug_printf("\nA53s booting from %#018llx\n", downloadAddress);
-			A53Sleep();
+			A53Sleep0();
+			A53Sleep1();
+			A53Sleep2();
+			A53Sleep3();
 			auto const lowAddress = (uint32_t) (downloadAddress & 0x0000'0000'FFFF'FFFFull);
 			auto const hiAddress = (uint32_t) ((downloadAddress & 0xFFFF'FFFF'0000'0000ull) >> 32ull);
 			HW_REG_SET(APU, RVBARADDR0L, lowAddress);
 			HW_REG_SET(APU, RVBARADDR0H, hiAddress);
+			HW_REG_SET(APU, RVBARADDR1L, lowAddress);
+			HW_REG_SET(APU, RVBARADDR1H, hiAddress);
+			HW_REG_SET(APU, RVBARADDR2L, lowAddress);
+			HW_REG_SET(APU, RVBARADDR2H, hiAddress);
+			HW_REG_SET(APU, RVBARADDR3L, lowAddress);
+			HW_REG_SET(APU, RVBARADDR3H, hiAddress);
 			// wakey wakey rise and shine
 			A53WakeUp0();
+			A53WakeUp1();
+			A53WakeUp2();
+			A53WakeUp3();
 			break;
 		}
 //		case "R5F"_hash: {
@@ -330,8 +350,12 @@ void HostInterface::BootCpu(uint8_t const *cmdBuffer, unsigned int const *finds,
 }
 void HostInterface::Reset(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int const findCount) {
 	debug_print("\nSoft Reset in Progress\n");
-	A53Sleep();
-	R5FSleep();
+	A53Sleep0();
+	A53Sleep1();
+	A53Sleep2();
+	A53Sleep3();
+	R5FSleep0();
+	R5FSleep1();
 	// restore boot program
 	using namespace Dma::LpdDma;
 	Stall(Channels::ChannelSevern);

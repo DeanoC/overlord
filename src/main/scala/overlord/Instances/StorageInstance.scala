@@ -2,7 +2,6 @@ package overlord.Instances
 
 import ikuy_utils.Variant
 import overlord.ChipDefinitionTrait
-import toml.Value
 
 case class StorageInstance(ident: String,
                            private val defi: ChipDefinitionTrait

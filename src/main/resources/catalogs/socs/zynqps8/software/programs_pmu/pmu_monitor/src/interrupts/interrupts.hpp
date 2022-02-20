@@ -36,4 +36,4 @@ void Start(void);
 
 } // end namespace
 
-extern "C" void Interrupt_Handler() __attribute((interrupt_handler));
+EXTERN_C void Interrupt_Handler() __attribute((interrupt_handler));

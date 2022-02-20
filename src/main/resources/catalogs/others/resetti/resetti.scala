@@ -1,7 +1,5 @@
-import spinal.core._
-import spinal.lib._
 import ikuy_utils._
-import toml.Value
+
 import java.nio.file.Path
 
 object Resetti {

@@ -1,9 +1,5 @@
-import toml.Value
-import spinal.core._
-import spinal.lib._
-import spinal.lib.bus.misc.SizeMapping
-import spinal.lib.bus.amba3.apb._
 import ikuy_utils._
+
 import java.nio.file.Path
 
 object AdvancedPeripheralBus {

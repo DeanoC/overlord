@@ -4,7 +4,7 @@
 * SPDX-License-Identifier: MIT
 ******************************************************************************/
 
-_STACK_SIZE = DEFINED(_STACK_SIZE) ? _STACK_SIZE : 8K;
+_STACK_SIZE = DEFINED(_STACK_SIZE) ? _STACK_SIZE : 4K;
 
 /* Define Memories in the system */
 MEMORY

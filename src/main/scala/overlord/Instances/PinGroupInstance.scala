@@ -1,9 +1,8 @@
 package overlord.Instances
 
+import ikuy_utils._
 import overlord.Chip.{BitsDesc, Port, WireDirection}
 import overlord.{ChipDefinitionTrait, DiffPinConstraint, PinConstraint, PinConstraintType}
-import ikuy_utils._
-import toml.Value
 
 import scala.collection.immutable.Map
 import scala.collection.mutable

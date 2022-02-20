@@ -9,6 +9,8 @@ ExternalProject_Add(pmu_monitor
 		CMAKE_ARGS
 			-DCMAKE_TOOLCHAIN_FILE=${CMAKE_SOURCE_DIR}/pmu_toolchain.cmake
 			-DCPU=pmu
+			-DBOARD=${BOARD}
+			-DCMAKE_BUILD_TYPE=MinSizeRel
 		)
 ExternalProject_Get_Property(pmu_monitor binary_dir)
 

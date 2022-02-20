@@ -1,0 +1,23 @@
+[[definition]]
+name = "core"
+type = "library.core"
+software = "libs/core/core.toml"
+shared_with_host = true
+
+[[definition]]
+name = "multi_core"
+type = "library.multi_core"
+software = "libs/multi_core/multi_core.toml"
+shared_with_host = true
+
+[[definition]]
+name = "memory"
+type = "library.memory"
+software = "libs/memory/memory.toml"
+shared_with_host = true
+
+[[definition]]
+name = "utils"
+type = "library.utils"
+software = "libs/utils/utils.toml"
+shared_with_host = true

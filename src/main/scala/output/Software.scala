@@ -11,19 +11,22 @@ object Software {
 		println(s"Creating Software at $out")
 
 		Utils.ensureDirectories(out)
-		val hostProgramPath = out.resolve("programs_host")
-		val libraryPath     = out.resolve("libraries")
+		val compilerPath      = out.resolve("programs_compilers")
+		val libraryPath       = out.resolve("libs")
+		val hostLibraryPath   = out.resolve("libs_host")
+		val targetLibraryPath = out.resolve("libs_target")
 
-		Utils.ensureDirectories(hostProgramPath)
+		Utils.ensureDirectories(compilerPath)
 		Utils.ensureDirectories(libraryPath)
+		Utils.ensureDirectories(hostLibraryPath)
+		Utils.ensureDirectories(targetLibraryPath)
 
-		val in_program_paths       = game.cpus
+		val program_paths          = game.cpus
 			.map("programs_" + _.definition.defType.ident.last)
-			.map(tmp_program_path(out).resolve)
-		val out_program_paths      = game.cpus
-			.map("programs_" + _.definition.defType.ident.last)
-			.map(out.resolve)
+		val in_program_paths       = program_paths.map(tmp_program_path(out).resolve)
+		val out_program_paths      = program_paths.map(out.resolve)
 		val programs_folder_exists = in_program_paths.map(Utils.doesFileOrDirectoryExist)
+
 		for ((exists, i) <- programs_folder_exists.zipWithIndex) {
 			if (exists) {
 				Utils.deleteDirectories(out_program_paths(i))
@@ -33,7 +36,7 @@ object Software {
 
 		relocateTmpSoftware(game, out)
 
-		output.Compiler(game, hostProgramPath)
+		output.Compiler(game, compilerPath)
 		//		output.Svd(game, out)
 		genScripts(game, out, out_program_paths, programs_folder_exists)
 
@@ -44,23 +47,36 @@ object Software {
 		.resolve("soft")
 
 	private def relocateTmpSoftware(game: Game, out: Path): Unit = {
-		Utils.deleteDirectories(out.resolve("libraries"))
+		Utils.deleteDirectories(out.resolve("libs"))
+		Utils.deleteDirectories(out.resolve("libs_host"))
+		Utils.deleteDirectories(out.resolve("libs_target"))
 
 		// move from the tmp folder we done some building to its real place
 		Utils.rename(out.resolve("build")
 			             .resolve("tmp")
 			             .resolve("soft")
-			             .resolve("libraries"),
-		             out.resolve("libraries"))
+			             .resolve("libs"),
+		             out.resolve("libs"))
+		Utils.rename(out.resolve("build")
+			             .resolve("tmp")
+			             .resolve("soft")
+			             .resolve("libs_host"),
+		             out.resolve("libs_host"))
+		Utils.rename(out.resolve("build")
+			             .resolve("tmp")
+			             .resolve("soft")
+			             .resolve("libs_target"),
+		             out.resolve("libs_target"))
 
-		Utils.copy(Resources.stdResourcePath().resolve("software/subdir.cmake"),
-		           out.resolve("libraries").resolve("CMakeLists.txt"),
+		Utils.copy(Resources.stdResourcePath().resolve("catalogs/software/subdir.cmake"),
+		           out.resolve("libs").resolve("CMakeLists.txt"),
 		           getClass)
-		//		Utils.rename(out.resolve("build")
-		//			             .resolve("tmp")
-		//			             .resolve("soft")
-		//			             .resolve("programs_host"),
-		//		             out.resolve("programs_host"))
+		Utils.copy(Resources.stdResourcePath().resolve("catalogs/software/subdir.cmake"),
+		           out.resolve("libs_host").resolve("CMakeLists.txt"),
+		           getClass)
+		Utils.copy(Resources.stdResourcePath().resolve("catalogs/software/subdir.cmake"),
+		           out.resolve("libs_target").resolve("CMakeLists.txt"),
+		           getClass)
 
 		for (cpu <- game.cpus) {
 			val targetPrograms = s"programs_${cpu.definition.defType.ident.last}"
@@ -91,7 +107,12 @@ object Software {
 
 				sbpm ++=
 				f"cmake -DCMAKE_TOOLCHAIN_FILE=$$PWD/${cpu_name}_toolchain.cmake " +
-				f"-G Ninja -S . -B build/$program_name -DCPU=$cpu_name%n"
+				f"-G Ninja -S . -B build/$program_name -DCPU=$cpu_name -DBOARD=${
+					game
+						.board
+						.get
+						.ident
+				}%n"
 
 				sbm ++= f"cmake --build build/$program_name%n"
 
@@ -105,18 +126,18 @@ object Software {
 				Utils.writeFile(makePath, sbm.result())
 				Utils.setFileExecutable(makePath)
 
-				Utils.copy(Resources.stdResourcePath().resolve("software/subdir.cmake"),
+				Utils.copy(Resources.stdResourcePath().resolve("catalogs/software/subdir.cmake"),
 				           out.resolve(s"$program_name").resolve("CMakeLists.txt"),
 				           getClass)
 			}
 		}
 		Utils.writeFile(out.resolve(s"make_programs.sh"), sb.result())
 		Utils.setFileExecutable(out.resolve(s"make_programs.sh"))
-		Utils.copy(Resources.stdResourcePath().resolve("software/ikuy_root.cmake"),
+		Utils.copy(Resources.stdResourcePath().resolve("catalogs/software/ikuy_root.cmake"),
 		           out.resolve("CMakeLists.txt"),
 		           getClass)
 		// workaround for microblaze gcc
-		Utils.copy(Resources.stdResourcePath().resolve("software/empty-file.ld"),
+		Utils.copy(Resources.stdResourcePath().resolve("catalogs/software/empty-file.ld"),
 		           out.resolve("empty-file.ld"),
 		           getClass)
 

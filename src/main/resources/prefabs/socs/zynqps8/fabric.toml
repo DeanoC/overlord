@@ -18,7 +18,6 @@ type = "bridge.internal.mainbus_to_apb"
 name = "mainDDR4"
 type = "ram.ddr.ddr4.zynqps8"
 
-
 [[connection]]
 type = "logical"
 connection = "mainBus_to_APB -> apbBus"
@@ -30,5 +29,5 @@ address_offset = "0xFF00_0000"
 
 [[connection]]
 type = "bus"
-connection = "RawPS8 -> mainBus"
+connection = "mainBus -> RawPS8"
 address_offset = "0"

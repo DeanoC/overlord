@@ -1,3 +1,4 @@
 resources = [
-    "boards/myirfz3"
+    "boards/myirfz3",
+    "boards/kv260"
 ]

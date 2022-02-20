@@ -1,6 +1,6 @@
 package overlord.Instances
 
-import ikuy_utils.{BigIntV, IntV, Utils, Variant}
+import ikuy_utils.{Utils, Variant}
 import overlord.ChipDefinitionTrait
 
 case class BridgeInstance(ident: String,

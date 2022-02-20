@@ -1,7 +1,7 @@
 package overlord.Connections
 
+import overlord.Chip.InWireDirection
 import overlord.DistanceMatrix
-import overlord.Chip.{InOutWireDirection, InWireDirection, OutWireDirection}
 import overlord.Instances.{ClockInstance, PinGroupInstance}
 
 import scala.collection.mutable

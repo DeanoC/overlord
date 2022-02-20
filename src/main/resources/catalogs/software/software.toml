@@ -1,0 +1,15 @@
+resources = [
+    "libs",
+    "libs_target",
+    "libs_host",
+]
+
+[[definition]]
+name = "bin2c"
+type = "program.host.bin2c"
+software = "programs_host/bin2c/bin2c.toml"
+
+[[definition]]
+name = "image_convert"
+type = "program.host.image_convert"
+software = "programs_host/image_convert/image_convert.toml"

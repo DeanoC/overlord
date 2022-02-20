@@ -1,8 +1,5 @@
-import vexriscv.plugin._
-import vexriscv.{VexRiscv, VexRiscvConfig, plugin}
-import spinal.core._
 import ikuy_utils._
-import toml.Value
+
 import java.nio.file.Path
 
 object VexRiscV_smallest {

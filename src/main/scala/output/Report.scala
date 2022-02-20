@@ -112,7 +112,7 @@ object Report {
 			}
 			)
 
-		sb ++= game.distanceMatrix.toString
+		sb ++= game.distanceMatrix.debugPrint
 
 		Utils.writeFile(out.resolve("report.txt"), sb.result())
 
@@ -153,7 +153,7 @@ object Report {
 			cNodeTransformer = Some(context.nodePrep),
 			)
 
-		Utils.writeFile(out.resolve(s"${game.name}.gv"), dotText)
+		Utils.writeFile(out.resolve(s"${game.name}.dot"), dotText)
 	}
 
 	private def makeLegendGraph(graph: GraphType, maxDistance: Int): GraphType = {
@@ -243,22 +243,7 @@ object Report {
 		sb ++= (indent + f"------------------%n")
 		sb ++= (indent + instance.ident + f"%n")
 		val id   = instance.definition.defType.ident.mkString(".")
-		val name = (instance.definition.defType match {
-			case RamDefinitionType(ident)      => "ram."
-			case CpuDefinitionType(ident)      => "cpu."
-			case BusDefinitionType(ident)      => "bus."
-			case StorageDefinitionType(ident)  => "storage."
-			case BridgeDefinitionType(ident)   => "bridge."
-			case NetDefinitionType(ident)      => "net."
-			case IoDefinitionType(ident)       => "io."
-			case OtherDefinitionType(ident)    => "other."
-			case PinGroupDefinitionType(ident) => "pin."
-			case ClockDefinitionType(ident)    => "clock."
-			case BoardDefinitionType(ident)    => "board."
-			case ProgramDefinitionType(ident)  => "program."
-			case LibraryDefinitionType(ident)  => "library."
-		}) + id
-		sb ++= (indent + f"type: $name%n")
+		sb ++= (indent + f"type: $id%n")
 		instance match {
 			case ci: ChipInstance =>
 				for (rl <- ci.registerLists)

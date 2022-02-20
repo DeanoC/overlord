@@ -1,6 +1,7 @@
 resources = [
-  "boards/Arty35T",
-  "boards/MyirFZ3",
-  "boards/PynqZ2",
+    "boards/Arty35T",
+    "boards/Kv260",
+    "boards/MyirFZ3",
+    "boards/PynqZ2",
 ]
 

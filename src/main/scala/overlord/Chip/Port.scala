@@ -1,7 +1,6 @@
 package overlord.Chip
 
 import ikuy_utils._
-import toml.Value
 
 sealed trait WireDirection {
 	override def toString: String = {

@@ -20,7 +20,6 @@
 #include "osservices/osservices.h"
 #include "utils/busy_sleep.h"
 #include "core/snprintf.h"
-#include "xdpdma_video_example.h"
 
 void PrintBanner(void);
 void EnablePSToPL(void);
@@ -32,18 +31,12 @@ void PmuSleep();
 void PmuWakeup();
 void PmuSafeMemcpy(void * destination, const void* source, size_t num_in_bytes );
 
-extern "C" {
+EXTERN_C {
 	extern char _binary_pmu_monitor_bin_start[];
 	extern char _binary_pmu_monitor_bin_end[];
 
-	extern void mioRunInitProgram();
-	extern void pllRunInitProgram();
-	extern void clockRunInitProgram();
-	extern void ddrRunInitProgram();
-	extern void peripheralsRunInitProgram();
-	extern void serdesRunInitProgram();
-	extern void miscRunInitProgram();
-	extern void ddrQosRunInitProgram();
+	extern void RegisterBringUp(void);
+
 
 	extern uint8_t HeapBase[];
 	extern uint8_t HeapLimit[];
@@ -70,7 +63,7 @@ void BringUpDisplayPort();
 uintptr_lo_t videoBlock;
 uintptr_lo_t FrameBuffer;
 
-extern "C" int main(void)
+EXTERN_C int main(void)
 {
 	debug_force_raw_print(true);
 
@@ -87,22 +80,10 @@ extern "C" int main(void)
 	if(!(HW_REG_GET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) & OS_GLOBAL0_BOOT_COMPLETE)) {
 		EnablePSToPL();
 
-		// Register data is prefilled into the heap, so don't use
-		// the heap until you have programmed the registers!
-		mioRunInitProgram();
-		pllRunInitProgram();
+		RegisterBringUp();
 
-		clockRunInitProgram();
-		peripheralsRunInitProgram();
-
-		raw_debug_printf("\nUART ready to be used\n");
 		PrintBanner();
 
-		ddrRunInitProgram();
-		serdesRunInitProgram();
-		miscRunInitProgram();
-
-		ddrQosRunInitProgram();
 		// this is a silicon bug fix
 		HW_REG_SET(AMS_PS_SYSMON, ANALOG_BUS, 0X00003210U);
 	}
@@ -121,9 +102,11 @@ extern "C" int main(void)
 									(size_t) _binary_pmu_monitor_bin_end - (size_t) _binary_pmu_monitor_bin_start);
 		PmuWakeup();
 
+		debug_printf("Wait for PMU\n");
 		// stall until pmu says it loaded and ready to go
 		while (!(HW_REG_GET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) & OS_GLOBAL0_PMU_READY)) {
 		}
+		debug_printf("PMU Ready\n");
 	}
 
 	BootData bootData = {
@@ -131,9 +114,9 @@ extern "C" int main(void)
 			.frameBufferHeight = 720,
 			.frameBufferHertz = 60,
 			.videoBlockSizeInMB = 4,
-			.bootCodeSize = SRAM_OCP_0_SIZE_IN_BYTES,
+			.bootCodeSize = OCM_0_SIZE_IN_BYTES,
 			.videoBlock = 0,
-			.bootCodeStart = SRAM_OCP_0_BASE_ADDR,
+			.bootCodeStart = OCM_0_BASE_ADDR,
 	};
 
 	if(!(HW_REG_GET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) & OS_GLOBAL0_BOOT_COMPLETE)) {
@@ -164,12 +147,12 @@ void PrintBanner(void )
 {
 	debug_printf(ANSI_CLR_SCREEN ANSI_YELLOW_PEN "IKUY Boot Loader\n" ANSI_RESET_ATTRIBUTES);
 	debug_printf("Silicon Version %d\n", HW_REG_GET_FIELD(CSU, VERSION, PS_VERSION)+1);
-	debug_printf( "A53 L1 Cache Size %dKiB, LineSize %d, Number of Ways %d, Number of Sets %d\n",
+	debug_printf( "A53 L1 Cache Size %dKiB, LineSize %d, Ways %d, Sets %d\n",
 										(Cache_GetDCacheLineSizeInBytes(1) * Cache_GetDCacheNumWays(1) * Cache_GetDCacheNumSets(1)) / 1024,
 										Cache_GetDCacheLineSizeInBytes(1),
 										Cache_GetDCacheNumWays(1),
 										Cache_GetDCacheNumSets(1) );
-	debug_printf( "A53 L2 Cache Size %dKiB, LineSize %d, Number of Ways %d, Number of Sets %d\n",
+	debug_printf( "A53 L2 Cache Size %dKiB, LineSize %d, Ways %d, Sets %d\n",
 										(Cache_GetDCacheLineSizeInBytes(2) * Cache_GetDCacheNumWays(2) * Cache_GetDCacheNumSets(2)) / 1024,
 										Cache_GetDCacheLineSizeInBytes(2),
 										Cache_GetDCacheNumWays(2),
@@ -183,38 +166,15 @@ void PrintBanner(void )
 
 }
 
-void SetupVideo(Run_Config& runConfig);
-
-Run_Config RunConfig;
-extern "C" int run_dppsu(Run_Config *RunCfgPtr);
-
 void BringUpDisplayPort()
 {
-	if(videoBlock == 0) videoBlock = OsService_DdrLoBlockAlloc(4);
-	FrameBuffer = (uintptr_lo_t)(uintptr_t)(videoBlock + 4096);
-
-	RunConfig.VideoMode = XVIDC_VM_640x480_60_P;
-	RunConfig.Bpc = XVIDC_BPC_8;
-	RunConfig.ColorEncode = XDPPSU_CENC_RGB;
-	RunConfig.UseMaxCfgCaps = 1;
-	RunConfig.LaneCount = LANE_COUNT_2;
-	RunConfig.LinkRate = LINK_RATE_540GBPS;
-	RunConfig.EnSynchClkMode = 1;
-	RunConfig.UseMaxLaneCount = 1;
-	RunConfig.UseMaxLinkRate = 1;
-
-	run_dppsu(&RunConfig);
-
-	//	SetupVideo(RunConfig);
-
-	/*
+	debug_printf(ANSI_CLR_SCREEN ANSI_YELLOW_PEN "BringUpDisplayPort\n" ANSI_RESET_ATTRIBUTES);
 	using namespace DisplayPort::Display;
 
 	Init(&display);
 	Init(&mixer);
 
-//	CopyStandardVideoMode(DisplayPort::Display::StandardVideoMode::VM_1280_720_60, &display.videoTiming);
-	CopyStandardVideoMode(DisplayPort::Display::StandardVideoMode::VM_640_480_60, &display.videoTiming);
+	CopyStandardVideoMode(DisplayPort::Display::StandardVideoMode::VM_1280_720_60, &display.videoTiming);
 	if(videoBlock == 0) videoBlock = OsService_DdrLoBlockAlloc(4);
 	auto dmaDesc = (DMADescriptor*) (uintptr_t)videoBlock;
 	FrameBuffer = (uintptr_lo_t)(uintptr_t)(videoBlock + 4096);
@@ -229,8 +189,8 @@ void BringUpDisplayPort()
 	dmaDesc->sourceAddress = (uint32_t)FrameBuffer;
 	dmaDesc->sourceAddressExt = (uint32_t)(((uintptr_t)FrameBuffer) >> 32ULL);
 
-	mixer.function = DisplayPort::Display::MixerFunction::VIDEO;
-	mixer.globalAlpha = 0xFF;
+	mixer.function = DisplayPort::Display::MixerFunction::GFX;
+	mixer.globalAlpha = 0x80;
 
 	mixer.videoPlane.source = DisplayPort::Display::DisplayVideoPlane::Source::TEST_GENERATOR;
 	mixer.videoPlane.format = DisplayPort::Display::DisplayVideoPlane::Format::RGBX8;
@@ -248,7 +208,7 @@ void BringUpDisplayPort()
 
 	Init(&link);
 	SetDisplay(&link, &display, &mixer);
-*/
+
 /*
  * #define DP_AV_BUF_PALETTE_MEMORY_OFFSET 0x0000b400U
 	for(int i = 0; i < 256;i++) {
@@ -375,7 +335,7 @@ void PowerUpIsland(uint32_t PwrIslandMask)
 #define BLOCK_SIZE_A53 0x200000U
 #define NUM_BLOCKS_A53 0x400U
 #define BLOCK_SIZE_A53_HIGH 0x40000000U
-#define NUM_BLOCKS_A53_HIGH (DDR_DDR4_1_SIZE_IN_BYTES / BLOCK_SIZE_A53_HIGH)
+#define NUM_BLOCKS_A53_HIGH (MAINDDR4_1_SIZE_IN_BYTES / BLOCK_SIZE_A53_HIGH)
 #define ATTRIB_MEMORY_A53 0x705U
 #define BLOCK_SIZE_2MB 0x200000U
 #define BLOCK_SIZE_1GB 0x40000000U
@@ -412,10 +372,10 @@ void MarkDdrAsMemory()
 {
 	uint64_t BlockNum;
 	for (BlockNum = 0; BlockNum < NUM_BLOCKS_A53; BlockNum++) {
-		SetTlbAttributes(DDR_DDR4_0_BASE_ADDR + BlockNum * BLOCK_SIZE_A53, ATTRIB_MEMORY_A53);
+		SetTlbAttributes(MAINDDR4_0_BASE_ADDR + BlockNum * BLOCK_SIZE_A53, ATTRIB_MEMORY_A53);
 	}
 	for (BlockNum = 0; BlockNum < NUM_BLOCKS_A53_HIGH; BlockNum++) {
-		SetTlbAttributes(DDR_DDR4_1_BASE_ADDR + BlockNum * BLOCK_SIZE_A53_HIGH, ATTRIB_MEMORY_A53);
+		SetTlbAttributes(MAINDDR4_1_BASE_ADDR + BlockNum * BLOCK_SIZE_A53_HIGH, ATTRIB_MEMORY_A53);
 	}
 
 	Cache_DCacheCleanAndInvalidate();
@@ -559,7 +519,7 @@ void TcmInit()
 
 }
 
-extern "C" void SynchronousInterrupt(void) {
+EXTERN_C void SynchronousInterrupt(void) {
 	uint64_t const esr = read_ESR_EL3_register();
 	uint64_t const elr = read_ELR_EL3_register();
 	uint32_t const ec = HW_REG_DECODE_FIELD(A53_SYSTEM, ESR_EL3, EC, esr);
@@ -680,16 +640,16 @@ extern "C" void SynchronousInterrupt(void) {
 	}
 }
 
-extern "C" void IRQInterrupt(void) {
+EXTERN_C void IRQInterrupt(void) {
 	raw_debug_printf("IRQInterrupt\n");
 	asm volatile("wfe");
 }
 
-extern "C" void FIQInterrupt(void) {
+EXTERN_C void FIQInterrupt(void) {
 	raw_debug_printf("FIQInterrupt\n");
 	asm volatile("wfe");
 }
-extern "C" void SErrorInterrupt(void) {
+EXTERN_C void SErrorInterrupt(void) {
 	raw_debug_printf("SErrorInterruptHandler\n");
 	asm volatile("wfe");
 }

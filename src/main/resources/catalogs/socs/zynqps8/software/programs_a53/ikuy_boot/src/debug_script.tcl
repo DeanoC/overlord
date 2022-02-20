@@ -1,8 +1,9 @@
 connect -url tcp:127.0.0.1:3121
-source /home/deano/fpga_drive/Xilinx/Vitis/2021.1/scripts/vitis/util/zynqmp_utils.tcl
-
+source /tools/Xilinx/Vitis/2021.2/scripts/vitis/util/zynqmp_utils.tcl
 targets
 
+
+#Change bootmode to jtag and reboot
 targets -set -nocase -filter {name =~ "*PSU*"}
 stop
 mwr  0xff5e0200 0x0100
@@ -19,6 +20,6 @@ after 100
 
 targets -set -nocase -filter {name =~ "*A53*#0"}
 rst -processor
-dow ./build/programs_a53-debug/programs_a53/ikuy_boot/ikuy_boot
+dow ./ikuy_boot
 #bpadd main
 con -block

@@ -8,8 +8,8 @@
 #include "../os_heap.hpp"
 #include "osservices/osservices.h"
 
-extern uint32_t uart0TransmitLast;
-extern uint32_t uart0TransmitHead;
+extern uint32_t uartDebugTransmitLast;
+extern uint32_t uartDebugTransmitHead;
 
 namespace IPI3_OsServer {
 
@@ -20,22 +20,22 @@ void PutSizedData(uint32_t size, const uint8_t *text) {
 	//put text into to transmit buffer, interrupts will send it to host
 
 	// split at buffer end
-	if (uart0TransmitHead + size >= OsHeap::UartBufferSize) {
-		const uint32_t firstBlockSize = OsHeap::UartBufferSize - uart0TransmitHead;
+	if (uartDebugTransmitHead + size >= OsHeap::UartBufferSize) {
+		const uint32_t firstBlockSize = OsHeap::UartBufferSize - uartDebugTransmitHead;
 		if (firstBlockSize > 0) {
-			memcpy(&osHeap->uart0TransmitBuffer[uart0TransmitHead], text, firstBlockSize);
+			memcpy(&osHeap->uartDEBUGTransmitBuffer[uartDebugTransmitHead], text, firstBlockSize);
 			text += firstBlockSize;
 			size -= firstBlockSize;
 		}
-		uart0TransmitHead = 0;
+		uartDebugTransmitHead = 0;
 	}
 
 	if (size > 0) {
-		memcpy(&osHeap->uart0TransmitBuffer[uart0TransmitHead], text, size);
-		uart0TransmitHead += (uint32_t) size;
+		memcpy(&osHeap->uartDEBUGTransmitBuffer[uartDebugTransmitHead], text, size);
+		uartDebugTransmitHead += (uint32_t) size;
 	}
 
-	HW_REG_SET(UART0, INTRPT_EN, UART_INTRPT_EN_TEMPTY);
+	HW_REG_SET(UART_DEBUG, INTRPT_EN, UART_INTRPT_EN_TEMPTY);
 }
 
 #define IsTransmitFull() (HW_REG_GET_BIT(UART0, CHANNEL_STS, TNFUL))
@@ -57,19 +57,19 @@ void DebugPtrPrint(IPI_Channel senderChannel, IPI3_Msg const *msgBuffer) {
 
 
 // override the weak prints, to write directly into the buffer
-extern "C" WEAK_LINKAGE void OsService_InlinePrint(uint8_t size, const char *const text) {
+EXTERN_C WEAK_LINKAGE void OsService_InlinePrint(uint8_t size, const char *const text) {
 	IPI3_OsServer::PutSizedData(size, (const uint8_t *)text);
 }
 
-extern "C" WEAK_LINKAGE void OsService_Print(const char *const text) {
+EXTERN_C WEAK_LINKAGE void OsService_Print(const char *const text) {
 	OsService_PrintWithSize(Utils_StringLength(text), text);
 }
 
-extern "C" WEAK_LINKAGE void OsService_PrintWithSize(unsigned int count, const char *const text) {
+EXTERN_C WEAK_LINKAGE void OsService_PrintWithSize(unsigned int count, const char *const text) {
 	IPI3_OsServer::PutSizedData(count, (const uint8_t *) text);
 }
 
-extern "C" WEAK_LINKAGE void OsService_Printf(const char *format, ...) {
+EXTERN_C WEAK_LINKAGE void OsService_Printf(const char *format, ...) {
 	char buffer[256]; // 256 byte max string (on stack)
 	va_list va;
 	va_start(va, format);
@@ -80,10 +80,10 @@ extern "C" WEAK_LINKAGE void OsService_Printf(const char *format, ...) {
 	OsService_PrintWithSize(len,buffer);
 }
 
-extern "C" WEAK_LINKAGE void debug_print(char const * text){
+EXTERN_C WEAK_LINKAGE void debug_print(char const * text){
 	OsService_Print(text);
 }
-extern "C" WEAK_LINKAGE void debug_printf(const char *format, ...) {
+EXTERN_C WEAK_LINKAGE void debug_printf(const char *format, ...) {
 	char buffer[256]; // 256 byte max string (on stack)
 	va_list va;
 	va_start(va, format);
@@ -93,6 +93,6 @@ extern "C" WEAK_LINKAGE void debug_printf(const char *format, ...) {
 
 	OsService_PrintWithSize(len,buffer);
 }
-extern "C" WEAK_LINKAGE void debug_sized_print(uint32_t size, char const * text) {
+EXTERN_C WEAK_LINKAGE void debug_sized_print(uint32_t size, char const * text) {
 	OsService_PrintWithSize(size, text);
 }

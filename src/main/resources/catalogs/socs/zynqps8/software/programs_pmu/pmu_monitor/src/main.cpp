@@ -5,7 +5,6 @@
 #include "hw/memory_map.h"
 #include "hw_regs/pmu_global.h"
 #include "hw_regs/pmu/pmu_lmb_bram.h"
-#include "hw_regs/pmu/pmu_iomodule.h"
 #include "hw_regs/pmu/pmu_local.h"
 
 #include "hw_regs/lpd_slcr.h"
@@ -20,7 +19,6 @@
 #include "interrupts/interrupt_handlers.hpp"
 #include "os/ipi3_os_server.hpp"
 #include "interrupts/gic_proxy.hpp"
-#include "host_interface.hpp"
 #include "rom_extensions.h"
 #include "timers.hpp"
 #include "os_heap.hpp"
@@ -35,6 +33,13 @@ typedef struct {
 
 MainLoop loopy;
 
+static void MainCallsCallback() {
+	for(uint32_t i = 0; i < osHeap->mainCallCallbacksIndex;++i) {
+		osHeap->mainCallCallbacks[i]();
+	}
+	osHeap->mainCallCallbacksIndex = 0;
+}
+
 extern const ElfNoteSection_t g_note_build_id;
 void PrintBanner(void)
 {
@@ -48,6 +53,8 @@ void PrintBanner(void)
 }
 
 void ttc0_1_setup(void) {
+	raw_debug_print("  TTC0_1 handler\n");
+
 	uint32_t group = 0;
 	uint32_t bit = 0;
 
@@ -70,6 +77,68 @@ void ttc0_1_setup(void) {
 	HW_REG_SET(TTC0, INTERRUPT_ENABLE_1, TTC_INTERRUPT_REGISTER_1_IV);
 	HW_REG_CLR_BIT(TTC0, COUNTER_CONTROL_1, DIS);
 }
+
+void setupInterruptHandlers() {
+	raw_debug_print("Set Up Interrupt Handlers\n");
+
+	// install IPI0 as PMU sleep handlers (TODO seems a waste of an entire IPI...)
+	raw_debug_print("  PMU sleep handler\n");
+	HW_REG_SET(IPI, PMU_0_ISR, IPI_PMU_0_ISR_USERMASK);
+	HW_REG_SET(IPI, PMU_0_IER, IPI_PMU_0_IER_USERMASK);
+	Interrupts::SetHandler(Interrupts::Name::IN_IPI0, &IPI0_Handler);
+	Interrupts::Enable(Interrupts::Name::IN_IPI0);
+
+	// IPI3 OS service handler
+	raw_debug_print("  PMU OS handler\n");
+	HW_REG_SET(IPI, PMU_3_ISR, IPI_PMU_3_ISR_USERMASK);
+	HW_REG_SET(IPI, PMU_3_IER, IPI_PMU_3_IER_USERMASK);
+	Interrupts::SetHandler(Interrupts::Name::IN_IPI3, &IPI3_Handler);
+	Interrupts::Enable(Interrupts::Name::IN_IPI3);
+
+	// GPI0 (Fault tolerance events) (always enabled)
+	raw_debug_print("  Fault Tolerance handler\n");
+	Interrupts::SetHandler(Interrupts::Name::IN_GPI0, &GPI0_Handler);
+	Interrupts::Enable(Interrupts::Name::IN_GPI0);
+
+	// GPI1 (Wakeup events)
+	raw_debug_print("  Wakeup handler\n");
+	HW_REG_SET(PMU_LOCAL, GPI1_ENABLE, PMU_LOCAL_GPI1_ENABLE_USERMASK);
+	Interrupts::SetHandler(Interrupts::Name::IN_GPI1, &GPI1_Handler);
+	Interrupts::Enable(Interrupts::Name::IN_GPI1);
+
+	raw_debug_print("  GIC Proxy handler\n");
+	// GPI1 is also used for GIC_PROXY
+	// what UART are we using? set the interrupt based on that
+#if UART_DEBUG_BASE_ADDR == 0xff010000
+	HW_REG_SET(LPD_SLCR, GICP0_IRQ_ENABLE, LPD_SLCR_GICP0_IRQ_ENABLE_SRC22);
+#else
+	HW_REG_SET(LPD_SLCR, GICP0_IRQ_ENABLE, LPD_SLCR_GICP0_IRQ_ENABLE_SRC21);
+#endif
+
+	HW_REG_SET(LPD_SLCR, GICP_PMU_IRQ_ENABLE, LPD_SLCR_GICP_PMU_IRQ_ENABLE_SRC0);
+	HW_REG_SET(UART_DEBUG, INTRPT_DIS, 	~UART_CHNL_INT_STS_RTRIG);
+	HW_REG_SET(UART_DEBUG, INTRPT_EN, 	UART_CHNL_INT_STS_RTRIG);
+	HW_REG_SET(UART_DEBUG, RCVR_TIMEOUT, 32);
+	HW_REG_SET(UART_DEBUG, RCVR_FIFO_TRIGGER_LEVEL, 1);
+
+	// set Triple Timer/Counter 0 for our usage
+	ttc0_1_setup();
+
+	// GPI2 (Reset and sleep events)
+	raw_debug_print("  Reset and Sleep handler\n");
+	HW_REG_SET(PMU_LOCAL, GPI2_ENABLE, PMU_LOCAL_GPI2_ENABLE_USERMASK);
+	Interrupts::SetHandler(Interrupts::Name::IN_GPI2, &GPI2_Handler);
+	Interrupts::Enable(Interrupts::Name::IN_GPI2);
+
+	// GPI3 (PL to PMU events)
+	raw_debug_print("  PL to PMU handler\n");
+	HW_REG_SET(PMU_LOCAL, GPI3_ENABLE, PMU_LOCAL_GPI3_ENABLE_USERMASK);
+	Interrupts::SetHandler(Interrupts::Name::IN_GPI3, &GPI3_Handler);
+	Interrupts::Enable(Interrupts::Name::IN_GPI3);
+
+	raw_debug_print("Set Up Interrupt Handlers Finished\n");
+}
+
 
 
 void main() __attribute__((noreturn));
@@ -97,56 +166,15 @@ void main()
 	OsHeap::Init();
 	loopy.Init();
 
+	raw_debug_print("OS Server Init\n");
 	IPI3_OsServer::Init();
 
-	// install IPI0 as PMU sleep handlers (TODO seems a waste of an entire IPI...)
-	HW_REG_SET(IPI, PMU_0_ISR, IPI_PMU_0_ISR_USERMASK);
-	HW_REG_SET(IPI, PMU_0_IER, IPI_PMU_0_IER_USERMASK);
-	Interrupts::SetHandler(Interrupts::Name::IN_IPI0, &IPI0_Handler);
-	Interrupts::Enable(Interrupts::Name::IN_IPI0);
+	setupInterruptHandlers();
 
-	// IPI3 OS service handler
-	HW_REG_SET(IPI, PMU_3_ISR, IPI_PMU_3_ISR_USERMASK);
-	HW_REG_SET(IPI, PMU_3_IER, IPI_PMU_3_IER_USERMASK);
-	Interrupts::SetHandler(Interrupts::Name::IN_IPI3, &IPI3_Handler);
-	Interrupts::Enable(Interrupts::Name::IN_IPI3);
-
-	// ECC correctable interrupt
-	HW_REG_SET_BIT(PMU_LMB_BRAM, ECC_STATUS, CE);
-	HW_REG_SET_BIT(PMU_LMB_BRAM, ECC_IRQ_EN, CE);
-	Interrupts::SetHandler(Interrupts::Name::IN_CORRECTABLE_ECC, &CorrectableECCErrors_Handler);
-	Interrupts::Enable(Interrupts::Name::IN_CORRECTABLE_ECC);
-
-	// GPI0 (Fault tolerance events) (always enabled)
-	Interrupts::SetHandler(Interrupts::Name::IN_GPI0, &GPI0_Handler);
-	Interrupts::Enable(Interrupts::Name::IN_GPI0);
-
-	// GPI1 (Wakeup events)
-	HW_REG_SET(PMU_LOCAL, GPI1_ENABLE, PMU_LOCAL_GPI1_ENABLE_USERMASK);
-	Interrupts::SetHandler(Interrupts::Name::IN_GPI1, &GPI1_Handler);
-	Interrupts::Enable(Interrupts::Name::IN_GPI1);
-
-	// GPI1 is also used for GIC_PROXY
-	HW_REG_SET(LPD_SLCR, GICP0_IRQ_ENABLE, LPD_SLCR_GICP0_IRQ_ENABLE_SRC21);
-	HW_REG_SET(LPD_SLCR, GICP_PMU_IRQ_ENABLE, LPD_SLCR_GICP_PMU_IRQ_ENABLE_SRC0);
-	HW_REG_SET(UART0, INTRPT_DIS, 	~UART_CHNL_INT_STS_RTRIG);
-	HW_REG_SET(UART0, INTRPT_EN, 	UART_CHNL_INT_STS_RTRIG);
-	HW_REG_SET(UART0, RCVR_TIMEOUT, 32);
-	HW_REG_SET(UART0, RCVR_FIFO_TRIGGER_LEVEL, 1);
-	ttc0_1_setup();
-
-	// GPI2 (Reset and sleep events)
-	HW_REG_SET(PMU_LOCAL, GPI2_ENABLE, PMU_LOCAL_GPI2_ENABLE_USERMASK);
-	Interrupts::SetHandler(Interrupts::Name::IN_GPI2, &GPI2_Handler);
-	Interrupts::Enable(Interrupts::Name::IN_GPI2);
-
-	// GPI3 (PL to PMU events)
-	HW_REG_SET(PMU_LOCAL, GPI3_ENABLE, PMU_LOCAL_GPI3_ENABLE_USERMASK);
-	Interrupts::SetHandler(Interrupts::Name::IN_GPI3, &GPI3_Handler);
-	Interrupts::Enable(Interrupts::Name::IN_GPI3);
-
+	raw_debug_print("Timer::Init\n");
 	Timers::Init();
 
+	raw_debug_print("Interrupt Start\n");
 	Interrupts::Start();
 
 	HW_REG_SET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0,
@@ -156,6 +184,8 @@ void main()
 	Timers::Start();
 
 	HW_REG_SET_BIT(PMU_GLOBAL, GLOBAL_CNTRL, FW_IS_PRESENT);
+
+	osHeap->hundredHzCallbacks[(int)HundredHzTasks::HOST_MAIN_CALLS] = &MainCallsCallback;
 
 	loopy.Loop();
 

@@ -26,13 +26,13 @@ connection = "pmuInternalBus -> pmuRAM"
 address_offset = "0xFFDC_0000"
 
 [[connection]]
-type = "logical"
+type = "bus"
 connection = "pmuInternalBus -> pmu_to_mainBus"
+address_offset = "0"
 
 [[connection]]
-type = "bus"
+type = "logical"
 connection = "pmu_to_mainBus -> mainBus"
-address_offset = "0"
 
 [[connection]]
 type = "bus"

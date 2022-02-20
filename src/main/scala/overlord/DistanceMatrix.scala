@@ -49,7 +49,7 @@ case class DistanceMatrix(instanceArray: Array[ChipInstance]) {
 
 	def indexOf(c: ChipInstance): Int = instanceArray.indexOf(c)
 
-	override def toString: String = {
+	def debugPrint: String = {
 		val sb = new StringBuilder
 
 		// list instances that aren't isolated

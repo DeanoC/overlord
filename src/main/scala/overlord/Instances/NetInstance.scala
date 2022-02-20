@@ -2,7 +2,6 @@ package overlord.Instances
 
 import ikuy_utils.Variant
 import overlord.ChipDefinitionTrait
-import toml.Value
 
 case class NetInstance(ident: String,
                        override val definition: ChipDefinitionTrait,

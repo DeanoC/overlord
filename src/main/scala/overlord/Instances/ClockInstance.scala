@@ -1,9 +1,7 @@
 package overlord.Instances
 
-import overlord.Chip.{BitsDesc, Port}
 import ikuy_utils._
 import overlord.ChipDefinitionTrait
-import toml.Value
 
 case class ClockInstance(ident: String,
                          override val definition: ChipDefinitionTrait)

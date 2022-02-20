@@ -85,9 +85,10 @@ object OutputSoftware {
 					"${name}" -> (() => StringV(instance.name)),
 					"${triple}" -> (() => StringV(sanitizedTriple)),
 					"${TRIPLE}" -> (() => StringV(sanitizedTriple.toUpperCase)),
-					"${cpuName}" -> (() => StringV(cpu.ident.split('.').last)),
-					"${CPUNAME}" -> (() => StringV(cpu.ident.split('.').last.toUpperCase)),
+					"${cpuName}" -> (() => StringV(cpu.definition.defType.ident.last)),
+					"${CPUNAME}" -> (() => StringV(cpu.definition.defType.ident.last.toUpperCase)),
 					"${cpuWidth}" -> (() => IntV(cpu.width)),
+					"${cpuCoreCount}" -> (() => IntV(cpu.cpuCount)),
 					"${maxAtomicWidth}" -> (() => IntV(cpu.maxAtomicWidth)),
 					"${maxBitOpTypeWidth}" -> (() => IntV(cpu.maxBitOpTypeWidth)),
 					"${isSoftCore}" -> (() => BooleanV(!cpu.isHardware)),
@@ -96,8 +97,7 @@ object OutputSoftware {
 					"${board}" -> (() => StringV(game.board.get.ident))
 					)
 
-				val parametersTbl = keywords
-				action.execute(instance, parametersTbl, Game.pathStack.top.resolve("soft"))
+				action.execute(instance, keywords, Game.pathStack.top.resolve("soft"))
 			}
 
 		}
@@ -191,9 +191,7 @@ object OutputSoftware {
 		while (busStack.nonEmpty) {
 			val (bus, busAddr) = busStack.pop()
 
-			for (instance <- bus.consumerInstances
-			     if !instance.isInstanceOf[RamInstance]) {
-
+			for (instance <- bus.consumerInstances) {
 				val asplits = bus.getConsumerAddressesAndSizes(instance)
 				for ((address, size) <- asplits) {
 
@@ -221,26 +219,26 @@ object OutputSoftware {
 	private def writeRegisterBank(busAddr: BigInt,
 	                              rb: RegisterBank): String = {
 		val sb    = new StringBuilder
-		val name  = rb.registerListName.split('/').last
-		val uname = name.toUpperCase()
+		val name  = rb.name.replace('.', '_')
+		val uname = rb.registerListName.split('/').last.toUpperCase().replace('.', '_')
 
-		sb ++= f"// ${rb.name} 0x${busAddr + rb.address}%x ${rb.registerListName}%n"
+		sb ++= f"// ${name} 0x${busAddr + rb.address}%x ${rb.registerListName}%n"
 
 		// -1 bank address mean non MMIO register so no base address is valid
 		if (rb.address > -1) {
-			sb ++= f"#define ${rb.name}_BASE_ADDR 0x${busAddr + rb.address}%x%n"
-			sb ++= f"#define ${rb.name}_REGISTER(reg) ${uname}_##reg##_OFFSET%n"
+			sb ++= f"#define ${name}_BASE_ADDR 0x${busAddr + rb.address}%x%n"
+			sb ++= f"#define ${name}_REGISTER(reg) ${uname}_##reg##_OFFSET%n"
 		} else {
 			sb ++=
 			f"// These registers aren't MMIO accessible so require platform intrinsics to " +
 			f"use%n"
 		}
-		sb ++= f"#define ${rb.name}_FIELD(reg, field) ${uname}_##reg##_##field%n"
-		sb ++= f"#define ${rb.name}_FIELD_MASK(reg, field) ${uname}_##reg##_##field##_MASK%n"
+		sb ++= f"#define ${name}_FIELD(reg, field) ${uname}_##reg##_##field%n"
+		sb ++= f"#define ${name}_FIELD_MASK(reg, field) ${uname}_##reg##_##field##_MASK%n"
 		sb ++=
-		f"#define ${rb.name}_FIELD_LSHIFT(reg, field) ${uname}_##reg##_##field##_LSHIFT%n"
+		f"#define ${name}_FIELD_LSHIFT(reg, field) ${uname}_##reg##_##field##_LSHIFT%n"
 		sb ++=
-		f"#define ${rb.name}_FIELD_ENUM(reg, field, enm) ${uname}_##reg##_##field##_##enm%n"
+		f"#define ${name}_FIELD_ENUM(reg, field, enm) ${uname}_##reg##_##field##_##enm%n"
 		sb.result()
 	}
 
@@ -293,66 +291,7 @@ object OutputSoftware {
 	}
 
 	private def hwPath(cpu: CpuInstance, out: Path) =
-		out.resolve("libraries")
-			.resolve("hw")
-			.resolve("include")
-			.resolve("hw_regs")
-			.resolve(cpu.definition.defType.ident.last)
-
-	private def filePath(out: Path, name: String): Path = {
-		val fn       = s"${name.replace('.', '_')}.h".toLowerCase()
-		val filename = Path.of(fn).getFileName
-		out.resolve(filename)
-	}
-
-	private def genRegisterList(prefix: String, rl: RegisterList): String = {
-		val sb = new StringBuilder
-		for (reg <- rl.registers) {
-			sb ++= f"%n// ${reg.desc}%n"
-			sb ++= f"#define $prefix${reg.name}_OFFSET ${reg.offset}%#010xU%n"
-
-			var totalUserMask     : Long = 0
-			var reservedFieldCount: Long = -1 // we preincrement so start at -1 to get 0
-
-			reg.fields.foreach(f => {
-				sb ++= f"//${
-					if (f.shortDesc.nonEmpty) f.shortDesc.get
-					else ""
-				}%n"
-
-				val bits = BitsDesc(f.bits)
-				totalUserMask |= (if (f.name != "RESERVED") bits.mask else 0)
-
-				val fieldName = if (f.name == "RESERVED") {
-					reservedFieldCount += 1
-					s"RESERVED$reservedFieldCount"
-				}
-				else f.name
-
-				val name = reg.name.toUpperCase()
-
-				sb ++= f"#define $prefix${name}_${fieldName}_LSHIFT ${bits.lo}%#010xU%n"
-				sb ++= f"#define $prefix${name}_${fieldName}_MASK ${bits.mask}%#010xU%n"
-				if (bits.singleBit)
-					sb ++= f"#define $prefix${name}_$fieldName ${bits.mask}%#10xU%n"
-
-				for (elem <- f.enums) {
-					if (elem.description.isDefined)
-						sb ++= f"// ${elem.description.get.toString}%n"
-					sb ++= f"#define $prefix${name}_${fieldName}_${elem.name.toUpperCase()} ${
-						elem.value
-							.toString()
-					}%n"
-				}
-			})
-			if (totalUserMask != 0)
-				sb ++=
-				f"#define $prefix${reg.name}_USERMASK ${totalUserMask & 0xFFFFFFFF}%#010xU%n"
-
-		}
-
-		sb.result()
-	}
+		hwRegsPath(cpu, out).resolve(cpu.definition.defType.ident.last)
 
 	private def genInstanceHeadersFor(cpu: CpuInstance, game: Game, out: Path): Unit = {
 		val definitionsWritten = mutable.HashMap[String, String]()
@@ -364,8 +303,7 @@ object OutputSoftware {
 		while (busStack.nonEmpty) {
 			val (bus, busAddr) = busStack.pop()
 
-			for (instance <- bus.consumerInstances
-			     if !instance.isInstanceOf[RamInstance]) {
+			for (instance <- bus.consumerInstances) {
 				val asplits = bus.getConsumerAddressesAndSizes(instance)
 				for ((address, size) <- asplits) {
 
@@ -379,7 +317,10 @@ object OutputSoftware {
 								for (rl <- instance.registerLists) yield
 									RegisterBank(instance.ident.toUpperCase, address, rl.name)
 							} else instance.registerBanks
-							val rls = instance.registerLists
+							val rls = instance.registerLists ++ {
+								if (instance.definition.registers.isEmpty) Seq()
+								else instance.definition.registers.get.lists
+							}
 
 							for (rb <- rbs) {
 								val name  = rb.registerListName.split('/').last
@@ -413,12 +354,66 @@ object OutputSoftware {
 		}
 	}
 
+	private def filePath(out: Path, name: String): Path = {
+		val fn       = s"${name.replace('.', '_')}.h".toLowerCase()
+		val filename = Path.of(fn).getFileName
+		out.resolve(filename)
+	}
+
 	private def hwRegsPath(cpu: CpuInstance, out: Path) =
-		out.resolve("libraries")
+		out.resolve("libs_target")
 			.resolve("hw")
 			.resolve("include")
 			.resolve("hw_regs")
 
+	private def genRegisterList(prefix: String, rl: RegisterList): String = {
+		val sb = new StringBuilder
+		for (reg <- rl.registers) {
+			sb ++= f"%n// ${reg.desc}%n"
+			sb ++= f"#define $prefix${reg.name}_OFFSET ${reg.offset}%#010xU%n"
+
+			var totalUserMask     : Long = 0
+			var reservedFieldCount: Long = -1 // we preincrement so start at -1 to get 0
+
+			reg.fields.foreach(f => {
+				sb ++= f"//${
+					if (f.shortDesc.nonEmpty) f.shortDesc.get
+					else ""
+				}%n"
+
+				val bits = BitsDesc(f.bits)
+				totalUserMask |= (if (f.name != "RESERVED") bits.mask else 0)
+
+				val fieldName = if (f.name == "RESERVED") {
+					reservedFieldCount += 1
+					s"RESERVED$reservedFieldCount"
+				}
+				else f.name
+
+				val name = reg.name.toUpperCase().replace('.', '_')
+
+				sb ++= f"#define $prefix${name}_${fieldName}_LSHIFT ${bits.lo}%#010xU%n"
+				sb ++= f"#define $prefix${name}_${fieldName}_MASK ${bits.mask}%#010xU%n"
+				if (bits.singleBit)
+					sb ++= f"#define $prefix${name}_$fieldName ${bits.mask}%#10xU%n"
+
+				for (elem <- f.enums) {
+					if (elem.description.isDefined)
+						sb ++= f"// ${elem.description.get.toString}%n"
+					sb ++= f"#define $prefix${name}_${fieldName}_${elem.name.toUpperCase()} ${
+						elem.value
+							.toString()
+					}%n"
+				}
+			})
+			if (totalUserMask != 0)
+				sb ++=
+				f"#define $prefix${reg.name}_USERMASK ${totalUserMask & 0xFFFFFFFF}%#010xU%n"
+
+		}
+
+		sb.result()
+	}
 
 }
 

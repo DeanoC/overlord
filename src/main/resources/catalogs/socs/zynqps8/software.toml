@@ -1,58 +1,18 @@
-[[definition]]
-name = "core"
-type = "library.core.zynqps8"
-cpus = ["a53", "r5f", "pmu"]
-software = "software/libraries/core/core.toml"
-
-[[definition]]
-name = "utils"
-type = "library.utils"
-software = "software/libraries/utils/utils.toml"
-
-[[definition]]
-name = "hw"
-type = "library.hw.zynqps8"
-software = "software/libraries/hw/hw.toml"
-
-[[definition]]
-name = "dbg"
-type = "library.dbg.zynqps8"
-software = "software/libraries/dbg/dbg.toml"
-
-[[definition]]
-name = "osservices"
-type = "library.osservices.zynqps8"
-software = "software/libraries/osservices/osservices.toml"
-
-[[definition]]
-name = "utils"
-type = "library.utils.zynqps8"
-software = "software/libraries/utils/utils.toml"
 
 [[definition]]
 name = "zynqps8_display_port"
 type = "library.display_port.zynqps8"
-software = "software/libraries/display_port/display_port.toml"
+software = "software/libs_target/display_port/display_port.toml"
 
 [[definition]]
 name = "zynqps8_dma"
 type = "library.dma.zynqps8"
-software = "software/libraries/dma/dma.toml"
-
-[[definition]]
-name = "gfxdebug"
-type = "library.gfxdebug.zynqps8"
-software = "software/libraries/gfxdebug/gfxdebug.toml"
-
-[[definition]]
-name = "musl_math"
-type = "library.musl_math.zynqps8"
-software = "software/libraries/musl_math/musl_math.toml"
+software = "software/libs_target/dma/dma.toml"
 
 [[definition]]
 name = "xilinx"
 type = "library.xilinx.zynqps8"
-software = "software/libraries/xilinx/xilinx.toml"
+software = "software/libs_target/xilinx/xilinx.toml"
 
 [[definition]]
 name = "ikuy_boot"
