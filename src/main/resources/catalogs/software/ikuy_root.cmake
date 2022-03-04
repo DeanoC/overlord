@@ -20,7 +20,7 @@ if(${BOARD} STREQUAL "myirfz3" )
 	set(SOC "zynqmp")
 endif()
 
-project(ikuy_sw_${CPU} C ASM)
+project(ikuy_sw_${CPU} C CXX ASM)
 
 if(${CPU} STREQUAL "a53")
 	set(CPU_ARCH "aarch64")
@@ -28,11 +28,5 @@ elseif(${CPU} STREQUAL "pmu")
 	set(CPU_ARCH "microblaze")
 endif()
 
-add_subdirectory(libs)
-if(CPU STREQUAL "host")
-	add_subdirectory(libs_host)
-else()
-	add_subdirectory(libs_target)
-endif()
-
+add_subdirectory(libs_${CPU})
 add_subdirectory(programs_${CPU})

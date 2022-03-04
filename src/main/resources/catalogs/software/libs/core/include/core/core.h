@@ -51,5 +51,12 @@ EXTERN_C WARN_UNUSED_RESULT int memcmp ( const void * a, const void * b, size_t 
 EXTERN_C void * memset ( void *destination, int c, size_t num ) NON_NULL(1);
 EXTERN_C void * memcpy ( void * destination, const void * source, size_t bytes ) NON_NULL(1, 2);
 EXTERN_C void * memmove ( void * destination, const void * source, size_t bytes ) NON_NULL(1,2);
+#ifndef CPU_host
+ALWAYS_INLINE long unsigned int strlen(char const * const str) {
+	char const * p = str;
+	while(*p){ p++; };
+	return p - str;
+}
+#endif
 
 #define IKUY_DEBUG_BREAK() __builtin_trap();

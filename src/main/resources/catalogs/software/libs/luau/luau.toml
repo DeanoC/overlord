@@ -1,0 +1,10 @@
+actions = [
+    "soft_src"
+]
+
+[[process]]
+name = 'soft_src'
+processor = 'software_sources'
+sources = [
+    { in = "CMakeLists.txt", out = "CMakeLists.txt" },
+]

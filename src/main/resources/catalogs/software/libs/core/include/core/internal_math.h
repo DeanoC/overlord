@@ -1,4 +1,3 @@
-#pragma once
 // MIT Licensed (for full license see LICENSE file)
 
 // Math has no designs on being the fastest, most comprehensive or even most
@@ -78,9 +77,10 @@ CONST_EXPR ALWAYS_INLINE type Math_TwoPi##_##postfix() { return 2 * Math_Pi##_##
 CONST_EXPR ALWAYS_INLINE type Math_DegreesToRadians##_##postfix(type const val) { return val * (Math_Pi##_##postfix() / 180); } \
 CONST_EXPR ALWAYS_INLINE type Math_RadiansToDegrees##_##postfix(type const val) { return (180 * val) / Math_Pi##_##postfix(); } \
 CONST_EXPR ALWAYS_INLINE type Math_Reciprocal##_##postfix(type const a) { return 1 / a; } 									\
-CONST_EXPR ALWAYS_INLINE int Math_Sign##_##postfix(type val) { return (0 < val) - (val < 0); } 						\
-CONST_EXPR ALWAYS_INLINE type Math_Sqrt##_##postfix(type const a) { return (type)sqrt((double)a); } 				\
-CONST_EXPR ALWAYS_INLINE type Math_ReciprocalSqrt##_##postfix(type const a) { return 1 / (type)sqrt((double)a); }
+CONST_EXPR ALWAYS_INLINE int Math_Sign##_##postfix(type val) { return (0 < val) - (val < 0); }                                                                  \
+
+//CONST_EXPR ALWAYS_INLINE type Math_Sqrt##_##postfix(type const a) { return (type)sqrt((double)a); } 				\
+//CONST_EXPR ALWAYS_INLINE type Math_ReciprocalSqrt##_##postfix(type const a) { return 1 / (type)sqrt((double)a); }
 
 #if MATH_FM_USE_BUILTIN == 1
 // use gcc builtin

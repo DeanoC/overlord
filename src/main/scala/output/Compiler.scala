@@ -10,7 +10,6 @@ object Compiler {
 		if (game.cpus.isEmpty) return
 
 		println(s"Creating Compiler scripts at $out")
-		Utils.ensureDirectories(out)
 
 		val cpu_info: Set[(String, String, String)] = {
 			game.cpus.map(cpu => (
@@ -31,13 +30,13 @@ object Compiler {
 	                              out: Path): Unit = {
 		val sb = new StringBuilder
 
-		sb ++= (Utils.readFile("generate_compilers",
+		sb ++= (Utils.readFile("make_compilers",
 		                       Resources.stdResourcePath()
-			                       .resolve("catalogs/software/generate_compilers.sh"),
+			                       .resolve("catalogs/software/make_compilers.sh"),
 		                       getClass) match {
 			case Some(script) => script
 			case None         =>
-				println("ERROR: resource generate_compilers.sh not found!")
+				println("ERROR: resource make_compilers.sh not found!")
 				return
 		})
 
@@ -46,15 +45,15 @@ object Compiler {
 			if (triple.contains("none")) {
 				sb ++=
 				s"""
-					 |build_binutils $triple $$PWD/compilers
-					 |build_gcc $triple $$PWD/compilers "$gcc_flags"
+					 |build_binutils $triple $$PWD/programs_host
+					 |build_gcc $triple $$PWD/programs_host "$gcc_flags"
 					 |""".stripMargin
 			}
 		}
 
 
-		Utils.writeFile(out.resolve("generate_compilers.sh"), sb.result())
-		Utils.setFileExecutable(out.resolve(s"generate_compilers.sh"))
+		Utils.writeFile(out.resolve("make_compilers.sh"), sb.result())
+		Utils.setFileExecutable(out.resolve(s"make_compilers.sh"))
 
 	}
 
@@ -67,7 +66,7 @@ object Compiler {
 			getClass) match {
 			case Some(script) => script
 			case None         =>
-				println("ERROR: resource generate_compilers.sh not found!")
+				println("ERROR: resource make_compilers.sh not found!")
 				return
 		}
 
@@ -89,7 +88,7 @@ object Compiler {
 				}
 			}
 
-			Utils.writeFile(out.resolve("..").resolve(name + "_toolchain.cmake"), tt)
+			Utils.writeFile(out.resolve(name + "_toolchain.cmake"), tt)
 		}
 	}
 }

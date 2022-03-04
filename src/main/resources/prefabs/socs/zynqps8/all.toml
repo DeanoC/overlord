@@ -53,5 +53,3 @@ type = "program.bootrom.zynqps8"
 
 [[instance]]
 type = "program.pmu_monitor"
-
-

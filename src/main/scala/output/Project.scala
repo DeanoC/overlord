@@ -25,7 +25,7 @@ import java.nio.file.Path
 //              compilers
 //              ${cpu}_toolchain.cmake
 //              ${gamename}.svd
-//              generate_compilers.sh
+//              make_compilers.sh
 //       gate
 //
 

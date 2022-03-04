@@ -1,8 +1,7 @@
-get_filename_component(IKUY_PATH ./programs_compilers/ REALPATH)
+get_filename_component(IKUY_PATH ./programs_host/ REALPATH)
+get_filename_component(COMPILER_PATH ${IKUY_PATH}/${triple} REALPATH)
 
-get_filename_component(COMPILER_PATH ${IKUY_PATH}/compilers/${triple} REALPATH)
-
-set(GCC_VERSION "10.2.0")
+set(GCC_VERSION "11.2.0")
 set(CMAKE_SYSTEM_NAME Generic)
 
 set(CMAKE_ADDR2LINE ${COMPILER_PATH}/bin/${triple}-addr2line)

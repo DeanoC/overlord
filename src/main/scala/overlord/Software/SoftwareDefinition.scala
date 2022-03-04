@@ -18,8 +18,8 @@ object SoftwareDefinition {
 	def apply(table: Map[String, Variant], path: Path): Option[SoftwareDefinition] = {
 		if (!table.contains("software")) return None
 		val attribs = table.filter(a => a._1 match {
-			case "type" | "software" | "cpus" => false
-			case _                            => true
+			case "type" | "software" => false
+			case _                   => true
 		})
 
 		val defTypeName = Utils.toString(table("type"))

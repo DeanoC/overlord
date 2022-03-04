@@ -192,13 +192,13 @@ object Game {
 			// get chips (hardware or gateware)
 			val chipInstances               = top.children.
 				filter(_.isInstanceOf[ChipInstance]).
-				map(_.asInstanceOf[ChipInstance]).toSeq
+				map(_.asInstanceOf[ChipInstance])
 			val (setOfConnected, dm, wires) = DoChips(chipInstances, out, top)
 
 			// get software (libraries, boot rooms)
 			val softInstances = top.children.
 				filter(_.isInstanceOf[SoftwareInstance]).
-				map(_.asInstanceOf[SoftwareInstance]).toSeq
+				map(_.asInstanceOf[SoftwareInstance])
 
 			Some(Game(gameName,
 			          chipInstances ++ softInstances,

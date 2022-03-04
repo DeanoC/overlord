@@ -1,5 +1,3 @@
-#pragma once
-
 #define BITOP_FM_CREATE_UNSIGNED(postfix, type) 																										\
 CONST_EXPR ALWAYS_INLINE type BitOp_Not##_##postfix(const type a) { return ~a; } 										\
 CONST_EXPR ALWAYS_INLINE type BitOp_And##_##postfix(const type a, const type b) { return a & b; } 	\

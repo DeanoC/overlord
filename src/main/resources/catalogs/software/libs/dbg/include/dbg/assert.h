@@ -1,5 +1,7 @@
 #pragma once
 
+#include "core/core.h"
+
 #ifdef __cplusplus
 EXTERN_C
 {

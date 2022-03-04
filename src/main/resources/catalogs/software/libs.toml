@@ -2,28 +2,104 @@
 name = "core"
 type = "library.core"
 software = "libs/core/core.toml"
-shared_with_host = true
 
 [[definition]]
 name = "dbg"
 type = "library.dbg"
 software = "libs/dbg/dbg.toml"
-shared_with_host = true
 
 [[definition]]
 name = "multi_core"
 type = "library.multi_core"
 software = "libs/multi_core/multi_core.toml"
-shared_with_host = true
 
 [[definition]]
 name = "memory"
 type = "library.memory"
 software = "libs/memory/memory.toml"
-shared_with_host = true
 
 [[definition]]
 name = "utils"
 type = "library.utils"
 software = "libs/utils/utils.toml"
-shared_with_host = true
+
+[[definition]]
+name = "vfile"
+type = "library.vfile"
+software = "libs/vfile/vfile.toml"
+
+[[definition]]
+name = "vfile_memory"
+type = "library.vfile_memory"
+software = "libs/vfile_memory/vfile_memory.toml"
+
+[[definition]]
+name = "tiny_image_format"
+type = "library.tiny_image_format"
+software = "libs/tiny_image_format/tiny_image_format.toml"
+
+[[definition]]
+name = "gfx_image"
+type = "library.gfx_image"
+software = "libs/gfx_image/gfx_image.toml"
+cpus = "a53,host"
+
+[[definition]]
+name = "luau_vm"
+type = "library.luau_vm"
+software = "libs/luau_vm/luau_vm.toml"
+cpus = "a53"
+
+[[definition]]
+name = "host_platform"
+type = "library.host_platform"
+software = "libs/host_platform/host_platform.toml"
+cpus = "host"
+
+[[definition]]
+name = "host_os"
+type = "library.host_os"
+software = "libs/host_os/host_os.toml"
+cpus = "host"
+
+[[definition]]
+name = "tiny_dds"
+type = "library.tiny_dds"
+software = "libs/tiny_dds/tiny_dds.toml"
+cpus = "host"
+
+[[definition]]
+name = "tiny_ktx"
+type = "library.tiny_ktx"
+software = "libs/tiny_ktx/tiny_ktx.toml"
+cpus = "host"
+
+[[definition]]
+name = "luau"
+type = "library.luau"
+software = "libs/luau/luau.toml"
+cpus = "host"
+
+[[definition]]
+name = "hw"
+type = "library.hw"
+software = "libs/hw/hw.toml"
+cpus = "a53,r5f,pmu"
+
+[[definition]]
+name = "osservices"
+type = "library.osservices"
+software = "libs/osservices/osservices.toml"
+cpus = "a53,r5f,pmu"
+
+[[definition]]
+name = "gfxdebug"
+type = "library.gfxdebug"
+software = "libs/gfxdebug/gfxdebug.toml"
+cpus = "a53,r5f,pmu"
+
+[[definition]]
+name = "musl_math"
+type = "library.musl_math"
+software = "libs/musl_math/musl_math.toml"
+cpus = "a53,r5f"

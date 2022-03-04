@@ -9,8 +9,7 @@ import java.nio.file.Path
 import scala.collection.mutable
 
 object OutputSoftware {
-	def cpuInvariantActions(game: Game,
-	                        gatePath: Path): Unit = {
+	def cpuInvariantActions(game: Game, gatePath: Path): Unit = {
 		Game.pathStack.push(gatePath.toRealPath())
 
 		val swi = game.allSoftwareInstances
@@ -361,7 +360,7 @@ object OutputSoftware {
 	}
 
 	private def hwRegsPath(cpu: CpuInstance, out: Path) =
-		out.resolve("libs_target")
+		out.resolve("libs")
 			.resolve("hw")
 			.resolve("include")
 			.resolve("hw_regs")

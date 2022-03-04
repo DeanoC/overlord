@@ -2,17 +2,18 @@
 [[definition]]
 name = "zynqps8_display_port"
 type = "library.display_port.zynqps8"
-software = "software/libs_target/display_port/display_port.toml"
+software = "software/libs/display_port/display_port.toml"
+cpus = "a53"
 
 [[definition]]
 name = "zynqps8_dma"
 type = "library.dma.zynqps8"
-software = "software/libs_target/dma/dma.toml"
+software = "software/libs/dma/dma.toml"
 
 [[definition]]
 name = "xilinx"
 type = "library.xilinx.zynqps8"
-software = "software/libs_target/xilinx/xilinx.toml"
+software = "software/libs/xilinx/xilinx.toml"
 
 [[definition]]
 name = "ikuy_boot"

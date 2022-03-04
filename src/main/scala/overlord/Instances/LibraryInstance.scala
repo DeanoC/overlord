@@ -4,12 +4,9 @@ import ikuy_utils.Variant
 import overlord.SoftwareDefinitionTrait
 
 case class LibraryInstance(ident: String,
-                           sharedWithHost: Boolean,
-                           hostOnly: Boolean,
                            override val definition: SoftwareDefinitionTrait,
                           ) extends SoftwareInstance {
-	override val folder =
-		if (sharedWithHost) "libs" else if (hostOnly) "libs_host" else "libs_target"
+	override val folder = "libs"
 }
 
 object LibraryInstance {
@@ -24,12 +21,7 @@ object LibraryInstance {
 			return None
 		}
 
-		val sharedWithHost = attribs.contains("shared_with_host") |
-		                     definition.attributes.contains("shared_with_host")
-		val hostOnly       = attribs.contains("host_only") |
-		                     definition.attributes.contains("host_only")
-
-		val sw = LibraryInstance(ident, sharedWithHost, hostOnly, definition)
+		val sw = LibraryInstance(ident, definition)
 		sw.mergeAllAttributes(attribs)
 		Some(sw)
 	}
