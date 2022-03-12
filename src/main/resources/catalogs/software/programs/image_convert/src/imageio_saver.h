@@ -1,5 +1,9 @@
 #pragma once
 
+#include "multi_core/core_local.h"
+
+extern CORE_LOCAL(Memory_Allocator * ,imageIOAllocator);
+
 EXTERN_C bool ImageIO_CanSaveAsTGA(Image_ImageHeader const *image);
 EXTERN_C bool ImageIO_SaveAsTGA(Image_ImageHeader *image, VFile_Handle handle);
 

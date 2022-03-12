@@ -7,7 +7,7 @@
 
 #include "stb_image_write.h"
 #include "tiny_ktx.h"
-//#include "tiny_dds/tinydds.h"
+#include "tiny_dds.h"
 
 // TODO EXR
 //#include "syoyo/tiny_exr.hpp"
@@ -18,7 +18,7 @@ static void stbIoCallbackWrite(void *user, void *data, int size) {
 	VFile_Write(handle, data, size);
 }
 
-bool Image_SaveAsTGA(Image_ImageHeader *image, VFile_Handle handle) {
+bool ImageIO_SaveAsTGA(Image_ImageHeader *image, VFile_Handle handle) {
 	if (!handle) {
 		return false;
 	}
@@ -47,7 +47,7 @@ bool Image_SaveAsTGA(Image_ImageHeader *image, VFile_Handle handle) {
 	}
 }
 
-bool Image_SaveAsBMP(Image_ImageHeader *image, VFile_Handle handle) {
+bool ImageIO_SaveAsBMP(Image_ImageHeader *image, VFile_Handle handle) {
 	if (!handle) {
 		return false;
 	}
@@ -76,7 +76,7 @@ bool Image_SaveAsBMP(Image_ImageHeader *image, VFile_Handle handle) {
 	}
 }
 
-bool Image_SaveAsPNG(Image_ImageHeader *image, VFile_Handle handle) {
+bool ImageIO_SaveAsPNG(Image_ImageHeader *image, VFile_Handle handle) {
 
 
 	if (!handle) {
@@ -105,7 +105,7 @@ bool Image_SaveAsPNG(Image_ImageHeader *image, VFile_Handle handle) {
 	}
 }
 
-bool Image_SaveAsJPG(Image_ImageHeader *image, VFile_Handle handle) {
+bool ImageIO_SaveAsJPG(Image_ImageHeader *image, VFile_Handle handle) {
 
 
 	if (!handle) {
@@ -135,7 +135,7 @@ bool Image_SaveAsJPG(Image_ImageHeader *image, VFile_Handle handle) {
 	}
 }
 /*
-bool Image_SaveAsHDR(Image_ImageHeader *image, VFile_Handle handle) {
+bool ImageIO_SaveAsHDR(Image_ImageHeader *image, VFile_Handle handle) {
 
 	if (!handle) {
 		return false;
@@ -171,12 +171,10 @@ static void tinyktxCallbackWrite(void *user, void const *data, size_t size) {
 	VFile_Write(handle, data, size);
 }
 
-bool Image_SaveAsKTX(Image_ImageHeader *image, VFile_Handle handle) {
+bool ImageIO_SaveAsKTX(Image_ImageHeader *image, VFile_Handle handle) {
 
 	TinyKtx_WriteCallbacks callback = {
 			&tinyktxCallbackError,
-			nullptr,
-			nullptr,
 			&tinyktxCallbackWrite,
 	};
 
@@ -214,7 +212,7 @@ bool Image_SaveAsKTX(Image_ImageHeader *image, VFile_Handle handle) {
 }
 
 
-bool Image_CanSaveAsTGA(Image_ImageHeader const *image) {
+bool ImageIO_CanSaveAsTGA(Image_ImageHeader const *image) {
 	if(!Image_Is1D(image) || !Image_Is2D(image)) return false;
 
 	switch (image->format) {
@@ -231,7 +229,7 @@ bool Image_CanSaveAsTGA(Image_ImageHeader const *image) {
 	}
 }
 
-bool Image_CanSaveAsBMP(Image_ImageHeader const *image) {
+bool ImageIO_CanSaveAsBMP(Image_ImageHeader const *image) {
 	if(!Image_Is1D(image) || !Image_Is2D(image)) return false;
 
 	switch (image->format) {
@@ -247,7 +245,7 @@ bool Image_CanSaveAsBMP(Image_ImageHeader const *image) {
 		default: return false;
 	}
 }
-bool Image_CanSaveAsPNG(Image_ImageHeader const *image) {
+bool ImageIO_CanSaveAsPNG(Image_ImageHeader const *image) {
 	if(!Image_Is1D(image) || !Image_Is2D(image)) return false;
 
 	switch (image->format) {
@@ -264,7 +262,7 @@ bool Image_CanSaveAsPNG(Image_ImageHeader const *image) {
 	}
 
 }
-bool Image_CanSaveAsJPG(Image_ImageHeader const *image) {
+bool ImageIO_CanSaveAsJPG(Image_ImageHeader const *image) {
 	if(!Image_Is1D(image) || !Image_Is2D(image)) return false;
 
 	switch (image->format) {
@@ -282,14 +280,14 @@ bool Image_CanSaveAsJPG(Image_ImageHeader const *image) {
 	}
 }
 
-bool Image_CanSaveAsKTX(Image_ImageHeader const *image) {
+bool ImageIO_CanSaveAsKTX(Image_ImageHeader const *image) {
 	if(Image_Is3D(image) && Image_IsArray(image)) return false;
 
 	TinyKtx_Format fmt = TinyImageFormat_ToTinyKtxFormat(image->format);
 	return !(fmt == TKTX_UNDEFINED);
 
 }
-bool Image_CanSaveAsHDR(Image_ImageHeader const *image) {
+bool ImageIO_CanSaveAsHDR(Image_ImageHeader const *image) {
 	if(!Image_Is1D(image) || !Image_Is2D(image)) return false;
 
 	switch (image->format) {
@@ -302,13 +300,11 @@ bool Image_CanSaveAsHDR(Image_ImageHeader const *image) {
 			return false;
 	}
 }
-/*
-bool Image_SaveAsDDS(Image_ImageHeader *image, VFile_Handle handle) {
 
-	TinyDDS_WriteCallbacks callback{
+bool ImageIO_SaveAsDDS(Image_ImageHeader *image, VFile_Handle handle) {
+
+	TinyDDS_WriteCallbacks callback = {
 			&tinyktxCallbackError,
-			&tinyktxCallbackAlloc,
-			&tinyktxCallbackFree,
 			&tinyktxCallbackWrite,
 	};
 
@@ -316,8 +312,8 @@ bool Image_SaveAsDDS(Image_ImageHeader *image, VFile_Handle handle) {
 	if(fmt == TDDS_UNDEFINED) return false;
 
 	// mipmaps or no linked only
-	if(image->nextType != Image_NextType::Image_NT_MipMap &&
-	   image->nextType != Image_NextType::Image_NT_None	) {
+	if(image->nextType != Image_NT_MipMap &&
+	   image->nextType != Image_NT_None	) {
 		return false;
 	}
 	uint32_t numMipmaps = (uint32_t)Image_MipMapCountOf(image);
@@ -345,9 +341,8 @@ bool Image_SaveAsDDS(Image_ImageHeader *image, VFile_Handle handle) {
 	                          mipmapsizes,
 	                          mipmaps );
 }
-*/
-/*
-bool Image_CanSaveAsDDS(Image_ImageHeader const *image) {
+
+bool ImageIO_CanSaveAsDDS(Image_ImageHeader const *image) {
 	if(Image_Is3D(image) && Image_IsArray(image)) return false;
 
 	TinyDDS_Format fmt = TinyImageFormat_ToTinyDDSFormat(image->format);
@@ -355,4 +350,4 @@ bool Image_CanSaveAsDDS(Image_ImageHeader const *image) {
 	// can be used. Need to add support to check for this
 	return !(fmt == TDDS_UNDEFINED);
 }
-*/
+

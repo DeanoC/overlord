@@ -5,6 +5,12 @@
 #include "tiny_image_format/tiny_image_format_base.h"
 #include "tiny_image_format/tiny_image_format_query.h"
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+
 // Images can have a chain of related images, this type declares what if any
 // the next pointer are. Image_IT_None means no next images
 // The user is responsible to setting the next type and alloc the next
@@ -55,7 +61,7 @@ typedef struct Image_ImageHeader {
 
 	union {
 		uint64_t pad; // ensure always enough space for 64 bit if saved to disk
-		struct Image_ImageHeader const *nextImage;
+		struct Image_ImageHeader *nextImage;
 	};
 	struct Memory_Allocator* memoryAllocator;
 
@@ -64,92 +70,74 @@ typedef struct Image_ImageHeader {
 // Image are fundamentally 4D arrays
 // 'helper' functions in create.h let you
 // create and use them in more familiar texture terms
-EXTERN_C Image_ImageHeader const *Image_Create(uint32_t width,
-																							 uint32_t height,
-																							 uint32_t depth,
-																							 uint32_t slices,
-																							 enum TinyImageFormat format,
-																							 struct Memory_Allocator* memoryAllocator);
-EXTERN_C Image_ImageHeader const *Image_CreateNoClear(uint32_t width,
-																											uint32_t height,
-																											uint32_t depth,
-																											uint32_t slices,
-																											enum TinyImageFormat format,
-																											struct Memory_Allocator* memoryAllocator);
-EXTERN_C void Image_Destroy(Image_ImageHeader const *image);
+Image_ImageHeader *Image_Create(uint32_t width,
+																 uint32_t height,
+																 uint32_t depth,
+																 uint32_t slices,
+																 enum TinyImageFormat format,
+																 struct Memory_Allocator* memoryAllocator);
+Image_ImageHeader *Image_CreateNoClear(uint32_t width,
+																				uint32_t height,
+																				uint32_t depth,
+																				uint32_t slices,
+																				enum TinyImageFormat format,
+																				struct Memory_Allocator* memoryAllocator);
+void Image_Destroy(Image_ImageHeader *image);
 
 // if you want to use the calculation fields without an actual image
 // this will fill in a valid header with no data or allocation
-EXTERN_C void Image_FillHeader(uint32_t width,
+void Image_FillHeader(uint32_t width,
 															 uint32_t height,
 															 uint32_t depth,
 															 uint32_t slices,
 															 enum TinyImageFormat format,
 															 Image_ImageHeader *header);
 
-EXTERN_C Image_ImageHeader const* Image_CreateHeaderOnly(uint32_t width,
-																												 uint32_t height,
-																												 uint32_t depth,
-																												 uint32_t slices,
-																												 enum TinyImageFormat format,
-																												 struct Memory_Allocator* memoryAllocator);
+Image_ImageHeader * Image_CreateHeaderOnly(uint32_t width,
+																					 uint32_t height,
+																					 uint32_t depth,
+																					 uint32_t slices,
+																					 enum TinyImageFormat format,
+																					 struct Memory_Allocator* memoryAllocator);
 
-EXTERN_C inline void *Image_RawDataPtr(Image_ImageHeader const *image) {
+ALWAYS_INLINE void *Image_RawDataPtr(Image_ImageHeader const *image) {
 	assert(image != NULL);
 	assert((image->flags & Image_Flag_HeaderOnly) == 0)
 	return (void *) (image + 1);
 }
 
-EXTERN_C bool Image_GetBlocksAtF(Image_ImageHeader const *image, float *pixels, size_t blockCounts, size_t index);
-EXTERN_C bool Image_SetBlocksAtF(Image_ImageHeader const *image, float const *pixels, size_t blockCount, size_t index);
+bool Image_GetBlocksAtF(Image_ImageHeader const *image, float *pixels, size_t blockCounts, size_t index);
+bool Image_SetBlocksAtF(Image_ImageHeader *image, float const *pixels, size_t blockCount, size_t index);
 
-EXTERN_C bool Image_GetPixelAtF(Image_ImageHeader const *image, float *pixel, size_t index);
-EXTERN_C bool Image_SetPixelAtF(Image_ImageHeader const *image, float const *pixel, size_t index);
-EXTERN_C bool Image_GetRowAtF(Image_ImageHeader const *image, float *pixels, size_t index);
-EXTERN_C bool Image_SetRowAtF(Image_ImageHeader const *image, float const *pixels, size_t index);
+bool Image_GetPixelAtF(Image_ImageHeader const *image, float *pixel, size_t index);
+bool Image_SetPixelAtF(Image_ImageHeader *image, float const *pixel, size_t index);
+bool Image_GetRowAtF(Image_ImageHeader const *image, float *pixels, size_t index);
+bool Image_SetRowAtF(Image_ImageHeader *image, float const *pixels, size_t index);
 
-EXTERN_C bool Image_GetBlocksAtD(Image_ImageHeader const *image, double *pixels, size_t blockCounts, size_t index);
-EXTERN_C bool Image_SetBlocksAtD(Image_ImageHeader const *image, double const *pixels, size_t blockCount, size_t index);
+bool Image_GetBlocksAtD(Image_ImageHeader const *image, double *pixels, size_t blockCounts, size_t index);
+bool Image_SetBlocksAtD(Image_ImageHeader *image, double const *pixels, size_t blockCount, size_t index);
 
-EXTERN_C bool Image_GetPixelAtD(Image_ImageHeader const *image, double *pixel, size_t index);
-EXTERN_C bool Image_SetPixelAtD(Image_ImageHeader const *image, double const *pixel, size_t index);
-EXTERN_C bool Image_GetRowAtD(Image_ImageHeader const *image, double *pixels, size_t index);
-EXTERN_C bool Image_SetRowAtD(Image_ImageHeader const *image, double const *pixels, size_t index);
-
-EXTERN_C void Image_CopyImage(Image_ImageHeader const *src, Image_ImageHeader const *dst);
-EXTERN_C void Image_CopySlice(Image_ImageHeader const *src,
-																		uint32_t sw,
-																		Image_ImageHeader const *dst,
-																		uint32_t dw);
-EXTERN_C void Image_CopyPage(Image_ImageHeader const *src,
-																	 uint32_t sz, uint32_t sw,
-																	 Image_ImageHeader const *dst,
-																	 uint32_t dz, uint32_t dw);
-EXTERN_C void Image_CopyRow(Image_ImageHeader const *src,
-																	uint32_t sy, uint32_t sz, uint32_t sw,
-																	Image_ImageHeader const *dst,
-																	uint32_t dy, uint32_t dz, uint32_t dw);
-EXTERN_C void Image_CopyPixel(Image_ImageHeader const *src,
-																		uint32_t sx, uint32_t sy, uint32_t sz, uint32_t sw,
-																		Image_ImageHeader const *dst,
-																		uint32_t dx, uint32_t dy, uint32_t dz, uint32_t dw);
+bool Image_GetPixelAtD(Image_ImageHeader const *image, double *pixel, size_t index);
+bool Image_SetPixelAtD(Image_ImageHeader *image, double const *pixel, size_t index);
+bool Image_GetRowAtD(Image_ImageHeader const *image, double *pixels, size_t index);
+bool Image_SetRowAtD(Image_ImageHeader *image, double const *pixels, size_t index);
 
 
-EXTERN_C inline size_t Image_PixelCountPerRowOf(Image_ImageHeader const *image) {
+ALWAYS_INLINE size_t Image_PixelCountPerRowOf(Image_ImageHeader const *image) {
 	return image->width;
 }
-EXTERN_C inline size_t Image_PixelCountPerPageOf(Image_ImageHeader const *image) {
+ALWAYS_INLINE size_t Image_PixelCountPerPageOf(Image_ImageHeader const *image) {
 	return image->width * image->height;
 }
-EXTERN_C inline size_t Image_PixelCountPerSliceOf(Image_ImageHeader const *image) {
+ALWAYS_INLINE size_t Image_PixelCountPerSliceOf(Image_ImageHeader const *image) {
 	return image->width * image->height * image->depth;
 }
-EXTERN_C inline size_t Image_PixelCountOf(Image_ImageHeader const *image) {
+ALWAYS_INLINE size_t Image_PixelCountOf(Image_ImageHeader const *image) {
 	return image->width * image->height * image->depth * image->slices;
 }
-EXTERN_C size_t Image_PixelCountOfImageChainOf(Image_ImageHeader const *image);
+size_t Image_PixelCountOfImageChainOf(Image_ImageHeader const *image);
 
-EXTERN_C inline size_t Image_CalculateIndex(Image_ImageHeader const *image,
+ALWAYS_INLINE size_t Image_CalculateIndex(Image_ImageHeader const *image,
 																									uint32_t x,
 																									uint32_t y,
 																									uint32_t z,
@@ -165,7 +153,7 @@ EXTERN_C inline size_t Image_CalculateIndex(Image_ImageHeader const *image,
 	size_t const index = (slice * size3D) + (z * size2D) + (y * size1D) + x;
 	return index;
 }
-EXTERN_C inline size_t Image_GetBlockIndex(Image_ImageHeader const *image,
+ALWAYS_INLINE size_t Image_GetBlockIndex(Image_ImageHeader const *image,
 																								 uint32_t x,
 																								 uint32_t y,
 																								 uint32_t z,
@@ -188,24 +176,27 @@ EXTERN_C inline size_t Image_GetBlockIndex(Image_ImageHeader const *image,
 	return index;
 }
 
-EXTERN_C inline size_t Image_ByteCountPerRowOf(Image_ImageHeader const *image) {
+ALWAYS_INLINE size_t Image_ByteCountPerRowOf(Image_ImageHeader const *image) {
 	assert(image);
 
 	return (Image_PixelCountPerRowOf(image) * TinyImageFormat_BitSizeOfBlock(image->format)) /
 			(TinyImageFormat_PixelCountOfBlock(image->format) * 8);
-	}
-EXTERN_C inline size_t Image_ByteCountPerPageOf(Image_ImageHeader const *image) {
+}
+
+ALWAYS_INLINE size_t Image_ByteCountPerPageOf(Image_ImageHeader const *image) {
 	assert(image);
 	return (Image_PixelCountPerPageOf(image) * TinyImageFormat_BitSizeOfBlock(image->format)) /
 			(TinyImageFormat_PixelCountOfBlock(image->format) * 8);
 }
-EXTERN_C inline size_t Image_ByteCountPerSliceOf(Image_ImageHeader const *image) {
+
+ALWAYS_INLINE size_t Image_ByteCountPerSliceOf(Image_ImageHeader const *image) {
 	assert(image);
 	return (Image_PixelCountPerSliceOf(image) * TinyImageFormat_BitSizeOfBlock(image->format)) /
 				(TinyImageFormat_PixelCountOfBlock(image->format) * 8);
 
 }
-EXTERN_C inline size_t Image_ByteCountOf(Image_ImageHeader const *image) {
+
+ALWAYS_INLINE size_t Image_ByteCountOf(Image_ImageHeader const *image) {
 	assert(image);
 
 	return (Image_PixelCountOf(image) * TinyImageFormat_BitSizeOfBlock(image->format)) /
@@ -213,32 +204,36 @@ EXTERN_C inline size_t Image_ByteCountOf(Image_ImageHeader const *image) {
 
 }
 
-EXTERN_C size_t Image_ByteCountOfImageChainOf(Image_ImageHeader const *image);
+size_t Image_ByteCountOfImageChainOf(Image_ImageHeader const *image);
 
-EXTERN_C size_t Image_BytesRequiredForMipMapsOf(Image_ImageHeader const *image);
+size_t Image_BytesRequiredForMipMapsOf(Image_ImageHeader const *image);
 
-EXTERN_C size_t Image_LinkedImageCountOf(Image_ImageHeader const *image);
+size_t Image_LinkedImageCountOf(Image_ImageHeader const *image);
 
-EXTERN_C size_t Image_MipMapCountOf(Image_ImageHeader const *image);
+size_t Image_MipMapCountOf(Image_ImageHeader const *image);
 
-EXTERN_C Image_ImageHeader const *Image_LinkedImageOf(Image_ImageHeader const *image, size_t const index);
+Image_ImageHeader const *Image_LinkedImageOf(Image_ImageHeader const *image, size_t const index);
 
-EXTERN_C inline bool Image_Is1D(Image_ImageHeader const *image) {
+ALWAYS_INLINE bool Image_Is1D(Image_ImageHeader const *image) {
 	return image->height == 1 && image->depth == 1;
 }
-EXTERN_C inline bool Image_Is2D(Image_ImageHeader const *image) {
+ALWAYS_INLINE bool Image_Is2D(Image_ImageHeader const *image) {
 	return image->height != 1 && image->depth == 1;
 }
-EXTERN_C inline bool Image_Is3D(Image_ImageHeader const *image) {
+ALWAYS_INLINE bool Image_Is3D(Image_ImageHeader const *image) {
 	return image->depth != 1;
 }
-EXTERN_C inline bool Image_IsArray(Image_ImageHeader const *image) {
+ALWAYS_INLINE bool Image_IsArray(Image_ImageHeader const *image) {
 	return image->slices != 1;
 }
-EXTERN_C inline bool Image_IsCubemap(Image_ImageHeader const *image) {
+ALWAYS_INLINE bool Image_IsCubemap(Image_ImageHeader const *image) {
 	return image->flags & Image_Flag_Cubemap;
 }
 
-EXTERN_C inline bool Image_HasPackedMipMaps(Image_ImageHeader const *image) {
+ALWAYS_INLINE bool Image_HasPackedMipMaps(Image_ImageHeader const *image) {
 	return image->flags & Image_Flag_PackedMipMaps;
 }
+
+#ifdef __cplusplus
+}
+#endif

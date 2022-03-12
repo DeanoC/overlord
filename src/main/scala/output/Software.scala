@@ -107,22 +107,30 @@ object Software {
 	private def generateSubdirMake(out: Path, excludes: Seq[String] = Seq()): Unit = {
 		val sb = new StringBuilder
 		sb ++=
-		"""file(GLOB _all LIST_DIRECTORIES true RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-			|CONFIGURE_DEPENDS * )
-			|list(REMOVE_ITEM _all "CMakeLists.txt" )
+		"""
+			|if(DEFINED ONLY_PROGRAM)
+			|   add_subdirectory(${ONLY_PROGRAM})
+			|else()
+			|   file(GLOB _all LIST_DIRECTORIES true RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+			|   CONFIGURE_DEPENDS * )
+			|   list(REMOVE_ITEM _all "CMakeLists.txt" )
 			|""".stripMargin
 
 		for (ed <- excludes) {
 			sb ++=
-			f"""list(REMOVE_ITEM _all "${ed}")
+			f"""  list(REMOVE_ITEM _all "${ed}")
 				 |""".stripMargin
 		}
 
 		sb ++=
 		"""
-			|foreach(sd ${_all})
+			| foreach(sd ${_all})
 			|   add_subdirectory(${sd})
-			|endforeach()""".stripMargin
+			| endforeach()
+			|
+			|endif()
+			|
+			|""".stripMargin
 
 		Utils.writeFile(out, sb.result())
 	}

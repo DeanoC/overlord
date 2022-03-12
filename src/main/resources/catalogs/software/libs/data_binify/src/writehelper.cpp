@@ -1,167 +1,161 @@
-#include "al2o3_platform/platform.h"
-#include "data_binify/writehelper.hpp"
-
+#include "core/core.h"
+#include "data_binify/write_helper.hpp"
 
 namespace Binify {
 
 WriteHelper::WriteHelper()
 {
 	// system labels
-	ReserveLabel("stringTable");
-	ReserveLabel("stringTableEnd");
-	ReserveLabel("chunks");
-	ReserveLabel("chunksEnd");
+	reserveLabel("stringTable");
+	reserveLabel("stringTableEnd");
+	reserveLabel("chunks");
+	reserveLabel("chunksEnd");
 
-	ReserveLabel("beginEnd");
+	reserveLabel("beginEnd");
 
 	buffer.reserve(1024*1024); // reserve 1 MB output buffer
 }
 
 char const* WriteHelper::c_str() {
-	char* tmp = (char*)MEMORY_TEMP_MALLOC(buffer.size()+1);
-	memcpy(tmp, buffer.data(), buffer.size());
-	tmp[buffer.size()] = 0;
-	outputString = tinystl::string(tmp);
-	MEMORY_TEMP_FREE(tmp);
-
+	outputString = std::string(buffer.data(), buffer.size());
 	return outputString.c_str();
 }
 
-void WriteHelper::SetVariable(tinystl::string const &name,
+void WriteHelper::setVariable(std::string const &name,
 															int64_t value,
 															bool pass0,
-															tinystl::string comment_,
+															std::string comment_,
 															bool noCommentEndStatement_) {
-	SetVariableToExpression(name, tinystl::to_string(value), pass0, comment_, noCommentEndStatement_);
+	setVariableToExpression(name, std::to_string(value), pass0, comment_, noCommentEndStatement_);
 }
 
-void WriteHelper::SetVariableToExpression(tinystl::string const &name,
-																					tinystl::string const &exp,
+void WriteHelper::setVariableToExpression(std::string const &name,
+																					std::string const &exp,
 																					bool pass0,
-																					tinystl::string comment_,
+																					std::string comment_,
 																					bool noCommentEndStatement_) {
 
 	variables.insert(name);
 
 	// pass 0 variables output the last set in pass 0, so work for counters
 	if (pass0) {
-		fmt::format_to(buffer, "*VAR_{}* {}", name.c_str(), exp.c_str());
+		fmt::format_to(std::back_inserter(buffer), "*VAR_{}* {}", name.c_str(), exp.c_str());
 	} else {
-		fmt::format_to(buffer, "VAR_{} = {}", name.c_str(), exp.c_str());
+		fmt::format_to(std::back_inserter(buffer), "VAR_{} = {}", name.c_str(), exp.c_str());
 	}
-	Comment(comment_, noCommentEndStatement_);
+	comment(comment_, noCommentEndStatement_);
 }
 
-void WriteHelper::SetConstant(tinystl::string const& name, int64_t value, tinystl::string const comment_, bool noCommentEndStatement_)
+void WriteHelper::setConstant(std::string const& name, int64_t value, std::string const comment_, bool noCommentEndStatement_)
 {
-	SetConstantToExpression(name, tinystl::to_string(value), comment_, noCommentEndStatement_);
+	setConstantToExpression(name, std::to_string(value), comment_, noCommentEndStatement_);
 }
 
-void WriteHelper::SetConstantToExpression(tinystl::string const& name, tinystl::string const& exp, tinystl::string const comment_, bool noCommentEndStatement_)
+void WriteHelper::setConstantToExpression(std::string const& name, std::string const& exp, std::string const comment_, bool noCommentEndStatement_)
 {
 	assert(constants.find(name) == constants.end());
 	constants.insert(name);
-	fmt::format_to(buffer, "*CONST_{}* {}", name.c_str(), exp.c_str());
-	Comment(comment_, noCommentEndStatement_);
+	fmt::format_to(std::back_inserter(buffer), "*CONST_{}* {}", name.c_str(), exp.c_str());
+	comment(comment_, noCommentEndStatement_);
 }
-tinystl::string WriteHelper::GetVariable(tinystl::string const& name)
+std::string WriteHelper::getVariable(std::string const& name)
 {
 	assert(variables.find(name) != variables.end());
 	return " VAR_" + name;
 }
 
-tinystl::string WriteHelper::GetConstant(tinystl::string const& name)
+std::string WriteHelper::getConstant(std::string const& name)
 {
 	assert(constants.find(name) != constants.end());
 	return " CONST_" + name;
 }
 
-void WriteHelper::IncrementVariable(tinystl::string const& str_, tinystl::string const comment_, bool noCommentEndStatement_)
+void WriteHelper::incrementVariable(std::string const& str_, std::string const comment_, bool noCommentEndStatement_)
 {
-	tinystl::string var = GetVariable(str_);
-	SetVariableToExpression(str_, var + "+ 1");
-	Comment(comment_, noCommentEndStatement_);
+	std::string var = getVariable(str_);
+	setVariableToExpression(str_, var + "+ 1");
+	comment(comment_, noCommentEndStatement_);
 }
 
-void WriteHelper::AddEnum(tinystl::string const& name)
+void WriteHelper::addEnum(std::string const& name)
 {
 	assert(enums.find(name) == enums.end());
 	enums[name] = {};
 }
 
-void WriteHelper::AddEnumValue(tinystl::string const& name, tinystl::string const& value_name, uint64_t value, tinystl::string const comment_, bool noCommentEndStatement_)
+void WriteHelper::addEnumValue(std::string const& name, std::string const& value_name, uint64_t value, std::string const comment_, bool noCommentEndStatement_)
 {
 	assert(enums.find(name) != enums.end());
 	auto& e = enums[name];
 	assert(e.find(value_name) == e.end());
 	e[value_name] = value;
-	SetConstant(name + "_" + value_name, value,comment_, noCommentEndStatement_);
+	setConstant(name + "_" + value_name, value,comment_, noCommentEndStatement_);
 }
 
-tinystl::string WriteHelper::GetEnumValue(tinystl::string const& name, tinystl::string const& value_name)
+std::string WriteHelper::getEnumValue(std::string const& name, std::string const& value_name)
 {
 	assert(enums.find(name) != enums.end());
 	auto& e = enums[name];
 	assert(e.find(value_name) != e.end());
 
-	return GetConstant(name + "_" + value_name);
+	return getConstant(name + "_" + value_name);
 }
 
-void WriteHelper::WriteEnum(tinystl::string const& name, tinystl::string const& value_name, tinystl::string const comment_, bool noCommentEndStatement_)
+void WriteHelper::writeEnum(std::string const& name, std::string const& value_name, std::string const comment_, bool noCommentEndStatement_)
 {
-	fmt::format_to(buffer, "{}", GetEnumValue(name, value_name).c_str());
-	Comment(comment_, noCommentEndStatement_);
+	fmt::format_to(std::back_inserter(buffer), "{}", getEnumValue(name, value_name).c_str());
+	comment(comment_, noCommentEndStatement_);
 }
 
-void WriteHelper::WriteFlags(tinystl::string const& name, uint64_t flags, tinystl::string const comment_, bool noCommentEndStatement_)
+void WriteHelper::writeFlags(std::string const& name, uint64_t flags, std::string const comment_, bool noCommentEndStatement_)
 {
 	assert(enums.find(name) != enums.end());
 	auto& e = enums[name];
-	fmt::format_to(buffer, "0");
+	fmt::format_to(std::back_inserter(buffer), "0");
 	for(auto const en : e)
 	{
 		if(flags & en.second)
 		{
-			fmt::format_to(buffer, " | {}", GetEnumValue(name, en.first).c_str());
+			fmt::format_to(std::back_inserter(buffer), " | {}", getEnumValue(name, en.first).c_str());
 		}
 	}
-	Comment(comment_, noCommentEndStatement_);
+	comment(comment_, noCommentEndStatement_);
 }
 
-void WriteHelper::Comment(tinystl::string const& comment, bool noCommentEndStatement) {
+void WriteHelper::comment(std::string const& comment, bool noCommentEndStatement) {
 	if (!comment.empty())
 	{
-		fmt::format_to(buffer, " // {}\n", comment.c_str());
+		fmt::format_to(std::back_inserter(buffer), " // {}\n", comment.c_str());
 	}
 	else if(noCommentEndStatement)
 	{
-		fmt::format_to(buffer, "\n");
+		fmt::format_to(std::back_inserter(buffer), "\n");
 	}
 }
 
-void WriteHelper::AllowNan(bool yesno)
+void WriteHelper::allowNan(bool yesno)
 {
-	fmt::format_to(buffer, ".allownan {}\n", (yesno ? "1" : "0"));
+	fmt::format_to(std::back_inserter(buffer), ".allownan {}\n", (yesno ? "1" : "0"));
 }
 
-void WriteHelper::AllowInfinity(bool yesno)
+void WriteHelper::allowInfinity(bool yesno)
 {
-	fmt::format_to(buffer, ".allowinfinity {}\n", (yesno ? "1" : "0"));
+	fmt::format_to(std::back_inserter(buffer), ".allowinfinity {}\n", (yesno ? "1" : "0"));
 }
 
-void WriteHelper::Align(int i)
+void WriteHelper::align(int i)
 {
-	fmt::format_to(buffer, ".align {}\n", tinystl::to_string(i).c_str());
+	fmt::format_to(std::back_inserter(buffer), ".align {}\n", std::to_string(i).c_str());
 }
 
-void WriteHelper::Align()
+void WriteHelper::align()
 {
-	Align(addressLen / 8);
+	align(addressLen / 8);
 }
 
-void WriteHelper::ReserveLabel(tinystl::string const& name, bool makeDefault)
+void WriteHelper::reserveLabel(std::string const& name, bool makeDefault)
 {
-	tinystl::string label = name;
+	std::string label = name;
 	assert(labels.find(label) == labels.end());
 	labels.insert(label);
 
@@ -171,32 +165,32 @@ void WriteHelper::ReserveLabel(tinystl::string const& name, bool makeDefault)
 	}
 }
 
-void WriteHelper::WriteLabel(tinystl::string const& name, bool reserve, tinystl::string const comment_, bool noCommentEndStatement_)
+void WriteHelper::writeLabel(std::string const& name, bool reserve, std::string const comment_, bool noCommentEndStatement_)
 {
 	if (reserve)
 	{
-		ReserveLabel(name);
+		reserveLabel(name);
 	}
 
 	assert(labels.find(name) != labels.end());
-	Align();
-	fmt::format_to(buffer, "{}:", name.c_str());
-	Comment(comment_, noCommentEndStatement_);
+	align();
+	fmt::format_to(std::back_inserter(buffer), "{}:", name.c_str());
+	comment(comment_, noCommentEndStatement_);
 }
 
-void WriteHelper::UseLabel(tinystl::string const& name, tinystl::string baseBlock, bool reserve, bool addFixup,  tinystl::string const comment_, bool noCommentEndStatement_)
+void WriteHelper::useLabel(std::string const& name, std::string baseBlock, bool reserve, bool addFixup,  std::string const comment_, bool noCommentEndStatement_)
 {
 	if (reserve)
 	{
-		ReserveLabel(name);
+		reserveLabel(name);
 	}
 	assert(labels.find(name) != labels.end());
 
 	if (addFixup)
 	{
-		tinystl::string fixupLabel = "FIXUP_" + tinystl::to_string(fixups.size());
+		std::string fixupLabel = "FIXUP_" + std::to_string(fixups.size());
 		fixups.push_back(fixupLabel);
-		WriteLabel(fixupLabel, true);
+		writeLabel(fixupLabel, true);
 	}
 
 	if (baseBlock.empty())
@@ -205,34 +199,34 @@ void WriteHelper::UseLabel(tinystl::string const& name, tinystl::string baseBloc
 	}
 	assert(name != baseBlock);
 
-	fmt::format_to(buffer, ".fixip {} - {}", name.c_str(), baseBlock.c_str());
-	Comment(comment_, noCommentEndStatement_);
+	fmt::format_to(std::back_inserter(buffer), ".fixip {} - {}", name.c_str(), baseBlock.c_str());
+	comment(comment_, noCommentEndStatement_);
 }
 
-void WriteHelper::SetStringTableBase(tinystl::string const& label)
+void WriteHelper::setStringTableBase(std::string const& label)
 {
 	stringTableBase = label;
 }
 
-void WriteHelper::AddString(tinystl::string_view str_)
+void WriteHelper::addString(std::string_view str_)
 {
-	tinystl::string str = tinystl::string(str_);
-	tinystl::string stringLabel = AddStringToTable(str);
-	UseLabel(stringLabel, stringTableBase, false, true, str);
+	std::string str = std::string(str_);
+	std::string stringLabel = addStringToTable(str);
+	useLabel(stringLabel, stringTableBase, false, true, str);
 }
 
-tinystl::string WriteHelper::AddStringToTable(tinystl::string const& str)
+std::string WriteHelper::addStringToTable(std::string const& str)
 {
-	tinystl::string stringLabel;
+	std::string stringLabel;
 	// dedup strings
 	if (reverseStringTable.find(str) == reverseStringTable.end())
 	{
-		stringLabel = "STR_" + NameToLabel(str);
+		stringLabel = "STR_" + nameToLabel(str);
 
 		labelToStringTable[stringLabel] = str;
 		reverseStringTable[str] = stringLabel;
 
-		ReserveLabel(stringLabel);
+		reserveLabel(stringLabel);
 	}
 	else
 	{
@@ -241,9 +235,9 @@ tinystl::string WriteHelper::AddStringToTable(tinystl::string const& str)
 	return stringLabel;
 }
 
-tinystl::string WriteHelper::NameToLabel(tinystl::string const& name)
+std::string WriteHelper::nameToLabel(std::string const& name)
 {
-	tinystl::string clean = name;
+	std::string clean = name;
 	for(auto& ch : clean)
 	{
 		if(!std::isdigit(ch) && !std::isalpha(ch))
@@ -255,85 +249,86 @@ tinystl::string WriteHelper::NameToLabel(tinystl::string const& name)
 	return clean;
 }
 
-void WriteHelper::MergeStringTable(WriteHelper& other)
+void WriteHelper::mergeStringTable(WriteHelper& other)
 {
 	for(auto const& en :other.labelToStringTable)
 	{
-		tinystl::string newLabel = AddStringToTable(en.second);
+		std::string newLabel = addStringToTable(en.second);
 		assert(newLabel == en.first);
 		assert(labelToStringTable.find(en.first) != labelToStringTable.end());
 	}
 }
 
-void WriteHelper::FinishStringTable()
+void WriteHelper::finishStringTable()
 {
-	Align();
-	WriteLabel("stringTable");
+	align();
+	writeLabel("stringTable");
 
 	for(auto const& en : labelToStringTable)
 	{
-		WriteLabel(en.first);
-		fmt::format_to(buffer, "\"{}\", 0\n", en.second.c_str());
+		writeLabel(en.first);
+		fmt::format_to(std::back_inserter(buffer), "\"{}\", 0\n", en.second.c_str());
 	}
 
-	WriteLabel("stringTableEnd");
+	writeLabel("stringTableEnd");
 }
 
-void WriteHelper::SizeOfBlock(tinystl::string const& name, tinystl::string const comment_, bool noCommentEndStatement_)
+void WriteHelper::sizeOfBlock(std::string const& name, std::string const comment_, bool noCommentEndStatement_)
 {
-	tinystl::string const nameend = name + "End";
+	std::string const nameend = name + "End";
 
 	assert(labels.find(name) != labels.end());
 	assert(labels.find(nameend) != labels.end());
-	fmt::format_to(buffer, "{} - {}", nameend.c_str(), name.c_str());
+	fmt::format_to(std::back_inserter(buffer), "{} - {}", nameend.c_str(), name.c_str());
 
-	Comment(comment_, noCommentEndStatement_);
+	comment(comment_, noCommentEndStatement_);
 }
 
-void WriteHelper::SetAddressLength(int bits)
+void WriteHelper::setAddressLength(int bits)
 {
-	fmt::format_to(buffer, ".addresslen {}", bits);
-	Comment("Using " + tinystl::to_string(bits) + " bits for addresses");
+	fmt::format_to(std::back_inserter(buffer), ".addresslen {}", bits);
+	comment("Using " + std::to_string(bits) + " bits for addresses");
 	addressLen = bits;
 }
 
-void WriteHelper::WriteNullPtr(tinystl::string const comment_, bool noCommentEndStatement_)
+
+void WriteHelper::writeNullPtr(std::string const comment_, bool noCommentEndStatement_)
 {
-	WriteAddressType();
-	fmt::format_to(buffer, "0");
-	Comment(comment_, noCommentEndStatement_);
+	writeAddressType();
+	fmt::format_to(std::back_inserter(buffer), "0");
+	comment(comment_, noCommentEndStatement_);
 }
-void WriteHelper::WriteAddressType()
+void WriteHelper::writeAddressType()
 {
-	fmt::format_to(buffer, "(u{})", tinystl::to_string(addressLen).c_str());
+	fmt::format_to(std::back_inserter(buffer), "(u{})", std::to_string(addressLen).c_str());
 }
 
-void WriteHelper::WriteByteArray(tinystl::vector<uint8_t> const& barray)
+void WriteHelper::writeByteArray(std::vector<uint8_t> const& barray)
 {
-	WriteByteArray(barray.data(), barray.size());
+	writeByteArray(barray.data(), barray.size());
 }
 
-void WriteHelper::WriteByteArray(uint8_t const* bytes_, size_t size_)
+void WriteHelper::writeByteArray(uint8_t const* bytes_, size_t size_)
 {
-	SetDefaultType<uint8_t>();
+	setDefaultType<uint8_t>();
 	if (size_ == 0)
 	{
-		fmt::format_to(buffer, "0\n");
+		fmt::format_to(std::back_inserter(buffer), "0\n");
 	}
 	else
 	{
 		for (size_t i = 0; i < size_ - 1; i++)
 		{
-			fmt::format_to(buffer, "{}{}",
-										 tinystl::to_string(bytes_[i]).c_str(),
+			fmt::format_to(std::back_inserter(buffer), "{}{}",
+										 std::to_string(bytes_[i]).c_str(),
 										 ((i % 80) == 79) ? "\n" : ", ");
 		}
 
 		// write last byte without ,
-		fmt::format_to(buffer, "{}\n", tinystl::to_string(bytes_[size_ -1]).c_str());
+		fmt::format_to(std::back_inserter(buffer), "{}\n", std::to_string(bytes_[size_ -1]).c_str());
 	}
 
-	SetDefaultType<uint32_t>();
+	setDefaultType<uint32_t>();
 }
 
 } // end namespace

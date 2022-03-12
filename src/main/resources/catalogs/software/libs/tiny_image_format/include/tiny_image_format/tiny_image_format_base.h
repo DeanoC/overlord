@@ -229,6 +229,11 @@
  *
  *
  */
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 typedef enum TinyImageFormat {
 	TinyImageFormat_UNDEFINED = 0,
 	TinyImageFormat_R1_UNORM = 1,
@@ -482,4 +487,9 @@ typedef struct TinyImageFormat_EncodeOutput {
 	void * pixelPlane9;
 } TinyImageFormat_EncodeOutput;
 
+#ifdef __cplusplus
+}
+#endif
+
 #endif // TINYIMAGEFORMAT_BASE_H_
+

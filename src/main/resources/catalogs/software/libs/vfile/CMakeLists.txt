@@ -33,6 +33,7 @@ endif()
 
 set(PRIVATE_LIBRARIES
 		core
+		dbg
 		)
 
 if(SRCS_LENGTH)

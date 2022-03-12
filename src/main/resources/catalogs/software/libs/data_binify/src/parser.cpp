@@ -258,7 +258,7 @@ namespace yy {
 
       case 5: // "string"
       case 6: // "identifier"
-        value.copy< tinystl::string > (other.value);
+        value.copy< std::string > (other.value);
         break;
 
       default:
@@ -314,7 +314,7 @@ namespace yy {
 
       case 5: // "string"
       case 6: // "identifier"
-        value.copy< tinystl::string > (v);
+        value.copy< std::string > (v);
         break;
 
       default:
@@ -361,7 +361,7 @@ namespace yy {
   {}
 
   template <typename Base>
-  parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const tinystl::string v, const location_type& l)
+  parser::basic_symbol<Base>::basic_symbol (typename Base::kind_type t, const std::string v, const location_type& l)
     : Base (t)
     , value (v)
     , location (l)
@@ -429,7 +429,7 @@ namespace yy {
 
       case 5: // "string"
       case 6: // "identifier"
-        value.template destroy< tinystl::string > ();
+        value.template destroy< std::string > ();
         break;
 
       default:
@@ -491,7 +491,7 @@ namespace yy {
 
       case 5: // "string"
       case 6: // "identifier"
-        value.move< tinystl::string > (s.value);
+        value.move< std::string > (s.value);
         break;
 
       default:
@@ -552,13 +552,13 @@ namespace yy {
   }
 
   parser::symbol_type
-  parser::make_STRING (const tinystl::string& v, const location_type& l)
+  parser::make_STRING (const std::string& v, const location_type& l)
   {
     return symbol_type (token::T_STRING, v, l);
   }
 
   parser::symbol_type
-  parser::make_IDENTIFIER (const tinystl::string& v, const location_type& l)
+  parser::make_IDENTIFIER (const std::string& v, const location_type& l)
   {
     return symbol_type (token::T_IDENTIFIER, v, l);
   }
@@ -766,7 +766,7 @@ namespace yy {
 
       case 5: // "string"
       case 6: // "identifier"
-        value.copy< tinystl::string > (that.value);
+        value.copy< std::string > (that.value);
         break;
 
       default:
@@ -818,7 +818,7 @@ namespace yy {
 
       case 5: // "string"
       case 6: // "identifier"
-        value.move< tinystl::string > (that.value);
+        value.move< std::string > (that.value);
         break;
 
       default:
@@ -873,7 +873,7 @@ namespace yy {
 
       case 5: // "string"
       case 6: // "identifier"
-        value.copy< tinystl::string > (that.value);
+        value.copy< std::string > (that.value);
         break;
 
       default:
@@ -1137,7 +1137,7 @@ namespace yy {
 
       case 5: // "string"
       case 6: // "identifier"
-        yylhs.value.build< tinystl::string > ();
+        yylhs.value.build< std::string > ();
         break;
 
       default:
@@ -1292,7 +1292,7 @@ namespace yy {
 
   case 30:
 #line 135 "parser.y" // lalr1.cc:856
-    { cb->String( yystack_[0].value.as< tinystl::string > () ); }
+    { cb->String( yystack_[0].value.as< std::string > () ); }
 #line 1297 "parser.cpp" // lalr1.cc:856
     break;
 
@@ -1352,19 +1352,19 @@ namespace yy {
 
   case 40:
 #line 145 "parser.y" // lalr1.cc:856
-    { cb->SetPass0Symbol( yystack_[2].value.as< tinystl::string > (), yystack_[0].value.as< int64_t > () ); }
+    { cb->SetPass0Symbol( yystack_[2].value.as< std::string > (), yystack_[0].value.as< int64_t > () ); }
 #line 1357 "parser.cpp" // lalr1.cc:856
     break;
 
   case 41:
 #line 146 "parser.y" // lalr1.cc:856
-    { cb->SetSymbolToOffset( yystack_[1].value.as< tinystl::string > () ); }
+    { cb->SetSymbolToOffset( yystack_[1].value.as< std::string > () ); }
 #line 1363 "parser.cpp" // lalr1.cc:856
     break;
 
   case 42:
 #line 147 "parser.y" // lalr1.cc:856
-    { cb->SetSymbol( yystack_[2].value.as< tinystl::string > (), yystack_[0].value.as< int64_t > () ); }
+    { cb->SetSymbol( yystack_[2].value.as< std::string > (), yystack_[0].value.as< int64_t > () ); }
 #line 1369 "parser.cpp" // lalr1.cc:856
     break;
 
@@ -1400,7 +1400,7 @@ namespace yy {
 
   case 48:
 #line 156 "parser.y" // lalr1.cc:856
-    { yylhs.value.as< int64_t > () = cb->LookupSymbol( yystack_[0].value.as< tinystl::string > () ); }
+    { yylhs.value.as< int64_t > () = cb->LookupSymbol( yystack_[0].value.as< std::string > () ); }
 #line 1405 "parser.cpp" // lalr1.cc:856
     break;
 

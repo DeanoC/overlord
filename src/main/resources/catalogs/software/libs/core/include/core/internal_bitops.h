@@ -36,7 +36,7 @@ CONST_EXPR ALWAYS_INLINE type BitOp_PopulationCount##_##postfix(const type a) { 
 /* We however define as the inverse of 1 << (n-1), so modify the clz */ \
 /* Not found will return ~0 */ \
 CONST_EXPR ALWAYS_INLINE type BitOp_FindFirstStringOfOnes##_##postfix(type x, unsigned int n) { \
-	type s;																																			\
+	type s = 0; 																																\
 	while (n > 1) {																															\
 		s = n >> 1;																 																\
 		x = x & (x >> s);																													\

@@ -27,7 +27,7 @@ WEAK_LINKAGE void OsService_ScreenConsolePrintWithSize(unsigned int count, const
 	} else
 	{
 		uint32_t const totalSize = count + IPI3_HEADER_SIZE + sizeof(IPI3_DdrPacket);
-		char *buffer = ALLOCA(totalSize); // string to send to OS (in DDR stack)
+		char *buffer = STACK_ALLOC(totalSize); // string to send to OS (in DDR stack)
 		IPI3_Msg* msg = (IPI3_Msg*) buffer;
 		msg->function = OSF_SCREEN_CONSOLE_PTR_PRINT;
 		msg->ddrPtrFlag = true;

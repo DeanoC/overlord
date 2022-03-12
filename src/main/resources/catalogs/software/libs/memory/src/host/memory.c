@@ -1,10 +1,11 @@
 // License Summary: MIT see LICENSE file
 #include "core/core.h"
+#include "memory/memory.h"
+
 #include <stdlib.h>
 #include "host_platform/host_platform.h"
 #include "dbg/assert.h"
 #include "dbg/print.h"
-#include "memory/memory.h"
 #include "multi_core/core_local.h"
 #include "core/utf8.h"
 
@@ -59,7 +60,7 @@ void *platformCalloc(size_t count, size_t size) {
     return mem;
 }
 
-AL2O3_FORCE_INLINE EXTERN_C
+FORCE_INLINE EXTERN_C
 void *platformRealloc(void *ptr, size_t size) {
     return _aligned_realloc(ptr, size, 16);
 }
@@ -75,6 +76,10 @@ EXTERN_C void* platformMalloc(size_t size)
 {
 	void* mem;
 	posix_memalign(&mem, 16, size);
+	if(!mem) {
+		debug_printf("platformMalloc(%zu) failed\n", size);
+		return nullptr;
+	}
 	return mem;
 }
 
@@ -82,17 +87,26 @@ EXTERN_C void* platformAalloc(size_t size, size_t align)
 {
 	void* mem;
 	posix_memalign(&mem, align, size);
+	if(!mem) {
+		debug_printf("platformAalloc(%zu) failed\n", size);
+		return nullptr;
+	}
 	return mem;
 }
 
 EXTERN_C void* platformCalloc(size_t count, size_t size)
 {
 	if(count == 0) {
-		return NULL;
+		return nullptr;
 	}
 
 	void* mem;
 	posix_memalign(&mem, 16, count * size);
+	if(!mem) {
+		debug_printf("platformCalloc(%zu) failed\n", count * size);
+		return nullptr;
+	}
+
 	if(mem) {
 		memset(mem, 0, count * size);
 	}
@@ -106,12 +120,16 @@ EXTERN_C void* platformRealloc(void* ptr, size_t size) {
 	// i'll live with it and assert it
 	ptr = realloc(ptr, size);
 	assert(((uintptr_t) ptr & 0xFUL) == 0);
+	if(!ptr) {
+		debug_printf("platformRealloc(%zu) failed\n", size);
+		return nullptr;
+	}
 	return ptr;
 }
 
 EXTERN_C void platformFree(void* ptr)
 {
-	free(ptr);
+	if(ptr) free(ptr);
 }
 
 #else
@@ -314,7 +332,7 @@ EXTERN_C void *Memory_TrackedAlloc(const char *sourceFile,
 													const size_t reportedSize,
 													void *actualSizedAllocation) {
 	if (actualSizedAllocation == NULL) {
-		LOGERROR("Request for allocation failed. Out of memory.");
+		debug_print("ERROR: Request for allocation failed. Out of memory.");
 		return NULL;
 	}
 
@@ -332,12 +350,12 @@ EXTERN_C void *Memory_TrackedAlloc(const char *sourceFile,
 	}
 
 	if (Memory_TrackerBreakOnAllocNumber != 0 && Memory_TrackerBreakOnAllocNumber == g_allocCounter + 1) {
-		LOGWARNING("Break on allocation number hit");
+		debug_print("WARNING:  Break on allocation number hit");
 		IKUY_DEBUG_BREAK();
 	}
 
 	if(sourceFile == NULL) {
-		LOGWARNING("Allocation without tracking file/line/function info");
+		debug_print("WARNING:  Allocation without tracking file/line/function info");
 		IKUY_DEBUG_BREAK();
 	}
 
@@ -381,7 +399,7 @@ EXTERN_C void *Memory_TrackedAAlloc(const char *sourceFile,
 													 const size_t reportedSize,
 													 void *actualSizedAllocation) {
 	if (actualSizedAllocation == NULL) {
-		LOGERROR("Request for allocation failed. Out of memory.");
+		debug_print("ERROR: Request for allocation failed. Out of memory.");
 		return NULL;
 	}
 
@@ -392,12 +410,12 @@ EXTERN_C void *Memory_TrackedAAlloc(const char *sourceFile,
 	MUTEX_LOCK
 
 	if(Memory_TrackerBreakOnAllocNumber != 0 && Memory_TrackerBreakOnAllocNumber == g_allocCounter+1) {
-		LOGWARNING("Break on allocation number hit");
+		debug_print("WARNING: Break on allocation number hit");
 		IKUY_DEBUG_BREAK();
 	}
 
 	if(sourceFile == NULL) {
-		LOGWARNING("Allocation without tracking file/line/function info");
+		debug_print("WARNING: Allocation without tracking file/line/function info");
 		IKUY_DEBUG_BREAK();
 	}
 
@@ -458,19 +476,19 @@ EXTERN_C void *Memory_TrackedRealloc(const char *sourceFile,
 	}
 
 	if (!actualSizedAllocation) {
-		LOGERROR("Request for reallocation failed. Out of memory.");
+		debug_print("ERROR: Request for reallocation failed. Out of memory.");
 		return NULL;
 	}
 
 	MUTEX_LOCK
 
 	if(Memory_TrackerBreakOnAllocNumber != 0 && Memory_TrackerBreakOnAllocNumber == g_allocCounter+1) {
-		LOGWARNING("Break on allocation number hit");
+		debug_print("WARNING: Break on allocation number hit");
 		IKUY_DEBUG_BREAK();
 	}
 
 	if(sourceFile == NULL) {
-		LOGWARNING("Allocation without tracking file/line/function info");
+		debug_print("WARNING: Allocation without tracking file/line/function info");
 		IKUY_DEBUG_BREAK();
 	}
 
@@ -479,7 +497,7 @@ EXTERN_C void *Memory_TrackedRealloc(const char *sourceFile,
 
 	// If you hit this assert, you tried to reallocate RAM that wasn't allocated by this memory manager.
 	if (au == NULL) {
-		LOGERROR("Request to reallocate RAM that was never allocated");
+		debug_print("ERROR: Request to reallocate RAM that was never allocated");
 		MUTEX_UNLOCK
 		return NULL;
 	}
@@ -544,7 +562,7 @@ EXTERN_C bool Memory_TrackedFree(const void *reportedAddress) {
 	}
 
 	if (reservoirBufferSize == 0 || reservoirBuffer == NULL) {
-		LOGERROR("Free before any allocations have occured or after exit!");
+		debug_print("ERROR: Free before any allocations have occured or after exit!");
 		return true; // we can't tell if this is an aalloc or other assume other as more common...
 	}
 
@@ -553,7 +571,7 @@ EXTERN_C bool Memory_TrackedFree(const void *reportedAddress) {
 	// Go get the allocation unit
 	AllocUnit *au = findAllocUnit(reportedAddress);
 	if (au == NULL) {
-		LOGERROR("Request to deallocate RAM that was never allocated");
+		debug_print("ERROR: Request to deallocate RAM that was never allocated");
 		MUTEX_UNLOCK
 		return false;
 	}
@@ -588,7 +606,14 @@ EXTERN_C bool Memory_TrackedFree(const void *reportedAddress) {
 }
 
 EXTERN_C void *trackedMalloc(size_t size) {
+	if(READ_CORE_LOCAL(g_lastSourceFile) == nullptr) {
+		debug_print("g_lastSourceFile == nullptr\n");
+	}
 	void *mem = platformMalloc(Memory_TrackerCalculateActualSize(size));
+	if(g_lastSourceFile == nullptr) {
+		debug_print("g_lastSourceFile == nullptr\n");
+		return mem;
+	}
 	return Memory_TrackedAlloc(g_lastSourceFile, g_lastSourceLine, g_lastSourceFunc, size, mem);
 }
 
@@ -605,6 +630,7 @@ EXTERN_C void *trackedCalloc(size_t count, size_t size) {
 	if (mem) {
 		memset(mem, 0, Memory_TrackerCalculateActualSize(count * size));
 	}
+
 	return Memory_TrackedAlloc(g_lastSourceFile, g_lastSourceLine, g_lastSourceFunc, count * size, mem);
 }
 
@@ -622,13 +648,14 @@ EXTERN_C void trackedFree(void *ptr) {
 	}
 }
 
-EXTERN_C Memory_Allocator Memory_GlobalAllocator = {
+Memory_Allocator Memory_GlobalAllocator = {
 		&trackedMalloc,
 		&trackedAalloc,
 		&trackedCalloc,
 		&trackedRealloc,
 		&trackedFree
 };
+
 
 EXTERN_C void Memory_TrackerDestroyAndLogLeaks() {
 	MUTEX_LOCK
@@ -638,13 +665,13 @@ EXTERN_C void Memory_TrackerDestroyAndLogLeaks() {
 		while (au != NULL) {
 			if (loggedHeader == false) {
 				loggedHeader = true;
-				LOGINFO("-=-=-=-=-=-=- Memory Leak Report -=-=-=-=-=-=-");
+				debug_printf("INFO: -=-=-=-=-=-=- Memory Leak Report -=-=-=-=-=-=-");
 			}
 			if(au->sourceFile) {
 				char const *fileNameOnly = sourceFileStripper(au->sourceFile);
-				LOGINFO("%u bytes from %s(%u): %s number: %lu", au->reportedSize, fileNameOnly, au->sourceLine, au->sourceFunc, au->allocationNumber);
+				debug_printf("INFO: %u bytes from %s(%u): %s number: %lu", au->reportedSize, fileNameOnly, au->sourceLine, au->sourceFunc, au->allocationNumber);
 			} else {
-				LOGINFO("%u bytes from an unknown caller number: %lu", au->reportedSize, au->allocationNumber);
+				debug_printf("INFO: %u bytes from an unknown caller number: %lu", au->reportedSize, au->allocationNumber);
 			}
 			au = au->next;
 		}
@@ -666,8 +693,7 @@ EXTERN_C void Memory_TrackerDestroyAndLogLeaks() {
 
 #else
 
-EXTERN_C Memory_Allocator
-Memory_GlobalAllocator = {
+EXTERN_C Memory_Allocator Memory_GlobalAllocator = {
         &platformMalloc,
         &platformAalloc,
         &platformCalloc,
@@ -677,11 +703,11 @@ Memory_GlobalAllocator = {
 EXTERN_C void Memory_TrackerDestroyAndLogLeaks() {}
 
 EXTERN_C void *Memory_TrackedAlloc(const char *a, const unsigned int b, const char *c, const size_t d, void *e) {
-    LOGERROR("Memory_TrackedAlloc called in non tracking build");
+    debug_print("ERROR: Memory_TrackedAlloc called in non tracking build");
     return NULL;
 };
 EXTERN_C void *Memory_TrackedAAlloc(const char *a, const unsigned int b, const char *c, const size_t d, void *e) {
-    LOGERROR("Memory_TrackedAAlloc called in non tracking build");
+    debug_print("ERROR: Memory_TrackedAAlloc called in non tracking build");
     return NULL;
 }
 EXTERN_C void *Memory_TrackedRealloc(const char *a,
@@ -690,7 +716,7 @@ EXTERN_C void *Memory_TrackedRealloc(const char *a,
                                            const size_t d,
                                            void *e,
                                            void *f) {
-    LOGERROR("Memory_TrackedRealloc called in non tracking build");
+    debug_print("ERROR: Memory_TrackedRealloc called in non tracking build");
     return NULL;
 }
 #endif

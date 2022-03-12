@@ -8,7 +8,7 @@
 #include "tiny_image_format/tiny_image_format_encode.h"
 #include "gfx_image/image.h"
 
-EXTERN_C size_t Image_ByteCountOfImageChainOf(Image_ImageHeader const *image) {
+size_t Image_ByteCountOfImageChainOf(Image_ImageHeader const *image) {
 
 	size_t total = Image_ByteCountOf(image);
 
@@ -22,7 +22,7 @@ EXTERN_C size_t Image_ByteCountOfImageChainOf(Image_ImageHeader const *image) {
 
 	return total;
 }
-EXTERN_C size_t Image_LinkedImageCountOf(Image_ImageHeader const *image) {
+size_t Image_LinkedImageCountOf(Image_ImageHeader const *image) {
   size_t count = 1;
 
 	while (image && image->nextImage != nullptr) {
@@ -33,7 +33,7 @@ EXTERN_C size_t Image_LinkedImageCountOf(Image_ImageHeader const *image) {
   return count;
 }
 
-EXTERN_C size_t Image_MipMapCountOf(Image_ImageHeader const *image) {
+size_t Image_MipMapCountOf(Image_ImageHeader const *image) {
 	size_t count = 1;
 
 	if(Image_HasPackedMipMaps(image)) {
@@ -48,7 +48,7 @@ EXTERN_C size_t Image_MipMapCountOf(Image_ImageHeader const *image) {
 	return count;
 }
 
-EXTERN_C Image_ImageHeader const *Image_LinkedImageOf(Image_ImageHeader const *image, size_t const index) {
+Image_ImageHeader const *Image_LinkedImageOf(Image_ImageHeader const *image, size_t const index) {
   size_t count = 0;
 
   if(index > 0) {
@@ -66,7 +66,7 @@ EXTERN_C Image_ImageHeader const *Image_LinkedImageOf(Image_ImageHeader const *i
 return nullptr;
 }
 
-EXTERN_C bool Image_GetBlocksAtF(Image_ImageHeader const *image, float *pixels, size_t blockCount, size_t index) {
+bool Image_GetBlocksAtF(Image_ImageHeader const *image, float *pixels, size_t blockCount, size_t index) {
 	assert(image);
 	assert(pixels);
 
@@ -80,47 +80,45 @@ EXTERN_C bool Image_GetBlocksAtF(Image_ImageHeader const *image, float *pixels, 
 			index * (TinyImageFormat_BitSizeOfBlock(image->format) / 8);
 
 
-	TinyImageFormat_DecodeInput input = { pixelPtr };
+	TinyImageFormat_DecodeInput input = { .pixel = pixelPtr };
 	return TinyImageFormat_DecodeLogicalPixelsF(image->format, &input, (uint32_t)blockCount, pixels);
 }
 
-EXTERN_C bool Image_SetBlocksAtF(Image_ImageHeader const *image, float const *pixels, size_t blockCount, size_t index) {
+bool Image_SetBlocksAtF(Image_ImageHeader *image, float const *pixels, size_t blockCount, size_t index) {
 	assert(image);
 	assert(pixels);
 
 	if(!TinyImageFormat_CanEncodeLogicalPixelsF(image->format)) return false;
 
-	uint32_t const pixelCount = TinyImageFormat_PixelCountOfBlock(image->format);
-
 	uint8_t *pixelPtr = ((uint8_t *) Image_RawDataPtr(image)) +
 			index * (TinyImageFormat_BitSizeOfBlock(image->format) / 8);
 
 
-	TinyImageFormat_EncodeOutput output = { pixelPtr };
+	TinyImageFormat_EncodeOutput output = { .pixel = pixelPtr };
 	return TinyImageFormat_EncodeLogicalPixelsF(image->format, pixels, (uint32_t)blockCount, &output);
 }
 
 
-EXTERN_C bool Image_GetPixelAtF(Image_ImageHeader const *image, float *pixel, size_t index) {
+bool Image_GetPixelAtF(Image_ImageHeader const *image, float *pixel, size_t index) {
 	assert(image);
 	if(TinyImageFormat_PixelCountOfBlock(image->format) != 1) return false;
 	return Image_GetBlocksAtF(image, pixel, 1, index);
 }
 
-EXTERN_C bool Image_SetPixelAtF(Image_ImageHeader const *image, float const *pixel, size_t index) {
+bool Image_SetPixelAtF(Image_ImageHeader *image, float const *pixel, size_t index) {
 	assert(image);
 	if(TinyImageFormat_PixelCountOfBlock(image->format) != 1) return false;
 	return Image_SetBlocksAtF(image, pixel, 1, index);
 }
 
-EXTERN_C bool Image_GetRowAtF(Image_ImageHeader const *image, float *pixels, size_t index) {
+bool Image_GetRowAtF(Image_ImageHeader const *image, float *pixels, size_t index) {
 	assert(image);
 	uint32_t const blockWidth = TinyImageFormat_WidthOfBlock(image->format);
 
 	return Image_GetBlocksAtF(image, pixels, image->width / blockWidth, index);
 }
 
-EXTERN_C bool Image_SetRowAtF(Image_ImageHeader const *image, float const *pixels, size_t index) {
+bool Image_SetRowAtF(Image_ImageHeader *image, float const *pixels, size_t index) {
 	assert(image);
 
 	uint32_t const blockWidth = TinyImageFormat_WidthOfBlock(image->format);
@@ -128,7 +126,7 @@ EXTERN_C bool Image_SetRowAtF(Image_ImageHeader const *image, float const *pixel
 }
 
 
-EXTERN_C bool Image_GetBlocksAtD(Image_ImageHeader const *image, double *pixels, size_t blockCount, size_t index) {
+bool Image_GetBlocksAtD(Image_ImageHeader const *image, double *pixels, size_t blockCount, size_t index) {
 	assert(image);
 	assert(pixels);
 
@@ -142,46 +140,44 @@ EXTERN_C bool Image_GetBlocksAtD(Image_ImageHeader const *image, double *pixels,
 			index * (TinyImageFormat_BitSizeOfBlock(image->format) / 8);
 
 
-	TinyImageFormat_DecodeInput input = { pixelPtr };
+	TinyImageFormat_DecodeInput input = { .pixel = pixelPtr };
 	return TinyImageFormat_DecodeLogicalPixelsD(image->format, &input, (uint32_t)blockCount, pixels);
 }
 
-EXTERN_C bool Image_SetBlocksAtD(Image_ImageHeader const *image, double const *pixels, size_t blockCount, size_t index) {
+bool Image_SetBlocksAtD(Image_ImageHeader *image, double const *pixels, size_t blockCount, size_t index) {
 	assert(image);
 	assert(pixels);
 
 	if(!TinyImageFormat_CanEncodeLogicalPixelsD(image->format)) return false;
 
-	uint32_t const pixelCount = TinyImageFormat_PixelCountOfBlock(image->format);
-
 	uint8_t *pixelPtr = ((uint8_t *) Image_RawDataPtr(image)) +
 			index * (TinyImageFormat_BitSizeOfBlock(image->format) / 8);
 
 
-	TinyImageFormat_EncodeOutput output = { pixelPtr };
+	TinyImageFormat_EncodeOutput output = { .pixel = pixelPtr };
 	return TinyImageFormat_EncodeLogicalPixelsD(image->format, pixels, (uint32_t)blockCount, &output);
 }
 
-EXTERN_C bool Image_GetPixelAtD(Image_ImageHeader const *image, double *pixel, size_t index) {
+bool Image_GetPixelAtD(Image_ImageHeader const *image, double *pixel, size_t index) {
 	assert(image);
 	if(TinyImageFormat_PixelCountOfBlock(image->format) != 1) return false;
 	return Image_GetBlocksAtD(image, pixel, 1, index);
 }
 
-EXTERN_C bool Image_SetPixelAtD(Image_ImageHeader const *image, double const *pixel, size_t index) {
+bool Image_SetPixelAtD(Image_ImageHeader *image, double const *pixel, size_t index) {
 	assert(image);
 	if(TinyImageFormat_PixelCountOfBlock(image->format) != 1) return false;
 	return Image_SetBlocksAtD(image, pixel, 1, index);
 }
 
-EXTERN_C bool Image_GetRowAtD(Image_ImageHeader const *image, double *pixels, size_t index) {
+bool Image_GetRowAtD(Image_ImageHeader const *image, double *pixels, size_t index) {
 	assert(image);
 	uint32_t const blockWidth = TinyImageFormat_WidthOfBlock(image->format);
 
 	return Image_GetBlocksAtD(image, pixels, image->width / blockWidth, index);
 }
 
-EXTERN_C bool Image_SetRowAtD(Image_ImageHeader const *image, double const *pixels, size_t index) {
+bool Image_SetRowAtD(Image_ImageHeader *image, double const *pixels, size_t index) {
 	assert(image);
 
 	uint32_t const blockWidth = TinyImageFormat_WidthOfBlock(image->format);
@@ -189,7 +185,7 @@ EXTERN_C bool Image_SetRowAtD(Image_ImageHeader const *image, double const *pixe
 }
 
 
-EXTERN_C size_t Image_BytesRequiredForMipMapsOf(Image_ImageHeader const *image) {
+size_t Image_BytesRequiredForMipMapsOf(Image_ImageHeader const *image) {
 
 	uint32_t const maxMipLevels =
 			Math_LogTwo_U32(Math_Max_U32(image->depth, Math_Max_U32(image->width, image->height)));
@@ -243,13 +239,13 @@ EXTERN_C size_t Image_BytesRequiredForMipMapsOf(Image_ImageHeader const *image) 
   return size;
 }
 
-EXTERN_C Image_ImageHeader const *Image_Create(uint32_t width,
-                                               uint32_t height,
-                                               uint32_t depth,
-                                               uint32_t slices,
-                                               TinyImageFormat format,
-                                               Memory_Allocator* memoryAllocator) {
-	Image_ImageHeader const * image = Image_CreateNoClear(width, height, depth, slices, format, memoryAllocator);
+Image_ImageHeader *Image_Create(uint32_t width,
+	                               uint32_t height,
+	                               uint32_t depth,
+	                               uint32_t slices,
+	                               TinyImageFormat format,
+	                               Memory_Allocator* memoryAllocator) {
+	Image_ImageHeader * image = Image_CreateNoClear(width, height, depth, slices, format, memoryAllocator);
 	if (image) {
 		memset(Image_RawDataPtr(image), 0, image->dataSize);
 	}
@@ -257,12 +253,12 @@ EXTERN_C Image_ImageHeader const *Image_Create(uint32_t width,
 	return image;
 }
 
-EXTERN_C Image_ImageHeader const *Image_CreateNoClear(uint32_t width,
-                                                      uint32_t height,
-                                                      uint32_t depth,
-                                                      uint32_t slices,
-                                                      TinyImageFormat format,
-                                                      Memory_Allocator* memoryAllocator) {
+Image_ImageHeader *Image_CreateNoClear(uint32_t width,
+                                        uint32_t height,
+                                        uint32_t depth,
+                                        uint32_t slices,
+                                        TinyImageFormat format,
+                                        Memory_Allocator* memoryAllocator) {
 	if(width == 0)return nullptr;
 	if (format == TinyImageFormat_UNDEFINED) return nullptr;
 	if(height == 0) height = 1;
@@ -280,13 +276,12 @@ EXTERN_C Image_ImageHeader const *Image_CreateNoClear(uint32_t width,
 
 	return image;
 }
-EXTERN_C void Image_FillHeader(uint32_t width,
-                               uint32_t height,
-                               uint32_t depth,
-                               uint32_t slices,
-                               TinyImageFormat format,
-                               Image_ImageHeader *header) {
-
+void Image_FillHeader(uint32_t width,
+                       uint32_t height,
+                       uint32_t depth,
+                       uint32_t slices,
+                       TinyImageFormat format,
+                       Image_ImageHeader *header) {
 
 	uint32_t const blockW = TinyImageFormat_WidthOfBlock(format);
 	uint32_t const blockH = TinyImageFormat_HeightOfBlock(format);
@@ -318,12 +313,12 @@ EXTERN_C void Image_FillHeader(uint32_t width,
 	header->memoryAllocator = nullptr;
 }
 
-EXTERN_C Image_ImageHeader const* Image_CreateHeaderOnly(	uint32_t width,
-                                                           uint32_t height,
-                                                           uint32_t depth,
-                                                           uint32_t slices,
-                                                           TinyImageFormat format,
-                                                           Memory_Allocator* memoryAllocator) {
+Image_ImageHeader * Image_CreateHeaderOnly(	uint32_t width,
+                                             uint32_t height,
+                                             uint32_t depth,
+                                             uint32_t slices,
+                                             TinyImageFormat format,
+                                             Memory_Allocator* memoryAllocator) {
 	Image_ImageHeader *image = (Image_ImageHeader *) MALLOC(memoryAllocator, sizeof(Image_ImageHeader));
 	if (!image) { return nullptr; }
 	Image_FillHeader(width, height, depth, slices, format, image);
@@ -332,7 +327,7 @@ EXTERN_C Image_ImageHeader const* Image_CreateHeaderOnly(	uint32_t width,
 	return image;
 }
 
-EXTERN_C void Image_Destroy(Image_ImageHeader const *image) {
+void Image_Destroy(Image_ImageHeader *image) {
 	if(!image) return;
 
 	// recursively free next in image chain

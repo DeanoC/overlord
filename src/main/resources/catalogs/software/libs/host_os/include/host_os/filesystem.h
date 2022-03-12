@@ -4,6 +4,7 @@
 #pragma once
 
 #include "core/core.h"
+#include "memory/memory.h"
 
 static const size_t FS_npos = (size_t) (-1);
 
@@ -45,7 +46,7 @@ typedef struct  {
 typedef struct Os_DirectoryEnumerator *Os_DirectoryEnumeratorHandle;
 typedef void (*Os_DirectoryEnumeratorAsyncFunc)(Os_DirectoryEnumeratorHandle handle, void* userData, Os_DirectoryEnumeratorItem const * item);
 
-EXTERN_C Os_DirectoryEnumeratorHandle Os_DirectoryEnumeratorCreate(char const* path);
+EXTERN_C Os_DirectoryEnumeratorHandle Os_DirectoryEnumeratorCreate(char const* path, Memory_Allocator* allocator);
 EXTERN_C void Os_DirectoryEnumeratorDestroy(Os_DirectoryEnumeratorHandle handle);
 
 EXTERN_C void Os_DirectoryEnumeratorAsyncStart(Os_DirectoryEnumeratorHandle handle, Os_DirectoryEnumeratorAsyncFunc func, void* userData);

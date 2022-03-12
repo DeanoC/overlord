@@ -1,7 +1,7 @@
 #pragma once
 
 #ifdef __cplusplus
-EXTERN_C
+extern "C"
 {
 #endif
 

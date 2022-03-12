@@ -1,16 +1,19 @@
 #include "core/core.h"
 #include "host_os/osvfile.h"
+#include "multi_core/core_local.h"
 #include "gfx_image/create.h"
 #include "gfx_image/copy.h"
-//#include "gfx_imageio/io.h"
+#include "imageio_saver.h"
+#include "imageio_loader.h"
+
 //#include "gfx_image/utils.h"
 //#include "gfx_imagecompress/imagecompress.h"
 #include "lua.h"
 #include "lualib.h"
 
 #define LUA_ASSERT(test, state, msg) if(!(test)) { luaL_error((state), (msg)); }
-static char const MetaName[] = "Al2o3.Image";
-static Memory_Allocator* luaAllocator;
+static char const MetaName[] = "ikuy.Image";
+static CORE_LOCAL(Memory_Allocator * , luaAllocator);
 
 // create the null image user data return on the lua state
 static Image_ImageHeader const** imageud_create(lua_State *L) {
@@ -25,7 +28,7 @@ static Image_ImageHeader const** imageud_create(lua_State *L) {
 }
 
 static int imageud_gc (lua_State *L) {
-	auto image = *(Image_ImageHeader const**)luaL_checkudata(L, 1, MetaName);
+	auto image = *(Image_ImageHeader **)luaL_checkudata(L, 1, MetaName);
 	if (image) Image_Destroy(image);
 
 	return 0;
@@ -101,7 +104,7 @@ static int getPixelAt(lua_State *L) {
 }
 
 static int setPixelAt(lua_State *L) {
-	auto image = *(Image_ImageHeader const**)luaL_checkudata(L, 1, MetaName);
+	auto image = *(Image_ImageHeader **)luaL_checkudata(L, 1, MetaName);
 	LUA_ASSERT(image, L, "image is NIL");
 	int64_t index = luaL_checkinteger(L, 2);
 
@@ -236,7 +239,7 @@ static int calculateIndex(lua_State *L) {
 
 static int copy(lua_State *L) {
 	auto src = *(Image_ImageHeader const**)luaL_checkudata(L, 1, MetaName);
-	auto dst = *(Image_ImageHeader const**)luaL_checkudata(L, 2, MetaName);
+	auto dst = *(Image_ImageHeader **)luaL_checkudata(L, 2, MetaName);
 	LUA_ASSERT(src, L, "image is NIL");
 	LUA_ASSERT(dst, L, "image is NIL");
 
@@ -247,7 +250,7 @@ static int copy(lua_State *L) {
 static int copySlice(lua_State *L) {
 	auto src = *(Image_ImageHeader const**)luaL_checkudata(L, 1, MetaName);
 	int64_t sw = luaL_checkinteger(L, 2);
-	auto dst = *(Image_ImageHeader const**)luaL_checkudata(L, 3, MetaName);
+	auto dst = *(Image_ImageHeader **)luaL_checkudata(L, 3, MetaName);
 	int64_t dw = luaL_checkinteger(L, 4);
 	LUA_ASSERT(src, L, "image is NIL");
 	LUA_ASSERT(dst, L, "image is NIL");
@@ -260,7 +263,7 @@ static int copyPage(lua_State *L) {
 	auto src = *(Image_ImageHeader const**)luaL_checkudata(L, 1, MetaName);
 	int64_t sz = luaL_checkinteger(L, 2);
 	int64_t sw = luaL_checkinteger(L, 3);
-	auto dst = *(Image_ImageHeader const**)luaL_checkudata(L, 4, MetaName);
+	auto dst = *(Image_ImageHeader **)luaL_checkudata(L, 4, MetaName);
 	int64_t dz = luaL_checkinteger(L, 5);
 	int64_t dw = luaL_checkinteger(L, 6);
 	LUA_ASSERT(src, L, "image is NIL");
@@ -275,7 +278,7 @@ static int copyRow(lua_State *L) {
 	int64_t sy = luaL_checkinteger(L, 2);
 	int64_t sz = luaL_checkinteger(L, 3);
 	int64_t sw = luaL_checkinteger(L, 4);
-	auto dst = *(Image_ImageHeader const**)luaL_checkudata(L, 5, MetaName);
+	auto dst = *(Image_ImageHeader **)luaL_checkudata(L, 5, MetaName);
 	int64_t dy = luaL_checkinteger(L, 6);
 	int64_t dz = luaL_checkinteger(L, 7);
 	int64_t dw = luaL_checkinteger(L, 8);
@@ -293,7 +296,7 @@ static int copyPixel(lua_State *L) {
 	int64_t sy = luaL_checkinteger(L, 3);
 	int64_t sz = luaL_checkinteger(L, 4);
 	int64_t sw = luaL_checkinteger(L, 5);
-	auto dst = *(Image_ImageHeader const**)luaL_checkudata(L, 6, MetaName);
+	auto dst = *(Image_ImageHeader **)luaL_checkudata(L, 6, MetaName);
 	int64_t dx = luaL_checkinteger(L, 7);
 	int64_t dy = luaL_checkinteger(L, 8);
 	int64_t dz = luaL_checkinteger(L, 9);
@@ -646,19 +649,19 @@ static int compressAMDBC7(lua_State *L) {
 	return 2;
 }
 
-
+*/
 static int load(lua_State * L) {
 	char const* filename = luaL_checkstring(L, 1);
 
-	VFile::ScopedFile file = VFile::File::FromFile(filename, Os_FM_ReadBinary);
-	if(!file) {
+	VFile_Handle fh = Os_VFileFromFile(filename, Os_FM_ReadBinary, luaAllocator);
+	if(!fh) {
 		lua_pushnil(L);
 		lua_pushboolean(L, false);
 		return 2;
 	}
 
 	auto ud = imageud_create(L);
-	*ud = Image_Load(file);
+	*ud = Image_Load(fh, luaAllocator);
 	lua_pushboolean(L, *ud != nullptr);
 
 	return 2;
@@ -667,97 +670,119 @@ static int load(lua_State * L) {
 static int saveAsDDS(lua_State * L) {
 	void* ud = luaL_checkudata(L, 1, MetaName);
 	char const* filename = luaL_checkstring(L, 2);
-	VFile::ScopedFile file = VFile::File::FromFile(filename, Os_FM_WriteBinary);
-	if(!file) {
-		return 0;
+	VFile_Handle fh = Os_VFileFromFile(filename, Os_FM_WriteBinary, luaAllocator);
+	if(!fh) {
+		lua_pushboolean(L, false);
+		return 1;
 	}
 	Image_ImageHeader* image = *(Image_ImageHeader**)ud;
-	bool ret = Image_SaveAsDDS(image, file);
-
+	bool ret = ImageIO_SaveAsDDS(image, fh);
 	lua_pushboolean(L, ret);
+	VFile_Close(fh);
 	return 1;
 }
 
 static int saveAsTGA(lua_State * L) {
 	void* ud = luaL_checkudata(L, 1, MetaName);
 	char const* filename = luaL_checkstring(L, 2);
-	VFile::ScopedFile file = VFile::File::FromFile(filename, Os_FM_WriteBinary);
-	if(!file) {
-		return 0;
+	VFile_Handle fh = Os_VFileFromFile(filename, Os_FM_WriteBinary, luaAllocator);
+	if(!fh) {
+		lua_pushboolean(L, false);
+		return 1;
 	}
 	Image_ImageHeader* image = *(Image_ImageHeader**)ud;
-	bool ret = Image_SaveAsTGA(image, file);
+	bool ret = ImageIO_SaveAsTGA(image, fh);
 	lua_pushboolean(L, ret);
+	VFile_Close(fh);
 	return 1;
 }
 static int saveAsBMP(lua_State * L) {
 	void* ud = luaL_checkudata(L, 1, MetaName);
 	char const* filename = luaL_checkstring(L, 2);
-	VFile::ScopedFile file = VFile::File::FromFile(filename, Os_FM_WriteBinary);
-	if(!file) {
-		return 0;
+	VFile_Handle fh = Os_VFileFromFile(filename, Os_FM_WriteBinary, luaAllocator);
+	if(!fh) {
+		lua_pushboolean(L, false);
+		return 1;
 	}
-	auto image = *(Image_ImageHeader const**)ud;
-	bool ret = Image_SaveAsBMP(image, file);
+	auto image = *(Image_ImageHeader **)ud;
+	bool ret = ImageIO_SaveAsBMP(image, fh);
 	lua_pushboolean(L, ret);
+	VFile_Close(fh);
 	return 1;
 }
 static int saveAsPNG(lua_State * L) {
 	void* ud = luaL_checkudata(L, 1, MetaName);
 	char const* filename = luaL_checkstring(L, 2);
-	VFile::ScopedFile file = VFile::File::FromFile(filename, Os_FM_WriteBinary);
-	if(!file) {
-		return 0;
+	VFile_Handle fh = Os_VFileFromFile(filename, Os_FM_WriteBinary, luaAllocator);
+	if(!fh) {
+		lua_pushboolean(L, false);
+		return 1;
 	}
-	auto image = *(Image_ImageHeader const**)ud;
-	bool ret = Image_SaveAsPNG(image, file);
+	auto image = *(Image_ImageHeader **)ud;
+	bool ret = ImageIO_SaveAsPNG(image, fh);
 	lua_pushboolean(L, ret);
+	VFile_Close(fh);
 	return 1;
 }
 
 static int saveAsJPG(lua_State * L) {
 	void* ud = luaL_checkudata(L, 1, MetaName);
 	char const* filename = luaL_checkstring(L, 2);
-	VFile::ScopedFile file = VFile::File::FromFile(filename, Os_FM_WriteBinary);
-	if(!file) {
-		return 0;
+	VFile_Handle fh = Os_VFileFromFile(filename, Os_FM_WriteBinary, luaAllocator);
+	if(!fh) {
+		lua_pushboolean(L, false);
+		return 1;
 	}
-	auto image = *(Image_ImageHeader const**)ud;
-	bool ret = Image_SaveAsJPG(image, file);
+	auto image = *(Image_ImageHeader **)ud;
+	bool ret = ImageIO_SaveAsJPG(image, fh);
 	lua_pushboolean(L, ret);
+	VFile_Close(fh);
 	return 1;
 }
 
 static int saveAsKTX(lua_State * L) {
 	void* ud = luaL_checkudata(L, 1, MetaName);
 	char const* filename = luaL_checkstring(L, 2);
-	VFile::ScopedFile file = VFile::File::FromFile(filename, Os_FM_WriteBinary);
-	if(!file) {
-		return 0;
+	VFile_Handle fh = Os_VFileFromFile(filename, Os_FM_WriteBinary, luaAllocator);
+	if(!fh) {
+		lua_pushboolean(L, false);
+		return 1;
 	}
+	auto image = *(Image_ImageHeader **)ud;
+	bool ret = ImageIO_SaveAsKTX(image, fh);
+	lua_pushboolean(L, ret);
+	VFile_Close(fh);
+	return 1;
+}
+
+
+static int canSaveAsHDR(lua_State * L) {
+	void* ud = luaL_checkudata(L, 1, MetaName);
 	auto image = *(Image_ImageHeader const**)ud;
-	bool ret = Image_SaveAsKTX(image, file);
+	bool ret = false; // TODO ImageIO_CanSaveAsHDR(image);
 	lua_pushboolean(L, ret);
 	return 1;
 }
 
-static int saveAsHDR(lua_State * L) {
+/*static int saveAsHDR(lua_State * L) {
 	void* ud = luaL_checkudata(L, 1, MetaName);
 	char const* filename = luaL_checkstring(L, 2);
-	VFile::ScopedFile file = VFile::File::FromFile(filename, Os_FM_WriteBinary);
-	if(!file) {
+	VFile_Handle fh = Os_VFileFromFile(filename, Os_FM_WriteBinary, luaAllocator);
+	if(!fh) {
+		VFile_Close(fh);
 		return 0;
 	}
 	auto image = *(Image_ImageHeader const**)ud;
-	bool ret = Image_SaveAsHDR(image, file);
+	bool ret = ImageIO_SaveAsHDR(image, fh);
 	lua_pushboolean(L, ret);
+	VFile_Close(fh);
 	return 1;
-}
+}*/
 
 static int canSaveAsDDS(lua_State * L) {
 	void* ud = luaL_checkudata(L, 1, MetaName);
 	Image_ImageHeader* image = *(Image_ImageHeader**)ud;
-	bool ret = Image_CanSaveAsDDS(image);
+	bool ret = ImageIO_CanSaveAsDDS(image);
 	lua_pushboolean(L, ret);
 	return 1;
 }
@@ -765,21 +790,21 @@ static int canSaveAsDDS(lua_State * L) {
 static int canSaveAsTGA(lua_State * L) {
 	void* ud = luaL_checkudata(L, 1, MetaName);
 	Image_ImageHeader* image = *(Image_ImageHeader**)ud;
-	bool ret = Image_CanSaveAsTGA(image);
+	bool ret = ImageIO_CanSaveAsTGA(image);
 	lua_pushboolean(L, ret);
 	return 1;
 }
 static int canSaveAsBMP(lua_State * L) {
 	void* ud = luaL_checkudata(L, 1, MetaName);
 	auto image = *(Image_ImageHeader const**)ud;
-	bool ret = Image_CanSaveAsBMP(image);
+	bool ret = ImageIO_CanSaveAsBMP(image);
 	lua_pushboolean(L, ret);
 	return 1;
 }
 static int canSaveAsPNG(lua_State * L) {
 	void* ud = luaL_checkudata(L, 1, MetaName);
 	auto image = *(Image_ImageHeader const**)ud;
-	bool ret = Image_CanSaveAsPNG(image);
+	bool ret = ImageIO_CanSaveAsPNG(image);
 	lua_pushboolean(L, ret);
 	return 1;
 }
@@ -788,7 +813,7 @@ static int canSaveAsJPG(lua_State * L) {
 	void* ud = luaL_checkudata(L, 1, MetaName);
 
 	auto image = *(Image_ImageHeader const**)ud;
-	bool ret = Image_CanSaveAsJPG(image);
+	bool ret = ImageIO_CanSaveAsJPG(image);
 	lua_pushboolean(L, ret);
 	return 1;
 }
@@ -796,19 +821,10 @@ static int canSaveAsJPG(lua_State * L) {
 static int canSaveAsKTX(lua_State * L) {
 	void* ud = luaL_checkudata(L, 1, MetaName);
 	auto image = *(Image_ImageHeader const**)ud;
-	bool ret = Image_CanSaveAsKTX(image);
+	bool ret = ImageIO_CanSaveAsKTX(image);
 	lua_pushboolean(L, ret);
 	return 1;
 }
-
-static int canSaveAsHDR(lua_State * L) {
-	void* ud = luaL_checkudata(L, 1, MetaName);
-	auto image = *(Image_ImageHeader const**)ud;
-	bool ret = Image_CanSaveAsHDR(image);
-	lua_pushboolean(L, ret);
-	return 1;
-}
-*/
 /*
 ** set functions from list 'l' into table at top - 'nup'; each
 ** function gets the 'nup' elements at the top as upvalues.
@@ -828,51 +844,42 @@ LUALIB_API void luaL_setfuncs (lua_State *L, const luaL_Reg *l, int nup) {
 
 int LuaImage_Open(lua_State* L, Memory_Allocator* allocator) {
 	static const struct luaL_Reg imageObj [] = {
-			{"width", &width},
-			{"height", &height},
-			{"depth", &depth},
-			{"slices", &slices},
-			{"dimensions", &dimensions},
-
-			{"format", &format},
-			{"flags", &flags},
-
-			{"getPixelAt", &getPixelAt},
-			{"setPixelAt", &setPixelAt},
-
-			{"copy", &copy},
-			{"copySlice", &copySlice},
-			{"copyPage", &copyPage},
-			{"copyRow", &copyRow},
-			{"copyPixel", &copyPixel},
-
-			{"is1D", &is1D},
-			{"is2D", &is2D},
-			{"is3D", &is3D},
-			{"isArray", &isArray},
-			{"isCubemap", &isCubemap},
-
-			{"calculateIndex", &calculateIndex },
-
-			{"pixelCount", &pixelCount },
-			{"pixelCountPerSlice", &pixelCountPerSlice },
-			{"pixelCountPerPage", &pixelCountPerPage },
-			{"pixelCountPerRow", &pixelCountPerRow },
-
-			{"byteCount", &byteCount },
-			{"byteCountPerSlice", &byteCountPerSlice },
-			{"byteCountPerPage", &byteCountPerPage },
-			{"byteCountPerRow", &byteCountPerRow },
-
-			{"linkedImageCount", &linkedImageCount},
-			{"linkedImage", &linkedImage},
-
-			{"byteCountOfImageChain", &byteCountOfImageChain},
-			{"bytesRequiredForMipMaps", &bytesRequiredForMipMaps},
-
-			{"clone", &clone},
-			{"cloneStructure", &cloneStructure},
-			{"preciseConvert", &preciseConvert},
+#define ENTRY(name) { #name, &name }
+			ENTRY(width),
+			ENTRY(height),
+			ENTRY(depth),
+			ENTRY(slices),
+			ENTRY(dimensions),
+			ENTRY(format),
+			ENTRY(flags),
+			ENTRY(getPixelAt),
+			ENTRY(setPixelAt),
+			ENTRY(copy),
+			ENTRY(copySlice),
+			ENTRY(copyPage),
+			ENTRY(copyRow),
+			ENTRY(copyPixel),
+			ENTRY(is1D),
+			ENTRY(is2D),
+			ENTRY(is3D),
+			ENTRY(isArray),
+			ENTRY(isCubemap),
+			ENTRY(calculateIndex ),
+			ENTRY(pixelCount ),
+			ENTRY(pixelCountPerSlice ),
+			ENTRY(pixelCountPerPage ),
+			ENTRY(pixelCountPerRow ),
+			ENTRY(byteCount ),
+			ENTRY(byteCountPerSlice ),
+			ENTRY(byteCountPerPage ),
+			ENTRY(byteCountPerRow ),
+			ENTRY(linkedImageCount),
+			ENTRY(linkedImage),
+			ENTRY(byteCountOfImageChain),
+			ENTRY(bytesRequiredForMipMaps),
+			ENTRY(clone),
+			ENTRY(cloneStructure),
+			ENTRY(preciseConvert),
 /*
 			{"createMipMapChain", &createMipMapChain},
       {"fastConvert", &fastConvert},
@@ -884,22 +891,21 @@ int LuaImage_Open(lua_State* L, Memory_Allocator* allocator) {
 			{"compressAMDBC5", &compressAMDBC5},
 			{"compressAMDBC6H", &compressAMDBC6H},
 			{"compressAMDBC7", &compressAMDBC7},
-
-			{"saveAsTGA", &saveAsTGA},
-			{"saveAsBMP", &saveAsBMP},
-			{"saveAsPNG", &saveAsPNG},
-			{"saveAsJPG", &saveAsJPG},
-			{"saveAsHDR", &saveAsHDR},
-			{"saveAsKTX", &saveAsKTX},
-			{"saveAsDDS", &saveAsDDS},
-
-			{"canSaveAsTGA", &canSaveAsTGA},
-			{"canSaveAsBMP", &canSaveAsBMP},
-			{"canSaveAsPNG", &canSaveAsPNG},
-			{"canSaveAsJPG", &canSaveAsJPG},
-			{"canSaveAsHDR", &canSaveAsHDR},
-			{"canSaveAsKTX", &canSaveAsKTX},
-			{"canSaveAsDDS", &canSaveAsDDS},*/
+*/
+			ENTRY(canSaveAsTGA),
+			ENTRY(saveAsTGA),
+			ENTRY(canSaveAsBMP),
+			ENTRY(saveAsBMP),
+			ENTRY(canSaveAsPNG),
+			ENTRY(saveAsPNG),
+			ENTRY(canSaveAsJPG),
+			ENTRY(saveAsJPG),
+			ENTRY(canSaveAsHDR),
+//			ENTRY(saveAsHDR),
+			ENTRY(canSaveAsKTX),
+			ENTRY(saveAsKTX),
+			ENTRY(canSaveAsDDS),
+			ENTRY(saveAsDDS),
 			{"__gc", &imageud_gc },
 			{nullptr, nullptr}  /* sentinel */
 	};
@@ -927,13 +933,12 @@ int LuaImage_Open(lua_State* L, Memory_Allocator* allocator) {
 			ENTRY(createCubemapNoClear),
 			ENTRY(createCubemapArray),
 			ENTRY(createCubemapArrayNoClear),
-
-//			{"load", &load},
-			{nullptr, nullptr}  /* sentinel */
+			ENTRY(load),
+			{nullptr, nullptr}  // sentinel
 #undef ENTRY
 	};
 
-	luaAllocator = allocator;
+	WRITE_CORE_LOCAL(luaAllocator,allocator);
 	luaL_newmetatable(L, MetaName);
 	/* metatable.__index = metatable */
 	lua_pushvalue(L, -1);

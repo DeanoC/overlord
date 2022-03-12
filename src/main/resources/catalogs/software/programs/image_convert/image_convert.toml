@@ -9,4 +9,5 @@ cpus = "host"
 sources = [
     { in = "src", out = "src" },
     { in = "CMakeLists.txt", out = "CMakeLists.txt" },
+    { in = "test.lua", out = "test.lua" },
 ]

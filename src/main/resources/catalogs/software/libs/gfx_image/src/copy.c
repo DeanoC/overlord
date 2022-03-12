@@ -8,14 +8,14 @@
 #include "gfx_image/copy.h"
 
 
-void Image_CopyImageChain(Image_ImageHeader const *src, Image_ImageHeader const *dst) {
+void Image_CopyImageChain(Image_ImageHeader const *src, Image_ImageHeader *dst) {
 	Image_CopyImage(src, dst);
 	if (src->nextType == dst->nextType && src->nextImage && dst->nextImage) {
 		Image_CopyImageChain(src->nextImage, dst->nextImage);
 	}
 }
 
-void Image_CopyImage(Image_ImageHeader const *src, Image_ImageHeader const *dst) {
+void Image_CopyImage(Image_ImageHeader const *src, Image_ImageHeader *dst) {
 	if (src == dst) {
 		return;
 	}
@@ -30,7 +30,7 @@ void Image_CopyImage(Image_ImageHeader const *src, Image_ImageHeader const *dst)
 	}
 }
 
-void Image_CopySlice( Image_ImageHeader const *src, uint32_t sw, Image_ImageHeader const *dst, uint32_t dw) {
+void Image_CopySlice( Image_ImageHeader const *src, uint32_t sw, Image_ImageHeader *dst, uint32_t dw) {
 	assert(dst->depth == src->depth);
 	assert(dst->height == src->height);
 	assert(dst->width == src->width);
@@ -43,11 +43,10 @@ void Image_CopySlice( Image_ImageHeader const *src, uint32_t sw, Image_ImageHead
 	}
 }
 
-void Image_CopyPage(
-		Image_ImageHeader const *src,
-		uint32_t sz, uint32_t sw,
-		Image_ImageHeader const *dst,
-		uint32_t dz, uint32_t dw) {
+void Image_CopyPage(Image_ImageHeader const *src,
+										uint32_t sz, uint32_t sw,
+										Image_ImageHeader *dst,
+										uint32_t dz, uint32_t dw) {
 	assert(dst->height == src->height);
 	assert(dst->width == src->width);
 	if (dst == src) {
@@ -62,7 +61,7 @@ void Image_CopyPage(
 
 void Image_CopyRow(Image_ImageHeader const *src,
                                   uint32_t sy, uint32_t sz, uint32_t sw,
-                                  Image_ImageHeader const *dst,
+                                  Image_ImageHeader *dst,
                                   uint32_t dy, uint32_t dz, uint32_t dw) {
 	assert(dst->width == src->width);
 	if (dst == src) {
@@ -105,7 +104,7 @@ void Image_CopyRow(Image_ImageHeader const *src,
 
 void Image_CopyPixel(Image_ImageHeader const *src,
                                     uint32_t sx, uint32_t sy, uint32_t sz, uint32_t sw,
-                                    Image_ImageHeader const *dst,
+                                    Image_ImageHeader *dst,
                                     uint32_t dx, uint32_t dy, uint32_t dz, uint32_t dw) {
 	size_t const srcIndex = Image_CalculateIndex(src, sx, sy, sz, sw);
 	size_t const dstIndex = Image_CalculateIndex(src, dx, dy, dz, dw);
@@ -114,7 +113,7 @@ void Image_CopyPixel(Image_ImageHeader const *src,
 	Image_SetPixelAtD(dst, (double*)&pixel, dstIndex);
 }
 
-Image_ImageHeader const *Image_Clone(Image_ImageHeader const *image) {
+Image_ImageHeader *Image_Clone(Image_ImageHeader const *image) {
 	Image_ImageHeader * dst = (Image_ImageHeader *) Image_Create(image->width, image->height, image->depth, image->slices, image->format,image->memoryAllocator);
 	if (dst == nullptr) {
 		return nullptr;
@@ -127,7 +126,7 @@ Image_ImageHeader const *Image_Clone(Image_ImageHeader const *image) {
 	return dst;
 }
 
-Image_ImageHeader const *Image_CloneStructure(Image_ImageHeader const *image) {
+Image_ImageHeader *Image_CloneStructure(Image_ImageHeader const *image) {
 	Image_ImageHeader *dst = (Image_ImageHeader *) Image_Create(image->width, image->height, image->depth, image->slices, image->format,image->memoryAllocator);
 	if (dst == nullptr) {
 		return nullptr;
@@ -139,7 +138,7 @@ Image_ImageHeader const *Image_CloneStructure(Image_ImageHeader const *image) {
 	return dst;
 }
 
-Image_ImageHeader const *Image_PreciseConvert(Image_ImageHeader const *image, TinyImageFormat const newFormat) {
+Image_ImageHeader *Image_PreciseConvert(Image_ImageHeader const *image, TinyImageFormat const newFormat) {
 	Image_ImageHeader * dst = (Image_ImageHeader *) Image_Create(image->width, image->height, image->depth, image->slices, newFormat, image->memoryAllocator);
 	if (dst == nullptr) {
 		return nullptr;
@@ -152,7 +151,7 @@ Image_ImageHeader const *Image_PreciseConvert(Image_ImageHeader const *image, Ti
 	return dst;
 }
 
-Image_ImageHeader const *Image_PackMipmaps(Image_ImageHeader const *image) {
+Image_ImageHeader *Image_PackMipmaps(Image_ImageHeader const *image) {
 	if (Image_HasPackedMipMaps(image))
 		return image;
 

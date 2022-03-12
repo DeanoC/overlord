@@ -1,6 +1,4 @@
 #pragma once
-#ifndef BINIFY_AST_H
-#define BINIFY_AST_H
 
 namespace binify {
 namespace ast {
@@ -25,5 +23,3 @@ enum class Statement
 };
 
 } }// end namespaces
-
-#endif //BINIFY_AST_H

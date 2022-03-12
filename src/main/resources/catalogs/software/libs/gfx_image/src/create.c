@@ -5,33 +5,33 @@
 #include "gfx_image/image.h"
 #include "gfx_image/create.h"
 
-EXTERN_C Image_ImageHeader const * Image_Create1D(uint32_t width, enum TinyImageFormat format, Memory_Allocator* memoryAllocator) {
+Image_ImageHeader * Image_Create1D(uint32_t width, enum TinyImageFormat format, Memory_Allocator* memoryAllocator) {
 	return Image_Create(width, 1, 1, 1, format, memoryAllocator);
 }
-EXTERN_C Image_ImageHeader const * Image_Create1DNoClear(uint32_t width, enum TinyImageFormat format, Memory_Allocator* memoryAllocator) {
+Image_ImageHeader * Image_Create1DNoClear(uint32_t width, enum TinyImageFormat format, Memory_Allocator* memoryAllocator) {
 	return Image_CreateNoClear(width, 1, 1, 1, format, memoryAllocator);
 }
-EXTERN_C Image_ImageHeader const *Image_Create1DArray(uint32_t width, uint32_t slices, enum TinyImageFormat format, Memory_Allocator* memoryAllocator) {
+Image_ImageHeader * Image_Create1DArray(uint32_t width, uint32_t slices, enum TinyImageFormat format, Memory_Allocator* memoryAllocator) {
 	return Image_Create(width, 1, 1, slices, format, memoryAllocator);
 }
-EXTERN_C Image_ImageHeader const * Image_Create1DArrayNoClear(uint32_t width, uint32_t slices, enum TinyImageFormat format, Memory_Allocator* memoryAllocator) {
+Image_ImageHeader * Image_Create1DArrayNoClear(uint32_t width, uint32_t slices, enum TinyImageFormat format, Memory_Allocator* memoryAllocator) {
 	return Image_CreateNoClear(width, 1, 1, slices, format, memoryAllocator);
 }
 
-EXTERN_C Image_ImageHeader const * Image_Create2D(uint32_t width, uint32_t height, enum TinyImageFormat format, Memory_Allocator* memoryAllocator) {
+Image_ImageHeader * Image_Create2D(uint32_t width, uint32_t height, enum TinyImageFormat format, Memory_Allocator* memoryAllocator) {
 	return Image_Create(width, height, 1, 1, format, memoryAllocator);
 }
-EXTERN_C Image_ImageHeader const * Image_Create2DNoClear(uint32_t width, uint32_t height, enum TinyImageFormat format, Memory_Allocator* memoryAllocator) {
+Image_ImageHeader * Image_Create2DNoClear(uint32_t width, uint32_t height, enum TinyImageFormat format, Memory_Allocator* memoryAllocator) {
 	return Image_CreateNoClear(width, height, 1, 1, format, memoryAllocator);
 }
-EXTERN_C Image_ImageHeader const * Image_Create2DArray(uint32_t width,
+Image_ImageHeader * Image_Create2DArray(uint32_t width,
                                                        uint32_t height,
                                                        uint32_t slices,
                                                        enum TinyImageFormat format,
 																											 Memory_Allocator* memoryAllocator) {
 	return Image_Create(width, height, 1, slices, format, memoryAllocator);
 }
-EXTERN_C Image_ImageHeader const * Image_Create2DArrayNoClear(uint32_t width,
+Image_ImageHeader * Image_Create2DArrayNoClear(uint32_t width,
                                                               uint32_t height,
                                                               uint32_t slices,
                                                               enum TinyImageFormat format,
@@ -39,17 +39,17 @@ EXTERN_C Image_ImageHeader const * Image_Create2DArrayNoClear(uint32_t width,
 	return Image_CreateNoClear(width, height, 1, slices, format, memoryAllocator);
 }
 
-EXTERN_C Image_ImageHeader const * Image_Create3D(uint32_t width, uint32_t height, uint32_t depth, enum TinyImageFormat format, Memory_Allocator* memoryAllocator) {
+Image_ImageHeader * Image_Create3D(uint32_t width, uint32_t height, uint32_t depth, enum TinyImageFormat format, Memory_Allocator* memoryAllocator) {
 	return Image_Create(width, height, depth, 1, format, memoryAllocator);
 }
-EXTERN_C Image_ImageHeader const * Image_Create3DNoClear(uint32_t width,
+Image_ImageHeader * Image_Create3DNoClear(uint32_t width,
                                                          uint32_t height,
                                                          uint32_t depth,
                                                          enum TinyImageFormat format,
                                                          Memory_Allocator* memoryAllocator) {
 	return Image_CreateNoClear(width, height, depth, 1, format, memoryAllocator);
 }
-EXTERN_C Image_ImageHeader const * Image_Create3DArray(uint32_t width,
+Image_ImageHeader * Image_Create3DArray(uint32_t width,
                                                        uint32_t height,
                                                        uint32_t depth,
                                                        uint32_t slices,
@@ -57,7 +57,7 @@ EXTERN_C Image_ImageHeader const * Image_Create3DArray(uint32_t width,
                                                        Memory_Allocator* memoryAllocator) {
 	return Image_Create(width, height, depth, slices, format, memoryAllocator);
 }
-EXTERN_C Image_ImageHeader const * Image_Create3DArrayNoClear(uint32_t width,
+Image_ImageHeader * Image_Create3DArrayNoClear(uint32_t width,
                                                               uint32_t height,
                                                               uint32_t depth,
                                                               uint32_t slices,
@@ -66,21 +66,21 @@ EXTERN_C Image_ImageHeader const * Image_Create3DArrayNoClear(uint32_t width,
 	return Image_CreateNoClear(width, height, depth, slices, format, memoryAllocator);
 }
 
-EXTERN_C Image_ImageHeader const * Image_CreateCubemap(uint32_t width, uint32_t height, enum TinyImageFormat format, Memory_Allocator* memoryAllocator) {
+Image_ImageHeader * Image_CreateCubemap(uint32_t width, uint32_t height, enum TinyImageFormat format, Memory_Allocator* memoryAllocator) {
 	Image_ImageHeader * image = (Image_ImageHeader *)Image_Create(width, height, 1, 6, format, memoryAllocator);
 	if(image) {
 		image->flags = Image_Flag_Cubemap;
 	}
 	return image;
 }
-EXTERN_C Image_ImageHeader const * Image_CreateCubemapNoClear(uint32_t width, uint32_t height, enum TinyImageFormat format, Memory_Allocator* memoryAllocator) {
+Image_ImageHeader * Image_CreateCubemapNoClear(uint32_t width, uint32_t height, enum TinyImageFormat format, Memory_Allocator* memoryAllocator) {
 	Image_ImageHeader * image = (Image_ImageHeader *)Image_CreateNoClear(width, height, 1, 6, format, memoryAllocator);
 	if(image) {
 		image->flags = Image_Flag_Cubemap;
 	}
 	return image;
 }
-EXTERN_C Image_ImageHeader const * Image_CreateCubemapArray(uint32_t width,
+Image_ImageHeader * Image_CreateCubemapArray(uint32_t width,
                                                             uint32_t height,
                                                             uint32_t slices,
                                                             enum TinyImageFormat format, Memory_Allocator* memoryAllocator) {
@@ -91,7 +91,7 @@ EXTERN_C Image_ImageHeader const * Image_CreateCubemapArray(uint32_t width,
 	}
 	return image;
 }
-EXTERN_C Image_ImageHeader const*Image_CreateCubemapArrayNoClear(uint32_t width,
+Image_ImageHeader * Image_CreateCubemapArrayNoClear(uint32_t width,
                                                                  uint32_t height,
                                                                  uint32_t slices,
                                                                  enum TinyImageFormat format, Memory_Allocator* memoryAllocator) {
@@ -103,15 +103,15 @@ EXTERN_C Image_ImageHeader const*Image_CreateCubemapArrayNoClear(uint32_t width,
 	return image;
 }
 
-EXTERN_C Image_ImageHeader const * Image_CreateCLUT(uint32_t width, uint32_t height, TinyImageFormat format, uint32_t clutSize, Memory_Allocator* memoryAllocator) {
+Image_ImageHeader * Image_CreateCLUT(uint32_t width, uint32_t height, TinyImageFormat format, uint32_t clutSize, Memory_Allocator* memoryAllocator) {
 	return Image_CreateCLUTArray(width, height, 1, format, clutSize, memoryAllocator);
 }
 
-EXTERN_C Image_ImageHeader const * Image_CreateCLUTNoClear(uint32_t width, uint32_t height, TinyImageFormat format, uint32_t clutSize, Memory_Allocator* memoryAllocator) {
+Image_ImageHeader * Image_CreateCLUTNoClear(uint32_t width, uint32_t height, TinyImageFormat format, uint32_t clutSize, Memory_Allocator* memoryAllocator) {
 	return Image_CreateCLUTArrayNoClear(width, height, 1, format, clutSize, memoryAllocator);
 }
 
-EXTERN_C Image_ImageHeader const * Image_CreateCLUTArray(uint32_t width,
+Image_ImageHeader * Image_CreateCLUTArray(uint32_t width,
                                                          uint32_t height,
                                                          uint32_t slices,
                                                          TinyImageFormat format,
@@ -136,7 +136,7 @@ EXTERN_C Image_ImageHeader const * Image_CreateCLUTArray(uint32_t width,
 	}
 	return image;
 }
-EXTERN_C Image_ImageHeader const * Image_CreateCLUTArrayNoClear(uint32_t width,
+Image_ImageHeader * Image_CreateCLUTArrayNoClear(uint32_t width,
                                                                 uint32_t height,
                                                                 uint32_t slices,
                                                                 TinyImageFormat format,

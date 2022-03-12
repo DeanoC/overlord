@@ -11,6 +11,8 @@
 #define BRANCH_LIKELY(x) __builtin_expect((x),1)
 #define BRANCH_UNLIKELY(x) __builtin_expect((x),0)
 
+#define RESTRICT __restrict
+
 #define WEAK_LINKAGE __attribute__((weak))
 #define WARN_UNUSED_RESULT __attribute__((warn_unused_result))
 #define PACKED  __attribute__((__packed__))
@@ -36,9 +38,9 @@
 #define CONST_EXPR
 #define static_assert(...) _Static_assert(__VA_ARGS__)
 #define NO_RETURN _Noreturn
-#define EXTERN_C
+#define EXTERN_C extern
 #endif
-#define ALLOCA(x) __builtin_alloca(x)
+#define STACK_ALLOC(x) __builtin_alloca(x)
 
 typedef float float_t;
 typedef double double_t;
@@ -46,17 +48,26 @@ typedef double double_t;
 typedef uint32_t uintptr_lo_t;
 typedef uint64_t uintptr_all_t;
 
+#if CPU_host != 1
 EXTERN_C WARN_UNUSED_RESULT int memcmp ( const void * a, const void * b, size_t num ) NON_NULL(1,2);
 
-EXTERN_C void * memset ( void *destination, int c, size_t num ) NON_NULL(1);
-EXTERN_C void * memcpy ( void * destination, const void * source, size_t bytes ) NON_NULL(1, 2);
-EXTERN_C void * memmove ( void * destination, const void * source, size_t bytes ) NON_NULL(1,2);
-#ifndef CPU_host
-ALWAYS_INLINE long unsigned int strlen(char const * const str) {
+EXTERN_C void * memset ( void * RESTRICT destination, int c, size_t num ) NON_NULL(1);
+EXTERN_C void * memcpy ( void * RESTRICT destination, const void * RESTRICT source, size_t bytes ) NON_NULL(1, 2);
+EXTERN_C void * memmove ( void * RESTRICT destination, const void * RESTRICT source, size_t bytes )NON_NULL(1,2);
+
+ALWAYS_INLINE long unsigned int strlen(char const * const RESTRICT str) {
 	char const * p = str;
 	while(*p){ p++; };
 	return p - str;
 }
+#else
+#ifndef __cplusplus
+	#include <string.h>
+#else
+	#include <cstring>
+	#include <string>
+#endif
+
 #endif
 
 #define IKUY_DEBUG_BREAK() __builtin_trap();

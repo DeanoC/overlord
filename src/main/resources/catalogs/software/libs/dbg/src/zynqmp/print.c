@@ -62,6 +62,7 @@ void debug_print(char const *const text){
 }
 
 void debug_printf(const char *format, ...) {
+
 	char buffer[256]; // 256 byte max string (on stack)
 	va_list va;
 	va_start(va, format);

@@ -79,8 +79,7 @@ CONST_EXPR ALWAYS_INLINE type Math_RadiansToDegrees##_##postfix(type const val) 
 CONST_EXPR ALWAYS_INLINE type Math_Reciprocal##_##postfix(type const a) { return 1 / a; } 									\
 CONST_EXPR ALWAYS_INLINE int Math_Sign##_##postfix(type val) { return (0 < val) - (val < 0); }                                                                  \
 
-//CONST_EXPR ALWAYS_INLINE type Math_Sqrt##_##postfix(type const a) { return (type)sqrt((double)a); } 				\
-//CONST_EXPR ALWAYS_INLINE type Math_ReciprocalSqrt##_##postfix(type const a) { return 1 / (type)sqrt((double)a); }
+//CONST_EXPR ALWAYS_INLINE type Math_Sqrt##_##postfix(type const a) { return (type)sqrt((double)a); } 				CONST_EXPR ALWAYS_INLINE type Math_ReciprocalSqrt##_##postfix(type const a) { return 1 / (type)sqrt((double)a); }
 
 #if MATH_FM_USE_BUILTIN == 1
 // use gcc builtin

@@ -42,7 +42,7 @@ else()
 endif()
 
 if(SRCS_LENGTH)
-	add_library(${project} ${SRC} ${HEADERLIST})
+	add_library(${project} ${SRCS} ${HEADERLIST})
 	target_include_directories(${project} PUBLIC include)
 	target_link_libraries(${project} PRIVATE ${PRIVATE_LIBRARIES})
 else()

@@ -51,6 +51,11 @@ set(PRIVATE_LIBRARIES
 		memory
 		tiny_image_format
 		)
+if(${CPU} STREQUAL "host")
+	list(APPEND PRIVATE_LIBRARIES host_platform)
+else()
+	list(APPEND PRIVATE_LIBRARIES musl_math)
+endif()
 
 if(SRCS_LENGTH)
 	add_library(${project} ${SRCS} ${HEADERS})

@@ -1,6 +1,11 @@
 set(project host_os)
 project(${project} C ASM CXX)
 
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS ON)
+
 # requires parent cmake project to set BOARD_ SOC_ CPU_ and CPU_ARCH
 file(GLOB CLIST CONFIGURE_DEPENDS
 		src/*.c
@@ -14,7 +19,9 @@ file(GLOB CPPLIST CONFIGURE_DEPENDS
 		src/${BOARD}/*.cpp
 		src/${SOC}/*.cpp
 		src/${CPU_ARCH}/*.cpp
-		src/${CPU}/*.cpp )
+		src/${CPU}/*.cpp
+		src/posix/*.cpp
+		)
 
 file(GLOB ASMLIST CONFIGURE_DEPENDS
 		src/*.S
@@ -38,6 +45,7 @@ file(GLOB CPPHEADERLIST CONFIGURE_DEPENDS
 		include/${CPU_ARCH}/*.hpp
 		include/${CPU}/*.hpp
 		)
+
 set( SRCS ${CLIST} ${CPPLIST} ${ASMLIST})
 set( HEADERS ${CHEADERLIST} ${CPPHEADERLIST})
 
@@ -49,6 +57,8 @@ set(PRIVATE_LIBRARIES
 		core
 		dbg
 		memory
+		vfile
+		host_platform
 		)
 
 if(SRCS_LENGTH)

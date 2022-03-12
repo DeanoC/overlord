@@ -39,10 +39,10 @@ EXTERN_C Memory_Allocator Memory_GlobalAllocator;
 #if MEMORY_TRACKING_SETUP == 1
 
 #define Memory_TrackingPaddingSize 4
-#define MALLOC(allocator, size) ((Memory_TrackerPushNextSrcLoc(__FILE__, __LINE__, __FUNCTION__)) ? (allocator)->malloc(size) : NULL)
-#define AALLOC(allocator, size, align) ((Memory_TrackerPushNextSrcLoc(__FILE__, __LINE__, __FUNCTION__)) ? (allocator)->aalloc(size, align) : NULL)
-#define CALLOC(allocator, count, size) ((Memory_TrackerPushNextSrcLoc(__FILE__, __LINE__, __FUNCTION__)) ? (allocator)->calloc(count, size) : NULL)
-#define REALLOC(allocator, orig, size) ((Memory_TrackerPushNextSrcLoc(__FILE__, __LINE__, __FUNCTION__)) ? (allocator)->realloc(orig, size) : NULL)
+#define MALLOC(allocator, size) ((Memory_TrackerPushNextSrcLoc(__FILE__, __LINE__, __func__)) ? (allocator)->malloc(size) : nullptr)
+#define MAALLOC(allocator, size, align) ((Memory_TrackerPushNextSrcLoc(__FILE__, __LINE__, __func__)) ? (allocator)->aalloc(size, align) : nullptr)
+#define MCALLOC(allocator, count, size) ((Memory_TrackerPushNextSrcLoc(__FILE__, __LINE__, __func__)) ? (allocator)->calloc(count, size) : nullptr)
+#define MREALLOC(allocator, orig, size) ((Memory_TrackerPushNextSrcLoc(__FILE__, __LINE__, __func__)) ? (allocator)->realloc(orig, size) : nullptr)
 #define MFREE(allocator, ptr) (allocator)->free(ptr)
 
 // to use tracking on custom allocated, add these in the same way trackedMalloc etc in memory.c does for the
@@ -72,9 +72,9 @@ EXTERN_C bool Memory_TrackedFree(const void *reportedAddress);
 #else
 
 #define MALLOC(allocator, size) (allocator)->malloc(size)
-#define AALLOC(allocator, size, align) (allocator)->aalloc(size, align)
-#define CALLOC(allocator, count, size) (allocator)->calloc(count, size)
-#define REALLOC(allocator, orig, size) (allocator)->realloc(orig, size)
+#define MAALLOC(allocator, size, align) (allocator)->aalloc(size, align)
+#define MCALLOC(allocator, count, size) (allocator)->calloc(count, size)
+#define MREALLOC(allocator, orig, size) (allocator)->realloc(orig, size)
 #define MFREE(allocator, ptr) (allocator)->free(ptr)
 
 #define Memory_TrackerCalculateActualSize(reportedSize) (reportedSize)
@@ -84,8 +84,8 @@ EXTERN_C void *Memory_TrackedRealloc(const char *a ,const unsigned int b, const 
 
 #endif
 
-#undef ALLOCA
-#define ALLOCA(x) __builtin_alloca(x)
+#undef STACK_ALLOC
+#define STACK_ALLOC(x) __builtin_alloca(x)
 
 #if __cplusplus
 #include <new>

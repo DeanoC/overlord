@@ -1,4 +1,4 @@
-set(project memory)
+set(project cadt)
 project(${project} C ASM CXX)
 
 # requires parent cmake project to set BOARD_ SOC_ CPU_ and CPU_ARCH
@@ -41,6 +41,7 @@ file(GLOB CPPHEADERLIST CONFIGURE_DEPENDS
 add_library(${project} ${CLIST} ${CPPLIST} ${ASMLIST} ${CHEADERLIST} ${CPPHEADERLIST})
 target_link_libraries(${project} PRIVATE core)
 target_link_libraries(${project} PRIVATE dbg)
+target_link_libraries(${project} PRIVATE memory)
 target_link_libraries(${project} PRIVATE multi_core)
 
 target_include_directories(${project} PUBLIC include)

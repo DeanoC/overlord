@@ -37,7 +37,7 @@ EXTERN_C bool Os_ReplaceExtension(utf8_int8_t const * path,
 
   utf8_int8_t const * const lastDot = utf8rchr(path, '.');
   if(lastDot == nullptr) {
-    utf8_int8_t * tmpExt = (utf8_int8_t *) ALLOCA(utf8size(newExtension + 1));
+    utf8_int8_t * tmpExt = (utf8_int8_t *) STACK_ALLOC(utf8size(newExtension + 1));
     tmpExt[0] = '.';
     memcpy(tmpExt+1, newExtension, utf8size(newExtension));
     utf8ncpy(dirOut, path, maxSize);

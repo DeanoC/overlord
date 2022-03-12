@@ -1,5 +1,6 @@
 #include "core/core.h"
 #include "vfile/vfile.h"
+#include "vfile/utils.h"
 #include "vfile_memory/memory.h"
 #include "memory/memory.h"
 
@@ -118,7 +119,7 @@ EXTERN_C VFile_Handle VFileMemory_FromBuffer(void const *memory, size_t size, bo
 
 	VFileMemory_Data_t *vof = (VFileMemory_Data_t *) (vif + 1);
   vif->magic = InterfaceMagic;
-  vif->type = 1;// TODO VFile_Type_Memory;
+  vif->type = VFILE_MAKE_ID('M', 'E', 'M', ' ');
   vif->closeFunc = &VFile_MemFile_Close;
   vif->flushFunc = &VFile_MemFile_Flush;
   vif->readFunc = &VFile_MemFile_Read;

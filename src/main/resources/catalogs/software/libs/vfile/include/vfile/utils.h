@@ -26,3 +26,5 @@ EXTERN_C double VFile_ReadDouble(VFile_Handle handle);
 EXTERN_C size_t VFile_ReadString(VFile_Handle handle, char *buffer, size_t maxSize);
 EXTERN_C void VFile_ReadFileID(VFile_Handle handle, char buffer[4]);
 EXTERN_C size_t VFile_ReadLine(VFile_Handle handle, char *buffer, size_t maxSize);
+
+#define VFILE_MAKE_ID(a,b,c,d) ((a) << 24U | (b) << 16U | (c) << 8U | (a) << 0U)

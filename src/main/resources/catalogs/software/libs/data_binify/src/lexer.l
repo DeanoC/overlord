@@ -9,8 +9,8 @@
 
 %{
     #define YY_NO_UNISTD_H
-    #include "al2o3_tinystl/string.hpp"
-    #include "ast.h"
+    #include <string>
+    #include "ast.hpp"
     #include "parser.hpp"
     #include "scanner.h"
 
@@ -19,15 +19,15 @@
                     yylval->build<type>(val);           \
                     return yy::parser::token::T_##tok;
 
-    #define YY_TXT                  tinystl::string(yytext, yyleng)
-    #define YY_FNUM					std::stod(tinystl::string(yytext, yyleng).c_str())
-    #define YY_INUM(base)           std::stoull(tinystl::string(yytext, yyleng).c_str(), 0, base)
+    #define YY_TXT                  std::string(yytext, yyleng)
+    #define YY_FNUM					std::stod(std::string(yytext, yyleng).c_str())
+    #define YY_INUM(base)           std::stoull(std::string(yytext, yyleng).c_str(), 0, base)
 
     #define INT_TOKEN(base)     	YIELD_TOKEN(INTNUM, YY_INUM(base), int64_t)
     #define FLT_TOKEN()          	YIELD_TOKEN(FPNUM, YY_FNUM, double)
     #define TYPE_TOKEN(val)         YIELD_TOKEN(val, binify::ast::Type:: val, binify::ast::Type)
     #define STATEMENT_TOKEN(val)    YIELD_TOKEN(val, binify::ast::Statement:: val, binify::ast::Statement)
-    #define STR_TOKEN(tok)          YIELD_TOKEN(tok, YY_TXT, tinystl::string)
+    #define STR_TOKEN(tok)          YIELD_TOKEN(tok, YY_TXT, std::string)
 
     // before executing an action, set the length of the location from
     // the length of the matched pattern:

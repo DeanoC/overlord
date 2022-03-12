@@ -1,6 +1,6 @@
 #include "memory/memory.h"
 
-Memory_Allocator Memory_GlobalAllocator = {
+Memory_Allocator Memory_GlobalAllocator = { 0
 //        .aalloc = platform_aligned_alloc,
 //       .calloc = platform_calloc,
 //        .free = platform_free,

@@ -2,6 +2,8 @@
 #include "core/utf8.h"
 #include "memory/memory.h"
 #include "vfile/vfile.h"
+#include "data_utils/lz4.h"
+#include "data_utils/crc32c.h"
 #include "resource_bundle.h"
 
 static const uint8_t ResourceBundle_MajorVersion = 1;
@@ -74,10 +76,8 @@ ResourceBundle_LoadReturn ResourceBundle_Load(VFile_Handle fileHandle,
 		if(dir->uncompressedSize != dir->storedSize) {
 			// chunk is compressed
 			// so we have to decompress to the temp buffer then copy that back over the top
-			int okay = LZ4_decompress_safe((char*) chunkDestAddress,
-			                               (char*) decompressionBuffer,
-			                               (int) dir->storedSize,
-			                               (int) dir->uncompressedSize);
+			int okay = LZ4_Decompress(chunkDestAddress, dir->storedSize,
+																decompressionBuffer, dir->uncompressedSize);
 
 			if(okay < 0 || okay != dir->uncompressedSize) {
 				ret.errorCode = RBEC_CompressionError;
@@ -87,8 +87,8 @@ ResourceBundle_LoadReturn ResourceBundle_Load(VFile_Handle fileHandle,
 		}
 
 		// do a crc check in case of corruption from somewhere
-		uint32_t ucrc32c = crc32c_append(0, chunkDestAddress, dir->uncompressedSize);
-		if(ucrc32c != dir->uncompressedCrc32c) return {
+		uint32_t ucrc32c = CRC32C_Calculate(0, chunkDestAddress, dir->uncompressedSize);
+		if(ucrc32c != dir->uncompressedCrc32c) {
 			ret.errorCode = RBEC_CorruptError;
 			goto errorExit;
 		};

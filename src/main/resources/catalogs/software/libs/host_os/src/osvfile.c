@@ -1,6 +1,7 @@
 
 #include "core/core.h"
 #include "core/utf8.h"
+#include "dbg/print.h"
 #include "memory/memory.h"
 #include "host_os/file.h"
 #include "vfile/vfile.h"
@@ -54,31 +55,33 @@ static bool VFile_OsFile_IsEOF(VFile_Interface_t *vif) {
 	return Os_FileIsEOF(vof->fileHandle);
 }
 
-#if MEMORY_TRACKING_SETUP == 1
-#undef Os_VFileFromFile
-#undef Os_AllFromFile
-#endif
 
 EXTERN_C void* Os_AllFromFile(char const *filename, bool text, size_t* outSize, Memory_Allocator* allocator) {
-	VFile_Handle fh = Os_VFileFromFile(filename, text ? Os_FM_Read : Os_FM_ReadBinary);
+	VFile_Handle fh = Os_VFileFromFile(filename, text ? Os_FM_Read : Os_FM_ReadBinary, allocator);
+	if(!fh) {
+		debug_printf("ERROR: File not found %s\n", filename);
+	}
 	size_t const size = VFile_Size(fh);
-#if MEMORY_TRACKING_SETUP == 1
-	// call the allocator direct, so that the line and file comes free the caller
-	void *ret = allocator->malloc(size);
-#else
 	void *ret = MALLOC(allocator, size);
-#endif
 	if(ret != nullptr) {
 		VFile_Read(fh, ret, size);
 		if(outSize != nullptr) *outSize = size;
 	} else {
+		debug_printf("ERROR: Malloc failed %s\n", filename);
 		if(outSize != nullptr) *outSize = 0;
 	}
 	VFile_Close(fh);
 	return ret;
 }
 
-EXTERN_C VFile_Handle Os_VFileFromFile(char const *filename, enum Os_FileMode mode) {
+#if MEMORY_TRACKING_SETUP == 1
+#undef Os_VFileFromFile
+#define LOCAL_MALLOC(a, s) (allocator)->malloc((s))
+#else
+#define LOCAL_MALLOC(a, s) MALLOC((a),(s))
+#endif
+
+EXTERN_C VFile_Handle Os_VFileFromFile(char const *filename, enum Os_FileMode mode, Memory_Allocator* allocator) {
 	Os_FileHandle handle = Os_FileOpen(filename, mode);
 	if (handle == nullptr) { return nullptr; }
 
@@ -86,12 +89,7 @@ EXTERN_C VFile_Handle Os_VFileFromFile(char const *filename, enum Os_FileMode mo
 			sizeof(VFile_Interface_t) +
 			sizeof(Os_VFile_t) +
 			utf8size(filename) + 1;
-#if MEMORY_TRACKING_SETUP == 1
-	// call the allocator direct, so that the line and file comes free the caller
-	VFile_Interface_t *vif = (VFile_Interface_t *) Memory_GlobalAllocator.malloc(mallocSize);
-#else
-	VFile_Interface_t *vif = (VFile_Interface_t *) MEMORY_MALLOC(mallocSize);
-#endif
+	VFile_Interface_t *vif = (VFile_Interface_t *) LOCAL_MALLOC(allocator, mallocSize);
 	vif->magic = InterfaceMagic;
 	vif->type =   vif->type = VFILE_MAKE_ID('O', 'S', 'F', 'L');
 	vif->closeFunc = &VFile_OsFile_Close;

@@ -30,7 +30,7 @@ WEAK_LINKAGE void OsService_PrintWithSize(unsigned int count, const char *const 
 		OsService_InlinePrint(count, text);
 	} else {
 		uint32_t const totalSize = count + IPI3_HEADER_SIZE + sizeof(IPI3_DdrPacket);
-		char *buffer = ALLOCA(totalSize); // string to send to OS (in DDR stack)
+		char *buffer = STACK_ALLOC(totalSize); // string to send to OS (in DDR stack)
 		IPI3_Msg* msg = (IPI3_Msg*) buffer;
 		msg->function = OSF_PTR_PRINT;
 		msg->ddrPtrFlag = true;

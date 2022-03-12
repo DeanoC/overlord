@@ -1,4 +1,8 @@
 #pragma once
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 typedef enum TinyImageFormat_Namespace {
 	TinyImageFormat_NAMESPACE_PACK = 0ULL,
@@ -279,3 +283,7 @@ typedef enum TinyImageFormat_Bits {
 				((TinyImageFormat_CLUT_BITS_REQUIRED_BITS * TinyImageFormat_CLUT_NUM_CHANNELS) + TinyImageFormat_CLUT_BITS_SHIFT),
 
 } TinyImageFormat_Bits;
+
+#ifdef __cplusplus
+}
+#endif

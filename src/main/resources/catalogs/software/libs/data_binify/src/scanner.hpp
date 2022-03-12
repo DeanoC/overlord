@@ -259,7 +259,7 @@ void yyfree ( void *  );
 
 #define yytext_ptr yytext
 
-#include <FlexLexer.h>
+#include "FlexLexer.hpp"
 
 int yyFlexLexer::yywrap() { return 1; }
 

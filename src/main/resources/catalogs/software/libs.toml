@@ -24,6 +24,11 @@ type = "library.utils"
 software = "libs/utils/utils.toml"
 
 [[definition]]
+name = "cadt"
+type = "library.cadt"
+software = "libs/cadt/cadt.toml"
+
+[[definition]]
 name = "vfile"
 type = "library.vfile"
 software = "libs/vfile/vfile.toml"
@@ -63,18 +68,6 @@ software = "libs/host_os/host_os.toml"
 cpus = "host"
 
 [[definition]]
-name = "tiny_dds"
-type = "library.tiny_dds"
-software = "libs/tiny_dds/tiny_dds.toml"
-cpus = "host"
-
-[[definition]]
-name = "tiny_ktx"
-type = "library.tiny_ktx"
-software = "libs/tiny_ktx/tiny_ktx.toml"
-cpus = "host"
-
-[[definition]]
 name = "luau"
 type = "library.luau"
 software = "libs/luau/luau.toml"
@@ -103,3 +96,15 @@ name = "musl_math"
 type = "library.musl_math"
 software = "libs/musl_math/musl_math.toml"
 cpus = "a53,r5f"
+
+[[definition]]
+name = "data_utils"
+type = "library.data_utils"
+software = "libs/data_utils/data_utils.toml"
+cpus = "a53,host"
+
+[[definition]]
+name = "data_binify"
+type = "library.data_binify"
+software = "libs/data_binify/data_binify.toml"
+cpus = "host"

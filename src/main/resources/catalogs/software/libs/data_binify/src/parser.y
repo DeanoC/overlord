@@ -22,16 +22,16 @@
 %token END     			0   		"end of file"
 %token <int64_t> 		INTNUM 		"int64"
 %token <double>			FPNUM		"double"
-%token <tinystl::string> 	STRING 		"string"
-%token <tinystl::string> 	IDENTIFIER 	"identifier"
+%token <std::string> 	STRING 		"string"
+%token <std::string> 	IDENTIFIER 	"identifier"
 
 %token <binify::ast::Statement> Align Blank LittleEndian BigEndian AddressLen
                                 Fixup Type AllowNan AllowInfinity
 %token <binify::ast::Type> U8 U16 U32 U64 S8 S16 S32 S64 Float Double
 
-%left '-' '+' 
+%left '-' '+'
 %left '*' '/'
-%left '|' 
+%left '|'
 %left '(' ')'
 %left NEG
 %left '='
@@ -41,9 +41,9 @@
 %type <binify::ast::Type> type
 
 %code requires {
-    #include "al2o3_tinystl/string.hpp"
+    #include <string>
 
-    #include "ast.h"
+    #include "ast.hpp"
     #include "location.hh"
 
     namespace yy {
@@ -55,7 +55,7 @@
     struct ParserOutput {
     	virtual void IntDefault( int64_t i ) = 0;
 		virtual void FloatDefault( double f ) = 0;
-		virtual void String( tinystl::string str ) = 0;
+		virtual void String( std::string str ) = 0;
 		virtual void Float( double d ) = 0;
 		virtual void Double( double d ) = 0;
 		virtual void U8( uint64_t i ) = 0;
@@ -65,7 +65,7 @@
 		virtual void S8( int64_t i ) = 0;
 		virtual void S16( int64_t i ) = 0;
 		virtual void S32( int64_t i ) = 0;
-		virtual void S64( int64_t i ) = 0;    	
+		virtual void S64( int64_t i ) = 0;
 		virtual void SetDefaultType( binify::ast::Type type ) = 0;
 		virtual void SetByteOrder( binify::ast::Statement order ) = 0;
 		virtual void AllowNan( int64_t yesno ) = 0;
@@ -74,10 +74,10 @@
 		virtual void Blank( int64_t count ) = 0;
 		virtual void SetAddressLen( int64_t bits ) = 0;
 		virtual void Fixup(uint64_t i) = 0;
-		virtual void SetSymbolToOffset( tinystl::string name ) = 0;
-		virtual void SetSymbol( tinystl::string name, int64_t i ) = 0;
-		virtual void SetPass0Symbol( tinystl::string name, int64_t i ) = 0;
-		virtual int64_t LookupSymbol( tinystl::string name ) = 0;
+		virtual void SetSymbolToOffset( std::string name ) = 0;
+		virtual void SetSymbol( std::string name, int64_t i ) = 0;
+		virtual void SetPass0Symbol( std::string name, int64_t i ) = 0;
+		virtual int64_t LookupSymbol( std::string name ) = 0;
     };
 	} // end namespace 
 

@@ -1,6 +1,8 @@
-#include "al2o3_tinystl/string.hpp"
-#include "utils_fmt/format.h"
-#include "binify.h"
+#include <string>
+//#include <format>
+#include "data_binify/fmt/format.hpp"
+#include "./binify.hpp"
+#include "scanner.h"
 
 // still need these from system stl for now
 #include <istream>
@@ -14,7 +16,7 @@
 
 namespace binify {
 
-bool Binify::parse( tinystl::string const& txt_, std::ostream* out_ )
+bool Binify::parse( std::string const& txt_, std::ostream* out_ )
 {
 	int result = 0;
 	out = out_;
@@ -50,7 +52,7 @@ bool Binify::parse( tinystl::string const& txt_, std::ostream* out_ )
 	return true;
 }
 
-void Binify::SetSymbolToOffset( tinystl::string name )
+void Binify::SetSymbolToOffset( std::string name )
 {
 	if( pass == 0 )
 	{
@@ -62,7 +64,7 @@ void Binify::SetSymbolToOffset( tinystl::string name )
 	}
 }
 
-void Binify::SetPass0Symbol( tinystl::string name, int64_t i )
+void Binify::SetPass0Symbol( std::string name, int64_t i )
 {
 	if( pass == 0 )
 	{
@@ -70,7 +72,7 @@ void Binify::SetPass0Symbol( tinystl::string name, int64_t i )
 	}
 }
 
-void Binify::SetSymbol( tinystl::string name, int64_t i )
+void Binify::SetSymbol( std::string name, int64_t i )
 {
 	if( debugMode )
 		log += fmt::format("{} = {}", name.c_str(), i).c_str();
@@ -79,7 +81,7 @@ void Binify::SetSymbol( tinystl::string name, int64_t i )
 }
 
 
-int64_t Binify::LookupSymbol( tinystl::string name )
+int64_t Binify::LookupSymbol( std::string name )
 {
 //	printf("Lookup( %s )\n", name );
 
@@ -148,7 +150,7 @@ void Binify::SetDefaultType( ast::Type type )
 
 void Binify::SetByteOrder( ast::Statement order )
 {
-	ASSERT(order == ast::Statement::BigEndian || order == ast::Statement::LittleEndian);
+	assert(order == ast::Statement::BigEndian || order == ast::Statement::LittleEndian);
 	byteOrder = order;
 }
 void Binify::AllowNan( int64_t yesno )
@@ -178,7 +180,7 @@ void Binify::Blank( int64_t count )
 }
 
 
-void Binify::String( tinystl::string sstr )
+void Binify::String( std::string sstr )
 {
 	const char* p;
 	size_t i;
@@ -186,9 +188,9 @@ void Binify::String( tinystl::string sstr )
 	char const* str = sstr.c_str();
 
 	size_t len = strlen(str);
-	ASSERT( len >= 2 );
-	ASSERT( str[0] == '\"' );
-	ASSERT( str[len-1] == '\"' );
+	assert( len >= 2 );
+	assert( str[0] == '\"' );
+	assert( str[len-1] == '\"' );
 
 	p = str+1;
 	i=1;
@@ -198,7 +200,7 @@ void Binify::String( tinystl::string sstr )
 		++i;
 		if( c == '\\' )
 		{
-			ASSERT( i<len-1 );	// should be proper error check?
+			assert( i<len-1 );	// should be proper error check?
 			++i;
 			switch( *p++ )
 			{
@@ -214,7 +216,7 @@ void Binify::String( tinystl::string sstr )
 	}
 }
 
-template<typename T> T SafeConvert(tinystl::string& log, uint64_t i)
+template<typename T> T SafeConvert(std::string& log, uint64_t i)
 {
 	bool rangeErr = (std::is_signed<T>()) ?
 			   (i < std::numeric_limits<T>::max() || i > std::numeric_limits<T>::max()) :
@@ -350,7 +352,7 @@ void Binify::IntDefault( int64_t i )
 			U64( u.ui64 );
 			break;
 		}
-		default: ASSERT(false && "IntDefault called from non integer type!");
+		default: assert(false && "IntDefault called from non integer type!");
 	}
 }
 
@@ -400,36 +402,38 @@ void Binify::Fixup(uint64_t i)
 } // end namespace
 
 // C api for binify
-#include "data_binify/binify.h"
-#include "al2o3_memory/memory.h"
-#include "al2o3_cadt/vector.h"
+#include "data_binify/data_binify.h"
+#include "memory/memory.h"
+#include "cadt/vector.h"
 
 struct Binify_Context
 {
 	CADT_VectorHandle data;
+	Memory_Allocator * allocator;
 };
 
-AL2O3_EXTERN_C Binify_ContextHandle Binify_Create(char const * const in) {
+EXTERN_C Binify_ContextHandle Binify_Create(char const * const in, Memory_Allocator* allocator, Memory_Allocator* tempAllocator) {
 	std::string tmp;
 	std::ostringstream dir;
 	bool okay;
 	binify::Binify *binny;
 
-	Binify_Context* ctx = (Binify_Context*)MEMORY_CALLOC(1, sizeof(Binify_Context));
-	if(ctx == NULL) goto failexit;
+	Binify_Context* ctx = (Binify_Context*)MCALLOC(allocator, 1, sizeof(Binify_Context));
+	if(ctx == nullptr) goto failexit;
+	ctx->allocator = allocator;
 
-	binny = (binify::Binify*) MEMORY_TEMP_CALLOC(1, sizeof(binify::Binify));
+	binny = (binify::Binify*) MCALLOC(tempAllocator, 1, sizeof(binify::Binify));
 	new(binny) binify::Binify();
 
 	okay = binny->parse( in, &dir );
 	if(!okay) goto failexit;
 	if(binny) {
 		binny->~Binify();
-		MEMORY_TEMP_FREE(binny);
+		MFREE(tempAllocator, binny);
 	}
 
 	tmp = dir.str();
-	ctx->data = CADT_VectorCreate(sizeof(uint8_t));
+	ctx->data = CADT_VectorCreate(sizeof(uint8_t), ctx->allocator);
 	CADT_VectorResize(ctx->data, tmp.size());
 	memcpy(CADT_VectorData(ctx->data), tmp.data(), tmp.size());
 
@@ -438,22 +442,22 @@ AL2O3_EXTERN_C Binify_ContextHandle Binify_Create(char const * const in) {
 failexit:
 	if(binny) {
 		binny->~Binify();
-		MEMORY_TEMP_FREE(binny);
+		MFREE(tempAllocator, binny);
 	}
-	MEMORY_FREE(ctx);
+	MFREE(allocator, ctx);
 	return nullptr;
 }
 
-AL2O3_EXTERN_C void Binify_Destroy( Binify_ContextHandle handle ) {
-	MEMORY_FREE(handle);
+EXTERN_C void Binify_Destroy( Binify_ContextHandle handle ) {
+	MFREE(handle->allocator, handle);
 }
 
-AL2O3_EXTERN_C size_t Binify_BinarySize( Binify_ContextHandle handle ) {
-	ASSERT(handle != nullptr);
+EXTERN_C size_t Binify_BinarySize( Binify_ContextHandle handle ) {
+	assert(handle != nullptr);
 	return CADT_VectorSize(handle->data);
 
 }
-AL2O3_EXTERN_C uint8_t const *Binify_BinaryData( Binify_ContextHandle handle ) {
-	ASSERT(handle != nullptr);
+EXTERN_C uint8_t const *Binify_BinaryData( Binify_ContextHandle handle ) {
+	assert(handle != nullptr);
 	return (uint8_t const *)CADT_VectorData(handle->data);
 }

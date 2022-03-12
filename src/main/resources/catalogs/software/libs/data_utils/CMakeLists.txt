@@ -1,5 +1,10 @@
-set(project cadt)
+set(project data_utils)
 project(${project} C ASM CXX)
+
+if(${CPU} STREQUAL "host")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=x86-64 -msse4.1 -mavx")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=x86-64 -msse4.1 -mavx")
+endif()
 
 # requires parent cmake project to set BOARD_ SOC_ CPU_ and CPU_ARCH
 file(GLOB CLIST CONFIGURE_DEPENDS
@@ -46,3 +51,4 @@ target_link_libraries(${project} PRIVATE multi_core)
 
 target_include_directories(${project} PUBLIC include)
 target_compile_definitions(${project} PRIVATE BOARD_${BOARD}=1 SOC_${SOC}=1 CPU_${CPU}=1 CPU_ARCH_${CPU_ARCH}=1)
+

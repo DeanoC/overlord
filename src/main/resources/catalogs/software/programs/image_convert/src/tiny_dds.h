@@ -78,8 +78,6 @@ typedef void (*TinyDDS_WriteFunc)(void *user, void const *buffer, size_t byteCou
 
 typedef struct TinyDDS_WriteCallbacks {
 		TinyDDS_ErrorFunc error;
-		TinyDDS_AllocFunc alloc;
-		TinyDDS_FreeFunc free;
 		TinyDDS_WriteFunc write;
 } TinyDDS_WriteCallbacks;
 

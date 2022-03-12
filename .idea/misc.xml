@@ -5,44 +5,43 @@
     <option name="openedFilesInfos">
       <list>
         <OpenedFileInfo>
-          <option name="caretOffset" value="11997" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/scala/overlord/OutputSoftware.scala" />
-        </OpenedFileInfo>
-        <OpenedFileInfo>
-          <option name="caretOffset" value="4149" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/scala/Main.scala" />
-        </OpenedFileInfo>
-        <OpenedFileInfo>
-          <option name="caretOffset" value="620" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/scala/actions/ActionsFile.scala" />
+          <option name="caretOffset" value="0" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/src/scanner.cpp" />
         </OpenedFileInfo>
         <OpenedFileInfo>
           <option name="caretOffset" value="0" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/scala/actions/SourcesAction.scala" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/src/scanner.h" />
         </OpenedFileInfo>
         <OpenedFileInfo>
           <option name="caretOffset" value="0" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/subdir.cmake" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/src/scanner.hpp" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="1727" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/scala/output/Xdc.scala" />
+          <option name="caretOffset" value="0" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/src/win_make_parser.bat" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="109" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software.toml" />
+          <option name="caretOffset" value="246" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/src/writehelper.cpp" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="1608" />
+          <option name="caretOffset" value="304" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/include/data_binify/write_helper.hpp" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="0" />
           <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs.toml" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="802" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/luau/CMakeLists.txt" />
+          <option name="caretOffset" value="0" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/CMakeLists.txt" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="1455" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/scala/output/Software.scala" />
+          <option name="caretOffset" value="0" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/hw/hw.toml" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="fileUrl" value="mock:///DiffPreview" />
         </OpenedFileInfo>
       </list>
     </option>

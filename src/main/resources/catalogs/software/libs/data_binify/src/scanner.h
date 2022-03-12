@@ -6,7 +6,7 @@
 #define BINIFY_SCANNER_H
 
 # undef yyFlexLexer
-# include "FlexLexer.h"
+# include "FlexLexer.hpp"
 # include "parser.hpp"
 
 // Tell flex which function to define
