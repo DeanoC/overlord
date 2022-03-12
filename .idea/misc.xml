@@ -5,43 +5,44 @@
     <option name="openedFilesInfos">
       <list>
         <OpenedFileInfo>
-          <option name="caretOffset" value="0" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/src/scanner.cpp" />
+          <option name="caretOffset" value="506" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/CMakeLists.txt" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="656" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/CMakeLists.txt" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="653" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/dbg/CMakeLists.txt" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="733" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gfx_image/CMakeLists.txt" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="639" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/host_os/CMakeLists.txt" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="784" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/multi_core/CMakeLists.txt" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="548" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_image_format/CMakeLists.txt" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="536" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/vfile/CMakeLists.txt" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="543" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/vfile_memory/CMakeLists.txt" />
         </OpenedFileInfo>
         <OpenedFileInfo>
           <option name="caretOffset" value="0" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/src/scanner.h" />
-        </OpenedFileInfo>
-        <OpenedFileInfo>
-          <option name="caretOffset" value="0" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/src/scanner.hpp" />
-        </OpenedFileInfo>
-        <OpenedFileInfo>
-          <option name="caretOffset" value="0" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/src/win_make_parser.bat" />
-        </OpenedFileInfo>
-        <OpenedFileInfo>
-          <option name="caretOffset" value="246" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/src/writehelper.cpp" />
-        </OpenedFileInfo>
-        <OpenedFileInfo>
-          <option name="caretOffset" value="304" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/include/data_binify/write_helper.hpp" />
-        </OpenedFileInfo>
-        <OpenedFileInfo>
-          <option name="caretOffset" value="0" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs.toml" />
-        </OpenedFileInfo>
-        <OpenedFileInfo>
-          <option name="caretOffset" value="0" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/CMakeLists.txt" />
-        </OpenedFileInfo>
-        <OpenedFileInfo>
-          <option name="caretOffset" value="0" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/hw/hw.toml" />
-        </OpenedFileInfo>
-        <OpenedFileInfo>
-          <option name="fileUrl" value="mock:///DiffPreview" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/src/host/backward.cpp" />
         </OpenedFileInfo>
       </list>
     </option>

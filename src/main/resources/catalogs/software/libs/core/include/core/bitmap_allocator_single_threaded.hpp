@@ -2,7 +2,7 @@
 
 #include "core/core.h"
 #include "core/bitops.hpp"
-#include "hw/cpu.h"
+#include "platform/cpu.h"
 #include "dbg/raw_print.h"
 #include "dbg/print.h"
 #include "dbg/assert.h"

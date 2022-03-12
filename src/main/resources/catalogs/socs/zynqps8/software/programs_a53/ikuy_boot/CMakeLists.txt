@@ -56,7 +56,7 @@ add_executable(${project} ${CLIST} ${CPPLIST} ${ASMFILES} ${HEADERLIST} ${LINKSC
 add_compile_definitions(${project} BOARD_${BOARD}=1 SOC_${SOC}=1 CPU_${CPU}=1 CPU_${CPU_ARCH}=1)
 target_link_libraries(${project} PRIVATE core)
 target_link_libraries(${project} PRIVATE utils)
-target_link_libraries(${project} PRIVATE hw)
+target_link_libraries(${project} PRIVATE platform)
 target_link_libraries(${project} PRIVATE dbg)
 target_link_libraries(${project} PRIVATE osservices)
 target_link_libraries(${project} PRIVATE zynqps8_display_port)

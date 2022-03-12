@@ -1,7 +1,7 @@
 #include "core/core.h"
-#include "hw/reg_access.h"
+#include "platform/reg_access.h"
 #include "utils/boot_psi.h"
-#include "hw/memory_map.h"
+#include "platform/memory_map.h"
 #include "hw_regs/crl_apb.h"
 #include "hw_regs/crf_apb.h"
 

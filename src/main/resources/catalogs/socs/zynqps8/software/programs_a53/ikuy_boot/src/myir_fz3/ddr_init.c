@@ -1,7 +1,7 @@
 #include "core/core.h"
 #include "utils/boot_psi.h"
-#include "hw/memory_map.h"
-#include "hw/reg_access.h"
+#include "platform/memory_map.h"
+#include "platform/reg_access.h"
 #include "dbg/raw_print.h"
 
 #include "hw_regs/afifm.h"

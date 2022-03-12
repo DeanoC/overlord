@@ -49,7 +49,7 @@ static size_t VFile_MemFile_Write(VFile_Interface_t *vif, void const *buffer, si
     } else {
       // grow the memory to fit
       vof->size = vof->offset + byteCount;
-      vof->memory = REALLOC(vof->allocator, (void*)vof->memory, vof->size);
+      vof->memory = MREALLOC(vof->allocator, (void*)vof->memory, vof->size);
     }
   }
 

@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 
 #include "core/core.h"
-#include "hw/cache.h"
-#include "hw/memory_map.h"
-#include "hw/reg_access.h"
-#include "hw/aarch64/intrinsics_gcc.h"
+#include "platform/cache.h"
+#include "platform/memory_map.h"
+#include "platform/reg_access.h"
+#include "platform/aarch64/intrinsics_gcc.h"
 #include "hw_regs/a53/a53_system.h"
 
 #define IRQ_FIQ_MASK 0xC0U	/* Mask IRQ and FIQ interrupts in cpsr */

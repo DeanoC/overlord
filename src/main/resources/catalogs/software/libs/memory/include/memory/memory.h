@@ -13,6 +13,8 @@
 #define MEMORY_TRACKING_SETUP 1
 #endif
 
+#undef memory
+
 typedef void* (*Memory_MallocFunc)(size_t size);
 typedef void* (*Memory_AallocFunc)(size_t size, size_t align);
 typedef void* (*Memory_CallocFunc)(size_t count, size_t size);

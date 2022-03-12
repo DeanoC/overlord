@@ -1,5 +1,5 @@
 #include "core/core.h"
-#include "hw/memory_map.h"
+#include "platform/memory_map.h"
 #include "osservices/ipi3_transport.h"
 #include "ipi3_os_server.hpp"
 #include "../os_heap.hpp"

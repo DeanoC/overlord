@@ -3,7 +3,7 @@
 #include <cstdio>
 #undef dbg
 #define BACKWARD_HAS_DW 1
-#include "host_platform/backward.hpp"
+#include "platform/host/backward.hpp"
 
 EXTERN_C void assert_printf(char const *file, int line, char const *txt)
 {

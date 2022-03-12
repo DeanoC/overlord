@@ -3,7 +3,7 @@
 #include "osservices/ipi3_transport.h"
 #include "core/snprintf.h"
 #include "utils/string_utils.h"
-#include "hw/cache.h"
+#include "platform/cache.h"
 
 // prints upto 29 characters to uart via PMU.
 WEAK_LINKAGE void OsService_ScreenConsoleInlinePrint(uint8_t size, const char *const text) {

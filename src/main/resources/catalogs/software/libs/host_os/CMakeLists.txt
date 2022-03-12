@@ -30,24 +30,7 @@ file(GLOB ASMLIST CONFIGURE_DEPENDS
 		src/${CPU_ARCH}/*.S
 		src/${CPU}/*.S )
 
-file(GLOB CHEADERLIST CONFIGURE_DEPENDS
-		include/*.h
-		include/${BOARD}/*.h
-		include/${SOC}/*.h
-		include/${CPU_ARCH}/*.h
-		include/${CPU}/*.h
-		)
-
-file(GLOB CPPHEADERLIST CONFIGURE_DEPENDS
-		include/*.hpp
-		include/${BOARD}/*.hpp
-		include/${SOC}/*.hpp
-		include/${CPU_ARCH}/*.hpp
-		include/${CPU}/*.hpp
-		)
-
 set( SRCS ${CLIST} ${CPPLIST} ${ASMLIST})
-set( HEADERS ${CHEADERLIST} ${CPPHEADERLIST})
 
 if(DEFINED SRCS)
 	list(LENGTH SRCS SRCS_LENGTH)
@@ -58,7 +41,7 @@ set(PRIVATE_LIBRARIES
 		dbg
 		memory
 		vfile
-		host_platform
+		platform
 		)
 
 if(SRCS_LENGTH)

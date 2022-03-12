@@ -5,17 +5,16 @@
 // as such we don't have thread local storage but do support core local storage
 // for host platforms this is actually just thread local
 
-#if !defined(CPU_host)
+#include "platform/cpu.h"
 
-#include "hw/cpu.h"
+#if !defined(CPU_host)
 
 #define CORE_LOCAL(type, name) type name[CPU_CORE_COUNT]
 #define READ_CORE_LOCAL(name) name[GetCpuHartNumber()]
 #define WRITE_CORE_LOCAL(name, value) name[GetCpuHartNumber()] = (value)
 
 #else
-
-#include "host_platform/host_platform.h"
+#include "platform/host/platform.h"
 
 #define CORE_LOCAL(type, name) HOST_PLATFORM_THREAD_LOCAL type name
 #define READ_CORE_LOCAL(name) name

@@ -1,7 +1,7 @@
 #include "core/core.h"
 #include "core/snprintf.h"
-#include "hw/reg_access.h"
-#include "hw/memory_map.h"
+#include "platform/reg_access.h"
+#include "platform/memory_map.h"
 #include "hw_regs/uart.h"
 #include "osservices/osservices.h"
 

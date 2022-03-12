@@ -1,6 +1,6 @@
 #include "core/core.h"
-#include "hw/reg_access.h"
-#include "hw/memory_map.h"
+#include "platform/reg_access.h"
+#include "platform/memory_map.h"
 #include "hw_regs/pmu/pmu_iomodule.h"
 #include "hw_regs/pmu/pmu_lmb_bram.h"
 #include "hw_regs/ipi.h"

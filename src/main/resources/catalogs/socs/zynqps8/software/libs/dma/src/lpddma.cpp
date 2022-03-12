@@ -2,8 +2,8 @@
 
 #include "zynqps8/dma/lpddma.hpp"
 
-#include "hw/memory_map.h"
-#include "hw/reg_access.h"
+#include "platform/memory_map.h"
+#include "platform/reg_access.h"
 #include "hw_regs/zdma.h"
 #include "dbg/assert.h"
 #include "dbg/raw_print.h"

@@ -1,7 +1,7 @@
 #include "core/core.h"
 #include "osservices/osservices.h"
 #include "osservices/ipi3_transport.h"
-#include "hw/memory_map.h"
+#include "platform/memory_map.h"
 
 uintptr_lo_t OsService_DdrLoBlockAlloc(uint16_t blocks1MB) {
 	IPI3_Msg msg = {

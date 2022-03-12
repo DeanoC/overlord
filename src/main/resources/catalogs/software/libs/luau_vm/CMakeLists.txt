@@ -44,9 +44,7 @@ set(PRIVATE_LIBRARIES
 		dbg
 		)
 
-if(${CPU} STREQUAL "host")
-	list(APPEND PRIVATE_LIBRARIES host_platform)
-else()
+if(NOT ${CPU} STREQUAL "host")
 	list(APPEND PRIVATE_LIBRARIES musl_math)
 endif()
 

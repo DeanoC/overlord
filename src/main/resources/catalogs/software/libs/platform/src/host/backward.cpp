@@ -33,7 +33,7 @@
 // - g++/clang++ -lunwind
 // #define BACKWARD_HAS_LIBUNWIND 1
 
-#include "host_platform/backward.hpp"
+#include "platform/host/backward.hpp"
 
 namespace backward {
 

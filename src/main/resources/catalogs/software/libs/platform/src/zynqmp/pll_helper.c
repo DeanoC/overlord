@@ -1,5 +1,5 @@
 #include "core/core.h"
-#include "hw/zynqmp/pll_helper.h"
+#include "platform/zynqmp/pll_helper.h"
 
 #ifdef __cplusplus
 EXTERN_C

@@ -3,7 +3,7 @@
 #include "osservices/ipi3_transport.h"
 #include "core/snprintf.h"
 #include "utils/string_utils.h"
-#include "hw/cache.h"
+#include "platform/cache.h"
 #include "dbg/print.h"
 #include "dbg/raw_print.h"
 

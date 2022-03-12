@@ -1,5 +1,12 @@
 set(project memory)
-project(${project} C ASM CXX)
+project(${project} C CXX ASM)
+
+if(${CPU} STREQUAL "host")
+	set(CMAKE_C_STANDARD 11)
+	set(CMAKE_CXX_STANDARD 17)
+	set(CMAKE_CXX_STANDARD_REQUIRED ON)
+	set(CMAKE_CXX_EXTENSIONS ON)
+endif()
 
 # requires parent cmake project to set BOARD_ SOC_ CPU_ and CPU_ARCH
 file(GLOB CLIST CONFIGURE_DEPENDS
@@ -22,26 +29,29 @@ file(GLOB ASMLIST CONFIGURE_DEPENDS
 		src/${SOC}/*.S
 		src/${CPU_ARCH}/*.S
 		src/${CPU}/*.S )
+set( SRCS ${CLIST} ${CPPLIST} ${ASMLIST})
+if(DEFINED SRCS)
+	list(LENGTH SRCS SRCS_LENGTH)
+endif()
 
-file(GLOB CHEADERLIST CONFIGURE_DEPENDS
-		include/*.h
-		include/${BOARD}/*.h
-		include/${SOC}/*.h
-		include/${CPU_ARCH}/*.h
-		include/${CPU}/*.h
+set(PRIVATE_LIBRARIES
+		core
+		dbg
+		multi_core
+		platform
 		)
 
-file(GLOB CPPHEADERLIST CONFIGURE_DEPENDS
-		include/*.hpp
-		include/${BOARD}/*.hpp
-		include/${SOC}/*.hpp
-		include/${CPU_ARCH}/*.hpp
-		include/${CPU}/*.hpp
-		)
-add_library(${project} ${CLIST} ${CPPLIST} ${ASMLIST} ${CHEADERLIST} ${CPPHEADERLIST})
-target_link_libraries(${project} PRIVATE core)
-target_link_libraries(${project} PRIVATE dbg)
-target_link_libraries(${project} PRIVATE multi_core)
+if(SRCS_LENGTH)
+	add_library(${project} ${SRCS})
+	target_include_directories(${project} PUBLIC include)
+	target_link_libraries(${project} PRIVATE ${PRIVATE_LIBRARIES})
+else()
+	add_library(${project} INTERFACE)
+	target_include_directories(${project} INTERFACE include)
+	target_link_libraries(${project} INTERFACE ${PRIVATE_LIBRARIES})
+endif()
 
-target_include_directories(${project} PUBLIC include)
-target_compile_definitions(${project} PRIVATE BOARD_${BOARD}=1 SOC_${SOC}=1 CPU_${CPU}=1 CPU_ARCH_${CPU_ARCH}=1)
+add_compile_definitions(${project} BOARD_${BOARD}=1 SOC_${SOC}=1 CPU_${CPU}=1 CPU_ARCH_${CPU_ARCH}=1)
+
+
+

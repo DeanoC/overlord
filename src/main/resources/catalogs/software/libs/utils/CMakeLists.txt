@@ -23,30 +23,12 @@ file(GLOB ASMLIST CONFIGURE_DEPENDS
 		src/${CPU_ARCH}/*.S
 		src/${CPU}/*.S )
 
-file(GLOB HEADERLIST CONFIGURE_DEPENDS
-		include/utils/*.h
-		include/utils/*.hpp
-		include/utils/${BOARD}/*.h
-		include/utils/${BOARD}/*.hpp
-		include/utils/${SOC}/*.h
-		include/utils/${SOC}/*.hpp
-		include/utils/${CPU_ARCH}/*.h
-		include/utils/${CPU_ARCH}/*.hpp
-		include/utils/${CPU}/*.h
-		include/utils/${CPU}/*.hpp
-		)
-
-add_library(${project} ${CLIST} ${CPPLIST} ${ASMLIST} ${HEADERLIST})
+add_library(${project} ${CLIST} ${CPPLIST} ${ASMLIST})
 target_link_libraries(${project} PRIVATE core)
 target_link_libraries(${project} PRIVATE dbg)
+target_link_libraries(${project} PRIVATE platform)
 
 
 target_include_directories(${project} PUBLIC include)
 target_compile_definitions(${project} PRIVATE BOARD_${BOARD}=1 SOC_${SOC}=1 CPU_${CPU}=1 CPU_ARCH_${CPU_ARCH}=1)
-
-if(${CPU} STREQUAL "host")
-	list(APPEND PRIVATE_LIBRARIES host_platform)
-else()
-	target_link_libraries(${project} PRIVATE hw)
-endif()
 

@@ -2,7 +2,7 @@
 #include "osservices/ipi3_transport.h"
 
 #if CPU_a53
-#include "hw/aarch64/intrinsics_gcc.h"
+#include "platform/aarch64/intrinsics_gcc.h"
 #include "dbg/print.h"
 #endif
 

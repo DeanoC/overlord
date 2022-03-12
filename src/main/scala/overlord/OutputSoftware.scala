@@ -361,7 +361,7 @@ object OutputSoftware {
 
 	private def hwRegsPath(cpu: CpuInstance, out: Path) =
 		out.resolve("libs")
-			.resolve("hw")
+			.resolve("platform")
 			.resolve("include")
 			.resolve("hw_regs")
 

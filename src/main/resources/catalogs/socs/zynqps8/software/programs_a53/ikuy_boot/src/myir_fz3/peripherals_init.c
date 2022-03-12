@@ -1,6 +1,6 @@
 #include "core/core.h"
 #include "utils/boot_psi.h"
-#include "hw/memory_map.h"
+#include "platform/memory_map.h"
 #include "hw_regs/uart.h"
 #include "hw_regs/crl_apb.h"
 #include "hw_regs/crf_apb.h"

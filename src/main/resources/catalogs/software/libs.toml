@@ -56,12 +56,6 @@ software = "libs/luau_vm/luau_vm.toml"
 cpus = "a53"
 
 [[definition]]
-name = "host_platform"
-type = "library.host_platform"
-software = "libs/host_platform/host_platform.toml"
-cpus = "host"
-
-[[definition]]
 name = "host_os"
 type = "library.host_os"
 software = "libs/host_os/host_os.toml"
@@ -74,10 +68,9 @@ software = "libs/luau/luau.toml"
 cpus = "host"
 
 [[definition]]
-name = "hw"
-type = "library.hw"
-software = "libs/hw/hw.toml"
-cpus = "a53,r5f,pmu"
+name = "platform"
+type = "library.platform"
+software = "libs/platform/platform.toml"
 
 [[definition]]
 name = "osservices"

@@ -3,7 +3,7 @@
 #include "memory/memory.h"
 
 #include <stdlib.h>
-#include "host_platform/host_platform.h"
+#include "platform/host/platform.h"
 #include "dbg/assert.h"
 #include "dbg/print.h"
 #include "multi_core/core_local.h"

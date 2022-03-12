@@ -1,7 +1,7 @@
 #pragma once
 #include "hw_regs/ipi.h"
 #include "hw_regs/ipi_buffer.h"
-#include "hw/memory_map.h"
+#include "platform/memory_map.h"
 #include "osservices.h"
 #ifdef __cplusplus
 EXTERN_C {

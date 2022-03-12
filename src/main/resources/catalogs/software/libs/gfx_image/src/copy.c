@@ -151,7 +151,7 @@ Image_ImageHeader *Image_PreciseConvert(Image_ImageHeader const *image, TinyImag
 	return dst;
 }
 
-Image_ImageHeader *Image_PackMipmaps(Image_ImageHeader const *image) {
+Image_ImageHeader *Image_PackMipmaps(Image_ImageHeader * image) {
 	if (Image_HasPackedMipMaps(image))
 		return image;
 

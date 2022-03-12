@@ -1,8 +1,8 @@
 #include "core/core.h"
-#include "hw/memory_map.h"
-#include "hw/reg_access.h"
+#include "platform/memory_map.h"
+#include "platform/reg_access.h"
 #include "osservices/ipi3_transport.h"
-#include "hw/cache.h"
+#include "platform/cache.h"
 
 // Manual is wrong,
 // see https://forums.xilinx.com/t5/Processor-System-Design-and-AXI/Error-in-UG1085-Zynq-UltraScale-Device-TRM-IPI-Buffers/m-p/1281937

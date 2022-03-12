@@ -1,5 +1,5 @@
 #include "core/core.h"
-#include "hw/aarch64/intrinsics_gcc.h"
+#include "platform/aarch64/intrinsics_gcc.h"
 
 #define CPU_CORTEXA53_0_TIMESTAMP_CLK_FREQ 33333000
 #define TIMESTAMP_COUNTS_PER_SECOND     CPU_CORTEXA53_0_TIMESTAMP_CLK_FREQ

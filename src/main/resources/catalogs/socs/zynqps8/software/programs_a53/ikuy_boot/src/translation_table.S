@@ -28,7 +28,7 @@
 * None.
 *
 ******************************************************************************/
-#include "hw/memory_map.h"
+#include "platform/memory_map.h"
 
 	.globl  MMUTableL0
 	.globl  MMUTableL1

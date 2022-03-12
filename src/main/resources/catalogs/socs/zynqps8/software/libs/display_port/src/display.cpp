@@ -4,8 +4,8 @@
 #include "zynqps8/display_port/serdes.hpp"
 #include "zynqps8/display_port/train.hpp"
 #include "zynqps8/display_port/eedid.hpp"
-#include "hw/reg_access.h"
-#include "hw/memory_map.h"
+#include "platform/reg_access.h"
+#include "platform/memory_map.h"
 #include "hw_regs/dp.h"
 #include "hw_regs/dpdma.h"
 #include "hw_regs/dp_dpcd.h"
@@ -17,7 +17,7 @@
 #include "dbg/print.h"
 #include "core/math.h"
 #include "dbg/assert.h"
-#include "hw/zynqmp/pll_helper.h"
+#include "platform/zynqmp/pll_helper.h"
 #include "core/bitops.hpp"
 
 namespace DisplayPort::Display {

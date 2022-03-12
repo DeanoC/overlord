@@ -3,7 +3,7 @@
 #include "core/core.h"
 #include "core/cpp/bitops.h"
 #include "core/cpp/atomics.h"
-#include "hw/cpu.h"
+#include "platform/cpu.h"
 #include "dbg/raw_print.h"
 #include "dbg/print.h"
 #include "dbg/assert.h"

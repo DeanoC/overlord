@@ -38,7 +38,7 @@ file(GLOB HEADERLIST CONFIGURE_DEPENDS
 
 add_library(${project} ${CLIST} ${CPPLIST} ${ASMLIST} ${HEADERLIST})
 target_link_libraries(${project} PRIVATE core)
-target_link_libraries(${project} PRIVATE hw)
+target_link_libraries(${project} PRIVATE platform)
 target_link_libraries(${project} PRIVATE dbg)
 target_link_libraries(${project} PRIVATE osservices)
 

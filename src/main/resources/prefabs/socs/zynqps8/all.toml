@@ -23,7 +23,7 @@ type = "library.multi_core"
 type = "library.utils"
 
 [[instance]]
-type = "library.hw"
+type = "library.platform"
 
 [[instance]]
 type = "library.dbg"

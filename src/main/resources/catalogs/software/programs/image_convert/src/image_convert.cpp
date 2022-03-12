@@ -7,7 +7,7 @@
 #include "host_os/filesystem.h"
 #include "Luau/Compiler.h"
 #define BACKWARD_HAS_DW 1
-#include "host_platform/backward.hpp"
+#include "platform/host/backward.hpp"
 
 #include <memory>
 #include <string>

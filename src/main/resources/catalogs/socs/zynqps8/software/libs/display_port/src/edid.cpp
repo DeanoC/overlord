@@ -3,8 +3,8 @@
 #include "zynqps8/display_port/display.hpp"
 #include "zynqps8/display_port/eedid.hpp"
 #include "dbg/print.h"
-#include "hw/reg_access.h"
-#include "hw/memory_map.h"
+#include "platform/reg_access.h"
+#include "platform/memory_map.h"
 #include "hw_regs/eedid.h"
 #include "dbg/assert.h"
 

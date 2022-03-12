@@ -23,23 +23,10 @@ file(GLOB ASMLIST CONFIGURE_DEPENDS
 		src/${CPU_ARCH}/*.S
 		src/${CPU}/*.S )
 
-file(GLOB CHEADERLIST CONFIGURE_DEPENDS
-		include/*.h
-		include/${BOARD}/*.h
-		include/${SOC}/*.h
-		include/${CPU_ARCH}/*.h
-		include/${CPU}/*.h
-		)
-
-file(GLOB CPPHEADERLIST CONFIGURE_DEPENDS
-		include/*.hpp
-		include/${BOARD}/*.hpp
-		include/${SOC}/*.hpp
-		include/${CPU_ARCH}/*.hpp
-		include/${CPU}/*.hpp
-		)
 set( SRCS ${CLIST} ${CPPLIST} ${ASMLIST})
-set( HEADERS ${CHEADERLIST} ${CPPHEADERLIST})
+if(DEFINED SRCS)
+	list(LENGTH SRCS SRCS_LENGTH)
+endif()
 
 if(DEFINED SRCS)
 	list(LENGTH SRCS SRCS_LENGTH)
@@ -48,21 +35,20 @@ endif()
 set(PRIVATE_LIBRARIES
 		core
 		dbg
+		platform
 		memory
 		tiny_image_format
 		)
-if(${CPU} STREQUAL "host")
-	list(APPEND PRIVATE_LIBRARIES host_platform)
-else()
+if(NOT ${CPU} STREQUAL "host")
 	list(APPEND PRIVATE_LIBRARIES musl_math)
 endif()
 
 if(SRCS_LENGTH)
-	add_library(${project} ${SRCS} ${HEADERS})
+	add_library(${project} ${SRCS})
 	target_include_directories(${project} PUBLIC include)
 	target_link_libraries(${project} PRIVATE ${PRIVATE_LIBRARIES})
 else()
-	add_library(${project} INTERFACE ${HEADERS} )
+	add_library(${project} INTERFACE)
 	target_include_directories(${project} INTERFACE include)
 	target_link_libraries(${project} INTERFACE ${PRIVATE_LIBRARIES})
 endif()

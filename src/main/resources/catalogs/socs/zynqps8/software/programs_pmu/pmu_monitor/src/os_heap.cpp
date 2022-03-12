@@ -1,5 +1,5 @@
 #include "core/core.h"
-#include "hw/memory_map.h"
+#include "platform/memory_map.h"
 #include "os_heap.hpp"
 
 void OsHeap::Init() {

@@ -15,6 +15,8 @@ ALWAYS_INLINE uint8_t GetCpuHartNumber() {
 
 #elif CPU_r5f == 1
 # include "r5f/cpu.h"
+#elif CPU_host == 1
+# include "host/cpu.h"
 #else
 #error CPU not supported
 #endif

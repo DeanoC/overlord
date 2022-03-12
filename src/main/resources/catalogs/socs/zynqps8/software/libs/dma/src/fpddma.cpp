@@ -1,6 +1,6 @@
 #include "core/core.h"
-#include "hw/memory_map.h"
-#include "hw/reg_access.h"
+#include "platform/memory_map.h"
+#include "platform/reg_access.h"
 #include "zynqps8/dma/fpddma.hpp"
 #include "hw_regs/zdma.h"
 #include "dbg/assert.h"

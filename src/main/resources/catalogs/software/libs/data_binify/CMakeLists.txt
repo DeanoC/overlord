@@ -26,22 +26,7 @@ file(GLOB ASMLIST CONFIGURE_DEPENDS
 		src/${CPU_ARCH}/*.S
 		src/${CPU}/*.S )
 
-file(GLOB CHEADERLIST CONFIGURE_DEPENDS
-		include/*.h
-		include/${BOARD}/*.h
-		include/${SOC}/*.h
-		include/${CPU_ARCH}/*.h
-		include/${CPU}/*.h
-		)
-
-file(GLOB CPPHEADERLIST CONFIGURE_DEPENDS
-		include/*.hpp
-		include/${BOARD}/*.hpp
-		include/${SOC}/*.hpp
-		include/${CPU_ARCH}/*.hpp
-		include/${CPU}/*.hpp
-		)
-add_library(${project} ${CLIST} ${CPPLIST} ${ASMLIST} ${CHEADERLIST} ${CPPHEADERLIST})
+add_library(${project} ${CLIST} ${CPPLIST} ${ASMLIST})
 target_link_libraries(${project} PRIVATE core)
 target_link_libraries(${project} PRIVATE dbg)
 target_link_libraries(${project} PRIVATE memory)
