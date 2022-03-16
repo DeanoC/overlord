@@ -13,7 +13,7 @@ Image_ImageHeader * Image_Load(VFile_Handle handle, Memory_Allocator* allocator)
 		utf8ncpy(ext, pos+1, extLen);
 		utf8lwr(ext);
 
-		switch (Utils::RuntimeHash(extLen-1, ext)) {
+		switch (Core::RuntimeHash(extLen-1, ext)) {
 //			case "basis"_hash:
 //			case "basisu"_hash:
 //				return Image_LoadBasisU(handle);

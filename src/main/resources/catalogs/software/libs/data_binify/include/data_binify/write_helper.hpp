@@ -1,20 +1,20 @@
 #pragma once
 #include "core/core.h"
 #include "dbg/assert.h"
-#include <vector>
-#include <string>
-#include <string_view>
-#include <unordered_set>
-#include <unordered_map>
-//#include <format>
+#include "tiny_stl/vector.hpp"
+#include "tiny_stl/string.hpp"
+#include "tiny_stl/string_view.hpp"
+#include "tiny_stl/unordered_set.hpp"
+#include "tiny_stl/unordered_map.hpp"
 #include "fmt/format.hpp"
 #include "vfile/vfile.h"
+#include "utils/slice.hpp"
 
 namespace Binify {
 
 class WriteHelper {
 public:
-	WriteHelper();
+	WriteHelper(Memory_Allocator* allocator_);
 
 	// defaults
 	template<typename T> auto setDefaultType() -> void {
@@ -28,7 +28,7 @@ public:
 	void allowNan(bool yesno);
 	void allowInfinity(bool yesno);
 	void setAddressLength(int bits);
-	int getAddressLength() { return addressLen; };
+	WARN_UNUSED_RESULT int getAddressLength() const { return addressLen; };
 
 
 	// alignment functions
@@ -38,97 +38,107 @@ public:
 	// label functions
 	// Reserving a label puts the name into the system without writing it
 	// default will make it the implicit label to use for size etc.
-	void reserveLabel(std::string const &name, bool makeDefault = false);
+	void reserveLabel(tiny_stl::string_view const &name_, bool makeDefault_ = false);
 
 	// writes the label itself at the current position (can reserve at the same time)
 	// this causes the label to be set to the current position
-	void writeLabel(std::string const &name,
-									bool reserve = false,
-									std::string const comment_ = "",
+	void writeLabel(tiny_stl::string_view const &name_,
+									bool reserve_ = false,
+									tiny_stl::string_view const & comment_ = "",
 									bool noCommentEndStatement_ = true);
 	// writes the label into the current position, this will cause position in label
 	// to be used in an expression
-	void useLabel(std::string const &name,
-								std::string baseBlock = "",
-								bool reserve = false,
-								bool addFixup = true,
-								std::string const comment_ = "",
+	void useLabel(tiny_stl::string_view const & name_,
+	              tiny_stl::string_view const & baseBlock_ = "",
+								bool reserve_ = false,
+								bool addFixup_ = true,
+								tiny_stl::string_view const & comment_ = "",
 								bool noCommentEndStatement_ = true);
 
 	// constants
-	// consts are a seperate variable namespace that are not mutable
-	void setConstant(std::string const &name,
-									 int64_t value,
-									 std::string const comment_ = "",
+	// consts are a separate variable namespace that are not mutable
+	void setConstant(tiny_stl::string_view const &name_,
+									 int64_t value_,
+									 tiny_stl::string_view const & comment_  = "",
 									 bool noCommentEndStatement_ = true);
-	std::string getConstant(std::string const &name);
-	void setConstantToExpression(std::string const &name,
-															 std::string const &exp,
-															 std::string const comment_ = "",
+
+	WARN_UNUSED_RESULT tiny_stl::string getConstant(tiny_stl::string_view const & name_) const;
+
+	void setConstantToExpression(tiny_stl::string_view const & name_,
+	                             tiny_stl::string_view const & exp_,
+	                             tiny_stl::string_view const & comment_ = "",
 															 bool noCommentEndStatement_ = true);
 
-	// variables
-	// variables are named things that can set to expression whilst parsing
-	// poss 0 are not updated during pass 1, meaning that using them during pass 1
+	// variables are named things that can set to an expression whilst parsing
+	// pass 0 vars are not updated during pass 1, meaning that using them during pass 1
 	// will get you the last value set during pass 0. This allows for counter/size etc.
-	void setVariable(std::string const &name,
-									 int64_t value,
-									 bool pass0 = false,
-									 std::string const comment_ = "",
+	void setVariable(tiny_stl::string_view const & name_,
+									 int64_t value_,
+									 bool pass0_ = false,
+									 tiny_stl::string_view const & comment_ = "",
 									 bool noCommentEndStatement_ = true);
-	void setVariableToExpression(std::string const &name,
-															 std::string const &exp,
-															 bool pass0 = false,
-															 std::string const comment_ = "",
+
+	void setVariableToExpression(tiny_stl::string_view const & name_,
+	                             tiny_stl::string_view const & exp_,
+															 bool pass0_ = false,
+															 tiny_stl::string_view const & comment_ = "",
 															 bool noCommentEndStatement_ = true);
-	std::string getVariable(std::string const &name);
-	void incrementVariable(std::string const &str_,
-												 std::string const comment_ = "",
+
+	WARN_UNUSED_RESULT tiny_stl::string getVariable(tiny_stl::string_view const & name_) const;
+
+	void incrementVariable(tiny_stl::string_view const & name_,
+	                       uint32_t adder_ = 1,
+	                       tiny_stl::string_view const & comment_ = "",
 												 bool noCommentEndStatement_ = true);
 
 	// enum and flags functions
 	// enums are named types, each enum value belongs to a single enum and form
 	// a set of constants that are then output into the binify text
-	// this helps readibiltiy
+	// this helps readability
 	// flags are an extension of this that allow you to pass a bitwise flag set
 	// but produce nice readable binify with the flags all given names.
-	void addEnum(std::string const &name);
-	void addEnumValue(std::string const &enum_name,
-										std::string const &value_name,
-										uint64_t value,
-										std::string const comment_ = "",
+	void addEnum(tiny_stl::string_view const & name_);
+
+	void addEnumValue(tiny_stl::string_view const & name_,
+	                  tiny_stl::string_view const & value_name_,
+										int64_t value_,
+										tiny_stl::string_view const & comment_ = "",
 										bool noCommentEndStatement_ = true);
-	std::string getEnumValue(std::string const &name, std::string const &value_name);
-	void writeEnum(std::string const &name,
-								 std::string const &value_name,
-								 std::string const comment_ = "",
+
+	tiny_stl::string getEnumValue(tiny_stl::string_view const & name_, tiny_stl::string_view const & value_name);
+
+	void writeEnum(tiny_stl::string_view const & name_,
+	               tiny_stl::string_view const & value_name_,
+	               tiny_stl::string_view const & comment_ = "",
 								 bool noCommentEndStatement_ = true);
-	void writeFlags(std::string const &name,
-									uint64_t flags,
-									std::string const comment_ = "",
+
+	void writeFlags(tiny_stl::string_view const & name_,
+									uint64_t flags_,
+									tiny_stl::string_view const & comment_ = "",
 									bool noCommentEndStatement_ = true);
 
 	// string table functions
 	// the string table handles all the management of strings lik4 copying, offset etc.
 	// After fixup each string pointer will point to the correct portion of the file
-	void addString(std::string_view str);  ///< adds it to the table and outputs a fixup
-	std::string addStringToTable(std::string const &str);
+	void addString(tiny_stl::string_view const & str_);  ///< adds it to the table and outputs a fixup
+	tiny_stl::string addStringToTable(tiny_stl::string_view const & str_);
+
 	// sometimes its useful to have multiple string tables. this allows it by
 	// setting the base the fixup will refer to
-	void setStringTableBase(std::string const &label);
+	void setStringTableBase(tiny_stl::string_view const & label_);
 
 	// expression functions
 	// an expression can be for integers + - | () and variable/constant number
-	void writeExpression(std::string const &str_,
-											 std::string const comment_ = "",
+	void writeExpression(tiny_stl::string const & str_,
+	                     tiny_stl::string_view const & comment_ = "",
 											 bool noCommentEndStatement_ = true) {
 		fmt::format_to(std::back_inserter(buffer), "{}", str_.c_str());
 		comment(comment_, noCommentEndStatement_);
 	}
 
 	template<typename type>
-	void writeExpressionAs(std::string const &str_,
-												 std::string const comment_ = "",
+	void writeExpressionAs(tiny_stl::string const & str_,
+	                       tiny_stl::string_view const & comment_ = "",
 												 bool noCommentEndStatement_ = true) {
 		fmt::format_to(std::back_inserter(buffer), "({}){}", typeToString<type>(), str_.c_str());
 		comment(comment_, noCommentEndStatement_);
@@ -136,57 +146,59 @@ public:
 
 	// misc functions
 	// writes current position - defaultBlock into the file
-	void sizeOfBlock(std::string const &name,
-									 std::string const comment = "",
+	void sizeOfBlock(tiny_stl::string_view const & name,
+	                 tiny_stl::string_view const & comment_ = "",
 									 bool noCommentEndStatement_ = true);
 	// adds a comment
-	void comment(std::string const &comment, bool noCommentEndStatement_ = true);
+	void comment(tiny_stl::string_view const & comment_, bool noCommentEndStatement_ = true);
 
 	// writing functions
 	// output a null pointer (addresslen) 0
-	void writeNullPtr(std::string const comment = "",
+	void writeNullPtr(tiny_stl::string_view const & comment = "",
 										bool noCommentEndStatement_ = true); // outputs an address size 0 (without fixup of course!)
 
 	// writes (addressLen)
 	void writeAddressType(); ///< outputs a address type prefix
-	void writeByteArray(std::vector<uint8_t> const &barray); ///< writes a byte array
+
+	void writeByteArray(Utils::Slice<uint8_t const> slice_); // write a byte slice
 	void writeByteArray(uint8_t const *bytes_, size_t size_); ///< writes a byte array
 
 	// template single element write with optional comment
 	template<typename T>
-	void write(T i_, std::string const comment_ = "") {
+	void write(T i_, tiny_stl::string_view const & comment_ = "") {
 		fmt::format_to(std::back_inserter(buffer), "{}", i_);
 		comment(comment_);
 	}
 
-	void write(std::string const &str_, std::string const comment_ = "") {
-		fmt::format_to(std::back_inserter(buffer), "{}", str_.c_str());
+	void write(tiny_stl::string_view const & str_, tiny_stl::string_view const & comment_ = "") {
+		fmt::format_to(std::back_inserter(buffer), "{}", str_.data());
 		comment(comment_);
 	}
 
 	// template 2 element write with optional comment
 	template<typename T>
-	void write(T i0_, T i1_, std::string const comment_ = "") {
+	void write(T i0_, T i1_, tiny_stl::string_view const & comment_ = "") {
 		fmt::format_to(std::back_inserter(buffer), "{}, {}", i0_, i1_);
 		comment(comment_);
 	}
 
 	// template 3 element write with optional comment
 	template<typename T>
-	void write(T i0_, T i1_, T i2_, std::string const comment_ = "") {
+	void write(T i0_, T i1_, T i2_, tiny_stl::string_view const & comment_ = "") {
 		fmt::format_to(std::back_inserter(buffer), "{}, {}, {}", i0_, i1_, i2_);
 		comment(comment_);
 	}
 
 	// template 4 element write with optional comment
 	template<typename T>
-	void write(T i0_, T i1_, T i2_, T i3_, std::string const comment_ = "") {
+	void write(T i0_, T i1_, T i2_, T i3_, tiny_stl::string_view const & comment_ = "") {
 		fmt::format_to(std::back_inserter(buffer), "{}, {}, {}, {}", i0_, i1_, i2_, i3_);
 		comment(comment_);
 	}
 
 	// returns the binify type string for supported types (except strings)
-	template<typename T> char const *const typeToString() const {
+	template<typename T>
+	WARN_UNUSED_RESULT CONST_EXPR char const *typeToString() const {
 		if (std::is_signed<T>()) {
 			if (typeid(T) == typeid(double)) {
 				return "Double";
@@ -214,15 +226,46 @@ public:
 		return "unknown";
 	}
 
-	// template single element write as type with optional comment
+	template<typename type>
+	void writeFlagsAs(tiny_stl::string_view const & name_, uint64_t flags_, tiny_stl::string_view const & comment_ = "", bool noCommentEndStatement_ = true) {
+		tiny_stl::string const name{ name_, allocator };
+
+		assert(enums.find(name) != enums.end());
+		size_t index = enums[name];
+		auto& e = enumValueVector[index];
+		fmt::format_to(std::back_inserter(buffer), "({}) 0", typeToString<type>());
+		for(auto const& en : e)
+		{
+			if(flags_ & en.second)
+			{
+				fmt::format_to(std::back_inserter(buffer), " | {}", getEnumValue(name_, en.first).c_str());
+			}
+		}
+		comment(comment_, noCommentEndStatement_);
+	}
+
+	template<typename type>
+	void sizeOfBlockAs(tiny_stl::string_view const & name_, tiny_stl::string_view const & comment_ = "", bool noCommentEndStatement_ = true)
+	{
+		tiny_stl::string const name { name_, allocator};
+		tiny_stl::string const nameend { name + tiny_stl::string("End",allocator) };
+
+		assert(labels.find(name) != labels.end());
+		assert(labels.find(nameend) != labels.end());
+		fmt::format_to(std::back_inserter(buffer), "({})({} - {})", typeToString<type>(), nameend.c_str(), name.c_str());
+
+		comment(comment_, noCommentEndStatement_);
+	}
+
+		// template single element write as type with optional comment
 	template<typename type, typename T>
-	void writeAs(T i_, std::string const comment_ = "") {
+	void writeAs(T i_, tiny_stl::string_view const & comment_ = "") {
 		fmt::format_to(std::back_inserter(buffer), "({}) {}", typeToString<type>(), i_);
 		comment(comment_);
 	}
 
 	template<typename type, typename T>
-	void writeAs(T i0_, T i1_, std::string const comment_ = "") {
+	void writeAs(T i0_, T i1_, tiny_stl::string_view const & comment_ = "") {
 		auto typ = typeToString<type>();
 		fmt::format_to(std::back_inserter(buffer), "({}) {}, ({}) {}",
 									 typ, i0_, typ, i1_);
@@ -231,7 +274,7 @@ public:
 	}
 
 	template<typename type, typename T>
-	void writeAs(T i0_, T i1_, T i2_, std::string const comment_ = "") {
+	void writeAs(T i0_, T i1_, T i2_, tiny_stl::string_view const & comment_ = "") {
 		auto typ = typeToString<type>();
 		fmt::format_to(std::back_inserter(buffer), "({}) {}, ({}) {}, ({}) {}",
 									 typ, i0_, typ, i1_, typ, i2_
@@ -241,7 +284,7 @@ public:
 	}
 
 	template<typename type, typename T>
-	void writeAs(T i0_, T i1_, T i2_, T i3_, std::string const comment_ = "") {
+	void writeAs(T i0_, T i1_, T i2_, T i3_, tiny_stl::string_view const & comment_ = "") {
 		auto typ = typeToString<type>();
 		fmt::format_to(std::back_inserter(buffer), "({}) {}, ({}) {}, ({}) {}, ({}) {}",
 									 typ, i0_, typ, i1_, typ, i2_, typ, i3_
@@ -250,35 +293,39 @@ public:
 	}
 
 	template<typename T>
-	void writeSize(T i_, std::string const comment_ = "") {
+	void writeSize(T i_, tiny_stl::string_view const & comment_ = "") {
 		writeAddressType();
 		fmt::format_to(std::back_inserter(buffer), "{}", i_);
 		comment(comment_);
 	}
+
 	void finishStringTable();
 
-	size_t getFixupCount() const { return fixups.size(); }
-	std::string const& getFixup(size_t index) const { return fixups[index]; }
+	WARN_UNUSED_RESULT size_t getFixupCount() const { return fixups.size(); }
+	WARN_UNUSED_RESULT tiny_stl::string const & getFixup(size_t index) const { return fixups[index]; }
+
 private:
-	fmt::memory_buffer buffer;
-	std::string outputString;
-
-	std::string stringTableBase = "stringTable";
-
 	void mergeStringTable(WriteHelper &other);
 	void clearStringTable();
-	std::string nameToLabel(std::string const &name);
+	tiny_stl::string nameToLabel(tiny_stl::string_view const &name_);
 
-	std::unordered_map<std::string, std::string> labelToStringTable;
-	std::unordered_map<std::string, std::string> reverseStringTable;
+	Memory_Allocator* allocator;
+	fmt::memory_buffer buffer;
+	tiny_stl::string outputString;
+	tiny_stl::string stringTableBase;
 
-	std::vector<std::string> fixups;
-	std::unordered_set<std::string> labels;
-	std::unordered_set<std::string> variables;
-	std::unordered_set<std::string> constants;
-	std::unordered_map<std::string, std::unordered_map<std::string, uint64_t>> enums;
+	tiny_stl::unordered_map<tiny_stl::string, tiny_stl::string> labelToStringTable;
+	tiny_stl::unordered_map<tiny_stl::string, tiny_stl::string> reverseStringTable;
 
-	std::string defaultBlock;
+	tiny_stl::vector<tiny_stl::string> fixups;
+	tiny_stl::unordered_set<tiny_stl::string> labels;
+	tiny_stl::unordered_set<tiny_stl::string> variables;
+	tiny_stl::unordered_set<tiny_stl::string> constants;
+	typedef tiny_stl::unordered_map<tiny_stl::string, uint64_t> enumValue_t;
+	tiny_stl::vector<enumValue_t> enumValueVector;
+	tiny_stl::unordered_map<tiny_stl::string, size_t> enums;
+
+	tiny_stl::string defaultBlock;
 	int addressLen = 64;
 
 };

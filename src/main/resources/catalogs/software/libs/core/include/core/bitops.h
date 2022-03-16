@@ -4,7 +4,7 @@
 extern "C"
 {
 #endif
-
+#include "core/core.h"
 #include "internal_bitops.h"
 
 BITOP_FM_CREATE_UNSIGNED(U8, uint8_t)

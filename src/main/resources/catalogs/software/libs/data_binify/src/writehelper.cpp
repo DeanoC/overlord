@@ -3,7 +3,19 @@
 
 namespace Binify {
 
-WriteHelper::WriteHelper()
+WriteHelper::WriteHelper(Memory_Allocator* allocator_) :
+	allocator(allocator_),
+	outputString(allocator),
+	stringTableBase("stringTable", allocator),
+	labelToStringTable(allocator),
+	reverseStringTable(allocator),
+	fixups(allocator),
+	labels(allocator),
+	variables(allocator),
+	constants(allocator),
+	enumValueVector(allocator),
+	enums(allocator),
+	defaultBlock(allocator)
 {
 	// system labels
 	reserveLabel("stringTable");
@@ -17,28 +29,33 @@ WriteHelper::WriteHelper()
 }
 
 char const* WriteHelper::c_str() {
-	outputString = std::string(buffer.data(), buffer.size());
+	outputString = tiny_stl::string(buffer.data(), buffer.size(), allocator);
 	return outputString.c_str();
 }
 
-void WriteHelper::setVariable(std::string const &name,
-															int64_t value,
-															bool pass0,
-															std::string comment_,
+void WriteHelper::setVariable(tiny_stl::string_view const & name_,
+															int64_t value_,
+															bool pass0_,
+															tiny_stl::string_view const & comment_,
 															bool noCommentEndStatement_) {
-	setVariableToExpression(name, std::to_string(value), pass0, comment_, noCommentEndStatement_);
+	MEMORY_STACK_ALLOCATOR(_, 1024);
+	setVariableToExpression(name_, tiny_stl::to_string(value_, _), pass0_, comment_, noCommentEndStatement_);
 }
 
-void WriteHelper::setVariableToExpression(std::string const &name,
-																					std::string const &exp,
-																					bool pass0,
-																					std::string comment_,
+void WriteHelper::setVariableToExpression(tiny_stl::string_view const & name_,
+                                          tiny_stl::string_view const & exp_,
+																					bool pass0_,
+																					tiny_stl::string_view const & comment_,
 																					bool noCommentEndStatement_) {
+	MEMORY_STACK_ALLOCATOR(_, 1024);
+
+	tiny_stl::string const name { name_, allocator};
+	tiny_stl::string const exp { exp_, _ };
 
 	variables.insert(name);
 
 	// pass 0 variables output the last set in pass 0, so work for counters
-	if (pass0) {
+	if (pass0_) {
 		fmt::format_to(std::back_inserter(buffer), "*VAR_{}* {}", name.c_str(), exp.c_str());
 	} else {
 		fmt::format_to(std::back_inserter(buffer), "VAR_{} = {}", name.c_str(), exp.c_str());
@@ -46,75 +63,129 @@ void WriteHelper::setVariableToExpression(std::string const &name,
 	comment(comment_, noCommentEndStatement_);
 }
 
-void WriteHelper::setConstant(std::string const& name, int64_t value, std::string const comment_, bool noCommentEndStatement_)
+void WriteHelper::setConstant(tiny_stl::string_view const & name_,
+															int64_t value_,
+															tiny_stl::string_view const & comment_,
+															bool noCommentEndStatement_)
 {
-	setConstantToExpression(name, std::to_string(value), comment_, noCommentEndStatement_);
+	MEMORY_STACK_ALLOCATOR(_, 1024);
+	setConstantToExpression(name_, tiny_stl::to_string(value_,_), comment_, noCommentEndStatement_);
 }
 
-void WriteHelper::setConstantToExpression(std::string const& name, std::string const& exp, std::string const comment_, bool noCommentEndStatement_)
+void WriteHelper::setConstantToExpression(tiny_stl::string_view const & name_,
+																					tiny_stl::string_view const & exp_,
+																					tiny_stl::string_view const & comment_,
+																					bool noCommentEndStatement_)
 {
+	MEMORY_STACK_ALLOCATOR(_, 1024);
+	tiny_stl::string const name(name_, allocator);
+	tiny_stl::string const exp(exp_, _);
 	assert(constants.find(name) == constants.end());
 	constants.insert(name);
 	fmt::format_to(std::back_inserter(buffer), "*CONST_{}* {}", name.c_str(), exp.c_str());
 	comment(comment_, noCommentEndStatement_);
 }
-std::string WriteHelper::getVariable(std::string const& name)
+tiny_stl::string WriteHelper::getVariable(tiny_stl::string_view const & name_) const
 {
+	MEMORY_STACK_ALLOCATOR(_, 1024);
+	tiny_stl::string const name(name_, _);
+
 	assert(variables.find(name) != variables.end());
-	return " VAR_" + name;
+	return tiny_stl::string(" VAR_", allocator) + name;
 }
 
-std::string WriteHelper::getConstant(std::string const& name)
+tiny_stl::string WriteHelper::getConstant(tiny_stl::string_view const & name_) const
 {
+	MEMORY_STACK_ALLOCATOR(_, 1024);
+	tiny_stl::string const name(name_, _);
+
 	assert(constants.find(name) != constants.end());
-	return " CONST_" + name;
+	return tiny_stl::string(" CONST_", allocator) + name;
 }
 
-void WriteHelper::incrementVariable(std::string const& str_, std::string const comment_, bool noCommentEndStatement_)
+void WriteHelper::incrementVariable(tiny_stl::string_view const & str_,
+																		uint32_t adder,
+																		tiny_stl::string_view const & comment_,
+																		bool noCommentEndStatement_)
 {
-	std::string var = getVariable(str_);
-	setVariableToExpression(str_, var + "+ 1");
+	MEMORY_STACK_ALLOCATOR(_, 1024);
+
+	tiny_stl::string var = getVariable(str_);
+	setVariableToExpression(str_, var + " + " + tiny_stl::to_string(adder,_));
 	comment(comment_, noCommentEndStatement_);
 }
 
-void WriteHelper::addEnum(std::string const& name)
+void WriteHelper::addEnum(tiny_stl::string_view const & name_)
 {
+	tiny_stl::string const name(name_, allocator);
+
 	assert(enums.find(name) == enums.end());
-	enums[name] = {};
+	enumValueVector.emplace_back( enumValue_t{allocator } );
+	enums.insert( tiny_stl::pair(name, enumValueVector.size()-1) );
 }
 
-void WriteHelper::addEnumValue(std::string const& name, std::string const& value_name, uint64_t value, std::string const comment_, bool noCommentEndStatement_)
+void WriteHelper::addEnumValue(tiny_stl::string_view const & name_,
+                               tiny_stl::string_view const & value_name_,
+															 int64_t value,
+															 tiny_stl::string_view const & comment_,
+															 bool noCommentEndStatement_)
 {
+	MEMORY_STACK_ALLOCATOR(_, 1024);
+	tiny_stl::string const name(name_, _);
+	tiny_stl::string const value_name(value_name_, allocator);
+
 	assert(enums.find(name) != enums.end());
-	auto& e = enums[name];
+	size_t index = enums[name];
+	auto& e = enumValueVector[index];
+
 	assert(e.find(value_name) == e.end());
 	e[value_name] = value;
-	setConstant(name + "_" + value_name, value,comment_, noCommentEndStatement_);
+	setConstant(name + "_" + value_name, value, comment_, noCommentEndStatement_);
 }
 
-std::string WriteHelper::getEnumValue(std::string const& name, std::string const& value_name)
+tiny_stl::string WriteHelper::getEnumValue(tiny_stl::string_view const & name_,
+																					tiny_stl::string_view const & value_name_)
 {
+	MEMORY_STACK_ALLOCATOR(_, 1024);
+	tiny_stl::string const name(name_, _);
+	tiny_stl::string const value_name(value_name_, _);
+
 	assert(enums.find(name) != enums.end());
-	auto& e = enums[name];
+	size_t index = enums[name];
+	auto& e = enumValueVector[index];
 	assert(e.find(value_name) != e.end());
 
 	return getConstant(name + "_" + value_name);
 }
 
-void WriteHelper::writeEnum(std::string const& name, std::string const& value_name, std::string const comment_, bool noCommentEndStatement_)
+void WriteHelper::writeEnum(tiny_stl::string_view const & name_,
+                            tiny_stl::string_view const & value_name_,
+                            tiny_stl::string_view const & comment_,
+														bool noCommentEndStatement_)
 {
+	MEMORY_STACK_ALLOCATOR(_, 1024);
+	tiny_stl::string const name(name_, _);
+	tiny_stl::string const value_name(value_name_, _);
+
 	fmt::format_to(std::back_inserter(buffer), "{}", getEnumValue(name, value_name).c_str());
 	comment(comment_, noCommentEndStatement_);
 }
 
-void WriteHelper::writeFlags(std::string const& name, uint64_t flags, std::string const comment_, bool noCommentEndStatement_)
+void WriteHelper::writeFlags(tiny_stl::string_view const & name_,
+														 uint64_t flags_,
+														 tiny_stl::string_view const & comment_,
+														 bool noCommentEndStatement_)
 {
+	MEMORY_STACK_ALLOCATOR(_, 1024);
+	tiny_stl::string const name(name_, _);
+
 	assert(enums.find(name) != enums.end());
-	auto& e = enums[name];
+	size_t index = enums[name];
+	auto& e = enumValueVector[index];
 	fmt::format_to(std::back_inserter(buffer), "0");
 	for(auto const en : e)
 	{
-		if(flags & en.second)
+		if(flags_ & en.second)
 		{
 			fmt::format_to(std::back_inserter(buffer), " | {}", getEnumValue(name, en.first).c_str());
 		}
@@ -122,9 +193,13 @@ void WriteHelper::writeFlags(std::string const& name, uint64_t flags, std::strin
 	comment(comment_, noCommentEndStatement_);
 }
 
-void WriteHelper::comment(std::string const& comment, bool noCommentEndStatement) {
-	if (!comment.empty())
+void WriteHelper::comment(tiny_stl::string_view const & comment_,
+													bool noCommentEndStatement) {
+
+	if (!comment_.empty())
 	{
+		MEMORY_STACK_ALLOCATOR(_, 16 * 1024);
+		tiny_stl::string const comment(comment_, _);
 		fmt::format_to(std::back_inserter(buffer), " // {}\n", comment.c_str());
 	}
 	else if(noCommentEndStatement)
@@ -145,7 +220,8 @@ void WriteHelper::allowInfinity(bool yesno)
 
 void WriteHelper::align(int i)
 {
-	fmt::format_to(std::back_inserter(buffer), ".align {}\n", std::to_string(i).c_str());
+	MEMORY_STACK_ALLOCATOR(_, 1024);
+	fmt::format_to(std::back_inserter(buffer), ".align {}\n", tiny_stl::to_string(i,_).c_str());
 }
 
 void WriteHelper::align()
@@ -153,9 +229,10 @@ void WriteHelper::align()
 	align(addressLen / 8);
 }
 
-void WriteHelper::reserveLabel(std::string const& name, bool makeDefault)
+void WriteHelper::reserveLabel(tiny_stl::string_view const &name_, bool makeDefault)
 {
-	std::string label = name;
+	MEMORY_STACK_ALLOCATOR(_, 1024);
+	tiny_stl::string label(name_, allocator);
 	assert(labels.find(label) == labels.end());
 	labels.insert(label);
 
@@ -165,12 +242,15 @@ void WriteHelper::reserveLabel(std::string const& name, bool makeDefault)
 	}
 }
 
-void WriteHelper::writeLabel(std::string const& name, bool reserve, std::string const comment_, bool noCommentEndStatement_)
+void WriteHelper::writeLabel(tiny_stl::string_view const &name_,
+                             bool reserve_,
+                             tiny_stl::string_view const & comment_,
+                             bool noCommentEndStatement_)
 {
-	if (reserve)
-	{
-		reserveLabel(name);
-	}
+	MEMORY_STACK_ALLOCATOR(_, 1024);
+	if (reserve_) reserveLabel(name_);
+
+	tiny_stl::string name(name_, allocator);
 
 	assert(labels.find(name) != labels.end());
 	align();
@@ -178,82 +258,90 @@ void WriteHelper::writeLabel(std::string const& name, bool reserve, std::string 
 	comment(comment_, noCommentEndStatement_);
 }
 
-void WriteHelper::useLabel(std::string const& name, std::string baseBlock, bool reserve, bool addFixup,  std::string const comment_, bool noCommentEndStatement_)
+void WriteHelper::useLabel(tiny_stl::string_view const & name_,
+                           tiny_stl::string_view const & baseBlock_,
+													 bool reserve_,
+													 bool addFixup_,
+													 tiny_stl::string_view const & comment_,
+													 bool noCommentEndStatement_)
 {
-	if (reserve)
-	{
-		reserveLabel(name);
-	}
+	MEMORY_STACK_ALLOCATOR(_, 1024);
+	if (reserve_) reserveLabel(name_);
+
+	tiny_stl::string name(name_, _);
 	assert(labels.find(name) != labels.end());
 
-	if (addFixup)
+	if (addFixup_)
 	{
-		std::string fixupLabel = "FIXUP_" + std::to_string(fixups.size());
-		fixups.push_back(fixupLabel);
+		tiny_stl::string fixupLabel(allocator);
+		fmt::format_to(std::back_inserter(fixupLabel), "FIXUP_{}", fixups.size());
+		fixups.emplace_back(fixupLabel);
 		writeLabel(fixupLabel, true);
 	}
 
-	if (baseBlock.empty())
-	{
-		baseBlock = defaultBlock;
-	}
+	tiny_stl::string baseBlock(baseBlock_, _);
+	if (baseBlock_.empty()) baseBlock = defaultBlock;
 	assert(name != baseBlock);
 
-	fmt::format_to(std::back_inserter(buffer), ".fixip {} - {}", name.c_str(), baseBlock.c_str());
+	fmt::format_to(std::back_inserter(buffer), ".fixup {} - {}", name.c_str(), baseBlock.c_str());
 	comment(comment_, noCommentEndStatement_);
 }
 
-void WriteHelper::setStringTableBase(std::string const& label)
+void WriteHelper::setStringTableBase(tiny_stl::string_view const & label_)
 {
-	stringTableBase = label;
+	stringTableBase = tiny_stl::string(label_, allocator);
 }
 
-void WriteHelper::addString(std::string_view str_)
+void WriteHelper::addString(tiny_stl::string_view const & str_)
 {
-	std::string str = std::string(str_);
-	std::string stringLabel = addStringToTable(str);
+	MEMORY_STACK_ALLOCATOR(_, 1024);
+	tiny_stl::string str = tiny_stl::string(str_, _);
+	tiny_stl::string stringLabel = addStringToTable(str);
 	useLabel(stringLabel, stringTableBase, false, true, str);
 }
 
-std::string WriteHelper::addStringToTable(std::string const& str)
+tiny_stl::string WriteHelper::addStringToTable(tiny_stl::string_view const & str_)
 {
-	std::string stringLabel;
+	tiny_stl::string str = tiny_stl::string(str_, allocator);
 	// dedup strings
 	if (reverseStringTable.find(str) == reverseStringTable.end())
 	{
-		stringLabel = "STR_" + nameToLabel(str);
+		tiny_stl::string stringLabel { "STR_" + nameToLabel(str), allocator };
 
-		labelToStringTable[stringLabel] = str;
-		reverseStringTable[str] = stringLabel;
+		labelToStringTable.insert(tiny_stl::pair(stringLabel,str));
+		reverseStringTable.insert(tiny_stl::pair(str,stringLabel));
 
 		reserveLabel(stringLabel);
+		return stringLabel;
 	}
 	else
 	{
-		stringLabel = reverseStringTable[str];
+		tiny_stl::string stringLabel = reverseStringTable.find(str)->second;
+		return stringLabel;
 	}
-	return stringLabel;
 }
 
-std::string WriteHelper::nameToLabel(std::string const& name)
+tiny_stl::string WriteHelper::nameToLabel(tiny_stl::string_view const & name_)
 {
-	std::string clean = name;
+	tiny_stl::string clean { name_, allocator };
 	for(auto& ch : clean)
 	{
-		if(!std::isdigit(ch) && !std::isalpha(ch))
-		{
-			ch = '_';
-		}
+		if(!isdigit(ch) && !isalpha(ch)) ch = '_';
 	}
 
 	return clean;
 }
 
-void WriteHelper::mergeStringTable(WriteHelper& other)
+void WriteHelper::clearStringTable() {
+	labelToStringTable.clear();
+	reverseStringTable.clear();
+}
+
+void WriteHelper::mergeStringTable(WriteHelper& other_)
 {
-	for(auto const& en :other.labelToStringTable)
+	for(auto const& en :other_.labelToStringTable)
 	{
-		std::string newLabel = addStringToTable(en.second);
+		tiny_stl::string newLabel = addStringToTable(en.second);
 		assert(newLabel == en.first);
 		assert(labelToStringTable.find(en.first) != labelToStringTable.end());
 	}
@@ -273,9 +361,11 @@ void WriteHelper::finishStringTable()
 	writeLabel("stringTableEnd");
 }
 
-void WriteHelper::sizeOfBlock(std::string const& name, std::string const comment_, bool noCommentEndStatement_)
+void WriteHelper::sizeOfBlock(tiny_stl::string_view const & name_, tiny_stl::string_view const & comment_, bool noCommentEndStatement_)
 {
-	std::string const nameend = name + "End";
+	MEMORY_STACK_ALLOCATOR(_, 1024);
+	tiny_stl::string name(name_, allocator);
+	tiny_stl::string const nameend = name + "End";
 
 	assert(labels.find(name) != labels.end());
 	assert(labels.find(nameend) != labels.end());
@@ -284,15 +374,16 @@ void WriteHelper::sizeOfBlock(std::string const& name, std::string const comment
 	comment(comment_, noCommentEndStatement_);
 }
 
-void WriteHelper::setAddressLength(int bits)
+void WriteHelper::setAddressLength(int bits_)
 {
-	fmt::format_to(std::back_inserter(buffer), ".addresslen {}", bits);
-	comment("Using " + std::to_string(bits) + " bits for addresses");
-	addressLen = bits;
+	MEMORY_STACK_ALLOCATOR(_, 1024);
+	fmt::format_to(std::back_inserter(buffer), ".addresslen {}", bits_);
+	comment(tiny_stl::string("Using ", _) + tiny_stl::to_string(bits_, _) + " bits for addresses");
+	addressLen = bits_;
 }
 
 
-void WriteHelper::writeNullPtr(std::string const comment_, bool noCommentEndStatement_)
+void WriteHelper::writeNullPtr(tiny_stl::string_view const & comment_, bool noCommentEndStatement_)
 {
 	writeAddressType();
 	fmt::format_to(std::back_inserter(buffer), "0");
@@ -300,32 +391,30 @@ void WriteHelper::writeNullPtr(std::string const comment_, bool noCommentEndStat
 }
 void WriteHelper::writeAddressType()
 {
-	fmt::format_to(std::back_inserter(buffer), "(u{})", std::to_string(addressLen).c_str());
+	MEMORY_STACK_ALLOCATOR(_, 1024);
+	fmt::format_to(std::back_inserter(buffer), "(u{})", tiny_stl::to_string(addressLen,_).c_str());
 }
 
-void WriteHelper::writeByteArray(std::vector<uint8_t> const& barray)
-{
-	writeByteArray(barray.data(), barray.size());
+void WriteHelper::writeByteArray(uint8_t const* bytes_, size_t size_) {
+	writeByteArray(Utils::Slice<uint8_t const>{ .data = bytes_, .size = size_ });
 }
 
-void WriteHelper::writeByteArray(uint8_t const* bytes_, size_t size_)
-{
+void WriteHelper::writeByteArray(Utils::Slice<uint8_t const> slice_) {
 	setDefaultType<uint8_t>();
-	if (size_ == 0)
-	{
-		fmt::format_to(std::back_inserter(buffer), "0\n");
-	}
+	if (slice_.size == 0) fmt::format_to(std::back_inserter(buffer), "0\n");
 	else
 	{
-		for (size_t i = 0; i < size_ - 1; i++)
+		for (size_t i = 0; i < slice_.size - 1; i++)
 		{
+			MEMORY_STACK_ALLOCATOR(_, 32);
 			fmt::format_to(std::back_inserter(buffer), "{}{}",
-										 std::to_string(bytes_[i]).c_str(),
+										 tiny_stl::to_string(slice_.data[i], _).c_str(),
 										 ((i % 80) == 79) ? "\n" : ", ");
 		}
 
 		// write last byte without ,
-		fmt::format_to(std::back_inserter(buffer), "{}\n", std::to_string(bytes_[size_ -1]).c_str());
+		MEMORY_STACK_ALLOCATOR(_, 32);
+		fmt::format_to(std::back_inserter(buffer), "{}\n", tiny_stl::to_string(slice_.data[slice_.size - 1], _).c_str());
 	}
 
 	setDefaultType<uint32_t>();

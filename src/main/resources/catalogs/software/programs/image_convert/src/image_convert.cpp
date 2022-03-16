@@ -8,10 +8,10 @@
 #include "Luau/Compiler.h"
 #define BACKWARD_HAS_DW 1
 #include "platform/host/backward.hpp"
-
 #include <memory>
 #include <string>
 #include <optional>
+#include "resource_bundle_writer.hpp"
 
 extern int LuaImage_Open(lua_State* L, Memory_Allocator* allocator);
 
@@ -146,11 +146,11 @@ void setupState(lua_State* L)
 	static const luaL_Reg funcs[] = {
 			{"loadstring", lua_loadstring},
 			{"require", lua_require},
-			{NULL, NULL},
+			{nullptr, nullptr},
 	};
 
 	lua_pushvalue(L, LUA_GLOBALSINDEX);
-	luaL_register(L, NULL, funcs);
+	luaL_register(L, nullptr, funcs);
 	lua_pop(L, 1);
 
 	LuaImage_Open(L, &Memory_GlobalAllocator);
@@ -179,7 +179,7 @@ std::string runCode(lua_State* L, std::string const& name, std::string const& so
 	lua_remove(L, -3);
 	lua_xmove(L, T, 1);
 
-	int status = lua_resume(T, NULL, 0);
+	int status = lua_resume(T, nullptr, 0);
 
 	if (status == 0)
 	{
@@ -233,6 +233,17 @@ int main(int argc, char const *argv[]) {
 		Usage(argv[0]);
 		return 1;
 	}
+
+	Binny::BundleWriter bundleWriter(64, &Memory_GlobalAllocator, &Memory_GlobalAllocator);
+	tiny_stl::vector<uint32_t> dependecies(&Memory_GlobalAllocator);
+	bundleWriter.addRawTextChunk(tiny_stl::string("test", &Memory_GlobalAllocator),
+															 "TEST"_bundle_id,
+															 0,
+															 0,
+															 dependecies,
+															 tiny_stl::string("TEST Text",&Memory_GlobalAllocator) );
+	tiny_stl::vector<uint8_t> bundleResults(&Memory_GlobalAllocator);
+	bundleWriter.build(bundleResults);
 
 	std::unique_ptr<lua_State, void (*)(lua_State*)> globalState(luaL_newstate(), lua_close);
 	lua_State* L = globalState.get();

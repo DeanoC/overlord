@@ -112,7 +112,7 @@ EXTERN_C VFile_Handle VFileMemory_FromBuffer(void const *memory, size_t size, bo
 
 #if MEMORY_TRACKING_SETUP == 1
 	// call the allocator direct, so that the line and file comes free the caller
-	VFile_Interface_t *vif = (VFile_Interface_t *) memoryAllocator->malloc(VFileMemory_HeaderSize);
+	VFile_Interface_t *vif = (VFile_Interface_t *) memoryAllocator->malloc(memoryAllocator, VFileMemory_HeaderSize);
 #else
 	VFile_Interface_t *vif = (VFile_Interface_t *) ALLOCATOR_MALLOC(memoryAllocator, VFileMemory_HeaderSize);
 #endif
@@ -143,7 +143,7 @@ EXTERN_C VFile_Handle VFileMemory_FromSize(size_t size, Memory_Allocator* memory
 	size_t sizeWithHeader = VFileMemory_HeaderSize + size;
 #if MEMORY_TRACKING_SETUP == 1
 	// call the allocator direct, so that the line and file comes free the caller
-	VFile_Interface_t *vif = (VFile_Interface_t *) memoryAllocator->malloc(sizeWithHeader);
+	VFile_Interface_t *vif = (VFile_Interface_t *) memoryAllocator->malloc(memoryAllocator, sizeWithHeader);
 #else
 	VFile_Interface_t *vif = (VFile_Interface_t *) ALLOCATOR_MALLOC(sizeWithHeader, memoryAllocator);
 #endif

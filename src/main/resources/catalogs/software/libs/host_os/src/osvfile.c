@@ -76,7 +76,7 @@ EXTERN_C void* Os_AllFromFile(char const *filename, bool text, size_t* outSize, 
 
 #if MEMORY_TRACKING_SETUP == 1
 #undef Os_VFileFromFile
-#define LOCAL_MALLOC(a, s) (allocator)->malloc((s))
+#define LOCAL_MALLOC(a, s) (allocator)->malloc(allocator, (s))
 #else
 #define LOCAL_MALLOC(a, s) MALLOC((a),(s))
 #endif

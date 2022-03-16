@@ -1,7 +1,7 @@
 #pragma once
 #include "core/core.h"
 
-namespace Utils
+namespace Core
 {
 	// FNV-1a 32bit hashing algorithm.
 	CONST_EXPR uint32_t CompileTimeHash(size_t count, char const* s)
@@ -22,5 +22,5 @@ namespace Utils
 
 CONST_EXPR uint32_t operator"" _hash(char const* s, size_t count)
 {
-	return Utils::CompileTimeHash(count, s);
+	return Core::CompileTimeHash(count, s);
 }

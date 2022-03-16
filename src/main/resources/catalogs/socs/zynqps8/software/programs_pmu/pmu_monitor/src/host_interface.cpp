@@ -162,7 +162,7 @@ void HostInterface::WhatCommand() {
 
 	// special case Zmodem receive code first
 	if(cmdBufferHeadTmp > 4 && this->cmdBuffer[4] == 0x18) {
-		if(Utils::RuntimeHash(4, (char *) this->cmdBuffer) == "rz**"_hash) {
+		if(Core::RuntimeHash(4, (char *) this->cmdBuffer) == "rz**"_hash) {
 			// zmodem download start
 			osHeap->console.console.PrintLn(ANSI_BLUE_PAPER "ZModem download started" ANSI_RESET_ATTRIBUTES);
 			textConsoleSkip = 30;
@@ -181,7 +181,7 @@ void HostInterface::WhatCommand() {
 	osHeap->console.console.PrintWithSize(finds[0], (char *) this->cmdBuffer);
 	osHeap->console.console.PrintLn(" command received");
 
-	switch (Utils::RuntimeHash(finds[0], (char *) this->cmdBuffer)) {
+	switch (Core::RuntimeHash(finds[0], (char *) this->cmdBuffer)) {
 		case "echo"_hash: {
 			EchoCmd(cmdBuffer, finds, findCount);
 			break;
@@ -259,7 +259,7 @@ void HostInterface::SleepCpu(uint8_t const *cmdBuffer, unsigned int const *finds
 		this->currentState = State::RECEIVING_COMMAND;
 		return;
 	}
-	switch (Utils::RuntimeHash(finds[1] - finds[0] - 1, (char *) cmdBuffer + finds[0] + 1)) {
+	switch (Core::RuntimeHash(finds[1] - finds[0] - 1, (char *) cmdBuffer + finds[0] + 1)) {
 		case "A53"_hash: {
 			A53Sleep0();
 			A53Sleep1();
@@ -287,7 +287,7 @@ void HostInterface::WakeUpCpu(uint8_t const *cmdBuffer, unsigned int const *find
 		this->currentState = State::RECEIVING_COMMAND;
 		return;
 	}
-	switch (Utils::RuntimeHash(finds[1] - finds[0] - 1, (char *) cmdBuffer + finds[0] + 1)) {
+	switch (Core::RuntimeHash(finds[1] - finds[0] - 1, (char *) cmdBuffer + finds[0] + 1)) {
 		case "A53"_hash: {
 			A53WakeUp0();
 			A53WakeUp1();
@@ -315,7 +315,7 @@ void HostInterface::BootCpu(uint8_t const *cmdBuffer, unsigned int const *finds,
 		this->currentState = State::RECEIVING_COMMAND;
 		return;
 	}
-	switch (Utils::RuntimeHash(finds[1] - finds[0] - 1, (char *) cmdBuffer + finds[0] + 1)) {
+	switch (Core::RuntimeHash(finds[1] - finds[0] - 1, (char *) cmdBuffer + finds[0] + 1)) {
 		case "A53"_hash: {
 			debug_printf("\nA53s booting from %#018llx\n", downloadAddress);
 			A53Sleep0();

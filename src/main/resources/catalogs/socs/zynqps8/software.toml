@@ -9,11 +9,13 @@ cpus = "a53"
 name = "zynqps8_dma"
 type = "library.dma.zynqps8"
 software = "software/libs/dma/dma.toml"
+cpus = "a53,pmu,r5f"
 
 [[definition]]
 name = "xilinx"
 type = "library.xilinx.zynqps8"
 software = "software/libs/xilinx/xilinx.toml"
+cpus = "a53,pmu,r5f"
 
 [[definition]]
 name = "ikuy_boot"

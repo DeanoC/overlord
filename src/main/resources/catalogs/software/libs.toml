@@ -101,3 +101,8 @@ name = "data_binify"
 type = "library.data_binify"
 software = "libs/data_binify/data_binify.toml"
 cpus = "host"
+
+[[definition]]
+name = "tiny_stl"
+type = "library.tiny_stl"
+software = "libs/tiny_stl/tiny_stl.toml"

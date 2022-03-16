@@ -4,106 +4,55 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="73b7f681-932b-4979-9f4f-6aee48997ac8" name="Default Changelist" comment="More support for host programs&#10;Adding many of my old libraries and other bits from wyrd, yolk and al2o3&#10;binify&#10;cadt&#10;host_os&#10;data_utils (lz4, crc32c, miniz)&#10;imageio (load and siave)&#10;lua bindings to image and imageio">
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/platform.toml" afterDir="false" />
+    <list default="true" id="73b7f681-932b-4979-9f4f-6aee48997ac8" name="Default Changelist" comment="Renamed hw lib to platform&#10;host_platform now integrated in platform, so less if($CPU == host) needed">
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/core/include/core/utils.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/include/memory/memory.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/src/linear_allocator.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/src/memory.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/CMakeLists.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/algorithm.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/buffer.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/hash.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/hash_base.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/initializer_list.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/new.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/pair.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/pdqsort.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/stack.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/string.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/string_view.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/traits.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/unordered_map.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/unordered_set.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/vector.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/tiny_stl.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/utils/include/utils/array_utils.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/utils/include/utils/enum_utils.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/display_port/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/display_port/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/display_port/src/aux.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/display_port/src/aux.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/display_port/src/display.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/display_port/src/display.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/display_port/src/edid.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/display_port/src/edid.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/display_port/src/serdes.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/display_port/src/serdes.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/display_port/src/train.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/display_port/src/train.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/dma/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/dma/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/dma/src/fpddma.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/dma/src/fpddma.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/dma/src/lpddma.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/dma/src/lpddma.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/kv260/pll_init.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/kv260/pll_init.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/myir_fz3/clock_init.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/myir_fz3/clock_init.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/myir_fz3/ddr_init.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/myir_fz3/ddr_init.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/myir_fz3/misc_init.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/myir_fz3/misc_init.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/myir_fz3/peripherals_init.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/myir_fz3/peripherals_init.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/myir_fz3/pll_init.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/myir_fz3/pll_init.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/myir_fz3/serdes_init.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/myir_fz3/serdes_init.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/translation_table.S" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/translation_table.S" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/cpuwake.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/cpuwake.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/host_interface.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/host_interface.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/interrupts/gic_proxy.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/interrupts/gic_proxy.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/interrupts/interrupt_handlers.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/interrupts/interrupt_handlers.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/interrupts/interrupts.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/interrupts/interrupts.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os/ipi3_os_server.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os/ipi3_os_server.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os/os_cpu.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os/os_cpu.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os/os_print.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os/os_print.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os/os_screenconsole.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os/os_screenconsole.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os_heap.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os_heap.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/timers.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/timers.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/core/include/core/bitmap_allocator.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/core/include/core/bitmap_allocator.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/core/include/core/bitmap_allocator_single_threaded.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/core/include/core/bitmap_allocator_single_threaded.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/cadt/src/vector.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/cadt/src/vector.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/core/include/core/bitops.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/core/include/core/bitops.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/core/include/core/compile_time_hash.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/core/include/core/compile_time_hash.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/core/include/core/utf8.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/core/include/core/utf8.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/dbg/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/dbg/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/dbg/src/host/assert.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/dbg/src/host/assert.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/dbg/src/zynqmp/print.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/dbg/src/zynqmp/print.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gfx_image/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gfx_image/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gfx_image/include/gfx_image/copy.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gfx_image/include/gfx_image/copy.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gfx_image/src/copy.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gfx_image/src/copy.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/host_os/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/host_os/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/host_os/include/host_os/osvfile.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/host_os/include/host_os/osvfile.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/host_platform/CMakeLists.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/host_platform/host_platform.toml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/host_platform/include/host_platform/backward.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/include/platform/host/backward.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/host_platform/include/host_platform/compiler_gcc.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/include/platform/host/compiler_gcc.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/host_platform/include/host_platform/compiler_msvc.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/include/platform/host/compiler_msvc.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/host_platform/include/host_platform/host_platform.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/include/platform/host/platform.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/host_platform/include/host_platform/host_platform_linux.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/include/platform/host/host_platform_linux.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/host_platform/include/host_platform/host_platform_osx.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/include/platform/host/host_platform_osx.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/host_platform/include/host_platform/host_platform_posix.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/include/platform/host/host_platform_posix.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/host_platform/include/host_platform/host_platform_win.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/include/platform/host/host_platform_win.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/host_platform/src/backward.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/src/host/backward.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/host_platform/src/compat.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/src/host/compat.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/hw/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/hw/hw.toml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/hw/include/hw/aarch64/intrinsics_gcc.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/include/platform/aarch64/intrinsics_gcc.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/hw/include/hw/cache.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/include/platform/cache.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/hw/include/hw/cpu.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/include/platform/cpu.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/hw/include/hw/cpu_percpu.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/include/platform/cpu_percpu.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/hw/include/hw/memory_map.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/include/platform/memory_map.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/hw/include/hw/memory_map_percpu.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/include/platform/memory_map_percpu.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/hw/include/hw/microblaze/intrinsics_gcc.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/include/platform/microblaze/intrinsics_gcc.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/hw/include/hw/reg_access.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/include/platform/reg_access.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/hw/include/hw/zynqmp/pll_helper.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/include/platform/zynqmp/pll_helper.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/hw/src/aarch64/cache.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/src/aarch64/cache.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/hw/src/microblaze/disable_exceptions.S" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/src/microblaze/disable_exceptions.S" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/hw/src/microblaze/disable_interrupts.S" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/src/microblaze/disable_interrupts.S" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/hw/src/microblaze/enable_exceptions.S" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/src/microblaze/enable_exceptions.S" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/hw/src/microblaze/enable_interrupts.S" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/src/microblaze/enable_interrupts.S" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/hw/src/pmu/cache.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/src/pmu/cache.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/hw/src/zynqmp/pll_helper.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/src/zynqmp/pll_helper.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/luau_vm/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/luau_vm/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/include/data_binify/write_helper.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/include/data_binify/write_helper.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/src/writehelper.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/src/writehelper.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/host_os/src/osvfile.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/host_os/src/osvfile.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/include/memory/memory.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/include/memory/memory.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/src/dummy.c" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/src/host/memory.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/src/host/memory.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/multi_core/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/multi_core/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/multi_core/include/multi_core/core_local.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/multi_core/include/multi_core/core_local.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/musl_math/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/musl_math/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/include/osservices/ipi3_transport.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/include/osservices/ipi3_transport.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/src/cpu.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/src/cpu.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/src/ipi3_transport.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/src/ipi3_transport.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/src/memory.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/src/memory.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/src/print.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/src/print.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/src/screen_console.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/src/screen_console.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_image_format/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_image_format/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/utils/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/utils/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/utils/src/aarch64/busy_sleep.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/utils/src/aarch64/busy_sleep.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/multi_core/include/multi_core/mutex.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/multi_core/include/multi_core/mutex.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/vfile_memory/src/vfile_memory.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/vfile_memory/src/vfile_memory.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/CMakeLists.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/image_convert.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/image_convert.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/prefabs/socs/zynqps8/all.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/prefabs/socs/zynqps8/all.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/OutputSoftware.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/OutputSoftware.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/imageio_loader.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/imageio_loader.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/resource_bundle.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/resource_bundle.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/resource_bundle.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/resource_bundle.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/resource_bundle_writer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/resource_bundle_writer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/resource_bundle_writer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/resource_bundle_writer.hpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -189,16 +138,16 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tinystl" />
     <property name="settings.editor.selected.configurable" value="vcs.Git" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tinystl" />
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify" />
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs/software/libs" />
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/cadt" />
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs/software" />
-      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/luau_vm" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/include/platform/host" />
@@ -428,7 +377,12 @@
       <workItem from="1646407334217" duration="595000" />
       <workItem from="1646493240872" duration="905000" />
       <workItem from="1646650054823" duration="1247000" />
-      <workItem from="1646853812812" duration="7943000" />
+      <workItem from="1646853812812" duration="9216000" />
+      <workItem from="1647283550349" duration="596000" />
+      <workItem from="1647289985132" duration="25000" />
+      <workItem from="1647290025005" duration="26000" />
+      <workItem from="1647381241683" duration="596000" />
+      <workItem from="1647415408465" duration="726000" />
     </task>
     <task id="LOCAL-00001" summary="Major work on connection expansion and block connections&#10;Refactor and reorg instances, constraits, actions etc.&#10;moved ps8 docs to lower case">
       <created>1605964442645</created>
@@ -710,7 +664,14 @@
       <option name="project" value="LOCAL" />
       <updated>1646391201066</updated>
     </task>
-    <option name="localTasksCounter" value="41" />
+    <task id="LOCAL-00041" summary="Renamed hw lib to platform&#10;host_platform now integrated in platform, so less if($CPU == host) needed">
+      <created>1647104112541</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1647104112541</updated>
+    </task>
+    <option name="localTasksCounter" value="42" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -757,7 +718,6 @@
       <path value="$PROJECT_DIR$/../ikuy_utils" />
       <path value="$USER_HOME$/.sbt/1.0/staging/a7772c47d5d7e84d3e85/ikuy_utils" />
     </ignored-roots>
-    <MESSAGE value="Fixed Distance Matrix to only connect Top items that are connected&#10;Moved more functionality into Distance Matrix&#10;Bridged bus address calculation now correct&#10;added pow2 and log2 to Utils" />
     <MESSAGE value="Base C Header implementation WIP" />
     <MESSAGE value="Base C Header implementation WIP&#10;Bridge address working&#10;Bus fixed and variable address fitter&#10;Distance Matrix no longer assumed tops are connected.&#10;Moved more in Distance Matrix&#10;Game now stores Distance Matrix and Wires&#10;Fixes to naming in the top file.&#10;pow2 and log2 in Utils" />
     <MESSAGE value="Copy CMSIS-SVD.xsd to project to validate our svd&#10;Add stdResources paths to Resources Object" />
@@ -782,7 +742,8 @@
     <MESSAGE value="Added Sheredom's utf8 single header to core&#10;Made dbg library both target and host library&#10;added some LOG macros to print for back compat for al203 until I bring in a proper logger&#10;memory.c host version ported from al203&#10;CORE_LOCAL uses host thread local identifier on host&#10;added a host only host_platform ported from al203 platform" />
     <MESSAGE value="Major clean up and refactor of software, with better support for host software&#10;host is getting closer to just be another 'cpu' target&#10;All libraries now live in libs, per cpu target (and host) lib_${CPU} folders have links to the actual folder (allows sharing of multiple platforms for multiple cpus)&#10;software definition now can select which cpu they work on&#10;Compiler generation is cleaned up and they go into programs_host (not deleted when regenerating)&#10;Removed the xilinx version of zynqmp display port&#10;Added my gfx_image library&#10;Added host_os (WIP) from my al2o3 libraries&#10;Added host_platform from my al2o3 libraries&#10;Added luau for host and seperated luau_vm for targets&#10;Added memory (WIP) from my al203 libraries&#10;Added tiny_dds + tiny_ktx + tiny_image_format&#10;Added vfile and vfile_memory from al203 libraries" />
     <MESSAGE value="More support for host programs&#10;Adding many of my old libraries and other bits from wyrd, yolk and al2o3&#10;binify&#10;cadt&#10;host_os&#10;data_utils (lz4, crc32c, miniz)&#10;imageio (load and siave)&#10;lua bindings to image and imageio" />
-    <option name="LAST_COMMIT_MESSAGE" value="More support for host programs&#10;Adding many of my old libraries and other bits from wyrd, yolk and al2o3&#10;binify&#10;cadt&#10;host_os&#10;data_utils (lz4, crc32c, miniz)&#10;imageio (load and siave)&#10;lua bindings to image and imageio" />
+    <MESSAGE value="Renamed hw lib to platform&#10;host_platform now integrated in platform, so less if($CPU == host) needed" />
+    <option name="LAST_COMMIT_MESSAGE" value="Renamed hw lib to platform&#10;host_platform now integrated in platform, so less if($CPU == host) needed" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />

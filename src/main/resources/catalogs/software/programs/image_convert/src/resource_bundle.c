@@ -6,9 +6,6 @@
 #include "data_utils/crc32c.h"
 #include "resource_bundle.h"
 
-static const uint8_t ResourceBundle_MajorVersion = 1;
-static const uint8_t ResourceBundle_MinorVersion = 0;
-
 ResourceBundle_LoadReturn ResourceBundle_Load(VFile_Handle fileHandle,
 																					 Memory_Allocator* allocator,
 																					 Memory_Allocator* tempAllocator) {
@@ -96,11 +93,11 @@ ResourceBundle_LoadReturn ResourceBundle_Load(VFile_Handle fileHandle,
 		ResourceBundle_ChunkHeader32 * const chunk = (ResourceBundle_ChunkHeader32 *)chunkDestAddress;
 		uint8_t * const chunkBase = (uint8_t*)chunkDestAddress;
 
-		if (chunk->chunkHas64BitFixups) {
+		if (chunk->flags & RBCF_64BitFixups) {
 			// 64 bit fixups
 			uintptr_all_t * fixupTable = (uintptr_all_t *) (chunkBase + chunk->fixupOffset);
 			uintptr_all_t upperBound = (uintptr_all_t)(uintptr_t)(chunkBase + chunk->dataSize);
-			for(size_t fi = 0; fi < chunk->fixupCount; ++fi) {
+			for(size_t fi = 0; fi < chunk->fixupSize / sizeof(uint64_t); ++fi) {
 				uintptr_t const varAddress = (uintptr_t)(chunkBase + fixupTable[fi]);
 				uintptr_all_t * const varPtr = ((uintptr_all_t *)varAddress);
 				if (varAddress >= upperBound || varAddress == 0) {
@@ -123,7 +120,7 @@ ResourceBundle_LoadReturn ResourceBundle_Load(VFile_Handle fileHandle,
 			// 32 bit fixups
 			uintptr_lo_t * fixupTable = (uintptr_lo_t *) (chunkBase + chunk->fixupOffset);
 			uintptr_lo_t upperBound = (uintptr_lo_t)(uintptr_t)(chunkBase + chunk->dataSize);
-			for(size_t fi = 0; fi < chunk->fixupCount; ++fi) {
+			for(size_t fi = 0; fi < chunk->fixupSize / sizeof(uint32_t); ++fi) {
 				uintptr_t const varAddress = (uintptr_t)(chunkBase + fixupTable[fi]);
 				uintptr_lo_t * const varPtr = ((uintptr_lo_t *)varAddress);
 				if (varAddress >= upperBound || varAddress == 0) {
