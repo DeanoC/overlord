@@ -4,28 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="73b7f681-932b-4979-9f4f-6aee48997ac8" name="Default Changelist" comment="memory has linear and stack allocators now&#10;memory tracking seperated and compiles on non host-platform&#10;mutex gains recursive capabilities&#10;slice added (TODO C Slice) &#10;tinystl -&gt; tiny_stl&#10;Lots of cleanup of tiny_stl with allocator support&#10;resource_bundle + writer updated to new tiny_stl and use of stack allocator">
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/dbg/src/host/print.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/iterators.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="73b7f681-932b-4979-9f4f-6aee48997ac8" name="Default Changelist" comment="Integrate dlmalloced&#10;Added a per core optimised version (each thread allocs from its own mspace)&#10;Redone bundle to use lz4 frame compression, now compress/decompress on mass rather then each chunk">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/include/data_binify/data_binify.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/include/data_binify/data_binify.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/include/data_binify/write_helper.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/include/data_binify/write_helper.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/src/binify.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/src/binify.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/src/scanner.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/src/scanner.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/src/writehelper.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/src/writehelper.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/dbg/src/zynqmp/print.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/dbg/src/zynqmp/print.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/include/memory/memory.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/include/memory/memory.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/src/linear_allocator.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/src/linear_allocator.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/algorithm.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/algorithm.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/traits.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/traits.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/vector.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/vector.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/utils/include/utils/slice.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/utils/include/utils/slice.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/utils/include/utils/string_utils.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/utils/include/utils/string_utils.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/vfile_memory/include/vfile_memory/memory.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/vfile_memory/include/vfile_memory/memory.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/image_convert.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/image_convert.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/resource_bundle.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/resource_bundle.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/resource_bundle.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/resource_bundle.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/image_resource.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/image_resource.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/resource_bundle_writer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/resource_bundle_writer.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/resource_bundle_writer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/resource_bundle_writer.hpp" afterDir="false" />
     </list>
@@ -359,6 +341,7 @@
       <workItem from="1647381241683" duration="596000" />
       <workItem from="1647415408465" duration="1738000" />
       <workItem from="1647504541496" duration="596000" />
+      <workItem from="1647861638255" duration="794000" />
     </task>
     <task id="LOCAL-00001" summary="Major work on connection expansion and block connections&#10;Refactor and reorg instances, constraits, actions etc.&#10;moved ps8 docs to lower case">
       <created>1605964442645</created>
@@ -654,7 +637,14 @@
       <option name="project" value="LOCAL" />
       <updated>1647416572774</updated>
     </task>
-    <option name="localTasksCounter" value="43" />
+    <task id="LOCAL-00043" summary="Integrate dlmalloced&#10;Added a per core optimised version (each thread allocs from its own mspace)&#10;Redone bundle to use lz4 frame compression, now compress/decompress on mass rather then each chunk">
+      <created>1647861787020</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1647861787020</updated>
+    </task>
+    <option name="localTasksCounter" value="44" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -701,7 +691,6 @@
       <path value="$PROJECT_DIR$/../ikuy_utils" />
       <path value="$USER_HOME$/.sbt/1.0/staging/a7772c47d5d7e84d3e85/ikuy_utils" />
     </ignored-roots>
-    <MESSAGE value="Base C Header implementation WIP&#10;Bridge address working&#10;Bus fixed and variable address fitter&#10;Distance Matrix no longer assumed tops are connected.&#10;Moved more in Distance Matrix&#10;Game now stores Distance Matrix and Wires&#10;Fixes to naming in the top file.&#10;pow2 and log2 in Utils" />
     <MESSAGE value="Copy CMSIS-SVD.xsd to project to validate our svd&#10;Add stdResources paths to Resources Object" />
     <MESSAGE value="Refactored parameters and attribute merging etc.&#10;Definition no longer have parameters, only gateware does.&#10;Instance merge all attributes, ports etc.&#10;Cpu and Bus Instance now use lazy variable and the merged attributes instead of custom constructor parameters" />
     <MESSAGE value="DistanceMatrix fixed added NonRoute flag and using negative numbers as markers&#10;Lots of work with C Header output&#10;Work on fixing hardware" />
@@ -726,7 +715,8 @@
     <MESSAGE value="More support for host programs&#10;Adding many of my old libraries and other bits from wyrd, yolk and al2o3&#10;binify&#10;cadt&#10;host_os&#10;data_utils (lz4, crc32c, miniz)&#10;imageio (load and siave)&#10;lua bindings to image and imageio" />
     <MESSAGE value="Renamed hw lib to platform&#10;host_platform now integrated in platform, so less if($CPU == host) needed" />
     <MESSAGE value="memory has linear and stack allocators now&#10;memory tracking seperated and compiles on non host-platform&#10;mutex gains recursive capabilities&#10;slice added (TODO C Slice) &#10;tinystl -&gt; tiny_stl&#10;Lots of cleanup of tiny_stl with allocator support&#10;resource_bundle + writer updated to new tiny_stl and use of stack allocator" />
-    <option name="LAST_COMMIT_MESSAGE" value="memory has linear and stack allocators now&#10;memory tracking seperated and compiles on non host-platform&#10;mutex gains recursive capabilities&#10;slice added (TODO C Slice) &#10;tinystl -&gt; tiny_stl&#10;Lots of cleanup of tiny_stl with allocator support&#10;resource_bundle + writer updated to new tiny_stl and use of stack allocator" />
+    <MESSAGE value="Integrate dlmalloced&#10;Added a per core optimised version (each thread allocs from its own mspace)&#10;Redone bundle to use lz4 frame compression, now compress/decompress on mass rather then each chunk" />
+    <option name="LAST_COMMIT_MESSAGE" value="Integrate dlmalloced&#10;Added a per core optimised version (each thread allocs from its own mspace)&#10;Redone bundle to use lz4 frame compression, now compress/decompress on mass rather then each chunk" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />

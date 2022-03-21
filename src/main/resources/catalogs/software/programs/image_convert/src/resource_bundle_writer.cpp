@@ -25,30 +25,29 @@ namespace Binny {
 		o.setAddressLength(addressLength);
 	}
 
-	bool BundleWriter::registerChunk(tiny_stl::string const& name_,
-	                                 uint32_t id_,
+	bool BundleWriter::registerChunk(uint32_t id_,
 	                                 uint8_t version_,
 	                                 tiny_stl::vector<uint32_t> const& dependencies_,
-	                                 ChunkWriter const & writer_) {
+																	 ChunkWriter const & setup_,
+	                                 ChunkWriter const & item_) {
 		if(chunkRegistry.find(id_) != chunkRegistry.end()) return false;
 
 		DirEntryWriter entry = {
 				id_,
 				version_,
-				name_,
 				dependencies_,
-				writer_,
-				tiny_stl::vector<void*>{ allocator }
+				setup_,
+				item_,
+				tiny_stl::vector<DirNamePair>{ allocator }
 		};
 
 		chunkRegistry.insert(tiny_stl::pair<uint32_t, DirEntryWriter>(id_,entry));
-		o.reserveLabel(name_ + "chunk");
 		return true;
 	}
 
-	void BundleWriter::addItemToChunk(uint32_t id_, void* item) {
+	void BundleWriter::addItemToChunk(uint32_t id_, tiny_stl::string const & name_, void* item_) {
 		assert(chunkRegistry.find(id_) != chunkRegistry.end());
-		chunkRegistry.find(id_)->second.items.push_back(item);
+		chunkRegistry.find(id_)->second.items.push_back(tiny_stl::pair(name_, item_));
 	}
 
 	bool BundleWriter::build(VFile_Handle result_)
@@ -118,13 +117,15 @@ namespace Binny {
 		for (uint32_t id : final) {
 			DirEntryWriter const& dw = chunkRegistry.find(id)->second;
 
-			o.writeAs<uint32_t>(dw.id, "id type");
-			o.writeAs<uint8_t>(dw.version, "Chunk version");
-			o.align(4); // padd0
-			o.addString(dw.name);
-			o.useLabel(dw.name + "chunk","", false );
-			o.align(8); // padd1
-			o.incrementVariable("DirectoryCount");
+			for(auto const & item : dw.items) {
+				o.writeAs<uint32_t>(dw.id, "id type");
+				o.writeAs<uint8_t>(dw.version, "Chunk version");
+				o.align(4); // padd1-3
+				o.addString(item.first);
+				o.useLabel(item.first + "chunk", "", true);
+				o.align(16); // padd4
+				o.incrementVariable("DirectoryCount");
+			}
 		}
 
 		// output string table
@@ -145,9 +146,10 @@ namespace Binny {
 		for (auto const & entry : chunkRegistry)
 		{
 			o.align();
-			o.writeLabel(entry.second.name + "chunk");
+			entry.second.setup(nullptr, o);
 			for( auto const & item : entry.second.items) {
-				entry.second.writer(item, o);
+				o.writeLabel(item.first + "chunk", false);
+				entry.second.perItem(item.second, o);
 			}
 		}
 

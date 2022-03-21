@@ -245,7 +245,6 @@ int main(int argc, char const *argv[]) {
 	}
 
 	{
-		Binny::BundleWriter bundleWriter(64, true, globalAllocator);
 		tiny_stl::vector<uint32_t> dependecies(globalAllocator);
 		auto image = Image_Create2D(32, 32, TinyImageFormat_R8G8B8A8_UNORM, globalAllocator);
 		for (auto y = 0; y < image->width; ++y) {
@@ -255,12 +254,17 @@ int main(int argc, char const *argv[]) {
 				Image_SetBlocksAtF(image, arr, 1, Image_CalculateIndex(image, x, y, 0, 0));
 			}
 		}
-		bundleWriter.registerChunk(tiny_stl::string("image_test", globalAllocator),
-		                           "IMG_"_bundle_id,
+
+		Binny::BundleWriter bundleWriter(64, true, globalAllocator);
+		bundleWriter.registerChunk("IMG_"_bundle_id,
 		                           0,
 		                           dependecies,
+															 ImageChunkWriter,
 		                           ImageChunkWriter);
-		bundleWriter.addItemToChunk("IMG_"_bundle_id, image);
+
+		bundleWriter.addItemToChunk("IMG_"_bundle_id, tiny_stl::string("image_test", globalAllocator), image);
+		bundleWriter.addItemToChunk("IMG_"_bundle_id, tiny_stl::string("image_test2", globalAllocator), image);
+
 		auto wfh = Os_VFileFromFile("test.bin", Os_FM_WriteBinary, globalAllocator);
 		bundleWriter.build(wfh);
 		VFile_Close(wfh);

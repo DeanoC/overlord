@@ -7,15 +7,17 @@
 #include "data_binify/write_helper.hpp"
 
 void ImageChunkWriter(void * userData_, Binify::WriteHelper& helper) {
+	if(userData_ == nullptr) {
+		helper.addEnum("Image_FlagBits");
+		helper.addEnumValue("Image_FlagBits", "Cubemap", Image_Flag_Cubemap);
+		helper.addEnumValue("Image_FlagBits", "HeaderOnly", Image_Flag_HeaderOnly);
+		helper.addEnumValue("Image_FlagBits", "HasNextImageData", Image_Flag_HasNextImageData);
+		helper.addEnumValue("Image_FlagBits", "CLUT", Image_Flag_CLUT);
+		return;
+	}
+
 	auto image = (Image_ImageHeader const * const) userData_;
-
 	assert((image->dataSizeInBytes & 0x7) == 0);
-	helper.addEnum("Image_FlagBits");
-	helper.addEnumValue("Image_FlagBits", "Cubemap", Image_Flag_Cubemap);
-	helper.addEnumValue("Image_FlagBits", "HeaderOnly", Image_Flag_HeaderOnly);
-	helper.addEnumValue("Image_FlagBits", "HasNextImageData", Image_Flag_HasNextImageData);
-	helper.addEnumValue("Image_FlagBits", "CLUT", Image_Flag_CLUT);
-
 	while(image != nullptr) {
 		helper.writeNullPtr("Where the allocator pointer lives");
 		helper.writeAs<uint64_t>(image->dataSizeInBytes, "Image size in bytes");

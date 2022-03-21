@@ -23,13 +23,13 @@ namespace Binny {
 
 				/// @param ChunkWriter will be called at build time for each item of this chunk
 				/// @return true if successful
-				bool registerChunk( tiny_stl::string const& name_,
-				               uint32_t id_,
-				               uint8_t version_,
-				               tiny_stl::vector<uint32_t> const& dependencies_,
-				               ChunkWriter const& writer_ );
+				bool registerChunk( uint32_t id_,
+				                    uint8_t version_,
+				                    tiny_stl::vector<uint32_t> const& dependencies_,
+														ChunkWriter const & setup_,
+				                    ChunkWriter const & item_ );
 
-				void addItemToChunk(uint32_t id_, void* item);
+				void addItemToChunk(uint32_t id_, tiny_stl::string const & name_, void* item_);
 
 				/// @param result_ where the bundle data will be put
 				/// @return true if successful
@@ -41,24 +41,20 @@ namespace Binny {
 				void writeBundleHeader(Binify::WriteHelper& h, size_t uncompressedSize, size_t decompressionBufferSize) const;
 				void beginCompressedBlock(Binify::WriteHelper& h);
 
-				bool addChunkInternal( tiny_stl::string const& name_,
-				                       uint32_t id_,
-				                       uint32_t flags_,
-				                       tiny_stl::vector<uint32_t> const& dependencies_,
-															 Utils::Slice<uint8_t const > bin_);
-
 				int addressLength;
 				Binify::WriteHelper o;
 				Memory_Allocator* allocator;
+
+				typedef tiny_stl::pair<tiny_stl::string, void*> DirNamePair;
 
 				struct DirEntryWriter
 				{
 						uint32_t id;
 						uint8_t version;
-						tiny_stl::string name;
 						tiny_stl::vector<uint32_t> dependencies;
-						ChunkWriter writer;
-						tiny_stl::vector<void*> items;
+						ChunkWriter setup;
+						ChunkWriter perItem;
+						tiny_stl::vector<DirNamePair> items;
 				};
 
 				tiny_stl::unordered_map<uint32_t, DirEntryWriter> chunkRegistry;
