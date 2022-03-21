@@ -13,6 +13,7 @@
 static void VFile_OsFile_Close(VFile_Interface_t *vif) {
 	Os_VFile_t *vof = (Os_VFile_t *) (vif + 1);
 	Os_FileClose(vof->fileHandle);
+	MFREE(vof->allocator, vif);
 }
 
 static void VFile_OsFile_Flush(VFile_Interface_t *vif) {
@@ -74,13 +75,6 @@ EXTERN_C void* Os_AllFromFile(char const *filename, bool text, size_t* outSize, 
 	return ret;
 }
 
-#if MEMORY_TRACKING_SETUP == 1
-#undef Os_VFileFromFile
-#define LOCAL_MALLOC(a, s) (allocator)->malloc(allocator, (s))
-#else
-#define LOCAL_MALLOC(a, s) MALLOC((a),(s))
-#endif
-
 EXTERN_C VFile_Handle Os_VFileFromFile(char const *filename, enum Os_FileMode mode, Memory_Allocator* allocator) {
 	Os_FileHandle handle = Os_FileOpen(filename, mode);
 	if (handle == nullptr) { return nullptr; }
@@ -89,9 +83,9 @@ EXTERN_C VFile_Handle Os_VFileFromFile(char const *filename, enum Os_FileMode mo
 			sizeof(VFile_Interface_t) +
 			sizeof(Os_VFile_t) +
 			utf8size(filename) + 1;
-	VFile_Interface_t *vif = (VFile_Interface_t *) LOCAL_MALLOC(allocator, mallocSize);
+	VFile_Interface_t *vif = (VFile_Interface_t *) MALLOC(allocator, mallocSize);
 	vif->magic = InterfaceMagic;
-	vif->type =   vif->type = VFILE_MAKE_ID('O', 'S', 'F', 'L');
+	vif->type =   VFILE_MAKE_ID('O', 'S', 'F', 'L');
 	vif->closeFunc = &VFile_OsFile_Close;
 	vif->flushFunc = &VFile_OsFile_Flush;
 	vif->readFunc = &VFile_OsFile_Read;
@@ -104,6 +98,7 @@ EXTERN_C VFile_Handle Os_VFileFromFile(char const *filename, enum Os_FileMode mo
 
 	Os_VFile_t *vof = (Os_VFile_t *) (vif + 1);
 	vof->fileHandle = handle;
+	vof->allocator = allocator;
 	char *dstname = (char *) (vof + 1);
 	strcpy(dstname, filename);
 

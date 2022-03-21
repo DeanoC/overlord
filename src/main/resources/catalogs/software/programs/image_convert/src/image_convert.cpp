@@ -6,14 +6,21 @@
 #include "host_os/osvfile.h"
 #include "host_os/filesystem.h"
 #include "Luau/Compiler.h"
+#include "vfile_memory/memory.h"
+#include "host_os/osvfile.h"
+#include "resource_bundle.h"
+
 #define BACKWARD_HAS_DW 1
 #include "platform/host/backward.hpp"
 #include <memory>
 #include <string>
 #include <optional>
 #include "resource_bundle_writer.hpp"
-
+#include "gfx_image/create.h"
+#include "image_resource.h"
 extern int LuaImage_Open(lua_State* L, Memory_Allocator* allocator);
+
+GLOBAL_HEAP_ALLOCATOR(globalAllocator)
 
 
 std::optional<std::string> readFile(const std::string& name) {
@@ -26,7 +33,7 @@ std::optional<std::string> readFile(const std::string& name) {
 		debug_printf("File not found at %s%s\n", currentDir, name.c_str());
 		return {};
 	}
-	void* fileMem = Os_AllFromFile(name.c_str(), true, &size, &Memory_GlobalAllocator);
+	void* fileMem = Os_AllFromFile(name.c_str(), true, &size, globalAllocator);
 	if(fileMem == nullptr) {
 		debug_printf("File loading failed%s\n",  name.c_str());
 		return {};
@@ -34,7 +41,7 @@ std::optional<std::string> readFile(const std::string& name) {
 	std::string str;
 	str.resize(size);
 	memcpy(str.data(), fileMem, size);
-	MFREE(&Memory_GlobalAllocator, fileMem);
+	MFREE(globalAllocator, fileMem);
 	return str;
 }
 
@@ -153,7 +160,7 @@ void setupState(lua_State* L)
 	luaL_register(L, nullptr, funcs);
 	lua_pop(L, 1);
 
-	LuaImage_Open(L, &Memory_GlobalAllocator);
+	LuaImage_Open(L, globalAllocator);
 
 	luaL_sandbox(L);
 }
@@ -227,6 +234,9 @@ void Usage(char const* programName) {
 }
 
 int main(int argc, char const *argv[]) {
+	Memory_MallocInit();
+	Memory_HeapAllocatorInit(globalAllocator);
+
 	backward::SignalHandling sh;
 
 	if(argc != 2) {
@@ -234,30 +244,60 @@ int main(int argc, char const *argv[]) {
 		return 1;
 	}
 
-	Binny::BundleWriter bundleWriter(64, &Memory_GlobalAllocator, &Memory_GlobalAllocator);
-	tiny_stl::vector<uint32_t> dependecies(&Memory_GlobalAllocator);
-	bundleWriter.addRawTextChunk(tiny_stl::string("test", &Memory_GlobalAllocator),
-															 "TEST"_bundle_id,
-															 0,
-															 0,
-															 dependecies,
-															 tiny_stl::string("TEST Text",&Memory_GlobalAllocator) );
-	tiny_stl::vector<uint8_t> bundleResults(&Memory_GlobalAllocator);
-	bundleWriter.build(bundleResults);
+	{
+		Binny::BundleWriter bundleWriter(64, true, globalAllocator);
+		tiny_stl::vector<uint32_t> dependecies(globalAllocator);
+		auto image = Image_Create2D(32, 32, TinyImageFormat_R8G8B8A8_UNORM, globalAllocator);
+		for (auto y = 0; y < image->width; ++y) {
+			for (auto x = 0; x < image->width; ++x) {
+				float arr[4] = {static_cast<float>(x + y), static_cast<float>(x * y + 1), static_cast<float>(x + 2),
+				                static_cast<float>(x + 3)};
+				Image_SetBlocksAtF(image, arr, 1, Image_CalculateIndex(image, x, y, 0, 0));
+			}
+		}
+		bundleWriter.registerChunk(tiny_stl::string("image_test", globalAllocator),
+		                           "IMG_"_bundle_id,
+		                           0,
+		                           dependecies,
+		                           ImageChunkWriter);
+		bundleWriter.addItemToChunk("IMG_"_bundle_id, image);
+		auto wfh = Os_VFileFromFile("test.bin", Os_FM_WriteBinary, globalAllocator);
+		bundleWriter.build(wfh);
+		VFile_Close(wfh);
 
-	std::unique_ptr<lua_State, void (*)(lua_State*)> globalState(luaL_newstate(), lua_close);
-	lua_State* L = globalState.get();
-	setupState(L);
+		std::unique_ptr<VFile_Interface_t,void (*)(VFile_Interface_t*)> fh(Os_VFileFromFile("test.bin", Os_FM_ReadBinary, globalAllocator), &VFile_Close);
+		auto bundleReturn = ResourceBundle_Load(fh.get(), globalAllocator, globalAllocator);
+		if (bundleReturn.errorCode != ResourceBundle_LoadReturn::RBEC_Okay) {
+			debug_printf("bundle error %i\n", bundleReturn.errorCode);
+		}
+		auto const bundle = bundleReturn.resourceBundle;
+		for (uint32_t i = 0; i < ResourceBundle_GetDirectoryCount(bundle); ++i) {
+			auto de = ResourceBundle_GetDirectory(bundle, i);
+			debug_printf("chunk %i - id %u version %i name %s at %p\n", i, de->id, de->version, de->namePtr, de->chunkPtr);
+		}
 
-	auto const source = readFile(argv[1]);
-	if(!source) {
-		printf("%s: Could not read %s\n", argv[0], argv[1]);
-		return 2;
+		MFREE(globalAllocator, image);
+		MFREE(globalAllocator, bundle);
+
+		std::unique_ptr<lua_State, void (*)(lua_State *)> globalState(luaL_newstate(), lua_close);
+		lua_State *L = globalState.get();
+		setupState(L);
+
+		auto const source = readFile(argv[1]);
+		if (!source) {
+			printf("%s: Could not read %s\n", argv[0], argv[1]);
+			return 2;
+		}
+		auto const result = runCode(L, argv[1], source.value());
+		if (!result.empty()) {
+			printf("%s: %s\n", argv[0], result.c_str());
+			return 3;
+		}
 	}
-	auto const result = runCode(L, argv[1], source.value());
-	if(!result.empty()) {
-		printf("%s: %s\n", argv[0], result.c_str());
-		return 3;
-	}
+
+	Memory_TrackerDestroyAndLogLeaks();
+	Memory_HeapAllocatorFinish(globalAllocator);
+	Memory_MallocFinish();
+
 	return 0;
 }

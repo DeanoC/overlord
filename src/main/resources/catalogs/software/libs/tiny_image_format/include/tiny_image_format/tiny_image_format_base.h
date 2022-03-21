@@ -234,7 +234,7 @@ extern "C"
 {
 #endif
 
-typedef enum TinyImageFormat {
+typedef enum PACKED TinyImageFormat {
 	TinyImageFormat_UNDEFINED = 0,
 	TinyImageFormat_R1_UNORM = 1,
 	TinyImageFormat_R2_UNORM = 2,
@@ -439,7 +439,7 @@ typedef enum TinyImageFormat {
 	TinyImageFormat_CLUT_P8A8 = 201,
 } TinyImageFormat;
 
-typedef enum TinyImageFormat_LogicalChannel {
+typedef enum PACKED TinyImageFormat_LogicalChannel {
 	TinyImageFormat_LC_Red = 0,
 	TinyImageFormat_LC_Green = 1,
 	TinyImageFormat_LC_Blue = 2,
@@ -450,7 +450,7 @@ typedef enum TinyImageFormat_LogicalChannel {
 	TinyImageFormat_LC_1 = -2,
 } TinyImageFormat_LogicalChannel;
 
-typedef enum TinyImageFormat_PhysicalChannel {
+typedef enum PACKED TinyImageFormat_PhysicalChannel {
 	TinyImageFormat_PC_0 = 0,
 	TinyImageFormat_PC_1 = 1,
 	TinyImageFormat_PC_2 = 2,

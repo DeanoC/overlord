@@ -86,6 +86,19 @@ public:
 
 	WARN_UNUSED_RESULT tiny_stl::string getVariable(tiny_stl::string_view const & name_) const;
 
+	void writeVariable(tiny_stl::string_view const & name_,
+										 tiny_stl::string_view const & comment_ = "",
+	                   bool noCommentEndStatement_ = true);
+
+	template<typename type>
+	void writeVariableAs(tiny_stl::string_view const & name_,
+	                     tiny_stl::string_view const & comment_ = "",
+	                     bool noCommentEndStatement_ = true) {
+		fmt::format_to(std::back_inserter(buffer), "({})", typeToString<type>());
+		writeVariable(name_, comment_, noCommentEndStatement_);
+
+	}
+
 	void incrementVariable(tiny_stl::string_view const & name_,
 	                       uint32_t adder_ = 1,
 	                       tiny_stl::string_view const & comment_ = "",
@@ -111,16 +124,57 @@ public:
 	               tiny_stl::string_view const & value_name_,
 	               tiny_stl::string_view const & comment_ = "",
 								 bool noCommentEndStatement_ = true);
+	void writeEnum(tiny_stl::string_view const & name_,
+	               uint64_t value_,
+	               tiny_stl::string_view const & comment_ = "",
+	               bool noCommentEndStatement_ = true);
+
+	template<typename type>
+	void writeEnumAs(tiny_stl::string_view const & name_,
+	                 tiny_stl::string_view const & value_name_,
+	                 tiny_stl::string_view const & comment_ = "",
+	                 bool noCommentEndStatement_ = true)
+	{
+		fmt::format_to(std::back_inserter(buffer), "({})", typeToString<type>());
+		writeEnum(name_, value_name_, comment_, noCommentEndStatement_);
+	}
+		template<typename type>
+		void writeEnumAs(tiny_stl::string_view const & name_,
+		                 uint64_t value_,
+		                 tiny_stl::string_view const & comment_ = "",
+		                 bool noCommentEndStatement_ = true)
+		{
+			fmt::format_to(std::back_inserter(buffer), "({})", typeToString<type>());
+			writeEnum(name_, value_, comment_, noCommentEndStatement_);
+		}
 
 	void writeFlags(tiny_stl::string_view const & name_,
 									uint64_t flags_,
 									tiny_stl::string_view const & comment_ = "",
 									bool noCommentEndStatement_ = true);
 
+	template<typename type>
+	void writeFlagsAs(tiny_stl::string_view const & name_,
+	                uint64_t flags_,
+	                tiny_stl::string_view const & comment_ = "",
+	                bool noCommentEndStatement_ = true)
+	{
+		fmt::format_to(std::back_inserter(buffer), "({})", typeToString<type>());
+		writeFlags(name_, flags_, comment_, noCommentEndStatement_);
+	}
+
 	// string table functions
 	// the string table handles all the management of strings lik4 copying, offset etc.
 	// After fixup each string pointer will point to the correct portion of the file
-	void addString(tiny_stl::string_view const & str_);  ///< adds it to the table and outputs a fixup
+	void addString(tiny_stl::string_view const & str_, bool addFixup_ = true);  ///< adds it to the table and outputs a fixup
+
+	template<typename type>
+	void addStringAs(tiny_stl::string_view const & str_, bool addFixup_ = true)
+	{
+		fmt::format_to(std::back_inserter(buffer), "({})", typeToString<type>());
+		addString(str_, addFixup_);
+	}
+
 	tiny_stl::string addStringToTable(tiny_stl::string_view const & str_);
 
 	// sometimes its useful to have multiple string tables. this allows it by
@@ -143,6 +197,10 @@ public:
 		fmt::format_to(std::back_inserter(buffer), "({}){}", typeToString<type>(), str_.c_str());
 		comment(comment_, noCommentEndStatement_);
 	}
+
+	// scope functions
+	void pushScope() { scope += "_"; }
+	void popScope() { scope.pop_back(); }
 
 	// misc functions
 	// writes current position - defaultBlock into the file
@@ -227,24 +285,6 @@ public:
 	}
 
 	template<typename type>
-	void writeFlagsAs(tiny_stl::string_view const & name_, uint64_t flags_, tiny_stl::string_view const & comment_ = "", bool noCommentEndStatement_ = true) {
-		tiny_stl::string const name{ name_, allocator };
-
-		assert(enums.find(name) != enums.end());
-		size_t index = enums[name];
-		auto& e = enumValueVector[index];
-		fmt::format_to(std::back_inserter(buffer), "({}) 0", typeToString<type>());
-		for(auto const& en : e)
-		{
-			if(flags_ & en.second)
-			{
-				fmt::format_to(std::back_inserter(buffer), " | {}", getEnumValue(name_, en.first).c_str());
-			}
-		}
-		comment(comment_, noCommentEndStatement_);
-	}
-
-	template<typename type>
 	void sizeOfBlockAs(tiny_stl::string_view const & name_, tiny_stl::string_view const & comment_ = "", bool noCommentEndStatement_ = true)
 	{
 		tiny_stl::string const name { name_, allocator};
@@ -252,12 +292,24 @@ public:
 
 		assert(labels.find(name) != labels.end());
 		assert(labels.find(nameend) != labels.end());
-		fmt::format_to(std::back_inserter(buffer), "({})({} - {})", typeToString<type>(), nameend.c_str(), name.c_str());
+		fmt::format_to(std::back_inserter(buffer), "({}) ({} - {})", typeToString<type>(), nameend.c_str(), name.c_str());
 
 		comment(comment_, noCommentEndStatement_);
 	}
 
-		// template single element write as type with optional comment
+	// template single element write as type with optional comment
+	template<typename type>
+	void useLabelAs(tiny_stl::string_view const & name_,
+	                tiny_stl::string_view const & baseBlock_ = "",
+	                bool reserve_ = false,
+	                bool addFixup_ = true,
+	                tiny_stl::string_view const & comment_ = "",
+	                bool noCommentEndStatement_ = true) {
+		fmt::format_to(std::back_inserter(buffer), "({}) ", typeToString<type>());
+		useLabel(name_, baseBlock_, reserve_, addFixup_, comment_, noCommentEndStatement_);
+	}
+
+	// template single element write as type with optional comment
 	template<typename type, typename T>
 	void writeAs(T i_, tiny_stl::string_view const & comment_ = "") {
 		fmt::format_to(std::back_inserter(buffer), "({}) {}", typeToString<type>(), i_);
@@ -294,7 +346,6 @@ public:
 
 	template<typename T>
 	void writeSize(T i_, tiny_stl::string_view const & comment_ = "") {
-		writeAddressType();
 		fmt::format_to(std::back_inserter(buffer), "{}", i_);
 		comment(comment_);
 	}
@@ -304,9 +355,10 @@ public:
 	WARN_UNUSED_RESULT size_t getFixupCount() const { return fixups.size(); }
 	WARN_UNUSED_RESULT tiny_stl::string const & getFixup(size_t index) const { return fixups[index]; }
 
+
 private:
-	void mergeStringTable(WriteHelper &other);
 	void clearStringTable();
+	void mergeStringTable(WriteHelper &other);
 	tiny_stl::string nameToLabel(tiny_stl::string_view const &name_);
 
 	Memory_Allocator* allocator;
@@ -325,6 +377,7 @@ private:
 	tiny_stl::vector<enumValue_t> enumValueVector;
 	tiny_stl::unordered_map<tiny_stl::string, size_t> enums;
 
+	tiny_stl::string scope;
 	tiny_stl::string defaultBlock;
 	int addressLen = 64;
 

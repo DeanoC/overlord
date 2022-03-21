@@ -1,10 +1,73 @@
 #include "core/core.h"
 #include "core/utf8.h"
+#include "dbg/print.h"
 #include "memory/memory.h"
 #include "vfile/vfile.h"
 #include "data_utils/lz4.h"
 #include "data_utils/crc32c.h"
 #include "resource_bundle.h"
+
+static enum ResourceBundle_ErrorCode DoFixups(ResourceBundle_Header * const actualHeader,
+                     ResourceBundle_CompressionHeader const * const compressionHeader,
+                     uint8_t const * const uncompressedBase,
+                     uint32_t const sizeWithoutHeader
+										 ) {
+	uint32_t const * const fixupTable = (uint32_t const * const)(uncompressedBase + compressionHeader->fixupOffset);
+
+	if (actualHeader->flags & RBHF_64BitFixups) {
+		// 64 bit fixups
+		uintptr_all_t const lowerBound = (uintptr_all_t)(uintptr_t)(uncompressedBase);
+		uintptr_all_t const upperBound = (uintptr_all_t)(uintptr_t)(uncompressedBase + sizeWithoutHeader);
+		for(size_t fi = 0; fi < compressionHeader->fixupCount; ++fi) {
+			uintptr_t const varAddress = (uintptr_t)(uncompressedBase + fixupTable[fi]);
+			// check the fixup address itself valid
+			if (varAddress >= upperBound || varAddress < lowerBound) {
+				debug_printf("fixup error a!\n");
+				return RBEC_CorruptError;
+			}
+			uintptr_all_t * const varPtr = ((uintptr_all_t *)varAddress);
+			uintptr_all_t offset = *varPtr;
+			//debug_printf("fixup %zu, table %i varAddress %lx offset %lx\n", fi, fixupTable[fi], varAddress, offset);
+			// check the place we are going to store the pointer address in is valid
+			if (offset >= sizeWithoutHeader) {
+				debug_printf("fixup error offset %lu b\n", offset);
+				return RBEC_CorruptError;
+			}
+			*varPtr = (uintptr_all_t)(uintptr_t) (uncompressedBase + offset);
+			// check the address we point to is valid;
+			if (*varPtr >= upperBound || *varPtr < lowerBound) {
+				debug_printf("fixup error c!\n");
+				return RBEC_CorruptError;
+			}
+		}
+	} else {
+		// 32 bit fixups
+		// if we are loaded above 32 bit address space these fixups won't work so test and fail
+		if((uint64_t)uncompressedBase >= (1ULL << 32ULL) || ((uint64_t)uncompressedBase + (uint64_t)sizeWithoutHeader) >= (1ULL << 32ULL)){
+			return RBEC_MemoryError;
+		}
+		uintptr_lo_t const lowerBound = (uintptr_lo_t)(uintptr_t)(uncompressedBase);
+		uintptr_lo_t upperBound = (uintptr_lo_t)(uintptr_t)(uncompressedBase + sizeWithoutHeader);
+		for(size_t fi = 0; fi < compressionHeader->fixupCount; ++fi) {
+			uintptr_t const varAddress = (uintptr_t)(uncompressedBase + fixupTable[fi]);
+			uintptr_lo_t * const varPtr = ((uintptr_lo_t *)varAddress);
+			if (varAddress >= upperBound || varAddress < lowerBound) {
+				return RBEC_CorruptError;
+			}
+
+			uintptr_lo_t offset = *varPtr;
+			if (offset >= upperBound || varAddress < lowerBound) {
+				return RBEC_CorruptError;
+			}
+			*varPtr = (uintptr_lo_t)(uintptr_t) (uncompressedBase + offset);
+			if (*varPtr >= upperBound || *varPtr < lowerBound) {
+				return RBEC_CorruptError;
+			}
+		}
+	}
+
+	return RBEC_Okay;
+}
 
 ResourceBundle_LoadReturn ResourceBundle_Load(VFile_Handle fileHandle,
 																					 Memory_Allocator* allocator,
@@ -17,138 +80,62 @@ ResourceBundle_LoadReturn ResourceBundle_Load(VFile_Handle fileHandle,
 		ret.errorCode = RBEC_ReadError;
 		return ret;
 	}
-	if(header.magic != ('B' << 24ul | 'U' << 16ul | 'N' << 8ul | 'D' << 0ul)) {
+	if(header.magic != ('B' << 0ul | 'U' << 8ul | 'N' << 16ul | 'D' << 24ul)) {
+		char magic[5];
+		memcpy(magic, &header.magic, 4);
+		magic[5] = 0;
+		debug_printf("Wrong magic (%s) in resource bundle\n", magic);
 		ret.errorCode = RBEC_CorruptError;
 		return ret;
 	}
-	if( header.majorVersion != ResourceBundle_MajorVersion ||
-			header.minorVersion > ResourceBundle_MinorVersion) {
+	if( header.majorVersion != ResourceBundle_MajorVersion ) {
+		debug_printf("Wrong version (%i.%i) in resource bundle\n", header.majorVersion, header.minorVersion);
 		ret.errorCode = RBEC_WrongVersion;
 		return ret;
 	}
 
 	// allocate the entire memory for the bundle and the temporary decompression buffer
-	void* decompressionBuffer = MALLOC(tempAllocator, header.decompressionBufferSize);
-	if(!decompressionBuffer) {
-		ret.errorCode = RBEC_MemoryError;
-		goto errorExit;
-	}
+	void* decompressionBuffer = MALLOC(tempAllocator, header.decompressionBlockSize);
 	void* bundleMemory = MALLOC(allocator, header.uncompressedSize);
-	if(!bundleMemory) {
+	if(!decompressionBuffer || !bundleMemory) {
 		ret.errorCode = RBEC_MemoryError;
-		goto errorExit;
+		MFREE(allocator, bundleMemory);
+		MFREE(allocator, decompressionBuffer);
+		return ret;
 	}
+
 	ResourceBundle_Header * const actualHeader = (ResourceBundle_Header*)bundleMemory;
-	memcpy(bundleMemory, &header, sizeof(header));
-	actualHeader->allocator = allocator;
+	memcpy(actualHeader, &header, sizeof(header));
 
-	// read the directory
-	ResourceBundle_DiskDirEntry32 * const directoryHead = (ResourceBundle_DiskDirEntry32*)(actualHeader+1);
-	uint32_t const directorySizeInBytes = actualHeader->directoryCount * sizeof(ResourceBundle_DiskDirEntry32);
-	if(VFile_Read(fileHandle, directoryHead, directorySizeInBytes) != directorySizeInBytes) {
-		ret.errorCode = RBEC_ReadError;
-		goto errorExit;
-	}
-	// read the string table
-	utf8_int8_t * const stringTableHead = ((uint8_t*)directoryHead) + actualHeader->stringTableSize;
-	if(VFile_Read(fileHandle, stringTableHead, actualHeader->stringTableSize) != actualHeader->stringTableSize) {
-		ret.errorCode = RBEC_ReadError;
-		goto errorExit;
-	}
+	uint8_t const * uncompressedBase = (uint8_t *) (actualHeader+1);
+	uint32_t const sizeWithoutHeader = actualHeader->uncompressedSize - sizeof(header);
 
-	// now parse the directory
-	for(uint32_t i = 0; i < actualHeader->directoryCount; ++i) {
-		ResourceBundle_DiskDirEntry32 * const dir = (directoryHead + i);
-		dir->namePtr = stringTableHead + dir->nameOffset;
-		// seek to the start of the chunk (a sorted directory could make this a no-op)
-		VFile_Seek(fileHandle, VFile_SD_Begin, dir->storedOffset);
-
-		// read the chunk into bufferMemory
-		void * const chunkDestAddress = ((uint8_t *)bundleMemory) + dir->storedOffset;
-		if(VFile_Read(fileHandle, chunkDestAddress, dir->storedSize) != dir->storedSize) {
-			ret.errorCode = RBEC_ReadError;
-			goto errorExit;
-		}
-
-		if(dir->uncompressedSize != dir->storedSize) {
-			// chunk is compressed
-			// so we have to decompress to the temp buffer then copy that back over the top
-			int okay = LZ4_Decompress(chunkDestAddress, dir->storedSize,
-																decompressionBuffer, dir->uncompressedSize);
-
-			if(okay < 0 || okay != dir->uncompressedSize) {
-				ret.errorCode = RBEC_CompressionError;
-				goto errorExit;
-			}
-			memcpy(chunkDestAddress, decompressionBuffer, dir->uncompressedSize);
-		}
-
-		// do a crc check in case of corruption from somewhere
-		uint32_t ucrc32c = CRC32C_Calculate(0, chunkDestAddress, dir->uncompressedSize);
-		if(ucrc32c != dir->uncompressedCrc32c) {
-			ret.errorCode = RBEC_CorruptError;
-			goto errorExit;
-		};
-
-		ResourceBundle_ChunkHeader32 * const chunk = (ResourceBundle_ChunkHeader32 *)chunkDestAddress;
-		uint8_t * const chunkBase = (uint8_t*)chunkDestAddress;
-
-		if (chunk->flags & RBCF_64BitFixups) {
-			// 64 bit fixups
-			uintptr_all_t * fixupTable = (uintptr_all_t *) (chunkBase + chunk->fixupOffset);
-			uintptr_all_t upperBound = (uintptr_all_t)(uintptr_t)(chunkBase + chunk->dataSize);
-			for(size_t fi = 0; fi < chunk->fixupSize / sizeof(uint64_t); ++fi) {
-				uintptr_t const varAddress = (uintptr_t)(chunkBase + fixupTable[fi]);
-				uintptr_all_t * const varPtr = ((uintptr_all_t *)varAddress);
-				if (varAddress >= upperBound || varAddress == 0) {
-					ret.errorCode = RBEC_CorruptError;
-					goto errorExit;
-				}
-
-				uintptr_all_t offset = *varPtr;
-				if (offset >= upperBound) {
-					ret.errorCode = RBEC_CorruptError;
-					goto errorExit;
-				}
-				*varPtr = (uintptr_all_t)(uintptr_t) (chunkBase + offset);
-				if (*varPtr >= upperBound) {
-					ret.errorCode = RBEC_CorruptError;
-					goto errorExit;
-				}
-			}
-		} else {
-			// 32 bit fixups
-			uintptr_lo_t * fixupTable = (uintptr_lo_t *) (chunkBase + chunk->fixupOffset);
-			uintptr_lo_t upperBound = (uintptr_lo_t)(uintptr_t)(chunkBase + chunk->dataSize);
-			for(size_t fi = 0; fi < chunk->fixupSize / sizeof(uint32_t); ++fi) {
-				uintptr_t const varAddress = (uintptr_t)(chunkBase + fixupTable[fi]);
-				uintptr_lo_t * const varPtr = ((uintptr_lo_t *)varAddress);
-				if (varAddress >= upperBound || varAddress == 0) {
-					ret.errorCode = RBEC_CorruptError;
-					goto errorExit;
-				}
-
-				uintptr_lo_t offset = *varPtr;
-				if (offset >= upperBound) {
-					ret.errorCode = RBEC_CorruptError;
-					goto errorExit;
-				}
-				*varPtr = (uintptr_lo_t)(uintptr_t) (chunkBase + offset);
-				if (*varPtr >= upperBound) {
-					ret.errorCode = RBEC_CorruptError;
-					goto errorExit;
-				}
-			}
-		}
-	}
-
+	// decompress rest of the bundle
+	LZ4_FrameDecompress(fileHandle, (void*)uncompressedBase, sizeWithoutHeader, decompressionBuffer, actualHeader->decompressionBlockSize);
 	MFREE(tempAllocator, decompressionBuffer);
-	ret.resourceBundle = actualHeader;
-	ret.errorCode = RBEC_Okay;
-	return ret;
 
-errorExit:
-	MFREE(tempAllocator, decompressionBuffer);
-	MFREE(allocator, bundleMemory);
-	return ret;
+	// decode compression header, get directory, string table and fixup table
+	ResourceBundle_CompressionHeader const * const compressionHeader = (ResourceBundle_CompressionHeader *)uncompressedBase;
+	enum ResourceBundle_ErrorCode fixUpResult = DoFixups(actualHeader, compressionHeader, uncompressedBase, sizeWithoutHeader);
+	if(fixUpResult != RBEC_Okay) {
+		ret.errorCode = fixUpResult;
+		MFREE(allocator, bundleMemory);
+		return ret;
+	} else {
+		ret.resourceBundle = actualHeader;
+		ret.errorCode = RBEC_Okay;
+		return ret;
+	}
+
+}
+uint32_t ResourceBundle_GetDirectoryCount(ResourceBundle_Header* header) {
+	ResourceBundle_CompressionHeader const * const compressionHeader = (ResourceBundle_CompressionHeader *)(header+1);
+	return compressionHeader->directoryCount;
+}
+ResourceBundle_DirectoryEntry const* ResourceBundle_GetDirectory(ResourceBundle_Header* header, uint32_t index) {
+	uint8_t const * uncompressedBase = (uint8_t *) (header+1);
+	ResourceBundle_CompressionHeader const * const compressionHeader = (ResourceBundle_CompressionHeader *)(uncompressedBase);
+	assert(index < compressionHeader->directoryCount);
+	ResourceBundle_DirectoryEntry const * directoryEntry = (ResourceBundle_DirectoryEntry const *)(uncompressedBase + compressionHeader->directoryOffset);
+	return directoryEntry+index;
 }

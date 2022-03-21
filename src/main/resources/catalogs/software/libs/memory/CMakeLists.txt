@@ -29,7 +29,14 @@ file(GLOB ASMLIST CONFIGURE_DEPENDS
 		src/${SOC}/*.S
 		src/${CPU_ARCH}/*.S
 		src/${CPU}/*.S )
+
+if(${CPU} STREQUAL "host" OR ${CPU} STREQUAL "a53")
+    file(GLOB MALLOCCLIST CONFIGURE_DEPENDS src/malloc/*.c)
+    list(APPEND CLIST ${MALLOCCLIST})
+endif()
+
 set( SRCS ${CLIST} ${CPPLIST} ${ASMLIST})
+
 if(DEFINED SRCS)
 	list(LENGTH SRCS SRCS_LENGTH)
 endif()
@@ -40,7 +47,10 @@ set(PRIVATE_LIBRARIES
 		multi_core
 		platform
 		)
-
+if(NOT ${CPU} STREQUAL "host")
+    list(APPEND PRIVATE_LIBRARIES osservices)
+endif()
+set_source_files_properties(foo.cpp PROPERTIES COMPILE_FLAGS -Wno-effc++)
 if(SRCS_LENGTH)
 	add_library(${project} ${SRCS})
 	target_include_directories(${project} PUBLIC include)

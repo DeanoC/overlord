@@ -22,7 +22,6 @@ Image_ImageHeader * Image_Clone(Image_ImageHeader const * image);
 Image_ImageHeader * Image_CloneStructure(Image_ImageHeader const * image);
 
 Image_ImageHeader * Image_PreciseConvert(Image_ImageHeader const * src, TinyImageFormat const newFormat);
-Image_ImageHeader * Image_PackMipmaps(Image_ImageHeader * image);
 
 #ifdef __cplusplus
 }

@@ -15,46 +15,31 @@ namespace Binny {
 		{
 		public:
 
-				BundleWriter( int addressLength_, Memory_Allocator* allocator_, Memory_Allocator* tempAllocator_ );
+				BundleWriter( int addressLength_, bool fixup64bit_, Memory_Allocator* allocator_);
 
-				using ChunkWriter = std::function<void( Binify::WriteHelper& helper )>;
+				using ChunkWriter = std::function<void( void * userData, Binify::WriteHelper& helper )>;
 
-				/// add a raw text chunk, will be stored independently in its own chunk
+				void setCompressionBlockSize(uint32_t size_) { compressionBlockSize = size_; }
+
+				/// @param ChunkWriter will be called at build time for each item of this chunk
 				/// @return true if successful
-				bool addRawTextChunk( tiny_stl::string const& name_,
-				                      uint32_t id_,
-				                      uint8_t version_,
-				                      uint32_t directoryFlags_,
-				                      tiny_stl::vector<uint32_t> const& dependencies_,
-				                      tiny_stl::string const& text_ );
-
-				/// add a raw binary chunk, will be stored in its own chunk without any processing
-				/// @return true if successful
-				bool addRawBinaryChunk( tiny_stl::string const& name_,
-				                        uint32_t id_,
-				                        uint8_t version_,
-				                        uint32_t directoryFlags_,
-				                        tiny_stl::vector<uint32_t> const& dependencies_,
-				                        Utils::Slice<uint8_t const> bin_ );
-
-				/// @param ChunkWriter will be called at build time
-				/// @return true if successful
-				bool addChunk( tiny_stl::string const& name_,
+				bool registerChunk( tiny_stl::string const& name_,
 				               uint32_t id_,
 				               uint8_t version_,
-				               uint32_t directoryFlags_,
 				               tiny_stl::vector<uint32_t> const& dependencies_,
-				               ChunkWriter writer_ );
+				               ChunkWriter const& writer_ );
+
+				void addItemToChunk(uint32_t id_, void* item);
 
 				/// @param result_ where the bundle data will be put
 				/// @return true if successful
-				bool build(tiny_stl::vector<uint8_t>& result_ );
+				bool build(VFile_Handle result_ );
 
 				void setLogBinifyText() { logBinifyText = true; }
 
 		private:
-				void writeChunkHeader(uint8_t version_, bool use64BitFixups = true);
-				void writeBundleHeader();
+				void writeBundleHeader(Binify::WriteHelper& h, size_t uncompressedSize, size_t decompressionBufferSize) const;
+				void beginCompressedBlock(Binify::WriteHelper& h);
 
 				bool addChunkInternal( tiny_stl::string const& name_,
 				                       uint32_t id_,
@@ -65,23 +50,21 @@ namespace Binny {
 				int addressLength;
 				Binify::WriteHelper o;
 				Memory_Allocator* allocator;
-				Memory_Allocator* tempAllocator;
 
 				struct DirEntryWriter
 				{
 						uint32_t id;
-						uint32_t flags;
+						uint8_t version;
 						tiny_stl::string name;
-						size_t compressedSize;
-						size_t uncompressedSize;
-						uint32_t compressedCrc32c;
-						uint32_t uncompressedCrc32c;
-						tiny_stl::vector<uint8_t> *chunk;
 						tiny_stl::vector<uint32_t> dependencies;
+						ChunkWriter writer;
+						tiny_stl::vector<void*> items;
 				};
 
-				tiny_stl::vector<DirEntryWriter> dirEntries;
-				bool logBinifyText = true;
+				tiny_stl::unordered_map<uint32_t, DirEntryWriter> chunkRegistry;
+				bool logBinifyText = false;
+				uint32_t compressionBlockSize;
+				bool fixup64Bits;
 		};
 
 } // end namespace

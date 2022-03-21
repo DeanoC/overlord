@@ -30,12 +30,21 @@
 #include "memory/memory.h"
 #include "tiny_stl/buffer.hpp"
 #include "tiny_stl/new.hpp"
+#include "tiny_stl/iterators.hpp"
 
 namespace tiny_stl {
 
 template<typename T>
 class vector {
 public:
+	typedef T value_type;
+	typedef T* pointer_type;
+	typedef iterator_impl<T, base_iterator_tag> iterator;
+	typedef forward_iterator_impl<T> forward_iterator;
+	typedef reverse_iterator_impl<T> reverse_iterator;
+	typedef forward_iterator_impl<T const> const_forward_iterator;
+	typedef reverse_iterator_impl<T const> const_reverse_iterator;
+
 	explicit vector(Memory_Allocator* allocator_) {buffer_init(&m_buffer, allocator_); }
 	vector(const vector& other);
 	vector(vector&& other) noexcept { buffer_move(&m_buffer, &other.m_buffer); }
@@ -81,21 +90,17 @@ public:
 
 	void swap(vector& other) { buffer_swap(&m_buffer, &other.m_buffer);}
 
-	typedef T value_type;
+	forward_iterator begin() { return forward_iterator{ m_buffer.first }; }
+	forward_iterator end() { return forward_iterator{ m_buffer.last }; }
+	reverse_iterator rbegin() { return reverse_iterator{ m_buffer.last-1 }; }
+	reverse_iterator rend() { return reverse_iterator{ m_buffer.first-1 }; }
 
-	typedef T *iterator;
-	iterator begin() { return m_buffer.first; }
-	iterator end() { return m_buffer.last; }
-	iterator rbegin() { return m_buffer.last; }
-	iterator rend() { return m_buffer.first; }
-
-	typedef const T *const_iterator;
-	const_iterator cbegin() const { return m_buffer.first; }
-	const_iterator cend() const { return m_buffer.last; }
-	const_iterator begin() const { return m_buffer.first; }
-	const_iterator end() const { return m_buffer.last; }
-	const_iterator rbegin() const { return m_buffer.last; }
-	const_iterator rend() const { return m_buffer.first; }
+	const_forward_iterator cbegin() const { return const_forward_iterator{ m_buffer.first }; }
+	const_forward_iterator cend() const { return const_forward_iterator{ m_buffer.last }; }
+	const_forward_iterator begin() const { return const_forward_iterator{ m_buffer.first }; }
+	const_forward_iterator end() const { return const_forward_iterator{ m_buffer.last }; }
+	const_reverse_iterator rbegin() const { return const_reverse_iterator{ m_buffer.last - 1 }; }
+	const_reverse_iterator rend() const { return const_reverse_iterator{ m_buffer.first - 1 }; }
 
 	void insert(iterator where) { buffer_insert(&m_buffer, where, 1);}
 	void insert(iterator where, const T& value) {	buffer_insert(&m_buffer, where, &value, &value + 1);}

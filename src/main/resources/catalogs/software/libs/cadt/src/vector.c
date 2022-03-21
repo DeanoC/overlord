@@ -186,18 +186,8 @@ size_t CADT_VectorFind(CADT_VectorHandle vector, void const* data) {
 	return (size_t)-1;
 }
 
-#if MEMORY_TRACKING_SETUP == 1
-#undef CADT_VectorCreate
-#undef CADT_VectorReserve
-#endif
-
 CADT_VectorHandle CADT_VectorCreate(size_t elementSize, Memory_Allocator* allocator) {
-#if MEMORY_TRACKING_SETUP == 1
-	// call the allocator direct, so that the line and file comes free the caller
-	CADT_Vector* vector = allocator->calloc(allocator, 1, sizeof(CADT_Vector));
-#else
-	CADT_Vector* vector = MCALLOC(allocator,1, sizeof(CADT_Vector));
-#endif
+	CADT_Vector* vector = MCALLOC(allocator, 1, sizeof(CADT_Vector));
 	if(vector == NULL) return nullptr;
 	vector->elementSize = elementSize;
 	vector->allocator = allocator;
@@ -214,11 +204,7 @@ void CADT_VectorReserve(CADT_VectorHandle vector, size_t size) {
 	size_t const oldCapacity = (vector->capacity) ? vector->capacity : 1;
 	size_t const newCapacity = Math_Max_U64(oldCapacity*2, size);
 	vector->capacity = newCapacity;
-#if MEMORY_TRACKING_SETUP == 1
-	vector->data = (uint8_t*) vector->allocator->calloc(vector->allocator, newCapacity, vector->elementSize);
-#else
 	vector->data = (uint8_t*) MCALLOC(vector->allocator, newCapacity, vector->elementSize);
-#endif
 	assert(vector->data);
 	if(oldData) {
 		memcpy(vector->data, oldData, vector->size * vector->elementSize);

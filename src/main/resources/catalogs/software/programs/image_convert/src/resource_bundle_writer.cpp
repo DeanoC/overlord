@@ -3,202 +3,80 @@
 #include "tiny_stl/algorithm.hpp"
 #include "data_binify/data_binify.h"
 #include "data_utils/lz4.h"
-#include "data_utils/crc32c.h"
+#include "vfile_memory/memory.h"
 #include "resource_bundle.h"
 #include "resource_bundle_writer.hpp"
 #include "data_binify/write_helper.hpp"
 #include "dbg/print.h"
+#include "core/math.h"
+
 namespace Binny {
 	using namespace Binify;
 
-	BundleWriter::BundleWriter(int addressLength_, Memory_Allocator* allocator_, Memory_Allocator* tempAllocator_) :
+	BundleWriter::BundleWriter(int addressLength_, bool fixup64bit_, Memory_Allocator* allocator_) :
 			addressLength(addressLength_),
 			allocator(allocator_),
-			tempAllocator(tempAllocator_),
-			dirEntries(allocator_),
-			o(allocator_)
+			chunkRegistry(allocator_),
+			o(allocator_),
+			fixup64Bits(fixup64bit_),
+			compressionBlockSize(64*1024)
 	{
 		assert(addressLength == 64 || addressLength == 32);
 		o.setAddressLength(addressLength);
 	}
 
-
-	bool BundleWriter::addRawTextChunk(tiny_stl::string const& name_,
-	                                   uint32_t id_,
-	                                   uint8_t version_,
-	                                   uint32_t directoryFlags_,
-	                                   tiny_stl::vector<uint32_t> const& dependencies_,
-	                                   tiny_stl::string const& text_)
-	{
-		bool nullTerminated = text_.back() == '\0';
-
-		tiny_stl::vector<uint8_t> bin(text_.size() + sizeof(ResourceBundle_ChunkHeader32) + (nullTerminated ? 0 : 1), allocator);
-		memcpy(bin.data() + sizeof(ResourceBundle_ChunkHeader32), text_.data(), text_.size());
-		if (!nullTerminated)
-		{
-			bin[sizeof(ResourceBundle_ChunkHeader32) + text_.size()] = 0; // null terminate string
-		}
-
-		// write chunk header
-		auto* cheader = (ResourceBundle_ChunkHeader32*) bin.data();
-		cheader->dataSize = text_.size() + 1;
-		cheader->fixupOffset = 0;
-		cheader->fixupSize = 0;
-		cheader->dataOffset = sizeof(ResourceBundle_ChunkHeader32);
-		cheader->version = version_;
-
-		return addChunkInternal(name_,
-														id_,
-														directoryFlags_,
-														dependencies_,
-														Utils::Slice<uint8_t const> { .data = bin.data(), .size = bin.size() });
-	}
-
-	bool BundleWriter::addRawBinaryChunk(tiny_stl::string const& name_,
-	                                     uint32_t id_,
-	                                     uint8_t version_,
-	                                     uint32_t directoryFlags_,
-	                                     tiny_stl::vector<uint32_t> const& dependencies_,
-	                                     Utils::Slice<uint8_t const> const bin_)
-	{
-		tiny_stl::vector<uint8_t> bin(bin_.size + sizeof(ResourceBundle_ChunkHeader32), allocator);
-		memcpy(bin.data() + sizeof(ResourceBundle_ChunkHeader32), bin_.data, bin_.size);
-
-		// write chunk header
-		auto cheader = (ResourceBundle_ChunkHeader32*) bin.data();
-		cheader->dataSize = bin_.size;
-		cheader->fixupOffset = 0;
-		cheader->fixupSize = 0;
-		cheader->dataOffset = sizeof(ResourceBundle_ChunkHeader32);
-		cheader->version = version_;
-
-		return addChunkInternal(tiny_stl::string(name_, allocator),
-														id_,
-														directoryFlags_,
-														dependencies_,
-														Utils::Slice<uint8_t const> { .data = bin.data(), .size = bin.size() });
-	}
-
-	bool BundleWriter::addChunkInternal(
-			tiny_stl::string const& name_,
-			uint32_t id_,
-			uint32_t flags_,
-			tiny_stl::vector<uint32_t> const & dependencies_,
-			Utils::Slice<uint8_t const> const bin_)
-	{
-		if(addressLength == 32 && bin_.size >= (1ull << 32)) return false;
-
-		uint32_t const uncompressedCrc32c = CRC32C_Calculate(0, bin_.data, bin_.size);
-		size_t const maxSize = LZ4_CompressionBoundFromInputSize(bin_.size);
-
-		auto compressedData = new tiny_stl::vector<uint8_t>(maxSize, allocator);
-		size_t const compressedSize = LZ4_CompressHigh(bin_.data,bin_.size,
-																compressedData->data(),compressedData->size(),
-		                            LZ4_MAX_COMPRESSION_LEVEL);
-
-		bool compressedOkay = compressedSize > 0;
-		if (addressLength == 32 && compressedSize >= (1ull << 32)) compressedOkay = false;
-		if(!compressedOkay) {
-			delete compressedData;
-			return false;
-		}
-		compressedData->resize(compressedSize);
-
-		// if compression made this block bigger, use the uncompressed data and mark it by
-		// having uncompressed size == compressed size in the file
-	//			if (compressedData->size() >= bin_.size()) *compressedData = bin_;
-
+	bool BundleWriter::registerChunk(tiny_stl::string const& name_,
+	                                 uint32_t id_,
+	                                 uint8_t version_,
+	                                 tiny_stl::vector<uint32_t> const& dependencies_,
+	                                 ChunkWriter const & writer_) {
+		if(chunkRegistry.find(id_) != chunkRegistry.end()) return false;
 
 		DirEntryWriter entry = {
 				id_,
-				flags_,
+				version_,
 				name_,
-				compressedData->size(),
-				bin_.size,
-				CRC32C_Calculate(0, compressedData->data(), compressedData->size()),
-				uncompressedCrc32c,
-				compressedData,
-				dependencies_
+				dependencies_,
+				writer_,
+				tiny_stl::vector<void*>{ allocator }
 		};
 
-		dirEntries.push_back(entry);
+		chunkRegistry.insert(tiny_stl::pair<uint32_t, DirEntryWriter>(id_,entry));
 		o.reserveLabel(name_ + "chunk");
 		return true;
 	}
 
-	bool BundleWriter::addChunk(tiny_stl::string const& name_,
-	                            uint32_t id_,
-	                            uint8_t version_,
-	                            uint32_t directoryFlags_,
-	                            tiny_stl::vector<uint32_t> const& dependencies_,
-	                            ChunkWriter writer_)
-	{
-		WriteHelper h(allocator);
-
-		// add chunk header
-		writeChunkHeader(version_);
-
-		h.writeLabel("data");
-		writer_(h);
-		h.finishStringTable();
-		h.align();
-		h.writeLabel("dataEnd");
-		h.writeLabel("fixups");
-		size_t const numFixups = h.getFixupCount();
-		for(size_t i = 0;i < numFixups;++i)
-		{
-			tiny_stl::string const& label = h.getFixup(i);
-			h.useLabel(label, "", false, false);
-		}
-		h.writeLabel("fixupsEnd");
-
-		char const* binifyText = h.c_str();
-
-		/*
-		Binify_Create(binifyText, )
-
-		std::string log;
-		std::vector<uint8_t> data;
-		std::stringstream binData;
-		bool okay = BINIFY_StringToOStream(binifyText, &binData, log);
-		if(!okay) return false;
-		std::string tmp = binData.str();
-		data.resize(tmp.size());
-		std::memcpy(data.data(), tmp.data(), tmp.size());
-
-		if (!log.empty() || logBinifyText)
-		{
-			LOG_S(INFO) << name_ << "_Chunk:" << log;
-			LOG_S(INFO) << std::endl << binifyText;
-		}
-	*/
-		return false; // addChunkInternal(name_, id_, flags_, dependencies_, data);
+	void BundleWriter::addItemToChunk(uint32_t id_, void* item) {
+		assert(chunkRegistry.find(id_) != chunkRegistry.end());
+		chunkRegistry.find(id_)->second.items.push_back(item);
 	}
 
-	bool BundleWriter::build(tiny_stl::vector<uint8_t>& result_)
+	bool BundleWriter::build(VFile_Handle result_)
 	{
-		writeBundleHeader();
+		ResourceBundle_Header bundleHeader;
+		// write a dummy header, will we fill properly after compression
+		VFile_Write(result_, &bundleHeader, sizeof(bundleHeader));
 
-		// begin the directory
+		// mark beginning of the main block
 		o.reserveLabel("begin", true);
 		o.writeLabel("begin");
+		o.setStringTableBase("begin");
 
-		o.addEnum("ChunkFlags");
+		// add the compression header and set up variables next
+		beginCompressedBlock(o);
+
+		// begin the directory
 
 		// dependency ordering
 		// chunks will be written so that any chunk that are depended on, become
 		// before teh chunks that depend on them. Loops and cycles would be *bad*
 
-
-		// to flatten the dependency list, each index is pushed on a stack
+		// to flatten the dependency list, each id is pushed on a stack
 		tiny_stl::stack<uint32_t> dirIndices(allocator);
-		for(auto i = 0u; i < dirEntries.size(); ++i)
-		{
-			dirIndices.push(i);
-		}
+		for(auto const& node : chunkRegistry) dirIndices.push(node.first);
 
-		// when each index gets popped, it stores itself in the order list
-		// and pushs it all indices of types it dependent on onto the stack.
+		// when id index gets popped, it stores itself in the order list
+		// and pushs it all id of types it dependent on onto the stack.
 		// This means that the order list has each index before the types its
 		// dependent on.
 		// later in the order list have fewer or nothing dependent on it
@@ -206,155 +84,138 @@ namespace Binny {
 		// dependencies are on type but multiple chunks of the same type are allowed
 
 		tiny_stl::vector<uint32_t> order(allocator);
-		order.reserve(dirEntries.size());
-		while(!dirIndices.empty())
-		{
-			uint32_t index = dirIndices.top(); dirIndices.pop();
-			auto const& entry = dirEntries[index];
-			order.push_back(index);
-			for(uint32_t dep : entry.dependencies)
-			{
-				auto fit = dirEntries.cbegin();
-				do
-				{
-					for(auto& it = fit;dirEntries.cend(); ++it) {
-						if(it->id == dep) {
-							dirIndices.push(tiny_stl::distance(dirEntries.cbegin(), it));
-							++fit;
-						}
-					}
-				} while(fit != dirEntries.cend());
+		order.reserve(chunkRegistry.size());
+		while(!dirIndices.empty()) {
+			uint32_t id = dirIndices.top(); dirIndices.pop();
+			auto const& entry = chunkRegistry.find(id)->second;
+			order.push_back(id);
+			for(uint32_t dep : entry.dependencies) {
+				if(chunkRegistry.find(dep) != chunkRegistry.end()) {
+					dirIndices.push(dep);
+					continue;
+				} else {
+					debug_printf("Unknown dependency %u\n", dep);
+					return false;
+				}
 			}
 		}
+
 		// we then go backwards through the ordering list, pushing the first
-		// instance of each index onto another list. The produces the correct ordering
-		// indices of a type appear before anything that depends on it
+		// instance of each id onto another list. The produces the correct ordering
+		// id of a type appear before anything that depends on it
 		tiny_stl::vector<uint32_t> final(allocator);
 		final.reserve(order.size());
-		for(auto it = order.rbegin();it != order.rend();it++)
-		{
-			if(std::find(final.begin(), final.end(), *it) == final.end())
-			{
+		for(auto it = order.rbegin();it != order.rend();it++) {
+			if(tiny_stl::find(final.begin(), final.end(), *it) == final.end()) {
 				final.push_back(*it);
 			}
 		}
 
-		tiny_stl::string lastName {"chunks", allocator };
-		for (uint32_t index : final)
-		{
-			DirEntryWriter const& dw = dirEntries[index];
+		o.writeLabel("directory");
 
-			o.write(dw.id, "id type");
-			o.writeAs<uint32_t>(dw.compressedCrc32c, "stored crc32c");
-			o.writeAs<uint32_t>(dw.uncompressedCrc32c, "unpacked crc32c");
-			o.writeFlags("ChunkFlags", dw.flags, "Chunk flags");
+		// each chunk gets a directory entry
+		uint32_t maxUncompressedSize = 0;
+		for (uint32_t id : final) {
+			DirEntryWriter const& dw = chunkRegistry.find(id)->second;
 
+			o.writeAs<uint32_t>(dw.id, "id type");
+			o.writeAs<uint8_t>(dw.version, "Chunk version");
+			o.align(4); // padd0
 			o.addString(dw.name);
-			o.useLabel(dw.name + "chunk", lastName, false, false );
-
-			o.writeSize(dw.compressedSize, "stored size");
-			o.writeSize(dw.uncompressedSize, "unpacked size");
-
-			o.incrementVariable("DirEntryCount");
-			lastName = dw.name + "chunk";
+			o.useLabel(dw.name + "chunk","", false );
+			o.align(8); // padd1
+			o.incrementVariable("DirectoryCount");
 		}
-		o.writeLabel("beginEnd");
 
 		// output string table
 		o.finishStringTable();
 
-		// output pointer fixups
+		o.writeLabel("fixups");
+		size_t const numFixups = o.getFixupCount();
+		o.setVariable("FixupCount", (int64_t) numFixups);
+		for(size_t i = 0;i < numFixups;++i)
+		{
+			tiny_stl::string const& label = o.getFixup(i);
+			o.useLabelAs<uint32_t>(label, "", false, false);
+		}
 
 		// output chunks
 		o.align();
-		o.writeLabel("chunks");
-		for (auto& entry : dirEntries)
+		o.writeLabel("chunks", true);
+		for (auto const & entry : chunkRegistry)
 		{
-			assert(entry.chunk != nullptr);
 			o.align();
-			o.writeLabel(entry.name + "chunk");
-			o.writeByteArray(Utils::Slice<uint8_t const>{ entry.chunk->begin(), entry.chunk->end() });
-			delete entry.chunk;
-			entry.chunk = nullptr;
-		}
-		o.writeLabel("chunksEnd");
-
-		/*
-		// convert
-		std::string binifyText = o.ostr.str();
-		std::string log;
-		std::stringstream binData;
-		bool okay = BINIFY_StringToOStream(binifyText, &binData, log);
-		if(!okay) return false;
-		std::string tmp = binData.str();
-		result_.resize(tmp.size());
-		std::memcpy(result_.data(), tmp.data(), tmp.size());
-*/
-		if (logBinifyText)
-		{
-			debug_print(o.c_str());
-	//				LOG_S(INFO) << "Bundle: ";
-	//				LOG_S(INFO) << std::endl << binifyText;
+			o.writeLabel(entry.second.name + "chunk");
+			for( auto const & item : entry.second.items) {
+				entry.second.writer(item, o);
+			}
 		}
 
+		if (logBinifyText) debug_print(o.c_str());
+
+		Binify_ContextHandle ctx = Binify_Create(o.c_str(), allocator);
+		Utils::TrackingSlice<uint8_t> data {
+			Utils::Slice<uint8_t >{ .data = (uint8_t *)(Binify_BinaryData(ctx)), .size = Binify_BinarySize(ctx) },
+		};
+
+		LZ4_FrameCompressionContext lz4ctx = LZ4_CreateFrameCompressor(result_, LZ4CS_64K, allocator);
+		while(data.left() > 0 ) {
+			size_t const amount = data.left() > LZ4CS_64K ? LZ4CS_64K : data.left();
+			LZ4_FrameCompressNextChunk(lz4ctx, data.current, amount);
+			data.increment(amount);
+		}
+		LZ4_FrameCompressFinishAndDestroy(lz4ctx);
+
+		WriteHelper headerWriteHelper(allocator);
+		writeBundleHeader(headerWriteHelper, data.slice.size, LZ4CS_64K);
+		Binify_ContextHandle headerBinifyCtx = Binify_Create(headerWriteHelper.c_str(), allocator);
+		Utils::Slice<uint8_t> headerData{ .data = (uint8_t *)(Binify_BinaryData(headerBinifyCtx)), .size = Binify_BinarySize(headerBinifyCtx) };
+		VFile_Seek(result_, 0, VFile_SD_Begin);
+		VFile_Write(result_, headerData.data, headerData.size);
+
+		Binify_Destroy(headerBinifyCtx);
+		Binify_Destroy(ctx);
 		return true;
 	}
 
-	void BundleWriter::writeChunkHeader(uint8_t version_, bool use64BitFixups)
+	void BundleWriter::writeBundleHeader(WriteHelper& h, size_t const uncompressedSize, size_t const decompressionBufferSize) const
 	{
 		// write header
-		o.comment("---------------------------------------------");
-		o.comment("Chunk");
-		o.comment("---------------------------------------------");
-		o.writeAddressType();
+		h.comment("---------------------------------------------");
+		h.comment("Bundle");
+		h.comment("---------------------------------------------");
+		h.setAddressLength(addressLength);
+		h.setDefaultType<uint32_t>();
 
-		o.writeLabel("chunk_begin", true);
-		o.setStringTableBase("chunk_begin");
-		o.reserveLabel("fixups");
-		o.reserveLabel("data", true);
-		o.reserveLabel("fixupsEnd");
-		o.reserveLabel("dataEnd");
-
-		o.useLabel("data", "chunk_begin", false, false );
-		o.sizeOfBlock("data");
-		o.useLabel("fixups", "chunk_begin", false, false );
-		o.sizeOfBlockAs<uint16_t>("fixups");
-		o.writeAs<uint8_t>(version_, "Version");
-		uint32_t const flags = (o.getAddressLength() == 32) ? RBHF_Is32Bit : 0;
-		o.writeFlagsAs<uint8_t>("HeaderFlag", flags);
-
-		o.align();
-		o.setDefaultType<uint32_t>();
-		o.setStringTableBase("data");
-	}
-
-	void BundleWriter::writeBundleHeader()
-	{
-		// write header
-		o.comment("---------------------------------------------");
-		o.comment("Bundle");
-		o.comment("---------------------------------------------");
-		o.setDefaultType<uint32_t>();
-
-		o.addEnum("HeaderFlags");
-	  o.addEnumValue("HeaderFlags", "32Bit", RBHF_Is32Bit);
-		o.addEnum("ChunkHeaderFlags");
-		o.addEnumValue("ChunkHeaderFlags", "64BitFixups", RBCF_64BitFixups);
-		o.setVariable("DirectoryCount", 0, true);
-		o.setVariable("UncompressedSize", 0, true);
+		h.addEnum("HeaderFlags");
+	  h.addEnumValue("HeaderFlags", "32Bit", RBHF_Is32Bit);
+		h.addEnumValue("HeaderFlags", "64BitFixups", RBHF_64BitFixups);
 
 		// magic
-		o.write("BUND"_bundle_id, "magic");
 		static_assert("BUND"_bundle_id == RESOURCE_BUNDLE_ID('B','U','N','D'));
+		h.write("BUND"_bundle_id, "magic");
 
-		uint32_t flags = (o.getAddressLength() == 32) ? RBHF_Is32Bit : 0;
-		o.writeFlags("HeaderFlags", flags);
-		o.writeAs<uint8_t>(ResourceBundle_MajorVersion, ResourceBundle_MinorVersion, "major, minor version");
-		o.writeExpressionAs<uint32_t>(o.getVariable("DirectoryCount"), "Directory count");
-		o.sizeOfBlock("stringTable");
-		o.writeExpressionAs<uint32_t>(o.getVariable("UncompressedSize"), "Total uncompressed size");
-		o.align(32);
-		o.incrementVariable("UncompressedSize", 32, "include header size");
+		uint32_t flags = (h.getAddressLength() == 32) ? RBHF_Is32Bit : RBHF_64BitFixups;
+
+		h.writeFlagsAs<uint16_t>("HeaderFlags", flags, "HeaderFlags");
+		h.writeAs<uint8_t>(ResourceBundle_MajorVersion, ResourceBundle_MinorVersion, "major, minor version");
+		h.writeAs<uint32_t>(uncompressedSize + sizeof(ResourceBundle_Header), "Total uncompressed size including header");
+		h.writeAs<uint32_t>( decompressionBufferSize,"Size needed for decompression buffer");
+	}
+
+	void BundleWriter::beginCompressedBlock(Binify::WriteHelper& h) {
+		h.comment("---------------------------------------------");
+		h.comment("Compressed Block");
+		h.comment("---------------------------------------------");
+		h.setAddressLength(addressLength);
+		h.setDefaultType<uint32_t>();
+		o.setVariable("DirectoryCount", 0, true);
+		o.setVariable("FixupCount", 0, true);
+		h.writeVariableAs<uint32_t>("DirectoryCount");
+		h.writeVariableAs<uint32_t>("FixupCount");
+		h.useLabelAs<uint32_t>("directory","", true, false, "directory offset");
+		h.useLabelAs<uint32_t>("fixups","", true, false, "Fixups offset");
+		h.align(16);
 	}
 
 } // end namespace

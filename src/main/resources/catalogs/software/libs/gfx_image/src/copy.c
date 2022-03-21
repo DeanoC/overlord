@@ -10,8 +10,8 @@
 
 void Image_CopyImageChain(Image_ImageHeader const *src, Image_ImageHeader *dst) {
 	Image_CopyImage(src, dst);
-	if (src->nextType == dst->nextType && src->nextImage && dst->nextImage) {
-		Image_CopyImageChain(src->nextImage, dst->nextImage);
+	if (Image_HasNextImageData(src) && Image_HasNextImageData(dst)) {
+		Image_CopyImageChain(Image_GetNextImageData(src), Image_GetNextImageData(src));
 	}
 }
 
@@ -114,28 +114,18 @@ void Image_CopyPixel(Image_ImageHeader const *src,
 }
 
 Image_ImageHeader *Image_Clone(Image_ImageHeader const *image) {
-	Image_ImageHeader * dst = (Image_ImageHeader *) Image_Create(image->width, image->height, image->depth, image->slices, image->format,image->memoryAllocator);
+	size_t totalSize = Image_ByteCountOfImageChainOf(image);
+
+	Image_ImageHeader * dst = (Image_ImageHeader *) MALLOC(image->memoryAllocator, totalSize);
 	if (dst == nullptr) {
 		return nullptr;
 	}
-	Image_CopyImage(image, dst);
-	if (image->nextType != Image_NT_None) {
-		dst->nextImage = Image_Clone(image->nextImage);
-		dst->nextType = image->nextType;
-	}
+	memcpy(dst, image, totalSize);
 	return dst;
 }
 
 Image_ImageHeader *Image_CloneStructure(Image_ImageHeader const *image) {
-	Image_ImageHeader *dst = (Image_ImageHeader *) Image_Create(image->width, image->height, image->depth, image->slices, image->format,image->memoryAllocator);
-	if (dst == nullptr) {
-		return nullptr;
-	}
-	if (image->nextType != Image_NT_None) {
-		dst->nextImage = Image_CloneStructure(image->nextImage);
-		dst->nextType = image->nextType;
-	}
-	return dst;
+	return Image_Clone(image);
 }
 
 Image_ImageHeader *Image_PreciseConvert(Image_ImageHeader const *image, TinyImageFormat const newFormat) {
@@ -144,34 +134,10 @@ Image_ImageHeader *Image_PreciseConvert(Image_ImageHeader const *image, TinyImag
 		return nullptr;
 	}
 	Image_CopyImage(image, dst);
-	if (image->nextType != Image_NT_None) {
-		dst->nextImage = Image_PreciseConvert(image->nextImage, newFormat);
-		dst->nextType = image->nextType;
+
+	if (Image_HasNextImageData(image)) {
+		dst = Image_DestructiveJoinImages(dst, Image_PreciseConvert(Image_GetNextImageData(image), newFormat), image->memoryAllocator);
 	}
 	return dst;
 }
 
-Image_ImageHeader *Image_PackMipmaps(Image_ImageHeader * image) {
-	if (Image_HasPackedMipMaps(image))
-		return image;
-
-	size_t const numLevels = Image_LinkedImageCountOf(image);
-	if (numLevels == 1)
-		return image;
-
-	size_t const packedSized = Image_ByteCountOfImageChainOf(image);
-	Image_ImageHeader *newImage = (Image_ImageHeader *) MALLOC(image->memoryAllocator, sizeof(Image_ImageHeader) + packedSized);
-	Image_FillHeader(image->width, image->height, image->depth, image->slices, image->format, newImage);
-	newImage->dataSize = packedSized;
-	newImage->flags |= Image_Flag_PackedMipMaps;
-	newImage->packedMipMapCount = (uint8_t)numLevels;
-
-	uint8_t *dstPtr = (uint8_t *) Image_RawDataPtr(newImage);
-	for (size_t i = 0; i < numLevels; ++i) {
-		assert((size_t)(dstPtr - (uint8_t *) Image_RawDataPtr(newImage)) < packedSized);
-		Image_ImageHeader const *levelHeader = Image_LinkedImageOf(image, i);
-		memcpy(dstPtr, Image_RawDataPtr(levelHeader), levelHeader->dataSize);
-		dstPtr += levelHeader->dataSize;
-	}
-	return newImage;
-}

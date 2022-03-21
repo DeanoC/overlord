@@ -15,12 +15,12 @@ EXTERN_C void VFile_Flush(VFile_Handle handle);
 EXTERN_C size_t VFile_Read(VFile_Handle handle, void *buffer, size_t byteCount);
 EXTERN_C size_t VFile_Write(VFile_Handle handle, void const *buffer, size_t byteCount);
 EXTERN_C bool VFile_Seek(VFile_Handle handle, int64_t offset, enum VFile_SeekDir origin);
-EXTERN_C int64_t VFile_Tell(VFile_Handle handle);
-EXTERN_C size_t VFile_Size(VFile_Handle handle);
-EXTERN_C char const *VFile_GetName(VFile_Handle handle);
-EXTERN_C bool VFile_IsEOF(VFile_Handle handle);
-EXTERN_C uint32_t VFile_GetType(VFile_Handle handle);
-EXTERN_C void* VFile_GetTypeSpecificData(VFile_Handle handle);
+EXTERN_C WARN_UNUSED_RESULT int64_t VFile_Tell(VFile_Handle handle);
+EXTERN_C WARN_UNUSED_RESULT size_t VFile_Size(VFile_Handle handle);
+EXTERN_C WARN_UNUSED_RESULT char const *VFile_GetName(VFile_Handle handle);
+EXTERN_C WARN_UNUSED_RESULT bool VFile_IsEOF(VFile_Handle handle);
+EXTERN_C WARN_UNUSED_RESULT uint32_t VFile_GetType(VFile_Handle handle);
+EXTERN_C WARN_UNUSED_RESULT void* VFile_GetTypeSpecificData(VFile_Handle handle);
 
 typedef void (*VFile_CloseFunc)(struct VFile_Interface_t *);
 typedef void (*VFile_FlushFunc)(struct VFile_Interface_t *);

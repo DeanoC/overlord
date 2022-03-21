@@ -261,7 +261,7 @@ void yyfree ( void *  );
 
 #include "FlexLexer.hpp"
 
-int yyFlexLexer::yywrap() { return 1; }
+inline int yyFlexLexer::yywrap() { return 1; }
 
 /* %if-c-only Standard (non-C++) definition */
 /* %endif */

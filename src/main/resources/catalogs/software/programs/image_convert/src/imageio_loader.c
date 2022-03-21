@@ -497,7 +497,7 @@ Image_ImageHeader * Image_LoadKTX(VFile_Handle handle, Memory_Allocator* allocat
 			}
 
 		} else {
-// fast path data is packed we can just copy
+			// fast path data is packed we can just copy
 			size_t const expectedSize = Image_ByteCountOf(image);
 			size_t const fileSize = TinyKtx_ImageSize(ctx, i);
 			if (expectedSize > fileSize) {
@@ -510,8 +510,7 @@ Image_ImageHeader * Image_LoadKTX(VFile_Handle handle, Memory_Allocator* allocat
 		}
 		if (prevImage) {
 			Image_ImageHeader * p = (Image_ImageHeader *) prevImage;
-			p->nextType = Image_NT_MipMap;
-			p->nextImage = image;
+			topImage = Image_DestructiveJoinImages(p, image, allocator);
 		}
 		if (w > 1)
 			w = w / 2;
@@ -564,7 +563,7 @@ Image_ImageHeader *Image_LoadDDS(VFile_Handle handle, Memory_Allocator* allocato
 // mip[0] -> face[0], face[1], etc.
 // mip[1] -> face[0], face[1], etc.
 
-	Image_ImageHeader * images[TINYDDS_MAX_MIPMAPLEVELS];
+	Image_ImageHeader * final;
 	for (uint32_t i = 0u; i < TinyDDS_NumberOfMipmaps(ctx); ++i) {
 		Image_ImageHeader * image = nullptr;
 		if (TinyDDS_IsCubemap(ctx)) {
@@ -574,14 +573,12 @@ Image_ImageHeader *Image_LoadDDS(VFile_Handle handle, Memory_Allocator* allocato
 		} else {
 			image = Image_Create2DArrayNoClear(w, h, s, fmt, allocator);
 		}
-		images[i] = image;
-
 		size_t const expectedSize = Image_ByteCountOf(image);
 		size_t const fileSize = TinyDDS_ImageSize(ctx, i);
 		if (expectedSize != fileSize) {
 			debug_printf("DDS file %s mipmap %i size error %liu < %liu\n", VFile_GetName(handle), i, expectedSize, fileSize);
 			for (uint32_t j = 0u; j < TinyDDS_NumberOfMipmaps(ctx); ++j) {
-				Image_Destroy(images[j]);
+				Image_Destroy(final);
 			}
 			TinyDDS_DestroyContext(ctx);
 			return nullptr;
@@ -589,9 +586,9 @@ Image_ImageHeader *Image_LoadDDS(VFile_Handle handle, Memory_Allocator* allocato
 		memcpy(Image_RawDataPtr(image), TinyDDS_ImageRawData(ctx, i), fileSize);
 
 		if (i > 0) {
-			Image_ImageHeader * p =images[i - 1];
-			p->nextType = Image_NT_MipMap;
-			p->nextImage = image;
+			final = Image_DestructiveJoinImages(final, image, allocator);
+		} else {
+			final = image;
 		}
 
 		if (w > 1) {
@@ -606,7 +603,7 @@ Image_ImageHeader *Image_LoadDDS(VFile_Handle handle, Memory_Allocator* allocato
 	}
 
 	TinyDDS_DestroyContext(ctx);
-	return images[0];
+	return final;
 }
 /*
 Image_ImageHeader const *Image_LoadBasisU(VFile_Handle handle) {

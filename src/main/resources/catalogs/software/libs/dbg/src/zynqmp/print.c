@@ -7,6 +7,7 @@
 
 #define IsTransmitFull() (HW_REG_GET_BIT(UART_DEBUG, CHANNEL_STS, TNFUL))
 
+#define VPRINTF_STACK_SIZE 1024
 static bool force_raw_print;
 
 void debug_force_raw_print(bool enabled) {
@@ -44,12 +45,12 @@ void raw_debug_sized_print(uint32_t size, char const * text) {
 }
 
 void raw_debug_printf(const char *format, ...) {
-	char buffer[256]; // 256 byte max string (on stack)
+	char buffer[VPRINTF_STACK_SIZE]; // max string (on stack)
 	va_list va;
 	va_start(va, format);
-	int len = vsnprintf(buffer, 256, format, va);
+	int len = vsnprintf(buffer, VPRINTF_STACK_SIZE, format, va);
 	va_end(va);
-	buffer[255] = 0;
+	buffer[VPRINTF_STACK_SIZE-1] = 0;
 	raw_debug_sized_print(len, buffer);
 }
 
@@ -63,12 +64,12 @@ void debug_print(char const *const text){
 
 void debug_printf(const char *format, ...) {
 
-	char buffer[256]; // 256 byte max string (on stack)
+	char buffer[VPRINTF_STACK_SIZE]; // max string (on stack)
 	va_list va;
 	va_start(va, format);
-	vsnprintf(buffer, 256, format, va);
+	vsnprintf(buffer, VPRINTF_STACK_SIZE, format, va);
 	va_end(va);
-	buffer[255] = 0;
+	buffer[VPRINTF_STACK_SIZE-1] = 0;
 	if (force_raw_print) {
 		raw_debug_print(buffer);
 	} else {

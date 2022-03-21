@@ -77,8 +77,6 @@ bool ImageIO_SaveAsBMP(Image_ImageHeader *image, VFile_Handle handle) {
 }
 
 bool ImageIO_SaveAsPNG(Image_ImageHeader *image, VFile_Handle handle) {
-
-
 	if (!handle) {
 		return false;
 	}
@@ -181,11 +179,6 @@ bool ImageIO_SaveAsKTX(Image_ImageHeader *image, VFile_Handle handle) {
 	TinyKtx_Format fmt = TinyImageFormat_ToTinyKtxFormat(image->format);
 	if(fmt == TKTX_UNDEFINED) return false;
 
-	// mipmaps or no linked only
-	if(image->nextType != Image_NT_MipMap &&
-	   image->nextType != Image_NT_None	) {
-		return false;
-	}
 	uint32_t numMipmaps = (uint32_t)Image_MipMapCountOf(image);
 
 	uint32_t mipmapsizes[TINYKTX_MAX_MIPMAPLEVELS];
@@ -194,7 +187,7 @@ bool ImageIO_SaveAsKTX(Image_ImageHeader *image, VFile_Handle handle) {
 	memset(mipmaps, 0, sizeof(void const*)*TINYKTX_MAX_MIPMAPLEVELS);
 
 	for(size_t i = 0; i < numMipmaps; ++i) {
-		mipmapsizes[i] = (uint32_t) Image_LinkedImageOf(image, i)->dataSize;
+		mipmapsizes[i] = (uint32_t) Image_LinkedImageOf(image, i)->dataSizeInBytes - sizeof(Image_ImageHeader);
 		mipmaps[i] = Image_RawDataPtr(Image_LinkedImageOf(image, i));
 	}
 
@@ -311,11 +304,6 @@ bool ImageIO_SaveAsDDS(Image_ImageHeader *image, VFile_Handle handle) {
 	TinyDDS_Format fmt = TinyImageFormat_ToTinyDDSFormat(image->format);
 	if(fmt == TDDS_UNDEFINED) return false;
 
-	// mipmaps or no linked only
-	if(image->nextType != Image_NT_MipMap &&
-	   image->nextType != Image_NT_None	) {
-		return false;
-	}
 	uint32_t numMipmaps = (uint32_t)Image_MipMapCountOf(image);
 
 	uint32_t mipmapsizes[TINYDDS_MAX_MIPMAPLEVELS];
@@ -324,7 +312,7 @@ bool ImageIO_SaveAsDDS(Image_ImageHeader *image, VFile_Handle handle) {
 	memset(mipmaps, 0, sizeof(void const*)*TINYDDS_MAX_MIPMAPLEVELS);
 
 	for(size_t i = 0; i < numMipmaps; ++i) {
-		mipmapsizes[i] = (uint32_t) Image_LinkedImageOf(image, i)->dataSize;
+		mipmapsizes[i] = (uint32_t) Image_LinkedImageOf(image, i)->dataSizeInBytes - sizeof(Image_ImageHeader);
 		mipmaps[i] = Image_RawDataPtr(Image_LinkedImageOf(image, i));
 	}
 

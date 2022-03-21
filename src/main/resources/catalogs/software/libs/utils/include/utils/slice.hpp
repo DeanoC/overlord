@@ -6,28 +6,42 @@
 namespace Utils {
 	/// non owning slice of memory
 	template<typename T> struct Slice {
-			T const * const data;
+			T * const data;
 			size_t const size;
-
-			Slice(T *ptr_, size_t size_) : data(ptr_), size(size_) {}
-			Slice(T *begin_, T * end_) : data(begin_), size(end_ - begin_) {}
 	};
 
 	template<typename T> struct TrackingSlice {
 			Slice<T> slice;
-			T const * current;
-			TrackingSlice(Slice<T> slice_, size_t startOffset_ = 0) : slice(slice_), current(slice.data + startOffset_) {}
+			T * current;
+			explicit TrackingSlice(Slice<T> slice_, size_t startOffset_ = 0) : slice(slice_), current(slice.data + startOffset_) {}
 
-			T const * operator++() {
-				current++;
-				assert(current < slice.data+slice.size);
-				return current;
+			void increment(size_t val) {
+				assert(current+val <= slice.data + slice.size);
+				current += val;
+			}
+
+			WARN_UNUSED_RESULT size_t left() const { return (slice.data + slice.size) - current; }
+
+			// pre-increment
+			T * operator++() {
+				assert(current+1 <= slice.data + slice.size);
+				return ++current;
 			}
 			T const * operator--() {
-				current--;
-				assert(current >= slice.data);
-				return current;
+				assert(current-1 >= slice.data);
+				return --current;
 			}
+			// post-increment
+			T * operator++(int) {
+				assert(current+1 <= slice.data + slice.size);
+				return current++;
+			}
+			T * operator--(int) {
+				assert(current-1 >= slice.data);
+				return current--;
+			}
+
+			// deference
 			T const& operator*() {
 				return *current;
 			}

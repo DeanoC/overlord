@@ -106,15 +106,16 @@ static bool VFile_MemFile_IsEOF(VFile_Interface_t *vif) {
 #if MEMORY_TRACKING_SETUP == 1
 #undef VFileMemory_FromBuffer
 #undef VFileMemory_FromSize
+#undef VFileMemory_CreateEmpty
 #endif
 
-EXTERN_C VFile_Handle VFileMemory_FromBuffer(void const *memory, size_t size, bool takeOwnership, Memory_Allocator* memoryAllocator) {
+VFile_Handle VFileMemory_FromBuffer(void const *memory, size_t size, bool takeOwnership, Memory_Allocator* memoryAllocator) {
 
 #if MEMORY_TRACKING_SETUP == 1
 	// call the allocator direct, so that the line and file comes free the caller
 	VFile_Interface_t *vif = (VFile_Interface_t *) memoryAllocator->malloc(memoryAllocator, VFileMemory_HeaderSize);
 #else
-	VFile_Interface_t *vif = (VFile_Interface_t *) ALLOCATOR_MALLOC(memoryAllocator, VFileMemory_HeaderSize);
+	VFile_Interface_t *vif = (VFile_Interface_t *) MALLOC(memoryAllocator, VFileMemory_HeaderSize);
 #endif
 
 	VFileMemory_Data_t *vof = (VFileMemory_Data_t *) (vif + 1);
@@ -138,14 +139,14 @@ EXTERN_C VFile_Handle VFileMemory_FromBuffer(void const *memory, size_t size, bo
   return (VFile_Handle) vif;
 }
 
-EXTERN_C VFile_Handle VFileMemory_FromSize(size_t size, Memory_Allocator* memoryAllocator) {
+VFile_Handle VFileMemory_FromSize(size_t size, Memory_Allocator* memoryAllocator) {
 
 	size_t sizeWithHeader = VFileMemory_HeaderSize + size;
 #if MEMORY_TRACKING_SETUP == 1
 	// call the allocator direct, so that the line and file comes free the caller
 	VFile_Interface_t *vif = (VFile_Interface_t *) memoryAllocator->malloc(memoryAllocator, sizeWithHeader);
 #else
-	VFile_Interface_t *vif = (VFile_Interface_t *) ALLOCATOR_MALLOC(sizeWithHeader, memoryAllocator);
+	VFile_Interface_t *vif = (VFile_Interface_t *) MALLOC(memoryAllocator, sizeWithHeader);
 #endif
 
 	VFileMemory_Data_t *vof = (VFileMemory_Data_t *) (vif + 1);
@@ -167,4 +168,34 @@ EXTERN_C VFile_Handle VFileMemory_FromSize(size_t size, Memory_Allocator* memory
   vof->offset = 0;
 
   return (VFile_Handle) vif;
+}
+VFile_Handle VFileMemory_CreateEmpty(Memory_Allocator* memoryAllocator) {
+
+	size_t sizeWithHeader = VFileMemory_HeaderSize;
+#if MEMORY_TRACKING_SETUP == 1
+	// call the allocator direct, so that the line and file comes free the caller
+	VFile_Interface_t *vif = (VFile_Interface_t *) memoryAllocator->malloc(memoryAllocator, sizeWithHeader);
+#else
+	VFile_Interface_t *vif = (VFile_Interface_t *) MALLOC(memoryAllocator, sizeWithHeader);
+#endif
+
+	VFileMemory_Data_t *vof = (VFileMemory_Data_t *) (vif + 1);
+	vif->magic = InterfaceMagic;
+	vif->type = VFILE_MAKE_ID('M', 'E', 'M', '_');
+	vif->closeFunc = &VFile_MemFile_Close;
+	vif->flushFunc = &VFile_MemFile_Flush;
+	vif->readFunc = &VFile_MemFile_Read;
+	vif->writeFunc = &VFile_MemFile_Write;
+	vif->seekFunc = &VFile_MemFile_Seek;
+	vif->tellFunc = &VFileMemory_tell;
+	vif->sizeFunc = &VFile_MemFile_Size;
+	vif->nameFunc = &VFile_MemFile_GetName;
+	vif->isEofFunc = &VFile_MemFile_IsEOF;
+	vof->memory = nullptr;
+	vof->allocator = memoryAllocator;
+	vof->size = 0;
+	vof->autoFreeMemoryOnClose = true;
+	vof->offset = 0;
+
+	return (VFile_Handle) vif;
 }

@@ -103,62 +103,57 @@ Image_ImageHeader * Image_CreateCubemapArrayNoClear(uint32_t width,
 	return image;
 }
 
-Image_ImageHeader * Image_CreateCLUT(uint32_t width, uint32_t height, TinyImageFormat format, uint32_t clutSize, Memory_Allocator* memoryAllocator) {
-	return Image_CreateCLUTArray(width, height, 1, format, clutSize, memoryAllocator);
+Image_ImageHeader * Image_CreateWithCLUT(uint32_t width_, uint32_t height_, TinyImageFormat format_, uint32_t clutSize_, Memory_Allocator* memoryAllocator_) {
+	return Image_CreateArrayWithCLUT(width_, height_, 1, format_, clutSize_, memoryAllocator_);
 }
 
-Image_ImageHeader * Image_CreateCLUTNoClear(uint32_t width, uint32_t height, TinyImageFormat format, uint32_t clutSize, Memory_Allocator* memoryAllocator) {
-	return Image_CreateCLUTArrayNoClear(width, height, 1, format, clutSize, memoryAllocator);
+Image_ImageHeader * Image_CreateWithCLUTNoClear(uint32_t width_, uint32_t height_, TinyImageFormat format_, uint32_t clutSize_, Memory_Allocator* memoryAllocator_) {
+	return Image_CreateArrayWithCLUTNoClear(width_, height_, 1, format_, clutSize_, memoryAllocator_);
 }
 
-Image_ImageHeader * Image_CreateCLUTArray(uint32_t width,
-                                                         uint32_t height,
-                                                         uint32_t slices,
-                                                         TinyImageFormat format,
-                                                         uint32_t clutSize,
-                                                         Memory_Allocator* memoryAllocator) {
-	if(!TinyImageFormat_IsCLUT(format)) return nullptr;
-
-	// this creates the colour image and the lut image
-	// currently LUT is always R8G8B8A8 format
-	if(slices == 0) slices = 1;
-	Image_ImageHeader* image = (Image_ImageHeader*) Image_Create(width, height, 1, slices, format, memoryAllocator);
-	if(image) {
-		Image_ImageHeader* clutImage = (Image_ImageHeader*) Image_Create(clutSize, 1, 1, 1, TinyImageFormat_R8G8B8A8_UNORM, memoryAllocator);
-		if(clutImage) {
-			image->flags = Image_Flag_CLUT;
-			image->nextType = Image_NT_CLUT;
-			image->nextImage  = clutImage;
-		} else {
-			Image_Destroy(image);
-			return nullptr;
-		}
-	}
+Image_ImageHeader * Image_CreateArrayWithCLUT(uint32_t width_,
+	                                         uint32_t height_,
+	                                         uint32_t slices_,
+	                                         TinyImageFormat format_,
+	                                         uint32_t clutSize_,
+	                                         Memory_Allocator* memoryAllocator_) {
+	Image_ImageHeader* image = Image_CreateArrayWithCLUTNoClear(width_, height_, slices_, format_, clutSize_, memoryAllocator_);
+	memset(Image_RawDataPtr(image), 0, image->dataSizeInBytes - sizeof(Image_ImageHeader));
+	Image_ImageHeader *clut = Image_GetNextImageData(image);
+	memset(Image_RawDataPtr(clut), 0, clut->dataSizeInBytes - sizeof(Image_ImageHeader));
 	return image;
 }
-Image_ImageHeader * Image_CreateCLUTArrayNoClear(uint32_t width,
-                                                                uint32_t height,
-                                                                uint32_t slices,
-                                                                TinyImageFormat format,
-                                                                uint32_t clutSize,
-                                                                Memory_Allocator* memoryAllocator) {
-	if(!TinyImageFormat_IsCLUT(format)) return nullptr;
+
+Image_ImageHeader * Image_CreateArrayWithCLUTNoClear(uint32_t width_,
+                                                uint32_t height_,
+                                                uint32_t slices_,
+                                                TinyImageFormat format_,
+                                                uint32_t clutSize_,
+                                                Memory_Allocator* memoryAllocator_) {
+	if(!TinyImageFormat_IsCLUT(format_)) return nullptr;
 
 	// this creates the colour image and the lut image
 	// currently LUT is always R8G8B8A8 format
-	if(slices == 0) slices = 1;
-	Image_ImageHeader* image = (Image_ImageHeader*) Image_CreateNoClear(width, height, 1, slices, format, memoryAllocator);
+	if(slices_ == 0) slices_ = 1;
+
+	// if small enough create temporiries on the stack
+	static const int TMP_STACK_SIZE = 32 * 1024;
+	MEMORY_STACK_ALLOCATOR(_, TMP_STACK_SIZE);
+	Memory_Allocator* tmpAllocator = memoryAllocator_;
+	if( (Image_CalcSize(width_,height_, slices_, 1, format_) +
+	     (Image_CalcSize(clutSize_, 1, 1, 1, TinyImageFormat_R8G8B8A8_UNORM))) < TMP_STACK_SIZE) {
+		tmpAllocator = _;
+	}
+
+	Image_ImageHeader* image = (Image_ImageHeader*) Image_CreateNoClear(width_, height_, 1, slices_, format_, tmpAllocator);
 	if(image) {
-		Image_ImageHeader* clutImage = (Image_ImageHeader*) Image_CreateNoClear(clutSize, 1, 1, 1, TinyImageFormat_R8G8B8A8_UNORM, memoryAllocator);
+		Image_ImageHeader* clutImage = (Image_ImageHeader*) Image_CreateNoClear(clutSize_, 1, 1, 1, TinyImageFormat_R8G8B8A8_UNORM, tmpAllocator);
 		if(clutImage) {
-			image->flags = Image_Flag_CLUT;
-			image->nextType = Image_NT_CLUT;
-			image->nextImage  = clutImage;
+			image = Image_DestructiveJoinImages(image, clutImage, memoryAllocator_);
 		} else {
 			Image_Destroy(image);
 			return nullptr;
 		}
 	}
-
 	return image;
 }

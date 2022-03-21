@@ -42,8 +42,3 @@ EXTERN_C void CADT_VectorSwapRemove(CADT_VectorHandle handle, size_t index);
 // returns the index of a peice data or -1 if not found. Linear find so slow for large vectors
 EXTERN_C size_t CADT_VectorFind(CADT_VectorHandle handle, void const	* data);
 
-#if MEMORY_TRACKING_SETUP == 1
-#define CADT_VectorCreate(size, allocator) ((Memory_TrackerPushNextSrcLoc(__FILE__, __LINE__, __FUNCTION__)) ? CADT_VectorCreate(size, allocator) : NULL)
-#define CADT_VectorReserve(handle, size) Memory_TrackerPushNextSrcLoc(__FILE__, __LINE__, __FUNCTION__); CADT_VectorReserve(handle, size)
-
-#endif

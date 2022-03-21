@@ -2,7 +2,7 @@
 
 #include "core/core.h"
 
-#define ATOMIC_FM_CREATE_UNSIGNED(postfix, type) 																				\
+#define ATOMIC_FM_CREATE_UNSIGNED(postfix, type) \
 ALWAYS_INLINE NON_NULL(1) type Atomic_Load##_##postfix(const type* ptr)  { type val; __atomic_load(ptr, &val, __ATOMIC_SEQ_CST); return val; } \
 ALWAYS_INLINE NON_NULL(1) void Atomic_Store##_##postfix(type* ptr, const type val) { __atomic_store(ptr, (type*) &val, __ATOMIC_SEQ_CST); } \
 ALWAYS_INLINE NON_NULL(1, 2) void Atomic_StorePtr##_##postfix(type* ptr, const type* val) { __atomic_store(ptr, (type*) val, __ATOMIC_SEQ_CST); } \

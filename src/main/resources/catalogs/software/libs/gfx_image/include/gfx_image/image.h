@@ -10,62 +10,40 @@ extern "C"
 {
 #endif
 
-
-// Images can have a chain of related images, this type declares what if any
-// the next pointer are. Image_IT_None means no next images
-// The user is responsible to setting the next type and alloc the next
-// chains. Destroy will free the entire chain.
-// MipMaps + Layers in the same image is not supported
-typedef enum Image_NextType {
-	Image_NT_None,
-	Image_NT_MipMap,
-	Image_NT_Layer,
-	Image_NT_Plane,
-	Image_NT_CLUT,
-} Image_NextType;
-
 typedef enum Image_FlagBits {
-	Image_Flag_Cubemap = 0x1,				// slices are treated as faces of a cubemap
-	Image_Flag_HeaderOnly = 0x2,		// no data attached
-	Image_Flag_PackedMipMaps = 0x4,	// has a packed mipmap
-	Image_Flag_CLUT = 0x8,					// has a Colour LookUp Table
+	Image_Flag_Cubemap = 0x1,				    // slices are treated as faces of a cubemap
+	Image_Flag_HeaderOnly = 0x2,		    // no data attached
+	Image_Flag_HasNextImageData = 0x4,	// another 'image' follow (wh
+	Image_Flag_CLUT = 0x8,					    // has a Colour LookUp Table
+
 } Image_FlagBits;
 
-// Upto 4D (3D Arrays_ image data, stored as packed formats but
+// Upto 4D (3D Arrays) image data, stored as packed formats but
 // accessed as floats or double upto 4 channels per pixel in RGBA order
 // Support image arrays/slices
 // You ask for R and it will retrieve it from wherever it really is in the
 // format (i.e. you don't worry about how its encoded)
-// Mipmaps can be stored either packed in the 1st image or in a chain of
-// images. A utility function can convert from chain to packed.
 // CLUTs index image has a LUT image next in chain. LUT should be R8G8B8A8
 
-// the image data follows this header directly
-typedef struct Image_ImageHeader {
-	uint64_t dataSize; ///< size of data following this header (Not including it!)
+// the image data (padded to 8 bytes alignment) follows this header directly
+// if it has a next image its header follows the padded image data
+typedef  struct PACKED Image_ImageHeader {
+	struct Memory_Allocator* memoryAllocator;
+	uint64_t dataSizeInBytes; // how much image + header size in bytes (not including next images)
 
 	// width, height and depth are in pixels (NOT blocks)
 	uint32_t width;
 	uint32_t height;
-	uint32_t depth;
-	uint32_t slices;
-
-	union {
-		uint32_t fmtSizer; ///< ensure there is always 32 bit if saved to disk
-		TinyImageFormat format; ///< type TinyImageFormat
-	};
-
+	uint16_t depth;
+	uint16_t slices;
 	uint16_t flags; ///< From Image_FlagBits
-	uint8_t nextType; ///< Image_NextType
-	uint8_t packedMipMapCount; // if has packed mip maps this it the level count
-
 	union {
-		uint64_t pad; // ensure always enough space for 64 bit if saved to disk
-		struct Image_ImageHeader *nextImage;
+			uint16_t fmtSizer; ///< ensure there is always 16 bit if saved to disk
+			enum TinyImageFormat format; ///< type TinyImageFormat
 	};
-	struct Memory_Allocator* memoryAllocator;
-
 } Image_ImageHeader;
+
+static_assert(sizeof(Image_ImageHeader) - sizeof(Memory_Allocator*) == 24, "Bad Image Header Size");
 
 // Image are fundamentally 4D arrays
 // 'helper' functions in create.h let you
@@ -86,12 +64,9 @@ void Image_Destroy(Image_ImageHeader *image);
 
 // if you want to use the calculation fields without an actual image
 // this will fill in a valid header with no data or allocation
-void Image_FillHeader(uint32_t width,
-															 uint32_t height,
-															 uint32_t depth,
-															 uint32_t slices,
-															 enum TinyImageFormat format,
-															 Image_ImageHeader *header);
+void Image_FillHeader(uint32_t width_, uint32_t height_, uint32_t depth_, uint32_t slices_,
+											enum TinyImageFormat format, Image_ImageHeader *outHeader);
+uint64_t Image_CalcSize(uint32_t width_, uint32_t height_, uint32_t depth_, uint32_t slices_, TinyImageFormat format_);
 
 Image_ImageHeader * Image_CreateHeaderOnly(uint32_t width,
 																					 uint32_t height,
@@ -100,10 +75,18 @@ Image_ImageHeader * Image_CreateHeaderOnly(uint32_t width,
 																					 enum TinyImageFormat format,
 																					 struct Memory_Allocator* memoryAllocator);
 
-ALWAYS_INLINE void *Image_RawDataPtr(Image_ImageHeader const *image) {
-	assert(image != NULL);
-	assert((image->flags & Image_Flag_HeaderOnly) == 0)
-	return (void *) (image + 1);
+Image_ImageHeader * Image_JoinImages(Image_ImageHeader *first_,
+                                                Image_ImageHeader *second_,
+                                                Memory_Allocator* memoryAllocator_);
+
+Image_ImageHeader * Image_DestructiveJoinImages(Image_ImageHeader *first_,
+																								Image_ImageHeader *second_,
+																								Memory_Allocator* memoryAllocator_);
+
+ALWAYS_INLINE void *Image_RawDataPtr(Image_ImageHeader const *image_) {
+	assert(image_ != NULL);
+	assert((image_->flags & Image_Flag_HeaderOnly) == 0)
+	return (void *) (image_ + 1);
 }
 
 bool Image_GetBlocksAtF(Image_ImageHeader const *image, float *pixels, size_t blockCounts, size_t index);
@@ -230,8 +213,13 @@ ALWAYS_INLINE bool Image_IsCubemap(Image_ImageHeader const *image) {
 	return image->flags & Image_Flag_Cubemap;
 }
 
-ALWAYS_INLINE bool Image_HasPackedMipMaps(Image_ImageHeader const *image) {
-	return image->flags & Image_Flag_PackedMipMaps;
+ALWAYS_INLINE bool Image_HasNextImageData(Image_ImageHeader const *image) {
+	return image->flags & Image_Flag_HasNextImageData;
+}
+
+ALWAYS_INLINE Image_ImageHeader * Image_GetNextImageData(Image_ImageHeader const *image) {
+	assert(image->flags & Image_Flag_HasNextImageData);
+	return (Image_ImageHeader*)(((uint8_t*)image) + image->dataSizeInBytes);
 }
 
 #ifdef __cplusplus

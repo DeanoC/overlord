@@ -19,17 +19,9 @@ NO_RETURN void assert_printf(char const *file, int line, char const* txt);
 void assert_printf(char const *file, int line, char const* txt);
 #endif
 
-#define assert(test) \
-if (!(test))       \
-{                  \
-assert_printf(__FILE__, __LINE__, #test); \
-}
+#define assert(test) if (!(test)) { assert_printf(__FILE__, __LINE__, #test); }
 
-#define assert_msg(test, msg) \
-if (!(test))       \
-{                  \
-assert_printf(__FILE__, __LINE__, msg ": " #test); \
-}
+#define assert_msg(test, msg) if (!(test)) { assert_printf(__FILE__, __LINE__, msg ": " #test); }
 
 #else
 

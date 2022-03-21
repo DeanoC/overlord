@@ -1,4 +1,5 @@
 #pragma once
+#include "tiny_stl/traits.hpp"
 #include "tiny_stl/pdqsort.hpp"
 
 namespace tiny_stl {
@@ -17,6 +18,16 @@ inline void sort(Iter begin, Iter end) {
 template<class Iter>
 inline ptrdiff_t distance(Iter const lsh, Iter const rhs) {
 	return lsh - rhs;
+}
+
+template<class Iter, typename Value = tiny_stl::remove_pointer<Iter>>
+inline Iter find(Iter const first, Iter const last, Value const & toFind) {
+	for(auto i = first; i != last;++i) {
+		if(*i == toFind) {
+			return i;
+		}
+	}
+	return last;
 }
 
 } // end namespace

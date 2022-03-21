@@ -7,60 +7,39 @@
 #include "tiny_image_format/tiny_image_format_decode.h"
 #include "tiny_image_format/tiny_image_format_encode.h"
 #include "gfx_image/image.h"
+#include "dbg/print.h"
 
 size_t Image_ByteCountOfImageChainOf(Image_ImageHeader const *image) {
 
 	size_t total = Image_ByteCountOf(image);
-
-	if(Image_HasPackedMipMaps(image)) {
-		return total;
+	if(Image_HasNextImageData(image)) {
+		total += Image_ByteCountOfImageChainOf(Image_GetNextImageData(image));
 	}
-
-	if(image->nextType != Image_NT_None && image->nextImage != nullptr) {
-		total += Image_ByteCountOfImageChainOf(image->nextImage);
-	}
-
 	return total;
 }
 size_t Image_LinkedImageCountOf(Image_ImageHeader const *image) {
   size_t count = 1;
 
-	while (image && image->nextImage != nullptr) {
+	while (image && Image_HasNextImageData(image)) {
     count++;
-    image = image->nextImage;
+    image = Image_GetNextImageData(image);
   }
-
   return count;
-}
-
-size_t Image_MipMapCountOf(Image_ImageHeader const *image) {
-	size_t count = 1;
-
-	if(Image_HasPackedMipMaps(image)) {
-		return image->packedMipMapCount;
-	}
-
-	while (image && image->nextType == Image_NT_MipMap && image->nextImage != nullptr) {
-		count++;
-		image = image->nextImage;
-	}
-
-	return count;
 }
 
 Image_ImageHeader const *Image_LinkedImageOf(Image_ImageHeader const *image, size_t const index) {
   size_t count = 0;
-
-  if(index > 0) {
-		assert(Image_HasPackedMipMaps(image) == false)
-	}
 
   do {
     if (count == index) {
       return image;
     }
     count++;
-    image = image->nextImage;
+	  if(Image_HasNextImageData(image)) {
+		  image = Image_GetNextImageData(image);
+	  } else {
+			return nullptr;
+		}
   }  while (image);
 
 return nullptr;
@@ -232,7 +211,7 @@ size_t Image_BytesRequiredForMipMapsOf(Image_ImageHeader const *image) {
     }
     scratch.width = Math_Max_I32(scratch.width, minWidth);
     scratch.height = Math_Max_I32(scratch.height, minHeight);
-    scratch.depth = Math_Max_I32(scratch.depth, minDepth);
+    scratch.depth = Math_Max_I16(scratch.depth, minDepth);
 
     level--;
   }
@@ -247,7 +226,7 @@ Image_ImageHeader *Image_Create(uint32_t width,
 	                               Memory_Allocator* memoryAllocator) {
 	Image_ImageHeader * image = Image_CreateNoClear(width, height, depth, slices, format, memoryAllocator);
 	if (image) {
-		memset(Image_RawDataPtr(image), 0, image->dataSize);
+		memset(Image_RawDataPtr(image), 0, image->dataSizeInBytes - sizeof(Image_ImageHeader));
 	}
 
 	return image;
@@ -268,7 +247,7 @@ Image_ImageHeader *Image_CreateNoClear(uint32_t width,
 	Image_ImageHeader tmp;
 	Image_FillHeader(width, height, depth, slices, format, &tmp);
 
-	Image_ImageHeader *image = (Image_ImageHeader *) MALLOC(memoryAllocator, sizeof(Image_ImageHeader) + tmp.dataSize);
+	Image_ImageHeader *image = (Image_ImageHeader *) MALLOC(memoryAllocator, tmp.dataSizeInBytes);
 	if (!image) { return nullptr; }
 
 	memcpy(image, &tmp, sizeof(Image_ImageHeader));
@@ -276,13 +255,12 @@ Image_ImageHeader *Image_CreateNoClear(uint32_t width,
 
 	return image;
 }
-void Image_FillHeader(uint32_t width,
-                       uint32_t height,
-                       uint32_t depth,
-                       uint32_t slices,
-                       TinyImageFormat format,
-                       Image_ImageHeader *header) {
 
+uint64_t Image_CalcSize(uint32_t width,
+                      uint32_t height,
+                      uint32_t depth,
+                      uint32_t slices,
+                      TinyImageFormat format ) {
 	uint32_t const blockW = TinyImageFormat_WidthOfBlock(format);
 	uint32_t const blockH = TinyImageFormat_HeightOfBlock(format);
 	uint32_t const blockD = TinyImageFormat_DepthOfBlock(format);
@@ -290,7 +268,7 @@ void Image_FillHeader(uint32_t width,
 	// smallest sized a block texture can have is the block size
 	width = Math_Max_U32(width, blockW);
 	height = Math_Max_U32(height, blockH);
-	depth = Math_Max_U32(depth, blockD);
+	depth = Math_Max_U16(depth, blockD);
 
 	// round up to block size
 	width = (width + (blockW-1)) & ~(blockW-1);
@@ -300,17 +278,27 @@ void Image_FillHeader(uint32_t width,
 	uint64_t const pixelCount = (uint64_t)width * (uint64_t)height * (uint64_t)depth * (uint64_t)slices;
 	uint64_t const blockBitSize = TinyImageFormat_BitSizeOfBlock(format);
 	uint64_t const blockPixelCount = (uint64_t)blockW * (uint64_t)blockH * (uint64_t)blockD;
-	header->dataSize = (pixelCount * blockBitSize) / (blockPixelCount * 8ULL);
+	uint64_t totalSize = sizeof(Image_ImageHeader) + ((pixelCount * blockBitSize) / (blockPixelCount * 8ULL));
+	totalSize = ((totalSize + 7) & ~7);
 
-	header->width = width;
-	header->height = height;
-	header->depth = depth;
-	header->slices = slices;
-	header->format = format;
-	header->flags = 0;
-	header->nextType = Image_NT_None;
-	header->nextImage = nullptr;
-	header->memoryAllocator = nullptr;
+	return totalSize;
+}
+
+void Image_FillHeader(uint32_t width_,
+                       uint32_t height_,
+                       uint32_t depth_,
+                       uint32_t slices_,
+                       TinyImageFormat format_,
+                       Image_ImageHeader *header_) {
+
+	header_->dataSizeInBytes = Image_CalcSize(width_, height_, depth_, slices_, format_);
+	header_->width = width_;
+	header_->height = height_;
+	header_->depth = depth_;
+	header_->slices = slices_;
+	header_->format = format_;
+	header_->flags = 0;
+	header_->memoryAllocator = nullptr;
 }
 
 Image_ImageHeader * Image_CreateHeaderOnly(	uint32_t width,
@@ -330,10 +318,40 @@ Image_ImageHeader * Image_CreateHeaderOnly(	uint32_t width,
 void Image_Destroy(Image_ImageHeader *image) {
 	if(!image) return;
 
-	// recursively free next in image chain
-	if(image->nextType != Image_NT_None) {
-		Image_Destroy(image->nextImage);
-	}
-
 	MFREE(image->memoryAllocator, (Image_ImageHeader*)image);
+}
+
+size_t Image_MipMapCountOf(Image_ImageHeader const *image) {
+	return Image_LinkedImageCountOf(image);
+}
+
+Image_ImageHeader * Image_JoinImages(Image_ImageHeader *first_, Image_ImageHeader *second_, Memory_Allocator* memoryAllocator_) {
+	Image_ImageHeader *image = (Image_ImageHeader *) MALLOC(memoryAllocator_,
+	                                                        first_->dataSizeInBytes + second_->dataSizeInBytes);
+	// join the data
+	Image_ImageHeader *f = (Image_ImageHeader *) image;
+	Image_ImageHeader *s = (Image_ImageHeader *) (((uint8_t *) image) + first_->dataSizeInBytes);
+	memcpy(f, first_, first_->dataSizeInBytes);
+	memcpy(s, second_, second_->dataSizeInBytes);
+	f->memoryAllocator = memoryAllocator_;
+	s->memoryAllocator = nullptr;
+
+	// we now need to fix up flags
+	Image_ImageHeader *c = f;
+	while (Image_HasNextImageData(c)) {
+		c = Image_GetNextImageData(c);
+	}
+	// add the next flag and validate
+	c->flags |= Image_Flag_HasNextImageData;
+	assert(Image_GetNextImageData(c) == s);
+
+	return image;
+}
+
+Image_ImageHeader * Image_DestructiveJoinImages(Image_ImageHeader *first_, Image_ImageHeader *second_, Memory_Allocator* memoryAllocator_) {
+	Image_ImageHeader *image = Image_JoinImages(first_, second_, memoryAllocator_);
+	Image_Destroy(first_);
+	Image_Destroy(second_);
+
+	return image;
 }

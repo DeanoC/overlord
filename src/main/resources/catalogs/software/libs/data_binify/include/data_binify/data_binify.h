@@ -4,7 +4,7 @@
 
 typedef struct Binify_Context *Binify_ContextHandle ;
 
-EXTERN_C Binify_ContextHandle Binify_Create(char const * const in, Memory_Allocator* allocator, Memory_Allocator* tempAllocator);
+EXTERN_C Binify_ContextHandle Binify_Create(char const * const in, Memory_Allocator* allocator);
 EXTERN_C void Binify_Destroy( Binify_ContextHandle handle );
 EXTERN_C size_t Binify_BinarySize( Binify_ContextHandle handle );
 EXTERN_C uint8_t const *Binify_BinaryData( Binify_ContextHandle handle );
@@ -14,7 +14,7 @@ EXTERN_C uint8_t const *Binify_BinaryData( Binify_ContextHandle handle );
  * humans.
  *
  * These functions parse the DSL and produce a binary to store to disk, loading
- * these data as binary and applying pointer fixups will give you a in memory workable
+ * these data as binary and applying pointer fixups will give you an in memory workable
  * copy of the data.
  * The DSL is fairly simple but quite powerful.
  * It allows and promotes comments in the text version, to explain what the data is for.

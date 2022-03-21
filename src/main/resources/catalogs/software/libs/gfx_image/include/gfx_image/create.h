@@ -28,10 +28,10 @@ Image_ImageHeader * Image_CreateCubemapArray(uint32_t width, uint32_t height, ui
 Image_ImageHeader * Image_CreateCubemapArrayNoClear(uint32_t width, uint32_t height, uint32_t slices, TinyImageFormat format, struct Memory_Allocator* memoryAllocator);
 
 
-Image_ImageHeader * Image_CreateCLUT(uint32_t width, uint32_t height, TinyImageFormat format, uint32_t clutSize, struct Memory_Allocator* memoryAllocator);
-Image_ImageHeader * Image_CreateCLUTNoClear(uint32_t width, uint32_t height, TinyImageFormat format, uint32_t clutSize, struct Memory_Allocator* memoryAllocator);
-Image_ImageHeader * Image_CreateCLUTArray(uint32_t width, uint32_t height, uint32_t slices, TinyImageFormat format, uint32_t clutSize, struct Memory_Allocator* memoryAllocator);
-Image_ImageHeader * Image_CreateCLUTArrayNoClear(uint32_t width, uint32_t height, uint32_t slices, TinyImageFormat format, uint32_t clutSize, struct Memory_Allocator* memoryAllocator);
+Image_ImageHeader * Image_CreateWithCLUT(uint32_t width_, uint32_t height_, TinyImageFormat format_, uint32_t clutSize_, struct Memory_Allocator* memoryAllocator_);
+Image_ImageHeader * Image_CreateWithCLUTNoClear(uint32_t width_, uint32_t height_, TinyImageFormat format_, uint32_t clutSize_, struct Memory_Allocator* memoryAllocator_);
+Image_ImageHeader * Image_CreateArrayWithCLUT(uint32_t width_, uint32_t height_, uint32_t slices_, TinyImageFormat format_, uint32_t clutSize_, struct Memory_Allocator* memoryAllocator_);
+Image_ImageHeader * Image_CreateArrayWithCLUTNoClear(uint32_t width_, uint32_t height_, uint32_t slices_, TinyImageFormat format_, uint32_t clutSize_, struct Memory_Allocator* memoryAllocator_);
 
 #ifdef __cplusplus
 }

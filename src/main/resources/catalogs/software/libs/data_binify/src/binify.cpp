@@ -3,7 +3,7 @@
 #include "data_binify/fmt/format.hpp"
 #include "./binify.hpp"
 #include "scanner.h"
-
+#include "dbg/print.h"
 // still need these from system stl for now
 #include <istream>
 #include <ostream>
@@ -46,8 +46,26 @@ bool Binify::parse( std::string const& txt_, std::ostream* out_ )
 		int len = 1 + e.location.end.column - col;
 		// TODO: The reported location is not entirely satisfying. Any
 		// chances for improvement?
-		log += fmt::format("{} in pass {} row {} col {}:",
-				e.what(), pass, e.location.end.line, col).c_str();
+		log += fmt::format("{} in pass {} row {} col {}:\n", e.what(), pass, e.location.end.line, col).c_str();
+		int markbegin = 0;
+		int markend = 0;
+		unsigned int curLen = 0;
+		for (int i = 0; i < txt_.length(); ++i) {
+			if (txt_[i] == '\n') {
+				markend = i;
+				if (curLen > (e.location.end.line - 5) && curLen < (e.location.end.line + 5)) {
+					std::string result = txt_.substr(markbegin, markend - markbegin);
+					if (curLen == e.location.end.line-1) {
+						log += fmt::format("-----");
+					}
+					log += fmt::format("{} {}\n", curLen, result);
+				}
+				markbegin = (i + 1);
+				++curLen;
+			}
+		}
+
+		return false;
 	}
 	return true;
 }
@@ -412,44 +430,48 @@ struct Binify_Context
 	Memory_Allocator * allocator;
 };
 
-EXTERN_C Binify_ContextHandle Binify_Create(char const * const in, Memory_Allocator* allocator, Memory_Allocator* tempAllocator) {
+EXTERN_C Binify_ContextHandle Binify_Create(char const * const in, Memory_Allocator* allocator) {
 	std::string tmp;
 	std::ostringstream dir;
 	bool okay;
-	binify::Binify *binny;
+	binify::Binify *binny = nullptr;
+	MEMORY_STACK_ALLOCATOR(_, sizeof(binify::Binify));
 
-	Binify_Context* ctx = (Binify_Context*)MCALLOC(allocator, 1, sizeof(Binify_Context));
+	auto* ctx = (Binify_Context*)MCALLOC(allocator, 1, sizeof(Binify_Context));
 	if(ctx == nullptr) goto failexit;
 	ctx->allocator = allocator;
 
-	binny = (binify::Binify*) MCALLOC(tempAllocator, 1, sizeof(binify::Binify));
+	binny = (binify::Binify*) MCALLOC(_, 1, sizeof(binify::Binify));
+	assert(binny);
 	new(binny) binify::Binify();
 
 	okay = binny->parse( in, &dir );
-	if(!okay) goto failexit;
-	if(binny) {
-		binny->~Binify();
-		MFREE(tempAllocator, binny);
+	if(!okay) {
+		debug_printf("Binny error log: %s\n", binny->getLog().c_str());
+		goto failexit;
 	}
-
 	tmp = dir.str();
 	ctx->data = CADT_VectorCreate(sizeof(uint8_t), ctx->allocator);
 	CADT_VectorResize(ctx->data, tmp.size());
 	memcpy(CADT_VectorData(ctx->data), tmp.data(), tmp.size());
 
+	binny->~Binify();
+	MFREE(_, binny);
 	return ctx;
 
 failexit:
 	if(binny) {
 		binny->~Binify();
-		MFREE(tempAllocator, binny);
 	}
 	MFREE(allocator, ctx);
 	return nullptr;
 }
 
-EXTERN_C void Binify_Destroy( Binify_ContextHandle handle ) {
-	MFREE(handle->allocator, handle);
+EXTERN_C void Binify_Destroy( Binify_ContextHandle handle) {
+	if(handle) {
+		if(handle->data) CADT_VectorDestroy(handle->data);
+		MFREE(handle->allocator, handle);
+	}
 }
 
 EXTERN_C size_t Binify_BinarySize( Binify_ContextHandle handle ) {

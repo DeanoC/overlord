@@ -15,10 +15,17 @@
 static char const MetaName[] = "ikuy.Image";
 static CORE_LOCAL(Memory_Allocator * , luaAllocator);
 
+static void imageud_gc (void *image_) {
+	auto image = *(Image_ImageHeader **)image_;
+	if (image) Image_Destroy(image);
+}
+
 // create the null image user data return on the lua state
 static Image_ImageHeader const** imageud_create(lua_State *L) {
 	// allocate a pointer and push it onto the stack
-	auto ud = (Image_ImageHeader const**)lua_newuserdata(L, sizeof(Image_ImageHeader*));
+	auto ud = (Image_ImageHeader const**)lua_newuserdatadtor(L, sizeof(Image_ImageHeader*), &imageud_gc);
+
+
 	if(ud == nullptr) return nullptr;
 
 	*ud = nullptr;
@@ -27,12 +34,6 @@ static Image_ImageHeader const** imageud_create(lua_State *L) {
 	return ud;
 }
 
-static int imageud_gc (lua_State *L) {
-	auto image = *(Image_ImageHeader **)luaL_checkudata(L, 1, MetaName);
-	if (image) Image_Destroy(image);
-
-	return 0;
-}
 
 static int width(lua_State * L) {
 	auto image = *(Image_ImageHeader const**)luaL_checkudata(L, 1, MetaName);
@@ -663,6 +664,7 @@ static int load(lua_State * L) {
 	auto ud = imageud_create(L);
 	*ud = Image_Load(fh, luaAllocator);
 	lua_pushboolean(L, *ud != nullptr);
+	VFile_Close(fh);
 
 	return 2;
 }
@@ -906,7 +908,6 @@ int LuaImage_Open(lua_State* L, Memory_Allocator* allocator) {
 			ENTRY(saveAsKTX),
 			ENTRY(canSaveAsDDS),
 			ENTRY(saveAsDDS),
-			{"__gc", &imageud_gc },
 			{nullptr, nullptr}  /* sentinel */
 	};
 
