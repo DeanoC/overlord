@@ -5,6 +5,7 @@
 #include "hw_regs/pmu/pmu_lmb_bram.h"
 #include "hw_regs/ipi.h"
 #include "dbg/raw_print.h"
+#include "dbg/print.h"
 
 #include "interrupt_handlers.hpp"
 #include "../rom_extensions.h"
@@ -22,7 +23,7 @@ void IPI0_Handler(Interrupts::Name irq_name) {
 
 void IPI3_Handler(Interrupts::Name irq_name) {
 	uint32_t isr = HW_REG_GET(IPI, PMU_3_ISR);
-//	raw_debug_printf ("irq_name 0x%x IPI3_Handler 0x%lx\n", irq_name, isr);
+//	debug_printf ("irq_name 0x%x IPI3_Handler 0x%lx\n", irq_name, isr);
 
 	for (uint32_t name = 0x80000000U; name != 0; name >>= 1) {
 		if ((isr & name) == 0) {

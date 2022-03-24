@@ -129,7 +129,7 @@ typedef struct PACKED {
 
 	struct PACKED {
 		union {
-			uint8_t _padd[IPI3_PACKET_MINUS_HEADER_SIZE];					// IPI3_Msg always 32 bytes
+			uint8_t padd[IPI3_PACKET_MINUS_HEADER_SIZE];					// IPI3_Msg always 32 bytes
 			IPI3_DdrPacket DdrPacket;
 			struct PACKED {
 				uint8_t _reserved : 3;
@@ -141,20 +141,20 @@ typedef struct PACKED {
 				uint8_t text[IPI3_PACKET_MINUS_HEADER_SIZE-sizeof(IPI3_DdrPacket)];			// first n character, rest follow msg
 			} PtrPrint;
 			struct PACKED {
-				uint8_t _padd_0[2]; 	// align to 32 bit boundary as we have the space to spare
-				uint16_t blocks1MB;   // how many blocks (each 1MB) to allocate
+				uint8_t padd0[2]; 			// align to 32 bit boundary as we have the space to spare
+				uint32_t blocks64KB;   // how many blocks (each 64KB) to allocate
 			} DdrLoBlockAlloc;
 			struct PACKED {
-				uint8_t _padd_0[2]; 	// align to 32 bit boundary as we have the space to spare
-				uint16_t free_blocks_starting_at; 		// offset in 1M blocks to free
+				uint16_t blockCount; 	// how many 64KB blocks to free
+				uint32_t offset; 			// offset from base address to free
 			} DdrLoBlockFree;
 			struct PACKED {
-				uint8_t _padd_0[2]; 	// align to 32 bit boundary as we have the space to spare
-				uint16_t blocks1MB;   // how many blocks (each 1MB) to allocate
+				uint8_t padd0[2]; 	// align to 32 bit boundary as we have the space to spare
+				uint32_t blocks64KB;   // how many blocks (each 64KB) to allocate
 			} DdrHiBlockAlloc;
 			struct PACKED {
-				uint8_t _padd_0[2]; 	// align to 32 bit boundary as we have the space to spare
-				uint16_t free_blocks_starting_at; 		// offset in 1M blocks to free
+				uint16_t blockCount; 	// how many 64KB blocks to free
+				uint32_t offset; 			// offset from base address to free
 			} DdrHiBlockFree;
 			struct PACKED {
 				BootData bootData;
@@ -163,19 +163,19 @@ typedef struct PACKED {
 				uint8_t enabled; // turn the text console on or off
 			} ScreenConsoleEnable;
 			struct PACKED {
-				uint8_t sleep_a53_0;
-				uint8_t sleep_a53_1;
-				uint8_t sleep_a53_2;
-				uint8_t sleep_a53_3;
-				uint8_t sleep_r5f_0;
-				uint8_t sleep_r5f_1;
+				uint8_t sleepA53_0;
+				uint8_t sleepA53_1;
+				uint8_t sleepA53_2;
+				uint8_t sleepA53_3;
+				uint8_t sleepR5f_0;
+				uint8_t sleepR5f_1;
 
-				uint8_t wake_a53_0;
-				uint8_t wake_a53_1;
-				uint8_t wake_a53_2;
-				uint8_t wake_a53_3;
-				uint8_t wake_r5f_0;
-				uint8_t wake_r5f_1;
+				uint8_t wakeA53_0;
+				uint8_t wakeA53_1;
+				uint8_t wakeA53_2;
+				uint8_t wakeA53_3;
+				uint8_t wakeR5f_0;
+				uint8_t wakeR5f_1;
 
 				uintptr_all_t wakeAddress;
 			} CPUWakeOrSleep;
@@ -195,10 +195,10 @@ typedef struct PACKED {
 	union {
 		uint8_t _padd[31]; // IPI3_Response is always 32 bytes
 		struct PACKED {
-			uint16_t block_1MB_Offset; // offset in 1M block from DDR LO base of our RAM
+			uint32_t offset; // offset in bytes from DDR LO base of our RAM
 		} DdrLoBlockAlloc;
 		struct PACKED {
-			uint16_t block_1MB_Offset; // offset in 1M block from DDR Hi base of our RAM
+			uint32_t offset; // offset inbytes block from DDR Hi base of our RAM
 		} DdrHiBlockAlloc;
 		struct PACKED {
 			BootData bootData;

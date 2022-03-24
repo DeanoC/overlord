@@ -130,7 +130,7 @@ void Handler(IPI_Channel senderChannel) {
 																		 msgBuffer->Payload.DdrPacket.packetSize);
 					Dma::LpdDma::Stall(Dma::LpdDma::Channels::ChannelSevern);
 					HandleNeedResponse(senderChannel, (IPI3_Msg *) tmp);
-					osHeap->tmpOsBufferAllocator.Free(tmp);
+					osHeap->tmpOsBufferAllocator.Free(tmp, blockCount);
 					return;
 				}
 

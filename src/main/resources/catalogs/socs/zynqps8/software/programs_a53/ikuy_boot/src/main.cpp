@@ -168,14 +168,14 @@ void PrintBanner(void )
 
 void BringUpDisplayPort()
 {
-	debug_printf(ANSI_CLR_SCREEN ANSI_YELLOW_PEN "BringUpDisplayPort\n" ANSI_RESET_ATTRIBUTES);
+	debug_printf(ANSI_YELLOW_PEN "BringUpDisplayPort\n" ANSI_RESET_ATTRIBUTES);
 	using namespace DisplayPort::Display;
 
 	Init(&display);
 	Init(&mixer);
 
 	CopyStandardVideoMode(DisplayPort::Display::StandardVideoMode::VM_1280_720_60, &display.videoTiming);
-	if(videoBlock == 0) videoBlock = OsService_DdrLoBlockAlloc(4);
+	if(videoBlock == 0) videoBlock = OsService_DdrLoBlockAlloc(8*8); // 4MB
 	auto dmaDesc = (DMADescriptor*) (uintptr_t)videoBlock;
 	FrameBuffer = (uintptr_lo_t)(uintptr_t)(videoBlock + 4096);
 

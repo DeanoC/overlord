@@ -3,6 +3,8 @@
 #if CPU_a53 == 1
 # include "a53/cpu.h"
 
+#include "aarch64/intrinsics_gcc.h"
+
 ALWAYS_INLINE uint8_t GetCpuHartNumber() {
 	return read_MPIDR_EL1_register() & 0xFF;
 }

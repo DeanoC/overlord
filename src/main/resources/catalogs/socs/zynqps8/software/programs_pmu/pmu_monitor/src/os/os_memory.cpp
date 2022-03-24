@@ -7,46 +7,56 @@ namespace IPI3_OsServer {
 
 void DdrLoBlockAlloc(IPI_Channel senderChannel, IPI3_Msg const *msgBuffer) {
 	IPI3_Response responseBuffer;
-	const uint32_t blocksWanted = msgBuffer->Payload.DdrLoBlockAlloc.blocks1MB;
-	if(blocksWanted >= 128) {
-		responseBuffer.result = IRR_BAD_PARAMETERS;
+	uint32_t blocksWanted = msgBuffer->Payload.DdrLoBlockAlloc.blocks64KB;
+
+	debug_printf("Request for %lu KB from low memory\n", blocksWanted * 64);
+
+	uintptr_t address = osHeap->ddrLoAllocator.Alloc(blocksWanted);
+	if (address == (uintptr_t) ~0) {
+		responseBuffer.result = IRR_OUT_OF_MEMORY;
 	} else {
+//		debug_printf("SUCCESS %x\n", address);
+//		osHeap->ddrLoAllocator.DebugDumpMasks(4);
+
 		responseBuffer.result = IRR_SUCCESS;
-		uintptr_t address = osHeap->ddrLoAllocator.Alloc(blocksWanted);
-		if (address == (uintptr_t) ~0) {
-			responseBuffer.result = IRR_OUT_OF_MEMORY;
-		} else {
-			responseBuffer.DdrLoBlockAlloc.block_1MB_Offset = address / (1024 * 1024);
-		}
+		responseBuffer.DdrLoBlockAlloc.offset = address;
 	}
+
 	SubmitResponse(senderChannel, &responseBuffer);
 }
 
 void DdrLoBlockFree(IPI3_Msg const *msgBuffer) {
-	uintptr_t address = msgBuffer->Payload.DdrLoBlockFree.free_blocks_starting_at * (1024 * 1024);
-	osHeap->ddrLoAllocator.Free(address);
+	uintptr_t const address = msgBuffer->Payload.DdrLoBlockFree.offset;
+	uint16_t const blockCount = msgBuffer->Payload.DdrLoBlockFree.blockCount;
+//	osHeap->ddrLoAllocator.DebugDumpMasks(4);
+	debug_printf("Free of low %d KB %x\n", blockCount * 64, address);
+
+	osHeap->ddrLoAllocator.Free(address, blockCount);
 }
 
 void DdrHiBlockAlloc(IPI_Channel senderChannel, IPI3_Msg const *msgBuffer) {
+
 	IPI3_Response responseBuffer;
-	const uint32_t blocksWanted = msgBuffer->Payload.DdrHiBlockAlloc.blocks1MB;
-	if(blocksWanted >= 128) {
-		responseBuffer.result = IRR_BAD_PARAMETERS;
+	uint32_t blocksWanted = msgBuffer->Payload.DdrHiBlockAlloc.blocks64KB;
+
+	debug_printf("Request for %lu KB from hi memory\n", blocksWanted * 64);
+
+	uintptr_t address = osHeap->ddrHiAllocator.Alloc(blocksWanted);
+	if (address == (uintptr_t) ~0) {
+		responseBuffer.result = IRR_OUT_OF_MEMORY;
 	} else {
 		responseBuffer.result = IRR_SUCCESS;
-		uintptr_t address = osHeap->ddrHiAllocator.Alloc(blocksWanted);
-		if (address == (uintptr_t) ~0) {
-			responseBuffer.result = IRR_OUT_OF_MEMORY;
-		} else {
-			responseBuffer.DdrHiBlockAlloc.block_1MB_Offset = address / (1024 * 1024);
-		}
+		responseBuffer.DdrHiBlockAlloc.offset = address;
 	}
+
 	SubmitResponse(senderChannel, &responseBuffer);
 }
 
 void DdrHiBlockFree(IPI3_Msg const *msgBuffer) {
-	uintptr_t address = msgBuffer->Payload.DdrHiBlockFree.free_blocks_starting_at * (1024 * 1024);
-	osHeap->ddrHiAllocator.Free(address);
+	uintptr_t const address = msgBuffer->Payload.DdrHiBlockFree.offset;
+	uint16_t const blockCount = msgBuffer->Payload.DdrHiBlockFree.blockCount;
+	debug_printf("Free of hi %d KB %x\n", blockCount * 64, address);
+	osHeap->ddrHiAllocator.Free(address, blockCount);
 }
 
 } // end namespace

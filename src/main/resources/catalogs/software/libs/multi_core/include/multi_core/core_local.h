@@ -1,13 +1,12 @@
 #pragma once
 
-
 // IKUY doesn't have threads but doesn't support multiple cores (effectively 1 thread per core)
 // as such we don't have thread local storage but do support core local storage
 // for host platforms this is actually just thread local
 
 #include "platform/cpu.h"
 
-#if !defined(CPU_host)
+#if !CPU_host
 
 #define CORE_LOCAL(type, name) type name[CPU_CORE_COUNT]
 #define READ_CORE_LOCAL(name) name[GetCpuHartNumber()]

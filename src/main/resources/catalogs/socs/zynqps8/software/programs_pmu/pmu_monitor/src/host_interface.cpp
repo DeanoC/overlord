@@ -42,7 +42,7 @@ void HostInterface::Init() {
 
 [[maybe_unused]] void HostInterface::Fini() {
 	zModem.Fini();
-	osHeap->tmpOsBufferAllocator.Free((uintptr_t)this->cmdBuffer);
+	osHeap->tmpOsBufferAllocator.Free((uintptr_t)this->cmdBuffer, CMD_BUF_SIZE/64 );
 }
 
 void HostInterface::TmpBufferRefill(uintptr_t& tmpBufferAddr, uint32_t& tmpBufferSize) {
@@ -54,7 +54,6 @@ void HostInterface::TmpBufferRefill(uintptr_t& tmpBufferAddr, uint32_t& tmpBuffe
 			// wrapped
 			auto firstSize = OsHeap::UartBufferSize - last;
 			tmpBufferSize = firstSize + head;
-			assert(BitOp::PowerOfTwoContaining(tmpBufferSize / 64) < 128);
 			tmpBufferAddr = osHeap->tmpOsBufferAllocator.Alloc(BitOp::PowerOfTwoContaining(tmpBufferSize / 64));
 			memcpy((char *) tmpBufferAddr, &osHeap->uartDEBUGReceiveBuffer[last], firstSize);
 			memcpy((char *) tmpBufferAddr + firstSize, &osHeap->uartDEBUGReceiveBuffer[0], head);
@@ -64,6 +63,9 @@ void HostInterface::TmpBufferRefill(uintptr_t& tmpBufferAddr, uint32_t& tmpBuffe
 			memcpy((char *) tmpBufferAddr, &osHeap->uartDEBUGReceiveBuffer[last], tmpBufferSize);
 		}
 		uartDebugReceiveLast = head;
+	} else {
+		tmpBufferAddr = 0;
+		tmpBufferSize = 0;
 	}
 }
 
@@ -82,7 +84,7 @@ void HostInterface::InputCallback() {
 		if (tmpBufferSize != 0) {
 			auto const startOfBuffer = (uint8_t *) tmpBufferAddr;
 			if (tmpBufferIndex == tmpBufferSize) {
-				osHeap->tmpOsBufferAllocator.Free(tmpBufferAddr);
+				osHeap->tmpOsBufferAllocator.Free(tmpBufferAddr, BitOp::PowerOfTwoContaining(tmpBufferSize / 64));
 				tmpBufferSize = 0;
 				tmpBufferAddr = 0;
 				return;

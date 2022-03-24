@@ -15,7 +15,7 @@
 #define LACKS_TIME_H 1
 #define ABORT
 #define MALLOC_FAILURE_ACTION
-
+#define malloc_getpagesize (64*1024)
 #define PROT_READ 1
 #define PROT_WRITE 2
 #define MAP_PRIVATE 1

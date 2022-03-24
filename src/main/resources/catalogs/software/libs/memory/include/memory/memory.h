@@ -12,7 +12,7 @@
 // as well
 // Whether memory tracking is actually done (not just the setup) is decided
 // inside memory.c
-//#define MEMORY_TRACKING_SETUP 0
+#define MEMORY_TRACKING_SETUP 0
 
 #ifndef MEMORY_TRACKING_SETUP
 #define MEMORY_TRACKING_SETUP 1
@@ -45,7 +45,7 @@ typedef struct Memory_LinearAllocator {
 
 #if CPU_host
 #define MEMORY_HEAP_ALLOCATOR_SIZE (sizeof(Memory_Allocator))
-#elif CPU_a53
+#else
 #define MEMORY_HEAP_ALLOCATOR_SIZE (sizeof(Memory_Allocator) + CPU_CORE_COUNT * sizeof(void*))
 #endif
 

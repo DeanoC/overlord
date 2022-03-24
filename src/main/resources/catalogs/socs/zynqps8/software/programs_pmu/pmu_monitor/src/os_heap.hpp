@@ -24,8 +24,8 @@ struct OsHeap {
 	uint8_t uartDEBUGTransmitBuffer[UartBufferSize]; // filled in an interrupt!
 	uint8_t uartDEBUGReceiveBuffer[UartBufferSize]; // filled in an interrupt!
 
-	BitmapAllocator_SingleThreaded<1024*1024, 2046> ddrLoAllocator;
-	BitmapAllocator_SingleThreaded<1024*1024, 2048> ddrHiAllocator;
+	BitmapAllocator_SingleThreaded<64*1024, 2046*16> ddrLoAllocator;
+	BitmapAllocator_SingleThreaded<64*1024, 2048*16> ddrHiAllocator;
 
 	BitmapAllocator_SingleThreaded<64, 4096> tmpOsBufferAllocator;
 	uint8_t tmpBuffer[64 * 4096];

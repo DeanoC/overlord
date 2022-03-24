@@ -19,7 +19,7 @@ uint8_t ZModem::ReadNextByte() {
 		auto const startOfBuffer = (uint8_t *) this->tmpBufferAddr;
 		uint8_t b = startOfBuffer[this->tmpBufferIndex++];
 		if (this->tmpBufferIndex == this->tmpBufferSize) {
-			osHeap->tmpOsBufferAllocator.Free(this->tmpBufferAddr);
+			osHeap->tmpOsBufferAllocator.Free(this->tmpBufferAddr, this->tmpBufferSize/64);
 			this->tmpBufferSize = 0;
 			this->tmpBufferAddr = 0;
 			this->tmpBufferIndex = 0;
@@ -44,7 +44,7 @@ void ZModem::ReInit() {
 	this->fileBytesRecv = 0;
 	this->Rxframeind = HeaderType::ZHEX;
 	if (this->tmpBufferSize != 0) {
-		osHeap->tmpOsBufferAllocator.Free(this->tmpBufferAddr);
+		osHeap->tmpOsBufferAllocator.Free(this->tmpBufferAddr, this->tmpBufferSize / 64);
 		this->tmpBufferSize = 0;
 		this->tmpBufferAddr = 0;
 		this->tmpBufferIndex = 0;
@@ -61,7 +61,7 @@ void ZModem::ReInit() {
 }
 
 void ZModem::Fini() {
-	osHeap->tmpOsBufferAllocator.Free((uintptr_t) this->sectorBuffer);
+	osHeap->tmpOsBufferAllocator.Free((uintptr_t) this->sectorBuffer, (KSIZE + 1) / 64);
 }
 
 ZModem::Result ZModem::Receive() {

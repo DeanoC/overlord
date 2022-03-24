@@ -4,12 +4,31 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="73b7f681-932b-4979-9f4f-6aee48997ac8" name="Default Changelist" comment="Integrate dlmalloced&#10;Added a per core optimised version (each thread allocs from its own mspace)&#10;Redone bundle to use lz4 frame compression, now compress/decompress on mass rather then each chunk">
+    <list default="true" id="73b7f681-932b-4979-9f4f-6aee48997ac8" name="Default Changelist" comment="Each item in a chunk now gets its own director entry&#10;chunk names removed changed to items">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/host_interface.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/host_interface.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/interrupts/interrupts.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/interrupts/interrupts.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os/ipi3_os_server.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os/ipi3_os_server.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os/os_cpu.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os/os_cpu.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os/os_memory.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os/os_memory.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os_heap.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os_heap.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/zmodem.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/zmodem.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/core/include/core/bitmap_allocator_single_threaded.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/core/include/core/bitmap_allocator_single_threaded.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/core/include/core/bitops.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/core/include/core/bitops.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/src/write_helper.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/src/write_helper.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/include/memory/memory.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/include/memory/memory.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/src/a53/core_malloc.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/src/a53/core_malloc.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/src/a53/malloc-machine.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/src/a53/malloc-machine.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/src/linear_allocator.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/src/linear_allocator.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/multi_core/include/multi_core/core_local.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/multi_core/include/multi_core/core_local.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/include/osservices/ipi3_transport.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/include/osservices/ipi3_transport.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/include/osservices/osservices.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/include/osservices/osservices.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/src/cpu.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/src/cpu.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/src/memory.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/src/memory.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/include/platform/cpu.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/include/platform/cpu.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/image_convert.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/image_convert.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/image_resource.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/image_resource.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/resource_bundle_writer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/resource_bundle_writer.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/resource_bundle_writer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/resource_bundle_writer.hpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -341,7 +360,7 @@
       <workItem from="1647381241683" duration="596000" />
       <workItem from="1647415408465" duration="1738000" />
       <workItem from="1647504541496" duration="596000" />
-      <workItem from="1647861638255" duration="794000" />
+      <workItem from="1647861638255" duration="1455000" />
     </task>
     <task id="LOCAL-00001" summary="Major work on connection expansion and block connections&#10;Refactor and reorg instances, constraits, actions etc.&#10;moved ps8 docs to lower case">
       <created>1605964442645</created>
@@ -644,7 +663,14 @@
       <option name="project" value="LOCAL" />
       <updated>1647861787020</updated>
     </task>
-    <option name="localTasksCounter" value="44" />
+    <task id="LOCAL-00044" summary="Each item in a chunk now gets its own director entry&#10;chunk names removed changed to items">
+      <created>1647875728666</created>
+      <option name="number" value="00044" />
+      <option name="presentableId" value="LOCAL-00044" />
+      <option name="project" value="LOCAL" />
+      <updated>1647875728666</updated>
+    </task>
+    <option name="localTasksCounter" value="45" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -691,7 +717,6 @@
       <path value="$PROJECT_DIR$/../ikuy_utils" />
       <path value="$USER_HOME$/.sbt/1.0/staging/a7772c47d5d7e84d3e85/ikuy_utils" />
     </ignored-roots>
-    <MESSAGE value="Copy CMSIS-SVD.xsd to project to validate our svd&#10;Add stdResources paths to Resources Object" />
     <MESSAGE value="Refactored parameters and attribute merging etc.&#10;Definition no longer have parameters, only gateware does.&#10;Instance merge all attributes, ports etc.&#10;Cpu and Bus Instance now use lazy variable and the merged attributes instead of custom constructor parameters" />
     <MESSAGE value="DistanceMatrix fixed added NonRoute flag and using negative numbers as markers&#10;Lots of work with C Header output&#10;Work on fixing hardware" />
     <MESSAGE value="New distancematrix and routematrix algorithm&#10;Now using Dijkstra shortest path algo&#10;Takes into account connection directions&#10;Better logging of DistanceMatrix and RouteMatrix" />
@@ -716,7 +741,8 @@
     <MESSAGE value="Renamed hw lib to platform&#10;host_platform now integrated in platform, so less if($CPU == host) needed" />
     <MESSAGE value="memory has linear and stack allocators now&#10;memory tracking seperated and compiles on non host-platform&#10;mutex gains recursive capabilities&#10;slice added (TODO C Slice) &#10;tinystl -&gt; tiny_stl&#10;Lots of cleanup of tiny_stl with allocator support&#10;resource_bundle + writer updated to new tiny_stl and use of stack allocator" />
     <MESSAGE value="Integrate dlmalloced&#10;Added a per core optimised version (each thread allocs from its own mspace)&#10;Redone bundle to use lz4 frame compression, now compress/decompress on mass rather then each chunk" />
-    <option name="LAST_COMMIT_MESSAGE" value="Integrate dlmalloced&#10;Added a per core optimised version (each thread allocs from its own mspace)&#10;Redone bundle to use lz4 frame compression, now compress/decompress on mass rather then each chunk" />
+    <MESSAGE value="Each item in a chunk now gets its own director entry&#10;chunk names removed changed to items" />
+    <option name="LAST_COMMIT_MESSAGE" value="Each item in a chunk now gets its own director entry&#10;chunk names removed changed to items" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />

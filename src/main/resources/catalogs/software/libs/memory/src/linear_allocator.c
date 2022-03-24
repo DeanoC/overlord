@@ -39,10 +39,10 @@ static void * linearRealloc(Memory_Allocator* allocator, void *ptr, size_t size)
 	// we never extends always alloc and copy
 	void * ret = linearMalloc(allocator, size);
 	if(!ret) {
+		return nullptr;
+	} else {
 		memcpy(ret, ptr, size);
 		return ret;
-	} else {
-		return nullptr;
 	}
 }
 

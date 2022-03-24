@@ -268,8 +268,7 @@ void WriteHelper::align()
 
 void WriteHelper::reserveLabel(tiny_stl::string_view const &name_, bool makeDefault)
 {
-
-	tiny_stl::string label(name_, allocator);
+	tiny_stl::string label(nameToLabel(name_), allocator);
 
 	assert(labels.find(label) == labels.end());
 	labels.insert(label);
@@ -287,7 +286,7 @@ void WriteHelper::writeLabel(tiny_stl::string_view const &name_,
 {
 	if (reserve_) reserveLabel(name_);
 
-	tiny_stl::string name(name_, allocator);
+	tiny_stl::string name(nameToLabel(name_), allocator);
 
 	assert(labels.find(name) != labels.end());
 	align();
@@ -305,7 +304,7 @@ void WriteHelper::useLabel(tiny_stl::string_view const & name_,
 	MEMORY_STACK_ALLOCATOR(_, 1024);
 	if (reserve_) reserveLabel(name_);
 
-	tiny_stl::string name(name_, _);
+	tiny_stl::string name(nameToLabel(name_), _);
 
 	assert(labels.find(name) != labels.end());
 

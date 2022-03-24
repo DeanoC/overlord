@@ -528,6 +528,7 @@ void Memory_TrackerDestroyAndLogLeaks() {
 
 #else
 
+void Memory_TrackerDestroyAndLogLeaks() {}
 
 #endif
 

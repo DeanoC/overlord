@@ -5,14 +5,6 @@
     <option name="openedFilesInfos">
       <list>
         <OpenedFileInfo>
-          <option name="caretOffset" value="656" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/CMakeLists.txt" />
-        </OpenedFileInfo>
-        <OpenedFileInfo>
-          <option name="caretOffset" value="784" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/multi_core/CMakeLists.txt" />
-        </OpenedFileInfo>
-        <OpenedFileInfo>
           <option name="caretOffset" value="543" />
           <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/vfile_memory/CMakeLists.txt" />
         </OpenedFileInfo>
@@ -33,16 +25,8 @@
           <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/tiny_stl.toml" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="1777" />
+          <option name="caretOffset" value="395" />
           <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs.toml" />
-        </OpenedFileInfo>
-        <OpenedFileInfo>
-          <option name="caretOffset" value="0" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/CMakeLists.txt" />
-        </OpenedFileInfo>
-        <OpenedFileInfo>
-          <option name="caretOffset" value="657" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/CMakeLists.txt" />
         </OpenedFileInfo>
       </list>
     </option>

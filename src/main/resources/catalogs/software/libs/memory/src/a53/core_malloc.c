@@ -8,7 +8,14 @@ typedef struct Memory_HeapAllocator {
 		CORE_LOCAL(void*, threadMSpaces);
 } Memory_HeapAllocator;
 
-#define INITIAL_PER_CORE_ALLOC (1024*1024)
+#define INITIAL_PER_CORE_ALLOC (64*1024)
+#define ALWAYS_LOCK 0
+
+#if ALWAYS_LOCK == 1
+#define NOLOCK false
+#else
+#define NOLOCK true
+#endif
 
 ALWAYS_INLINE void coreMemoryInit(Memory_HeapAllocator* heap) {
 	if(READ_CORE_LOCAL(heap->threadMSpaces) == nullptr) {
@@ -19,19 +26,19 @@ ALWAYS_INLINE void coreMemoryInit(Memory_HeapAllocator* heap) {
 static void* coreMallocMalloc(Memory_Allocator* allocator, size_t size) {
 	Memory_HeapAllocator * heap = (Memory_HeapAllocator*)allocator;
 	coreMemoryInit(heap);
-	return mspace_malloc( READ_CORE_LOCAL(heap->threadMSpaces), size, true);
+	return mspace_malloc( READ_CORE_LOCAL(heap->threadMSpaces), size, NOLOCK);
 }
 
 static void* coreMallocAalloc(Memory_Allocator* allocator, size_t alignment, size_t size) {
 	Memory_HeapAllocator * heap = (Memory_HeapAllocator*)allocator;
 	coreMemoryInit(heap);
-	return mspace_memalign(READ_CORE_LOCAL(heap->threadMSpaces), alignment, size, true);
+	return mspace_memalign(READ_CORE_LOCAL(heap->threadMSpaces), alignment, size, NOLOCK);
 }
 
 static void *coreMallocCalloc(Memory_Allocator* allocator, size_t count, size_t size) {
 	Memory_HeapAllocator * heap = (Memory_HeapAllocator*)allocator;
 	coreMemoryInit(heap);
-	return mspace_calloc(READ_CORE_LOCAL(heap->threadMSpaces), count, size, true);
+	return mspace_calloc(READ_CORE_LOCAL(heap->threadMSpaces), count, size, NOLOCK);
 }
 
 static void* coreMallocRealloc(Memory_Allocator* allocator, void * mem, size_t size) {
@@ -42,7 +49,7 @@ static void* coreMallocRealloc(Memory_Allocator* allocator, void * mem, size_t s
 		return mspace_realloc(READ_CORE_LOCAL(heap->threadMSpaces), mem, size, false);
 	}
 	else {
-		return mspace_realloc(READ_CORE_LOCAL(heap->threadMSpaces), mem, size, true);
+		return mspace_realloc(READ_CORE_LOCAL(heap->threadMSpaces), mem, size, NOLOCK);
 	}
 
 }
@@ -55,7 +62,7 @@ static void coreMallocFree(Memory_Allocator* allocator, void* ptr) {
 		mspace_free(m, ptr, false);
 	} else {
 		// allocated from out cores mspace so we can free with no contention
-		mspace_free(m,ptr, true);
+		mspace_free(m,ptr, NOLOCK);
 	}
 }
 
