@@ -35,9 +35,9 @@ endif()
 set(PRIVATE_LIBRARIES
 		core
 		dbg
-		platform
 		memory
     multi_core
+		platform
 		tiny_image_format
 		)
 if(NOT ${CPU} STREQUAL "host")

@@ -77,8 +77,9 @@ trait GatewareDefinitionTrait extends ChipDefinitionTrait {
 }
 
 trait SoftwareDefinitionTrait extends DefinitionTrait {
-	val actionsFile: ActionsFile
-	val parameters : Map[String, Variant]
+	val actionsFile : ActionsFile
+	val parameters  : Map[String, Variant]
+	val dependencies: Seq[String]
 
 	def createInstance(name: String,
 	                   attribs: Map[String, Variant]
@@ -86,7 +87,7 @@ trait SoftwareDefinitionTrait extends DefinitionTrait {
 		defType match {
 			case _: LibraryDefinitionType => LibraryInstance(name, this, attribs)
 			case _: ProgramDefinitionType => ProgramInstance(name, this, attribs)
-			case _                        => println(s"$defType is invalid for software\n");
+			case _                        => println(s"$defType is invalid for software\n")
 				None
 		}
 	}

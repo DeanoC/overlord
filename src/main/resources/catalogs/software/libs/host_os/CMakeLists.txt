@@ -40,8 +40,8 @@ set(PRIVATE_LIBRARIES
 		core
 		dbg
 		memory
-		vfile
 		platform
+		vfile
 		)
 
 if(SRCS_LENGTH)

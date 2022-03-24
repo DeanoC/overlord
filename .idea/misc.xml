@@ -5,28 +5,31 @@
     <option name="openedFilesInfos">
       <list>
         <OpenedFileInfo>
-          <option name="caretOffset" value="543" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/vfile_memory/CMakeLists.txt" />
+          <option name="caretOffset" value="10004" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/scala/overlord/Game.scala" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="1032" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/src/host/backward.cpp" />
+          <option name="caretOffset" value="3286" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/scala/output/Software.scala" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="0" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/core/core.toml" />
+          <option name="caretOffset" value="99" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/scala/overlord/Instances/SoftwareInstance.scala" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="0" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/memory.toml" />
+          <option name="caretOffset" value="1941" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/scala/overlord/Software/SoftwareDefinition.scala" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="0" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/tiny_stl.toml" />
+          <option name="caretOffset" value="1056" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/scala/overlord/DefinitionType.scala" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="395" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs.toml" />
+          <option name="caretOffset" value="991" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software.toml" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="fileUrl" value="mock:///DiffPreview" />
         </OpenedFileInfo>
       </list>
     </option>

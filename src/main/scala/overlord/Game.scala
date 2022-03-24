@@ -168,18 +168,16 @@ object Game {
 
 			// pass the board as if it had been a prefab in the main project file
 			val boardInsertV = Map[String, Variant](
-				("instance" -> ArrayV(Array(
+				"instance" -> ArrayV(Array(
 					TableV(
 						Map[String, Variant](
 							"name" -> StringV(s"$board"),
 							"type" -> StringV(s"board.$board"))
-						)))
-					),
-				("prefab" -> ArrayV(Array(
+						))),
+				"prefab" -> ArrayV(Array(
 					TableV(
 						Map[String, Variant]("name" -> StringV(s"boards.$board"))
-						)))
-					))
+						))))
 			ProcessInstantiation(boardInsertV, rootContainer)
 			// flatten all containers
 			for (c <- containerStack.popAll()) {
@@ -198,7 +196,7 @@ object Game {
 			// get software (libraries, boot rooms)
 			val softInstances = top.children.
 				filter(_.isInstanceOf[SoftwareInstance]).
-				map(_.asInstanceOf[SoftwareInstance])
+				map(_.asInstanceOf[SoftwareInstance]).distinct
 
 			Some(Game(gameName,
 			          chipInstances ++ softInstances,
@@ -215,14 +213,14 @@ object Game {
 			Utils.ensureDirectories(gatePath)
 
 			// preconnect for bus address allocations
-			Connection.preConnect(top.connections.toSeq, chipInstances)
+			Connection.preConnect(top.connections, chipInstances)
 
 			// run gateware actions
 			OutputGateware(top, gatePath, 1)
 			OutputGateware(top, gatePath, 2)
 
 			// connect chips
-			val connected = Connection.connect(top.connections.toSeq, chipInstances)
+			val connected = Connection.connect(top.connections, chipInstances)
 
 			// instances that are connected to buses need a register bank
 			val buses = chipInstances.filter(_.isInstanceOf[BusInstance])
@@ -276,8 +274,34 @@ object Game {
 
 			// extract instances
 			if (parsed.contains("instance")) {
-				val instances = Utils.toArray(parsed("instance"))
-				container.children ++= instances.flatMap(Instance(_, defaults.toMap, catalogs))
+				val instancesWanted = Utils.toArray(parsed("instance"))
+				// so software dependecies
+				val instances       = instancesWanted.flatMap(Instance(_,
+				                                                       defaults.toMap,
+				                                                       catalogs))
+				val softInstances   = {
+					val sis          = instances.filter(_.isInstanceOf[SoftwareInstance])
+						.map(_.asInstanceOf[SoftwareInstance])
+					val allDeps      = (for (si <- sis) yield si.definition.dependencies)
+						.flatten
+						.distinct
+					val existingLibs = sis.flatMap {
+						inst =>
+							if (inst.isInstanceOf[Instances.LibraryInstance]) {
+								Some(inst.name)
+							} else None
+					}
+					val depsRequired = allDeps.diff(existingLibs)
+					sis ++ depsRequired.flatMap(n => catalogs.findDefinition(
+						LibraryDefinitionType(Seq("library", s"$n"))) match {
+						case Some(value) => value.createInstance(n, Map[String, Variant]())
+						case None        => None
+					})
+				}.map(_.asInstanceOf[SoftwareInstance])
+
+				container.children ++= (instances ++ softInstances)
+				println(softInstances.map(_.ident).mkString("Array(", ", ", ")"))
+				println(softInstances.map(_.ident).mkString("Array(", ", ", ")"))
 			}
 
 			// extract connections

@@ -12,41 +12,6 @@ name = "socs.zynqps8.r5f"
 [[prefab]]
 name = "socs.zynqps8.pmu"
 
-# standard platform libraries
-[[instance]]
-type = "library.core"
-
-[[instance]]
-type = "library.multi_core"
-
-[[instance]]
-type = "library.utils"
-
-[[instance]]
-type = "library.platform"
-
-[[instance]]
-type = "library.dbg"
-
-[[instance]]
-type = "library.osservices"
-
-
-[[instance]]
-type = "library.display_port.zynqps8"
-
-[[instance]]
-type = "library.dma.zynqps8"
-
-[[instance]]
-type = "library.gfxdebug"
-
-[[instance]]
-type = "library.musl_math"
-
-[[instance]]
-type = "library.xilinx.zynqps8"
-
 # boot rom
 [[instance]]
 type = "program.bootrom.zynqps8"

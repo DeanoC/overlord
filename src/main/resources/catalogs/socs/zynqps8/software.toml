@@ -1,30 +1,32 @@
 
 [[definition]]
-name = "zynqps8_display_port"
-type = "library.display_port.zynqps8"
+type = "library.display_port_zynqps8"
 software = "software/libs/display_port/display_port.toml"
 cpus = "a53"
+depends = ["core", "dbg", "osservices", "platform", "utils"]
 
 [[definition]]
-name = "zynqps8_dma"
-type = "library.dma.zynqps8"
+type = "library.dma_zynqps8"
 software = "software/libs/dma/dma.toml"
 cpus = "a53,pmu,r5f"
+depends = ["core", "dbg", "platform", "osservices", "utils"]
 
 [[definition]]
-name = "xilinx"
-type = "library.xilinx.zynqps8"
+type = "library.xilinx_zynqps8"
 software = "software/libs/xilinx/xilinx.toml"
 cpus = "a53,pmu,r5f"
+depends = ["core", "dbg", "utils"]
 
 [[definition]]
 name = "ikuy_boot"
 type = "program.bootrom.zynqps8"
 software = "software/programs_a53/ikuy_boot/ikuy_boot.toml"
 cpus = "a53"
+depends = ["core", "dbg", "gfxdebug", "osservices", "platform", "utils", "xilinx_zynqps8", "display_port_zynqps8"]
 
 [[definition]]
 name = "pmu_monitor"
 type = "program.pmu_monitor"
 software = "software/programs_pmu/pmu_monitor/pmu_monitor.toml"
 cpus = "pmu"
+depends = ["core", "dbg", "gfxdebug", "osservices", "platform", "utils", "dma_zynqps8"]

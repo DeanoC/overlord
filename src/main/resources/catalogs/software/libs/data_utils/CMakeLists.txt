@@ -47,8 +47,8 @@ add_library(${project} ${CLIST} ${CPPLIST} ${ASMLIST} ${CHEADERLIST} ${CPPHEADER
 target_link_libraries(${project} PRIVATE core)
 target_link_libraries(${project} PRIVATE dbg)
 target_link_libraries(${project} PRIVATE memory)
-target_link_libraries(${project} PRIVATE platform)
 target_link_libraries(${project} PRIVATE multi_core)
+target_link_libraries(${project} PRIVATE platform)
 target_link_libraries(${project} PRIVATE vfile)
 
 target_include_directories(${project} PUBLIC include)
