@@ -5,25 +5,30 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 
 file(GLOB SRCLIST CONFIGURE_DEPENDS src/*.c src/*.cpp)
-add_executable(${project} ${SRCLIST})
 
-target_link_libraries(${project} PRIVATE core)
-target_link_libraries(${project} PRIVATE dbg)
-target_link_libraries(${project} PRIVATE memory)
-target_link_libraries(${project} PRIVATE cadt)
-target_link_libraries(${project} PRIVATE utils)
-target_link_libraries(${project} PRIVATE multi_core)
-target_link_libraries(${project} PRIVATE vfile)
-target_link_libraries(${project} PRIVATE vfile_memory)
-target_link_libraries(${project} PRIVATE tiny_image_format)
-target_link_libraries(${project} PRIVATE gfx_image)
-target_link_libraries(${project} PRIVATE host_os)
-target_link_libraries(${project} PRIVATE luau_compiler)
-target_link_libraries(${project} PRIVATE luau_ast)
-target_link_libraries(${project} PRIVATE luau_hvm)
-target_link_libraries(${project} PRIVATE data_utils)
-target_link_libraries(${project} PRIVATE data_binify)
-target_link_libraries(${project} PRIVATE tiny_stl)
+set(PRIVATE_LIBRARIES
+			core
+			library_defines
+			dbg
+			memory
+			cadt
+			utils
+			multi_core
+			vfile
+			vfile_memory
+			tiny_image_format
+			image
+			host_os
+			luau_compiler
+			luau_ast
+			luau_hvm
+			data_binify
+			tiny_stl
+			resource_bundle
+			resource_bundle_writer)
+
+add_executable(${project} ${SRCLIST})
+target_link_libraries(${project} PRIVATE ${PRIVATE_LIBRARIES})
 target_link_libraries(${project} PRIVATE pthread)
 
 add_compile_definitions(${project} BOARD_${BOARD}=1 SOC_${SOC}=1 CPU_${CPU}=1 CPU_ARCH_${CPU_ARCH}=1)

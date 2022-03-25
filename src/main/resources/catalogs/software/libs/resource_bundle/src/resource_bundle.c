@@ -4,8 +4,7 @@
 #include "memory/memory.h"
 #include "vfile/vfile.h"
 #include "data_utils/lz4.h"
-#include "data_utils/crc32c.h"
-#include "resource_bundle.h"
+#include "resource_bundle/resource_bundle.h"
 
 static enum ResourceBundle_ErrorCode DoFixups(ResourceBundle_Header * const actualHeader,
                      ResourceBundle_CompressionHeader const * const compressionHeader,

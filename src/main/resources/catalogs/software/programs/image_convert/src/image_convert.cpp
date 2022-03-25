@@ -6,18 +6,16 @@
 #include "host_os/osvfile.h"
 #include "host_os/filesystem.h"
 #include "Luau/Compiler.h"
-#include "vfile_memory/memory.h"
-#include "host_os/osvfile.h"
-#include "resource_bundle.h"
+#include "resource_bundle/resource_bundle.h"
 
 #define BACKWARD_HAS_DW 1
 #include "platform/host/backward.hpp"
 #include <memory>
 #include <string>
 #include <optional>
-#include "resource_bundle_writer.hpp"
-#include "gfx_image/create.h"
-#include "image_resource.h"
+#include "resource_bundle_writer/resource_bundle_writer.hpp"
+#include "image/create.h"
+#include "image/resource_writer.hpp"
 extern int LuaImage_Open(lua_State* L, Memory_Allocator* allocator);
 
 GLOBAL_HEAP_ALLOCATOR(globalAllocator)

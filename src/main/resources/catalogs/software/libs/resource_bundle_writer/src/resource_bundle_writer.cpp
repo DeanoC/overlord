@@ -3,12 +3,10 @@
 #include "tiny_stl/algorithm.hpp"
 #include "data_binify/data_binify.h"
 #include "data_utils/lz4.h"
-#include "vfile_memory/memory.h"
-#include "resource_bundle.h"
-#include "resource_bundle_writer.hpp"
+#include "resource_bundle/resource_bundle.h"
+#include "resource_bundle_writer/resource_bundle_writer.hpp"
 #include "data_binify/write_helper.hpp"
 #include "dbg/print.h"
-#include "core/math.h"
 
 namespace Binny {
 	using namespace Binify;
@@ -17,9 +15,7 @@ namespace Binny {
 			addressLength(addressLength_),
 			allocator(allocator_),
 			chunkRegistry(allocator_),
-			o(allocator_),
-			fixup64Bits(fixup64bit_),
-			compressionBlockSize(64*1024)
+			o(allocator_)
 	{
 		assert(addressLength == 64 || addressLength == 32);
 		o.setAddressLength(addressLength);

@@ -1,5 +1,7 @@
-set(project gfx_image)
-project(${project} C ASM CXX)
+set(project resource_bundle)
+project(${project} C ASM)
+
+set(CMAKE_C_STANDARD 11)
 
 # requires parent cmake project to set BOARD_ SOC_ CPU_ and CPU_ARCH
 file(GLOB CLIST CONFIGURE_DEPENDS
@@ -9,13 +11,6 @@ file(GLOB CLIST CONFIGURE_DEPENDS
 		src/${CPU_ARCH}/*.c
 		src/${CPU}/*.c )
 
-file(GLOB CPPLIST CONFIGURE_DEPENDS
-		src/*.cpp
-		src/${BOARD}/*.cpp
-		src/${SOC}/*.cpp
-		src/${CPU_ARCH}/*.cpp
-		src/${CPU}/*.cpp )
-
 file(GLOB ASMLIST CONFIGURE_DEPENDS
 		src/*.S
 		src/${BOARD}/*.S
@@ -23,33 +18,35 @@ file(GLOB ASMLIST CONFIGURE_DEPENDS
 		src/${CPU_ARCH}/*.S
 		src/${CPU}/*.S )
 
-set( SRCS ${CLIST} ${CPPLIST} ${ASMLIST})
-if(DEFINED SRCS)
-	list(LENGTH SRCS SRCS_LENGTH)
-endif()
+file(GLOB HEADERLIST CONFIGURE_DEPENDS
+		include/*.h
+		include/${BOARD}/*.h
+		include/${SOC}/*.h
+		include/${CPU_ARCH}/*.h
+		include/${CPU}/*.h
+		)
 
+set( SRCS ${CLIST} ${ASMLIST})
 if(DEFINED SRCS)
 	list(LENGTH SRCS SRCS_LENGTH)
 endif()
 
 set(PRIVATE_LIBRARIES
 		core
+		data_utils
 		dbg
 		memory
-    multi_core
 		platform
-		tiny_image_format
+		vfile
 		)
-if(NOT ${CPU} STREQUAL "host")
-	list(APPEND PRIVATE_LIBRARIES musl_math)
-endif()
+
 
 if(SRCS_LENGTH)
-	add_library(${project} ${SRCS})
+	add_library(${project} ${SRCS} ${HEADERLIST})
 	target_include_directories(${project} PUBLIC include)
 	target_link_libraries(${project} PRIVATE ${PRIVATE_LIBRARIES})
 else()
-	add_library(${project} INTERFACE)
+	add_library(${project} INTERFACE ${HEADERLIST} )
 	target_include_directories(${project} INTERFACE include)
 	target_link_libraries(${project} INTERFACE ${PRIVATE_LIBRARIES})
 endif()

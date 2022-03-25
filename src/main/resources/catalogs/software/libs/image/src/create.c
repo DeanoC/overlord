@@ -2,8 +2,8 @@
 #include "memory/memory.h"
 #include "tiny_image_format/tiny_image_format_base.h"
 #include "tiny_image_format/tiny_image_format_query.h"
-#include "gfx_image/image.h"
-#include "gfx_image/create.h"
+#include "image/image.h"
+#include "image/create.h"
 
 Image_ImageHeader * Image_Create1D(uint32_t width, enum TinyImageFormat format, Memory_Allocator* memoryAllocator) {
 	return Image_Create(width, 1, 1, 1, format, memoryAllocator);

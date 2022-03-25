@@ -281,7 +281,7 @@ inline pair<typename unordered_map<Key, Value, Hash>::iterator, bool> unordered_
 template<typename Key, typename Value, class Hash>
 inline void unordered_map<Key, Value, Hash>::erase(const_iterator where) {
 	unordered_hash_node_erase(where.node,
-														hash(where->first),
+														hash<Hash>(where->first),
 														m_buckets.first,
 														(size_t) (m_buckets.last - m_buckets.first) - 1);
 
@@ -313,7 +313,7 @@ inline pair<typename unordered_map<Key, Value, Hash>::iterator, bool> unordered_
 		result.first.node->second = obj;
 		result.second = false;
 	} else {
-		insert(pair(k, obj));
+		insert(pair<Key,Value>(k, obj));
 		result.second = true;
 	}
 	return result;
@@ -334,7 +334,7 @@ inline pair<typename unordered_map<Key, Value, Hash>::iterator, bool> unordered_
 		result.first.node->second = obj;
 		result.second = false;
 	} else {
-		insert(pair(k, obj));
+		insert(pair<Key, Value>(k, obj));
 		result.second = true;
 	}
 	return result;
@@ -351,7 +351,7 @@ inline pair<typename unordered_map<Key, Value, Hash>::iterator, bool> unordered_
 		result.first.node->second = obj;
 		result.second = false;
 	} else {
-		insert(pair(k, obj));
+		insert(pair<Key, Value>(k, obj));
 		result.second = true;
 	}
 	return result;
@@ -372,7 +372,7 @@ inline pair<typename unordered_map<Key, Value, Hash>::iterator, bool> unordered_
 		result.first.node->second = obj;
 		result.second = false;
 	} else {
-		insert(pair(k, obj));
+		insert(pair<Key,Value>(k, obj));
 		result.second = true;
 	}
 	return result;

@@ -38,7 +38,7 @@ namespace tiny_stl {
 	public:
 		unordered_set(Memory_Allocator* allocator_);
 		unordered_set(const unordered_set& other);
-		unordered_set(unordered_set&& other);
+		unordered_set(unordered_set&& other) noexcept;
 		~unordered_set();
 
 		unordered_set& operator=(const unordered_set& other);
@@ -92,13 +92,13 @@ namespace tiny_stl {
 			void* mem = MALLOC(m_buckets.allocator, sizeof(unordered_hash_node<Key, void>));
 			auto newnode = new(placeholder(), mem) unordered_hash_node<Key, void>(*it);
 			newnode->next = newnode->prev = 0;
-			unordered_hash_node_insert(newnode, hash(it->first), m_buckets.first, nbuckets - 1);
+			unordered_hash_node_insert(newnode, hash<Hash>(it->first), m_buckets.first, nbuckets - 1);
 		}
 	}
 
 	template<typename Key, class Hash>
-	inline unordered_set<Key, Hash>::unordered_set(unordered_set&& other)
-		: m_size(other.m_size)
+	inline unordered_set<Key, Hash>::unordered_set(unordered_set&& other) noexcept
+	: m_size(other.m_size)
 	{
 		buffer_move(&m_buckets, &other.m_buckets);
 		other.m_size = 0;
@@ -241,7 +241,7 @@ namespace tiny_stl {
 
 	template<typename Key, class Hash>
 	inline void unordered_set<Key, Hash>::erase(iterator where) {
-		unordered_hash_node_erase(where.node, hash(where.node->first), m_buckets.first, (size_t)(m_buckets.last - m_buckets.first) - 1);
+		unordered_hash_node_erase(where.node, hash<Hash>(where.node->first), m_buckets.first, (size_t)(m_buckets.last - m_buckets.first) - 1);
 
 		where.node->~unordered_hash_node<Key, void>();
 		MFREE(m_buckets.allocator, (void*)where.node);

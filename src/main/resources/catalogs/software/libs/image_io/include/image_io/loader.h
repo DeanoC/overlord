@@ -2,7 +2,7 @@
 
 #include "core/core.h"
 #include "memory/memory.h"
-#include "gfx_image/image.h"
+#include "image/image.h"
 #include "vfile/vfile.h"
 
 EXTERN_C Image_ImageHeader * Image_LoadPVR(VFile_Handle handle, Memory_Allocator* allocator);

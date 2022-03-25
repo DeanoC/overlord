@@ -3,7 +3,7 @@
 #include "memory/memory.h"
 #include "vfile/vfile.h"
 #include "tiny_image_format/tiny_image_format_base.h"
-#include "gfx_image/image.h"
+#include "image/image.h"
 
 #include "stb_image_write.h"
 #include "tiny_ktx.h"

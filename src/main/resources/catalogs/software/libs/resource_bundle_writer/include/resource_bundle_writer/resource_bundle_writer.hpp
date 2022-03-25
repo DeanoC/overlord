@@ -7,7 +7,7 @@
 #include "tiny_stl/string.hpp"
 #include "memory/memory.h"
 #include "data_binify/write_helper.hpp"
-#include "resource_bundle.h"
+#include "resource_bundle/resource_bundle.h"
 
 namespace Binny {
 
@@ -18,8 +18,6 @@ namespace Binny {
 				BundleWriter( int addressLength_, bool fixup64bit_, Memory_Allocator* allocator_);
 
 				using ChunkWriter = std::function<void( void * userData, Binify::WriteHelper& helper )>;
-
-				void setCompressionBlockSize(uint32_t size_) { compressionBlockSize = size_; }
 
 				/// @param ChunkWriter will be called at build time for each item of this chunk
 				/// @return true if successful
@@ -59,8 +57,6 @@ namespace Binny {
 
 				tiny_stl::unordered_map<uint32_t, DirEntryWriter> chunkRegistry;
 				bool logBinifyText = false;
-				uint32_t compressionBlockSize;
-				bool fixup64Bits;
 		};
 
 } // end namespace

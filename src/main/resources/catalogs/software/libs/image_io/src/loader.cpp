@@ -2,7 +2,7 @@
 #include "dbg/print.h"
 #include "core/compile_time_hash.hpp"
 #include "core/utf8.h"
-#include "imageio_loader.h"
+#include "image_io/loader.h"
 
 Image_ImageHeader * Image_Load(VFile_Handle handle, Memory_Allocator* allocator) {
 	char const * name = VFile_GetName(handle);

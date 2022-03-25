@@ -4,8 +4,8 @@
 #include "tiny_image_format/tiny_image_format_query.h"
 #include "tiny_image_format/tiny_image_format_decode.h"
 #include "tiny_image_format/tiny_image_format_encode.h"
-#include "gfx_image/image.h"
-#include "gfx_image/copy.h"
+#include "image/image.h"
+#include "image/copy.h"
 
 
 void Image_CopyImageChain(Image_ImageHeader const *src, Image_ImageHeader *dst) {

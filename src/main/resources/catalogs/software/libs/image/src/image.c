@@ -6,7 +6,7 @@
 #include "tiny_image_format/tiny_image_format_query.h"
 #include "tiny_image_format/tiny_image_format_decode.h"
 #include "tiny_image_format/tiny_image_format_encode.h"
-#include "gfx_image/image.h"
+#include "image/image.h"
 #include "dbg/print.h"
 
 size_t Image_ByteCountOfImageChainOf(Image_ImageHeader const *image) {

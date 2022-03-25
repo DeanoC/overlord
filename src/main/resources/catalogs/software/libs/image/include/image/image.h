@@ -1,10 +1,11 @@
 #pragma once
 #include "core/core.h"
 #include "dbg/assert.h"
-#include "gfx_image/pixel.h"
+#include "image/pixel.h"
 #include "tiny_image_format/tiny_image_format_base.h"
 #include "tiny_image_format/tiny_image_format_query.h"
 
+#undef image
 #ifdef __cplusplus
 extern "C"
 {

@@ -1,13 +1,21 @@
+//
+// Created by deano on 3/25/22.
+//
 #include "core/core.h"
-#include "host_os/osvfile.h"
-#include "multi_core/core_local.h"
-#include "gfx_image/create.h"
-#include "gfx_image/copy.h"
-#include "imageio_saver.h"
-#include "imageio_loader.h"
+#include "library_defines/library_defines.h"
 
-//#include "gfx_image/utils.h"
-//#include "gfx_imagecompress/imagecompress.h"
+#if IKUY_HAVE_LIB_LUAU == 1 || IKUY_HAVE_LIB_LUAU_VM
+#include "multi_core/core_local.h"
+#include "image/create.h"
+#include "image/copy.h"
+
+#include "host_os/osvfile.h"
+
+#if IKUY_HAVE_LIB_IMAGE_IO == 1
+#include "image_io/saver.h"
+#include "image_io/loader.h"
+#endif
+
 #include "lua.h"
 #include "lualib.h"
 
@@ -24,8 +32,6 @@ static void imageud_gc (void *image_) {
 static Image_ImageHeader const** imageud_create(lua_State *L) {
 	// allocate a pointer and push it onto the stack
 	auto ud = (Image_ImageHeader const**)lua_newuserdatadtor(L, sizeof(Image_ImageHeader*), &imageud_gc);
-
-
 	if(ud == nullptr) return nullptr;
 
 	*ud = nullptr;
@@ -651,6 +657,8 @@ static int compressAMDBC7(lua_State *L) {
 }
 
 */
+#if IKUY_HAVE_LIB_IMAGE_IO == 1
+
 static int load(lua_State * L) {
 	char const* filename = luaL_checkstring(L, 1);
 
@@ -827,6 +835,8 @@ static int canSaveAsKTX(lua_State * L) {
 	lua_pushboolean(L, ret);
 	return 1;
 }
+#endif // IKUY_HAVE_LIB_IMAGE_IO == 1
+
 /*
 ** set functions from list 'l' into table at top - 'nup'; each
 ** function gets the 'nup' elements at the top as upvalues.
@@ -846,7 +856,7 @@ LUALIB_API void luaL_setfuncs (lua_State *L, const luaL_Reg *l, int nup) {
 
 int LuaImage_Open(lua_State* L, Memory_Allocator* allocator) {
 	static const struct luaL_Reg imageObj [] = {
-#define ENTRY(name) { #name, &name }
+#define ENTRY(name) { #name, &(name) }
 			ENTRY(width),
 			ENTRY(height),
 			ENTRY(depth),
@@ -882,18 +892,19 @@ int LuaImage_Open(lua_State* L, Memory_Allocator* allocator) {
 			ENTRY(clone),
 			ENTRY(cloneStructure),
 			ENTRY(preciseConvert),
-/*
-			{"createMipMapChain", &createMipMapChain},
-      {"fastConvert", &fastConvert},
+			/*
+						{"createMipMapChain", &createMipMapChain},
+						{"fastConvert", &fastConvert},
 
-			{"compressAMDBC1", &compressAMDBC1},
-			{"compressAMDBC2", &compressAMDBC2},
-			{"compressAMDBC3", &compressAMDBC3},
-			{"compressAMDBC4", &compressAMDBC4},
-			{"compressAMDBC5", &compressAMDBC5},
-			{"compressAMDBC6H", &compressAMDBC6H},
-			{"compressAMDBC7", &compressAMDBC7},
-*/
+						{"compressAMDBC1", &compressAMDBC1},
+						{"compressAMDBC2", &compressAMDBC2},
+						{"compressAMDBC3", &compressAMDBC3},
+						{"compressAMDBC4", &compressAMDBC4},
+						{"compressAMDBC5", &compressAMDBC5},
+						{"compressAMDBC6H", &compressAMDBC6H},
+						{"compressAMDBC7", &compressAMDBC7},
+			*/
+#if IKUY_HAVE_LIB_IMAGE_IO == 1
 			ENTRY(canSaveAsTGA),
 			ENTRY(saveAsTGA),
 			ENTRY(canSaveAsBMP),
@@ -903,16 +914,17 @@ int LuaImage_Open(lua_State* L, Memory_Allocator* allocator) {
 			ENTRY(canSaveAsJPG),
 			ENTRY(saveAsJPG),
 			ENTRY(canSaveAsHDR),
-//			ENTRY(saveAsHDR),
+			//			ENTRY(saveAsHDR),
 			ENTRY(canSaveAsKTX),
 			ENTRY(saveAsKTX),
 			ENTRY(canSaveAsDDS),
 			ENTRY(saveAsDDS),
+#endif
 			{nullptr, nullptr}  /* sentinel */
 	};
 
 	static const struct luaL_Reg imageLib [] = {
-#define ENTRY(name) { #name, &name }
+#define ENTRY(name) { #name, &(name) }
 			ENTRY(create),
 			ENTRY(createNoClear),
 			ENTRY(create1D),
@@ -934,7 +946,9 @@ int LuaImage_Open(lua_State* L, Memory_Allocator* allocator) {
 			ENTRY(createCubemapNoClear),
 			ENTRY(createCubemapArray),
 			ENTRY(createCubemapArrayNoClear),
+#if IKUY_HAVE_LIB_IMAGE_IO == 1
 			ENTRY(load),
+#endif
 			{nullptr, nullptr}  // sentinel
 #undef ENTRY
 	};
@@ -951,3 +965,5 @@ int LuaImage_Open(lua_State* L, Memory_Allocator* allocator) {
 	luaL_register(L, "image", imageLib);
 	return 1;
 }
+
+#endif

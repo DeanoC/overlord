@@ -3,15 +3,15 @@
 #include "memory/memory.h"
 #include "stb_image.h"
 #include "vfile/vfile.h"
-#include "gfx_image/create.h"
-#include "gfx_image/image.h"
+#include "image/create.h"
+#include "image/image.h"
 #include "multi_core/core_local.h"
 #include "tiny_image_format/tiny_image_format_base.h"
 #include "tiny_ktx.h"
 #include "tiny_dds.h"
 //#include "al2o3_syoyo/tiny_exr.hpp"
 //#include "gfx_imageio/basisu.h"
-#include "imageio_loader.h"
+#include "image_io/loader.h"
 
 // PVR loader borrowed from https://github.com/ConfettiFX/The-Forge
 // Describes the header of a PVR header-texture

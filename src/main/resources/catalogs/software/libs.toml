@@ -22,9 +22,15 @@ type = "library.dbg"
 depends = ["core", "platform"]
 
 [[definition]]
-type = "library.gfx_image"
+type = "library.image"
 cpus = "a53,host"
-depends = ["core", "dbg", "memory", "multi_core", "platform", "tiny_image_format", "musl_math"]
+depends = ["core", "dbg", "memory", "multi_core", "platform", "tiny_image_format", "musl_math",
+    "tiny_stl", "resource_bundle", "resource_bundle_writer", "data_binify", "vfile", "utils"]
+
+[[definition]]
+type = "library.image_io"
+cpus = "a53,host"
+depends = ["core", "dbg", "memory", "multi_core", "platform", "tiny_image_format", "musl_math", "vfile", "utils", "image"]
 
 [[definition]]
 type = "library.gfxdebug"
@@ -74,6 +80,16 @@ depends = ["core", "platform", "musl_math"]
 [[definition]]
 type = "library.tiny_stl"
 depends = ["core", "dbg", "multi_core", "platform"]
+
+[[definition]]
+type = "library.resource_bundle"
+depends = ["core", "data_utils", "dbg", "memory", "platform", "vfile"]
+
+[[definition]]
+type = "library.resource_bundle_writer"
+depends = ["core", "data_utils", "dbg", "memory", "platform", "vfile", "tiny_stl",
+    "data_binify", "data_utils", "resource_bundle", "utils"]
+cpus = "host"
 
 [[definition]]
 type = "library.utils"

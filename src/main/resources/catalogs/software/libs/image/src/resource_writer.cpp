@@ -1,8 +1,9 @@
 #include "core/core.h"
-#include "dbg/print.h"
-#include "memory/memory.h"
-#include "image_resource.h"
-#include "gfx_image/image.h"
+#include "library_defines/library_defines.h"
+
+#if IKUY_HAVE_LIB_RESOURCE_BUNDLE_WRITER == 1
+#include "image/resource_writer.hpp"
+#include "image/image.h"
 #include "tiny_stl/string.hpp"
 #include "data_binify/write_helper.hpp"
 
@@ -36,3 +37,6 @@ void ImageChunkWriter(void * userData_, Binify::WriteHelper& helper) {
 		}
 	}
 }
+
+#else
+#endif

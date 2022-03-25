@@ -300,8 +300,6 @@ object Game {
 				}.map(_.asInstanceOf[SoftwareInstance])
 
 				container.children ++= (instances ++ softInstances)
-				println(softInstances.map(_.ident).mkString("Array(", ", ", ")"))
-				println(softInstances.map(_.ident).mkString("Array(", ", ", ")"))
 			}
 
 			// extract connections

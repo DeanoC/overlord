@@ -39,7 +39,8 @@
 #define static_assert(...) _Static_assert(__VA_ARGS__)
 #define NO_RETURN _Noreturn
 #define EXTERN_C extern
-#endif
+#endif // end __cplusplus
+
 #define STACK_ALLOC(x) __builtin_alloca(x)
 
 typedef float float_t;
@@ -66,7 +67,7 @@ ALWAYS_INLINE long unsigned int strlen(char const * const RESTRICT str) {
 #else
 	#include <cstring>
 	#include <string>
-#endif
+#endif // end CPU_Host
 
 #endif
 

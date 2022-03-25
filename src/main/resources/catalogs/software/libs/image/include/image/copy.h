@@ -1,6 +1,6 @@
 #pragma once
 #include "core/core.h"
-#include "gfx_image/image.h"
+#include "image/image.h"
 
 #ifdef __cplusplus
 extern "C"

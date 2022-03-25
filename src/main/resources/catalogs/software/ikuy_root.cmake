@@ -28,5 +28,7 @@ elseif(${CPU} STREQUAL "pmu")
 	set(CPU_ARCH "microblaze")
 endif()
 
+include( "cmakelibrary_defines_${CPU}.cmake" )
+
 add_subdirectory(libs_${CPU})
 add_subdirectory(programs_${CPU})

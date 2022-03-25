@@ -5,31 +5,44 @@
     <option name="openedFilesInfos">
       <list>
         <OpenedFileInfo>
-          <option name="caretOffset" value="10004" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/scala/overlord/Game.scala" />
+          <option name="caretOffset" value="1154" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io/include/image_io/saver.h" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="3286" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/scala/output/Software.scala" />
+          <option name="caretOffset" value="677" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io/include/image_io/loader.h" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="99" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/scala/overlord/Instances/SoftwareInstance.scala" />
+          <option name="caretOffset" value="18045" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io/src/loader.c" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="1941" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/scala/overlord/Software/SoftwareDefinition.scala" />
+          <option name="caretOffset" value="1242" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io/src/loader.cpp" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="1056" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/scala/overlord/DefinitionType.scala" />
+          <option name="caretOffset" value="11314" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io/src/saver.c" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="991" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software.toml" />
+          <option name="caretOffset" value="0" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io/image_io.toml" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="fileUrl" value="mock:///DiffPreview" />
+          <option name="caretOffset" value="789" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io/CMakeLists.txt" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="643" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/CMakeLists.txt" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="409" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/programs.toml" />
+        </OpenedFileInfo>
+        <OpenedFileInfo>
+          <option name="caretOffset" value="921" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs.toml" />
         </OpenedFileInfo>
       </list>
     </option>

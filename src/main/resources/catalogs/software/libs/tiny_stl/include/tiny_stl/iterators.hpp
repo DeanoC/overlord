@@ -52,8 +52,8 @@ struct forward_iterator_impl : public iterator_impl<T, forward_iterator_tag> {
 			return *this;
 		}
 		// post-increment
-		forward_iterator_impl operator++(int) {
-			iterator_impl existing(*this);
+		forward_iterator_impl const operator++(int) {
+			forward_iterator_impl existing(*this);
 			++this->ptr;
 			return existing;
 		}
@@ -76,8 +76,8 @@ struct reverse_iterator_impl : public iterator_impl<T, reverse_iterator_tag> {
 			return *this;
 		}
 		// post-increment
-		reverse_iterator_impl operator++(int) {
-			reverse_iterator_impl existing(*this);
+		reverse_iterator_impl const operator++(int) {
+			reverse_iterator_impl const existing(*this);
 			--this->ptr;
 			return existing;
 		}
