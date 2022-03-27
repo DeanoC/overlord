@@ -84,6 +84,7 @@ depends = ["core", "dbg", "multi_core", "platform"]
 [[definition]]
 type = "library.resource_bundle"
 depends = ["core", "data_utils", "dbg", "memory", "platform", "vfile"]
+cpus = "a53,host"
 
 [[definition]]
 type = "library.resource_bundle_writer"
@@ -103,3 +104,7 @@ depends = ["core", "dbg"]
 type = "library.vfile_memory"
 depends = ["core", "dbg", "vfile", "memory"]
 
+[[definition]]
+type = "library.fatfs"
+depends = ["core", "dbg", "memory", "platform", "vfile", "utils"]
+cpus = "a53"

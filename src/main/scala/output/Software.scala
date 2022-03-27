@@ -100,7 +100,7 @@ object Software {
 				}
 			}
 
-			generateSubdirMake(out.resolve(s"libs_$cpuName").resolve("CMakeLists.txt"))
+			generateSubdirLibraryMake(out.resolve(s"libs_$cpuName").resolve("CMakeLists.txt"))
 			generateCLibraryDefines(out.resolve(s"libs_$cpuName"), libraryDefines.toArray)
 			generateCMakeLibraryDefines(out.resolve(s"cmakelibrary_defines_$cpuName.cmake"),
 			                            libraryDefines.toArray)
@@ -133,32 +133,28 @@ object Software {
 		Utils.writeFile(out, sb.result())
 	}
 
-
-	private def generateSubdirMake(out: Path, excludes: Seq[String] = Seq()): Unit = {
+	private def generateSubdirLibraryMake(out: Path,
+	                                      excludes: Seq[String] = Seq()): Unit = {
 		val sb = new StringBuilder
 		sb ++=
 		"""
-			|if(DEFINED ONLY_PROGRAM)
-			|   add_subdirectory(${ONLY_PROGRAM})
-			|else()
-			|   file(GLOB _all LIST_DIRECTORIES true RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
-			|   CONFIGURE_DEPENDS * )
-			|   list(REMOVE_ITEM _all "CMakeLists.txt" "library_defines.h")
+			|file(GLOB _all LIST_DIRECTORIES true RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+			|CONFIGURE_DEPENDS * )
+			|list(REMOVE_ITEM _all "CMakeLists.txt" "library_defines.h")
 			|""".stripMargin
 
 		for (ed <- excludes) {
 			sb ++=
-			f"""  list(REMOVE_ITEM _all "$ed")
+			f"""list(REMOVE_ITEM _all "$ed")
 				 |""".stripMargin
 		}
 
 		sb ++=
 		"""
-			| foreach(sd ${_all})
-			|   add_subdirectory(${sd})
-			| endforeach()
+			|foreach(sd ${_all})
+			| add_subdirectory(${sd})
+			|endforeach()
 			|
-			|endif()
 			|
 			|""".stripMargin
 
@@ -208,8 +204,8 @@ object Software {
 						}
 				} else Seq()
 
-				generateSubdirMake(out.resolve(s"$programName").resolve("CMakeLists.txt"),
-				                   excludes)
+				generateSubdirProgramMake(out.resolve(s"$programName").resolve("CMakeLists.txt"),
+				                          excludes)
 			}
 		}
 		Utils.writeFile(out.resolve(s"make_programs.sh"), sb.result())
@@ -223,6 +219,38 @@ object Software {
 		           getClass)
 
 		Utils.writeFile(out.resolve("make_software.sh"), sb.result())
+	}
+
+	private def generateSubdirProgramMake(out: Path,
+	                                      excludes: Seq[String] = Seq()): Unit = {
+		val sb = new StringBuilder
+		sb ++=
+		"""
+			|if(DEFINED ONLY_PROGRAM)
+			|   add_subdirectory(${ONLY_PROGRAM})
+			|else()
+			|   file(GLOB _all LIST_DIRECTORIES true RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+			|   CONFIGURE_DEPENDS * )
+			|   list(REMOVE_ITEM _all "CMakeLists.txt" "library_defines.h")
+			|""".stripMargin
+
+		for (ed <- excludes) {
+			sb ++=
+			f"""  list(REMOVE_ITEM _all "$ed")
+				 |""".stripMargin
+		}
+
+		sb ++=
+		"""
+			| foreach(sd ${_all})
+			|   add_subdirectory(${sd})
+			| endforeach()
+			|
+			|endif()
+			|
+			|""".stripMargin
+
+		Utils.writeFile(out, sb.result())
 	}
 
 }

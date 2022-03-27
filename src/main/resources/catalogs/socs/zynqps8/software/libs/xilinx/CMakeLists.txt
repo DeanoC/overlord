@@ -4,6 +4,7 @@ project(${project} C ASM CXX)
 # requires parent cmake project to set BOARD_ SOC_ CPU_ and CPU_ARCH
 file(GLOB CLIST CONFIGURE_DEPENDS
 		src/scugic/*.c
+		src/sdps/*.c
 
 		src/${BOARD}/*.c
 		src/${SOC}/*.c
@@ -12,6 +13,7 @@ file(GLOB CLIST CONFIGURE_DEPENDS
 
 file(GLOB HEADERLIST CONFIGURE_DEPENDS
 		include/scugic/*.h
+		include/sdps/*.h
 
 		include/*.h
 		include/*.hpp

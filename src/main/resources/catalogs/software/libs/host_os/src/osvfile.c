@@ -57,7 +57,7 @@ static bool VFile_OsFile_IsEOF(VFile_Interface_t *vif) {
 }
 
 
-EXTERN_C void* Os_AllFromFile(char const *filename, bool text, size_t* outSize, Memory_Allocator* allocator) {
+void* Os_AllFromFile(char const *filename, bool text, size_t* outSize, Memory_Allocator* allocator) {
 	VFile_Handle fh = Os_VFileFromFile(filename, text ? Os_FM_Read : Os_FM_ReadBinary, allocator);
 	if(!fh) {
 		debug_printf("ERROR: File not found %s\n", filename);
@@ -75,7 +75,7 @@ EXTERN_C void* Os_AllFromFile(char const *filename, bool text, size_t* outSize, 
 	return ret;
 }
 
-EXTERN_C VFile_Handle Os_VFileFromFile(char const *filename, enum Os_FileMode mode, Memory_Allocator* allocator) {
+VFile_Handle Os_VFileFromFile(char const *filename, enum Os_FileMode mode, Memory_Allocator* allocator) {
 	Os_FileHandle handle = Os_FileOpen(filename, mode);
 	if (handle == nullptr) { return nullptr; }
 

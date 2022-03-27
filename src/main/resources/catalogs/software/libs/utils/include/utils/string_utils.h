@@ -37,6 +37,15 @@ CONST_EXPR ALWAYS_INLINE NON_NULL(1,3) unsigned int Utils_StringCopy(const char*
 	return count + 1;
 }
 
+WARN_UNUSED_RESULT CONST_EXPR ALWAYS_INLINE NON_NULL(1) char const * Utils_StringChar(char const * string, char c) {
+	char const * ptr = string;
+	while(*ptr) {
+		if(*ptr == c) { return ptr; }
+		ptr++;
+	}
+	return nullptr;
+}
+
 static const unsigned int Utils_StringNotFound = ~0;
 
 WARN_UNUSED_RESULT NON_NULL(2) unsigned int Utils_StringFindNext(unsigned int strLen, const char* string, char c);

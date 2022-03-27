@@ -38,44 +38,44 @@ static void TranslateFileAccessFlags(enum Os_FileMode modeFlags, char *fileAcces
   fileAccessString[index] = '\0';
 }
 
-EXTERN_C Os_FileHandle Os_FileOpen(char const *filename, enum Os_FileMode mode) {
+Os_FileHandle Os_FileOpen(char const *filename, enum Os_FileMode mode) {
   char flags[4];
   TranslateFileAccessFlags(mode, flags, 4);
   FILE *fp = fopen(filename, flags);
   return (Os_FileHandle)fp;
 }
 
-EXTERN_C bool Os_FileClose(Os_FileHandle handle) {
+bool Os_FileClose(Os_FileHandle handle) {
   return (fclose((FILE *) handle) == 0);
 }
 
-EXTERN_C void Os_FileFlush(Os_FileHandle handle) {
+void Os_FileFlush(Os_FileHandle handle) {
   fflush((FILE *) handle);
 }
 
-EXTERN_C size_t Os_FileRead(Os_FileHandle handle, void *buffer, size_t byteCount) {
+size_t Os_FileRead(Os_FileHandle handle, void *buffer, size_t byteCount) {
   return fread(buffer,
                1,
                byteCount,
                (FILE *) handle);
 }
 
-EXTERN_C bool Os_FileSeek(Os_FileHandle handle, int64_t offset, enum Os_FileSeekDir origin) {
+bool Os_FileSeek(Os_FileHandle handle, int64_t offset, enum Os_FileSeekDir origin) {
   return fseek((FILE *) handle, (long) offset, origin) == 0;
 }
 
-EXTERN_C int64_t Os_FileTell(Os_FileHandle handle) {
+int64_t Os_FileTell(Os_FileHandle handle) {
   return ftell((FILE *) handle);
 }
 
-EXTERN_C size_t Os_FileWrite(Os_FileHandle handle, void const *buffer, size_t byteCount) {
+size_t Os_FileWrite(Os_FileHandle handle, void const *buffer, size_t byteCount) {
   return fwrite(buffer,
                 1,
                 byteCount,
                 (FILE *) handle);
 }
 
-EXTERN_C size_t Os_FileSize(Os_FileHandle handle) {
+size_t Os_FileSize(Os_FileHandle handle) {
   int64_t curPos = Os_FileTell(handle);
   Os_FileSeek(handle, 0, Os_FSD_End);
   int64_t length = Os_FileTell(handle);
@@ -83,10 +83,10 @@ EXTERN_C size_t Os_FileSize(Os_FileHandle handle) {
   return (size_t) length;
 }
 
-EXTERN_C bool Os_FileIsEOF(Os_FileHandle handle) {
+bool Os_FileIsEOF(Os_FileHandle handle) {
   return feof((FILE *) handle);
 }
 
-EXTERN_C bool Os_FileIsOpen(Os_FileHandle handle) {
+bool Os_FileIsOpen(Os_FileHandle handle) {
 	return handle != NULL;
 }

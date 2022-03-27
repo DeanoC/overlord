@@ -5,43 +5,35 @@
     <option name="openedFilesInfos">
       <list>
         <OpenedFileInfo>
-          <option name="caretOffset" value="1154" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io/include/image_io/saver.h" />
+          <option name="caretOffset" value="0" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/software.toml" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="677" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io/include/image_io/loader.h" />
+          <option name="caretOffset" value="233" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/dbg/dbg.toml" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="18045" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io/src/loader.c" />
+          <option name="caretOffset" value="1101" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs/src/ff.h" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="1242" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io/src/loader.cpp" />
+          <option name="caretOffset" value="9209" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs/src/ffconf.h" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="11314" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io/src/saver.c" />
+          <option name="caretOffset" value="781" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs/CMakeLists.txt" />
         </OpenedFileInfo>
         <OpenedFileInfo>
           <option name="caretOffset" value="0" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io/image_io.toml" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs/src/diskio.h" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="789" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io/CMakeLists.txt" />
+          <option name="caretOffset" value="0" />
+          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs/include/fatfs/vfile.h" />
         </OpenedFileInfo>
         <OpenedFileInfo>
-          <option name="caretOffset" value="643" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/CMakeLists.txt" />
-        </OpenedFileInfo>
-        <OpenedFileInfo>
-          <option name="caretOffset" value="409" />
-          <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/programs.toml" />
-        </OpenedFileInfo>
-        <OpenedFileInfo>
-          <option name="caretOffset" value="921" />
+          <option name="caretOffset" value="2459" />
           <option name="fileUrl" value="file://$PROJECT_DIR$/src/main/resources/catalogs/software/libs.toml" />
         </OpenedFileInfo>
       </list>

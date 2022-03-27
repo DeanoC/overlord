@@ -13,9 +13,9 @@
 #include <pwd.h>
 
 #if defined(__APPLE__) || defined(__FreeBSD__)
-#include <copyfile.h>
+	#include <copyfile.h>
 #else
-#include <sys/sendfile.h>
+	#include <sys/sendfile.h>
 #endif
 // internal and platform path are the same on posix
 EXTERN_C bool Os_IsNormalisedPath(char const *path) {
@@ -325,42 +325,40 @@ Os_DirectoryEnumeratorAsyncFunc func, void *userData) {
 }
 
 EXTERN_C Os_DirectoryEnumeratorItem const *Os_DirectoryEnumeratorSyncNext(Os_DirectoryEnumeratorHandle handle) {
-assert(handle != nullptr);
-auto enumerator = (Os_DirectoryEnumerator *) handle;
-if (enumerator->cancelled)
-return nullptr;
+	assert(handle != nullptr);
+	auto enumerator = (Os_DirectoryEnumerator *) handle;
+	if (enumerator->cancelled) return nullptr;
 
-if (enumerator->dir == nullptr) {
-enumerator->dir = opendir(enumerator->path);
-if (enumerator->dir == nullptr) {
-return nullptr;
-}
-}
+	if (enumerator->dir == nullptr) {
+		enumerator->dir = opendir(enumerator->path);
+		if (enumerator->dir == nullptr) {
+			return nullptr;
+		}
+	}
 
-dirent *entry = readdir(enumerator->dir);
-if (entry == nullptr)
-return nullptr;
-// skip . and ..
-if (utf8ncmp(entry->d_name, ".", 1) == 0) {
-return Os_DirectoryEnumeratorSyncNext(handle);
-}
-if (utf8ncmp(entry->d_name, "..", 2) == 0) {
-return Os_DirectoryEnumeratorSyncNext(handle);
-}
+	dirent *entry = readdir(enumerator->dir);
+	if (entry == nullptr) return nullptr;
+	// skip . and ..
+	if (utf8ncmp(entry->d_name, ".", 1) == 0) {
+		return Os_DirectoryEnumeratorSyncNext(handle);
+	}
+	if (utf8ncmp(entry->d_name, "..", 2) == 0) {
+		return Os_DirectoryEnumeratorSyncNext(handle);
+	}
 
-enumerator->lastItem.filename = entry->d_name;
-enumerator->lastItem.directory = entry->d_type == DT_DIR;
+	enumerator->lastItem.filename = entry->d_name;
+	enumerator->lastItem.directory = entry->d_type == DT_DIR;
 
-return &enumerator->lastItem;
+	return &enumerator->lastItem;
 }
 
 EXTERN_C bool Os_DirectoryEnumeratorCancel(Os_DirectoryEnumeratorHandle handle) {
-assert(handle != nullptr);
-auto enumerator = (Os_DirectoryEnumerator *) handle;
-enumerator->cancelled = true;
-return true;
+	assert(handle != nullptr);
+	auto enumerator = (Os_DirectoryEnumerator *) handle;
+	enumerator->cancelled = true;
+	return true;
 }
 EXTERN_C bool Os_DirectoryEnumeratorStallForAll(Os_DirectoryEnumeratorHandle handle) {
-// TODO no async means this doesn't do anything
-return true;
+	// TODO no async means this doesn't do anything
+	return true;
 }

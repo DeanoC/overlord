@@ -262,3 +262,4 @@ NON_NULL(2, 4) void Utils_StringScatterChar(unsigned int strLen, char* string, u
 		string[indices[i]] = c;
 	}
 }
+

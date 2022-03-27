@@ -4,71 +4,49 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="73b7f681-932b-4979-9f4f-6aee48997ac8" name="Default Changelist" comment="Added software dependencies to software definitions in overlord.&#10;Added sensibile defaults to Software Definitions&#10;Removed library duplicates, so only one of each libraries is setup">
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/library_defines.cmake" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image/include/image/resource_writer.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image/src/lua_image.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image/src/resource_writer.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io/CMakeLists.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io/image_io.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io/include/image_io/loader.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io/include/image_io/saver.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io/src/loader.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io/src/loader.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io/src/saver.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io/src/single_implementation_header.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io/src/stb_image.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io/src/stb_image_write.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io/src/tiny_dds.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io/src/tiny_ktx.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/resource_bundle/CMakeLists.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/resource_bundle/include/resource_bundle/resource_bundle.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/resource_bundle/resource_bundle.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/resource_bundle/src/resource_bundle.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/resource_bundle_writer/CMakeLists.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/resource_bundle_writer/include/resource_bundle_writer/resource_bundle_writer.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/resource_bundle_writer/resource_bundle_writer.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/resource_bundle_writer/src/resource_bundle_writer.cpp" afterDir="false" />
+    <list default="true" id="73b7f681-932b-4979-9f4f-6aee48997ac8" name="Default Changelist" comment="rename gfx_image to image&#10;added image_io library&#10;added resource_bundle library&#10;added resource_bundle_writer library&#10;added lua interface (if uses lua) to image and image_io&#10;Fixed some compile issues with tiny_stl&#10;Overlords now outputs per cpu type defines for C and CMake so libraries can make choices (like does have lua?) in each library/program">
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/xilinx/include/sdps/xsdps.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/xilinx/include/sdps/xsdps_core.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/xilinx/include/sdps/xsdps_hw.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/xilinx/src/sdps/xsdps.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/xilinx/src/sdps/xsdps_card.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/xilinx/src/sdps/xsdps_g.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/xilinx/src/sdps/xsdps_host.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/xilinx/src/sdps/xsdps_options.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/xilinx/src/sdps/xsdps_sinit.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs/CMakeLists.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs/fatfs.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs/include/fatfs/drive.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs/include/fatfs/fatfs.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs/include/fatfs/filesystem.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs/include/fatfs/vfile.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs/src/00history.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs/src/00readme.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs/src/diskio.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs/src/diskio.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs/src/fatfs.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs/src/ff.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs/src/ff.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs/src/ffconf.h" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs/src/ffsystem.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs/src/ffunicode.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs/src/vfile.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs/src/zynqmp/sdcard.c" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs/src/zynqmp/sdcard.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/xilinx/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/xilinx/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/xilinx/include/xparameters.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/xilinx/include/xparameters.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/ikuy_root.cmake" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/ikuy_root.cmake" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/core/include/core/core.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/core/include/core/core.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gfx_image/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gfx_image/gfx_image.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image/image.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gfx_image/include/gfx_image/copy.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image/include/image/copy.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gfx_image/include/gfx_image/create.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image/include/image/create.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gfx_image/include/gfx_image/image.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image/include/image/image.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gfx_image/include/gfx_image/pixel.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image/include/image/pixel.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gfx_image/src/copy.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image/src/copy.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gfx_image/src/create.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image/src/create.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gfx_image/src/image.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image/src/image.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/include/memory/memory.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/include/memory/memory.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/iterators.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/iterators.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/unordered_map.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/unordered_map.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/unordered_set.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tiny_stl/include/tiny_stl/unordered_set.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/image_convert.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/image_convert.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/image_resource.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/image_resource.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/imageio_loader.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/imageio_loader.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/imageio_loader.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/imageio_saver.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/imageio_saver.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/lua_image.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/resource_bundle.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/resource_bundle.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/resource_bundle_writer.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/resource_bundle_writer.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/single_header_impl.c" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/stb_image.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/stb_image_write.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/tiny_dds.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/tiny_ktx.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/core/include/core/bitmap_allocator.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/core/include/core/bitmap_allocator.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/host_os/src/file.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/host_os/src/file.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/host_os/src/osvfile.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/host_os/src/osvfile.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/host_os/src/posix/filesystem.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/host_os/src/posix/filesystem.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/src/a53/malloc-machine.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/src/a53/malloc-machine.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/utils/include/utils/string_utils.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/utils/include/utils/string_utils.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/utils/src/string_utils.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/utils/src/string_utils.c" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/scala/output/Software.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/output/Software.scala" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Game.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Game.scala" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -154,23 +132,23 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs" />
     <property name="settings.editor.selected.configurable" value="vcs.Git" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs" />
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image_io" />
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/resource_bundle_writer/include/resource_bundle_writer" />
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/resource_bundle_writer" />
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/tinystl" />
-      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/fatfs/" />
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/include/platform/host" />
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/hw/src/host" />
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/src/include" />
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_utils/src/host" />
-      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/software/libs" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
       <recent name="overlord.Definitions" />
@@ -404,7 +382,8 @@
       <workItem from="1648108906048" duration="1434000" />
       <workItem from="1648118443373" duration="3208000" />
       <workItem from="1648125674431" duration="2278000" />
-      <workItem from="1648199197412" duration="4489000" />
+      <workItem from="1648199197412" duration="5315000" />
+      <workItem from="1648282967800" duration="2084000" />
     </task>
     <task id="LOCAL-00001" summary="Major work on connection expansion and block connections&#10;Refactor and reorg instances, constraits, actions etc.&#10;moved ps8 docs to lower case">
       <created>1605964442645</created>
@@ -728,7 +707,14 @@
       <option name="project" value="LOCAL" />
       <updated>1648132730019</updated>
     </task>
-    <option name="localTasksCounter" value="47" />
+    <task id="LOCAL-00047" summary="rename gfx_image to image&#10;added image_io library&#10;added resource_bundle library&#10;added resource_bundle_writer library&#10;added lua interface (if uses lua) to image and image_io&#10;Fixed some compile issues with tiny_stl&#10;Overlords now outputs per cpu type defines for C and CMake so libraries can make choices (like does have lua?) in each library/program">
+      <created>1648220901369</created>
+      <option name="number" value="00047" />
+      <option name="presentableId" value="LOCAL-00047" />
+      <option name="project" value="LOCAL" />
+      <updated>1648220901369</updated>
+    </task>
+    <option name="localTasksCounter" value="48" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -775,7 +761,6 @@
       <path value="$PROJECT_DIR$/../ikuy_utils" />
       <path value="$USER_HOME$/.sbt/1.0/staging/a7772c47d5d7e84d3e85/ikuy_utils" />
     </ignored-roots>
-    <MESSAGE value="New distancematrix and routematrix algorithm&#10;Now using Dijkstra shortest path algo&#10;Takes into account connection directions&#10;Better logging of DistanceMatrix and RouteMatrix" />
     <MESSAGE value="Fixed Game lookup (RAM etc.) due to directional connection now in use" />
     <MESSAGE value="Fixed board instance and directional connections" />
     <MESSAGE value="Moved board resource files&#10;Moved ultrascale+ docs&#10;Added clean ZynqMP PS8 gateware&#10;Added soc section to resources&#10;Added basic PMU def&#10;Improved verilog module parser using regex&#10;Tidied up C header paths&#10;Made report print each instance register banks&#10;Removed replicationCount and shared from connections&#10;Fixed/improved unconnected connecting logic&#10;Fixed improved wire connecting logic&#10;More attrib merging in a few places&#10;Clock now inherits attribs properly&#10;Defination Catalog can now include other catalogs&#10;Tidy and container fixes" />
@@ -800,7 +785,8 @@
     <MESSAGE value="Each item in a chunk now gets its own director entry&#10;chunk names removed changed to items" />
     <MESSAGE value="Built in CLZ causes issues in PMU, so using software. TODO make tis PMU only&#10;Lots of fixes to bitmap_allocator&#10;OS service memory now uses 64KB chunks&#10;Per core malloc arenas with cross core free&#10;linear_realloc fix" />
     <MESSAGE value="Added software dependencies to software definitions in overlord.&#10;Added sensibile defaults to Software Definitions&#10;Removed library duplicates, so only one of each libraries is setup" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added software dependencies to software definitions in overlord.&#10;Added sensibile defaults to Software Definitions&#10;Removed library duplicates, so only one of each libraries is setup" />
+    <MESSAGE value="rename gfx_image to image&#10;added image_io library&#10;added resource_bundle library&#10;added resource_bundle_writer library&#10;added lua interface (if uses lua) to image and image_io&#10;Fixed some compile issues with tiny_stl&#10;Overlords now outputs per cpu type defines for C and CMake so libraries can make choices (like does have lua?) in each library/program" />
+    <option name="LAST_COMMIT_MESSAGE" value="rename gfx_image to image&#10;added image_io library&#10;added resource_bundle library&#10;added resource_bundle_writer library&#10;added lua interface (if uses lua) to image and image_io&#10;Fixed some compile issues with tiny_stl&#10;Overlords now outputs per cpu type defines for C and CMake so libraries can make choices (like does have lua?) in each library/program" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />

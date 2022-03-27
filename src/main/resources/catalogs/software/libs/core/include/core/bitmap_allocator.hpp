@@ -87,7 +87,6 @@ uintptr_t BitmapAllocator<BLOCKSIZE_IN_BYTES, BMA_BLOCK_COUNT>::Alloc(const uint
 			const auto maskShift = 0;//BitOp::UpperShiftForFindFirstStringOfOnes<BitMapType>(blockBitmap, blockCount) - 1;
 			// found update bitmap and return address of block
 			if( Atomic::CompareExchange<BitMapType>(&this->bitmap[i], &blockBitmap, blockBitmap & ~(mask << maskShift)) == false) {
-				debug_print("BOB");
 				goto restart;
 			}
 			else {
