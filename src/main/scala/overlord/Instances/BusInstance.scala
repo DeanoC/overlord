@@ -2,100 +2,92 @@ package overlord.Instances
 
 import ikuy_utils._
 import overlord.ChipDefinitionTrait
+import overlord.Interfaces.{BusLike, MultiBusLike, SupplierBusLike}
 
-import scala.collection.mutable
+import scala.reflect.ClassTag
 
-case class BusInstance(ident: String,
-                       override val definition: ChipDefinitionTrait,
-                      ) extends ChipInstance {
+case class BusInstance(name: String, override val definition: ChipDefinitionTrait) extends ChipInstance {
+	private val busSpec: BusSpec = {
+		val attrs = definition.attributes
+		val table = attrs
+		BusSpec(name = Utils.lookupString(table, "bus_name", "internal"),
+		        supplier = Utils.lookupBoolean(table, "bus_supplier", true),
+		        protocol = Utils.lookupString(table, "bus_protocol", "internal"),
+		        prefix = Utils.lookupString(table, "bus_prefix", "internal"),
+		        baseAddr = Utils.lookupBigInt(table, "base_address", 0),
+		        dataWidth = Utils.lookupBigInt(table, "data_width", 32),
+		        addrWidth = Utils.lookupBigInt(table, "address_width", 32))
+	}
+	private val bus    : Bus     = Bus(this, name, definition.attributes, busSpec)
 
-	lazy val busDataWidth    : Int         =
-		Utils.lookupInt(attributes, "bus_data_width", 32)
-	lazy val busAddrWidth    : Int         =
-		Utils.lookupInt(attributes, "bus_address_width", 32)
-	lazy val busBaseAddr     : BigInt      =
-		Utils.lookupBigInt(attributes, "bus_base_address", 0)
-	lazy val busBankAlignment: BigInt      =
-		Utils.lookupBigInt(attributes, "bus_bank_alignment", 1024)
-	lazy val supplierPrefixes: Seq[String] =
-		Utils.lookupStrings(attributes, "supplier_prefix", "supplier_")
-	lazy val consumerPrefix  : String      =
-		Utils.lookupString(attributes, "consumer_prefix", "consumer${index}_")
+	// query interface interface responder
+	override def getInterface[T](implicit tag: ClassTag[T]): Option[T] = {
+		val MultiBusLike_ = classOf[MultiBusLike]
+		val BusLike_      = classOf[BusLike]
 
-	private val fixedAddrConsumers    = mutable.ArrayBuffer[(ChipInstance, BigInt, BigInt)]()
-	private val variableAddrConsumers = mutable.ArrayBuffer[(ChipInstance, BigInt)]()
-
-	def addFixedAddressConsumer(instance: ChipInstance, address: BigInt, size: BigInt): Unit =
-		fixedAddrConsumers += ((instance, address, size))
-
-	def addVariableAddressConsumer(instance: ChipInstance, size: BigInt): Unit =
-		variableAddrConsumers += ((instance, size))
-
-	def computeConsumerAddresses(): Unit = {
-		fixedAddrConsumers.sortInPlaceWith((a, b) => a._2 < b._2)
-
-		var currentAddress = busBaseAddr
-		if (fixedAddrConsumers.nonEmpty && fixedAddrConsumers.head._2 < currentAddress) {
-			println(f"${fixedAddrConsumers.head._1.ident} has invalid fixed addresss%n")
-		}
-		while (fixedAddrConsumers.nonEmpty || variableAddrConsumers.nonEmpty) {
-			val consumeFixed = {
-				(variableAddrConsumers.isEmpty && fixedAddrConsumers.nonEmpty) ||
-				(
-					variableAddrConsumers.nonEmpty && fixedAddrConsumers.nonEmpty &&
-					((currentAddress == fixedAddrConsumers.head._2) ||
-					 (currentAddress + variableAddrConsumers.head._2 > fixedAddrConsumers.head._2))
-					)
-			}
-
-			val (instance, address, size) =
-				if (consumeFixed)
-					fixedAddrConsumers.remove(0)
-				else {
-					val (instance, size) = variableAddrConsumers.remove(0)
-					(instance, currentAddress, size)
-				}
-
-			val indexCount = getIndices(instance).length
-			consumerIndices += ((instance,indexCount) -> consumers.length)
-			consumers += (address -> size)
-			currentAddress = (address + size).max(busBaseAddr)
+		tag.runtimeClass match {
+			case MultiBusLike_ => Some(MultiBusAdaptor(this).asInstanceOf[T])
+			case BusLike_      => Some(bus.asInstanceOf[T])
+			case _             => super.getInterface[T](tag)
 		}
 	}
 
-	def getFirstIndex(instance: ChipInstance): Int = {
-		if (consumerIndices.contains((instance,0)))
-			consumerIndices((instance,0))
-		else
-			-1
+	// adapter to make this single bug work with multi bus code
+	private case class MultiBusAdaptor(parent: BusInstance) extends MultiBusLike {
+		override def getBus(index: Int): Option[BusLike] = {
+			if (index >= numberOfBuses) None
+			else Some(bus.asInstanceOf[BusLike])
+		}
+
+		override def numberOfBuses: Int = 1
+
+		override def getFirstSupplierBusByName(name: String): Option[SupplierBusLike] =
+			Some(getFirstBusByName(name, supplier = true).getOrElse(return None).asInstanceOf[SupplierBusLike])
+
+		private def getFirstBusByName(name: String, supplier: Boolean): Option[BusLike] = {
+			if (name.isEmpty) None
+			else if (busSpec.supplier != supplier) {
+				println(s"${parent.name} ${busSpec.name} bus is in the wrong direction")
+				None
+			} else if (nameMatch(name)) {
+				println(s"${parent.name} does not support bus named ${busSpec.name}")
+				None
+			} else Some(bus)
+		}
+
+		private def nameMatch(name: String): Boolean =
+			(name == busSpec.name ||
+			 name.replace("${index}", instanceNumber.toString) == busSpec.name ||
+			 name == busSpec.name.replace("${index}", instanceNumber.toString) ||
+			 name.replace("${index}", instanceNumber.toString) == busSpec.name.replace("${index}", instanceNumber.toString))
+
+		override def getFirstSupplierBusOfProtocol(protocol: String): Option[SupplierBusLike] =
+			Some(getFirstBusOfProtocol(protocol, supplier = true).getOrElse(return None).asInstanceOf[SupplierBusLike])
+
+		private def getFirstBusOfProtocol(protocol: String, supplier: Boolean): Option[BusLike] = {
+			if (busSpec.supplier != supplier) {
+				println(s"${parent.name} ${busSpec.name} bus is in the wrong direction")
+				None
+			} else if (protocolMatch(protocol)) {
+				println(s"${parent.name} does not support bus protocol ${busSpec.protocol}")
+				None
+			} else Some(bus)
+		}
+
+		private def protocolMatch(protocol: String): Boolean =
+			(protocol == busSpec.protocol ||
+			 protocol.replace("${index}", instanceNumber.toString) == busSpec.protocol ||
+			 protocol == busSpec.protocol.replace("${index}", instanceNumber.toString) ||
+			 protocol.replace("${index}", instanceNumber.toString) == busSpec.protocol.replace("${index}", instanceNumber.toString))
+
+		override def getFirstConsumerBusByName(name: String): Option[BusLike] = getFirstBusByName(name, supplier = false)
+
+		override def getFirstConsumerBusOfProtocol(protocol: String): Option[BusLike] = getFirstBusOfProtocol(protocol, supplier = false)
+
+		override def getInterface[T](implicit tag: ClassTag[T]): Option[T] = parent.getInterface[T]
+
+		override def getOwner: ChipInstance = parent
 	}
-	def getIndices(instance: ChipInstance): Seq[Int] = {
-		consumerIndices.filter(_._1._1 == instance).values.toSeq
-	}
-
-	def consumerCount: Int = consumers.length
-
-	def consumersVariant: Variant = ArrayV(consumers.flatMap {
-		case (addr, size) => Seq(BigIntV(addr), BigIntV(size))
-	}.toArray)
-
-	def getFirstConsumerAddressAndSize(instance: ChipInstance): (BigInt, BigInt) = {
-		val index = getFirstIndex(instance)
-		if (index == -1) return (0, 0)
-		consumers(index)
-	}
-	def getConsumerAddressesAndSizes(instance: ChipInstance): Seq[(BigInt, BigInt)] = {
-		getIndices(instance).map(consumers(_))
-	}
-
-	def consumerInstances: Seq[ChipInstance] =
-		consumerIndices.keysIterator.map(_._1).distinct.toSeq
-
-	private var consumers       = mutable.ArrayBuffer[(BigInt, BigInt)]()
-	private var consumerIndices = mutable.HashMap[(ChipInstance, Int), Int]()
-
-	override def copyMutate[A <: ChipInstance](nid: String): BusInstance =
-		copy(ident = nid)
 }
 
 object BusInstance {

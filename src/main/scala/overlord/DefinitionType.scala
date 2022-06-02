@@ -4,31 +4,41 @@ sealed trait DefinitionType {
 	val ident: Seq[String]
 }
 
-case class RamDefinitionType(ident: Seq[String]) extends DefinitionType
+sealed trait ChipDefinitionType extends DefinitionType
 
-case class CpuDefinitionType(ident: Seq[String]) extends DefinitionType
+sealed trait PortDefinitionType extends DefinitionType
 
-case class BusDefinitionType(ident: Seq[String]) extends DefinitionType
+sealed trait SoftwareDefinitionType extends DefinitionType
 
-case class StorageDefinitionType(ident: Seq[String]) extends DefinitionType
+case class RamDefinitionType(ident: Seq[String]) extends ChipDefinitionType
 
-case class BridgeDefinitionType(ident: Seq[String]) extends DefinitionType
+case class CpuDefinitionType(ident: Seq[String]) extends ChipDefinitionType
 
-case class NetDefinitionType(ident: Seq[String]) extends DefinitionType
+case class BusDefinitionType(ident: Seq[String]) extends ChipDefinitionType
 
-case class IoDefinitionType(ident: Seq[String]) extends DefinitionType
+case class GraphicDefinitionType(ident: Seq[String]) extends ChipDefinitionType
 
-case class OtherDefinitionType(ident: Seq[String]) extends DefinitionType
+case class StorageDefinitionType(ident: Seq[String]) extends ChipDefinitionType
 
-case class PinGroupDefinitionType(ident: Seq[String]) extends DefinitionType
+case class NetDefinitionType(ident: Seq[String]) extends ChipDefinitionType
 
-case class ClockDefinitionType(ident: Seq[String]) extends DefinitionType
+case class IoDefinitionType(ident: Seq[String]) extends ChipDefinitionType
+
+case class OtherDefinitionType(ident: Seq[String]) extends ChipDefinitionType
+
+case class SocDefinitionType(ident: Seq[String]) extends ChipDefinitionType
+
+case class SwitchDefinitionType(ident: Seq[String]) extends ChipDefinitionType
 
 case class BoardDefinitionType(ident: Seq[String]) extends DefinitionType
 
-case class ProgramDefinitionType(ident: Seq[String]) extends DefinitionType
+case class PinGroupDefinitionType(ident: Seq[String]) extends PortDefinitionType
 
-case class LibraryDefinitionType(ident: Seq[String]) extends DefinitionType
+case class ClockDefinitionType(ident: Seq[String]) extends PortDefinitionType
+
+case class ProgramDefinitionType(ident: Seq[String]) extends SoftwareDefinitionType
+
+case class LibraryDefinitionType(ident: Seq[String]) extends SoftwareDefinitionType
 
 object DefinitionType {
 	def apply(in: String): DefinitionType = {
@@ -38,21 +48,25 @@ object DefinitionType {
 		}.toSeq
 
 		defTypeName.head.toLowerCase match {
-			case "ram"      => RamDefinitionType(tt)
-			case "cpu"      => CpuDefinitionType(tt)
-			case "bus"      => BusDefinitionType(tt)
-			case "storage"  => StorageDefinitionType(tt)
-			case "bridge"   => BridgeDefinitionType(tt)
-			case "net"      => NetDefinitionType(tt)
-			case "io"       => IoDefinitionType(tt)
-			case "board"    => BoardDefinitionType(tt)
+			case "ram"     => RamDefinitionType(tt)
+			case "cpu"     => CpuDefinitionType(tt)
+			case "bus"     => BusDefinitionType(tt)
+			case "storage" => StorageDefinitionType(tt)
+			case "graphic" => GraphicDefinitionType(tt)
+			case "net"     => NetDefinitionType(tt)
+			case "io"      => IoDefinitionType(tt)
+			case "board"   => BoardDefinitionType(tt)
+			case "soc"     => SocDefinitionType(tt)
+			case "switch"  => SwitchDefinitionType(tt)
+			case "other"   => OtherDefinitionType(tt)
+
 			case "pin"      => PinGroupDefinitionType(tt)
 			case "pingroup" => PinGroupDefinitionType(tt)
 			case "clock"    => ClockDefinitionType(tt)
-			case "other"    => OtherDefinitionType(tt)
-			case "program"  => ProgramDefinitionType(tt)
-			case "library"  => LibraryDefinitionType(tt)
-			case _          =>
+
+			case "program" => ProgramDefinitionType(tt)
+			case "library" => LibraryDefinitionType(tt)
+			case _         =>
 				println(s"${defTypeName.head} unknown definition type\n")
 				OtherDefinitionType(tt)
 		}

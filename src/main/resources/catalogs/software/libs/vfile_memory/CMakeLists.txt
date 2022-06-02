@@ -33,6 +33,8 @@ endif()
 
 set(PRIVATE_LIBRARIES
 		core
+		dbg
+		library_defines
 		vfile
 		memory
 		)

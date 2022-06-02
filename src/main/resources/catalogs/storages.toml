@@ -1,4 +1,3 @@
-path = "storages"
 resources = [
-    "storages",
+    "storages/storages.toml",
 ]

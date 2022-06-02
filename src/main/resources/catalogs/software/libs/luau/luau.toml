@@ -6,5 +6,6 @@ actions = [
 name = 'soft_src'
 processor = 'software_sources'
 sources = [
+    { in = "src", out = "src" },
     { in = "CMakeLists.txt", out = "CMakeLists.txt" },
 ]

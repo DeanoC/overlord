@@ -1,33 +1,66 @@
-[[instance]]
-name = "RawPS8"
-type = "other.zynqps8.rawps8"
+[[include]]
+resource = "lpd.toml"
 
-[[instance]]
-name = "apbBus"
-type = "bus.apb.zynqps8"
+[[include]]
+resource = "fpd.toml"
 
-[[instance]]
-name = "mainBus"
-type = "bus.axi4.zynqps8"
+[[include]]
+resource = "iop.toml"
 
-[[instance]]
-name = "mainBus_to_APB"
-type = "bridge.internal.mainbus_to_apb"
+[[include]]
+resource = "lpdunits.toml"
 
+# DDR domain
 [[instance]]
-name = "mainDDR4"
-type = "ram.ddr.ddr4.zynqps8"
+name = "DDRController"
+type = "switch.ddr.zynqps8"
+
+# PL domain
+[[instance]]
+name = "PS8Soc"
+type = "soc.zynqps8.ps8soc"
+
+# FPD <-> LPD connection
+[[connection]]
+type = "bus"
+connection = "FPDMainSwitch -> OCMSwitch"
+bus_name = "fpd_ocm"
 
 [[connection]]
 type = "logical"
-connection = "mainBus_to_APB -> apbBus"
+connection = "FPDMainSwitch -> LPDInboundSwitch"
+
+[[connection]]
+type = "logical"
+connection = "LPDMainSwitch -> FPDMainSwitch"
 
 [[connection]]
 type = "bus"
-connection = "mainBus -> mainBus_to_APB"
-address_offset = "0xFF00_0000"
+connection = "LPDMainSwitch -> CCI"
+bus_name = "lpd_cci"
+
+# -> DDR Controller connections
+[[connection]]
+type = "bus"
+connection = "CCI -> DDRController"
+bus_name = "cci0_ddr"
+[[connection]]
+type = "bus"
+connection = "CCI -> DDRController"
+bus_name = "cci1_ddr"
 
 [[connection]]
 type = "bus"
-connection = "mainBus -> RawPS8"
-address_offset = "0"
+connection = "FPD_DDR_SPLITTER0 -> DDRController "
+bus_protocol = "internal_ddr"
+
+[[connection]]
+type = "bus"
+connection = "FPD_DDR_SPLITTER1 -> DDRController "
+bus_protocol = "internal_ddr"
+
+[[connection]]
+type = "bus"
+connection = "FPD_DDR_SPLITTER2 -> DDRController "
+bus_protocol = "internal_ddr"
+

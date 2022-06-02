@@ -4,33 +4,29 @@ import ikuy_utils.{Utils, Variant}
 import overlord.Game
 import overlord.Instances.{InstanceTrait, ProgramInstance, SoftwareInstance}
 
-import java.nio.file.Path
-
 case class TemplateAction(override val phase: Int,
                           cpus: Seq[String],
-                          srcPath: Path,
                           in: String,
-                          out: String,
-                          pathOp: ActionPathOp)
+                          out: String)
 	extends Action() {
-	override def execute(instance: InstanceTrait,
-	                     parameters: Map[String, () => Variant],
-	                     outPath: Path): Unit = {
+	override def execute(instance: InstanceTrait, parameters: Map[String, Variant]): Unit = {
 		var ifn = in
 		var ofn = out
 
 		val cpuName = if (phase == 1) "" else if (cpus.nonEmpty) {
-			val cpuName = Utils.toString(parameters("${cpuName}")())
+			val cpuName = Utils.toString(parameters("${cpuName}"))
 			if (!cpus.contains(cpuName)) return
 			cpuName
-		} else Utils.toString(parameters("${cpuName}")())
+		} else Utils.toString(parameters("${cpuName}"))
 
 		for ((k, v) <- parameters) {
-			ifn = ifn.replace(s"$k", v().toCString)
-			ofn = ofn.replace(s"$k", v().toCString)
+			ifn = ifn.replace(s"$k", v.toCString)
+			ofn = ofn.replace(s"$k", v.toCString)
 		}
 
-		val source = Utils.readFile(ifn, srcPath.resolve(ifn), getClass)
+		val iPath = Game.tryPaths(instance, ifn)
+
+		val source = Utils.readFile(iPath)
 		if (source.isEmpty) {
 			println(f"Template source file $ifn not found%n")
 			return
@@ -39,7 +35,7 @@ case class TemplateAction(override val phase: Int,
 		var sourceString = source.get
 
 		for ((k, v) <- parameters) {
-			sourceString = sourceString.replace(s"$k", v().toCString)
+			sourceString = sourceString.replace(s"$k", v.toCString)
 		}
 
 		val oPath = instance match {
@@ -49,26 +45,22 @@ case class TemplateAction(override val phase: Int,
 					else si.folder
 				} else si.folder
 
-				outPath
+				Game.outPath
 					.resolve(folder)
 					.resolve(si.name)
 					.resolve(ofn)
 			case _                    =>
-				outPath.resolve(ofn)
+				Game.outPath.resolve(ofn)
 		}
 		Utils.ensureDirectories(oPath.getParent)
 		Utils.writeFile(oPath, sourceString)
-
-		updatePath(oPath.getParent)
 	}
 }
 
 object TemplateAction {
 	private val cpuRegEx = "\\s*,\\s*".r
 
-	def apply(name: String,
-	          process: Map[String, Variant],
-	          pathOp: ActionPathOp): Seq[TemplateAction] = {
+	def apply(name: String, process: Map[String, Variant]): Seq[TemplateAction] = {
 		if (!process.contains("sources")) {
 			println(s"Template process $name doesn't have a sources field")
 			return Seq()
@@ -99,10 +91,8 @@ object TemplateAction {
 
 			TemplateAction(phase,
 			               cpus,
-			               Game.pathStack.top,
 			               inFilename,
-			               outFilename,
-			               pathOp)
+			               outFilename)
 		}
 
 	}

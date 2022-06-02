@@ -13,6 +13,9 @@ typedef enum LZ4_ChunkSize {
 		LZ4CS_64K = 64 * 1024,
 } LZ4_ChunkSize;
 
+// must before called compressed (per core) and not changed during compression
+EXTERN_C void LZ4_SetAllocator(Memory_Allocator* allocator);
+
 // de/compression where input/output where memory isn't constrained
 EXTERN_C size_t LZ4_BlockCompress(uint8_t const* src, size_t srcSize, uint8_t* dst, size_t dstCapacity);
 EXTERN_C size_t LZ4_BlockCompressHigh (uint8_t const* src, size_t srcSize, uint8_t * dst, size_t dstCapacity, int compressionLevel);

@@ -1,5 +1,9 @@
-path = "others"
+resources = [
+    "others/dma/dma.toml",
+    "others/sysmon/sysmon.toml",
+    "others/timer/timer.toml"
+]
 
 [[definition]]
 type = "other.resetti"
-gateware = "resetti/resetti.toml"
+gateware = "others/resetti/resetti.toml"

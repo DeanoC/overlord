@@ -1,42 +1,16 @@
 package actions
 
 import ikuy_utils.{ArrayV, Utils, Variant}
-import overlord.Game
 import overlord.Instances.{ChipInstance, InstanceTrait}
 
-import java.nio.file.Path
-
-sealed trait ActionPathOp
-
-case class ActionPathOp_Noop() extends ActionPathOp
-
-case class ActionPathOp_Push() extends ActionPathOp
-
-case class ActionPathOp_Pop() extends ActionPathOp
-
-
 trait Action {
-	val pathOp: ActionPathOp
 	val phase : Int
 
-	def updatePath(path: Path): Unit = {
-		pathOp match {
-			case ActionPathOp_Noop() =>
-			case ActionPathOp_Push() => Game.pathStack.push(path)
-			case ActionPathOp_Pop()  => Game.pathStack.pop()
-		}
-	}
-
-	def execute(instance: InstanceTrait,
-	            parameters: Map[String, () => Variant],
-	            outPath: Path): Unit
+	def execute(instance: InstanceTrait, parameters: Map[String, Variant]): Unit
 }
 
 trait GatewareAction extends Action {
-	def execute(instance: ChipInstance,
-	            parameters: Map[String, () => Variant],
-	            outPath: Path): Unit
-
+	def execute(instance: ChipInstance, parameters: Map[String, Variant]): Unit
 }
 
 trait SoftwareAction extends Action
@@ -74,27 +48,18 @@ object ActionsFile {
 					return None
 				}
 				val process = processes(action)
-
-				val pathOp: ActionPathOp = if (process.contains("path_op"))
-					Utils.toString(process("path_op")) match {
-						case "push" => ActionPathOp_Push()
-						case "pop"  => ActionPathOp_Pop()
-						case _      => ActionPathOp_Noop()
-					}
-				else ActionPathOp_Noop()
-
 				Utils.toString(process("processor")) match {
-					case "copy"                => CopyAction(name, process, pathOp)
-					case "sources"             => SourcesAction(name, process, pathOp)
-					case "git"                 => GitCloneAction(name, process, pathOp)
-					case "python"              => PythonAction(name, process, pathOp)
-					case "yaml"                => YamlAction(name, process, pathOp)
-					case "toml"                => TomlAction(name, process, pathOp)
-					case "sbt"                 => SbtAction(name, process, pathOp)
-					case "read_verilog_top"    => ReadVerilogTopAction(name, process, pathOp)
-					case "read_toml_registers" => ReadTomlRegistersAction(name, process, pathOp)
-					case "templates"           => TemplateAction(name, process, pathOp)
-					case "software_sources"    => SoftSourceAction(name, process, pathOp)
+					case "copy"                => CopyAction(name, process)
+					case "sources"             => SourcesAction(name, process)
+					case "git"                 => GitCloneAction(name, process)
+					case "python"              => PythonAction(name, process)
+					case "yaml"                => YamlAction(name, process)
+					case "toml"                => TomlAction(name, process)
+					case "sbt"                 => SbtAction(name, process)
+					case "read_verilog_top"    => ReadVerilogTopAction(name, process)
+					case "read_toml_registers" => ReadTomlRegistersAction(name, process)
+					case "templates"           => TemplateAction(name, process)
+					case "software_sources"    => SoftSourceAction(name, process)
 					case _                     =>
 						println(f"Unknown action processor (${Utils.toString(process("processor"))})" +
 						        f" in $name")

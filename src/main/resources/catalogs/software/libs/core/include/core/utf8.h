@@ -44,12 +44,20 @@
 #pragma warning(disable : 4820)
 #endif
 
+#include "core/core.h"
+#include "library_defines/library_defines.h"
 #include <stddef.h>
 
 #if !defined(UTF8_NO_STD_MALLOC)
 #include <stdlib.h>
 #else
+
+#if defined(IKUY_HAVE_LIB_DBG)
 #include "dbg/assert.h"
+#else
+#define assert(x)
+#endif
+
 #endif
 
 #if defined(_MSC_VER)

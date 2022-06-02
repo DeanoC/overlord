@@ -1,43 +1,42 @@
 path = "prefabs/socs/zynqps8"
 
 [[instance]]
-name = "r5fCluster"
-type = "cpu.zynqps8.r5f"
+name = "RPU"
+type = "cpu.r5f.zynqps8"
 
 [[instance]]
-name = "r5fClusterTCM"
-type = "ram.sram.tcm"
+name = "RPU_to_TCM"
+type = "switch.internal.tcm.zynqps8"
+
+[[connection]]
+type = "bus"
+connection = "RPU -> RPU_to_TCM"
+bus_name = "rputcm"
 
 [[instance]]
-name = "r5fClusterInternalBus"
-type = "bus.internal.r5f"
-
-[[instance]]
-name = "r5fCluster_to_mainBus"
-type = "bridge.internal.r5f_to_mainbus"
+name = "RPUTCM"
+type = "ram.sram.tcm.zynqps8"
 
 [[connection]]
 type = "logical"
-connection = "r5fCluster -> r5fClusterInternalBus"
+connection = "RPU_to_TCM -> RPUTCM"
 
 [[connection]]
 type = "bus"
-connection = "r5fClusterInternalBus -> r5fClusterTCM"
-
-[[connection]]
-type = "logical"
-connection = "r5fClusterInternalBus -> r5fCluster_to_mainBus"
+connection = "RPU -> RPUSwitch"
+bus_name = "rpu0"
 
 [[connection]]
 type = "bus"
-connection = "r5fCluster_to_mainBus -> mainBus"
+connection = "RPU -> RPUSwitch"
+bus_name = "rpu1"
 
 [[connection]]
 type = "bus"
-connection = "mainBus -> r5fClusterTCM"
-address_offset = [
-    ["0xFFE0_0000", "64 KiB"],
-    ["0xFFE2_0000", "64 KiB"],
-    ["0xFFE9_0000", "64 KiB"],
-    ["0xFFEB_0000", "64 KiB"]
-]
+connection = "RPUIOSwitch -> RPU"
+bus_name = "rpus${index}"
+
+[[connection]]
+type = "bus"
+connection = "RPUIOSwitch -> RPU"
+bus_name = "rpus${index}"

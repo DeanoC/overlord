@@ -1,7 +1,4 @@
 description = "SerDes Configuration"
-[[bank]]
-  name = "SERDES"
-  address = "0xfd400000"
 [[register]]
   name = "L0_TX_ANA_TM_18"
   type = "mixed"

@@ -1,35 +1,27 @@
 package actions
 
 import ikuy_utils._
+import overlord.Game
 import overlord.Instances.InstanceTrait
 
-import java.nio.file.Path
-
-case class PythonAction(script: String,
-                        args: String,
-                        pathOp: ActionPathOp)
+case class PythonAction(script: String, args: String)
 	extends Action {
 
 	override val phase: Int = 1
 
-	override def execute(instance: InstanceTrait,
-	                     parameters: Map[String, () => Variant],
-	                     outPath: Path): Unit = {
+	override def execute(instance: InstanceTrait, parameters: Map[String, Variant]): Unit = {
 		import scala.language.postfixOps
 
-		val result = sys.process.Process(
-			Seq("python3", s"$script", s"$args"), outPath.toFile).!
+		val result = sys.process.Process(Seq("python3", s"$script", Game.resolvePathMacros(instance, s"$args")),
+		                                 Game.catalogPath.toFile).!
 
-		if (result != 0)
-			println(s"FAILED python3 of $script $args")
+		if (result != 0) println(s"FAILED python3 of $script $args")
 
 	}
 }
 
 object PythonAction {
-	def apply(name: String,
-	          process: Map[String, Variant],
-	          pathOp: ActionPathOp): Seq[PythonAction] = {
+	def apply(name: String, process: Map[String, Variant]): Seq[PythonAction] = {
 		if (!process.contains("script")) {
 			println(s"Python process $name doesn't have a script field")
 			None
@@ -48,6 +40,6 @@ object PythonAction {
 		}
 		val script = Utils.toString(process("script"))
 		val args   = Utils.toString(process("args"))
-		Seq(PythonAction(script, args, pathOp))
+		Seq(PythonAction(script, args))
 	}
 }

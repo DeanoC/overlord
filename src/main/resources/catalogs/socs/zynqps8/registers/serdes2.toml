@@ -1,7 +1,4 @@
 description = "SerDes2 Configuration"
-[[bank]]
-name = "SERDES2"
-address = "0xfd410000"
 [[register]]
 name = "PLL_REF_SEL0"
 type = "mixed"

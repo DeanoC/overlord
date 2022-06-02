@@ -3,12 +3,12 @@ package overlord.Instances
 import ikuy_utils.Variant
 import overlord.ChipDefinitionTrait
 
-case class StorageInstance(ident: String,
+case class StorageInstance(name: String,
                            private val defi: ChipDefinitionTrait
                           ) extends ChipInstance {
-	override def definition:ChipDefinitionTrait = defi
-	override def copyMutate[A <: ChipInstance](nid: String) : StorageInstance =
-		copy(ident = nid)
+	override def definition: ChipDefinitionTrait = defi
+
+	override def isVisibleToSoftware: Boolean = true
 
 }
 

@@ -1,40 +1,7 @@
-path = "prefabs/socs/zynqps8"
-
 [[instance]]
-name = "a53Cluster"
-type = "cpu.zynqps8.a53"
-
-[[instance]]
-name = "a53ClusterInternalBus"
-type = "bus.axi4.zynqps8"
-
-[[instance]]
-name = "a53Cluster_to_mainBus"
-type = "bridge.internal.a53_to_mainbus"
-
-[[instance]]
-name = "ocm"
-type = "ram.sram.ocm"
+name = "APU"
+type = "cpu.a53.zynqps8"
 
 [[connection]]
 type = "logical"
-connection = "a53Cluster -> a53ClusterInternalBus"
-
-[[connection]]
-type = "bus"
-connection = "a53ClusterInternalBus -> ocm"
-address_offset = "0xFFFC_0000"
-
-[[connection]]
-type = "bus"
-connection = "a53ClusterInternalBus -> a53Cluster_to_mainBus"
-address_offset = "0"
-
-[[connection]]
-type = "logical"
-connection = "a53Cluster_to_mainBus -> mainBus"
-
-[[connection]]
-type = "bus"
-connection = "mainBus -> ocm"
-address_offset = "0xFFFC_0000"
+connection = "APU -> CCI"

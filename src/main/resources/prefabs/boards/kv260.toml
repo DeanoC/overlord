@@ -1,5 +1,5 @@
 [[instance]]
-name = "sdcard"
+name = "SDIO0"
 type = "storage.sdio.zynqps8"
 instance = 0
 
@@ -8,31 +8,36 @@ name = "sdcard.slot0"
 type = "storage.sdio.sdcard.slot"
 
 [[instance]]
-name = "ddr4.kv260"
-type = "ram.ddr.ddr4.kv260"
-size = "4 GiB"
+name = "DDR"
+type = "ram.ddr.ddr4.zynqps8"
+ranges = [
+    { address = "0x0_0000_0000", size = "2 GiB" },
+    { address = "0x8_0000_0000", size = "2 GiB" },
+]
 
 [[instance]]
-name = "uart.debug"
+name = "I2C0"
+type = "switch.i2c.zynqps8"
+instance = 0
+visible_to_software = true
+
+[[instance]]
+name = "UART1"
 type = "io.uart.zynqps8"
 instance = 1
+
+[[instance]]
+name = "USB1"
+type = "io.internal.usb.zynqps8"
+instance = 1
+
+[[instance]]
+name = "QSPI"
+type = "storage.qspi.zynqps8"
 
 [[connection]]
 type = "port"
 connection = "SDIO0._ <- sdcard.slot0"
-
-[[connection]]
-type = "bus"
-connection = "mainBus -> mainDDR4"
-address_offset = [["0x0000_0000", "2 GiB"], ["0x8_0000_0000", "2 GiB"], ]
-
-[[connection]]
-type = "bus"
-connection = "apbBus -> sdcard"
-
-[[connection]]
-type = "bus"
-connection = "apbBus -> uart._"
 
 [[connection]]
 type = "logical"
@@ -40,4 +45,12 @@ connection = "sdcard -> sdcard.slot0"
 
 [[connection]]
 type = "logical"
-connection = "mainDDR4 -> ddr4.kv260"
+connection = "DDRController -> DDR"
+
+[[connection]]
+type = "port_group"
+connection = "I2C0 -> BOARD.I2C0._"
+
+[[connection]]
+type = "logical"
+connection = "kv260 -> PS8"

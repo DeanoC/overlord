@@ -1,7 +1,4 @@
 description = "FPD System-level Control - Secure"
-[[bank]]
-  name = "FPD_SLCR_SECURE"
-  address = "0xfd690000"
 [[register]]
   name = "CTRL"
   type = "rw"

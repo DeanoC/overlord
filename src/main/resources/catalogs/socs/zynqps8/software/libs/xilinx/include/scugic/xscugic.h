@@ -220,8 +220,8 @@ typedef struct
 typedef struct
 {
 	u16 DeviceId;		/**< Unique ID  of device */
-	u32 CpuBaseAddress;	/**< CPU Interface Register base address */
-	u32 DistBaseAddress;	/**< Distributor Register base address */
+	uint32_t CpuBaseAddress;	/**< CPU Interface Register base address */
+	uint32_t DistBaseAddress;	/**< Distributor Register base address */
 	XScuGic_VectorTableEntry HandlerTable[XSCUGIC_MAX_NUM_INTR_INPUTS];/**<
 				 Vector table of interrupt handlers */
 } XScuGic_Config;
@@ -234,13 +234,13 @@ typedef struct
 typedef struct
 {
 	XScuGic_Config *Config;  /**< Configuration table entry */
-	u32 IsReady;		 /**< Device is initialized and ready */
-	u32 UnhandledInterrupts; /**< Intc Statistics */
+	uint32_t IsReady;		 /**< Device is initialized and ready */
+	uint32_t UnhandledInterrupts; /**< Intc Statistics */
 } XScuGic;
 
 /************************** Variable Definitions *****************************/
 
-extern XScuGic_Config XScuGic_ConfigTable[1];	/**< Config table */
+EXTERN_C XScuGic_Config XScuGic_ConfigTable[];	/**< Config table */
 
 /***************** Macros (Inline Functions) Definitions *********************/
 
@@ -257,12 +257,12 @@ extern XScuGic_Config XScuGic_ConfigTable[1];	/**< Config table */
 *
 * @note
 * C-style signature:
-*    void XScuGic_CPUWriteReg(XScuGic *InstancePtr, u32 RegOffset, u32 Data)
+*    void XScuGic_CPUWriteReg(XScuGic *InstancePtr, uint32_t RegOffset, uint32_t Data)
 *
 *****************************************************************************/
 #define XScuGic_CPUWriteReg(InstancePtr, RegOffset, Data) \
 (XScuGic_WriteReg(((InstancePtr)->Config->CpuBaseAddress), (RegOffset), \
-					((u32)(Data))))
+					((uint32_t)(Data))))
 
 /****************************************************************************/
 /**
@@ -276,7 +276,7 @@ extern XScuGic_Config XScuGic_ConfigTable[1];	/**< Config table */
 *
 * @note
 * C-style signature:
-*    u32 XScuGic_CPUReadReg(XScuGic *InstancePtr, u32 RegOffset)
+*    uint32_t XScuGic_CPUReadReg(XScuGic *InstancePtr, uint32_t RegOffset)
 *
 *****************************************************************************/
 #define XScuGic_CPUReadReg(InstancePtr, RegOffset) \
@@ -295,12 +295,12 @@ extern XScuGic_Config XScuGic_ConfigTable[1];	/**< Config table */
 *
 * @note
 * C-style signature:
-*    void XScuGic_DistWriteReg(XScuGic *InstancePtr, u32 RegOffset, u32 Data)
+*    void XScuGic_DistWriteReg(XScuGic *InstancePtr, uint32_t RegOffset, uint32_t Data)
 *
 *****************************************************************************/
 #define XScuGic_DistWriteReg(InstancePtr, RegOffset, Data) \
 (XScuGic_WriteReg(((InstancePtr)->Config->DistBaseAddress), (RegOffset), \
-					((u32)(Data))))
+					((uint32_t)(Data))))
 
 /****************************************************************************/
 /**
@@ -314,7 +314,7 @@ extern XScuGic_Config XScuGic_ConfigTable[1];	/**< Config table */
 *
 * @note
 * C-style signature:
-*    u32 XScuGic_DistReadReg(XScuGic *InstancePtr, u32 RegOffset)
+*    uint32_t XScuGic_DistReadReg(XScuGic *InstancePtr, uint32_t RegOffset)
 *
 *****************************************************************************/
 #define XScuGic_DistReadReg(InstancePtr, RegOffset) \
@@ -333,12 +333,12 @@ extern XScuGic_Config XScuGic_ConfigTable[1];	/**< Config table */
 *
 * @note
 * C-style signature:
-*    void XScuGic_DistWriteReg(XScuGic *InstancePtr, u32 RegOffset, u32 Data)
+*    void XScuGic_DistWriteReg(XScuGic *InstancePtr, uint32_t RegOffset, uint32_t Data)
 *
 *****************************************************************************/
 #define XScuGic_ReDistWriteReg(InstancePtr, RegOffset, Data) \
 (XScuGic_WriteReg(((InstancePtr)->Config->DistBaseAddress)+ \
-				   XSCUGIC_RDIST_OFFSET, (RegOffset), ((u32)(Data))))
+				   XSCUGIC_RDIST_OFFSET, (RegOffset), ((uint32_t)(Data))))
 
 /****************************************************************************/
 /**
@@ -352,7 +352,7 @@ extern XScuGic_Config XScuGic_ConfigTable[1];	/**< Config table */
 *
 * @note
 * C-style signature:
-*    u32 XScuGic_DistReadReg(XScuGic *InstancePtr, u32 RegOffset)
+*    uint32_t XScuGic_DistReadReg(XScuGic *InstancePtr, uint32_t RegOffset)
 *
 *****************************************************************************/
 #define XScuGic_ReDistReadReg(InstancePtr, RegOffset) \
@@ -372,12 +372,12 @@ XSCUGIC_RDIST_OFFSET), (RegOffset)))
 *
 * @note
 * C-style signature:
-*    void XScuGic_DistWriteReg(XScuGic *InstancePtr, u32 RegOffset, u32 Data)
+*    void XScuGic_DistWriteReg(XScuGic *InstancePtr, uint32_t RegOffset, uint32_t Data)
 *
 *****************************************************************************/
 #define XScuGic_ReDistSGIPPIWriteReg(InstancePtr, RegOffset, Data) \
 (XScuGic_WriteReg(((InstancePtr)->Config->DistBaseAddress)+ \
-				   XSCUGIC_RDIST_SGI_PPI_OFFSET, (RegOffset), ((u32)(Data))))
+				   XSCUGIC_RDIST_SGI_PPI_OFFSET, (RegOffset), ((uint32_t)(Data))))
 
 /****************************************************************************/
 /**
@@ -391,7 +391,7 @@ XSCUGIC_RDIST_OFFSET), (RegOffset)))
 *
 * @note
 * C-style signature:
-*    u32 XScuGic_DistReadReg(XScuGic *InstancePtr, u32 RegOffset)
+*    uint32_t XScuGic_DistReadReg(XScuGic *InstancePtr, uint32_t RegOffset)
 *
 *****************************************************************************/
 #define XScuGic_ReDistSGIPPIReadReg(InstancePtr, RegOffset) \
@@ -548,28 +548,25 @@ XSCUGIC_RDIST_OFFSET), (RegOffset)))
  * Required functions in xscugic.c
  */
 
-s32  XScuGic_Connect(XScuGic *InstancePtr, u32 Int_Id,
-			XInterruptHandler Handler, void *CallBackRef);
-void XScuGic_Disconnect(XScuGic *InstancePtr, u32 Int_Id);
+s32  XScuGic_Connect(XScuGic *InstancePtr, uint32_t Int_Id, XInterruptHandler Handler, void *CallBackRef);
+void XScuGic_Disconnect(XScuGic *InstancePtr, uint32_t Int_Id);
 
-void XScuGic_Enable(XScuGic *InstancePtr, u32 Int_Id);
-void XScuGic_Disable(XScuGic *InstancePtr, u32 Int_Id);
+void XScuGic_Enable(XScuGic *InstancePtr, uint32_t Int_Id);
+void XScuGic_Disable(XScuGic *InstancePtr, uint32_t Int_Id);
 
-s32  XScuGic_CfgInitialize(XScuGic *InstancePtr, XScuGic_Config *ConfigPtr,
-							u32 EffectiveAddr);
+int32_t  XScuGic_CfgInitialize(XScuGic *InstancePtr, XScuGic_Config *ConfigPtr, uint32_t EffectiveAddr);
 
-s32  XScuGic_SoftwareIntr(XScuGic *InstancePtr, u32 Int_Id, u32 Cpu_Identifier);
+s32  XScuGic_SoftwareIntr(XScuGic *InstancePtr, uint32_t Int_Id, uint32_t Cpu_Identifier);
 
-void XScuGic_GetPriorityTriggerType(XScuGic *InstancePtr, u32 Int_Id,
+void XScuGic_GetPriorityTriggerType(XScuGic *InstancePtr, uint32_t Int_Id,
 					u8 *Priority, u8 *Trigger);
-void XScuGic_SetPriorityTriggerType(XScuGic *InstancePtr, u32 Int_Id,
-					u8 Priority, u8 Trigger);
-void XScuGic_InterruptMaptoCpu(XScuGic *InstancePtr, u8 Cpu_Identifier, u32 Int_Id);
-void XScuGic_InterruptUnmapFromCpu(XScuGic *InstancePtr, u8 Cpu_Identifier, u32 Int_Id);
+EXTERN_C void XScuGic_SetPriorityTriggerType(XScuGic *InstancePtr, uint32_t Int_Id, uint8_t Priority, uint8_t Trigger);
+void XScuGic_InterruptMaptoCpu(XScuGic *InstancePtr, u8 Cpu_Identifier, uint32_t Int_Id);
+void XScuGic_InterruptUnmapFromCpu(XScuGic *InstancePtr, u8 Cpu_Identifier, uint32_t Int_Id);
 void XScuGic_UnmapAllInterruptsFromCpu(XScuGic *InstancePtr, u8 Cpu_Identifier);
 void XScuGic_Stop(XScuGic *InstancePtr);
-void XScuGic_SetCpuID(u32 CpuCoreId);
-u32 XScuGic_GetCpuID(void);
+void XScuGic_SetCpuID(uint32_t CpuCoreId);
+uint32_t XScuGic_GetCpuID(void);
 /*
  * Initialization functions in xscugic_sinit.c
  */

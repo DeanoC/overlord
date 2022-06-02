@@ -1,6 +1,7 @@
 package output
 
 import ikuy_utils._
+import overlord.Chip.Registers
 import overlord.Instances.{BoardInstance, ChipInstance, Container, InstanceTrait}
 import overlord._
 import scalax.collection.Graph
@@ -9,7 +10,6 @@ import scalax.collection.GraphPredef.EdgeAssoc
 import scalax.collection.io.dot.implicits._
 import scalax.collection.io.dot.{DotGraph, _}
 
-import java.nio.file.Path
 import scala.collection.mutable
 
 object Report {
@@ -55,7 +55,7 @@ object Report {
 	private val bridgeEdgeDotAttribs  = Seq(DotAttr("style", "dashed"))
 	private val defaultEdgeDotAttribs = Seq(DotAttr("color", "black"))
 
-	def apply(game: Game, out: Path): Unit = {
+	def apply(game: Game): Unit = {
 
 		val sb   = new StringBuilder
 		val cpus = game.cpus
@@ -108,22 +108,22 @@ object Report {
 			b => {
 				val first  = game.distanceMatrix.instanceArray(b._1)
 				val second = game.distanceMatrix.instanceArray(b._2)
-				sb ++= f" ${first.ident} ${second.ident}%n"
+				sb ++= f" ${first.name} ${second.name}%n"
 			}
 			)
 
 		sb ++= game.distanceMatrix.debugPrint
 
-		Utils.writeFile(out.resolve("report.txt"), sb.result())
+		Utils.writeFile(Game.outPath.resolve("report.txt"), sb.result())
 
-		outputDotGraph(game, out)
+		outputDotGraph(game)
 	}
 
 	private def reportInstances(game: Game): String = {
 		game.children.map(reportInstance(_)).mkString("")
 	}
 
-	private def outputDotGraph(game: Game, out: Path) = {
+	private def outputDotGraph(game: Game) = {
 		var (graph, maxDistance) = convertToGraph(game)
 
 		graph = makeLegendGraph(graph, maxDistance)
@@ -153,7 +153,7 @@ object Report {
 			cNodeTransformer = Some(context.nodePrep),
 			)
 
-		Utils.writeFile(out.resolve(s"${game.name}.dot"), dotText)
+		Utils.writeFile(Game.outPath.resolve(s"${game.name}.dot"), dotText)
 	}
 
 	private def makeLegendGraph(graph: GraphType, maxDistance: Int): GraphType = {
@@ -165,9 +165,8 @@ object Report {
 		var dinsts: Array[DefinitionType] = Array(BoardDefinitionType(Seq(s"Legend")))
 
 		// each class
-		dinsts ++= Utils.KnownSubClassesOfSealedType[DefinitionType]().map {
-			clazz =>
-				Utils.ConstructFromClassSymbol(clazz, clazz.name).asInstanceOf[DefinitionType]
+		dinsts ++= Utils.KnownSubClassesOfSealedType[DefinitionType]().flatMap {
+			clazz => Utils.ConstructFromClassSymbol[DefinitionType](clazz, clazz.name)
 		}
 
 		if (classCount < maxDistance * 3) {
@@ -204,7 +203,7 @@ object Report {
 	private def convertToGraph(game: Game) = {
 		var graph: GraphType = Graph[(String, DefinitionType, NodeStyleTypeTag), DiEdge]()
 		for (node <- game.distanceMatrix.instanceArray) {
-			graph += ((node.ident, node.definition.defType, ChipTypeTag))
+			graph += ((node.name, node.definition.defType, ChipTypeTag))
 		}
 
 		var maxDistance = 0
@@ -220,9 +219,9 @@ object Report {
 				for {endIndex <- route.indices} {
 					val sinst = game.distanceMatrix.instanceArray(startIndex)
 					val einst = game.distanceMatrix.instanceArray(route(endIndex))
-					graph += ((sinst.ident, sinst.definition.defType, ChipTypeTag)
+					graph += ((sinst.name, sinst.definition.defType, ChipTypeTag)
 					          ~>
-					          (einst.ident, einst.definition.defType, ChipTypeTag))
+					          (einst.name, einst.definition.defType, ChipTypeTag))
 					startIndex = route(endIndex)
 				}
 			}
@@ -237,17 +236,19 @@ object Report {
 
 	private def reportInstance(instance: InstanceTrait,
 	                           indentLevel: Int = 0): String = {
-		val sb = new StringBuilder
+		val sb = new mutable.StringBuilder
 
 		val indent = "\t" * indentLevel
 		sb ++= (indent + f"------------------%n")
-		sb ++= (indent + instance.ident + f"%n")
+		sb ++= (indent + instance.name + f"%n")
 		val id   = instance.definition.defType.ident.mkString(".")
 		sb ++= (indent + f"type: $id%n")
 		instance match {
 			case ci: ChipInstance =>
-				for (rl <- ci.registerLists)
-					sb ++= f"   ${rl.name} - ${rl.description}%n"
+				for (rb <- ci.banks) {
+					val rl = Registers.registerListCache(rb.registerListName)
+					sb ++= f"   ${rb.name} - ${rb.registerListName} ${rl.description}%n"
+				}
 			case _                =>
 		}
 		instance match {
@@ -271,7 +272,6 @@ object Report {
 					edef match {
 						case RamDefinitionType(ident)    => ramEdgeDotAttribs
 						case BusDefinitionType(ident)    => busEdgeDotAttribs
-						case BridgeDefinitionType(ident) => bridgeEdgeDotAttribs
 						case _                           => defaultEdgeDotAttribs
 					}
 				} ++ {
@@ -315,7 +315,6 @@ object Report {
 				case RamDefinitionType(_)      => ramDotAttribs
 				case StorageDefinitionType(_)  => storageDotAttribs
 				case BusDefinitionType(_)      => busDotAttribs
-				case BridgeDefinitionType(_)   => bridgeDotAttribs
 				case PinGroupDefinitionType(_) => graph = pins; pinGroupDotAttribs
 				case _                         => defaultDotAttribs
 			}

@@ -1,7 +1,4 @@
 description = "Clock and Reset control registers for FPD."
-[[bank]]
-  name = "CRF_APB"
-  address = "0xfd1a0000"
 [[register]]
   name = "ERR_CTRL"
   type = "rw"

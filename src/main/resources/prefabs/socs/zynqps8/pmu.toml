@@ -2,39 +2,10 @@ path = "prefabs/socs/zynqps8"
 
 [[instance]]
 name = "pmu"
-type = "cpu.zynqps8.pmu"
+type = "cpu.pmu.zynqps8"
 
 [[instance]]
-name = "pmuRAM"
+name = "PMURAM"
 type = "ram.sram.pmuram"
 
-[[instance]]
-name = "pmuInternalBus"
-type = "bus.internal.pmu"
-
-[[instance]]
-name = "pmu_to_mainBus"
-type = "bridge.internal.pmu_to_mainbus"
-
-[[connection]]
-type = "logical"
-connection = "pmu -> pmuInternalBus"
-
-[[connection]]
-type = "bus"
-connection = "pmuInternalBus -> pmuRAM"
-address_offset = "0xFFDC_0000"
-
-[[connection]]
-type = "bus"
-connection = "pmuInternalBus -> pmu_to_mainBus"
-address_offset = "0"
-
-[[connection]]
-type = "logical"
-connection = "pmu_to_mainBus -> mainBus"
-
-[[connection]]
-type = "bus"
-connection = "mainBus -> pmuRAM"
-address_offset = "0xFFDC_0000"
+#address_offset = "0xFFDC_0000"

@@ -1,9 +1,7 @@
-path = "ddr4"
 [[definition]]
 type = "ram.ddr.ddr4.zynqps8"
+
 registers = [
-    { resource = "zynqps8/ddr_phy" },
-    { resource = "zynqps8/ddr_qos_ctrl" },
-    { resource = "zynqps8/ddrc" }
+    { resource = "zynqps8/ddr_phy.toml", name = "DDR_PHY", base_address = "0xfd080000" },
+    { resource = "zynqps8/ddr_qos_ctrl.toml", name = "DDR_QOS_CTRL", base_address = "0xfd090000" },
 ]
-hardware = [{ max_cores = 1 }]

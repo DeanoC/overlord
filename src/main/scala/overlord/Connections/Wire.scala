@@ -50,9 +50,9 @@ object Wires {
 					var cp = sp
 					for {p <- route} {
 						val cploc = if (cp == sp) f else if (cp == ep) s else
-							InstanceLoc(dm.instanceOf(cp), None, dm.instanceOf(cp).ident)
+							InstanceLoc(dm.instanceOf(cp), None, dm.instanceOf(cp).name)
 						val ploc  = if (p == sp) f else if (p == ep) s else
-							InstanceLoc(dm.instanceOf(p), None, dm.instanceOf(p).ident)
+							InstanceLoc(dm.instanceOf(p), None, dm.instanceOf(p).name)
 
 						ghosts += GhostWire(cp, p, cploc, ploc, c.direction, c.connectionPriority)
 						cp = p
@@ -99,8 +99,8 @@ object Wires {
 		}
 
 		wires.sortInPlaceWith((a, b) =>
-			                      a.startLoc.instance.ident <
-			                      b.startLoc.instance.ident)
+			                      a.startLoc.instance.name <
+			                      b.startLoc.instance.name)
 
 		wires.toSeq
 

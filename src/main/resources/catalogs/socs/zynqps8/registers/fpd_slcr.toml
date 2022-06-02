@@ -1,7 +1,4 @@
 description = "FPD System-level Control"
-[[bank]]
-  name = "FPD_SLCR"
-  address = "0xfd610000"
 [[register]]
   name = "WPROT0"
   type = "rw"

@@ -1,12 +1,11 @@
 #include "core/core.h"
 #include "core/utf8.h"
-#include "dbg/print.h"
 #include "memory/memory.h"
 #include "vfile/vfile.h"
 #include "vfile/utils.h"
 #include "fatfs/fatfs.h"
 #include "ff.h"
-#include "fatfs/fatfs.h"
+#include "fatfs/vfile.h"
 
 typedef struct FATFS_VFile_t {
 	Memory_Allocator* allocator;
@@ -80,11 +79,16 @@ static bool FATFS_VFile_IsEOF(VFile_Interface_t *vif) {
 	return FATFS_IsEOF((FATFS_FileHandle)&vof->fileHandle);
 }
 
-VFile_Handle FATFS_VFileFromFile(char const *filename, enum FATFS_FileMode mode, Memory_Allocator* allocator) {
-	const uint64_t mallocSize =
-			sizeof(VFile_Interface_t) +
-					sizeof(FATFS_VFile_t) +
-					utf8size(filename) + 1;
+VFile_Handle FATFS_VFileFromName(utf8_int8_t const *filename, enum FATFS_FileMode mode, Memory_Allocator* allocator) {
+	FIL fh;
+	FRESULT result = FATFS_Open((FATFS_FileHandle)&fh, filename, mode);
+	if (result != FR_OK) { return nullptr; }
+	return FATFS_VFileFromFileHandle((FATFS_FileHandle)&fh, filename, allocator);
+}
+
+
+EXTERN_C VFile_Handle FATFS_VFileFromFileHandle(FATFS_FileHandle fh, utf8_int8_t const *filename, Memory_Allocator* allocator) {
+	uint64_t const mallocSize = sizeof(VFile_Interface_t) + sizeof(FATFS_VFile_t) + utf8size(filename) + 1;
 	VFile_Interface_t *vif = (VFile_Interface_t *) MALLOC(allocator, mallocSize);
 	vif->magic = InterfaceMagic;
 	vif->type =   VFILE_MAKE_ID('F', 'A', 'T', 'F');
@@ -99,11 +103,7 @@ VFile_Handle FATFS_VFileFromFile(char const *filename, enum FATFS_FileMode mode,
 	vif->isEofFunc = &FATFS_VFile_IsEOF;
 
 	FATFS_VFile_t *vof = (FATFS_VFile_t *) (vif + 1);
-	FRESULT result = FATFS_Open((FATFS_FileHandle)&vof->fileHandle, filename, mode);
-	if (result != FR_OK) {
-		MFREE(allocator, vif);
-		return nullptr;
-	}
+	memcpy(&vof->fileHandle, fh, sizeof(FIL));
 
 	vof->allocator = allocator;
 	char *dstname = (char *) (vof + 1);
@@ -111,4 +111,3 @@ VFile_Handle FATFS_VFileFromFile(char const *filename, enum FATFS_FileMode mode,
 
 	return (VFile_Handle) vif;
 }
-

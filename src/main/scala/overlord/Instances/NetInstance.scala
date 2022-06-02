@@ -3,11 +3,10 @@ package overlord.Instances
 import ikuy_utils.Variant
 import overlord.ChipDefinitionTrait
 
-case class NetInstance(ident: String,
+case class NetInstance(name: String,
                        override val definition: ChipDefinitionTrait,
                       ) extends ChipInstance {
-	override def copyMutate[A <: ChipInstance](nid: String): NetInstance =
-		copy(ident = nid)
+	override def isVisibleToSoftware: Boolean = true
 }
 
 object NetInstance {

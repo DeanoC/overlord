@@ -47,9 +47,9 @@ object Resetti {
 	case class ResettiComponent()
 		extends Component {
 		val io = new Bundle {
-			val clk = in Bool
-			val asyncReset = in Bool
-			val syncReset = out Bool
+			val clk        = in Bool()
+			val asyncReset = in Bool()
+			val syncReset  = out Bool()
 		}
 		noIoPrefix()
 
@@ -65,11 +65,11 @@ object Resetti {
 			//Implement an counter to keep the reset axiResetOrder high 64 cycles
 			// Also this counter will automaticly do a reset when the system boot.
 			val systemResetCounter = Reg(UInt(log2Up(resetClocks-1) bits)) init(0)
-			when(systemResetCounter =/= U(systemResetCounter.range -> true)){
+			when(systemResetCounter =/= U(systemResetCounter.bitsRange -> true)) {
 				systemResetCounter := systemResetCounter + 1
 				systemResetUnbuffered := True
 			}
-			when(BufferCC(io.asyncReset)){
+			when(BufferCC(io.asyncReset)) {
 				systemResetCounter := 0
 			}
 

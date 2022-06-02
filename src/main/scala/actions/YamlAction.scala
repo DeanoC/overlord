@@ -4,46 +4,37 @@ import ikuy_utils._
 import overlord.Game
 import overlord.Instances.InstanceTrait
 
-import java.nio.file.Path
+import scala.collection.mutable
 
-case class YamlAction(parameterKeys: Seq[String],
-                      filename: String,
-                      pathOp: ActionPathOp)
+case class YamlAction(parameterKeys: Seq[String], filename: String)
 	extends Action {
 
 	override val phase: Int = 1
 
-	override def execute(instance: InstanceTrait,
-	                     parameters: Map[String, () => Variant],
-	                     outPath: Path): Unit = {
-		val sb = new StringBuilder()
-		for {(k, v) <- parameters
-		     parameter = v()}
-			sb ++= (parameter match {
-				case ArrayV(arr)       => "TODO"
+	override def execute(instance: InstanceTrait, parameters: Map[String, Variant]): Unit = {
+		val sb = new mutable.StringBuilder()
+		for {(k, v) <- parameters}
+			sb ++= (v match {
+				case ArrayV(arr)       => ???
 				case BigIntV(bigInt)   => s"$k: $bigInt\n"
 				case BooleanV(boolean) => s"$k: $boolean\n"
 				case IntV(int)         => s"$k: $int\n"
-				case TableV(table)     => "TODO:"
+				case TableV(table)     => ???
 				case StringV(string)   => s"$k: '$string'\n"
 				case DoubleV(dbl)      => s"$k: $dbl\n"
 			})
 
-		val moddedOutPath = Game.pathStack.top.resolve(instance.ident)
+		val moddedOutPath = Game.outPath.resolve(Game.resolvePathMacros(instance, instance.name))
 
-		val dstAbsPath = moddedOutPath.resolve(filename)
+		val dstAbsPath = moddedOutPath.resolve(Game.resolvePathMacros(instance, filename))
 		Utils.ensureDirectories(dstAbsPath.getParent)
 
 		Utils.writeFile(dstAbsPath, sb.result())
-
-		updatePath(dstAbsPath.getParent)
 	}
 }
 
 object YamlAction {
-	def apply(name: String,
-	          process: Map[String, Variant],
-	          pathOp: ActionPathOp): Seq[YamlAction] = {
+	def apply(name: String, process: Map[String, Variant]): Seq[YamlAction] = {
 		if (!process.contains("parameters")) {
 			println(s"Yaml process $name doesn't have a parameters field")
 			return Seq()
@@ -64,6 +55,6 @@ object YamlAction {
 		val filename   = Utils.toString(process("filename"))
 		val parameters = Utils.toArray(process("parameters")).map(Utils.toString)
 
-		Seq(YamlAction(parameters, filename, pathOp))
+		Seq(YamlAction(parameters, filename))
 	}
 }

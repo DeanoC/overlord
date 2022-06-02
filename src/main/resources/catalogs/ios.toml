@@ -1,4 +1,3 @@
-path = "ios"
 resources = [
-    "ios",
+    "ios/ios.toml",
 ]

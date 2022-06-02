@@ -1,5 +1,5 @@
 resources = [
-    "boards",
-    "hosts",
-    "socs",
+    "boards.toml",
+    "hosts.toml",
+    "socs.toml",
 ]

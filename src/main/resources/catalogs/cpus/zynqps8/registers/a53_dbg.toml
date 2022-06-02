@@ -1,7 +1,4 @@
 description = "Cortex-A53 built-in debug logic, A53 Debug Logic"
-[[bank]]
-  name = "CORESIGHT_A53_DBG"
-  address = "0xfec10000"
 [[register]]
   name = "EDESR"
   type = "rw"

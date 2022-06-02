@@ -32,6 +32,9 @@
  * - LZ4 source repository : https://github.com/lz4/lz4
  */
 
+#include "core/core.h"
+#include "memory/memory.h"
+
 /* LZ4F is a stand-alone API to create LZ4-compressed Frames
  * in full conformance with specification v1.6.1 .
  * This library rely upon memory management capabilities (malloc, free)
@@ -72,13 +75,12 @@
  * by modifying below section.
  */
 #ifndef LZ4_SRC_INCLUDED   /* avoid redefinition when sources are coalesced */
-#  include <stdlib.h>   /* malloc, calloc, free */
-#  define ALLOC(s)          malloc(s)
-#  define ALLOC_AND_ZERO(s) calloc(1,(s))
-#  define FREEMEM(p)        free(p)
+extern Memory_Allocator * globalAllocator;
+#  define ALLOC(s)          MALLOC(globalAllocator, s)
+#  define ALLOC_AND_ZERO(s) MCALLOC(globalAllocator, 1,(s))
+#  define FREEMEM(p)        MFREE(globalAllocator, p)
 #endif
 
-#include <string.h>   /* memset, memcpy, memmove */
 #ifndef LZ4_SRC_INCLUDED  /* avoid redefinition when sources are coalesced */
 #  define MEM_INIT(p,v,s)   memset((p),(v),(s))
 #endif

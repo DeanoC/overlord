@@ -1,4 +1,3 @@
-path = "software"
 resources = [
-    "software",
+    "software/software.toml",
 ]

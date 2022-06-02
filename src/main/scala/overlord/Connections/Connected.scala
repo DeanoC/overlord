@@ -2,7 +2,8 @@ package overlord.Connections
 
 import overlord.Chip.Port
 import overlord.Instances.{ChipInstance, ClockInstance, InstanceTrait, PinGroupInstance}
-import overlord.{DefinitionTrait, GatewareDefinitionTrait, SoftwareDefinitionTrait}
+import overlord.Interfaces.QueryInterface
+import overlord.{DefinitionTrait, GatewareDefinitionTrait, HardwareDefinitionTrait, SoftwareDefinitionTrait}
 
 sealed trait ConnectionPriority
 
@@ -17,9 +18,11 @@ case class InstanceLoc(instance: InstanceTrait,
                        fullName: String) {
 	def definition: DefinitionTrait = instance.definition
 
-	def isGateware: Boolean = instance.isInstanceOf[GatewareDefinitionTrait]
+	val isHardware: Boolean = definition.isInstanceOf[HardwareDefinitionTrait]
 
-	def isSoftware: Boolean = instance.isInstanceOf[SoftwareDefinitionTrait]
+	def isGateware: Boolean = definition.isInstanceOf[GatewareDefinitionTrait]
+
+	def isSoftware: Boolean = definition.isInstanceOf[SoftwareDefinitionTrait]
 
 	def isPin: Boolean = instance.isInstanceOf[PinGroupInstance]
 
@@ -29,12 +32,18 @@ case class InstanceLoc(instance: InstanceTrait,
 
 }
 
-trait Connected extends Connection {
+trait Connected extends QueryInterface {
 	val connectionPriority: ConnectionPriority
 
-	def connectsToInstance(inst: ChipInstance): Boolean
+	def connectedTo(inst: ChipInstance): Boolean
+
+	def connectedBetween(s: ChipInstance, e: ChipInstance): Boolean = connectedBetween(s, e, BiDirectionConnection())
+
+	def connectedBetween(s: ChipInstance, e: ChipInstance, d: ConnectionDirection): Boolean
 
 	def first: Option[InstanceLoc]
+
+	def direction: ConnectionDirection
 
 	def second: Option[InstanceLoc]
 

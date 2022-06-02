@@ -26,15 +26,21 @@ file(GLOB ASMLIST CONFIGURE_DEPENDS
 		src/${CPU_ARCH}/*.S
 		src/${CPU}/*.S )
 
+set(PRIVATE_LIBRARIES
+		cadt
+		core
+		dbg
+		library_defines
+		memory
+		multi_core
+		utils
+		vfile
+		tiny_stl
+		)
+
+
 add_library(${project} ${CLIST} ${CPPLIST} ${ASMLIST})
-target_link_libraries(${project} PRIVATE cadt)
-target_link_libraries(${project} PRIVATE core)
-target_link_libraries(${project} PRIVATE dbg)
-target_link_libraries(${project} PRIVATE memory)
-target_link_libraries(${project} PRIVATE multi_core)
-target_link_libraries(${project} PRIVATE utils)
-target_link_libraries(${project} PRIVATE vfile)
-target_link_libraries(${project} PRIVATE tiny_stl)
+target_link_libraries(${project} PRIVATE ${PRIVATE_LIBRARIES})
 
 target_include_directories(${project} PUBLIC include)
 target_compile_definitions(${project} PRIVATE BOARD_${BOARD}=1 SOC_${SOC}=1 CPU_${CPU}=1 CPU_ARCH_${CPU_ARCH}=1)

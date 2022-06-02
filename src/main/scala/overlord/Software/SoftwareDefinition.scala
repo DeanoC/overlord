@@ -7,9 +7,11 @@ import overlord.{DefinitionType, Game, SoftwareDefinitionTrait}
 import java.nio.file.Path
 
 case class SoftwareDefinition(defType: DefinitionType,
+                              sourcePath: Path,
                               attributes: Map[String, Variant],
                               parameters: Map[String, Variant],
                               dependencies: Seq[String],
+                              actionsFilePath: Path,
                               actionsFile: ActionsFile)
 	extends SoftwareDefinitionTrait {
 }
@@ -38,7 +40,7 @@ object SoftwareDefinition {
 
 		val dependencies: Seq[String] = if (table.contains("depends")) {
 			val depends = Utils.toArray(table("depends"))
-			depends.map(Utils.toString)
+			depends.map(Utils.toString).toSeq
 		} else {
 			Seq()
 		}
@@ -49,6 +51,7 @@ object SoftwareDefinition {
 		}) ++ Map[String, Variant]("name" -> StringV(name))
 
 		Some(SoftwareDefinition(DefinitionType(defTypeName),
+		                        path,
 		                        attribs,
 		                        defTypeName,
 		                        dependencies,
@@ -56,25 +59,29 @@ object SoftwareDefinition {
 	}
 
 	def apply(defType: DefinitionType,
+	          path: Path,
 	          attributes: Map[String, Variant],
 	          name: String,
 	          dependencies: Seq[String],
-	          spath: Path): Option[SoftwareDefinition] = {
-		val path = Game.pathStack.top.resolve(spath)
-		Game.pathStack.push(path.getParent)
+	          softwarePath: Path): Option[SoftwareDefinition] = {
+		Game.pushCatalogPath(softwarePath)
 		val result = parse(defType,
+		                   path,
 		                   attributes,
 		                   name,
 		                   dependencies,
-		                   Utils.readToml(name, path, getClass))
-		Game.pathStack.pop()
+		                   softwarePath,
+		                   Utils.readToml(softwarePath))
+		Game.popCatalogPath()
 		result
 	}
 
 	private def parse(defType: DefinitionType,
+	                  path: Path,
 	                  attributes: Map[String, Variant],
 	                  name: String,
 	                  dependencies: Seq[String],
+	                  softwarePath: Path,
 	                  parsed: Map[String, Variant]): Option[SoftwareDefinition] = {
 		val actionsFile = ActionsFile(name, parsed)
 
@@ -87,12 +94,13 @@ object SoftwareDefinition {
 			Utils.toTable(parsed("parameters"))
 		else Map[String, Variant]()
 
-		Some(SoftwareDefinition(
-			defType,
-			attributes,
-			parameters,
-			dependencies,
-			actionsFile.get))
+		Some(SoftwareDefinition(defType,
+		                        path,
+		                        attributes,
+		                        parameters,
+		                        dependencies,
+		                        softwarePath,
+		                        actionsFile.get))
 	}
 
 }

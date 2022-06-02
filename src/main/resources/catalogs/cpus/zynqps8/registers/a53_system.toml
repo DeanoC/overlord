@@ -1,9 +1,4 @@
 description = "A53 EL3 System registers"
-
-[[bank]]
-name = "A53_SYSTEM"
-address = "-1"
-
 [[register]]
 name = "CCSIDR_EL1"
 type = "rw"

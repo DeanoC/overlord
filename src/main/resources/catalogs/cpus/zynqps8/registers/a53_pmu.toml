@@ -1,7 +1,4 @@
 description = "A53 Performance Monitor Unit profiler"
-[[bank]]
-  name = "CORESIGHT_A53_PMU"
-  address = "0xfec30000"
 [[register]]
   name = "EVCNTR0_EL0"
   type = "rw"

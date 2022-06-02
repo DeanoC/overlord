@@ -1,7 +1,4 @@
 description = "A53 Cross Trigger Interface with to/from broadcast"
-[[bank]]
-  name = "CORESIGHT_A53_CTI"
-  address = "0xfec20000"
 [[register]]
   name = "CTICONTROL"
   type = "rw"

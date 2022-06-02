@@ -1,13 +1,16 @@
 package overlord.Chip
 
-import ikuy_utils.{StringV, TableV, Utils, Variant}
+import ikuy_utils.{StringV, Utils, Variant}
 import overlord.Game
+import overlord.Instances.InstanceTrait
 
-import java.nio.file.{Files, Path}
+import java.nio.file.Path
 import scala.collection.mutable
 
 case class RegisterBank(name: String,
-                        address: BigInt,
+                        baseAddress: BigInt,
+                        addressIncrement: BigInt,
+                        registerWindowSize: BigInt,
                         registerListName: String)
 
 case class Register(name: String,
@@ -36,46 +39,41 @@ case class RegisterFieldEnum(name: String,
                              value: BigInt,
                              description: Option[String])
 
-case class Registers(banks: Seq[RegisterBank], lists: Seq[RegisterList])
-
 object Registers {
-	def apply(registerDefs: Seq[Variant],
-	          registerPath: Path): Registers = {
+	val registerListCache: mutable.Map[String, RegisterList] = mutable.Map[String, RegisterList]()
+
+	def apply(instance: InstanceTrait, registerDefs: Seq[Variant]): Seq[RegisterBank] = {
 
 		val tomls = mutable.ArrayBuffer[(String, Map[String, Variant])]()
 
-		for (inlineTable <- registerDefs) {
-			val item = inlineTable.asInstanceOf[TableV].value
+		val registerBanks = for (inlineTable <- registerDefs) yield {
+			val item = Utils.toTable(inlineTable)
 			if (!item.contains("resource")) {
 				println(s"No resource in register table\n")
-				return Registers(Seq(), Seq())
+				return Seq()
 			}
-			val resource = item("resource").asInstanceOf[StringV].value
+			val resource           = Utils.toString(item("resource"))
+			val name               = Utils.lookupString(item, "name", "")
+			val baseAddress        = Utils.lookupBigInt(item, "base_address", -1)
+			val addressIncrement   = Utils.lookupBigInt(item, "address_increment", 0)
+			val registerWindowSize = Utils.lookupBigInt(item, "register_window_size", -1)
 
-			val path = registerPath.resolve(Path.of(s"$resource" + s".toml"))
-			if (!Files.exists(path.toAbsolutePath)) {
-				println(s"$path register file not found")
-				return Registers(Seq(),Seq())
-			}
+			val path: Path = Game.tryPaths(instance, resource)
 
-			Game.pathStack.push(path.getParent)
-			val source = Utils.readToml(resource, path, getClass)
+			val source = Utils.readToml(path)
 			tomls += ((resource, source))
-			Game.pathStack.pop()
-		}
 
-		val registerLists = for ((name, source) <- tomls) yield {
-			parseRegisterList(name, source)
+			if (Registers.registerListCache.contains(resource)) {
+				Some(RegisterBank(name, baseAddress, addressIncrement, registerWindowSize, resource))
+			} else parseRegisterList(resource, source).flatMap { list =>
+				Registers.registerListCache(resource) = list
+				Some(RegisterBank(name, baseAddress, addressIncrement, registerWindowSize, resource))
+			}
 		}
-		val registerBanks = for ((name, source) <- tomls) yield {
-			parseRegisterBanks(name, source)
-		}
-
-		Registers(registerBanks.flatten.toSeq, registerLists.flatten.toSeq)
+		registerBanks.flatten
 	}
 
-	private def parseRegisterList(name: String, parsed: Map[String, Variant])
-	: Option[RegisterList] = {
+	private def parseRegisterList(name: String, parsed: Map[String, Variant]): Option[RegisterList] = {
 		if (!parsed.contains("register")) return None
 
 		val tregisters = Utils.toArray(parsed("register"))
@@ -92,7 +90,9 @@ object Registers {
 			val offset  = Utils.toBigInt(table("offset"))
 			val desc    = if (table.contains("description")) {
 				Utils.toString(table("description"))
-			} else { "" }
+			} else {
+				""
+			}
 
 			val fields = if (table.contains("field")) {
 				for (field <- Utils.toArray(table("field"))) yield {
@@ -138,19 +138,5 @@ object Registers {
 		else "No Description"
 
 		Some(RegisterList(name, desc, registers))
-	}
-
-	private def parseRegisterBanks(name: String, parsed: Map[String, Variant])
-	: Seq[RegisterBank] = {
-		if (!parsed.contains("bank")) return Seq[RegisterBank]()
-
-		val tbanks = Utils.toArray(parsed("bank"))
-		val banks  = for (bank <- tbanks) yield {
-			val table    = Utils.toTable(bank)
-			val bankName = Utils.toString(table("name"))
-			val address  = Utils.toBigInt(table("address"))
-			RegisterBank(bankName, address, name)
-		}
-		banks.toSeq
 	}
 }

@@ -359,12 +359,12 @@ typedef void (*Xil_InterruptHandler)(void *data);
 
 /************************** Function Prototypes *****************************/
 
-extern void Xil_ExceptionRegisterHandler(u32 Exception_id,
+extern void Xil_ExceptionRegisterHandler(uint32_t Exception_id,
 																				 Xil_ExceptionHandler Handler,
 																				 void *Data);
 
-extern void Xil_ExceptionRemoveHandler(u32 Exception_id);
-extern void Xil_GetExceptionRegisterHandler(u32 Exception_id,
+extern void Xil_ExceptionRemoveHandler(uint32_t Exception_id);
+extern void Xil_GetExceptionRegisterHandler(uint32_t Exception_id,
 																						Xil_ExceptionHandler *Handler, void **Data);
 
 extern void Xil_ExceptionInit(void);

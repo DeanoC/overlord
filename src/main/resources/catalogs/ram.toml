@@ -1,5 +1,5 @@
 resources = [
-    "ram/ram",
+    "ram/ram.toml",
 ]
 
 [[definition]]

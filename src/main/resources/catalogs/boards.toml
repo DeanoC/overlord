@@ -1,7 +1,7 @@
 resources = [
-    "boards/Arty35T",
-    "boards/Kv260",
-    "boards/MyirFZ3",
-    "boards/PynqZ2",
+    "boards/Arty35T.toml",
+    "boards/Kv260.toml",
+    "boards/MyirFZ3.toml",
+    "boards/PynqZ2.toml",
 ]
 

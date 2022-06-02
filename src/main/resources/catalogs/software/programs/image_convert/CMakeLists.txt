@@ -23,6 +23,7 @@ set(PRIVATE_LIBRARIES
 			luau_ast
 			luau_hvm
 			data_binify
+			data_utils
 			tiny_stl
 			resource_bundle
 			resource_bundle_writer)

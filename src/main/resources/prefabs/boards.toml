@@ -1,4 +1,4 @@
 resources = [
-    "boards/myirfz3",
-    "boards/kv260"
+    "boards/myirfz3.toml",
+    "boards/kv260.toml"
 ]

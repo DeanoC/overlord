@@ -3,34 +3,37 @@ package overlord.Connections
 import overlord.DefinitionType
 import overlord.Instances.ChipInstance
 
-case class ConnectedBetween(connectionType: ConnectionType,
-                            connectionPriority: ConnectionPriority,
-                            main: InstanceLoc,
-                            direction: ConnectionDirection,
-                            secondary: InstanceLoc)
-	extends Connected {
+trait ConnectedBetween extends Connected {
+	val connectionPriority: ConnectionPriority
+	val direction         : ConnectionDirection
 
-	def mainType: DefinitionType = main.definition.defType
+	def mainType: Option[DefinitionType] = if (first.nonEmpty) Some(first.get.definition.defType) else None
 
-	def secondaryType: DefinitionType = secondary.definition.defType
+	def secondaryType: Option[DefinitionType] = if (second.nonEmpty) Some(second.get.definition.defType) else None
 
-	override def connectsToInstance(inst: ChipInstance): Boolean =
-		(main.instance.ident == inst.ident ||
-		 secondary.instance.ident == inst.ident)
+	override def connectedTo(inst: ChipInstance): Boolean =
+		(first.nonEmpty && first.get.instance.name == inst.name) || (second.nonEmpty && second.get.instance.name == inst.name)
 
-	override def first: Option[InstanceLoc] = Some(main)
+	override def connectedBetween(s: ChipInstance, e: ChipInstance, d: ConnectionDirection): Boolean = {
+		if (first.isEmpty || second.isEmpty) false else {
+			d match {
+				case FirstToSecondConnection() => (first.get.instance == s && second.get.instance == e)
+				case SecondToFirstConnection() => (first.get.instance == e && second.get.instance == s)
+				case BiDirectionConnection()   => ((first.get.instance == s && second.get.instance == e) || (first.get.instance == e && second.get.instance == s))
+			}
+		}
+	}
 
-	override def second: Option[InstanceLoc] = Some(secondary)
+	override def isPinToChip: Boolean = first.nonEmpty && second.nonEmpty && first.get.isPin && second.get.isChip
 
-	override def isPinToChip: Boolean = main.isPin && secondary.isChip
+	override def isChipToChip: Boolean = first.nonEmpty && second.nonEmpty && first.get.isChip && second.get.isChip
 
-	override def isChipToChip: Boolean = main.isChip && secondary.isChip
+	override def isChipToPin: Boolean = first.nonEmpty && second.nonEmpty && first.get.isChip && second.get.isPin
 
-	override def isChipToPin: Boolean = main.isChip && secondary.isPin
+	override def isClock: Boolean = (first.nonEmpty && first.get.isClock) || (second.nonEmpty && second.get.isClock)
 
-	override def isClock: Boolean = main.isClock || secondary.isClock
+	override def firstFullName: String = if (first.nonEmpty) first.get.fullName else "NOT_CONNECTED"
 
-	override def firstFullName: String = main.fullName
+	override def secondFullName: String = if (second.nonEmpty) second.get.fullName else "NOT_CONNECTED"
 
-	override def secondFullName: String = secondary.fullName
 }

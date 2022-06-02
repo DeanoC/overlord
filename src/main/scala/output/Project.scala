@@ -1,9 +1,6 @@
 package output
 
-import ikuy_utils.Utils
 import overlord.Game
-
-import java.nio.file.Path
 
 // Projects structure
 // build
@@ -30,30 +27,32 @@ import java.nio.file.Path
 //
 
 object Project {
-	def apply(game: Game, out: Path): Unit = {
+	def apply(game: Game): Unit = {
+		val out = Game.outPath
 		println(s"Creating project at ${out.toRealPath()}")
 
-		val softPath = out.resolve("soft")
-		val gatePath = out.resolve("gate")
+		output.Report(game)
 
-		Utils.ensureDirectories(gatePath)
+		Game.pushOutPath("gate")
+		output.Xdc(game)
+		output.Top(game)
+		output.Edalize(game)
+		Game.popOutPath()
 
-		output.Report(game, out)
-		output.Xdc(game, gatePath)
-		output.Top(game, gatePath)
-//		output.Edalize(game, gatePath)
-		output.Software(game, softPath)
+		Game.pushOutPath("soft")
+		output.Software(game)
+		Game.popOutPath()
 	}
 }
 
 object UpdateProject {
-	def apply(game: Game, out: Path, instance: Option[String]): Unit = {
+	def apply(game: Game, instance: Option[String]): Unit = {
 		instance match {
 			case Some(inst) =>
 
-			case None        =>
+			case None =>
 				// TODO for now just call create Project
-				Project(game, out)
+				Project(game)
 		}
 	}
 

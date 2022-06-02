@@ -3,7 +3,7 @@ package overlord.Instances
 import ikuy_utils.Variant
 import overlord.SoftwareDefinitionTrait
 
-case class ProgramInstance(ident: String,
+case class ProgramInstance(name: String,
                            override val definition: SoftwareDefinitionTrait,
                           ) extends SoftwareInstance {
 	override val folder = "programs"

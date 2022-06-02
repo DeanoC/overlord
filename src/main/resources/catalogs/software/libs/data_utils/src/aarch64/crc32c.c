@@ -53,7 +53,9 @@
   } while (0)
 
 uint32_t CRC32C_Calculate(uint32_t crc, const uint8_t *data, size_t size) {
-  int64_t length = size;
+	static const uint32_t kCRC32Xor = 0xffffffffU;
+
+	int64_t length = size;
   uint32_t crc0, crc1, crc2, crc3;
   uint64_t t0, t1, t2;
 

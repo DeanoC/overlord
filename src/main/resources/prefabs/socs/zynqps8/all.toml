@@ -1,7 +1,7 @@
 path = "prefabs/socs/zynqps8"
 
-[[prefab]]
-name = "socs.zynqps8.fabric"
+[[include]]
+resource = "fabric.toml"
 
 [[prefab]]
 name = "socs.zynqps8.a53"
@@ -14,7 +14,7 @@ name = "socs.zynqps8.pmu"
 
 # boot rom
 [[instance]]
-type = "program.bootrom.zynqps8"
+type = "program.zynqps8.ikuy_boot"
 
 [[instance]]
-type = "program.pmu_monitor"
+type = "program.zynqps8.pmu_monitor"

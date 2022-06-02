@@ -1,24 +1,17 @@
 package overlord.Chip
 
 import ikuy_utils._
-import overlord.{ChipDefinitionTrait, DefinitionType}
+import overlord.{ChipDefinitionTrait, DefinitionType, HardwareDefinitionTrait}
 
 import java.nio.file.Path
 
-trait ChipDefinition extends ChipDefinitionTrait {
-	val defType   : DefinitionType
-	val attributes: Map[String, Variant]
-	val ports     : Map[String, Port]
-	val registers : Option[Registers]
-}
-
 case class HardwareDefinition(defType: DefinitionType,
+                              sourcePath: Path,
                               attributes: Map[String, Variant],
                               ports: Map[String, Port],
                               maxInstances: Int,
-                              instanceAddressOffsets: Array[BigInt],
-                              registers: Option[Registers])
-	extends ChipDefinition
+                              registersV: Seq[Variant])
+	extends HardwareDefinitionTrait
 
 object ChipDefinition {
 	def apply(table: Map[String, Variant], path: Path): Option[ChipDefinitionTrait] = {
@@ -37,9 +30,7 @@ object ChipDefinition {
 			return None
 		}
 
-		val registers = if (table.contains("registers"))
-			Some(Registers(Utils.toArray(table("registers")).toSeq, path))
-		else None
+		val registers: Seq[Variant] = Utils.lookupArray(table, "registers").toSeq
 
 		val ports = {
 			if (table.contains("ports"))
@@ -55,32 +46,16 @@ object ChipDefinition {
 			                   attribs,
 			                   ports,
 			                   registers,
-			                   name.last,
-			                   path.resolve(Utils.toString(gw)))
+			                   Utils.toString(gw))
 
 		} else {
-			var mi  = 1
-			var mao = Array[BigInt]()
-			if (table.contains("hardware")) {
-				val hw = Utils.toArray(table("hardware"))
-				for (inlineTable <- hw) {
-					val tab = inlineTable.asInstanceOf[TableV].value
-					tab.keys.foreach {
-						case f@("max_instances" | "max_cores") =>
-							mi = Utils.toInt(tab(f))
-						case f@("address_offsets")             =>
-							mao = Utils.toArray(tab(f)).map(Utils.toBigInt)
-						case _                                 =>
-					}
-				}
-			}
+			val mi = Utils.lookupInt(table, "max_instances", 1)
 
-			val (maxInstances, addressOffsets) = (mi, mao)
 			Some(HardwareDefinition(defType,
+			                        path,
 			                        attribs,
 			                        ports,
-			                        maxInstances,
-			                        addressOffsets,
+			                        mi,
 			                        registers))
 		}
 	}

@@ -1,0 +1,592 @@
+description = "Triple Timer Counter"
+[[register]]
+  name = "CLOCK_CONTROL_1"
+  type = "rw"
+  width = 7
+  description = "Clock Control register"
+  default = "0x00000000"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "EX_E"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "C_SRC"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "PS_V"
+    bits = "4:1"
+    type = "rw"
+  [[register.field]]
+    name = "PS_EN"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Prescale enable: when this bit is set the counter, clock source is prescaled; the default clock source is that defined by C_Src.'''
+    longdesc = '''the default'''
+[[register]]
+  name = "CLOCK_CONTROL_2"
+  type = "rw"
+  width = 7
+  description = "Clock Control register"
+  default = "0x00000000"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "EX_E"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "C_SRC"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "PS_V"
+    bits = "4:1"
+    type = "rw"
+  [[register.field]]
+    name = "PS_EN"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Prescale enable: when this bit is set the counter, clock source is prescaled; the default clock source is that defined by C_Src.'''
+    longdesc = '''the default'''
+[[register]]
+  name = "CLOCK_CONTROL_3"
+  type = "rw"
+  width = 7
+  description = "Clock Control register"
+  default = "0x00000000"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "EX_E"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "C_SRC"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "PS_V"
+    bits = "4:1"
+    type = "rw"
+  [[register.field]]
+    name = "PS_EN"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Prescale enable: when this bit is set the counter, clock source is prescaled; the default clock source is that defined by C_Src.'''
+    longdesc = '''the default'''
+[[register]]
+  name = "COUNTER_CONTROL_1"
+  type = "rw"
+  width = 7
+  description = "Operational mode and reset"
+  default = "0x00000021"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "WAVE_POL"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "WAVE_EN"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "RST"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "MATCH"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "DEC"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "INT"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "DIS"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "COUNTER_CONTROL_2"
+  type = "rw"
+  width = 7
+  description = "Operational mode and reset"
+  default = "0x00000021"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "WAVE_POL"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "WAVE_EN"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "RST"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "MATCH"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "DEC"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "INT"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "DIS"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "COUNTER_CONTROL_3"
+  type = "rw"
+  width = 7
+  description = "Operational mode and reset"
+  default = "0x00000021"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "WAVE_POL"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "WAVE_EN"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "RST"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "MATCH"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "DEC"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "INT"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "DIS"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "COUNTER_VALUE_1"
+  type = "ro"
+  width = 32
+  description = "Current counter value"
+  default = "0x00000000"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "COUNTER_VALUE_2"
+  type = "ro"
+  width = 32
+  description = "Current counter value"
+  default = "0x00000000"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "COUNTER_VALUE_3"
+  type = "ro"
+  width = 32
+  description = "Current counter value"
+  default = "0x00000000"
+  offset = "0x00000020"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "INTERVAL_COUNTER_1"
+  type = "rw"
+  width = 32
+  description = "Interval value"
+  default = "0x00000000"
+  offset = "0x00000024"
+  [[register.field]]
+    name = "INTERVAL"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "INTERVAL_COUNTER_2"
+  type = "rw"
+  width = 32
+  description = "Interval value"
+  default = "0x00000000"
+  offset = "0x00000028"
+  [[register.field]]
+    name = "INTERVAL"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "INTERVAL_COUNTER_3"
+  type = "rw"
+  width = 32
+  description = "Interval value"
+  default = "0x00000000"
+  offset = "0x0000002C"
+  [[register.field]]
+    name = "INTERVAL"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "MATCH_1_COUNTER_1"
+  type = "rw"
+  width = 32
+  description = "Match value"
+  default = "0x00000000"
+  offset = "0x00000030"
+  [[register.field]]
+    name = "MATCH"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''When a counter has the same value as is stored in one of its match registers and match mode is enabled, a match interrupt is generated.'''
+    longdesc = '''Each counter has three match registers.'''
+[[register]]
+  name = "MATCH_1_COUNTER_2"
+  type = "rw"
+  width = 32
+  description = "Match value"
+  default = "0x00000000"
+  offset = "0x00000034"
+  [[register.field]]
+    name = "MATCH"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''When a counter has the same value as is stored in one of its match registers and match mode is enabled, a match interrupt is generated.'''
+    longdesc = '''Each counter has three match registers.'''
+[[register]]
+  name = "MATCH_1_COUNTER_3"
+  type = "rw"
+  width = 32
+  description = "Match value"
+  default = "0x00000000"
+  offset = "0x00000038"
+  [[register.field]]
+    name = "MATCH"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''When a counter has the same value as is stored in one of its match registers and match mode is enabled, a match interrupt is generated.'''
+    longdesc = '''Each counter has three match registers.'''
+[[register]]
+  name = "MATCH_2_COUNTER_1"
+  type = "rw"
+  width = 32
+  description = "Match value"
+  default = "0x00000000"
+  offset = "0x0000003C"
+  [[register.field]]
+    name = "MATCH"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''When a counter has the same value as is stored in one of its match registers and match mode is enabled, a match interrupt is generated.'''
+    longdesc = '''Each counter has three match registers.'''
+[[register]]
+  name = "MATCH_2_COUNTER_2"
+  type = "rw"
+  width = 32
+  description = "Match value"
+  default = "0x00000000"
+  offset = "0x00000040"
+  [[register.field]]
+    name = "MATCH"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''When a counter has the same value as is stored in one of its match registers and match mode is enabled, a match interrupt is generated.'''
+    longdesc = '''Each counter has three match registers.'''
+[[register]]
+  name = "MATCH_2_COUNTER_3"
+  type = "rw"
+  width = 32
+  description = "Match value"
+  default = "0x00000000"
+  offset = "0x00000044"
+  [[register.field]]
+    name = "MATCH"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''When a counter has the same value as is stored in one of its match registers and match mode is enabled, a match interrupt is generated.'''
+    longdesc = '''Each counter has three match registers.'''
+[[register]]
+  name = "MATCH_3_COUNTER_1"
+  type = "rw"
+  width = 32
+  description = "Match value"
+  default = "0x00000000"
+  offset = "0x00000048"
+  [[register.field]]
+    name = "MATCH"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''When a counter has the same value as is stored in one of its match registers and match mode is enabled, a match interrupt is generated.'''
+    longdesc = '''Each counter has three match registers.'''
+[[register]]
+  name = "MATCH_3_COUNTER_2"
+  type = "rw"
+  width = 32
+  description = "Match value"
+  default = "0x00000000"
+  offset = "0x0000004C"
+  [[register.field]]
+    name = "MATCH"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''When a counter has the same value as is stored in one of its match registers and match mode is enabled, a match interrupt is generated.'''
+    longdesc = '''Each counter has three match registers.'''
+[[register]]
+  name = "MATCH_3_COUNTER_3"
+  type = "rw"
+  width = 32
+  description = "Match value"
+  default = "0x00000000"
+  offset = "0x00000050"
+  [[register.field]]
+    name = "MATCH"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''When a counter has the same value as is stored in one of its match registers and match mode is enabled, a match interrupt is generated.'''
+    longdesc = '''Each counter has three match registers.'''
+[[register]]
+  name = "INTERRUPT_REGISTER_1"
+  type = "clronrd"
+  width = 6
+  description = "Counter 1 Interval, Match, Overflow and Event interrupts"
+  default = "0x00000000"
+  offset = "0x00000054"
+  [[register.field]]
+    name = "EV"
+    bits = "5"
+    type = "clronrd"
+  [[register.field]]
+    name = "OV"
+    bits = "4"
+    type = "clronrd"
+  [[register.field]]
+    name = "M3"
+    bits = "3"
+    type = "clronrd"
+  [[register.field]]
+    name = "M2"
+    bits = "2"
+    type = "clronrd"
+  [[register.field]]
+    name = "M1"
+    bits = "1"
+    type = "clronrd"
+  [[register.field]]
+    name = "IV"
+    bits = "0"
+    type = "clronrd"
+[[register]]
+  name = "INTERRUPT_REGISTER_2"
+  type = "clronrd"
+  width = 6
+  description = "Counter 2 Interval, Match, Overflow and Event interrupts"
+  default = "0x00000000"
+  offset = "0x00000058"
+  [[register.field]]
+    name = "EV"
+    bits = "5"
+    type = "clronrd"
+  [[register.field]]
+    name = "OV"
+    bits = "4"
+    type = "clronrd"
+  [[register.field]]
+    name = "M3"
+    bits = "3"
+    type = "clronrd"
+  [[register.field]]
+    name = "M2"
+    bits = "2"
+    type = "clronrd"
+  [[register.field]]
+    name = "M1"
+    bits = "1"
+    type = "clronrd"
+  [[register.field]]
+    name = "IV"
+    bits = "0"
+    type = "clronrd"
+[[register]]
+  name = "INTERRUPT_REGISTER_3"
+  type = "clronrd"
+  width = 6
+  description = "Counter 3 Interval, Match, Overflow and Event interrupts"
+  default = "0x00000000"
+  offset = "0x0000005C"
+  [[register.field]]
+    name = "EV"
+    bits = "5"
+    type = "clronrd"
+  [[register.field]]
+    name = "OV"
+    bits = "4"
+    type = "clronrd"
+  [[register.field]]
+    name = "M3"
+    bits = "3"
+    type = "clronrd"
+  [[register.field]]
+    name = "M2"
+    bits = "2"
+    type = "clronrd"
+  [[register.field]]
+    name = "M1"
+    bits = "1"
+    type = "clronrd"
+  [[register.field]]
+    name = "IV"
+    bits = "0"
+    type = "clronrd"
+[[register]]
+  name = "INTERRUPT_ENABLE_1"
+  type = "rw"
+  width = 6
+  description = "ANDed with corresponding Interrupt Register"
+  default = "0x00000000"
+  offset = "0x00000060"
+  [[register.field]]
+    name = "IEN"
+    bits = "5:0"
+    type = "rw"
+[[register]]
+  name = "INTERRUPT_ENABLE_2"
+  type = "rw"
+  width = 6
+  description = "ANDed with corresponding Interrupt Register"
+  default = "0x00000000"
+  offset = "0x00000064"
+  [[register.field]]
+    name = "IEN"
+    bits = "5:0"
+    type = "rw"
+[[register]]
+  name = "INTERRUPT_ENABLE_3"
+  type = "rw"
+  width = 6
+  description = "ANDed with corresponding Interrupt Register"
+  default = "0x00000000"
+  offset = "0x00000068"
+  [[register.field]]
+    name = "IEN"
+    bits = "5:0"
+    type = "rw"
+[[register]]
+  name = "EVENT_CONTROL_TIMER_1"
+  type = "rw"
+  width = 4
+  description = "Enable, pulse and overflow"
+  default = "0x00000000"
+  offset = "0x0000006C"
+  [[register.field]]
+    name = "E_TM"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "E_OV"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "E_LO"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "E_EN"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "EVENT_CONTROL_TIMER_2"
+  type = "rw"
+  width = 4
+  description = "Enable, pulse and overflow"
+  default = "0x00000000"
+  offset = "0x00000070"
+  [[register.field]]
+    name = "E_TM"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "E_OV"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "E_LO"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "E_EN"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "EVENT_CONTROL_TIMER_3"
+  type = "rw"
+  width = 4
+  description = "Enable, pulse and overflow"
+  default = "0x00000000"
+  offset = "0x00000074"
+  [[register.field]]
+    name = "E_TM"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "E_OV"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "E_LO"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "E_EN"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "EVENT_REGISTER_1"
+  type = "ro"
+  width = 32
+  description = "pclk cycle count for event"
+  default = "0x00000000"
+  offset = "0x00000078"
+  [[register.field]]
+    name = "EVENT"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "EVENT_REGISTER_2"
+  type = "ro"
+  width = 32
+  description = "pclk cycle count for event"
+  default = "0x00000000"
+  offset = "0x0000007C"
+  [[register.field]]
+    name = "EVENT"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "EVENT_REGISTER_3"
+  type = "ro"
+  width = 32
+  description = "pclk cycle count for event"
+  default = "0x00000000"
+  offset = "0x00000080"
+  [[register.field]]
+    name = "EVENT"
+    bits = "31:0"
+    type = "ro"

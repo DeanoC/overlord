@@ -1,7 +1,4 @@
 description = "R5 Embedded Trace Macrocell"
-[[bank]]
-  name = "CORESIGHT_R5_ETM"
-  address = "0xfebfc000"
 [[register]]
   name = "CR"
   type = "rw"

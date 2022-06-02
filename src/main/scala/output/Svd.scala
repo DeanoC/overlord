@@ -10,9 +10,66 @@ import scala.collection.mutable
 import scala.xml.PrettyPrinter
 
 object Svd {
+	def apply(game: Game): Unit = {
+
+		val cpus = for (cpu <- game.cpus) yield <cpu>
+			{outputCpu(cpu)}
+		</cpu>
+
+		val instances = for (p <- game.allChipInstances) yield outputRegisters(p)
+
+		val deviceXml: xml.Elem =
+			<device schemaVersion="1.3"
+			        xmlns:xs="http://www.w3.org/2001/XMLSchema-instance"
+			        xs:noNamespaceSchemaLocation="etc/CMSIS-SVD.xsd">
+				<vendor>overlord</vendor>
+				<vendorID>OVER</vendorID>
+				<name>
+					{game.name}
+				</name>
+				<version>0.0.0</version>
+				<description>
+					{game.name}
+				</description>
+				<licenseText>// SPDX-License-Identifier: MIT\n</licenseText>
+				<cpu>
+					{outputFakeCpu(game.cpus.head)}
+				</cpu>
+				<addressUnitBits>8</addressUnitBits>
+				<width>32</width>
+				<size>32</size>
+				<access>read-write</access>
+				<resetValue>0x00000000</resetValue>
+				<resetMask>0xFFFFFFFF</resetMask>
+				<peripherals>
+					{instances}
+				</peripherals>
+				<vendorExtensions>
+					<cpus>
+						{cpus}
+					</cpus>
+				</vendorExtensions>
+			</device>
+		//@formatter:on
+
+		val out = Game.outPath
+		Utils.ensureDirectories(out)
+
+		// copy etc/CMSIS-SVD.xsd
+		val etc = out.resolve("etc")
+		Utils.ensureDirectories(etc)
+		Utils.copy(Path.of("etc/CMSIS-SVD.xsd"), etc.resolve("CMSIS-SVD.xsd"))
+
+		val path = if (out.toFile.isDirectory)
+			out.resolve(s"${game.name}.svd")
+		else out
+
+		Utils.writeFile(path, new PrettyPrinter(Int.MaxValue, 2).format(deviceXml))
+	}
+
 	//@formatter:off
 	private def outputFakeCpu(cpu: CpuInstance) ={
-		<name>{cpu.ident.split('.')(0) match {
+		<name>{cpu.name.split('.')(0) match {
 			case "a53" => "CA53"
 			case "a9" =>"CA9"
 			case "a57" => "CA57"
@@ -29,10 +86,6 @@ object Svd {
 		<vtorPresent>false</vtorPresent>
 		<nvicPrioBits>0</nvicPrioBits>
 		<vendorSystickConfig>false</vendorSystickConfig>
-	}
-	private def outputCpu(cpu: CpuInstance) = {
-		<name>{cpu.ident}</name>
-		<endian>little</endian>
 	}
 
 	private def outputRegister(r: Register) = {
@@ -70,7 +123,12 @@ object Svd {
 
 	private val definitionsWritten = mutable.HashMap[String, String]()
 
-	private def outputRegisters(s: ChipInstance) : Seq[xml.Elem] = {
+	private def outputCpu(cpu: CpuInstance) = {
+		<name>{cpu.name}</name>
+		<endian>little</endian>
+	}
+
+	private def outputRegisters(s: ChipInstance) : Seq[xml.Elem] = ??? /*{
 		if(s.registerBanks.isEmpty) return Seq[xml.Elem]()
 
 		for(bank <- s.registerBanks.toIndexedSeq) yield {
@@ -119,48 +177,5 @@ object Svd {
 			}
 		}
 	}
-
-	def apply(game: Game, out : Path): Unit = {
-
-		val cpus = for (cpu <- game.cpus) yield <cpu>{outputCpu(cpu)}</cpu>
-
-		val instances = for (p <- game.allChipInstances) yield outputRegisters(p)
-
-		val deviceXml: xml.Elem =
-			<device schemaVersion="1.3"
-			        xmlns:xs="http://www.w3.org/2001/XMLSchema-instance"
-			        xs:noNamespaceSchemaLocation="etc/CMSIS-SVD.xsd">
-				<vendor>overlord</vendor>
-				<vendorID>OVER</vendorID>
-				<name>{game.name}</name>
-				<version>0.0.0</version>
-				<description>{game.name}</description>
-				<licenseText>// SPDX-License-Identifier: MIT\n</licenseText>
-				<cpu>{outputFakeCpu(game.cpus.head)}</cpu>
-				<addressUnitBits>8</addressUnitBits>
-				<width>32</width>
-				<size>32</size>
-				<access>read-write</access>
-				<resetValue>0x00000000</resetValue>
-				<resetMask>0xFFFFFFFF</resetMask>
-				<peripherals>{instances}</peripherals>
-				<vendorExtensions>
-					<cpus>{cpus}</cpus>
-				</vendorExtensions>
-			</device>
-		//@formatter:on
-
-		Utils.ensureDirectories(out)
-
-		// copy etc/CMSIS-SVD.xsd
-		val etc     = out.resolve("etc")
-		Utils.ensureDirectories(etc)
-		Utils.copy(Path.of("etc/CMSIS-SVD.xsd"), etc.resolve("CMSIS-SVD.xsd"), getClass)
-
-		val path = if (out.toFile.isDirectory)
-			out.resolve(s"${game.name}.svd")
-		else out
-
-		Utils.writeFile(path, new PrettyPrinter(Int.MaxValue, 2).format(deviceXml))
-	}
+*/
 }

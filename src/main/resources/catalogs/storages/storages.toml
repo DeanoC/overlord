@@ -1,4 +1,4 @@
 resources = [
-    "qspi/qspi",
-    "sdio/sdio",
+    "qspi/qspi.toml",
+    "sdio/sdio.toml",
 ]

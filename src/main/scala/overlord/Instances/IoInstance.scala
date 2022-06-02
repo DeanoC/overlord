@@ -3,11 +3,10 @@ package overlord.Instances
 import ikuy_utils.Variant
 import overlord.ChipDefinitionTrait
 
-case class IoInstance(ident: String,
+case class IoInstance(name: String,
                       override val definition: ChipDefinitionTrait,
                      ) extends ChipInstance {
-	override def copyMutate[A <: ChipInstance](nid: String): IoInstance =
-		copy(ident = nid)
+	override def isVisibleToSoftware: Boolean = true
 }
 
 object IoInstance {

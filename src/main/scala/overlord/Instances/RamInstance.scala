@@ -2,26 +2,31 @@ package overlord.Instances
 
 import ikuy_utils.{Utils, Variant}
 import overlord.ChipDefinitionTrait
+import overlord.Interfaces.RamLike
 
-sealed trait RamFillType
+import scala.reflect.ClassTag
 
-case class ZeroFillType() extends RamFillType
-
-case class PrimaryBootFillType() extends RamFillType
-
-case class RamInstance(ident: String,
-                       private val sizeInBytes: Option[BigInt],
-                       fillType: RamFillType,
+case class RamInstance(name: String,
                        override val definition: ChipDefinitionTrait,
-                      ) extends ChipInstance {
-	override def copyMutate[A <: ChipInstance](nid: String): RamInstance =
-		copy(ident = nid)
-
-	def getSizeInBytes: BigInt = sizeInBytes match {
-		case Some(value) => value
-		case None        => Utils.lookupBigInt(attributes, "size_in_bytes", 1024)
+                      ) extends ChipInstance with RamLike {
+	private lazy val ranges: Seq[(BigInt, BigInt)] = {
+		if (!attributes.contains("ranges")) Seq()
+		else Utils.toArray(attributes("ranges")).map(
+			b => (Utils.lookupBigInt(Utils.toTable(b), "address", 0), Utils.lookupBigInt(Utils.toTable(b), "size", 0)))
 	}
 
+	override def isVisibleToSoftware: Boolean = true
+
+	override def getInterface[T](implicit tag: ClassTag[T]): Option[T] = {
+		val RamLike_ = classOf[RamLike]
+		tag.runtimeClass match {
+			case RamLike_ => Some(asInstanceOf[T])
+			case _        => super.getInterface[T](tag)
+		}
+
+	}
+
+	override def getRanges: Seq[(BigInt, BigInt)] = ranges
 }
 
 object RamInstance {
@@ -29,18 +34,13 @@ object RamInstance {
 	          definition: ChipDefinitionTrait,
 	          attribs: Map[String, Variant]
 	         ): Option[RamInstance] = {
-
-		val sizeInBytes    = if (attribs.contains("size_in_bytes"))
-			Some(Utils.toBigInt(attribs("size_in_bytes")))
-		else None
-		val fillTypeString = Utils.lookupString(attribs,
-		                                        "fill",
-		                                        "zero")
-		val fillType       = fillTypeString.toLowerCase match {
-			case "primary_boot" => PrimaryBootFillType()
-			case "zero" | _     => ZeroFillType()
+		if ((!definition.attributes.contains("ranges")) && (!attribs.contains("ranges"))) {
+			println(s"ERROR: ram ${ident} has no ranges, so isn't a valid range")
+			return None
 		}
 
-		Some(RamInstance(ident, sizeInBytes, fillType, definition))
+		val ram = RamInstance(ident, definition)
+		ram.mergeAllAttributes(attribs)
+		Some(ram)
 	}
 }

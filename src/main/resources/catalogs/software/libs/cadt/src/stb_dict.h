@@ -72,7 +72,7 @@
     } TYPE;
 
 #define STB_nocopy(x)        (x)
-#define STB_nodelete(x)      0
+#define STB_nodelete(x)
 #define STB_nofields
 #define STB_nonullvalue(x)
 #define STB_nullvalue(x)     x
@@ -382,7 +382,7 @@ stb_declare_fixed_sized_hash(EXTERN_C, stb_dictSizeT, stb_dictSizeT_, size_t, si
 
 stb_define_fixed_sized_hash_vnull(stb_dictPtr, stb_dictPtr_, void*,
                 ((void *) 2),((void *) 6),
-                return stb_hash_ptrSizeT(k);, void*, NULL);
+                return stb_hash_ptrSizeT(k);, void*, NULL)
 /*
 stb_define_fixed_sized_hash(stb_dictI32, stb_dictI32_, int32_t,
     (-1),(-2),

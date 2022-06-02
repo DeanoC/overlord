@@ -39,3 +39,8 @@
 #define invalid_all_TLB()	asm volatile("tlbi ALLE3")
 
 #define read_current_EL_level() __extension__ ({uint32_t rval = 0U; asm volatile("mrs %0, CurrentEL" : "=r" (rval)); rval; })
+
+#define CPSR_IRQ_ENABLE		0x80U
+#define CPSR_FIQ_ENABLE		0x40U
+#define enable_exceptions(v)  write_DAIF_register(read_DAIF_register() & ~(v))
+#define disable_exceptions(v)  write_DAIF_register(read_DAIF_register() | (v))

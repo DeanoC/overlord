@@ -4,25 +4,22 @@ import ikuy_utils._
 import overlord.Game
 import overlord.Instances.InstanceTrait
 
-import java.nio.file.Path
-
-case class SourcesAction(filename: String,
-                         language: String,
-                         srcPath: String,
-                         pathOp: ActionPathOp)
+case class SourcesAction(filename: String, language: String)
 	extends Action {
 
 	override val phase: Int = 1
 
-	private var actualSrcPath = srcPath
+	var actualSrcPath: String = ""
 
-	override def execute(instance: InstanceTrait,
-	                     parameters: Map[String, () => Variant],
-	                     outPath: Path): Unit = {
-		actualSrcPath = srcPath.replace("${name}", instance.ident)
-		if (!Path.of(actualSrcPath).toFile.exists()) {
-			println(f"$actualSrcPath not found%n")
+	override def execute(instance: InstanceTrait, parameters: Map[String, Variant]): Unit = {
+		val srcNamePath = Game.tryPaths(instance, filename)
+		val srcAbsPath  = srcNamePath.toAbsolutePath
+
+		if (!srcAbsPath.toFile.exists()) {
+			println(f"SourceAction: $srcAbsPath not found%n")
 		}
+
+		actualSrcPath = srcAbsPath.toString // TODO clean this
 	}
 
 	def getSrcPath: String = actualSrcPath
@@ -30,26 +27,16 @@ case class SourcesAction(filename: String,
 }
 
 object SourcesAction {
-	def apply(name: String,
-	          process: Map[String, Variant],
-	          pathOp: ActionPathOp): Seq[SourcesAction] = {
+	def apply(name: String, process: Map[String, Variant]): Seq[SourcesAction] = {
 		if (!process.contains("sources")) {
 			println(s"Sources process $name doesn't have a sources field")
-			None
+			return Seq()
 		}
-		val srcs = Utils.toArray(process("sources")).map(Utils.toTable)
 
+		val srcs = Utils.toArray(process("sources")).map(Utils.toTable)
 		for (entry <- srcs) yield {
 			val filename = Utils.toString(entry("file"))
-			val srcPath  = if (filename.contains("${src}")) {
-				val tmp = filename.replace("${src}", "")
-				Game.pathStack.top.toString + tmp
-			} else filename
-
-			SourcesAction(filename,
-			              Utils.toString(entry("language")),
-			              srcPath,
-			              pathOp)
+			SourcesAction(filename, Utils.toString(entry("language")))
 		}
 	}
 }

@@ -3,3 +3,6 @@ path = "sram"
 [[definition]]
 type = "ram.sram.pmb_bram"
 gateware = "pmb_bram/pmb_bram.toml"
+
+[[definition]]
+type = "ram.sram.generic"

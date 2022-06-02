@@ -1,7 +1,4 @@
 description = "FPD GPV"
-[[bank]]
-  name = "FPD_GPV"
-  address = "0xfd700000"
 [[register]]
   name = "PERIPH_ID_4"
   type = "ro"

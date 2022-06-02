@@ -4,19 +4,17 @@ import overlord.Connections._
 import overlord.Instances.{ChipInstance, Container, PinGroupInstance}
 
 import scala.collection.mutable
+import scala.language.postfixOps
 
 case class DistanceMatrix(instanceArray: Array[ChipInstance]) {
 	val dim: Int = instanceArray.length
-	private val distanceMatrix    = Array.fill[Int](dim, dim) {
-		DistanceMatrix.NotComputed
-	}
+	private val distanceMatrix    = Array.fill[Int](dim, dim)(DistanceMatrix.NotComputed)
 	private val routeMatrix       = Array.ofDim[Seq[Int]](dim, dim)
 	private var virtualContainers = Seq[ChipInstance]()
 
 	def routeBetween(s: Int, e: Int): Seq[Int] = routeMatrix(s)(e)
 
-	def between(s: Int, e: Int): (Int, Seq[Int]) =
-		(distanceMatrix(s)(e), routeMatrix(s)(e))
+	def between(s: Int, e: Int): (Int, Seq[Int]) = (distanceMatrix(s)(e), routeMatrix(s)(e))
 
 	def rowDistances(r: Int): Seq[Int] = distanceMatrix(r).toSeq
 
@@ -24,30 +22,43 @@ case class DistanceMatrix(instanceArray: Array[ChipInstance]) {
 
 	def validColumnDistances(c: Int): Seq[Int] = columnDistances(c).filter(_ > 0)
 
-	def columnDistances(c: Int): Seq[Int] =
-		for (i <- 0 until dim) yield distanceMatrix(i)(c)
+	def columnDistances(c: Int): Seq[Int] = for (i <- 0 until dim) yield distanceMatrix(i)(c)
 
 	def rowBetween(r: Int): Seq[Seq[Int]] = routeMatrix(r).toSeq
 
-	def columnBetween(c: Int): Seq[Seq[Int]] =
-		for (i <- 0 until dim) yield routeMatrix(i)(c)
+	def columnBetween(c: Int): Seq[Seq[Int]] = for (i <- 0 until dim) yield routeMatrix(i)(c)
 
 	def instanceOf(i: Int): ChipInstance = instanceArray(i)
 
-	def connected(a: ChipInstance, b: ChipInstance): Boolean = distanceBetween(a, b) > 0
-
-	def distanceBetween(a: ChipInstance, b: ChipInstance): Int =
-		distanceBetween(indexOf(a), indexOf(b))
-
 	def distanceBetween(s: Int, e: Int): Int = distanceMatrix(s)(e)
 
-	def indicesOf(c: Connected): (Int, Int) = (
-		if (c.first.nonEmpty) indexOf(c.first.get) else -1,
-		if (c.second.nonEmpty) indexOf(c.second.get) else -1)
+	// non index helpers of main functions
+	def isConnectedBetween(a: ChipInstance, b: ChipInstance): Boolean = distanceBetween(a, b) > 0
+
+	def distanceBetween(a: ChipInstance, b: ChipInstance): Int = distanceBetween(indexOf(a), indexOf(b))
+
+	def indicesOf(c: Connected): (Int, Int) = (if (c.first.nonEmpty) indexOf(c.first.get) else -1, if (c.second.nonEmpty) indexOf(c.second.get) else -1)
+
+	def connectedTo(c: ChipInstance): Seq[ChipInstance] = connectedTo(indexOf(c)).map(instanceOf(_))
 
 	def indexOf(c: InstanceLoc): Int = indexOf(c.instance.asInstanceOf[ChipInstance])
 
 	def indexOf(c: ChipInstance): Int = instanceArray.indexOf(c)
+
+	def connectedTo(srcIndex: Int): Seq[Int] = for {o <- 0 until dim
+	                                                if srcIndex != o
+	                                                d0 = distanceMatrix(srcIndex)(o)
+	                                                if !(d0 == DistanceMatrix.NotComputed)
+	                                                } yield o
+
+	def expandedRouteBetween(s: ChipInstance, e: ChipInstance): Seq[(ChipInstance, ChipInstance)] = {
+		val route = routeBetween(s, e)
+		Seq((instanceOf(indexOf(s)), instanceOf(route(0)))) ++ (for {i <- 1 until route.length
+		                                                             si = route(i - 1)
+		                                                             ei = route(i)} yield ((instanceOf(si), instanceOf(ei))))
+	}
+
+	def routeBetween(s: ChipInstance, e: ChipInstance): Seq[Int] = routeMatrix(indexOf(s))(indexOf(e))
 
 	def debugPrint: String = {
 		val sb = new StringBuilder
@@ -56,7 +67,7 @@ case class DistanceMatrix(instanceArray: Array[ChipInstance]) {
 		{
 			sb ++= f"Instances count = ${instanceArray.length}%n"
 			for {(instance, index) <- instanceArray.zipWithIndex
-			     if !isIsolated(index)} sb ++= f"$index - ${instance.ident}%n"
+			     if !isIsolated(index)} sb ++= f"$index - ${instance.name}%n"
 			sb ++= f"---------------------------------%n"
 		}
 
@@ -102,9 +113,9 @@ case class DistanceMatrix(instanceArray: Array[ChipInstance]) {
 							sb ++= f" -> $k"
 						}
 						sb ++= f" ::  "
-						sb ++= f"${instanceArray(i).ident}"
+						sb ++= f"${instanceArray(i).name}"
 						for {k <- routeMatrix(i)(j)} {
-							sb ++= f" -> ${instanceArray(k).ident}"
+							sb ++= f" -> ${instanceArray(k).name}"
 						}
 						sb ++= f"%n"
 					}
@@ -122,12 +133,12 @@ case class DistanceMatrix(instanceArray: Array[ChipInstance]) {
 		     d1 = distanceMatrix(o)(i)
 		     if !(d0 == DistanceMatrix.NotComputed && d1 == DistanceMatrix.NotComputed)
 		     } {
-			val minCount = if (instanceArray(i).isInstanceOf[PinGroupInstance] ||
-			                   instanceArray(o).isInstanceOf[PinGroupInstance]) 1 else 0
+			val minCount = if (instanceArray(i).isInstanceOf[PinGroupInstance] || instanceArray(o).isInstanceOf[PinGroupInstance]) 1 else 0
 			if (d0 > minCount || d1 > minCount) return false
 		}
 		true
 	}
+
 }
 
 

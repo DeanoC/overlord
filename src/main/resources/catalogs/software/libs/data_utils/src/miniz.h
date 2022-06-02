@@ -461,10 +461,10 @@ typedef void *const voidpc;
 }
 #endif
 #pragma once
-#include <assert.h>
+#include "core/core.h"
+#include "dbg/assert.h"
+#include "memory/memory.h"
 #include <stdint.h>
-#include <stdlib.h>
-#include <string.h>
 
 /* ------------------- Types and macros */
 typedef unsigned char mz_uint8;

@@ -5,6 +5,8 @@ project(${project} C ASM CXX)
 file(GLOB CLIST CONFIGURE_DEPENDS
 		src/scugic/*.c
 		src/sdps/*.c
+		src/ttcps/*.c
+		src/iicps/*.c
 
 		src/${BOARD}/*.c
 		src/${SOC}/*.c
@@ -14,6 +16,8 @@ file(GLOB CLIST CONFIGURE_DEPENDS
 file(GLOB HEADERLIST CONFIGURE_DEPENDS
 		include/scugic/*.h
 		include/sdps/*.h
+		include/ttcps/*.h
+		src/iicps/*.h
 
 		include/*.h
 		include/*.hpp

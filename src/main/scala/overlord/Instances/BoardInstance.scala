@@ -1,11 +1,10 @@
 package overlord.Instances
 
 import ikuy_utils._
-import overlord.Connections.Connection
+import overlord.Interfaces.UnConnectedLike
 import overlord.{ChipDefinitionTrait, Definition}
 import toml.Value
 
-import java.nio.file.Path
 import scala.collection.immutable
 
 sealed trait BoardType {
@@ -33,17 +32,15 @@ case class LatticeBoard() extends BoardType {
 		immutable.Map[String, toml.Value]()
 }
 
-case class BoardInstance(ident: String,
+case class BoardInstance(name: String,
                          boardType: BoardType,
                          override val definition: ChipDefinitionTrait,
                          override var children: Seq[InstanceTrait] = Seq()
                         ) extends ChipInstance with Container {
+	override val physical   : Boolean              = true
+	override var unconnected: Seq[UnConnectedLike] = Seq()
 
-	override val physical   : Boolean         = true
-	override var connections: Seq[Connection] = Seq()
-
-	override def copyMutate[A <: ChipInstance](nid: String): BoardInstance =
-		copy(ident = nid)
+	override def isVisibleToSoftware: Boolean = true
 }
 
 object BoardInstance {
@@ -89,23 +86,34 @@ object BoardInstance {
 			Utils.toTable(attribs("defaults"))
 		} else Map[String, Variant]()
 
+		// instiatiate all clocks
+		val clocks = (for (pinv <- Utils.toArray(attribs("clocks"))) yield {
+			val table = Utils.toTable(pinv)
+			if (table.contains("name")) {
+				val name  = Utils.toString(table("name"))
+				val clock = table ++ Map[String, Variant]("type" -> StringV(s"clock" +
+				                                                            s".$name"))
+				Definition(TableV(clock), defaults).createInstance(s"$name", clock)
+			} else {
+				println(s"clocks must either have a name field")
+				return None
+			}
+		}).flatten.toSeq
+
 		// instiatiate all pingroups
 		val pingroups = (for (pinv <- Utils.toArray(attribs("pingroups"))) yield {
 			val table = Utils.toTable(pinv)
 			if (table.contains("name")) {
 				val name     = Utils.toString(table("name"))
-				val pingroup = table ++ Map[String, Variant]("type" -> StringV(s"pingroup" +
-				                                                               s".$name"))
-				Definition(TableV(pingroup), Path.of("."), defaults).createInstance(s"$name",
-				                                                                    pingroup)
+				val pingroup = table ++ Map[String, Variant]("type" -> StringV(s"pingroup.$name"))
+				Definition(TableV(pingroup), defaults).createInstance(s"$name", pingroup)
 			} else if (table.contains("names")) {
 				val names = Utils.toArray(table("names"))
 				(for (nameV <- names) yield {
 					val name     = Utils.toString(nameV)
 					val pingroup = table ++
 					               Map[String, Variant]("type" -> StringV(s"pingroup.$name"))
-					Definition(TableV(pingroup), Path.of("."), defaults).createInstance(s"$name",
-					                                                                    pingroup)
+					Definition(TableV(pingroup), defaults).createInstance(s"$name", pingroup)
 				}).flatten.toSeq
 			} else {
 				println(s"pin groups must either have a name or names field")
@@ -116,7 +124,7 @@ object BoardInstance {
 		Some(BoardInstance(name,
 		                   boardType = boardType,
 		                   definition = definition,
-		                   children = pingroups
+		                   children = clocks ++ pingroups
 		                   ))
 	}
 }

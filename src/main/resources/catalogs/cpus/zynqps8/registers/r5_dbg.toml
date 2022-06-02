@@ -1,7 +1,4 @@
 description = "Cortex-R5 built-in debug logic, R5 Debug Logic"
-[[bank]]
-  name = "CORESIGHT_R5_DBG"
-  address = "0xfebf0000"
 [[register]]
   name = "DIDR"
   type = "ro"

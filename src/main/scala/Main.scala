@@ -3,7 +3,6 @@ import overlord._
 
 import java.nio.file.{Files, Path}
 import scala.annotation.tailrec
-import scala.collection.immutable.Map
 
 object Main {
 	private val usage =
@@ -13,7 +12,7 @@ object Main {
 		   |     : svd    - produce a CMSIS-SVD file on its own
 		   |     : --out  - path where generated files should be placed
 		   |     : --board - board defination to use
-		   |     : --nostdresources - don't use any build in resource toml files
+		   |     : --nostdresources - don't use any the std catalog
 		   |     : --resources - TODO use specified path a root of resources tomls
 		   |		 : filename should be a .over file to use for the project"""
 			.stripMargin
@@ -85,25 +84,29 @@ object Main {
 			println(s"$filename does not exists")
 			sys.exit(1)
 		}
+		val filePath = Path.of(filename)
+		val out      = Path.of(
+			if (!options.contains(Symbol("out"))) "."
+			else options(Symbol("out")).asInstanceOf[String]
+			).toAbsolutePath
+		Utils.ensureDirectories(out)
 
-		Game.pathStack.push(Resources.projectRootPath())
+		Game.setupPaths(filePath.getParent, Resources.stdResourcePath(), Resources.stdResourcePath(), out)
 
 		val stdResources = Resources(Resources.stdResourcePath())
 
-		val resources    =
+		val resources =
 			if (!options.contains(Symbol("resources"))) None
 			else Some(overlord.Resources(Path.of(options(Symbol("resources"))
 				                                     .asInstanceOf[String])))
 
 
-		val filePath = Path.of(filename)
-		Game.pathStack.push(filePath.getParent.toAbsolutePath)
-
 		val chipCatalog = new DefinitionCatalog
+
 		if (!options.contains(Symbol("nostdresources")))
-			chipCatalog.catalogs ++= stdResources.loadCatalogs()
+			chipCatalog.mergeNewDefinition(stdResources.loadCatalogs())
 		if (resources.isDefined)
-			chipCatalog.catalogs ++= resources.get.loadCatalogs()
+			chipCatalog.mergeNewDefinition(resources.get.loadCatalogs())
 
 		val prefabCatalog = new PrefabCatalog
 		if (!options.contains(Symbol("nostdprefabs")))
@@ -111,31 +114,26 @@ object Main {
 		if (resources.isDefined)
 			prefabCatalog.prefabs ++= resources.get.loadPrefabs()
 
-
-		val out = Path.of(
-			if (!options.contains(Symbol("out"))) "."
-			else options(Symbol("out")).asInstanceOf[String]
-			).toAbsolutePath
-		Utils.ensureDirectories(out)
-
 		val gameName = filename.split('/').last.split('.').head
 
-		val game = Game(gameName, board, filePath, out, chipCatalog, prefabCatalog) match {
+		Game.setupPaths(filePath.getParent, filePath.getParent, filePath.getParent, out)
+
+		val game = Game(gameName, board, filePath, chipCatalog, prefabCatalog) match {
 			case Some(game) => game
 			case None       =>
 				println(s"Error parsing $filename")
 				sys.exit()
 		}
 
-		if (options.contains(Symbol("create"))) output.Project(game, out)
+		if (options.contains(Symbol("create"))) output.Project(game)
 		if (options.contains(Symbol("update"))) {
 			val instance = if (!options.contains(Symbol("instance"))) None
 			else Some(options(Symbol("instance")).asInstanceOf[String])
-			output.UpdateProject(game, out, instance)
+			output.UpdateProject(game, instance)
 		}
 		else {
-			if (options.contains(Symbol("report"))) output.Report(game, out)
-			if (options.contains(Symbol("svd"))) output.Svd(game, out)
+			if (options.contains(Symbol("report"))) output.Report(game)
+			if (options.contains(Symbol("svd"))) output.Svd(game)
 		}
 	}
 }

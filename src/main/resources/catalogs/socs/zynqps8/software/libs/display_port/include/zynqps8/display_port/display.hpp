@@ -1,5 +1,7 @@
 #pragma once
 
+#include "core/core.h"
+
 namespace DisplayPort::Display {
 
 // 12 bit colours are fairly common. the MSB of this should be zero

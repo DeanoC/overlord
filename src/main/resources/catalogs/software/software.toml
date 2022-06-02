@@ -1,4 +1,4 @@
 resources = [
-    "libs",
-    "programs"
+    "libs.toml",
+    "programs.toml"
 ]

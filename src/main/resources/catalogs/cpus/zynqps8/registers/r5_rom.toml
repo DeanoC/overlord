@@ -1,7 +1,4 @@
 description = "R5 Integration ROM"
-[[bank]]
-  name = "CORESIGHT_R5_ROM"
-  address = "0xfebe0000"
 [[register]]
   name = "ENTRY00"
   type = "ro"

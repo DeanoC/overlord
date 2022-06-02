@@ -1,7 +1,4 @@
 description = "A53 Integration ROM"
-[[bank]]
-  name = "CORESIGHT_A53_ROM"
-  address = "0xfec00000"
 [[register]]
   name = "ENTRY00"
   type = "ro"

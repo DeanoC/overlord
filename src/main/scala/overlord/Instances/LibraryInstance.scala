@@ -3,7 +3,7 @@ package overlord.Instances
 import ikuy_utils.Variant
 import overlord.SoftwareDefinitionTrait
 
-case class LibraryInstance(ident: String,
+case class LibraryInstance(override val name: String,
                            override val definition: SoftwareDefinitionTrait,
                           ) extends SoftwareInstance {
 	override val folder = "libs"

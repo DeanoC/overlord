@@ -37,6 +37,7 @@ endif()
 set(PRIVATE_LIBRARIES
 		core
 		dbg
+		library_defines
 		memory
 		multi_core
 		platform

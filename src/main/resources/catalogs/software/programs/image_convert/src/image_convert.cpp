@@ -7,6 +7,7 @@
 #include "host_os/filesystem.h"
 #include "Luau/Compiler.h"
 #include "resource_bundle/resource_bundle.h"
+#include "data_utils/lz4.h"
 
 #define BACKWARD_HAS_DW 1
 #include "platform/host/backward.hpp"
@@ -234,6 +235,7 @@ void Usage(char const* programName) {
 int main(int argc, char const *argv[]) {
 	Memory_MallocInit();
 	Memory_HeapAllocatorInit(globalAllocator);
+	LZ4_SetAllocator(globalAllocator);
 
 	backward::SignalHandling sh;
 

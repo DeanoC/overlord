@@ -5,12 +5,12 @@ import overlord.Connections.{InstanceLoc, WildCardConnectionPriority, Wire}
 import overlord.Instances.{ChipInstance, ClockInstance, PinGroupInstance}
 import overlord._
 
-import java.nio.file.Path
+import scala.collection.mutable
 
 object Top {
-	def apply(game: Game, out: Path): Unit = {
+	def apply(game: Game): Unit = {
 
-		val sb = new StringBuilder()
+		val sb = new mutable.StringBuilder()
 
 		sb ++= s"module ${sanitizeIdent(game.name)}_top (\n"
 
@@ -24,7 +24,7 @@ object Top {
 		for (instance <- game.setOfConnectedGateware) {
 			sb ++=
 			s"""
-				 |  (*dont_touch = "true"*) ${instance.ident}""".stripMargin
+				 |  (*dont_touch = "true"*) ${instance.name}""".stripMargin
 
 			val merged = game.constants
 				.map(_.asParameter)
@@ -51,7 +51,7 @@ object Top {
 				sb ++= "  \n )"
 			}
 
-			sb ++= s" ${instance.ident}(\n"
+			sb ++= s" ${instance.name}(\n"
 
 			sb ++= writeChipWires(instance, game.wires)
 
@@ -64,28 +64,12 @@ object Top {
 
 		sb ++= s"""endmodule\n"""
 
-		Utils.writeFile(out.resolve(game.name + "_top.v"), sb.result())
+		Utils.writeFile(Game.outPath.resolve(game.name + "_top.v"), sb.result())
 	}
-
-	def writeTopWire(loc: InstanceLoc, comma: String): String = {
-		val sb = new StringBuilder
-
-		if (loc.isClock) {
-			val clk = loc.instance.asInstanceOf[ClockInstance]
-			sb ++= s"$comma\tinput wire ${sanitizeIdent(loc.fullName)}"
-		} else if (loc.port.nonEmpty) {
-			val port = loc.port.get
-			val dir  = s"${port.direction}"
-			val bits = if (port.width.singleBit) "" else s"${port.width.text}"
-			sb ++= s"$comma\t$dir wire $bits ${sanitizeIdent(loc.fullName)}"
-		}
-		sb.result()
-	}
-
 
 	private def writeTopWires(wires: Seq[Wire]) = {
 
-		val sb: StringBuilder = new StringBuilder
+		val sb = new mutable.StringBuilder
 
 		var comma = ""
 
@@ -111,8 +95,23 @@ object Top {
 		sb.result()
 	}
 
+	def writeTopWire(loc: InstanceLoc, comma: String): String = {
+		val sb = new mutable.StringBuilder
+
+		if (loc.isClock) {
+			val clk = loc.instance.asInstanceOf[ClockInstance]
+			sb ++= s"$comma\tinput wire ${sanitizeIdent(loc.fullName)}"
+		} else if (loc.port.nonEmpty) {
+			val port = loc.port.get
+			val dir  = s"${port.direction}"
+			val bits = if (port.width.singleBit) "" else s"${port.width.text}"
+			sb ++= s"$comma\t$dir wire $bits ${sanitizeIdent(loc.fullName)}"
+		}
+		sb.result()
+	}
+
 	private def writeChipToChipWires(wires: Seq[Wire]): String = {
-		val sb: StringBuilder = new StringBuilder
+		val sb = new mutable.StringBuilder
 
 		val c2cs = wires.filterNot(
 			w => {
@@ -131,7 +130,7 @@ object Top {
 
 	private def writeChipWires(instance: ChipInstance,
 	                           wires: Seq[Wire]): String = {
-		val sb: StringBuilder = new StringBuilder
+		val sb = new mutable.StringBuilder
 
 		var comma = ""
 		val cs0   = wires.filter(_.startLoc.instance == instance)
@@ -161,10 +160,10 @@ object Top {
 				val inst = wire.startLoc.instance
 				if (wire.startLoc.isClock) {
 					val clk = inst.asInstanceOf[ClockInstance]
-					sb ++= s"${sanitizeIdent(clk.ident)})"
+					sb ++= s"${sanitizeIdent(clk.name)})"
 				} else if (wire.startLoc.isPin) {
 					val pg = inst.asInstanceOf[PinGroupInstance]
-					sb ++= s"${sanitizeIdent(pg.ident)})"
+					sb ++= s"${sanitizeIdent(pg.name)})"
 				} else sb ++= s"${sanitizeIdent(wire.startLoc.fullName)})"
 
 				comma = ",\n"

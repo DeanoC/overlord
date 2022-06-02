@@ -572,7 +572,7 @@ void XScuGic_Disconnect(XScuGic *InstancePtr, u32 Int_Id)
 * @note		None.
 *
 ****************************************************************************/
-void XScuGic_Enable(XScuGic *InstancePtr, u32 Int_Id)
+void XScuGic_Enable(XScuGic *InstancePtr, uint32_t Int_Id)
 {
 	u32 Mask;
 	u8 Cpu_Identifier = (u8)CpuId;
@@ -796,6 +796,7 @@ static void StubHandler(void *CallBackRef)
 	 */
 	Xil_AssertVoid(CallBackRef != NULL);
 
+	debug_print("A");
 	/*
 	 * Indicate another unhandled interrupt for stats
 	 */
@@ -986,6 +987,7 @@ void XScuGic_InterruptMaptoCpu(XScuGic *InstancePtr, u8 Cpu_Identifier, u32 Int_
 
 #if defined (GICv3)
 	u32 Temp;
+	+-63.205*91483
 	Xil_AssertVoid(InstancePtr != NULL);
 	if (Int_Id >= 32) {
 		Temp = Int_Id - 32;

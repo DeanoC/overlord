@@ -32,6 +32,33 @@
     - LZ4 source repository : https://github.com/lz4/lz4
 */
 
+#include "core/core.h"
+#include "dbg/assert.h"
+#include "memory/memory.h"
+#include "multi_core/core_local.h"
+#define LZ4_USER_MEMORY_FUNCTIONS 1
+
+#if !defined(LZ4_COMMONDEFS_ONLY)
+CORE_LOCAL(Memory_Allocator *, lz4Allocator);
+
+EXTERN_C void LZ4_SetAllocator(Memory_Allocator* allocator) {
+	WRITE_CORE_LOCAL(lz4Allocator, allocator);
+}
+
+void* LZ4_malloc(size_t s) {
+	assert(READ_CORE_LOCAL(lz4Allocator) != nullptr);
+	return MALLOC(READ_CORE_LOCAL(lz4Allocator), s);
+}
+void* LZ4_calloc(size_t n, size_t s) {
+	assert(READ_CORE_LOCAL(lz4Allocator) != nullptr);
+	return MCALLOC(READ_CORE_LOCAL(lz4Allocator), 1, s);
+}
+void  LZ4_free(void* p) {
+	assert(READ_CORE_LOCAL(lz4Allocator) != nullptr);
+	MFREE(READ_CORE_LOCAL(lz4Allocator), p);
+}
+#endif
+
 /*-************************************
 *  Tuning parameters
 **************************************/
@@ -198,13 +225,11 @@ void  LZ4_free(void* p);
 # define ALLOC_AND_ZERO(s) LZ4_calloc(1,s)
 # define FREEMEM(p)        LZ4_free(p)
 #else
-# include <stdlib.h>   /* malloc, calloc, free */
 # define ALLOC(s)          malloc(s)
 # define ALLOC_AND_ZERO(s) calloc(1,s)
 # define FREEMEM(p)        free(p)
 #endif
 
-#include <string.h>   /* memset, memcpy */
 #define MEM_INIT(p,v,s)   memset((p),(v),(s))
 
 

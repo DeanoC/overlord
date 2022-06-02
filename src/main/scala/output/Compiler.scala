@@ -1,9 +1,11 @@
 package output
 
 import ikuy_utils.Utils
+import overlord.Instances.CpuInstance
 import overlord.{Game, Resources}
 
 import java.nio.file.Path
+import scala.collection.mutable
 
 object Compiler {
 	def apply(game: Game, out: Path): Unit = {
@@ -11,84 +13,57 @@ object Compiler {
 
 		println(s"Creating Compiler scripts at $out")
 
-		val cpu_info: Set[(String, String, String)] = {
-			game.cpus.map(cpu => (
-				cpu.definition.defType.ident.last,
-				cpu.triple,
-				Utils.lookupString(cpu.attributes, "gcc_flags", "")))
-		}.toSet
-
-		genCompilerScript(cpu_info, out)
-		genCMakeToolChains(cpu_info, out)
+		game.cpus.foreach(genCompilerScript(_, out))
+		game.cpus.foreach(genCMakeToolChains(_, out))
 	}
 
 	private def sanatizeTriple(triple: String): String = {
 		triple.replace("-", "_")
 	}
 
-	private def genCompilerScript(cpu_info: Set[(String, String, String)],
-	                              out: Path): Unit = {
-		val sb = new StringBuilder
+	private def genCompilerScript(cpu: CpuInstance, out: Path): Unit = {
+		if (cpu.host) return
 
-		sb ++= (Utils.readFile("make_compilers",
-		                       Resources.stdResourcePath()
-			                       .resolve("catalogs/software/make_compilers.sh"),
-		                       getClass) match {
+		val (triple, gccFlags) = (cpu.triple, cpu.gccFlags)
+
+		val sb = new mutable.StringBuilder
+		sb ++= (Utils.readFile(Resources.stdResourcePath().resolve("catalogs/software/make_compilers.sh")) match {
 			case Some(script) => script
 			case None         =>
 				println("ERROR: resource make_compilers.sh not found!")
 				return
 		})
-
-		cpu_info.foreach { case (_, triple, gcc_flags) =>
-			// only build compilers for none os (not hosts)
-			if (triple.contains("none")) {
-				sb ++=
-				s"""
-					 |build_binutils $triple $$PWD/programs_host
-					 |build_gcc $triple $$PWD/programs_host "$gcc_flags"
-					 |""".stripMargin
-			}
-		}
-
+		sb ++=
+		s"""
+			 |build_binutils $triple $$PWD/programs_host
+			 |build_gcc $triple $$PWD/programs_host "$gccFlags"
+			 |""".stripMargin
 
 		Utils.writeFile(out.resolve("make_compilers.sh"), sb.result())
 		Utils.setFileExecutable(out.resolve(s"make_compilers.sh"))
-
 	}
 
-	private def genCMakeToolChains(cpu_info: Set[(String, String, String)],
-	                               out: Path): Unit = {
+	private def genCMakeToolChains(cpu: CpuInstance, out: Path): Unit = {
+		if (cpu.host) return
 
-		val template = Utils.readFile(
-			"toolchain_template",
-			Resources.stdResourcePath().resolve("catalogs/software/toolchain_template.cmake"),
-			getClass) match {
+		val (cpuType, triple, gccFlags) = (cpu.cpuType, cpu.triple, cpu.gccFlags)
+
+		val template = Utils.readFile(Resources.stdResourcePath().resolve("catalogs/software/toolchain_template.cmake")) match {
 			case Some(script) => script
 			case None         =>
 				println("ERROR: resource make_compilers.sh not found!")
 				return
 		}
 
-		for ((name, triple, gcc_flags) <- cpu_info
-		     // only build compilers for none os (not hosts)
-		     if triple.contains("none")) {
-			// try to read a specialist toolchain file, if none exist use template
-			val tt = Utils.readFile(
-				name = "toolchain_" + name,
-				path = Resources.stdResourcePath().resolve(
-					s"catalogs/software/toolchain_$name.cmake"),
-				klass = getClass
-				) match {
-				case Some(s) => s
-				case None    => {
-					template
-						.replace("""${triple}""", triple)
-						.replace("""${GCC_FLAGS}""", gcc_flags)
-				}
-			}
-
-			Utils.writeFile(out.resolve(name + "_toolchain.cmake"), tt)
+		// try to read a specialist toolchain file, if none exist use template
+		val specialist = Resources.stdResourcePath().resolve(s"catalogs/software/toolchain_$cpuType.cmake")
+		val tt         = Utils.readFile(specialist) match {
+			case Some(s) => s
+			case None    => template
+				.replace("""${triple}""", triple)
+				.replace("""${GCC_FLAGS}""", gccFlags)
 		}
+
+		Utils.writeFile(out.resolve(cpuType + "_toolchain.cmake"), tt)
 	}
 }

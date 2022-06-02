@@ -1,0 +1,13 @@
+path = "graphics/displays"
+[[definition]]
+type = "graphic.display.displayport.zynqps8"
+registers = [
+    { resource = "displayport/zynqps8/dp.toml", name = "DP", base_address = "0xfd4a_0000" },
+    { resource = "displayport/zynqps8/dp_dpcd.toml", name = "DP_DPCD", base_address = "-1" },
+    { resource = "displayport/zynqps8/dpdma.toml", name = "DPDMA", base_address = "0xfd4c0000" },
+    { resource = "displayport/zynqps8/eedid.toml", name = "EEDID", base_address = "-1" },
+]
+buses = [
+    { name = "siou_dp", supplier = false, data_width = 64 },
+    { protocol = "internal_multiplexer0", supplier = true, data_width = 64 },
+]

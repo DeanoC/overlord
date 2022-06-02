@@ -108,6 +108,7 @@ WARN_UNUSED_RESULT CONST_EXPR ALWAYS_INLINE IPI_BUFFER_OFFSET IPI_ChannelToBuffe
 	OSF_BOOT_COMPLETE = OSF_FIRE_AND_FORGET_BIT | 4,					// boot loader is done, passing some parameters upto PMU
 	OSF_SCREEN_CONSOLE_ENABLE = OSF_FIRE_AND_FORGET_BIT | 5, 	// switch the screen console on or off
 	OSF_CPU_WAKE_OR_SLEEP = OSF_FIRE_AND_FORGET_BIT | 6, 			// power down or up CPUs
+	OSF_DEVICE_WAKE_OR_SLEEP = OSF_FIRE_AND_FORGET_BIT | 7,			// power down or up the Devices like the FPGA
 } OS_ServiceFunc;
 
 typedef struct PACKED {
@@ -179,6 +180,11 @@ typedef struct PACKED {
 
 				uintptr_all_t wakeAddress;
 			} CPUWakeOrSleep;
+			struct PACKED {
+				uint8_t sleepFPGA;
+
+				uint8_t wakeFPGA;
+			} DeviceWakeOrSleep;
 		};
 	} Payload;
 } IPI3_Msg;

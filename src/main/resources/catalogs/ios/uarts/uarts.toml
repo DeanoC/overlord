@@ -1,5 +1,3 @@
-path = "uarts"
-
 [[definition]]
 type = "io.uart.apb_ctrl"
 gateware = "apb_ctrl/apb_ctrl.toml"
@@ -7,5 +5,11 @@ consumer_prefix = "apb_"
 
 [[definition]]
 type = "io.uart.zynqps8"
-registers = [{ resource = "zynqps8/uart", bankPrefix = "UART" }]
-hardware = [{ max_instances = 2, address_offsets = ["0x00000", "0x10000"] }]
+registers = [
+    { resource = "zynqps8/uart.toml", name = "UART_${index}", base_address = "0x0", address_increment = "0x1_0000", register_window_size = "64 KiB" }
+]
+buses = [
+    { name = "iopunitsswitch_uart${index}", supplier = false },
+]
+
+max_instances = 2

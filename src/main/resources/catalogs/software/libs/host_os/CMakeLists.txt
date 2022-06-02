@@ -39,6 +39,7 @@ endif()
 set(PRIVATE_LIBRARIES
 		core
 		dbg
+		library_defines
 		memory
 		platform
 		vfile

@@ -32,6 +32,8 @@
 *  - xxHash source repository : https://github.com/Cyan4973/xxHash
 */
 
+#include "core/core.h"
+#include "memory/memory.h"
 
 /* *************************************
 *  Tuning parameters
@@ -102,16 +104,15 @@
 /* *************************************
 *  Includes & Memory related functions
 ***************************************/
+extern Memory_Allocator * globalAllocator;
 /*! Modify the local functions below should you wish to use some other memory routines
 *   for malloc(), free() */
-#include <stdlib.h>
-static void* XXH_malloc(size_t s) { return malloc(s); }
-static void  XXH_free  (void* p)  { free(p); }
+static void* XXH_malloc(size_t s) { return MALLOC(globalAllocator, s); }
+static void  XXH_free  (void* p)  { MFREE(globalAllocator, p); }
 /*! and for memcpy() */
-#include <string.h>
 static void* XXH_memcpy(void* dest, const void* src, size_t size) { return memcpy(dest,src,size); }
 
-#include <assert.h>   /* assert */
+#include "dbg/assert.h"
 
 #define XXH_STATIC_LINKING_ONLY
 #include "xxhash.h"

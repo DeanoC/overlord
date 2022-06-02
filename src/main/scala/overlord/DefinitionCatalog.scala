@@ -37,38 +37,44 @@ class DefinitionCatalog {
 		defi
 	}
 
+	def mergeNewDefinition(incoming: Map[DefinitionType, DefinitionTrait]): Unit = {
+		// check for duplicates
+		for (i <- catalogs.keys) {
+			if (incoming.contains(i)) {
+				println(s"WARN: Duplicate definition name ${i.ident.mkString(".")} detected")
+			}
+		}
+		catalogs ++= incoming
+	}
 }
 
 object DefinitionCatalog {
-	def fromFile(name: String,
-	             spath: Path,
-	             defaultMap: Map[String,Variant]): Option[Seq[DefinitionTrait]] = {
-		println(s"Reading $name catalog")
+	def fromFile(fileName: String, defaultMap: Map[String, Variant]): Option[Seq[DefinitionTrait]] = {
+		val filePath = Game.catalogPath.resolve(fileName)
 
-		val path = spath.resolve(s"$name.toml")
+		println(s"Reading $fileName catalog")
 
-		if (!Files.exists(path.toAbsolutePath)) {
-			println(s"$name catalog at $path not found")
+		if (!Files.exists(filePath.toAbsolutePath)) {
+			println(s"$fileName catalog at $filePath not found")
 			return None
 		}
 
-		val source = Utils.readToml(name, path, getClass)
-		parse(name, source, spath, defaultMap)
+		Game.pushCatalogPath(filePath.getParent)
+
+		val source = Utils.readToml(filePath)
+		val result = parse(fileName, source, defaultMap)
+		Game.popCatalogPath()
+		result
 	}
 
 	private def parse(name: String,
 	                  parsed: Map[String, Variant],
-	                  spath: Path,
 	                  defaultMap: Map[String, Variant]): Option[Seq[DefinitionTrait]] = {
 
 		if (parsed.contains("instance")) {
 			println(s"$name contains an Instance which are not allowed in definitions")
 			return None
 		};
-
-		val path = if (parsed.contains("path")) {
-			spath.resolve(Utils.toString(parsed("path")))
-		} else spath
 
 		val defaults = if (parsed.contains("defaults"))
 			Utils.mergeAintoB(Utils.toTable(parsed("defaults")), defaultMap)
@@ -77,19 +83,21 @@ object DefinitionCatalog {
 		val defs = ArrayBuffer[DefinitionTrait]()
 		if (parsed.contains("definition")) {
 			val tdef = Utils.toArray(parsed("definition"))
-			for (defi <- tdef) defs += Definition(defi, path, defaults)
+			for (defi <- tdef) defs += Definition(defi, defaults)
 		}
 
 		if (parsed.contains("include")) {
 			val tincs = Utils.toArray(parsed("include"))
 			for (include <- tincs) {
 				val table = Utils.toTable(include)
-				val name  = Utils.toString(table("resource"))
-				val cat   = DefinitionCatalog.fromFile(s"$name", path, defaults)
+				val name  = Path.of(Utils.toString(table("resource")))
+				Game.pushCatalogPath(name)
+				val cat = DefinitionCatalog.fromFile(s"${name.getFileName}", defaults)
 				cat match {
 					case Some(value) => defs ++= value
 					case None        =>
 				}
+				Game.popCatalogPath()
 			}
 		}
 
@@ -97,14 +105,23 @@ object DefinitionCatalog {
 			val resources = Utils.lookupArray(parsed, "resources")
 			for (resource <- resources) {
 				val name = Utils.toString(resource)
-				val cat  = DefinitionCatalog.fromFile(s"$name", path, defaults)
+				val cat  = DefinitionCatalog.fromFile(s"$name", defaults)
 				cat match {
 					case Some(value) => defs ++= value
 					case None        =>
 				}
 			}
 		}
+		val identArray = defs.map(_.defType.ident.mkString(".")).toArray
+		for (i <- 0 until identArray.length)
+			for (j <- i + 1 until identArray.length) {
+				if (identArray(i) == identArray(j)) {
+					println(s"WARN ${identArray(i)} already exists in catalog")
+				}
+			}
 
 		Some(defs.toSeq)
 	}
+
+
 }

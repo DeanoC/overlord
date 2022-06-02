@@ -61,9 +61,8 @@
  * Refer to the XScuGic_Config data structure in xscugic.h for details on how
  * this table should be initialized.
  */
-#define XPAR_SCUGIC_0_CPU_BASEADDR 0xF8F00100
-#define XPAR_SCUGIC_0_CPU_HIGHADDR 0xF8F001FF
-#define XPAR_SCUGIC_0_DIST_BASEADDR 0xF8F01000
+#define XPAR_SCUGIC_0_CPU_BASEADDR 0xF9020000
+#define XPAR_SCUGIC_0_DIST_BASEADDR 0xF9010000
 
 XScuGic_Config XScuGic_ConfigTable[] = {
 	{

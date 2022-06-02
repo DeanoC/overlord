@@ -81,4 +81,4 @@ parameters = [
 [[process]]
 	name = "copy_verilog"
 	processor = 'copy'
-	sources = [{ file ="${dest}/build/gateware/liteeth_core.v", language="verilog"}]
+sources = [{ file = "${outPath}/build/gateware/liteeth_core.v", language = "verilog" }]

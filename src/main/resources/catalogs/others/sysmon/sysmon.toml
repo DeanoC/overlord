@@ -1,0 +1,12 @@
+path = "sysmon"
+
+[[definition]]
+type = "other.sysmon.zynqps8"
+registers = [
+    { resource = "zynqps8/ams.toml", name = "AMS_CTRL", base_address = "0xffa5_0000" },
+    { resource = "zynqps8/plsysmon.toml", name = "AMS_PL_SYSMON", base_address = "0xffa5_0c00" },
+    { resource = "zynqps8/pssysmon.toml", name = "AMS_PS_SYSMON", base_address = "0xffa5_0800" },
+]
+buses = [
+    { name = "lpdunitsswitch_pssysmon", supplier = false, data_width = 32 },
+]

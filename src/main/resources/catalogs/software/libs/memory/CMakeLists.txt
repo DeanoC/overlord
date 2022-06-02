@@ -44,6 +44,7 @@ endif()
 set(PRIVATE_LIBRARIES
 		core
 		dbg
+		library_defines
 		multi_core
 		platform
 		)

@@ -1,7 +1,4 @@
 description = "SerDes Control and Debug"
-[[bank]]
-  name = "SIOU"
-  address = "0xfd3d0000"
 [[register]]
   name = "REG_CTRL"
   type = "mixed"

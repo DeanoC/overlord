@@ -42,7 +42,10 @@ namespace Utils {
 			}
 
 			// deference
-			T const& operator*() {
+			T const& operator*() const {
+				return *current;
+			}
+			T & operator*() {
 				return *current;
 			}
 	};

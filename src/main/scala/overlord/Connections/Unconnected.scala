@@ -1,106 +1,33 @@
 package overlord.Connections
 
-import ikuy_utils.{BigIntV, Utils, Variant}
+import ikuy_utils.{Utils, Variant}
 import overlord.Chip._
-import overlord.Connections
+import overlord.DefinitionCatalog
 import overlord.Instances._
+import overlord.Interfaces.{QueryInterface, UnConnectedLike}
 
-import scala.math.BigDecimal.double2bigDecimal
+trait UnConnected extends QueryInterface with UnConnectedLike {
 
-case class Unconnected(connectionType: ConnectionType,
-                       main: String,
-                       direction: ConnectionDirection,
-                       secondary: String,
-                       attributes: Map[String, Variant]
-                      ) extends Connection {
-	def firstFullName: String = main
+	def direction: ConnectionDirection
 
-	def secondFullName: String = secondary
+	def firstFullName: String
 
-	def first: String = main
+	def secondFullName: String
 
-	def second: String = secondary
-
-	def isConstant: Boolean = connectionType match {
-		case ConstantConnectionType(_) => true
-		case _                         => false
-	}
-
-	def connect(unexpanded: Seq[ChipInstance]): Seq[Connected] = {
-		connectionType match {
-			case _: PortConnectionType      => connectPortConnection(unexpanded)
-			case _: ClockConnectionType     => connectClockConnection(unexpanded)
-			case _: ConstantConnectionType  => connectConstantConnection(unexpanded)
-			case _: PortGroupConnectionType => connectPortGroupConnection(unexpanded)
-			case _: BusConnectionType       => connectBusConnection(unexpanded)
-			case _: LogicalConnectionType   => connectLogicalConnection(unexpanded)
-		}
-	}
-
-	def preConnect(unexpanded: Seq[ChipInstance]): Unit = {
-		connectionType match {
-			case _: BusConnectionType => preConnectBusConnection(unexpanded)
-			case _                    =>
-		}
-	}
-
-	private def matchInstances(name: String,
-	                           unexpanded: Seq[ChipInstance]):
-	Seq[InstanceLoc] = {
+	protected def matchInstances(nameToMatch: String, unexpanded: Seq[ChipInstance]): Seq[InstanceLoc] = {
 		unexpanded.flatMap(c => {
-			val (nm, port) = c.getMatchNameAndPort(name)
+			val (nm, port) = c.getMatchNameAndPort(nameToMatch)
 			if (nm.nonEmpty) Some(InstanceLoc(c, port, nm.get))
 			else c match {
-				case container: Container => matchInstances(name, container.chipChildren)
+				case container: Container => matchInstances(nameToMatch, container.chipChildren)
 				case _                    => None
 			}
 		})
 	}
 
-	private def connectPortConnection(unexpanded: Seq[ChipInstance]) = {
-		val mo = matchInstances(main, unexpanded)
-		val so = matchInstances(second, unexpanded)
-
-		val cbp = if (mo.length > 1 || so.length > 1)
-			WildCardConnectionPriority()
-		else ExplicitConnectionPriority()
-
-		for {mloc <- mo; sloc <- so} yield {
-			ConnectPortBetween(cbp, mloc, sloc)
-		}
-	}
-
-	private def connectClockConnection(unexpanded: Seq[ChipInstance]) = {
-		val mo = matchInstances(main, unexpanded)
-		val so = matchInstances(second, unexpanded)
-
-		val cbp = if (mo.length > 1 || so.length > 1)
-			WildCardConnectionPriority()
-		else ExplicitConnectionPriority()
-
-		for {mloc <- mo; sloc <- so} yield {
-			ConnectPortBetween(cbp, mloc, sloc)
-		}
-	}
-
-	private def connectLogicalConnection(unexpanded: Seq[ChipInstance]) = {
-		val mo = matchInstances(main, unexpanded)
-		val so = matchInstances(second, unexpanded)
-
-		val cbp = if (mo.length > 1 || so.length > 1)
-			WildCardConnectionPriority()
-		else ExplicitConnectionPriority()
-
-		for {mloc <- mo; sloc <- so} yield {
-			Connections.ConnectedBetween(LogicalConnectionType(),
-			                             cbp, mloc, direction, sloc)
-		}
-	}
-
-
-	private def ConnectPortBetween(cbp: ConnectionPriority,
-	                               fil: InstanceLoc,
-	                               sil: InstanceLoc) = {
+	protected def ConnectPortBetween(cbp: ConnectionPriority,
+	                                 fil: InstanceLoc,
+	                                 sil: InstanceLoc): ConnectedPortGroup = {
 		val fp = {
 			if (fil.port.nonEmpty) fil.port.get
 			else if (fil.isPin) {
@@ -128,12 +55,8 @@ case class Unconnected(connectionType: ConnectionType,
 		var secondDirection = sp.direction
 
 		if (fp.direction != InOutWireDirection()) {
-			if (sp.direction == InOutWireDirection())
-				secondDirection = fp.direction
-		} else {
-			if (sp.direction != InOutWireDirection())
-				firstDirection = sp.direction
-		}
+			if (sp.direction == InOutWireDirection()) secondDirection = fp.direction
+		} else if (sp.direction != InOutWireDirection()) firstDirection = sp.direction
 
 		val fport = fp.copy(direction = firstDirection)
 		val sport = sp.copy(direction = secondDirection)
@@ -141,251 +64,65 @@ case class Unconnected(connectionType: ConnectionType,
 		val fmloc = InstanceLoc(fil.instance, Some(fport), fil.fullName)
 		val fsloc = InstanceLoc(sil.instance, Some(sport), sil.fullName)
 
-		Connections.ConnectedBetween(PortConnectionType(),
-		                             cbp, fmloc, direction, fsloc)
+		ConnectedPortGroup(cbp, fmloc, direction, fsloc)
 	}
+}
 
-	private def connectConstantConnection(unexpanded: Seq[ChipInstance]) = {
-		val to       = matchInstances(second, unexpanded)
-		val constant = connectionType.asInstanceOf[ConstantConnectionType]
-		val ccp      = if (to.length > 1) WildCardConnectionPriority()
-		else ExplicitConnectionPriority()
+object Unconnected {
 
-		for {tloc <- to} yield
-			ConnectedConstant(connectionType, ccp,
-			                  constant.constant, direction, tloc)
-	}
+	def apply(connection: Variant,
+	          catalogs: DefinitionCatalog): Option[UnConnectedLike] = {
+		val table = Utils.toTable(connection)
 
-	private def ConnectPortGroupBetween(fi: ChipInstance,
-	                                    fp: Port,
-	                                    fn: String,
-	                                    si: ChipInstance,
-	                                    sp: Port) = {
-		var firstDirection  = fp.direction
-		var secondDirection = sp.direction
+		if (!table.contains("type")) {
+			println(s"connection $connection requires a type field")
+			return None
+		}
+		val conntype = Utils.toString(table("type"))
 
-		if (fp.direction != InOutWireDirection()) {
-			if (sp.direction == InOutWireDirection())
-				secondDirection = fp.direction
-		} else {
-			if (sp.direction != InOutWireDirection())
-				firstDirection = sp.direction
+		if (!table.contains("connection")) {
+			println(s"connection $conntype requires a connection field")
+			return None
 		}
 
-		val fport = fp.copy(direction = firstDirection)
-		val sport = sp.copy(direction = secondDirection)
-
-		val fmloc = InstanceLoc(fi, Some(fport), s"$fn.${fp.name}")
-		val fsloc = InstanceLoc(si, Some(sport), s"$fn.${sp.name}")
-
-		Connections.ConnectedBetween(PortConnectionType(),
-		                             GroupConnectionPriority(),
-		                             fmloc, direction, fsloc)
-	}
-
-
-	private def connectPortGroupConnection(unexpanded: Seq[ChipInstance]) = {
-		val mo = matchInstances(main, unexpanded)
-		val so = matchInstances(second, unexpanded)
-
-		val ct = connectionType.asInstanceOf[PortGroupConnectionType]
-
-		for {mloc <- mo; sloc <- so
-		     fp <- mloc.instance.asInstanceOf[ChipInstance].ports.values
-			     .filter(_.name.startsWith(ct.first_prefix))
-		     sp <- sloc.instance.asInstanceOf[ChipInstance].ports.values
-			     .filter(_.name.startsWith(ct.second_prefix))
-		     if fp.name.stripPrefix(ct.first_prefix) ==
-		        sp.name.stripPrefix(ct.second_prefix)
-		     if !(ct.excludes.contains(fp.name) || ct.excludes.contains(sp.name))
-		     } yield ConnectPortGroupBetween(mloc.instance.asInstanceOf[ChipInstance],
-		                                     fp,
-		                                     mloc.fullName,
-		                                     sloc.instance.asInstanceOf[ChipInstance],
-		                                     sp)
-	}
-
-	private def connectBusConnection(unexpanded: Seq[ChipInstance]): Seq[ConnectedBetween] = {
-		val mo = matchInstances(main, unexpanded)
-		val so = matchInstances(second, unexpanded)
-
-		if (mo.length != 1 || so.length != 1) {
-			println(s"connection $main between $second count error")
-			Seq[ChipInstance]()
+		val cons = Utils.toString(table("connection"))
+		val con  = cons.split(' ')
+		if (con.length != 3) {
+			println(s"$conntype has an invalid connection field: $cons")
+			return None
+		}
+		val (first, dir, secondary) = con(1) match {
+			case "->"         => (con(0), FirstToSecondConnection(), con(2))
+			case "<->" | "<>" => (con(0), BiDirectionConnection(), con(2))
+			case "<-"         => (con(0), SecondToFirstConnection(), con(2))
+			case _            =>
+				println(s"$conntype has an invalid connection ${con(1)} : $cons")
+				return None
 		}
 
-		val mainIL = mo.head
-		val secondaryIL = so.head
-		val isMainBus = mo.head.instance.isInstanceOf[BusInstance]
 
-		if (mainIL.fullName == "RawPS8") {
-			println(s"${mainIL.fullName} ${secondaryIL.fullName}")
-		}
-
-		val bus: BusInstance =
-			if (isMainBus) mainIL.instance.asInstanceOf[BusInstance]
-			else secondaryIL.instance.asInstanceOf[BusInstance]
-		val other            = if (!isMainBus)
-			mainIL.instance.asInstanceOf[ChipInstance]
-		else
-			secondaryIL.instance.asInstanceOf[ChipInstance]
-
-		val busLoc = if (isMainBus) mainIL else secondaryIL
-
-		// main = bus and first to second so main is bus, other is consumer
-		// main = bus and second to first so main is bus, other is supplier
-		// other = bus and first to second so main is supplier, other is bus
-		// other = bus and second to first so main is consumer, other is bus
-		val isBusSupplier =
-			(isMainBus && direction == FirstToSecondConnection()) ||
-			(!isMainBus && direction == SecondToFirstConnection())
-
-		if(bus.isHardware || other.isHardware) {
-			return Seq(ConnectedBetween(BusConnectionType(),
-			                        GroupConnectionPriority(), mainIL,
-			                        direction, secondaryIL))
-		}
-
-		// if the bus isn't the supplier it needs to present its consumer interface
-		// and vice versa
-		val busPrefixes = if (isBusSupplier)
-			Seq(bus.consumerPrefix.replace("${index}",s"${bus.getFirstIndex(other)}"))
-		else bus.supplierPrefixes
-
-		// other the same but in reverse and bridges are special
-		// bridges are special
-		val otherPrefixes =
-			if (other.isInstanceOf[BridgeInstance])
-				Utils.lookupStrings(other.attributes,
-				                    bus.definition.defType.ident.head,
-				                    "bus_")
-			else if (isBusSupplier)
-				Utils.lookupStrings(other.attributes, "consumer_prefix", "bus_")
-			else
-				Utils.lookupStrings(other.attributes, "supplier_prefix", "bus_")
-
-		if (busPrefixes == otherPrefixes) {
-			for {
-				bp <- busPrefixes
-				fp <- bus.ports.values.filter(_.name.startsWith(bp))
-				sp <- other.ports.values.filter(_.name.startsWith(bp))
-				if fp.name == sp.name
-			} yield {
-				if(isMainBus) ConnectPortGroupBetween(bus, fp, busLoc.fullName, other, sp)
-				else ConnectPortGroupBetween(other, sp, busLoc.fullName, bus, fp)
+		conntype match {
+			case "port"       => Some(UnConnectedPortGroup(first, dir, secondary, "", "", Seq()))
+			case "clock"      => Some(UnConnectedClock(first, dir, secondary))
+			case "constant"   => Some(UnConnectedConstant(first, dir, secondary, Utils.stringToVariant(first)))
+			case "port_group" => Some(UnConnectedPortGroup(first, dir, secondary,
+			                                               Utils.lookupString(table, "first_prefix", ""),
+			                                               Utils.lookupString(table, "second_prefix", ""),
+			                                               Utils.lookupArray(table, "excludes").toSeq.map(Utils.toString)))
+			case "bus"        => {
+				Some(UnConnectedBus(first,
+				                    dir,
+				                    secondary,
+				                    Utils.lookupString(table, "bus_protocol", "internal"),
+				                    Utils.lookupString(table, "bus_name", ""),
+				                    Utils.lookupBoolean(table, "silent", or = false)
+				                    ))
 			}
-		}
-		else {
-			for {
-				bp <- busPrefixes
-				op <- otherPrefixes
-				fp <- bus.ports.values.filter(_.name.startsWith(bp))
-				sp <- other.ports.values.filter(_.name.startsWith(op))
-				if fp.name.stripPrefix(bp) == sp.name.stripPrefix(op)
-			} yield {
-				if (isMainBus) ConnectPortGroupBetween(bus, fp, busLoc.fullName, other, sp)
-				else ConnectPortGroupBetween(other, sp, busLoc.fullName, bus, fp)
-			}
-		}
-	}
-
-	private def preConnectBusConnection(unexpanded: Seq[ChipInstance]): Unit = {
-
-		val mo = matchInstances(main, unexpanded)
-		val so = matchInstances(second, unexpanded)
-
-		if (mo.isEmpty) {
-			println(s"$main instance can't be found")
-		}
-		if (so.isEmpty) {
-			println(s"$second instance can't be found")
-		}
-
-		if (mo.length != 1 || so.length != 1) {
-			println(s"connection $main between $second count error")
-			Seq[ChipInstance]()
-		}
-
-		val mainIL     = mo.head
-		val otherIL    = so.head
-		val isMainABus = mo.head.instance.isInstanceOf[BusInstance]
-
-		// main = bus and first to second so main is supplier, other is consumer
-		// main = bus and second to first so main is consumer, other is supplier
-		// other = bus and first to second so main is consumer, other is supplier
-		// other = bus and second to first so main is supplier, other is consumer
-		val mainIsSupplier =
-			(isMainABus && direction == FirstToSecondConnection()) ||
-			(!isMainABus && direction == SecondToFirstConnection())
-
-		if (mainIsSupplier) {
-			val bus: BusInstance =
-				if (isMainABus) mainIL.instance.asInstanceOf[BusInstance]
-				else otherIL.instance.asInstanceOf[BusInstance]
-
-			val other = if (!isMainABus) mainIL.instance else otherIL.instance
-
-			val busBankAlignment = Utils.lookupBigInt(bus.attributes.toMap,
-			                                          "bus_bank_alignment",
-			                                          1024)
-
-			val connectionSize = Utils.lookupBigInt(attributes,
-			                                        key = "size_in_bytes",
-			                                        busBankAlignment)
-
-
-			val size = other match {
-				case bridge: BridgeInstance =>
-					if (!attributes.contains("address_offset"))
-						println(f"${bus.ident.mkString} -> ${other.ident}: " +
-						        "Bridge ending connections require a address_offset")
-
-					Utils.pow2(bridge.addressWindowWidth).toBigInt
-
-				case ram: RamInstance => ram.getSizeInBytes
-				case _                => connectionSize
-			}
-
-			if (attributes.contains("address_offset")) {
-				val faAttrib = attributes("address_offset")
-				if (faAttrib.isInstanceOf[BigIntV]) {
-					val address = Utils.toBigInt(faAttrib)
-					bus.addFixedAddressConsumer(other.asInstanceOf[ChipInstance], address, size)
-				} else {
-					val fixedAddresses = Utils.toArray(faAttrib)
-					for (fixedAddress <- fixedAddresses) {
-						val fa = Utils.toArray(fixedAddress)
-						val address = Utils.toBigInt(fa(0))
-						val size = Utils.toBigInt(fa(1))
-
-						bus.addFixedAddressConsumer(other.asInstanceOf[ChipInstance], address, size)
-					}
-
-				}
-			} else {
-				if (!other.definition.isInstanceOf[HardwareDefinition])
-					bus.addVariableAddressConsumer(other.asInstanceOf[ChipInstance], size)
-				else {
-					val hw = other.definition.asInstanceOf[HardwareDefinition]
-					if (!other.attributes.contains("instance") ||
-					    hw.instanceAddressOffsets.isEmpty) {
-						println(f"${other.ident}: hardware needs instances setup correctly")
-					} else {
-						val instanceNo = Utils.toInt(other.attributes("instance"))
-						if (instanceNo >= hw.maxInstances) {
-							println(s"${other.ident}: ${
-								hw
-									.defType
-									.ident
-									.mkString
-							} not enough instances\n");
-						} else {
-							val address = hw.instanceAddressOffsets(instanceNo)
-							bus.addFixedAddressConsumer(other.asInstanceOf[ChipInstance], address, size)
-						}
-					}
-				}
-			}
+			case "logical"    => Some(UnConnectedLogical(first, dir, secondary))
+			case _            =>
+				println(s"$conntype is an unknown connection type")
+				None
+			//				PortConnectionType()
 		}
 	}
 }

@@ -35,6 +35,7 @@ set(PRIVATE_LIBRARIES
 		core
 		data_utils
 		dbg
+		library_defines
 		memory
 		platform
 		vfile

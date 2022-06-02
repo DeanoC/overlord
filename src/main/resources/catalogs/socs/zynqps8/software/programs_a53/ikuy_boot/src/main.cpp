@@ -11,7 +11,8 @@
 #include "hw_regs/csu.h"
 #include "hw_regs/ipi.h"
 #include "hw_regs/pmu_global.h"
-#include "hw_regs/gic400.h"
+#include "hw_regs/gic400_cpu.h"
+#include "hw_regs/gic400_dist.h"
 #include "hw_regs/zdma.h"
 #include "hw_regs/rpu.h"
 #include "hw_regs/crl_apb.h"
@@ -50,10 +51,6 @@ EXTERN_C {
 #define PSSYSMON_ANALOG_BUS_OFFSET		0x114U
 #define ZDMA_ZDMA_CH_CTRL0_TOTAL_BYTE_OFFSET 0X0188U
 
-// TODO get from memory map
-#define PMU_RAM_ADDR 0xFFDC0000
-
-
 DisplayPort::Display::Connection link;
 DisplayPort::Display::Display display;
 DisplayPort::Display::Mixer mixer;
@@ -90,14 +87,12 @@ EXTERN_C int main(void)
 
 	MarkDdrAsMemory();
 
-//	TcmInit();
-
 	if(!(HW_REG_GET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) & OS_GLOBAL0_BOOT_COMPLETE)) {
 		debug_printf("PMU size = %lu\n", (size_t) _binary_pmu_monitor_bin_end - (size_t) _binary_pmu_monitor_bin_start);
 		debug_printf("PMU load started\n");
 		PmuSleep();
 
-		PmuSafeMemcpy((void *) PMU_RAM_ADDR,
+		PmuSafeMemcpy((void *) PMURAM_0_BASE_ADDR,
 									(void *) _binary_pmu_monitor_bin_start,
 									(size_t) _binary_pmu_monitor_bin_end - (size_t) _binary_pmu_monitor_bin_start);
 		PmuWakeup();
@@ -130,6 +125,7 @@ EXTERN_C int main(void)
 	debug_force_raw_print(false);
 
 	Cache_DCacheCleanAndInvalidate();
+
 	if(!(HW_REG_GET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) & OS_GLOBAL0_BOOT_COMPLETE)) {
 		debug_printf("Hard Boot Complete VideoBlock @ %#010x\n", videoBlock);
 		OsService_BootComplete(&bootData);
@@ -140,6 +136,7 @@ EXTERN_C int main(void)
 	}
 
 	while(1) {
+		Utils_BusySecondSleep(1);
 	}
 }
 
@@ -276,38 +273,38 @@ void EnablePSToPL(void)
 void ClearPendingInterrupts(void)
 {
 	// Clear pending peripheral interrupts
-	HW_REG_SET(ACPU_GIC, GICD_ICENABLER0, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GIC, GICD_ICPENDR0, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GIC, GICD_ICACTIVER0, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, GICD_ICENABLER0, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, GICD_ICPENDR0, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, GICD_ICACTIVER0, 0xFFFFFFFFU);
 
-	HW_REG_SET(ACPU_GIC, GICD_ICENABLER1, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GIC, GICD_ICPENDR1, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GIC, GICD_ICACTIVER1, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, GICD_ICENABLER1, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, GICD_ICPENDR1, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, GICD_ICACTIVER1, 0xFFFFFFFFU);
 
-	HW_REG_SET(ACPU_GIC, GICD_ICENABLER2, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GIC, GICD_ICPENDR2, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GIC, GICD_ICACTIVER2, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, GICD_ICENABLER2, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, GICD_ICPENDR2, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, GICD_ICACTIVER2, 0xFFFFFFFFU);
 
-	HW_REG_SET(ACPU_GIC, GICD_ICENABLER3, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GIC, GICD_ICPENDR3, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GIC, GICD_ICACTIVER3, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, GICD_ICENABLER3, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, GICD_ICPENDR3, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, GICD_ICACTIVER3, 0xFFFFFFFFU);
 
-	HW_REG_SET(ACPU_GIC, GICD_ICENABLER4, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GIC, GICD_ICPENDR4, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GIC, GICD_ICACTIVER4, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, GICD_ICENABLER4, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, GICD_ICPENDR4, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, GICD_ICACTIVER4, 0xFFFFFFFFU);
 
-	HW_REG_SET(ACPU_GIC, GICD_ICENABLER5, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GIC, GICD_ICPENDR5, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GIC, GICD_ICACTIVER5, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, GICD_ICENABLER5, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, GICD_ICPENDR5, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, GICD_ICACTIVER5, 0xFFFFFFFFU);
 
 	// Clear active software generated interrupts, if any
-	HW_REG_SET(ACPU_GIC, GICC_EOIR, HW_REG_GET(ACPU_GIC, GICC_IAR));
+	HW_REG_SET(ACPU_GICC, GICC_EOIR, HW_REG_GET(ACPU_GICC, GICC_IAR));
 
 	// Clear pending software generated interrupts
-	HW_REG_SET(ACPU_GIC, GICD_CPENDSGIR0, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GIC, GICD_CPENDSGIR1, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GIC, GICD_CPENDSGIR2, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GIC, GICD_CPENDSGIR3, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, GICD_CPENDSGIR0, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, GICD_CPENDSGIR1, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, GICD_CPENDSGIR2, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, GICD_CPENDSGIR3, 0xFFFFFFFFU);
 
 }
 
@@ -641,16 +638,17 @@ EXTERN_C void SynchronousInterrupt(void) {
 }
 
 EXTERN_C void IRQInterrupt(void) {
-	raw_debug_printf("IRQInterrupt\n");
-	asm volatile("wfe");
+	uint32_t InterruptID = HW_REG_GET_FIELD(ACPU_GICC, GICC_IAR, INTERRUPT_ID);
+	raw_debug_printf("IRQInterrupt shouldn't FIRE!!! %x\n", InterruptID);
+	HW_REG_MERGE_FIELD(ACPU_GICC, GICC_EOIR, INTERRUPT_ID, InterruptID);
 }
 
 EXTERN_C void FIQInterrupt(void) {
-	raw_debug_printf("FIQInterrupt\n");
-	asm volatile("wfe");
-}
-EXTERN_C void SErrorInterrupt(void) {
-	raw_debug_printf("SErrorInterruptHandler\n");
-	asm volatile("wfe");
+	uint32_t InterruptID = HW_REG_GET_FIELD(ACPU_GICC, GICC_IAR, INTERRUPT_ID);
+	raw_debug_printf("Not handled FIQInterrupt %x\n", InterruptID);
+	HW_REG_MERGE_FIELD(ACPU_GICC, GICC_EOIR, INTERRUPT_ID, InterruptID);
 }
 
+EXTERN_C void SErrorInterrupt(void) {
+	raw_debug_printf("SErrorInterruptHandler\n");
+}

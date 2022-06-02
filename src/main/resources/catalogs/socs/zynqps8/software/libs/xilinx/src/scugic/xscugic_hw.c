@@ -551,7 +551,6 @@ void XScuGic_SetPriTrigTypeByDistAddr(u32 DistBaseAddress, u32 Int_Id,
 	 * the spinlock mechanism is used only if spinlock is enabled by
 	 * user.
 	 */
-	XIL_SPINLOCK();
 
 	/*
 	 * Determine the register to write to using the Int_Id.
@@ -601,7 +600,7 @@ void XScuGic_SetPriTrigTypeByDistAddr(u32 DistBaseAddress, u32 Int_Id,
 	 * Release the lock previously taken. This macro ensures that the lock
 	 * is given only if spinlock mechanism is enabled by the user.
 	 */
-	XIL_SPINUNLOCK();
+
 }
 
 /****************************************************************************/

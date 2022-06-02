@@ -5,12 +5,12 @@ import ikuy_utils._
 import overlord.Instances._
 import overlord._
 
-import java.nio.file.Path
+import scala.collection.mutable
 
 object Edalize {
-	def apply(game: Game, out: Path): Unit = {
-		println(s"Creating Edalize script at $out")
-		Utils.ensureDirectories(out)
+	def apply(game: Game): Unit = {
+		println(s"Creating Edalize script at ${Game.outPath}")
+		Utils.ensureDirectories(Game.outPath)
 
 		val board = if (game.board.nonEmpty) game.board.get else {
 			print(s"No board instance found, aborting Edalize process")
@@ -18,7 +18,7 @@ object Edalize {
 		}
 
 		//@formatter:off
-		val sb = new StringBuilder()
+		val sb = new mutable.StringBuilder()
 		sb ++=
 		s"""from edalize import *
 			 |import os
@@ -26,7 +26,7 @@ object Edalize {
 			 |
 			 |
 			 |""".stripMargin
-
+/*
 		sb ++=
 		s"""def prep_rom(name, in_path, out_path, bits_per_byte, data_width, size_in_bytes):
 			 |    "turns roms into form for bitstream"
@@ -96,9 +96,11 @@ object Edalize {
 				case _ | ZeroFillType() =>
 			}
 
-		}
-		sb ++= "work_root = 'build'\n"
-		sb ++= "name = 'xmasdemo'\n"
+		}*/
+val buildPath = Game.projectPath.resolve("build")
+		Utils.ensureDirectories(buildPath)
+		sb ++= s"work_root = '${buildPath.toString.replace("\\", "\\\\")}'\n"
+		sb ++= s"name = '${game.name}'\n"
 
 		board.boardType match {
 			case XilinxBoard(_, _) => sb ++= "tool = 'vivado'\n"
@@ -113,22 +115,25 @@ object Edalize {
 				case action: CopyAction =>
 					sb ++=
 					// @formatter:off
-s"""    {'name': os.path.relpath('${action.getDestPath}', work_root), 'file_type': '${action.language}Source'},\n"""
+s"""    {'name': '${action.getDestPath}', 'file_type': '${action.language}Source'},\n"""
 						// @formatter:on
 				case action: SourcesAction =>
 					sb ++=
 					// @formatter:off
-s"""    {'name': os.path.relpath('${action.getSrcPath}', work_root), 'file_type': '${action.language}Source'},\n"""
+s"""    {'name': '${action.getSrcPath}', 'file_type': '${action.language}Source'},\n"""
 						// @formatter:on
 				case _ =>
 			}
 		}
 
+		val absTopFilePath = Game.outPath.resolve(s"${game.name}_top.v").toAbsolutePath
+		val absXDCFilePath = Game.outPath.resolve(s"${game.name}.xdc").toAbsolutePath
+
 		sb ++=
 		// @formatter:off
-s"""    {'name': os.path.relpath('${game.name}_top.v', work_root), 'file_type': 'verilogSource'},\n"""
+s"""    {'name': '${absTopFilePath.toString}', 'file_type': 'verilogSource'},\n"""
 		sb ++=
-s"""    {'name': os.path.relpath('${game.name}.xdc', work_root), 'file_type': 'xdc'}\n"""
+s"""    {'name': '${absXDCFilePath.toString}', 'file_type': 'xdc'}\n"""
 		// @formatter:on
 
 		sb ++= "]\n"
@@ -163,7 +168,7 @@ s"""    {'name': os.path.relpath('${game.name}.xdc', work_root), 'file_type': 'x
 		    |
 		    |""".stripMargin
 
-		Utils.writeFile(out.resolve("edalize_build.py"), sb.result())
+		Utils.writeFile(Game.outPath.resolve("edalize_build.py"), sb.result())
 	}
 
 }

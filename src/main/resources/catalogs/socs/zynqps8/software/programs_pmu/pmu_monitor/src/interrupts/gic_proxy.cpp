@@ -63,16 +63,6 @@ static void UART_DEBUG_Interrupt() {
 	HW_REG_SET(UART_DEBUG, INTRPT_EN, status); // enable interrupts
 }
 
-static void TTC0_1_Interrupt() {
-//	raw_debug_print("TTC\n");
-	// gcc warns that the get isn't used BUT in this case its a clear on
-	// read register, so turn the warning off.
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-variable"
-	auto dummy = HW_REG_GET(TTC0, INTERRUPT_REGISTER_1); // clr on *read*
-#pragma GCC diagnostic pop
-}
-
 void GIC_Proxy(void) {
 	const uint32_t maxRestartCount = 10;
 	uint32_t restartCount = 0;
@@ -89,13 +79,12 @@ restart:;
 
 //			raw_debug_printf("group 0x%lx gicbits 0x%lx\n", group, gicbits);
 
-			const GICInterrupt_Names name = GIC_ProxyToName(group, gicbits);
+			const Interrupt_Names name = GIC_ProxyToName(group, gicbits);
 			switch(name) {
-				case GICIN_TTC0_1: TTC0_1_Interrupt(); break;
 #if UART_DEBUG_BASE_ADDR == 0xff010000
-				case GICIN_UART1: UART_DEBUG_Interrupt(); break;
+				case INT_UART1: UART_DEBUG_Interrupt(); break;
 #else
-				case GICIN_UART0: UART_DEBUG_Interrupt(); break;
+				case INT_UART0: UART_DEBUG_Interrupt(); break;
 #endif
 				default:
 					break;

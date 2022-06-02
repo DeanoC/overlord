@@ -30,9 +30,9 @@ void OsService_ScreenConsolePrintWithSize(unsigned int count, const char * text)
 void OsService_ScreenConsolePrint(const char *text) NON_NULL(1);
 void OsService_ScreenConsolePrintf(const char *format, ...) NON_NULL(1) __attribute__((format(printf, 1, 2)));
 
-WARN_UNUSED_RESULT uintptr_lo_t OsService_DdrLoBlockAlloc(uint32_t blocks128KB_);
+WARN_UNUSED_RESULT uintptr_lo_t OsService_DdrLoBlockAlloc(uint32_t blocks64KB_);
 void OsService_DdrLoBlockFree(uintptr_lo_t ptr_, uint32_t blockCount_);
-WARN_UNUSED_RESULT uintptr_all_t OsService_DdrHiBlockAlloc(uint32_t blocks128KB_);
+WARN_UNUSED_RESULT uintptr_all_t OsService_DdrHiBlockAlloc(uint32_t blocks64KB_);
 void OsService_DdrHiBlockFree(uintptr_all_t ptr_, uint32_t blockCount_);
 
 void OsService_BootComplete(BootData const* bootData);
@@ -49,6 +49,9 @@ typedef enum OSS_CPU {
 
 void OsService_SleepCpus(uint8_t cpus);
 void OsService_WakeCpu(uint8_t cpus, uintptr_all_t wakeAddress);
+void OsService_SleepFPGA();
+void OsService_WakeFPGA();
+
 uint8_t OsService_GetCoreHart();
 
 #ifdef __cplusplus

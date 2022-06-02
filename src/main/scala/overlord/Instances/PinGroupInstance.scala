@@ -4,16 +4,12 @@ import ikuy_utils._
 import overlord.Chip.{BitsDesc, Port, WireDirection}
 import overlord.{ChipDefinitionTrait, DiffPinConstraint, PinConstraint, PinConstraintType}
 
-import scala.collection.immutable.Map
 import scala.collection.mutable
 
-case class PinGroupInstance(ident: String,
+case class PinGroupInstance(name: String,
                             constraint: PinConstraintType,
                             override val definition: ChipDefinitionTrait,
                            ) extends ChipInstance {
-
-	override def copyMutate[A <: ChipInstance](nid: String): PinGroupInstance =
-		copy(ident = nid)
 
 	override lazy val ports: mutable.HashMap[String, Port] =
 		mutable.HashMap.from(definition.ports ++ constraint.ports.map(p => p.name -> p))

@@ -12,7 +12,7 @@ __attribute__((__section__(".hwregs")))
 static PSI_IWord const clock_init[] = {
 		PSI_SET_REGISTER_BANK(CRL_APB),
 
-		PSI_WRITE_MASKED_32(CRL_APB, GEM3_REF_CTRL,																											// GEM3_REF_CTRL
+		PSI_WRITE_MASKED_32(CRL_APB, GEM3_REF_CTRL,																								// GEM3_REF_CTRL
 												HW_REG_FIELD_MASK(CRL_APB, GEM3_REF_CTRL, RX_CLKACT) |
 															HW_REG_FIELD_MASK(CRL_APB, GEM3_REF_CTRL, CLKACT) |
 															HW_REG_FIELD_MASK(CRL_APB, GEM3_REF_CTRL, DIVISOR1) |
@@ -22,7 +22,7 @@ static PSI_IWord const clock_init[] = {
 															HW_REG_ENCODE_FIELD(CRL_APB, GEM3_REF_CTRL, CLKACT, 1) |
 															HW_REG_ENCODE_FIELD(CRL_APB, GEM3_REF_CTRL, DIVISOR1, 1) |      // / 1
 															HW_REG_ENCODE_FIELD(CRL_APB, GEM3_REF_CTRL, DIVISOR0, 12) |     // / 12 = 125Mhz
-															HW_REG_ENCODE_ENUM(CRL_APB, GEM3_REF_CTRL, SRCSEL, IOPLL)            	// IOPLL (1500Mhz)
+															HW_REG_ENCODE_ENUM(CRL_APB, GEM3_REF_CTRL, SRCSEL, IOPLL)       // IOPLL (1500Mhz)
 		),
 		PSI_WRITE_MASKED_32(CRL_APB, GEM_TSU_REF_CTRL,																									// GEM_TSU_REF_CTRL
 														HW_REG_FIELD_MASK(CRL_APB, GEM_TSU_REF_CTRL, CLKACT) |
@@ -32,9 +32,9 @@ static PSI_IWord const clock_init[] = {
 														HW_REG_ENCODE_FIELD(CRL_APB, GEM_TSU_REF_CTRL, CLKACT, 1) |
 														HW_REG_ENCODE_FIELD(CRL_APB, GEM_TSU_REF_CTRL, DIVISOR1, 1) |      	// / 1
 														HW_REG_ENCODE_FIELD(CRL_APB, GEM_TSU_REF_CTRL, DIVISOR0, 6) |     	// / 6 = 250Mhz
-														HW_REG_ENCODE_ENUM(CRL_APB, GEM_TSU_REF_CTRL, SRCSEL, IOPLL)            	// IOPLL (1500Mhz)
+														HW_REG_ENCODE_ENUM(CRL_APB, GEM_TSU_REF_CTRL, SRCSEL, IOPLL)        // IOPLL (1500Mhz)
 		),
-		PSI_WRITE_MASKED_32(CRL_APB, USB0_BUS_REF_CTRL,																									// USB0_BUS_REF_CTRL
+		PSI_WRITE_MASKED_32(CRL_APB, USB0_BUS_REF_CTRL,																							// USB0_BUS_REF_CTRL
 												HW_REG_FIELD_MASK(CRL_APB, USB0_BUS_REF_CTRL, CLKACT) |
 														HW_REG_FIELD_MASK(CRL_APB, USB0_BUS_REF_CTRL, DIVISOR1) |
 														HW_REG_FIELD_MASK(CRL_APB, USB0_BUS_REF_CTRL, DIVISOR0) |
@@ -42,10 +42,10 @@ static PSI_IWord const clock_init[] = {
 												HW_REG_ENCODE_FIELD(CRL_APB, USB0_BUS_REF_CTRL, CLKACT, 1) |
 														HW_REG_ENCODE_FIELD(CRL_APB, USB0_BUS_REF_CTRL, DIVISOR1, 1) |      // / 1
 														HW_REG_ENCODE_FIELD(CRL_APB, USB0_BUS_REF_CTRL, DIVISOR0, 6) |     	// / 6 = 250Mhz
-														HW_REG_ENCODE_ENUM(CRL_APB, USB0_BUS_REF_CTRL, SRCSEL, IOPLL)            	// IOPLL (1500Mhz)
+														HW_REG_ENCODE_ENUM(CRL_APB, USB0_BUS_REF_CTRL, SRCSEL, IOPLL)       // IOPLL (1500Mhz)
 		),
 
-		PSI_WRITE_MASKED_32(CRL_APB, USB3_DUAL_REF_CTRL,																									// USB3_DUAL_REF_CTRL
+		PSI_WRITE_MASKED_32(CRL_APB, USB3_DUAL_REF_CTRL,																						// USB3_DUAL_REF_CTRL
 												HW_REG_FIELD_MASK(CRL_APB, USB3_DUAL_REF_CTRL, CLKACT) |
 														HW_REG_FIELD_MASK(CRL_APB, USB3_DUAL_REF_CTRL, DIVISOR1) |
 														HW_REG_FIELD_MASK(CRL_APB, USB3_DUAL_REF_CTRL, DIVISOR0) |
@@ -53,7 +53,7 @@ static PSI_IWord const clock_init[] = {
 												HW_REG_ENCODE_FIELD(CRL_APB, USB3_DUAL_REF_CTRL, CLKACT, 1) |
 														HW_REG_ENCODE_FIELD(CRL_APB, USB3_DUAL_REF_CTRL, DIVISOR1, 3) |     // / 3
 														HW_REG_ENCODE_FIELD(CRL_APB, USB3_DUAL_REF_CTRL, DIVISOR0, 25) |    // / (3*25) = 20Mhz
-														HW_REG_ENCODE_ENUM(CRL_APB, USB3_DUAL_REF_CTRL, SRCSEL, IOPLL)            // IOPLL (1500Mhz)
+														HW_REG_ENCODE_ENUM(CRL_APB, USB3_DUAL_REF_CTRL, SRCSEL, IOPLL)      // IOPLL (1500Mhz)
 		),
 
 		// QSPI, SDIO0, SDIO1 and UART0 share a mask

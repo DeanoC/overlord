@@ -1,7 +1,4 @@
 description = "A53 Embedded Trace Macrocell"
-[[bank]]
-  name = "CORESIGHT_A53_ETM"
-  address = "0xfec40000"
 [[register]]
   name = "PRGCTLR"
   type = "rw"

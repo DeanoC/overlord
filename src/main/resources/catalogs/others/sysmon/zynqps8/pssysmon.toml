@@ -1,0 +1,1127 @@
+description = "PS System Monitor"
+[[register]]
+  name = "TEMP_LPD"
+  type = "ro"
+  width = 16
+  description = "LPD temperature measurement."
+  default = "0x00000000"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "TEMPERATURE"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Bits [15:6] = 10-bit ADC measurement.'''
+    longdesc = '''Bits [5:0] LSBs. Read-only.'''
+[[register]]
+  name = "VCC_PSINTLP"
+  type = "ro"
+  width = 16
+  description = "VCC PS LPD voltage measurement (supply1)."
+  default = "0x00000000"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Bits [15:6] = 10-bit ADC measurement.'''
+    longdesc = '''Bits [5:0] LSBs. Read-only.'''
+[[register]]
+  name = "VCC_PSINTFP"
+  type = "ro"
+  width = 16
+  description = "VCC PS FPD voltage measurement (supply2)."
+  default = "0x00000000"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Bits [15:6] = 10-bit ADC measurement.'''
+    longdesc = '''Bits [5:0] LSBs. Read-only.'''
+[[register]]
+  name = "VP_VN"
+  type = "ro"
+  width = 16
+  description = "VP_VN voltage measurement."
+  default = "0x00000000"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "VP_VN"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''PS SysMon reset.'''
+    longdesc = '''Any write to this register causes a unit reset. Read and write data have no meaning.'''
+[[register]]
+  name = "VCC_PSAUX"
+  type = "ro"
+  width = 16
+  description = "PS Aux voltage reference (supply3)."
+  default = "0x00000000"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Bits [15:6] = 10-bit ADC measurement.'''
+    longdesc = '''Bits [5:0] LSBs. Read-only.'''
+[[register]]
+  name = "VCCO_PSDDR"
+  type = "ro"
+  width = 16
+  description = "DDR I/O VCC voltage measurement."
+  default = "0x00000000"
+  offset = "0x00000034"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Bits [15:6] = 10-bit ADC measurement.'''
+    longdesc = '''Bits [5:0] LSBs. Read-only.'''
+[[register]]
+  name = "VCCO_PSIO3"
+  type = "ro"
+  width = 16
+  description = "PS IO Bank 503 voltage measurement (supply5)."
+  default = "0x00000000"
+  offset = "0x00000038"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Bits [15:6] = 10-bit ADC measurement.'''
+    longdesc = '''Bits [5:0] LSBs. Read-only.'''
+[[register]]
+  name = "VCCO_PSIO0"
+  type = "ro"
+  width = 16
+  description = "PS IO Bank 500 voltage measurement (supply6)."
+  default = "0x00000000"
+  offset = "0x0000003C"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Bits [15:6] = 10-bit ADC measurement.'''
+    longdesc = '''Bits [5:0] LSBs. Read-only.'''
+[[register]]
+  name = "MAX_TEMP_LPD"
+  type = "ro"
+  width = 16
+  description = "Max Temperature measured for LPD."
+  default = "0x00000000"
+  offset = "0x00000080"
+  [[register.field]]
+    name = "TEMPERATURE"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Maximum value recorded in the temperature measurement register since the last reset.'''
+    longdesc = '''Read-only.'''
+[[register]]
+  name = "MAX_VCC_PSINTLP"
+  type = "ro"
+  width = 16
+  description = "Max voltage measured for VCC PS LPD (supply1)."
+  default = "0x00000000"
+  offset = "0x00000084"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Maximum value recorded in the voltage measurement register since last reset.'''
+    longdesc = '''Read-only. Cleared by unit reset.'''
+[[register]]
+  name = "MAX_VCC_PSINTFP"
+  type = "ro"
+  width = 16
+  description = "Max voltage measured for VCC PS FPD (supply2)."
+  default = "0x00000000"
+  offset = "0x00000088"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Maximum value recorded in the voltage measurement register since the last reset.'''
+    longdesc = '''Read-only. Cleared by unit reset.'''
+[[register]]
+  name = "MAX_VCC_PSAUX"
+  type = "ro"
+  width = 16
+  description = "Max voltage measured for VCC PS Aux (supply3)."
+  default = "0x00000000"
+  offset = "0x0000008C"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Maximum value recorded in the voltage measurement register since the last reset.'''
+    longdesc = '''Read-only. Cleared by unit reset.'''
+[[register]]
+  name = "MIN_TEMP_LPD"
+  type = "ro"
+  width = 16
+  description = "Min temperature measured for LPD."
+  default = "0x0000FFFF"
+  offset = "0x00000090"
+  [[register.field]]
+    name = "TEMPERATURE"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Minimum value recorded in the temperature measurement register since the last reset.'''
+    longdesc = '''Read-only. Cleared by unit reset.'''
+[[register]]
+  name = "MIN_VCC_PSINTLP"
+  type = "ro"
+  width = 16
+  description = "Min voltage measured for VCC PS LPD (supply1)."
+  default = "0x0000FFFF"
+  offset = "0x00000094"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Minimum value recorded in the voltage measurement register since the last reset.'''
+    longdesc = '''Read-only. Cleared by unit reset.'''
+[[register]]
+  name = "MIN_VCC_PSINTFP"
+  type = "ro"
+  width = 16
+  description = "Min voltage measured for VCC PS FPD (supply2)."
+  default = "0x0000FFFF"
+  offset = "0x00000098"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Minimum value recorded in the voltage measurement register since the last reset.'''
+    longdesc = '''Read-only. Cleared by unit reset.'''
+[[register]]
+  name = "MIN_VCC_PSAUX"
+  type = "ro"
+  width = 16
+  description = "Min voltage measured for VCC PS Aux (supply3)."
+  default = "0x0000FFFF"
+  offset = "0x0000009C"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Minimum value recorded in the voltage measurement register since the last reset.'''
+    longdesc = '''Read-only. Cleared by unit reset.'''
+[[register]]
+  name = "MAX_VCCO_PSDDR"
+  type = "ro"
+  width = 16
+  description = "Max voltage measured for VCCO PS DDR (supply4)."
+  default = "0x00000000"
+  offset = "0x000000A0"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Maximum value recorded in the voltage measurement register since last reset.'''
+    longdesc = '''Read-only. Cleared by unit reset.'''
+[[register]]
+  name = "MAX_VCCO_PSIO3"
+  type = "ro"
+  width = 16
+  description = "Max voltage measured for VCCO PSIO 3 (supply5)."
+  default = "0x00000000"
+  offset = "0x000000A4"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Maximum value recorded in the voltage measurement register since last reset.'''
+    longdesc = '''Read-only. Cleared by unit reset.'''
+[[register]]
+  name = "MAX_VCCO_PSIO0"
+  type = "ro"
+  width = 16
+  description = "Max voltage measured for VCCO PSIO 0 (supply6)."
+  default = "0x00000000"
+  offset = "0x000000A8"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Maximum value recorded in the voltage measurement register since last reset.'''
+    longdesc = '''Read-only. Cleared by unit reset.'''
+[[register]]
+  name = "MIN_VCCO_PSDDR"
+  type = "ro"
+  width = 16
+  description = "Min voltage measured for VCCO PS DDR (supply4)."
+  default = "0x0000FFFF"
+  offset = "0x000000B0"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Minimum value recorded in the voltage measurement register since the last reset.'''
+    longdesc = '''Read-only. Cleared by unit reset.'''
+[[register]]
+  name = "MIN_VCCO_PSIO3"
+  type = "ro"
+  width = 16
+  description = "Min voltage measured for VCCO PSIO 3 (supply5)."
+  default = "0x0000FFFF"
+  offset = "0x000000B4"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Minimum value recorded in the voltage measurement register since the last reset.'''
+    longdesc = '''Read-only. Cleared by unit reset.'''
+[[register]]
+  name = "MIN_VCCO_PSIO0"
+  type = "ro"
+  width = 16
+  description = "Min voltage measured for VCCO PSIO 0 (supply6)."
+  default = "0x0000FFFF"
+  offset = "0x000000B8"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Minimum value recorded in the voltage measurement register since the last reset.'''
+    longdesc = '''Read-only. Cleared by unit reset.'''
+[[register]]
+  name = "STATUS_FLAG"
+  type = "ro"
+  width = 16
+  description = "Alarm Status, Flag 0."
+  default = "0x00000A00"
+  offset = "0x000000FC"
+  [[register.field]]
+    name = "INTERNAL_REF"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "DISABLED"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''PS SysMon Power indicator.'''
+    longdesc = '''0: enabled. 1: disabled. State of VCC_PSADC voltage node.'''
+  [[register.field]]
+    name = "ALM_6_3"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''Alarm Status read-bit.'''
+    longdesc = '''Voltage out of range. Bit [4] Alarm 3, VCC_PSAUX. Bit [5] Alarm 4, VCCO_PSDDR. Bit [6] Alarm 5, VCCO_PSIO3. Bit [7] Alarm 6,VCCO_PSIO0.'''
+  [[register.field]]
+    name = "OT"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "ALM_2_0"
+    bits = "2:0"
+    type = "ro"
+    shortdesc = '''Alarm Status read-bit.'''
+    longdesc = '''Bit [0] Alarm 0, Temp_LPD. Bit [1] Alarm 1, VCC_PSINTLP. Bit [2] Alarm 2, VCC_PSINTFP.'''
+[[register]]
+  name = "CONFIG_REG0"
+  type = "rw"
+  width = 16
+  description = "Configuration, Reg 0."
+  default = "0x00000000"
+  offset = "0x00000100"
+  [[register.field]]
+    name = "AVERAGING"
+    bits = "13:12"
+    type = "rw"
+    shortdesc = '''Averaging mode enable and set.'''
+    longdesc = '''0: no averaging. 1: 16 samples. 2: 64 samples. 3: 256 samples. Applies to sequencer looping.'''
+  [[register.field]]
+    name = "EC"
+    bits = "9"
+    type = "rw"
+    shortdesc = '''Reserved.'''
+    longdesc = '''Single sampling is triggered by the AMS.PS_SYSMON_CONTROL_STATUS register.'''
+  [[register.field]]
+    name = "ACQ"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''Long Acquisition Settling Time enable.'''
+    longdesc = '''0: normal. 1: long acquisition time. Applies to single sampling mode of single channel.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:6"
+    type = "rw"
+  [[register.field]]
+    name = "MUX_CHANNEL"
+    bits = "5:0"
+    type = "rw"
+    shortdesc = '''Single-measurement Mode.'''
+    longdesc = '''Select the channel to measure. Bits[5:0] selects an analog channel listed in the PS SysMon and AMS Sensor Channel tables of UG1085.'''
+[[register]]
+  name = "CONFIG_REG1"
+  type = "rw"
+  width = 16
+  description = "Configuration, Reg 1."
+  default = "0x00000000"
+  offset = "0x00000104"
+  [[register.field]]
+    name = "SEQUENCE_MODE"
+    bits = "15:12"
+    type = "rw"
+    shortdesc = '''Select Sequence Mode: 0000: Default channels; Loop sequence.'''
+    longdesc = '''0001: Selected channels; Single pass. 0010: Selected channgls; Loop sequence (will include calibration and temperature). 0011: Single channel (sequencer off), select channel in CONFIG_REG0 [mux_channel]. 11xx: Default mode. Others: reserved'''
+  [[register.field]]
+    name = "ALARM_DISABLE6TO3"
+    bits = "11:8"
+    type = "rw"
+    shortdesc = '''Alarm Disables.'''
+    longdesc = '''Bit [8] Alarm 3, VCC_PSAUX. Bit [9] Alarm 4, VCCO_PSDDR. Bit [10] Alarm 5, VCCO_PSIO3. Bit [11] Alarm 6,VCCO_PSIO0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:4"
+    type = "rw"
+  [[register.field]]
+    name = "ALARM_DISABLE2TO0"
+    bits = "3:1"
+    type = "rw"
+    shortdesc = '''Alarm Disables.'''
+    longdesc = '''Bit [1] Alarm 0, Temp_LPD. Bit [2] Alarm 1, VCC_PSINTLP. Bit [3] Alarm 2, VCC_PSINTFP.'''
+  [[register.field]]
+    name = "OVER_TEMP_DISABLE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "CONFIG_REG2"
+  type = "rw"
+  width = 16
+  description = "Configuration, Reg 2."
+  default = "0x00000000"
+  offset = "0x00000108"
+  [[register.field]]
+    name = "CLOCK_DIVIDER"
+    bits = "15:8"
+    type = "rw"
+    shortdesc = '''ADC Clock Divide Ratio.'''
+    longdesc = '''The reference clock is divided-down to generate the ADC clock. 00h: divide by 8. 01h, 02h: divide by 2. 03h through FFh: divide by 3 through 255. Note: for a value of 00h, this encoding is different than the PL SysMon unit.'''
+  [[register.field]]
+    name = "POWER_DOWN"
+    bits = "7:4"
+    type = "rw"
+    shortdesc = '''Enable Power-down Sleep Modes.'''
+    longdesc = '''0000: normal operation. 0001: partial sleep mode. SysOsc is operational, but all other analog circuits are in power-down. The SysOsc is left running for other units to utilize, as needed. 0010: reserved 0011: sleep mode. All analog circuits are in power-down.'''
+[[register]]
+  name = "CONFIG_REG3"
+  type = "rw"
+  width = 16
+  description = "Config Reg 3: Alarm disables."
+  default = "0x00000000"
+  offset = "0x0000010C"
+  [[register.field]]
+    name = "ALARM_DISABLE13TO8"
+    bits = "5:0"
+    type = "rw"
+    shortdesc = '''Alarm Disables.'''
+    longdesc = '''Bit [0] Alarm 8, VCCO_PSIO1. Bit [1] Alarm 9, VCCO_PSIO2. Bit [2] Alarm 10, PS_MGTRAVCC. Bit [3] Alarm 11, PS_MGTRAVTT. Bit [4] Alarm 12, VCC_PSADC. Bit [5] Alarm 13, Temp_FPD (near APU).'''
+[[register]]
+  name = "CONFIG_REG4"
+  type = "rw"
+  width = 16
+  description = "Configuration, Reg 4."
+  default = "0x00000000"
+  offset = "0x00000110"
+  [[register.field]]
+    name = "LOW_RATE_EOS"
+    bits = "11:10"
+    type = "rw"
+    shortdesc = '''Control generation of EOS relative to regular and low-rate (slow) sequencer.'''
+    longdesc = '''End of sequence is from: 00: regular rate. 01: low-rate (slow). 10: regular and low-rate (slow). 11: regular rate (default).'''
+  [[register.field]]
+    name = "SEQUENCE_RATE"
+    bits = "9:8"
+    type = "rw"
+    shortdesc = '''When using the low-rate sample mode, this field determines the divided down conversion rate from normal.'''
+    longdesc = '''Channels can be either a normal sample rate (SEQ_CHANNEL{0:2}) or a less frequent sample rate (SEQ_LOW_RATE_CHANNEL{0:2}). 00: every sequence. 01: every 4th Sequence. 10: every 16th Sequence 11: every 64th Sequence. When including a channel in the sequence, the user must ensure that each selected channel is either in the normal or low-rate sequence register, but not both. Channels not in the sequence are not selected in either sequence channel type.'''
+[[register]]
+  name = "SEQ_CHANNEL2"
+  type = "rw"
+  width = 16
+  description = "Sequencer Channel Inclusion, Group 2."
+  default = "0x00000000"
+  offset = "0x00000118"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:6"
+    type = "rw"
+  [[register.field]]
+    name = "TEMPERATURE_REMOTE"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "VCCAMS"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "SUPPLY10"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "SUPPLY9"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "SUPPLY8"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "SUPPLY7"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "SEQ_AVERAGE2"
+  type = "rw"
+  width = 16
+  description = "Sequencer Average Enable, Group 2."
+  default = "0x00000000"
+  offset = "0x0000011C"
+  [[register.field]]
+    name = "AVERAGE2"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "SEQ_CHANNEL0"
+  type = "rw"
+  width = 16
+  description = "Sequencer Channel Inclusion, Group 0."
+  default = "0x00000000"
+  offset = "0x00000120"
+  [[register.field]]
+    name = "SUPPLY3"
+    bits = "14"
+    type = "rw"
+  [[register.field]]
+    name = "SUPPLY2"
+    bits = "10"
+    type = "rw"
+  [[register.field]]
+    name = "SUPPLY1"
+    bits = "9"
+    type = "rw"
+  [[register.field]]
+    name = "TEMPERATURE"
+    bits = "8"
+    type = "rw"
+  [[register.field]]
+    name = "SUPPLY6"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "SUPPLY5"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "SUPPLY4"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "CALIBRATION"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "SEQ_AVERAGE0"
+  type = "rw"
+  width = 16
+  description = "Sequencer Average Enable, Group 0."
+  default = "0x00000000"
+  offset = "0x00000128"
+  [[register.field]]
+    name = "AVERAGE0"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "ALARM_TEMP_LPD_UPPER"
+  type = "rw"
+  width = 16
+  description = "Upper Alarm Temperature Threshold for LPD."
+  default = "0x00000000"
+  offset = "0x00000140"
+  [[register.field]]
+    name = "TEMPERATURE_ALARM"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "ALARM_VCC_PSINTLP_UPPER"
+  type = "rw"
+  width = 16
+  description = "Upper Alarm Voltage Threshold for LPD (supply1)."
+  default = "0x00000000"
+  offset = "0x00000144"
+  [[register.field]]
+    name = "SUPPLY_ALARM"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "ALARM_VCC_PSINTFP_UPPER"
+  type = "rw"
+  width = 16
+  description = "Upper Alarm Voltage Threshold for FPD (supply2)."
+  default = "0x00000000"
+  offset = "0x00000148"
+  [[register.field]]
+    name = "SUPPLY_ALARM"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "ALARM_OT_UPPER"
+  type = "rw"
+  width = 16
+  description = "Upper Alarm Over-Temperature (OT) Threshold for LPD and FPD."
+  default = "0x00000000"
+  offset = "0x0000014C"
+  [[register.field]]
+    name = "TEMPERATURE_ALARM"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "ALARM_TEMP_LPD_LOWER"
+  type = "rw"
+  width = 16
+  description = "Lower Alarm Temperature Threshold and Config for LPD."
+  default = "0x00000000"
+  offset = "0x00000150"
+  [[register.field]]
+    name = "TEMPERATURE_ALARM"
+    bits = "15:1"
+    type = "rw"
+    shortdesc = '''Alarm temperature threshold.'''
+    longdesc = '''Programmed register value is compared to the measurement register. Applies only when [threshold_mode] = 0; when hysteresis is enabled, the LPD temperature alarm is cleared when the temperature goes below the [temperature_alarm] threshold.'''
+  [[register.field]]
+    name = "THRESHOLD_MODE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Lower Threshold Hysteresis Disable.'''
+    longdesc = '''0: enable hysteresis. 1: disable hysteresis.'''
+[[register]]
+  name = "ALARM_LOWER_VCC_PSINTLP"
+  type = "rw"
+  width = 16
+  description = "Lower Alarm Voltage Threshold for LPD (supply1)."
+  default = "0x00000000"
+  offset = "0x00000154"
+  [[register.field]]
+    name = "SUPPLY_ALARM"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "ALARM_VCC_PSINTFP_LOWER"
+  type = "rw"
+  width = 16
+  description = "Lower Alarm Voltage Threshold for FPD (supply2)."
+  default = "0x00000000"
+  offset = "0x00000158"
+  [[register.field]]
+    name = "SUPPLY_ALARM"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "ALARM_OT_LOWER"
+  type = "rw"
+  width = 16
+  description = "Lower Alarm Over-Temperature (OT) Threshold and Control for LPD and FPD."
+  default = "0x00000000"
+  offset = "0x0000015C"
+  [[register.field]]
+    name = "TEMPERATURE_ALARM"
+    bits = "15:1"
+    type = "rw"
+    shortdesc = '''Alarm temperature threshold.'''
+    longdesc = '''Programmed register value is compared to the measurement register. Applies only when [threshold_mode] = 0; when hysteresis is enabled, the LPD and FPD over temperature (OT) alarm is cleared when the temperature goes below the [temperature_alarm] threshold.'''
+  [[register.field]]
+    name = "THRESHOLD_MODE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Lower Threshold, Hysteresis Disable.'''
+    longdesc = '''0: enable hysteresis. 1: disable hysteresis.'''
+[[register]]
+  name = "ALARM_VCC_PSAUX_UPPER"
+  type = "rw"
+  width = 16
+  description = "Upper Alarm Threshold Setting for VCC_PSAUX (supply3)."
+  default = "0x00000000"
+  offset = "0x00000160"
+  [[register.field]]
+    name = "SUPPLY_ALARM"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "ALARM_VCCO_PSDDR_UPPER"
+  type = "rw"
+  width = 16
+  description = "Upper Alarm Threshold for VCCO_PSDDR (supply4)."
+  default = "0x00000000"
+  offset = "0x00000164"
+  [[register.field]]
+    name = "SUPPLY_ALARM"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "ALARM_VCCO_PSIO3_UPPER"
+  type = "rw"
+  width = 16
+  description = "Upper Alarm Threshold for VCCO_PSIO3 (supply5)."
+  default = "0x00000000"
+  offset = "0x00000168"
+  [[register.field]]
+    name = "SUPPLY_ALARM"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "ALARM_VCCO_PSIO0_UPPER"
+  type = "rw"
+  width = 16
+  description = "Upper Alarm Threshold for VCCO_PSIO0 (supply6)."
+  default = "0x00000000"
+  offset = "0x0000016C"
+  [[register.field]]
+    name = "SUPPLY_ALARM"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "ALARM_VCC_PSAUX_LOWER"
+  type = "rw"
+  width = 16
+  description = "Lower Alarm Threshold for VCC_PSAUX (supply3)."
+  default = "0x00000000"
+  offset = "0x00000170"
+  [[register.field]]
+    name = "SUPPLY_ALARM"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "ALARM_VCCO_PSDDR_LOWER"
+  type = "rw"
+  width = 16
+  description = "Lower Alarm Threshold for VCCO_PSDDR (supply4)."
+  default = "0x00000000"
+  offset = "0x00000174"
+  [[register.field]]
+    name = "SUPPLY_ALARM"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "ALARM_VCCO_PSIO3_LOWER"
+  type = "rw"
+  width = 16
+  description = "Lower Alarm Threshold for VCCO_PSIO3 (supply5)."
+  default = "0x00000000"
+  offset = "0x00000178"
+  [[register.field]]
+    name = "SUPPLY_ALARM"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "ALARM_VCCO_PSIO0_LOWER"
+  type = "rw"
+  width = 16
+  description = "Lower Alarm Threshold for VCCO_PSIO0 (supply6)."
+  default = "0x00000000"
+  offset = "0x0000017C"
+  [[register.field]]
+    name = "SUPPLY_ALARM"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "ALARM_VCCO_PSIO1_UPPER"
+  type = "rw"
+  width = 16
+  description = "Alarm Upper Threshold for VCCO_PSIO1 (supply7)."
+  default = "0x00000000"
+  offset = "0x00000180"
+  [[register.field]]
+    name = "SUPPLY_ALARM"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "ALARM_VCCO_PSIO2_UPPER"
+  type = "rw"
+  width = 16
+  description = "Upper Alarm Threshold for VCCO_PSIO2 (supply8)."
+  default = "0x00000000"
+  offset = "0x00000184"
+  [[register.field]]
+    name = "SUPPLY_ALARM"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "ALARM_MGTRAVCC_UPPER"
+  type = "rw"
+  width = 16
+  description = "Upper Alarm Threshold for PS_MGTRAVCC (supply9)."
+  default = "0x00000000"
+  offset = "0x00000188"
+  [[register.field]]
+    name = "SUPPLY_ALARM"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "ALARM_MGTRAVTT_UPPER"
+  type = "rw"
+  width = 16
+  description = "Upper Alarm Threshold for PS_MGTRAVTT (supply10)."
+  default = "0x00000000"
+  offset = "0x0000018C"
+  [[register.field]]
+    name = "SUPPLY_ALARM"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "ALARM_VCC_PSADC_UPPER"
+  type = "rw"
+  width = 16
+  description = "Alarm Upper Threshold for VCC_PSADC (vccams)."
+  default = "0x00000000"
+  offset = "0x00000190"
+  [[register.field]]
+    name = "SUPPLY_ALARM"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "ALARM_TEMP_FPD_UPPER"
+  type = "rw"
+  width = 16
+  description = "Alarm Upper Temperature Threshold for FPD (t-remote)."
+  default = "0x00000000"
+  offset = "0x00000194"
+  [[register.field]]
+    name = "TEMPERATURE_ALARM"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "ALARM_VCCO_PSIO1_LOWER"
+  type = "rw"
+  width = 16
+  description = "Lower Alarm Threshold for VCCO PSIO1 (supply7)."
+  default = "0x00000000"
+  offset = "0x000001A0"
+  [[register.field]]
+    name = "SUPPLY_ALARM"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "ALARM_VCCO_PSIO2_LOWER"
+  type = "rw"
+  width = 16
+  description = "Lower Alarm Threshold for VCCO_PSIO2 (supply8)."
+  default = "0x00000000"
+  offset = "0x000001A4"
+  [[register.field]]
+    name = "SUPPLY_ALARM"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "ALARM_MGTRAVCC_LOWER"
+  type = "rw"
+  width = 16
+  description = "Lower Alarm Threshold for PS_MGTRAVCC (supply9)."
+  default = "0x00000000"
+  offset = "0x000001A8"
+  [[register.field]]
+    name = "SUPPLY_ALARM"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "ALARM_MGTRAVTT_LOWER"
+  type = "rw"
+  width = 16
+  description = "Lower Alarm Threshold for PS_MGTRAVTT (supply10)."
+  default = "0x00000000"
+  offset = "0x000001AC"
+  [[register.field]]
+    name = "SUPPLY_ALARM"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "ALARM_VCC_PSADC_LOWER"
+  type = "rw"
+  width = 16
+  description = "Lower Alarm Threshold for VCC_PSADC (vccams)."
+  default = "0x00000000"
+  offset = "0x000001B0"
+  [[register.field]]
+    name = "SUPPLY_ALARM"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "ALARM_TEMP_FPD_LOWER"
+  type = "rw"
+  width = 16
+  description = "Lower Alarm Temperature Threshold and Control for FPD (t-remote)."
+  default = "0x00000000"
+  offset = "0x000001B4"
+  [[register.field]]
+    name = "TEMPERATURE_ALARM"
+    bits = "15:1"
+    type = "rw"
+    shortdesc = '''Alarm temperature threshold.'''
+    longdesc = '''Programmed register value is compared to the measurement register. Applies only when [threshold_mode] = 0; when hysteresis is enabled, the FPD temperature alarm is cleared when the temperature goes below the [temperature_alarm] threshold.'''
+  [[register.field]]
+    name = "THRESHOLD_MODE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Lower Threshold, Hysteresis Disable.'''
+    longdesc = '''0: enable hysteresis. 1: disable hysteresis.'''
+[[register]]
+  name = "SEQ_LOW_RATE_CHANNEL0"
+  type = "rw"
+  width = 16
+  description = "Low-Rate Sequence Channel, Group 0."
+  default = "0x00000000"
+  offset = "0x000001E8"
+  [[register.field]]
+    name = "CHANNEL0"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''Set which full-featured group 0 channels are to have a low-rate of sampling.'''
+    longdesc = '''Refer to CONFIG_REG4 [sequence_rate] for more information. Refer to SEQ_CHANNEL0 for bit assignments.'''
+[[register]]
+  name = "SEQ_LOW_RATE_CHANNEL2"
+  type = "rw"
+  width = 16
+  description = "Low-Rate Sequence Channel, Group 2."
+  default = "0x00000000"
+  offset = "0x000001F0"
+  [[register.field]]
+    name = "CHANNEL2"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''Set which full-featured group 2 channels are to have a low-rate of sampling.'''
+    longdesc = '''Refer to CONFIG_REG4 [sequence_rate] for more information. Refer to SEQ_CHANNEL2 for bit assignments.'''
+[[register]]
+  name = "VCCO_PSIO1"
+  type = "ro"
+  width = 16
+  description = "VCCO_PSIO1 voltage measurement."
+  default = "0x00000000"
+  offset = "0x00000200"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Bits [15:6] = 10-bit ADC measurement.'''
+    longdesc = '''Bits [5:0] LSBs. Read-only.'''
+[[register]]
+  name = "VCCO_PSIO2"
+  type = "ro"
+  width = 16
+  description = "VCCO_PSIO2 voltage measurement."
+  default = "0x00000000"
+  offset = "0x00000204"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Bits [15:6] = 10-bit ADC measurement.'''
+    longdesc = '''Bits [5:0] LSBs. Read-only.'''
+[[register]]
+  name = "VCC_PSGTR"
+  type = "ro"
+  width = 16
+  description = "VCC_PS_GTR voltage measurement (VPS_MGTRAVCC)."
+  default = "0x00000000"
+  offset = "0x00000208"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Bits [15:6] = 10-bit ADC measurement.'''
+    longdesc = '''Bits [5:0] LSBs. Read-only.'''
+[[register]]
+  name = "VTT_PSGTR"
+  type = "ro"
+  width = 16
+  description = "VTT_PS_GTR voltage measurement (VPS_MGTRAVTT)."
+  default = "0x00000000"
+  offset = "0x0000020C"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Bits [15:6] = 10-bit ADC measurement.'''
+    longdesc = '''Bits [5:0] LSBs. Read-only.'''
+[[register]]
+  name = "VCC_PSADC"
+  type = "ro"
+  width = 16
+  description = "VCC_PSADC voltage measurement."
+  default = "0x00000000"
+  offset = "0x00000210"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Bits [15:6] = 10-bit ADC measurement.'''
+    longdesc = '''Bits [5:0] LSBs. Read-only.'''
+[[register]]
+  name = "TEMP_FPD"
+  type = "ro"
+  width = 16
+  description = "FPD Temperature Measurment (REMOTE)."
+  default = "0x00000000"
+  offset = "0x00000214"
+  [[register.field]]
+    name = "TEMPERATURE"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Bits [15:6] = 10-bit ADC measurement.'''
+    longdesc = '''Bits [5:0] LSBs. Read-only.'''
+[[register]]
+  name = "MAX_VCCO_PSIO1"
+  type = "ro"
+  width = 16
+  description = "Max voltage measured for VCCO_PSIO1."
+  default = "0x00000000"
+  offset = "0x00000280"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Maximum value recorded in the voltage measurement register since the last reset.'''
+    longdesc = '''Read-only. Cleared by unit reset.'''
+[[register]]
+  name = "MAX_VCCO_PSIO2"
+  type = "ro"
+  width = 16
+  description = "Max voltage measured for VCCO_PSIO2."
+  default = "0x00000000"
+  offset = "0x00000284"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Maximum value recorded in the voltage measurement register since the last reset.'''
+    longdesc = '''Read-only. Cleared by unit reset.'''
+[[register]]
+  name = "MAX_VCC_PSGTR"
+  type = "ro"
+  width = 16
+  description = "Max voltage measured for VCC_PS_GTR (VPS_MGTRAVCC)."
+  default = "0x00000000"
+  offset = "0x00000288"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Maximum value recorded in the voltage measurement register since the last reset.'''
+    longdesc = '''Read-only. Cleared by unit reset.'''
+[[register]]
+  name = "MAX_VTT_PSGTR"
+  type = "ro"
+  width = 16
+  description = "Max voltage measured for VTT_PS_GTR (VPS_MGTRAVTT)."
+  default = "0x00000000"
+  offset = "0x0000028C"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Maximum value recorded in the voltage measurement register since the last reset.'''
+    longdesc = '''Read-only. Cleared by unit reset.'''
+[[register]]
+  name = "MAX_PSADC"
+  type = "ro"
+  width = 16
+  description = "Max voltage measured for VCC_PSADC."
+  default = "0x00000000"
+  offset = "0x00000290"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Maximum value recorded in the voltage measurement register since the last reset.'''
+    longdesc = '''Read-only. Cleared by unit reset.'''
+[[register]]
+  name = "MAX_TEMP_FPD"
+  type = "ro"
+  width = 16
+  description = "Max temperature measured for FPD (remote)."
+  default = "0x00000000"
+  offset = "0x00000294"
+  [[register.field]]
+    name = "TEMPERATURE"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Maximum value recorded in the temperature measurement register since the last reset.'''
+    longdesc = '''Read-only. Cleared by unit reset.'''
+[[register]]
+  name = "MIN_VCCO_PSIO1"
+  type = "ro"
+  width = 16
+  description = "Min voltage measured for VCCO_PSIO1."
+  default = "0x0000FFFF"
+  offset = "0x000002A0"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Minimum value recorded in the voltage measurement register since the last reset.'''
+    longdesc = '''Read-only. Cleared by unit reset.'''
+[[register]]
+  name = "MIN_VCCO_PSIO2"
+  type = "ro"
+  width = 16
+  description = "Min voltage measured for VCCO_PSIO2."
+  default = "0x0000FFFF"
+  offset = "0x000002A4"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Minimum value recorded in the voltage measurement register since the last reset.'''
+    longdesc = '''Read-only. Cleared by unit reset.'''
+[[register]]
+  name = "MIN_VCC_PSGTR"
+  type = "ro"
+  width = 16
+  description = "Min voltage measured for VCC_PS_GTR (VPS_MGTRAVCC)."
+  default = "0x0000FFFF"
+  offset = "0x000002A8"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Minimum value recorded in the voltage measurement register since the last reset.'''
+    longdesc = '''Read-only. Cleared by unit reset.'''
+[[register]]
+  name = "MIN_VTT_PSGTR"
+  type = "ro"
+  width = 16
+  description = "Min voltage measured for VTT_PS_GTR (VPS_MGTRAVTT)."
+  default = "0x0000FFFF"
+  offset = "0x000002AC"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Minimum value recorded in the voltage measurement register since the last reset.'''
+    longdesc = '''Read-only. Cleared by unit reset.'''
+[[register]]
+  name = "MIN_VCC_PSADC"
+  type = "ro"
+  width = 16
+  description = "Min voltage measured for VCC_PSADC."
+  default = "0x0000FFFF"
+  offset = "0x000002B0"
+  [[register.field]]
+    name = "SUPPLY_VAL"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Minimum value recorded in the voltage measurement register since the last reset.'''
+    longdesc = '''Read-only. Cleared by unit reset.'''
+[[register]]
+  name = "MIN_TEMP_FPD"
+  type = "ro"
+  width = 16
+  description = "Min temperature measured for FPD (remote)."
+  default = "0x0000FFFF"
+  offset = "0x000002B4"
+  [[register.field]]
+    name = "TEMPERATURE"
+    bits = "15:0"
+    type = "ro"
+    shortdesc = '''Minimum value recorded in the temperature measurement register since the last reset.'''
+    longdesc = '''Read-only. Cleared by unit reset.'''

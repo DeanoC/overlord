@@ -52,32 +52,6 @@ void PrintBanner(void)
 	raw_debug_print("\n");
 }
 
-void ttc0_1_setup(void) {
-	raw_debug_print("  TTC0_1 handler\n");
-
-	uint32_t group = 0;
-	uint32_t bit = 0;
-
-	GIC_NameToProxy(GICIN_TTC0_1, &group, &bit);
-
-	HW_REG_SET(TTC0, CLOCK_CONTROL_1, 0);
-	HW_REG_SET(TTC0, INTERVAL_COUNTER_1, 0);
-	HW_REG_SET(TTC0, MATCH_1_COUNTER_1, 0);
-	HW_REG_SET(TTC0, MATCH_1_COUNTER_2, 0);
-	HW_REG_SET(TTC0, MATCH_1_COUNTER_3, 0);
-	HW_REG_SET(TTC0, INTERRUPT_ENABLE_1, 0);
-	HW_REG_SET(TTC0, INTERRUPT_REGISTER_1, TTC_INTERRUPT_REGISTER_1_USERMASK);
-
-	HW_REG_SET(TTC0, INTERVAL_COUNTER_1, 0x0F00FFFF);
-	HW_REG_SET_BIT(TTC0, COUNTER_CONTROL_1, RST);
-	HW_REG_SET_BIT(TTC0, COUNTER_CONTROL_1, INT);
-	hw_RegWrite(LPD_SLCR_BASE_ADDR, LPD_SLCR_GICP0_IRQ_ENABLE_OFFSET + (group * GICPROXY_INTERRUPT_GROUP_SIZE), bit);
-	hw_RegWrite(LPD_SLCR_BASE_ADDR, LPD_SLCR_GICP_PMU_IRQ_ENABLE_OFFSET, Math_PowTwo_U32(group));
-
-	HW_REG_SET(TTC0, INTERRUPT_ENABLE_1, TTC_INTERRUPT_REGISTER_1_IV);
-	HW_REG_CLR_BIT(TTC0, COUNTER_CONTROL_1, DIS);
-}
-
 void setupInterruptHandlers() {
 	raw_debug_print("Set Up Interrupt Handlers\n");
 
@@ -120,9 +94,6 @@ void setupInterruptHandlers() {
 	HW_REG_SET(UART_DEBUG, INTRPT_EN, 	UART_CHNL_INT_STS_RTRIG);
 	HW_REG_SET(UART_DEBUG, RCVR_TIMEOUT, 32);
 	HW_REG_SET(UART_DEBUG, RCVR_FIFO_TRIGGER_LEVEL, 1);
-
-	// set Triple Timer/Counter 0 for our usage
-	ttc0_1_setup();
 
 	// GPI2 (Reset and sleep events)
 	raw_debug_print("  Reset and Sleep handler\n");

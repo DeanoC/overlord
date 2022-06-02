@@ -43,14 +43,20 @@ file(GLOB CPPHEADERLIST CONFIGURE_DEPENDS
 		include/${CPU_ARCH}/*.hpp
 		include/${CPU}/*.hpp
 		)
-add_library(${project} ${CLIST} ${CPPLIST} ${ASMLIST} ${CHEADERLIST} ${CPPHEADERLIST})
-target_link_libraries(${project} PRIVATE core)
-target_link_libraries(${project} PRIVATE dbg)
-target_link_libraries(${project} PRIVATE memory)
-target_link_libraries(${project} PRIVATE multi_core)
-target_link_libraries(${project} PRIVATE platform)
-target_link_libraries(${project} PRIVATE vfile)
 
+set(PRIVATE_LIBRARIES
+		core
+		dbg
+		library_defines
+		memory
+		multi_core
+		platform
+		vfile
+		)
+
+
+add_library(${project} ${CLIST} ${CPPLIST} ${ASMLIST} ${CHEADERLIST} ${CPPHEADERLIST})
+target_link_libraries(${project} PRIVATE ${PRIVATE_LIBRARIES})
 target_include_directories(${project} PUBLIC include)
 target_compile_definitions(${project} PRIVATE BOARD_${BOARD}=1 SOC_${SOC}=1 CPU_${CPU}=1 CPU_ARCH_${CPU_ARCH}=1)
 

@@ -2,16 +2,17 @@ package overlord.Instances
 
 import ikuy_utils.{Utils, Variant}
 import overlord.Chip.ChipDefinition
+import overlord.Interfaces.QueryInterface
 import overlord.Software.SoftwareDefinition
-import overlord.{DefinitionCatalog, DefinitionTrait, DefinitionType}
+import overlord.{DefinitionCatalog, DefinitionTrait, DefinitionType, Game}
 
 import java.nio.file.Path
 import scala.collection.mutable
 
-trait InstanceTrait {
-	lazy val attributes: mutable.HashMap[String, Variant] =
-		mutable.HashMap[String, Variant](definition.attributes.toSeq: _*)
-	val ident: String
+trait InstanceTrait extends QueryInterface {
+	lazy val attributes: mutable.HashMap[String, Variant] = mutable.HashMap[String, Variant](definition.attributes.toSeq: _*)
+	val name: String
+	val sourcePath: Path = Game.instancePath.toAbsolutePath
 
 	def definition: DefinitionTrait
 
@@ -54,27 +55,29 @@ object Instance {
 
 		val defi = catalogs.findDefinition(defType) match {
 			case Some(d) => d
-			case None    => definitionFrom(catalogs, table, defType) match {
-				case Some(value) => value
-				case None        =>
-					println(s"No definition found or could be create $name $defType")
-					return None
-			}
+			case None    =>
+				definitionFrom(catalogs, Game.projectPath, table, defType) match {
+					case Some(value) => value
+					case None        =>
+						println(s"No definition found or could be create $name $defType")
+						return None
+				}
 		}
 
 		defi.createInstance(name, attribs) match {
 			case Some(i) => Some(i)
 			case None    => None
 		}
-
 	}
 
 	private def definitionFrom(catalogs: DefinitionCatalog,
+	                           path: Path,
 	                           table: Map[String, Variant],
 	                           defType: DefinitionType)
 	: Option[DefinitionTrait] = {
+
 		if (table.contains("gateware")) {
-			val result = ChipDefinition(table, Path.of("."))
+			val result = ChipDefinition(table, path)
 			result match {
 				case Some(value) =>
 					catalogs.catalogs += (defType -> value)
@@ -84,7 +87,7 @@ object Instance {
 					None
 			}
 		} else if (table.contains("software")) {
-			val result = SoftwareDefinition(table, Path.of("."))
+			val result = SoftwareDefinition(table, path)
 			result match {
 				case Some(value) =>
 					catalogs.catalogs += (defType -> value)

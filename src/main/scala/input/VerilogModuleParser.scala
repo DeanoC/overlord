@@ -13,8 +13,8 @@ case class VerilogPort(direction: String, bits: BitsDesc, name: String)
 	extends VerilogBoundary
 
 object VerilogModuleParser {
-	private val bitRegEx = "\\[\\d+:\\d+\\]".r
-	private val moduleRegEx = "\\s*module\\s+(\\w+)[\\s|(]*".r
+	private val bitRegEx      = "\\[\\d+:\\d+\\]".r
+	private val moduleRegEx   = "\\s*module\\s+(\\w+)[\\s|#(]*".r
 	private val endPortsRegEx = "\\);".r
 
 	def apply(absolutePath: Path, name: String): Seq[VerilogBoundary] = {
@@ -24,11 +24,11 @@ object VerilogModuleParser {
 		for {i <- txt.indices;
 		     if txt(i).contains("module") && !txt(i).contains("endmodule")
 		     moduleRegEx(n) = txt(i)
-				 if n == name
+		     if n == name
 		     } {
 			for {j <- i + 1 until txt.length} {
-				val words = txt(j).split(" ")
-					.filterNot(w => w == "wire" || w == "reg")
+				val words = txt(j).split("\\s")
+					.filterNot(w => w == "wire" || w == "reg" || w == "integer")
 					.map(_.filter(c => (c.isLetterOrDigit || c == '_')))
 					.filterNot(_.isBlank)
 					.filterNot(_ (0).isDigit)
@@ -58,7 +58,7 @@ object VerilogModuleParser {
 
 	private def load(absolutePath: Path): Seq[String] = {
 		if (!Files.exists(absolutePath)) {
-			println(s"$absolutePath does't not exists");
+			println(s"$absolutePath does not exists");
 			Seq()
 		} else {
 			val file       = absolutePath.toFile

@@ -1,3 +1,5 @@
 resources = [
-    "uarts/uarts",
+    "uarts/uarts.toml",
+    "usbs/usbs.toml",
+    "cans/cans.toml"
 ]
