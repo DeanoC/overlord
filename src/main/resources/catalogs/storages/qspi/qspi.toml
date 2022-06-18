@@ -3,7 +3,7 @@ path = "qspi"
 [[definition]]
 type = "storage.qspi.zynqps8"
 registers = [
-    { resource = "zynqps8/qspi.toml", name = "QSPI", base_address = "0xff0f0000" }
+    { resource = "zynqps8/qspi.toml", name = "QSPI", base_address = "0x020f_0000" }
 ]
 buses = [
     { name = "iopunitsswitch_quadspi", supplier = false, data_width = 64, address_width = 32 },

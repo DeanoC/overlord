@@ -1,9 +1,9 @@
 #include "core/core.h"
 #include "platform/reg_access.h"
 #include "platform/memory_map.h"
-#include "hw_regs/pmu/pmu_iomodule.h"
-#include "hw_regs/pmu/pmu_lmb_bram.h"
-#include "hw_regs/ipi.h"
+#include "platform/registers/pmu_iomodule.h"
+#include "platform/registers/pmu_lmb_bram.h"
+#include "platform/registers/ipi.h"
 #include "dbg/raw_print.h"
 #include "dbg/print.h"
 

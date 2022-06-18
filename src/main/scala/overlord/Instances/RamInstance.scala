@@ -9,10 +9,19 @@ import scala.reflect.ClassTag
 case class RamInstance(name: String,
                        override val definition: ChipDefinitionTrait,
                       ) extends ChipInstance with RamLike {
-	private lazy val ranges: Seq[(BigInt, BigInt)] = {
+	private val cpuRegEx = "\\s*,\\s*".r
+
+	private def decodeCpusString(cpus: String): Seq[String] = if (cpus == "_") Seq() else cpuRegEx.split(cpus).toSeq.map(_.toLowerCase())
+
+	private lazy val ranges: Seq[(BigInt, BigInt, Boolean, Seq[String])] = {
 		if (!attributes.contains("ranges")) Seq()
-		else Utils.toArray(attributes("ranges")).map(
-			b => (Utils.lookupBigInt(Utils.toTable(b), "address", 0), Utils.lookupBigInt(Utils.toTable(b), "size", 0)))
+		else Utils.toArray(attributes("ranges")).map {
+			b =>
+				(Utils.lookupBigInt(Utils.toTable(b), "address", 0),
+					Utils.lookupBigInt(Utils.toTable(b), "size", 0),
+					Utils.lookupBoolean(Utils.toTable(b), "fixed_address", false),
+					decodeCpusString(Utils.lookupString(Utils.toTable(b), key = "cpus", "_")))
+		}
 	}
 
 	override def isVisibleToSoftware: Boolean = true
@@ -26,7 +35,7 @@ case class RamInstance(name: String,
 
 	}
 
-	override def getRanges: Seq[(BigInt, BigInt)] = ranges
+	override def getRanges: Seq[(BigInt, BigInt, Boolean, Seq[String])] = ranges
 }
 
 object RamInstance {

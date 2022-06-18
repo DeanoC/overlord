@@ -8,15 +8,16 @@
 #include "platform/cache.h"
 #include "platform/aarch64/intrinsics_gcc.h"
 #include "platform/memory_map.h"
-#include "hw_regs/csu.h"
-#include "hw_regs/ipi.h"
-#include "hw_regs/pmu_global.h"
-#include "hw_regs/gic400_cpu.h"
-#include "hw_regs/gic400_dist.h"
-#include "hw_regs/zdma.h"
-#include "hw_regs/rpu.h"
-#include "hw_regs/crl_apb.h"
-#include "hw_regs/a53/a53_system.h"
+#include "platform/registers/csu.h"
+#include "platform/registers/ipi.h"
+#include "platform/registers/pmu_global.h"
+#include "platform/registers/acpu_gicc.h"
+#include "platform/registers/acpu_gicd.h"
+#include "platform/registers/zdma.h"
+#include "platform/registers/rpu.h"
+#include "platform/registers/crl_apb.h"
+#include "platform/registers/a53_system.h"
+#include "platform/registers/plsysmon.h"
 #include "zynqps8/display_port/display.hpp"
 #include "osservices/osservices.h"
 #include "utils/busy_sleep.h"
@@ -82,7 +83,7 @@ EXTERN_C int main(void)
 		PrintBanner();
 
 		// this is a silicon bug fix
-		HW_REG_SET(AMS_PS_SYSMON, ANALOG_BUS, 0X00003210U);
+		HW_REG_SET(PSSYSMON, ANALOG_BUS, 0X00003210U);
 	}
 
 	MarkDdrAsMemory();
@@ -101,7 +102,7 @@ EXTERN_C int main(void)
 		// stall until pmu says it loaded and ready to go
 		while (!(HW_REG_GET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) & OS_GLOBAL0_PMU_READY)) {
 		}
-		debug_printf("PMU Ready\n");
+		debug_printf("PMU " ANSI_GREEN_PEN"Ready\n" ANSI_WHITE_PEN);
 	}
 
 	BootData bootData = {
@@ -116,9 +117,12 @@ EXTERN_C int main(void)
 
 	if(!(HW_REG_GET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) & OS_GLOBAL0_BOOT_COMPLETE)) {
 		debug_force_raw_print(false);
+		debug_printf("Video boot console init\n");
 		BringUpDisplayPort();
+		debug_printf("Video boot console init " ANSI_GREEN_PEN "DONE\n" ANSI_WHITE_PEN);
 		bootData.videoBlock = videoBlock;
 	} else {
+		debug_printf("Video boot console ready\n");
 		OsService_FetchBootData(&bootData);
 		videoBlock = bootData.videoBlock;
 	}
@@ -135,6 +139,8 @@ EXTERN_C int main(void)
 		debug_printf("Soft Boot Finished VideoBlock @ %#010x\n", videoBlock);
 	}
 
+	debug_printf(ANSI_GREEN_PEN "BOOT DONE\n" ANSI_WHITE_PEN);
+
 	while(1) {
 		Utils_BusySecondSleep(1);
 	}
@@ -142,7 +148,7 @@ EXTERN_C int main(void)
 
 void PrintBanner(void )
 {
-	debug_printf(ANSI_CLR_SCREEN ANSI_YELLOW_PEN "IKUY Boot Loader\n" ANSI_RESET_ATTRIBUTES);
+	debug_printf(ANSI_RESET_ATTRIBUTES ANSI_YELLOW_PEN "IKUY Boot Loader\n" ANSI_WHITE_PEN);
 	debug_printf("Silicon Version %d\n", HW_REG_GET_FIELD(CSU, VERSION, PS_VERSION)+1);
 	debug_printf( "A53 L1 Cache Size %dKiB, LineSize %d, Ways %d, Sets %d\n",
 										(Cache_GetDCacheLineSizeInBytes(1) * Cache_GetDCacheNumWays(1) * Cache_GetDCacheNumSets(1)) / 1024,
@@ -273,38 +279,38 @@ void EnablePSToPL(void)
 void ClearPendingInterrupts(void)
 {
 	// Clear pending peripheral interrupts
-	HW_REG_SET(ACPU_GICD, GICD_ICENABLER0, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GICD, GICD_ICPENDR0, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GICD, GICD_ICACTIVER0, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, ICENABLER0, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, ICPENDR0, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, ICACTIVER0, 0xFFFFFFFFU);
 
-	HW_REG_SET(ACPU_GICD, GICD_ICENABLER1, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GICD, GICD_ICPENDR1, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GICD, GICD_ICACTIVER1, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, ICENABLER1, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, ICPENDR1, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, ICACTIVER1, 0xFFFFFFFFU);
 
-	HW_REG_SET(ACPU_GICD, GICD_ICENABLER2, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GICD, GICD_ICPENDR2, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GICD, GICD_ICACTIVER2, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, ICENABLER2, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, ICPENDR2, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, ICACTIVER2, 0xFFFFFFFFU);
 
-	HW_REG_SET(ACPU_GICD, GICD_ICENABLER3, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GICD, GICD_ICPENDR3, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GICD, GICD_ICACTIVER3, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, ICENABLER3, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, ICPENDR3, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, ICACTIVER3, 0xFFFFFFFFU);
 
-	HW_REG_SET(ACPU_GICD, GICD_ICENABLER4, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GICD, GICD_ICPENDR4, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GICD, GICD_ICACTIVER4, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, ICENABLER4, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, ICPENDR4, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, ICACTIVER4, 0xFFFFFFFFU);
 
-	HW_REG_SET(ACPU_GICD, GICD_ICENABLER5, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GICD, GICD_ICPENDR5, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GICD, GICD_ICACTIVER5, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, ICENABLER5, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, ICPENDR5, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, ICACTIVER5, 0xFFFFFFFFU);
 
 	// Clear active software generated interrupts, if any
-	HW_REG_SET(ACPU_GICC, GICC_EOIR, HW_REG_GET(ACPU_GICC, GICC_IAR));
+	HW_REG_SET(ACPU_GICC, EOIR, HW_REG_GET(ACPU_GICC, IAR));
 
 	// Clear pending software generated interrupts
-	HW_REG_SET(ACPU_GICD, GICD_CPENDSGIR0, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GICD, GICD_CPENDSGIR1, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GICD, GICD_CPENDSGIR2, 0xFFFFFFFFU);
-	HW_REG_SET(ACPU_GICD, GICD_CPENDSGIR3, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, CPENDSGIR0, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, CPENDSGIR1, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, CPENDSGIR2, 0xFFFFFFFFU);
+	HW_REG_SET(ACPU_GICD, CPENDSGIR3, 0xFFFFFFFFU);
 
 }
 
@@ -332,7 +338,7 @@ void PowerUpIsland(uint32_t PwrIslandMask)
 #define BLOCK_SIZE_A53 0x200000U
 #define NUM_BLOCKS_A53 0x400U
 #define BLOCK_SIZE_A53_HIGH 0x40000000U
-#define NUM_BLOCKS_A53_HIGH (MAINDDR4_1_SIZE_IN_BYTES / BLOCK_SIZE_A53_HIGH)
+#define NUM_BLOCKS_A53_HIGH (DDR_1_SIZE_IN_BYTES / BLOCK_SIZE_A53_HIGH)
 #define ATTRIB_MEMORY_A53 0x705U
 #define BLOCK_SIZE_2MB 0x200000U
 #define BLOCK_SIZE_1GB 0x40000000U
@@ -369,10 +375,10 @@ void MarkDdrAsMemory()
 {
 	uint64_t BlockNum;
 	for (BlockNum = 0; BlockNum < NUM_BLOCKS_A53; BlockNum++) {
-		SetTlbAttributes(MAINDDR4_0_BASE_ADDR + BlockNum * BLOCK_SIZE_A53, ATTRIB_MEMORY_A53);
+		SetTlbAttributes(DDR_0_BASE_ADDR + BlockNum * BLOCK_SIZE_A53, ATTRIB_MEMORY_A53);
 	}
 	for (BlockNum = 0; BlockNum < NUM_BLOCKS_A53_HIGH; BlockNum++) {
-		SetTlbAttributes(MAINDDR4_1_BASE_ADDR + BlockNum * BLOCK_SIZE_A53_HIGH, ATTRIB_MEMORY_A53);
+		SetTlbAttributes(DDR_1_BASE_ADDR + BlockNum * BLOCK_SIZE_A53_HIGH, ATTRIB_MEMORY_A53);
 	}
 
 	Cache_DCacheCleanAndInvalidate();
@@ -638,15 +644,15 @@ EXTERN_C void SynchronousInterrupt(void) {
 }
 
 EXTERN_C void IRQInterrupt(void) {
-	uint32_t InterruptID = HW_REG_GET_FIELD(ACPU_GICC, GICC_IAR, INTERRUPT_ID);
+	uint32_t InterruptID = HW_REG_GET_FIELD(ACPU_GICC, IAR, INTERRUPT_ID);
 	raw_debug_printf("IRQInterrupt shouldn't FIRE!!! %x\n", InterruptID);
-	HW_REG_MERGE_FIELD(ACPU_GICC, GICC_EOIR, INTERRUPT_ID, InterruptID);
+	HW_REG_MERGE_FIELD(ACPU_GICC, EOIR, INTERRUPT_ID, InterruptID);
 }
 
 EXTERN_C void FIQInterrupt(void) {
-	uint32_t InterruptID = HW_REG_GET_FIELD(ACPU_GICC, GICC_IAR, INTERRUPT_ID);
+	uint32_t InterruptID = HW_REG_GET_FIELD(ACPU_GICC, IAR, INTERRUPT_ID);
 	raw_debug_printf("Not handled FIQInterrupt %x\n", InterruptID);
-	HW_REG_MERGE_FIELD(ACPU_GICC, GICC_EOIR, INTERRUPT_ID, InterruptID);
+	HW_REG_MERGE_FIELD(ACPU_GICC, EOIR, INTERRUPT_ID, InterruptID);
 }
 
 EXTERN_C void SErrorInterrupt(void) {

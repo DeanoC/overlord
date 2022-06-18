@@ -39,12 +39,11 @@ name = "ikuy_boot"
 type = "program.zynqps8.ikuy_boot"
 software = "programs_a53/ikuy_boot/ikuy_boot.toml"
 cpus = "a53"
-depends = ["core", "dbg", "gfxdebug", "osservices", "platform", "utils",
-    "xilinx_zynqps8", "display_port_zynqps8"]
+depends = ["core", "dbg", "gfxdebug", "osservices", "platform", "utils", "zynqps8.xilinx", "zynqps8.display_port"]
 
 [[definition]]
 name = "pmu_monitor"
 type = "program.zynqps8.pmu_monitor"
 software = "programs_pmu/pmu_monitor/pmu_monitor.toml"
 cpus = "pmu"
-depends = ["core", "dbg", "gfxdebug", "osservices", "platform", "utils", "dma_zynqps8"]
+depends = ["core", "dbg", "gfxdebug", "osservices", "platform", "utils", "zynqps8.dma"]

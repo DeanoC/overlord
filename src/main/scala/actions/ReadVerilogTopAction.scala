@@ -20,18 +20,20 @@ case class ReadVerilogTopAction(filename: String)
 	}
 
 	override def execute(instance: ChipInstance, parameters: Map[String, Variant]): Unit = {
-		val expandedName = Game.resolveInstanceMacros(instance, instance.name)
-		val bs           = input.VerilogModuleParser(
-			Game.tryPaths(instance, expandedName + ".v"),
-			expandedName.split("/").last)
+		val expandedName = Game.resolveInstanceMacros(instance, filename)
+		val modules      = input.VerilogModuleParser(Game.tryPaths(instance, expandedName), instance.name)
+		val module       = modules.find(_.name == instance.name).getOrElse {
+			modules.find(_.name == expandedName.split("/").last.replace(".v", "")).getOrElse(
+				return
+				)
+		}
 
-		bs.filter(_.isInstanceOf[VerilogPort])
-			.map(_.asInstanceOf[VerilogPort])
-			.foreach(p => instance.mergePort(p.name, Port(p.name, p.bits, WireDirection(p.direction))))
+		instance.moduleName = module.name
+		val ports         = module.boundary.collect { case p: VerilogPort => p }
+		val parameterKeys = module.boundary.collect { case p: VerilogParameterKey => p }
+		ports.foreach(p => instance.mergePort(p.name, Port(p.name, p.bits, WireDirection(p.direction), p.knownWidth)))
+		parameterKeys.foreach(p => instance.mergeParameterKey(p.parameter))
 
-		bs.filter(_.isInstanceOf[VerilogParameterKey])
-			.map(_.asInstanceOf[VerilogParameterKey])
-			.foreach(p => instance.mergeParameterKey(p.parameter))
 	}
 }
 

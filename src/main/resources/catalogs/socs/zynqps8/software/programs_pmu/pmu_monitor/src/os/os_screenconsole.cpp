@@ -2,7 +2,7 @@
 #include "core/snprintf.h"
 #include "platform/memory_map.h"
 #include "platform/reg_access.h"
-#include "hw_regs/uart.h"
+#include "platform/registers/uart.h"
 #include "osservices/ipi3_transport.h"
 #include "ipi3_os_server.hpp"
 #include "../os_heap.hpp"

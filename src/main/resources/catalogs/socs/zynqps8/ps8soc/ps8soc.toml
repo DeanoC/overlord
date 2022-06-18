@@ -19,7 +19,6 @@ processor = 'sbt'
 main_scala = "Ps8Wrapper"
 with_build_sbt = true
 args = '+runMain Ps8Wrapper config.toml .. ${name}'
-path_op = 'push'
 
 [[process]]
 name = 'src'
@@ -32,4 +31,4 @@ sources = [
 [[process]]
 name = 'read_verilog_top'
 processor = 'read_verilog_top'
-source = "${name}"
+source = "${name}.v"

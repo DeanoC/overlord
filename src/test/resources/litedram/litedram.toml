@@ -33,7 +33,6 @@ parameters = [
 	name = 'git_clone'
 	processor = 'git'
 	url = "https://github.com/enjoy-digital/litedram"
-	path_op = "push"
 
 [[process]]
 	name = 'make_config'
@@ -57,7 +56,6 @@ parameters = [
 		"cmd_buffer_depth",
 		"user_ports",
 	]
-	path_op = "pop"
 
 
 [[process]]

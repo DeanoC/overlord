@@ -27,11 +27,15 @@ type = "switch.internal.ocm.zynqps8"
 name = "OCM"
 type = "ram.sram.generic"
 ranges = [
-    { address = "0", size = "256 KiB" }
+    { address = "0xFC_0000", size = "256 KiB" }
 ]
 registers = [
-    { resource = "registers/ocm.toml", name = "OCM", base_address = "0xff960000" },
+    { resource = "registers/ocm.toml", name = "OCM", base_address = "0x960000" },
 ]
+
+[[instance]]
+name = "PMUOutSwitch"
+type = "switch.internal.pmuoutbound.zynqps8"
 
 # LPD connections
 [[connection]]
@@ -57,7 +61,6 @@ bus_name = "lpd_lpdinbound"
 type = "bus"
 connection = "LPDMainSwitch -> OCMSwitch"
 bus_name = "lpd_ocm"
-
 
 [[connection]]
 type = "bus"

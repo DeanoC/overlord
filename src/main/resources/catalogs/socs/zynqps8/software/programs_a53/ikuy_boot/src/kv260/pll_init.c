@@ -2,8 +2,8 @@
 #include "platform/reg_access.h"
 #include "utils/boot_psi.h"
 #include "platform/memory_map.h"
-#include "hw_regs/crl_apb.h"
-#include "hw_regs/crf_apb.h"
+#include "platform/registers/crl_apb.h"
+#include "platform/registers/crf_apb.h"
 
 __attribute__((__section__(".hwregs")))
 static PSI_IWord const pll_init[] = {

@@ -9,8 +9,6 @@ case class ConnectedBus(connectionPriority: ConnectionPriority,
                         secondary: InstanceLoc,
                         bus: SupplierBusLike,
                         other: ChipInstance,
-                        busName: String,
-                        busProtocol: String
                        ) extends ConnectedBetween {
 	override def first: Option[InstanceLoc] = Some(main)
 

@@ -5,7 +5,7 @@
 void OsHeap::Init() {
 	raw_debug_print("OsHeap::Init\n");
 	// allocate the 1MB DDR heap for the OS
-	osHeap = (OsHeap *) MAINDDR4_0_BASE_ADDR;
+	osHeap = (OsHeap *) DDR_0_BASE_ADDR;
 
 	// gcc warns osHeap is null, but really its just DDR start is 0x0 address
 	// so turn off the null checker just here.

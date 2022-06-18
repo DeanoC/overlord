@@ -80,7 +80,7 @@ object TemplateAction {
 					if (cpusString == "_") (2, Seq())
 					else {
 						val cpus = cpuRegEx.split(cpusString)
-						if (all_cpus.isDefined) (2, cpus.intersect(all_cpus.get).toSeq)
+						if (all_cpus.isDefined) (2, cpus.intersect(all_cpus.get).toSeq.map(_.toLowerCase()))
 						else (2, cpus.toSeq)
 					}
 				} else if (all_cpus.isDefined) (2, all_cpus.get)

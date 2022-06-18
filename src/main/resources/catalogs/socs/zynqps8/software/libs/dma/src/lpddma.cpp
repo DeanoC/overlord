@@ -4,7 +4,7 @@
 
 #include "platform/memory_map.h"
 #include "platform/reg_access.h"
-#include "hw_regs/zdma.h"
+#include "platform/registers/zdma.h"
 #include "dbg/assert.h"
 #include "dbg/raw_print.h"
 

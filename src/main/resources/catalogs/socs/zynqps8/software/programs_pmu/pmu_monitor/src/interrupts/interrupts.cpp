@@ -9,9 +9,9 @@
 #include "platform/reg_access.h"
 #include "platform/memory_map.h"
 #include "platform/microblaze/intrinsics_gcc.h"
-#include "hw_regs/pmu/pmu_iomodule.h"
-#include "hw_regs/pmu/pmu_local.h"
-#include "hw_regs/pmu_global.h"
+#include "platform/registers/pmu_iomodule.h"
+#include "platform/registers/pmu_local.h"
+#include "platform/registers/pmu_global.h"
 #include "interrupts.hpp"
 
 EXTERN_C WEAK_LINKAGE void NullHandler(Interrupts::Name name) {

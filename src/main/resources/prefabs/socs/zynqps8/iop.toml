@@ -15,6 +15,14 @@ type = "switch.internal.iopoutbound.zynqps8"
 name = "LPDDMA"
 type = "other.dma.lpd.zynqps8"
 
+[[instance]]
+name = "CSU"
+type = "other.internal.csu.zynqps8"
+
+[[instance]]
+name = "DAP"
+type = "other.internal.dap.zynqps8"
+
 # IOP connections
 
 [[connection]]
@@ -92,12 +100,69 @@ type = "bus"
 connection = "IOPInboundSwitch -> Gem0"
 bus_name = "iopunitsswitch_gem${index}"
 silent = true
-
 [[connection]]
 type = "bus"
 connection = "Gem0 -> IOPOutboundSwitch"
 bus_name = "gem${index}_iopoutbound"
 silent = true
+
+[[connection]]
+type = "bus"
+connection = "Gem1 -> IOPOutboundSwitch"
+bus_name = "gem${index}_iopoutbound"
+silent = true
+[[connection]]
+type = "bus"
+connection = "IOPInboundSwitch -> Gem1"
+bus_name = "iopunitsswitch_gem${index}"
+silent = true
+
+[[connection]]
+type = "bus"
+connection = "Gem2 -> IOPOutboundSwitch"
+bus_name = "gem${index}_iopoutbound"
+silent = true
+[[connection]]
+type = "bus"
+connection = "IOPInboundSwitch -> Gem2"
+bus_name = "iopunitsswitch_gem${index}"
+silent = true
+
+[[connection]]
+type = "bus"
+connection = "Gem3 -> IOPOutboundSwitch"
+bus_name = "gem${index}_iopoutbound"
+silent = true
+[[connection]]
+type = "bus"
+connection = "IOPInboundSwitch -> Gem3"
+bus_name = "iopunitsswitch_gem${index}"
+silent = true
+
+# PMU interconnect
+[[connection]]
+type = "bus"
+connection = "IOPInboundSwitch -> PMUSwitch"
+bus_name = "iopinbound_pmuswitch"
+silent = true
+
+# CSU interconnect
+[[connection]]
+type = "bus"
+connection = "IOPInboundSwitch -> CSU"
+bus_name = "iopinbound_csu"
+
+[[connection]]
+type = "bus"
+connection = "CSU -> PMUOutSwitch"
+bus_name = "csu_outbound"
+
+
+# DAP interconnect
+[[connection]]
+type = "bus"
+connection = "DAP -> PMUOutSwitch"
+bus_name = "dap_outbound"
 
 # SDIO
 [[connection]]
@@ -148,4 +213,3 @@ bus_name = "iopinbound_lpddma"
 type = "bus"
 connection = "LPDDMA -> LPDOutboundSwitch"
 bus_name = "lpddma_lpdoutbound"
-

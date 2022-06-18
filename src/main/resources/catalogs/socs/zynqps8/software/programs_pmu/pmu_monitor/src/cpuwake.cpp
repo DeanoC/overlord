@@ -2,7 +2,7 @@
 #include "rom_extensions.h"
 #include "platform/reg_access.h"
 #include "platform/memory_map.h"
-#include "hw_regs/crf_apb.h"
+#include "platform/registers/crf_apb.h"
 
 void A53Sleep0() {
 	RomServiceTable[REN_ACPU0SLEEP]();

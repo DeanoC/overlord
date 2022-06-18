@@ -3,7 +3,7 @@
 #include "dbg/assert.h"
 #include "platform/reg_access.h"
 #include "platform/a53/memory_map.h"
-#include "hw_regs/ttc.h"
+#include "platform/registers/ttc.h"
 #include "zynqps8/triple_timer_counter/ttc.hpp"
 
 #define TTC_CLK_FREQ_HZ 100000000U

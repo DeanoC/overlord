@@ -3,5 +3,6 @@ name = "APU"
 type = "cpu.a53.zynqps8"
 
 [[connection]]
-type = "logical"
+type = "bus"
 connection = "APU -> CCI"
+bus_name = "apu_cci"

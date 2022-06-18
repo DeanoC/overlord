@@ -1,0 +1,8 @@
+[[definition]]
+type = "io.gpio.zynqps8"
+registers = [
+    { resource = "zynqps8/gpio.toml", name = "GPIO", base_address = "0x020a_0000" }
+]
+buses = [
+    { name = "lpdunitsswitch_gpio", supplier = false },
+]

@@ -4,7 +4,7 @@
 #include "dbg/print.h"
 #include "platform/memory_map.h"
 #include "platform/reg_access.h"
-#include "hw_regs/apu.h"
+#include "platform/registers/apu.h"
 #include "../cpuwake.hpp"
 #include "../os_heap.hpp"
 

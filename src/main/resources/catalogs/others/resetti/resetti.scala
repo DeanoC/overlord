@@ -1,6 +1,8 @@
 import ikuy_utils._
 
 import java.nio.file.Path
+import spinal.core._
+import spinal.lib._
 
 object Resetti {
 	var resetClocks: Int = 64
@@ -16,7 +18,7 @@ object Resetti {
 			println(s"No toml config file provided, defaults will be used")
 			Map[String, Variant]()
 		}
-		else Utils.readToml(name, Path.of(tomlFile.get), getClass)
+		else Utils.readToml(Path.of(tomlFile.get))
 
 
 		val luInt  = new Function2[String, Int, Int] {
@@ -56,7 +58,7 @@ object Resetti {
 		val resetCtrlClockDomain = ClockDomain(
 			clock = io.clk,
 			config = ClockDomainConfig(resetKind = BOOT),
-			frequency = FixedFrequency(100 MHz) // TODO
+			frequency = FixedFrequency(33 MHz) // TODO
 			)
 
 		val resetCtrl = new ClockingArea(resetCtrlClockDomain) {

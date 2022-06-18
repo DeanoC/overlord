@@ -8,7 +8,7 @@
 #include "dbg/print.h"
 #include "utils/busy_sleep.h"
 #include "zynqps8/i2c/i2c.hpp"
-#include "hw_regs/i2c.h"
+#include "platform/registers/i2c.h"
 #include "platform/memory_map.h"
 #include "platform/reg_access.h"
 #include "zynqps8/gic_v2/gic_v2.hpp"

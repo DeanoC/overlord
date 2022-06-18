@@ -8,30 +8,30 @@ gcc_flags = "-mcpu=cortex-r5 -mfloat-abi=hard -mfpu=vfpv3-d16 -Wl,--build-id"
 max_atomic_width = 64
 max_bitop_type_width = 128
 registers = [
-    { resource = "registers/r5_rom.toml", name = "CORESIGHT_R5_ROM", base_address = "0XFEBE_0000", register_window_size = "64 KiB" },
-    { resource = "registers/r5_dbg.toml", name = "CORESIGHT_R5_DBG", base_address = "0XFEBF_0000", register_window_size = "64 KiB" },
-    { resource = "registers/r5_etm.toml", name = "CORESIGHT_R5_ETM", base_address = "0XFEBF_C000", register_window_size = "64 KiB" },
+    { resource = "registers/r5_pl390.toml", name = "RCPU_GIC", base_address = "0xf900_0000" },
 ]
 buses = [
-    { name = "rpu0", supplier = true, data_width = 64, address_width = 32 },
-    { name = "rpu1", supplier = true, data_width = 64, address_width = 32 },
-    { name = "rputcm", supplier = true, data_width = 64, address_width = 18 },
-    { name = "rpus${index}", supplier = false, data_width = 64, address_width = 32 },
+    { name = "rpu0", supplier = true, base_address = "0xFD00_0000", data_width = 64, address_width = 32 },
+    { name = "rpu1", supplier = true, base_address = "0xFD00_0000", data_width = 64, address_width = 32 },
 ]
-
-[[definition]]
-type = "switch.internal.tcm.zynqps8"
-buses = [
-    { name = "rputcm", supplier = false, data_width = 64, address_width = 18 }
-]
-
 
 [[definition]]
 type = "ram.sram.tcm.zynqps8"
 ranges = [
-    { address = "0x0_0000", size = "64 KiB" }, # RPU both see there own ram at 0 and 2, they don't see the other
-    { address = "0x2_0000", size = "64 KiB" },
-    { address = "0x9_0000", size = "64 KiB" }, # Other units see the RPU0 at 0 and 2 and RPU1 at 9 and B
-    { address = "0xB_0000", size = "64 KiB" }
-]
+    { address = "0x0_0000", size = "64 KiB", fixed_base_address = true, cpus = "R5F" }, # RPU both see there own ram at 0 and 2, they don't see the other
+    { address = "0x2_0000", size = "64 KiB", fixed_base_address = true, cpus = "R5F" },
+    # Other units see R5_0_ATCM_SPLIT, etc.
+    { address = "0x0_0000", size = "64 KiB", cpus = "A53, PMU" }, # R5_0_ATCM_SPLIT
+    { address = "0x2_0000", size = "64 KiB", cpus = "A53, PMU" }, # R5_0_BTCM_SPLIT
+    { address = "0x4_0000", size = "32 KiB", cpus = "A53, PMU" }, # R5_0_ICACHE
+    { address = "0x5_0000", size = "32 KiB", cpus = "A53, PMU" }, # R5_0_DCACHE
 
+    { address = "0x9_0000", size = "64 KiB", cpus = "A53, PMU" }, # R5_1_ATCM_SPLIT
+    { address = "0xB_0000", size = "64 KiB", cpus = "A53, PMU" }, # R5_1_BTCM_SPLIT
+    { address = "0xD_0000", size = "32 KiB", cpus = "A53, PMU" }, # R5_1_ICACHE
+    { address = "0xD_0000", size = "32 KiB", cpus = "A53, PMU" }, # R5_1_DCACHE
+
+]
+buses = [
+    { name = "rputcm", supplier = false, data_width = 64, address_width = 18 }
+]

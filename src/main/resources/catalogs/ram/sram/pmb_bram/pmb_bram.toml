@@ -29,7 +29,6 @@ processor = 'sbt'
 main_scala = "pmb_bram.scala"
 with_build_sbt = true
 args = '+runMain PmbBram config.toml .. ${name}'
-path_op = 'push'
 
 [[process]]
 name = 'src'

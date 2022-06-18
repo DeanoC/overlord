@@ -5,21 +5,13 @@ name = "RPU"
 type = "cpu.r5f.zynqps8"
 
 [[instance]]
-name = "RPU_to_TCM"
-type = "switch.internal.tcm.zynqps8"
-
-[[connection]]
-type = "bus"
-connection = "RPU -> RPU_to_TCM"
-bus_name = "rputcm"
-
-[[instance]]
 name = "RPUTCM"
 type = "ram.sram.tcm.zynqps8"
 
 [[connection]]
-type = "logical"
-connection = "RPU_to_TCM -> RPUTCM"
+type = "bus"
+connection = "RPUSwitch -> RPUTCM"
+bus_name = "rputcm"
 
 [[connection]]
 type = "bus"
@@ -33,10 +25,10 @@ bus_name = "rpu1"
 
 [[connection]]
 type = "bus"
-connection = "RPUIOSwitch -> RPU"
-bus_name = "rpus${index}"
+connection = "RPUIOSwitch -> RPUSwitch"
+bus_name = "rpuio_rpuswitch"
 
 [[connection]]
 type = "bus"
-connection = "RPUIOSwitch -> RPU"
-bus_name = "rpus${index}"
+connection = "RPUIOSwitch -> LPDMainSwitch"
+bus_name = "rpuio_lpd"

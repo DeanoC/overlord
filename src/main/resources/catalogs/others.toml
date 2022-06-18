@@ -1,9 +1,3 @@
 resources = [
-    "others/dma/dma.toml",
-    "others/sysmon/sysmon.toml",
-    "others/timer/timer.toml"
+    "others/others.toml",
 ]
-
-[[definition]]
-type = "other.resetti"
-gateware = "others/resetti/resetti.toml"

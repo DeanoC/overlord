@@ -1,0 +1,1546 @@
+description = "APU GIC Interrupt Controller; GICv2 distributor registers"
+name = "ACPU_GICD"
+
+[[register]]
+name = "CTLR"
+type = "rw"
+width = 32
+description = "Distributor Control Register"
+default = "0x00000000"
+offset = "0x00000000"
+[[register.field]]
+name = "ENABLE_GRP0"
+description = "Enables Group 0 interrupts in this GIC"
+bits = "0"
+type = "rw"
+[[register.field]]
+name = "ENABLE_GRP1"
+description = "Enables Group 1 interrupts in this GIC"
+bits = "1"
+type = "rw"
+
+[[register]]
+name = "TYPER"
+type = "ro"
+width = 32
+description = "Interrupt Controller Type Register"
+default = "0x00000000"
+offset = "0x00000004"
+[[register.field]]
+name = "ITLINE_NUMBER"
+description = "32 * (N+1) maximum interrupt lines supported"
+bits = "[4:0]"
+type = "ro"
+[[register.field]]
+name = "CPU_NUMBER"
+description = "N+1 cpus supported by this GIC"
+bits = "[7:5]"
+type = "ro"
+[[register.field]]
+name = "SECURITY_EXT"
+description = "Are the Security extensions supported?"
+bits = "10"
+type = "ro"
+[[register.field]]
+name = "LSPI"
+description = "If Security extension supported how many SPI are lockable?"
+bits = "[15:11]"
+type = "ro"
+
+[[register]]
+name = "IIDR"
+type = "ro"
+width = 32
+description = "Distributor Implementer Identification Register"
+default = "0x0200143B"
+offset = "0x00000008"
+[[register.field]]
+name = "IMPLEMENTER"
+description = "JEP106 code of HW maker, for ARM = 0x43B"
+bits = "[11:0]"
+type = "ro"
+[[register.field]]
+name = "REVISION"
+description = "Implementation defined minor revision code"
+bits = "[15:12]"
+type = "ro"
+[[register.field]]
+name = "VARIANT"
+description = "Implementation defined variant code"
+bits = "[19:16]"
+type = "ro"
+[[register.field]]
+name = "PRODUCT_ID"
+description = "Implementation defined product ID"
+bits = "[31:24]"
+type = "ro"
+
+[[register]]
+name = "IGROUPR0"
+type = "rw"
+width = 32
+description = "Interrupt Group Registers"
+default = "0x00000000"
+offset = "0x00000080"
+[[register.field]]
+name = "GROUP_STATUS"
+description = "each bit is an interrupt 0 = interrupt is Group 0, 1 is Group 1"
+bits = "[31:0]"
+type = "rw"
+[[register]]
+name = "IGROUPR1"
+type = "rw"
+width = 32
+description = "Interrupt Group Registers"
+default = "0x00000000"
+offset = "0x00000084"
+[[register]]
+name = "IGROUPR2"
+type = "rw"
+width = 32
+description = "Interrupt Group Registers"
+default = "0x00000000"
+offset = "0x00000088"
+[[register]]
+name = "IGROUPR3"
+type = "rw"
+width = 32
+description = "Interrupt Group Registers"
+default = "0x00000000"
+offset = "0x0000008C"
+[[register]]
+name = "IGROUPR4"
+type = "rw"
+width = 32
+description = "Interrupt Group Registers"
+default = "0x00000000"
+offset = "0x00000090"
+[[register]]
+name = "IGROUPR5"
+type = "rw"
+width = 32
+description = "Interrupt Group Registers"
+default = "0x00000000"
+offset = "0x00000094"
+
+[[register]]
+name = "ISENABLER0"
+type = "rw"
+width = 32
+description = "Interrupt Set-Enable Registers"
+default = "0x0000FFFF"
+offset = "0x00000100"
+[[register.field]]
+name = "SET_ENABLE"
+description = "each bit is an interrupt Write 1 = forward to CPU"
+bits = "[31:0]"
+type = "rw"
+[[register]]
+name = "ISENABLER1"
+type = "rw"
+width = 32
+description = "Interrupt Set-Enable Registers"
+default = "0x00000000"
+offset = "0x00000104"
+[[register]]
+name = "ISENABLER2"
+type = "rw"
+width = 32
+description = "Interrupt Set-Enable Registers"
+default = "0x00000000"
+offset = "0x00000108"
+[[register]]
+name = "ISENABLER3"
+type = "rw"
+width = 32
+description = "Interrupt Set-Enable Registers"
+default = "0x00000000"
+offset = "0x0000010C"
+[[register]]
+name = "ISENABLER4"
+type = "rw"
+width = 32
+description = "Interrupt Set-Enable Registers"
+default = "0x00000000"
+offset = "0x00000110"
+[[register]]
+name = "ISENABLER5"
+type = "rw"
+width = 32
+description = "Interrupt Set-Enable Registers"
+default = "0x00000000"
+offset = "0x00000114"
+
+[[register]]
+name = "ICENABLER0"
+type = "rw"
+width = 32
+description = "Interrupt Clear-Enable Registers"
+default = "0x0000FFFF"
+offset = "0x00000180"
+[[register.field]]
+name = "CLR_ENABLE"
+description = "each bit is an interrupt 1 = does not forward"
+bits = "[31:0]"
+type = "rw"
+[[register]]
+name = "ICENABLER1"
+type = "rw"
+width = 32
+description = "Interrupt Clear-Enable Registers"
+default = "0x00000000"
+offset = "0x00000184"
+[[register]]
+name = "ICENABLER2"
+type = "rw"
+width = 32
+description = "Interrupt Clear-Enable Registers"
+default = "0x00000000"
+offset = "0x00000188"
+[[register]]
+name = "ICENABLER3"
+type = "rw"
+width = 32
+description = "Interrupt Clear-Enable Registers"
+default = "0x00000000"
+offset = "0x0000018C"
+[[register]]
+name = "ICENABLER4"
+type = "rw"
+width = 32
+description = "Interrupt Clear-Enable Registers"
+default = "0x00000000"
+offset = "0x00000190"
+[[register]]
+name = "ICENABLER5"
+type = "rw"
+width = 32
+description = "Interrupt Clear-Enable Registers"
+default = "0x00000000"
+offset = "0x00000194"
+
+[[register]]
+name = "ISPENDR0"
+type = "rw"
+width = 32
+description = "Interrupt Set-Pending Registers"
+default = "0x00000000"
+offset = "0x00000200"
+[[register.field]]
+name = "SET_PENDING"
+description = "each bit is an interrupt, read is pending write 1 = making pending"
+bits = "[31:0]"
+type = "rw"
+[[register]]
+name = "ISPENDR1"
+type = "rw"
+width = 32
+description = "Interrupt Set-Pending Registers"
+default = "0x00000000"
+offset = "0x00000204"
+[[register]]
+name = "ISPENDR2"
+type = "rw"
+width = 32
+description = "Interrupt Set-Pending Registers"
+default = "0x00000000"
+offset = "0x00000208"
+[[register]]
+name = "ISPENDR3"
+type = "rw"
+width = 32
+description = "Interrupt Set-Pending Registers"
+default = "0x00000000"
+offset = "0x0000020C"
+[[register]]
+name = "ISPENDR4"
+type = "rw"
+width = 32
+description = "Interrupt Set-Pending Registers"
+default = "0x00000000"
+offset = "0x00000210"
+[[register]]
+name = "ISPENDR5"
+type = "rw"
+width = 32
+description = "Interrupt Set-Pending Registers"
+default = "0x00000000"
+offset = "0x00000214"
+
+[[register]]
+name = "ICPENDR0"
+type = "rw"
+width = 32
+description = "Interrupt Clear-Pending Registers"
+default = "0x00000000"
+offset = "0x00000280"
+[[register.field]]
+name = "CLR_PENDING"
+description = "each bit is an interrupt, read is pending write 1 = clear pending"
+bits = "[31:0]"
+type = "rw"
+[[register]]
+name = "ICPENDR1"
+type = "rw"
+width = 32
+description = "Interrupt Clear-Pending Registers"
+default = "0x00000000"
+offset = "0x00000284"
+[[register]]
+name = "ICPENDR2"
+type = "rw"
+width = 32
+description = "Interrupt Clear-Pending Registers"
+default = "0x00000000"
+offset = "0x00000288"
+[[register]]
+name = "ICPENDR3"
+type = "rw"
+width = 32
+description = "Interrupt Clear-Pending Registers"
+default = "0x00000000"
+offset = "0x0000028C"
+[[register]]
+name = "ICPENDR4"
+type = "rw"
+width = 32
+description = "Interrupt Clear-Pending Registers"
+default = "0x00000000"
+offset = "0x00000290"
+[[register]]
+name = "ICPENDR5"
+type = "rw"
+width = 32
+description = "Interrupt Clear-Pending Registers"
+default = "0x00000000"
+offset = "0x00000294"
+
+[[register]]
+name = "ISACTIVER0"
+type = "rw"
+width = 32
+description = "Interrupt Set-Active Registers"
+default = "0x00000000"
+offset = "0x00000300"
+[[register.field]]
+name = "SET_ACTIVE"
+description = "each bit is an interrupt, read is active write 1 = making active"
+bits = "[31:0]"
+type = "rw"
+[[register]]
+name = "ISACTIVER1"
+type = "rw"
+width = 32
+description = "Interrupt Set-Active Registers"
+default = "0x00000000"
+offset = "0x00000304"
+[[register]]
+name = "ISACTIVER2"
+type = "rw"
+width = 32
+description = "Interrupt Set-Active Registers"
+default = "0x00000000"
+offset = "0x00000308"
+[[register]]
+name = "ISACTIVER3"
+type = "rw"
+width = 32
+description = "Interrupt Set-Active Registers"
+default = "0x00000000"
+offset = "0x0000030C"
+[[register]]
+name = "ISACTIVER4"
+type = "rw"
+width = 32
+description = "Interrupt Set-Active Registers"
+default = "0x00000000"
+offset = "0x00000310"
+[[register]]
+name = "ISACTIVER5"
+type = "rw"
+width = 32
+description = "Interrupt Set-Active Registers"
+default = "0x00000000"
+offset = "0x00000314"
+
+[[register]]
+name = "ICACTIVER0"
+type = "rw"
+width = 32
+description = "Interrupt Clear-Active Registers"
+default = "0x00000000"
+offset = "0x00000380"
+[[register.field]]
+name = "CLR_ACTIVE"
+description = "each bit is an interrupt, read is active write 1 = clear active"
+bits = "[31:0]"
+type = "rw"
+[[register]]
+name = "ICACTIVER1"
+type = "rw"
+width = 32
+description = "Interrupt Clear-Active Registers"
+default = "0x00000000"
+offset = "0x00000384"
+[[register]]
+name = "ICACTIVER2"
+type = "rw"
+width = 32
+description = "Interrupt Clear-Active Registers"
+default = "0x00000000"
+offset = "0x00000388"
+[[register]]
+name = "ICACTIVER3"
+type = "rw"
+width = 32
+description = "Interrupt Clear-Active Registers"
+default = "0x00000000"
+offset = "0x0000038C"
+[[register]]
+name = "ICACTIVER4"
+type = "rw"
+width = 32
+description = "Interrupt Clear-Active Registers"
+default = "0x00000000"
+offset = "0x00000390"
+[[register]]
+name = "ICACTIVER5"
+type = "rw"
+width = 32
+description = "Interrupt Clear-Active Registers"
+default = "0x00000000"
+offset = "0x00000394"
+
+[[register]]
+name = "IPRIORITYR0"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000400"
+[[register.field]]
+name = "PRIORITY_4"
+description = "byte priority of interupt number/4"
+bits = "[31:24]"
+type = "rw"
+[[register.field]]
+name = "PRIORITY_2"
+description = "byte priority of interupt number/4"
+bits = "[23:16]"
+type = "rw"
+[[register.field]]
+name = "PRIORITY_1"
+description = "byte priority of interupt number/4"
+bits = "[15:8]"
+type = "rw"
+[[register.field]]
+name = "PRIORITY_0"
+description = "byte priority of interupt number/4"
+bits = "[7:0]"
+type = "rw"
+[[register]]
+name = "IPRIORITYR1"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000404"
+[[register]]
+name = "IPRIORITYR2"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000408"
+[[register]]
+name = "IPRIORITYR3"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x0000040C"
+[[register]]
+name = "IPRIORITYR4"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000410"
+[[register]]
+name = "IPRIORITYR5"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000414"
+[[register]]
+name = "IPRIORITYR6"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000418"
+[[register]]
+name = "IPRIORITYR7"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x0000041C"
+[[register]]
+name = "IPRIORITYR8"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000420"
+[[register]]
+name = "IPRIORITYR9"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000424"
+[[register]]
+name = "IPRIORITYR10"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000428"
+[[register]]
+name = "IPRIORITYR11"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x0000042C"
+[[register]]
+name = "IPRIORITYR12"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000430"
+[[register]]
+name = "IPRIORITYR13"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000434"
+[[register]]
+name = "IPRIORITYR14"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000438"
+[[register]]
+name = "IPRIORITYR15"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x0000043C"
+[[register]]
+name = "IPRIORITYR16"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000440"
+[[register]]
+name = "IPRIORITYR17"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000444"
+[[register]]
+name = "IPRIORITYR18"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000448"
+[[register]]
+name = "IPRIORITYR19"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x0000044C"
+[[register]]
+name = "IPRIORITYR20"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000450"
+[[register]]
+name = "IPRIORITYR21"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000454"
+[[register]]
+name = "IPRIORITYR22"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000458"
+[[register]]
+name = "IPRIORITYR23"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x0000045C"
+[[register]]
+name = "IPRIORITYR24"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000460"
+[[register]]
+name = "IPRIORITYR25"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000464"
+[[register]]
+name = "IPRIORITYR26"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000468"
+[[register]]
+name = "IPRIORITYR27"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x0000046C"
+[[register]]
+name = "IPRIORITYR28"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000470"
+[[register]]
+name = "IPRIORITYR29"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000474"
+[[register]]
+name = "IPRIORITYR30"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000478"
+[[register]]
+name = "IPRIORITYR31"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x0000047C"
+[[register]]
+name = "IPRIORITYR32"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000480"
+[[register]]
+name = "IPRIORITYR33"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000484"
+[[register]]
+name = "IPRIORITYR34"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000488"
+[[register]]
+name = "IPRIORITYR35"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x0000048C"
+[[register]]
+name = "IPRIORITYR36"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000490"
+[[register]]
+name = "IPRIORITYR37"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000494"
+[[register]]
+name = "IPRIORITYR38"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x00000498"
+[[register]]
+name = "IPRIORITYR39"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x0000049C"
+[[register]]
+name = "IPRIORITYR40"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x000004A0"
+[[register]]
+name = "IPRIORITYR41"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x000004A4"
+[[register]]
+name = "IPRIORITYR42"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x000004A8"
+[[register]]
+name = "IPRIORITYR43"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x000004AC"
+[[register]]
+name = "IPRIORITYR44"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x000004B0"
+[[register]]
+name = "IPRIORITYR45"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x000004B4"
+[[register]]
+name = "IPRIORITYR46"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x000004B8"
+[[register]]
+name = "IPRIORITYR47"
+type = "rw"
+width = 32
+description = "Interrupt Priority Registers"
+default = "0x00000000"
+offset = "0x000004BC"
+
+[[register]]
+name = "ITARGETSR0"
+type = "ro"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000800"
+[[register.field]]
+name = "CPU_TARGET_4"
+description = "(1 << cpu_target) per interrupt"
+bits = "[31:24]"
+type = "rw"
+[[register.field]]
+name = "CPU_TARGET_2"
+description = "(1 << cpu_target) per interrupt"
+bits = "[23:16]"
+type = "rw"
+[[register.field]]
+name = "CPU_TARGET_1"
+description = "(1 << cpu_target) per interrupt"
+bits = "[15:8]"
+type = "rw"
+[[register.field]]
+name = "CPU_TARGET_0"
+description = "(1 << cpu_target) per interrupt"
+bits = "[7:0]"
+type = "rw"
+[[register]]
+name = "ITARGETSR1"
+type = "ro"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000804"
+[[register]]
+name = "ITARGETSR2"
+type = "ro"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000808"
+[[register]]
+name = "ITARGETSR3"
+type = "ro"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x0000080C"
+[[register]]
+name = "ITARGETSR4"
+type = "ro"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000810"
+[[register]]
+name = "ITARGETSR5"
+type = "ro"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000814"
+[[register]]
+name = "ITARGETSR6"
+type = "ro"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000818"
+[[register]]
+name = "ITARGETSR7"
+type = "ro"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x0000081C"
+[[register]]
+name = "ITARGETSR8"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000820"
+[[register]]
+name = "ITARGETSR9"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000824"
+[[register]]
+name = "ITARGETSR10"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000828"
+[[register]]
+name = "ITARGETSR11"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x0000082C"
+[[register]]
+name = "ITARGETSR12"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000830"
+[[register]]
+name = "ITARGETSR13"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000834"
+[[register]]
+name = "ITARGETSR14"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000838"
+[[register]]
+name = "ITARGETSR15"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x0000083C"
+[[register]]
+name = "ITARGETSR16"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000840"
+[[register]]
+name = "ITARGETSR17"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000844"
+[[register]]
+name = "ITARGETSR18"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000848"
+[[register]]
+name = "ITARGETSR19"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x0000084C"
+[[register]]
+name = "ITARGETSR20"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000850"
+[[register]]
+name = "ITARGETSR21"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000854"
+[[register]]
+name = "ITARGETSR22"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000858"
+[[register]]
+name = "ITARGETSR23"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x0000085C"
+[[register]]
+name = "ITARGETSR24"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000860"
+[[register]]
+name = "ITARGETSR25"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000864"
+[[register]]
+name = "ITARGETSR26"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000868"
+[[register]]
+name = "ITARGETSR27"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x0000086C"
+[[register]]
+name = "ITARGETSR28"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000870"
+[[register]]
+name = "ITARGETSR29"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000874"
+[[register]]
+name = "ITARGETSR30"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000878"
+[[register]]
+name = "ITARGETSR31"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x0000087C"
+[[register]]
+name = "ITARGETSR32"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000880"
+[[register]]
+name = "ITARGETSR33"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000884"
+[[register]]
+name = "ITARGETSR34"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000888"
+[[register]]
+name = "ITARGETSR35"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x0000088C"
+[[register]]
+name = "ITARGETSR36"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000890"
+[[register]]
+name = "ITARGETSR37"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000894"
+[[register]]
+name = "ITARGETSR38"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x00000898"
+[[register]]
+name = "ITARGETSR39"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x0000089C"
+[[register]]
+name = "ITARGETSR40"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x000008A0"
+[[register]]
+name = "ITARGETSR41"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x000008A4"
+[[register]]
+name = "ITARGETSR42"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x000008A8"
+[[register]]
+name = "ITARGETSR43"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x000008AC"
+[[register]]
+name = "ITARGETSR44"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x000008B0"
+[[register]]
+name = "ITARGETSR45"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x000008B4"
+[[register]]
+name = "ITARGETSR46"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x000008B8"
+[[register]]
+name = "ITARGETSR47"
+type = "rw"
+width = 32
+description = "Interrupt Processor Targets Registers"
+default = "0x00000000"
+offset = "0x000008BC"
+
+[[register]]
+name = "ICFGR0"
+type = "ro"
+width = 32
+description = "Interrupt Configuration Registers"
+default = "0xAAAAAAAA"
+offset = "0x00000C00"
+[[register.field]]
+name = "CONFIG_FIELD_0"
+description = "0x00 = level sensitive, 0x10 = edge triggered"
+bits = "[2:0]"
+type = "rw"
+[[register.field]]
+name = "CONFIG_FIELD_1"
+description = "0x00 = level sensitive, 0x10 = edge triggered"
+bits = "[2:0]"
+type = "rw"
+[[register.field]]
+name = "CONFIG_FIELD_2"
+description = "0x00 = level sensitive, 0x10 = edge triggered"
+bits = "[2:0]"
+type = "rw"
+[[register.field]]
+name = "CONFIG_FIELD_3"
+description = "0x00 = level sensitive, 0x10 = edge triggered"
+bits = "[2:0]"
+type = "rw"
+[[register.field]]
+name = "CONFIG_FIELD_4"
+description = "0x00 = level sensitive, 0x10 = edge triggered"
+bits = "[2:0]"
+type = "rw"
+[[register.field]]
+name = "CONFIG_FIELD_5"
+description = "0x00 = level sensitive, 0x10 = edge triggered"
+bits = "[2:0]"
+type = "rw"
+[[register.field]]
+name = "CONFIG_FIELD_6"
+description = "0x00 = level sensitive, 0x10 = edge triggered"
+bits = "[2:0]"
+type = "rw"
+[[register.field]]
+name = "CONFIG_FIELD_7"
+description = "0x00 = level sensitive, 0x10 = edge triggered"
+bits = "[2:0]"
+type = "rw"
+[[register.field]]
+name = "CONFIG_FIELD_8"
+description = "0x00 = level sensitive, 0x10 = edge triggered"
+bits = "[2:0]"
+type = "rw"
+[[register.field]]
+name = "CONFIG_FIELD_9"
+description = "0x00 = level sensitive, 0x10 = edge triggered"
+bits = "[2:0]"
+type = "rw"
+[[register.field]]
+name = "CONFIG_FIELD_10"
+description = "0x00 = level sensitive, 0x10 = edge triggered"
+bits = "[2:0]"
+type = "rw"
+[[register.field]]
+name = "CONFIG_FIELD_11"
+description = "0x00 = level sensitive, 0x10 = edge triggered"
+bits = "[2:0]"
+type = "rw"
+[[register.field]]
+name = "CONFIG_FIELD_12"
+description = "0x00 = level sensitive, 0x10 = edge triggered"
+bits = "[2:0]"
+type = "rw"
+[[register.field]]
+name = "CONFIG_FIELD_13"
+description = "0x00 = level sensitive, 0x10 = edge triggered"
+bits = "[2:0]"
+type = "rw"
+[[register.field]]
+name = "CONFIG_FIELD_14"
+description = "0x00 = level sensitive, 0x10 = edge triggered"
+bits = "[2:0]"
+type = "rw"
+[[register.field]]
+name = "CONFIG_FIELD_15"
+description = "0x00 = level sensitive, 0x10 = edge triggered"
+bits = "[2:0]"
+type = "rw"
+
+[[register]]
+name = "ICFGR1"
+type = "ro"
+width = 32
+description = "Interrupt Configuration Registers"
+default = "0x55540000"
+offset = "0x00000C04"
+[[register]]
+name = "ICFGR2"
+type = "rw"
+width = 32
+description = "Interrupt Configuration Registers"
+default = "0x55555555"
+offset = "0x00000C08"
+[[register]]
+name = "ICFGR3"
+type = "rw"
+width = 32
+description = "Interrupt Configuration Registers"
+default = "0x55555555"
+offset = "0x00000C0C"
+[[register]]
+name = "ICFGR4"
+type = "rw"
+width = 32
+description = "Interrupt Configuration Registers"
+default = "0x55555555"
+offset = "0x00000C10"
+[[register]]
+name = "ICFGR5"
+type = "rw"
+width = 32
+description = "Interrupt Configuration Registers"
+default = "0x55555555"
+offset = "0x00000C14"
+[[register]]
+name = "ICFGR6"
+type = "rw"
+width = 32
+description = "Interrupt Configuration Registers"
+default = "0x55555555"
+offset = "0x00000C18"
+[[register]]
+name = "ICFGR7"
+type = "rw"
+width = 32
+description = "Interrupt Configuration Registers"
+default = "0x55555555"
+offset = "0x00000C1C"
+[[register]]
+name = "ICFGR8"
+type = "rw"
+width = 32
+description = "Interrupt Configuration Registers"
+default = "0x55555555"
+offset = "0x00000C20"
+[[register]]
+name = "ICFGR9"
+type = "rw"
+width = 32
+description = "Interrupt Configuration Registers"
+default = "0x55555555"
+offset = "0x00000C24"
+[[register]]
+name = "ICFGR10"
+type = "rw"
+width = 32
+description = "Interrupt Configuration Registers"
+default = "0x55555555"
+offset = "0x00000C28"
+[[register]]
+name = "ICFGR11"
+type = "rw"
+width = 32
+description = "Interrupt Configuration Registers"
+default = "0x55555555"
+offset = "0x00000C2C"
+[[register]]
+name = "PPISR"
+type = "ro"
+width = 32
+description = "Private Peripheral Interrupt Status Register"
+default = "0x00000000"
+offset = "0x00000D00"
+[[register]]
+name = "SPISR0"
+type = "ro"
+width = 32
+description = "Shared Peripheral Interrupt Status Registers"
+default = "0x00000000"
+offset = "0x00000D04"
+[[register]]
+name = "SPISR1"
+type = "ro"
+width = 32
+description = "Shared Peripheral Interrupt Status Registers"
+default = "0x00000000"
+offset = "0x00000D08"
+[[register]]
+name = "SPISR2"
+type = "ro"
+width = 32
+description = "Shared Peripheral Interrupt Status Registers"
+default = "0x00000000"
+offset = "0x00000D0C"
+[[register]]
+name = "SPISR3"
+type = "ro"
+width = 32
+description = "Shared Peripheral Interrupt Status Registers"
+default = "0x00000000"
+offset = "0x00000D10"
+[[register]]
+name = "SPISR4"
+type = "ro"
+width = 32
+description = "Shared Peripheral Interrupt Status Registers"
+default = "0x00000000"
+offset = "0x00000D14"
+
+[[register]]
+name = "SGIR"
+type = "wo"
+width = 32
+description = "Software Generated Interrupt Register"
+default = "0x00000000"
+offset = "0x00000F00"
+[[register.field]]
+name = "SGIINTID"
+description = "Sofware Generated Interrupt ID field 0-15"
+bits = "[3:0]"
+type = "rw"
+[[register.field]]
+name = "NSATT"
+description = "0 = Group 0 or 1 = Group 1"
+bits = "15"
+type = "rw"
+[[register.field]]
+name = "CPU_TARGET_LIST"
+description = "Each bit refers to a cpu to forward this interrupt to"
+bits = "[23:16]"
+type = "rw"
+[[register.field]]
+name = "TARGET_LIST_FILTER"
+description = "0b00 = Forward to all CPUs, 0b01 Forward to all except issuer, 0b10 Forward to issuer only"
+bits = "[23:16]"
+type = "rw"
+
+[[register]]
+name = "CPENDSGIR0"
+type = "rw"
+width = 32
+description = "SGI Clear-Pending Registers"
+default = "0x00000000"
+offset = "0x00000F10"
+[[register.field]]
+name = "CLR_PENDING_0"
+description = "Each bit clears the pending flag for corresponding CPU for appropiate interrupt"
+bits = "[7:0]"
+type = "rw"
+[[register.field]]
+name = "CLR_PENDING_1"
+description = "Each bit clears the pending flag for corresponding CPU for appropiate interrupt"
+bits = "[15:8]"
+type = "rw"
+[[register.field]]
+name = "CLR_PENDING_2"
+description = "Each bit clears the pending flag for corresponding CPU for appropiate interrupt"
+bits = "[23:16]"
+type = "rw"
+[[register.field]]
+name = "CLR_PENDING_3"
+description = "Each bit clears the pending flag for corresponding CPU for appropiate interrupt"
+bits = "[31:24]"
+type = "rw"
+
+[[register]]
+name = "CPENDSGIR1"
+type = "rw"
+width = 32
+description = "SGI Clear-Pending Registers"
+default = "0x00000000"
+offset = "0x00000F14"
+[[register]]
+name = "CPENDSGIR2"
+type = "rw"
+width = 32
+description = "SGI Clear-Pending Registers"
+default = "0x00000000"
+offset = "0x00000F18"
+[[register]]
+name = "CPENDSGIR3"
+type = "rw"
+width = 32
+description = "SGI Clear-Pending Registers"
+default = "0x00000000"
+offset = "0x00000F1C"
+
+[[register]]
+name = "SPENDSGIR0"
+type = "rw"
+width = 32
+description = "SGI Set-Pending Registers"
+default = "0x00000000"
+offset = "0x00000F20"
+[[register.field]]
+name = "SET_PENDING_0"
+description = "Each bit sets the pending flag for corresponding CPU for appropiate interrupt"
+bits = "[7:0]"
+type = "rw"
+[[register.field]]
+name = "SET_PENDING_1"
+description = "Each bit sets the pending flag for corresponding CPU for appropiate interrupt"
+bits = "[15:8]"
+type = "rw"
+[[register.field]]
+name = "SET_PENDING_2"
+description = "Each bit sets the pending flag for corresponding CPU for appropiate interrupt"
+bits = "[23:16]"
+type = "rw"
+[[register.field]]
+name = "SET_PENDING_3"
+description = "Each bit sets the pending flag for corresponding CPU for appropiate interrupt"
+bits = "[31:24]"
+type = "rw"
+[[register]]
+name = "SPENDSGIR1"
+type = "rw"
+width = 32
+description = "SGI Set-Pending Registers"
+default = "0x00000000"
+offset = "0x00000F24"
+[[register]]
+name = "SPENDSGIR2"
+type = "rw"
+width = 32
+description = "SGI Set-Pending Registers"
+default = "0x00000000"
+offset = "0x00000F28"
+[[register]]
+name = "SPENDSGIR3"
+type = "rw"
+width = 32
+description = "SGI Set-Pending Registers"
+default = "0x00000000"
+offset = "0x00000F2C"
+
+[[register]]
+name = "PIDR0"
+type = "ro"
+width = 32
+description = "Peripheral ID0 Register"
+default = "0x00000090"
+offset = "0x00000FE0"
+[[register]]
+name = "PIDR1"
+type = "ro"
+width = 32
+description = "Peripheral ID1 Register"
+default = "0x000000B4"
+offset = "0x00000FE4"
+[[register]]
+name = "PIDR2"
+type = "ro"
+width = 32
+description = "Peripheral ID2 Register"
+default = "0x0000002B"
+offset = "0x00000FE8"
+[[register]]
+name = "PIDR3"
+type = "ro"
+width = 32
+description = "Peripheral ID3 Register"
+default = "0x00000000"
+offset = "0x00000FEC"
+[[register]]
+name = "PIDR4"
+type = "ro"
+width = 32
+description = "Peripheral ID4 Register"
+default = "0x00000004"
+offset = "0x00000FD0"
+[[register]]
+name = "PIDR5"
+type = "ro"
+width = 32
+description = "Peripheral ID5 Register"
+default = "0x00000000"
+offset = "0x00000FD4"
+[[register]]
+name = "PIDR6"
+type = "ro"
+width = 32
+description = "Peripheral ID6 Register"
+default = "0x00000000"
+offset = "0x00000FD8"
+[[register]]
+name = "PIDR7"
+type = "ro"
+width = 32
+description = "Peripheral ID7 Register"
+default = "0x00000000"
+offset = "0x00000FDC"
+[[register]]
+name = "CIDR0"
+type = "ro"
+width = 32
+description = "Component ID0 Register"
+default = "0x0000000D"
+offset = "0x00000FF0"
+[[register]]
+name = "CIDR1"
+type = "ro"
+width = 32
+description = "Component ID1 Register"
+default = "0x000000F0"
+offset = "0x00000FF4"
+[[register]]
+name = "CIDR2"
+type = "ro"
+width = 32
+description = "Component ID2 Register"
+default = "0x00000005"
+offset = "0x00000FF8"
+[[register]]
+name = "CIDR3"
+type = "ro"
+width = 32
+description = "Component ID3 Register"
+default = "0x000000B1"
+offset = "0x00000FFC"

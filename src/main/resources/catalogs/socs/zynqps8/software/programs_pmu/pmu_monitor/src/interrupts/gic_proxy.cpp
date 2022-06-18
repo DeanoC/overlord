@@ -2,19 +2,27 @@
 #include "gic_proxy.hpp"
 #include "platform/memory_map.h"
 #include "platform/reg_access.h"
-#include "hw_regs/lpd_slcr.h"
-#include "hw_regs/uart.h"
-#include "hw_regs/ttc.h"
+#include "platform/registers/lpd_slcr.h"
+#include "platform/registers/uart.h"
+#include "platform/registers/ttc.h"
 #include "dbg/raw_print.h"
 #include "../os_heap.hpp"
 
-#define IsTransmitFull() (HW_REG_GET_BIT(UART_DEBUG, CHANNEL_STS, TNFUL))
-#define IsReceiveEmpty() (HW_REG_GET_BIT(UART_DEBUG, CHANNEL_STS, REMPTY))
 
 uint32_t uartDebugTransmitLast;
 uint32_t uartDebugTransmitHead;
 uint32_t uartDebugReceiveLast;
 uint32_t uartDebugReceiveHead;
+
+#define UART_DEBUG_BASE_ADDR UART1_BASE_ADDR
+#define UART_DEBUG_REGISTER(reg) UART_##reg##_OFFSET
+#define UART_DEBUG_FIELD(reg, field) UART_##reg##_##field
+#define UART_DEBUG_FIELD_MASK(reg, field) UART_##reg##_##field##_MASK
+#define UART_DEBUG_FIELD_LSHIFT(reg, field) UART_##reg##_##field##_LSHIFT
+#define UART_DEBUG_FIELD_ENUM(reg, field, enm) UART_##reg##_##field##_##enm
+
+#define IsTransmitFull() (HW_REG_GET_BIT(UART_DEBUG, CHANNEL_STS, TNFUL))
+#define IsReceiveEmpty() (HW_REG_GET_BIT(UART_DEBUG, CHANNEL_STS, REMPTY))
 
 static void UART_DEBUG_Interrupt() {
 	uint32_t status = HW_REG_GET(UART_DEBUG, CHNL_INT_STS) & HW_REG_GET(UART_DEBUG, INTRPT_MASK);
@@ -69,7 +77,6 @@ void GIC_Proxy(void) {
 
 restart:;
 	const uint32_t gicpIrqStatus = HW_REG_GET(LPD_SLCR, GICP_PMU_IRQ_STATUS);
-
 
 	for(uint32_t group = 0; group < 5; group++) {
 		const uint32_t bit = 1 << group;

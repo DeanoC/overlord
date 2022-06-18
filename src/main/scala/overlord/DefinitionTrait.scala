@@ -10,9 +10,10 @@ import java.nio.file.Path
 import scala.sys.exit
 
 trait DefinitionTrait {
-	val defType   : DefinitionType
-	val attributes: Map[String, Variant]
-	val sourcePath: Path
+	val defType     : DefinitionType
+	val attributes  : Map[String, Variant]
+	val sourcePath  : Path
+	val dependencies: Seq[String]
 
 	def createInstance(name: String, attribs: Map[String, Variant]): Option[InstanceTrait]
 }
@@ -55,7 +56,6 @@ trait ChipDefinitionTrait extends DefinitionTrait {
 		val instance = defType match {
 			case _: RamDefinitionType     => RamInstance(name, this, attribs)
 			case _: CpuDefinitionType     => CpuInstance(name, this, attribs)
-			case _: BusDefinitionType     => BusInstance(name, this, attribs)
 			case _: GraphicDefinitionType => GraphicInstance(name, this, attribs)
 			case _: StorageDefinitionType => StorageInstance(name, this, attribs)
 			case _: NetDefinitionType     => NetInstance(name, this, attribs)
@@ -85,7 +85,7 @@ trait SoftwareDefinitionTrait extends DefinitionTrait {
 	val actionsFilePath: Path
 	val actionsFile    : ActionsFile
 	val parameters     : Map[String, Variant]
-	val dependencies   : Seq[String]
+
 
 	def createInstance(name: String,
 	                   attribs: Map[String, Variant]

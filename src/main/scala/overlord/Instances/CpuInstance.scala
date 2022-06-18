@@ -31,7 +31,8 @@ case class CpuInstance(name: String,
 				        prefix = Utils.lookupString(table, "prefix", "internal"),
 				        baseAddr = Utils.lookupBigInt(table, "base_address", 0),
 				        dataWidth = Utils.lookupBigInt(table, "data_width", 32),
-				        addrWidth = Utils.lookupBigInt(table, "address_width", 32))
+				        addrWidth = Utils.lookupBigInt(table, "address_width", 32),
+				        fixedAddress = Utils.lookupBoolean(table, "fixed_base_address", or = false))
 			})
 	}
 	private val buses            : Seq[Bus]     = busSpecs.map(Bus(this, name, definition.attributes, _))

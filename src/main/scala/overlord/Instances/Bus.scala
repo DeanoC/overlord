@@ -13,15 +13,16 @@ case class BusSpec(name: String,
                    dataWidth: BigInt,
                    addrWidth: BigInt,
                    protocol: String,
-                   prefix: String)
+                   prefix: String,
+                   fixedAddress: Boolean)
 
 case class Bus(owner: ChipInstance, ident: String, attributes: VariantTable, spec: BusSpec) extends SupplierBusLike {
 	private val fixedRelativeAddrConsumers = mutable.ArrayBuffer[(ChipInstance, BigInt, BigInt)]()
 	private val variableAddrConsumers      = mutable.ArrayBuffer[(ChipInstance, BigInt)]()
 
-	private var consumers = mutable.HashMap[ChipInstance, (BigInt, BigInt)]()
+	private var consumers = mutable.HashMap[(ChipInstance, BigInt), (BigInt, BigInt)]()
 
-	def consumerInstances: Seq[ChipInstance] = consumers.keys.toSeq
+	def consumerInstances: Seq[ChipInstance] = consumers.keys.toSeq.map(_._1)
 
 	def consumerCount: Int = consumers.size
 
@@ -44,14 +45,6 @@ case class Bus(owner: ChipInstance, ident: String, attributes: VariantTable, spe
 		else variableAddrConsumers += ((instance, size))
 
 	override def consumerVariant: Variant = ArrayV(consumers.values.flatMap { case (addr, size) => Seq(BigIntV(addr), BigIntV(size)) }.toArray)
-
-	override def getConsumerAddressAndSize(instance: ChipInstance): (BigInt, BigInt) = {
-		if (consumers.contains(instance)) consumers(instance)
-		else {
-			println(s"${getOwner.name} doesn't have a consumer address for ${instance.name}")
-			(-1, 0)
-		}
-	}
 
 	override def getOwner: ChipInstance = owner
 
@@ -80,11 +73,12 @@ case class Bus(owner: ChipInstance, ident: String, attributes: VariantTable, spe
 				}
 			}
 
-			if (consumers.contains(instance)) {
+			currentAddress = (address + size).max(spec.baseAddr)
+
+			if (consumers.contains((instance, currentAddress))) {
 				println(s"$ident bus already has entry for ${instance.name}")
 			} else {
-				consumers(instance) = (address -> size)
-				currentAddress = (address + size).max(spec.baseAddr)
+				consumers((instance, address)) = (address -> size)
 			}
 		}
 	}
@@ -92,5 +86,8 @@ case class Bus(owner: ChipInstance, ident: String, attributes: VariantTable, spe
 	override def isHardware: Boolean = false
 
 	override def getBaseAddress: BigInt = spec.baseAddr
+
+	override def fixedBaseBusAddress: Boolean = spec.fixedAddress
+
 }
 

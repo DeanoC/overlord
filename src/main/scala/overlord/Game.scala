@@ -12,7 +12,9 @@ import scala.reflect.ClassTag
 case class Game(name: String,
                 children: Seq[InstanceTrait],
                 connected: Seq[Connected],
+                constants: Seq[Constant],
                 distanceMatrix: DistanceMatrix,
+                busDistanceMatrix: DistanceMatrix,
                 wires: Seq[Wire]
                ) {
 	lazy val setOfConnectedGateware: Set[ChipInstance] = {
@@ -62,8 +64,6 @@ case class Game(name: String,
 	lazy val libraries: Seq[LibraryInstance] = flatSoftwareChildren.filter(_.isInstanceOf[LibraryInstance]).map(_.asInstanceOf[LibraryInstance])
 
 	lazy val programs: Seq[ProgramInstance] = flatSoftwareChildren.filter(_.isInstanceOf[ProgramInstance]).map(_.asInstanceOf[ProgramInstance])
-
-	lazy val constants: Seq[ConnectedConstant] = connected.filter(_.isInstanceOf[ConnectedConstant]).map(_.asInstanceOf[ConnectedConstant])
 
 	lazy val board: Option[BoardInstance] = children.find(_.isInstanceOf[BoardInstance]).asInstanceOf[Option[BoardInstance]]
 
@@ -182,7 +182,7 @@ object Game {
 		}
 
 		val gb = new GameBuilder(gameName, board, gamePath, catalogs, prefabs)
-		gb.toGame
+		gb.toGame()
 	}
 
 	private def tryPaths(instance: InstanceTrait, resource: String, pass: Int): Path = {
@@ -217,7 +217,7 @@ object Game {
 
 		private val defaults = mutable.Map[String, Variant]()
 
-		def toGame: Option[Game] = {
+		def toGame(): Option[Game] = {
 			generateInstances(gamePath)
 
 			if (containerStack.isEmpty) {
@@ -229,29 +229,11 @@ object Game {
 			injectBoard(rootContainer)
 			flattenContainers(rootContainer)
 
-			// add any software dependecies
-			val sis          = rootContainer.children.collect { case s: SoftwareInstance => s }
-			val allDeps      = (for (si <- sis) yield si.definition.dependencies).flatten.distinct
-			val existingLibs = sis.flatMap { inst =>
-				if (inst.isInstanceOf[Instances.LibraryInstance]) {
-					Some(inst.name)
-				} else None
-			}
-			val depsRequired = allDeps.diff(existingLibs)
-			depsRequired.foreach(n => catalogs.findDefinition(
-				LibraryDefinitionType(Seq("library", s"$n"))) match {
-				case Some(defi) =>
-					val opt = defi.createInstance(n, Map[String, Variant]())
-					if (opt.nonEmpty) rootContainer.children ++= Seq(opt.get)
-					else {
-						println(s"ERROR: Software depdency ${defi.defType.ident.mkString(".")}")
-					}
-				case None       =>
-			})
+			resolveSoftwareDependencies(rootContainer)
 
 			// connect everything
-			val (setOfConnected, distanceMatrix, wires) = connectAndOutputChips(rootContainer)
-			outputSoftware(rootContainer, setOfConnected, distanceMatrix)
+			val (connected, distanceMatrix, busDistanceMatrix, wires) = connectAndOutputChips(rootContainer)
+			outputSoftware(rootContainer, connected, busDistanceMatrix)
 
 			// get chips (hardware or gateware)
 			val instances = rootContainer.children.collect {
@@ -259,10 +241,14 @@ object Game {
 				case s: SoftwareInstance => s
 			}
 
+			val constants = rootContainer.unconnected.flatMap(_.collectConstants(instances))
+
 			Some(Game(gameName,
 			          instances,
-			          setOfConnected.toSeq,
+			          connected,
+			          constants,
 			          distanceMatrix,
+			          busDistanceMatrix,
 			          wires))
 		}
 
@@ -277,7 +263,7 @@ object Game {
 		}
 
 		private def outputSoftware(rootContainer: RootContainer,
-		                           setOfConnected: Set[Connected],
+		                           connected: Seq[Connected],
 		                           distanceMatrix: DistanceMatrix): Unit = {
 			pushOutPath("soft/tmp")
 			Utils.ensureDirectories(outPath)
@@ -285,10 +271,12 @@ object Game {
 			// get software (libraries, boot roms) for all cpus
 			val softInstances = rootContainer.children.collect { case i: SoftwareInstance => i }
 			val cpuInstances  = rootContainer.children.collect { case i: CpuInstance => i }
+			// collect constants
+			val constants     = rootContainer.unconnected.flatMap(_.collectConstants(softInstances))
 
-			OutputSoftware.cpuInvariantActions(softInstances, setOfConnected.toSeq)
-			OutputSoftware.cpuSpecificActions(board, softInstances, cpuInstances, distanceMatrix, setOfConnected.toSeq)
-			OutputSoftware.hardwareRegistersOutput(cpuInstances, distanceMatrix, setOfConnected.toSeq)
+			OutputSoftware.cpuInvariantActions(softInstances, constants)
+			OutputSoftware.cpuSpecificActions(board, softInstances, cpuInstances, distanceMatrix, connected)
+			OutputSoftware.hardwareRegistersOutput(cpuInstances, distanceMatrix, connected)
 
 			popOutPath()
 		}
@@ -325,29 +313,30 @@ object Game {
 
 			val chipInstances = rootContainer.children.collect { case i: ChipInstance => i }
 
+			// collect constants
+			val constants = rootContainer.unconnected.flatMap(_.collectConstants(chipInstances))
+
 			// preconnect for bus address allocations
 			rootContainer.unconnected.foreach(_.preConnect(chipInstances))
 
 			// run gateware actions
-			OutputGateware(rootContainer, outPath, 1)
-			OutputGateware(rootContainer, outPath, 2)
+			OutputGateware(rootContainer, outPath, constants, 1)
+			OutputGateware(rootContainer, outPath, constants, 2)
 
 			rootContainer.unconnected.foreach(_.finaliseBuses(chipInstances))
 
-			// connect chips
-			val connected = rootContainer.unconnected.flatMap(_.connect(chipInstances))
+			// connect chips and uniquise the connections
+			val connected = rootContainer.unconnected.flatMap(_.connect(chipInstances)).toSet.toSeq
 
-			// instances that are connected to buses need a register bank
-			val registerBanks = connected.flatMap(c => c.getInterface[RegisterBankLike])
-			registerBanks.foreach(_.generateInstancedRegisterBank())
-
-			// get connections and compute the distance matrix
-			val setOfConnected     = connected.toSet
-			val dm: DistanceMatrix = DistanceMatrix(chipInstances, setOfConnected.toSeq)
-			val wires              = Wires(dm, setOfConnected.toSeq)
+			// compute the distance matrix
+			val allDistanceMatrix: DistanceMatrix = DistanceMatrix(chipInstances, connected)
+			val busDistanceMatrix: DistanceMatrix = DistanceMatrix(chipInstances, connected.filterNot { i =>
+				i.isInstanceOf[ConnectedPortGroup]
+			})
+			val wires                             = Wires(allDistanceMatrix, connected)
 			popOutPath()
 
-			(setOfConnected, dm, wires)
+			(connected, allDistanceMatrix, busDistanceMatrix, wires)
 
 		}
 
@@ -391,7 +380,7 @@ object Game {
 			// extract connections
 			if (parsed.contains("connection")) {
 				val connections = Utils.toArray(parsed("connection"))
-				container.unconnected ++= connections.flatMap(Unconnected(_, catalogs))
+				container.unconnected ++= connections.flatMap(Unconnected(_))
 			}
 
 			var okay = true
@@ -413,6 +402,45 @@ object Game {
 			}
 			okay
 		}
+
+		private def resolveSoftwareDependencies(rootContainer: RootContainer): Unit = {
+			// add all instances, so we can check for software dependencies (including drivers for hardware)
+			val depSet: mutable.Set[InstanceTrait] = rootContainer.children.to(mutable.Set)
+
+			// push all there dependencies onto stack
+			val depStack = mutable.Stack[String]()
+			depSet.foreach(_.definition.dependencies.foreach(depStack.push))
+			while (depStack.nonEmpty) {
+				val n = depStack.pop()
+				// if already exists ignore (and we can assume all children have already are/been on the stack
+				if (!depSet.exists(_.definition.defType.ident.tail.mkString(".") == n)) {
+					val defs = {
+						val si = n.split('.')
+						if (si.isEmpty) Seq()
+						else if (si(0) == "library") Seq(LibraryDefinitionType(si.toSeq))
+						else if (si(0) == "program") Seq(ProgramDefinitionType(si.toSeq))
+						else Seq(LibraryDefinitionType(si.prepended("library").toSeq), ProgramDefinitionType(si.prepended("program").toSeq))
+					}
+
+					for (d <- defs) {
+						catalogs.findDefinition(d) match {
+							case Some(defi) =>
+								val opt = defi.createInstance(n, Map[String, Variant]())
+								if (opt.nonEmpty) {
+									val inst = opt.get
+									assert(inst.isInstanceOf[SoftwareInstance])
+									rootContainer.children ++= Seq(inst)
+									depSet += inst.asInstanceOf[SoftwareInstance]
+									inst.definition.dependencies.filterNot(d => depStack.contains(d)).foreach(depStack.push)
+								}
+								else println(s"ERROR: Software dependency $n ${defi.defType.ident.mkString(".")}")
+							case None       => if (defs.length != 2) println(s"ERROR: Software dependency $n (${d.ident.mkString(".")}) not found")
+						}
+					}
+				}
+			}
+		}
 	}
+
 }
 

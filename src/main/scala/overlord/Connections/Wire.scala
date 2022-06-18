@@ -8,7 +8,8 @@ import scala.collection.mutable
 
 case class Wire(startLoc: InstanceLoc,
                 endLocs: Seq[InstanceLoc],
-                priority: ConnectionPriority) {
+                priority: ConnectionPriority,
+                knownWidth: Boolean) {
 	def isStartPinOrClock: Boolean = startLoc.instance
 		                                 .isInstanceOf[PinGroupInstance] ||
 	                                 startLoc.instance
@@ -92,10 +93,14 @@ object Wires {
 		}
 
 		wires ++= fanoutTmpWires.map {
-			case (sl, (pr, els)) => Wire(sl, els.toSeq, pr)
+			case (sl, (pr, els)) =>
+				var knownWidth: Boolean = if (sl.port.isDefined) sl.port.get.knownWidth else true
+				Wire(sl, els.toSeq, pr, knownWidth)
 		}
 		wires ++= singleTmpWires.map {
-			case (sl, (pr, el)) => Wire(sl, Seq(el), pr)
+			case (sl, (pr, el)) =>
+				val knownWidth: Boolean = if (sl.port.isDefined) sl.port.get.knownWidth else true
+				Wire(sl, Seq(el), pr, knownWidth)
 		}
 
 		wires.sortInPlaceWith((a, b) =>

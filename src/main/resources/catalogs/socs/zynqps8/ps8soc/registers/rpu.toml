@@ -1,0 +1,1501 @@
+description = "Realtime Processing Unit, Real time Processing Unit"
+[[register]]
+  name = "RPU_GLBL_CNTL"
+  type = "mixed"
+  width = 32
+  description = "Global Control Regiter for RPU"
+  default = "0x00000050"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:11"
+    type = "raz"
+  [[register.field]]
+    name = "GIC_AXPROT"
+    bits = "10"
+    type = "rw"
+    shortdesc = '''GIC implements security extesion.'''
+    longdesc = '''R5 does not toggle TZ bit. This bit will be used instead of AxPROT[1] of LLPP AXI bus 0 = All R5 transactions to GIC are secure 1 = All R5 transactions to GIC are nonsecure'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "9"
+    type = "raz"
+  [[register.field]]
+    name = "TCM_CLK_CNTL"
+    bits = "8"
+    type = "rw"
+  [[register.field]]
+    name = "TCM_WAIT"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "TCM_COMB"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "TEINIT"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "SLCLAMP"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "SLSPLIT"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "DBGNOCLKSTOP"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "CFGIE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "CFGEE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "RPU_GLBL_STATUS"
+  type = "mixed"
+  width = 32
+  description = "Miscellaneous status information for RPU"
+  default = "0x00000000"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "raz"
+  [[register.field]]
+    name = "DBGNOPWRDWN"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "RPU_ERR_CNTL"
+  type = "mixed"
+  width = 32
+  description = "Error Response Enable/Disable Register"
+  default = "0x00000000"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "raz"
+  [[register.field]]
+    name = "APB_ERR_RES"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "RPU_RAM"
+  type = "mixed"
+  width = 32
+  description = "Control for extra features of RAMs"
+  default = "0x00000000"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+  [[register.field]]
+    name = "RAMCONTROL1"
+    bits = "15:8"
+    type = "rw"
+  [[register.field]]
+    name = "RAMCONTROL0"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "RPU_ERR_INJ"
+  type = "mixed"
+  width = 32
+  description = "Reserved for future use"
+  default = "0x00000000"
+  offset = "0x00000020"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+  [[register.field]]
+    name = "DCCMINP2"
+    bits = "15:8"
+    type = "rw"
+  [[register.field]]
+    name = "DCCMINP"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "RPU_CCF_MASK"
+  type = "mixed"
+  width = 32
+  description = "Common Cause Signal Mask Register"
+  default = "0x00000000"
+  offset = "0x00000024"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "raz"
+  [[register.field]]
+    name = "TEST_MBIST_MODE"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "TEST_SCAN_MODE_LP"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "TEST_SCAN_MODE"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "ISO"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "PGE"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "R50_DBG_RST"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "R50_RST"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "PGE_RST"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "RPU_INTR_0"
+  type = "rw"
+  width = 32
+  description = "RPU Interrupt Injection register"
+  default = "0x00000000"
+  offset = "0x00000028"
+  [[register.field]]
+    name = "SPI"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "RPU_INTR_1"
+  type = "rw"
+  width = 32
+  description = "RPU Interrupt Injection register"
+  default = "0x00000000"
+  offset = "0x0000002C"
+  [[register.field]]
+    name = "SPI"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "RPU_INTR_2"
+  type = "rw"
+  width = 32
+  description = "RPU Interrupt Injection register"
+  default = "0x00000000"
+  offset = "0x00000030"
+  [[register.field]]
+    name = "SPI"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "RPU_INTR_3"
+  type = "rw"
+  width = 32
+  description = "RPU Interrupt Injection register"
+  default = "0x00000000"
+  offset = "0x00000034"
+  [[register.field]]
+    name = "SPI"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "RPU_INTR_4"
+  type = "rw"
+  width = 32
+  description = "RPU Interrupt Injection register"
+  default = "0x00000000"
+  offset = "0x00000038"
+  [[register.field]]
+    name = "SPI"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "RPU_INTR_MASK_0"
+  type = "rw"
+  width = 32
+  description = "RPU Interrupt Injection Mask register"
+  default = "0x00000000"
+  offset = "0x00000040"
+  [[register.field]]
+    name = "SPI"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "RPU_INTR_MASK_1"
+  type = "rw"
+  width = 32
+  description = "RPU Interrupt Injection Mask register"
+  default = "0x00000000"
+  offset = "0x00000044"
+  [[register.field]]
+    name = "SPI"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "RPU_INTR_MASK_2"
+  type = "rw"
+  width = 32
+  description = "RPU Interrupt Injection Mask register"
+  default = "0x00000000"
+  offset = "0x00000048"
+  [[register.field]]
+    name = "SPI"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "RPU_INTR_MASK_3"
+  type = "rw"
+  width = 32
+  description = "RPU Interrupt Injection Mask register"
+  default = "0x00000000"
+  offset = "0x0000004C"
+  [[register.field]]
+    name = "SPI"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "RPU_INTR_MASK_4"
+  type = "rw"
+  width = 32
+  description = "RPU Interrupt Injection Mask register"
+  default = "0x00000000"
+  offset = "0x00000050"
+  [[register.field]]
+    name = "SPI"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "RPU_CCF_VAL"
+  type = "mixed"
+  width = 32
+  description = "Common Cause Signal Value Register"
+  default = "0x00000007"
+  offset = "0x00000054"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "raz"
+  [[register.field]]
+    name = "TEST_MBIST_MODE"
+    bits = "7"
+    type = "rw"
+    shortdesc = '''Bit field indicates the error value(faulty) of the signal.'''
+    longdesc = '''CCF monitor generates an interrupt if programmed value matches the current signal value and CCF checking is enabled'''
+  [[register.field]]
+    name = "TEST_SCAN_MODE_LP"
+    bits = "6"
+    type = "rw"
+    shortdesc = '''Bit field indicates the error value(faulty) of the signal.'''
+    longdesc = '''CCF monitor generates an interrupt if programmed value matches the current signal value and CCF checking is enabled'''
+  [[register.field]]
+    name = "TEST_SCAN_MODE"
+    bits = "5"
+    type = "rw"
+    shortdesc = '''Bit field indicates the error value(faulty) of the signal.'''
+    longdesc = '''CCF monitor generates an interrupt if programmed value matches the current signal value and CCF checking is enabled'''
+  [[register.field]]
+    name = "ISO"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''Bit field indicates the error value(faulty) of the signal.'''
+    longdesc = '''CCF monitor generates an interrupt if programmed value matches the current signal value and CCF checking is enabled'''
+  [[register.field]]
+    name = "PGE"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''Bit field indicates the error value(faulty) of the signal.'''
+    longdesc = '''CCF monitor generates an interrupt if programmed value matches the current signal value and CCF checking is enabled'''
+  [[register.field]]
+    name = "R50_DBG_RST"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Bit field indicates the error value(faulty) of the signal.'''
+    longdesc = '''CCF monitor generates an interrupt if programmed value matches the current signal value and CCF checking is enabled'''
+  [[register.field]]
+    name = "R50_RST"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Bit field indicates the error value(faulty) of the signal.'''
+    longdesc = '''CCF monitor generates an interrupt if programmed value matches the current signal value and CCF checking is enabled'''
+  [[register.field]]
+    name = "PGE_RST"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Bit field indicates the error value(faulty) of the signal.'''
+    longdesc = '''CCF monitor generates an interrupt if programmed value matches the current signal value and CCF checking is enabled'''
+[[register]]
+  name = "RPU_SAFETY_CHK"
+  type = "rw"
+  width = 32
+  description = "RPU Safety Check Register"
+  default = "0x00000000"
+  offset = "0x000000F0"
+  [[register.field]]
+    name = "VAL"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "RPU0_CFG"
+  type = "mixed"
+  width = 32
+  description = "Configuration Parameters specific to RPU0"
+  default = "0x00000005"
+  offset = "0x00000100"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "raz"
+  [[register.field]]
+    name = "CFGNMFI0"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "VINITHI"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''High = Start executing form 0xFFFF0000 (OCM) out of reset.'''
+    longdesc = '''Low = Start executing from 0x00000000 (ATCM) out of reset.'''
+  [[register.field]]
+    name = "COHERENT"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''High = All accesses to peripherals will be through APU Cache Controller.'''
+    longdesc = '''Low = All accesses to peripherals will be direct and without any Cache Choerency with APU.'''
+  [[register.field]]
+    name = "NCPUHALT"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''nCPUHALT bit can be asserted while the processor is in reset to stop the processor from fetching and executing instructions after coming out of reset.'''
+    longdesc = '''When nCPUHALT has been deasserted to start the processor fetching, nCPUHALT must not be asserted again except when the processor is under processor or power-on reset, that is, nRESET asserted. The processor does not halt if the nCPUHALT pin is asserted while the processor is running low = stops CPU from fetching instructions out of reset, processor is halted High = Processor is running'''
+[[register]]
+  name = "RPU0_STATUS"
+  type = "mixed"
+  width = 32
+  description = "R5_0 Status Register"
+  default = "0x0000003F"
+  offset = "0x00000104"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:6"
+    type = "raz"
+  [[register.field]]
+    name = "NVALRESET"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "NVALIRQ"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "NVALFIQ"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "NWFIPIPESTOPPED"
+    bits = "2"
+    type = "ro"
+    shortdesc = '''When LOW, this indicates the CPU is in standby mode because of a WFI instruction.'''
+    longdesc = '''The CPU pipeline is inactive'''
+  [[register.field]]
+    name = "NWFEPIPESTOPPED"
+    bits = "1"
+    type = "ro"
+    shortdesc = '''When LOW, this indicates that the CPU is in standby mode because of a WFE instruction.'''
+    longdesc = '''The CPU pipeline is inactive'''
+  [[register.field]]
+    name = "NCLKSTOPPED"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''When LOW, this indicates clock has been stopped because processor is in Standby Mode.'''
+    longdesc = '''It is never asserted without one of WFIPIPESTOPPEDm or WFEPIPESTOPPEDm.'''
+[[register]]
+  name = "RPU0_PWRDWN"
+  type = "mixed"
+  width = 32
+  description = "Power down request from R5s"
+  default = "0x00000000"
+  offset = "0x00000108"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "raz"
+  [[register.field]]
+    name = "EN"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "RPU0_ISR"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Status Register"
+  default = "0x00000000"
+  offset = "0x00000114"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:25"
+    type = "raz"
+  [[register.field]]
+    name = "FPUFC"
+    bits = "24"
+    type = "wtc"
+  [[register.field]]
+    name = "FPOFC"
+    bits = "23"
+    type = "wtc"
+  [[register.field]]
+    name = "FPIXC"
+    bits = "22"
+    type = "wtc"
+  [[register.field]]
+    name = "FPIOC"
+    bits = "21"
+    type = "wtc"
+  [[register.field]]
+    name = "FPIDC"
+    bits = "20"
+    type = "wtc"
+  [[register.field]]
+    name = "FPDZC"
+    bits = "19"
+    type = "wtc"
+  [[register.field]]
+    name = "TCM_ASLV_CE"
+    bits = "18"
+    type = "wtc"
+  [[register.field]]
+    name = "TCM_ASLV_FAT"
+    bits = "17"
+    type = "wtc"
+  [[register.field]]
+    name = "TCM_LST_CE"
+    bits = "16"
+    type = "wtc"
+  [[register.field]]
+    name = "TCM_PREFETCH_CE"
+    bits = "15"
+    type = "wtc"
+  [[register.field]]
+    name = "B1TCM_CE"
+    bits = "14"
+    type = "wtc"
+  [[register.field]]
+    name = "B0TCM_CE"
+    bits = "13"
+    type = "wtc"
+  [[register.field]]
+    name = "ATCM_CE"
+    bits = "12"
+    type = "wtc"
+  [[register.field]]
+    name = "B1TCM_UE"
+    bits = "11"
+    type = "wtc"
+  [[register.field]]
+    name = "B0TCM_UE"
+    bits = "10"
+    type = "wtc"
+  [[register.field]]
+    name = "ATCM_UE"
+    bits = "9"
+    type = "wtc"
+  [[register.field]]
+    name = "DTAG_DIRTY_FAT"
+    bits = "8"
+    type = "wtc"
+  [[register.field]]
+    name = "DDATA_FAT"
+    bits = "7"
+    type = "wtc"
+  [[register.field]]
+    name = "TCM_LST_FAT"
+    bits = "6"
+    type = "wtc"
+  [[register.field]]
+    name = "TCM_PREFETCH_FAT"
+    bits = "5"
+    type = "wtc"
+  [[register.field]]
+    name = "DDATA_CE"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "DTAG_DIRTY_CE"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "IDATA_CE"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "ITAG_CE"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "APB_ERR"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "RPU0_IMR"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Mask Register"
+  default = "0x01FFFFFF"
+  offset = "0x00000118"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:25"
+    type = "raz"
+  [[register.field]]
+    name = "FPUFC"
+    bits = "24"
+    type = "ro"
+  [[register.field]]
+    name = "FPOFC"
+    bits = "23"
+    type = "ro"
+  [[register.field]]
+    name = "FPIXC"
+    bits = "22"
+    type = "ro"
+  [[register.field]]
+    name = "FPIOC"
+    bits = "21"
+    type = "ro"
+  [[register.field]]
+    name = "FPIDC"
+    bits = "20"
+    type = "ro"
+  [[register.field]]
+    name = "FPDZC"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "TCM_ASLV_CE"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "TCM_ASLV_FAT"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "TCM_LST_CE"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "TCM_PREFETCH_CE"
+    bits = "15"
+    type = "ro"
+  [[register.field]]
+    name = "B1TCM_CE"
+    bits = "14"
+    type = "ro"
+  [[register.field]]
+    name = "B0TCM_CE"
+    bits = "13"
+    type = "ro"
+  [[register.field]]
+    name = "ATCM_CE"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "B1TCM_UE"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "B0TCM_UE"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "ATCM_UE"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "DTAG_DIRTY_FAT"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "DDATA_FAT"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "TCM_LST_FAT"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "TCM_PREFETCH_FAT"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "DDATA_CE"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "DTAG_DIRTY_CE"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "IDATA_CE"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "ITAG_CE"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "APB_ERR"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "RPU0_IEN"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Enable Register"
+  default = "0x00000000"
+  offset = "0x0000011C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:25"
+    type = "raz"
+  [[register.field]]
+    name = "FPUFC"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "FPOFC"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "FPIXC"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "FPIOC"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "FPIDC"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "FPDZC"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "TCM_ASLV_CE"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "TCM_ASLV_FAT"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "TCM_LST_CE"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "TCM_PREFETCH_CE"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "B1TCM_CE"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "B0TCM_CE"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "ATCM_CE"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "B1TCM_UE"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "B0TCM_UE"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "ATCM_UE"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "DTAG_DIRTY_FAT"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "DDATA_FAT"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "TCM_LST_FAT"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "TCM_PREFETCH_FAT"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "DDATA_CE"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "DTAG_DIRTY_CE"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "IDATA_CE"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "ITAG_CE"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "APB_ERR"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "RPU0_IDS"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Disable Register"
+  default = "0x00000000"
+  offset = "0x00000120"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:25"
+    type = "raz"
+  [[register.field]]
+    name = "FPUFC"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "FPOFC"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "FPIXC"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "FPIOC"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "FPIDC"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "FPDZC"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "TCM_ASLV_CE"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "TCM_ASLV_FAT"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "TCM_LST_CE"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "TCM_PREFETCH_CE"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "B1TCM_CE"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "B0TCM_CE"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "ATCM_CE"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "B1TCM_UE"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "B0TCM_UE"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "ATCM_UE"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "DTAG_DIRTY_FAT"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "DDATA_FAT"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "TCM_LST_FAT"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "TCM_PREFETCH_FAT"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "DDATA_CE"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "DTAG_DIRTY_CE"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "IDATA_CE"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "ITAG_CE"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "APB_ERR"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "RPU0_SLV_BASE"
+  type = "mixed"
+  width = 32
+  description = "Slave Base Address Register"
+  default = "0x00000000"
+  offset = "0x00000124"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "raz"
+  [[register.field]]
+    name = "ADDR"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''Slave address is appended wih 8 bits to generate 23 bit address.'''
+    longdesc = '''If incomign access is going to caches, RPU use this register to generate final address passed to R5 {RPU_0_SLV_BASE_ADDR[7:0], ARADDR[14:0]}'''
+[[register]]
+  name = "RPU0_AXI_OVER"
+  type = "mixed"
+  width = 32
+  description = "RPU 0 AXI Override Register"
+  default = "0x00000000"
+  offset = "0x00000128"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:10"
+    type = "raz"
+  [[register.field]]
+    name = "AWCACHE"
+    bits = "9:6"
+    type = "rw"
+  [[register.field]]
+    name = "ARCACHE"
+    bits = "5:2"
+    type = "rw"
+  [[register.field]]
+    name = "AWCACHE_EN"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "ARCACHE_EN"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "RPU1_CFG"
+  type = "mixed"
+  width = 32
+  description = "Configuration Parameters specific to RPU1"
+  default = "0x00000005"
+  offset = "0x00000200"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "raz"
+  [[register.field]]
+    name = "CFGNMFI1"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "VINITHI"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''High = Start executing form 0xFFFF0000 (OCM) out of reset.'''
+    longdesc = '''Low = Start executing from 0x00000000 (ATCM) out of reset.'''
+  [[register.field]]
+    name = "COHERENT"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''High = All accesses to peripherals will be through APU Cache Controller.'''
+    longdesc = '''Low = All accesses to peripherals will be direct and without any Cache Choerency with APU.'''
+  [[register.field]]
+    name = "NCPUHALT"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''nCPUHALT bit can be asserted while the processor is in reset to stop the processor from fetching and executing instructions after coming out of reset.'''
+    longdesc = '''When nCPUHALT has been deasserted to start the processor fetching, nCPUHALT must not be asserted again except when the processor is under processor or power-on reset, that is, nRESET asserted. The processor does not halt if the nCPUHALT pin is asserted while the processor is running low = stops CPU from fetching instructions out of reset, processor is halted High = Processor is running'''
+[[register]]
+  name = "RPU1_STATUS"
+  type = "mixed"
+  width = 32
+  description = "R5_1 Status Register"
+  default = "0x0000003F"
+  offset = "0x00000204"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:6"
+    type = "raz"
+  [[register.field]]
+    name = "NVALRESET"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "NVALIRQ"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "NVALFIQ"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "NWFIPIPESTOPPED"
+    bits = "2"
+    type = "ro"
+    shortdesc = '''When LOW, this indicates the CPU is in standby mode because of a WFI instruction.'''
+    longdesc = '''The CPU pipeline is inactive'''
+  [[register.field]]
+    name = "NWFEPIPESTOPPED"
+    bits = "1"
+    type = "ro"
+    shortdesc = '''When LOW, this indicates that the CPU is in standby mode because of a WFE instruction.'''
+    longdesc = '''The CPU pipeline is inactive'''
+  [[register.field]]
+    name = "NCLKSTOPPED"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "RPU1_PWRDWN"
+  type = "mixed"
+  width = 32
+  description = "Power down request from R5s"
+  default = "0x00000000"
+  offset = "0x00000208"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "raz"
+  [[register.field]]
+    name = "EN"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "RPU1_ISR"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Status Register"
+  default = "0x00000000"
+  offset = "0x00000214"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:25"
+    type = "raz"
+  [[register.field]]
+    name = "FPUFC"
+    bits = "24"
+    type = "wtc"
+  [[register.field]]
+    name = "FPOFC"
+    bits = "23"
+    type = "wtc"
+  [[register.field]]
+    name = "FPIXC"
+    bits = "22"
+    type = "wtc"
+  [[register.field]]
+    name = "FPIOC"
+    bits = "21"
+    type = "wtc"
+  [[register.field]]
+    name = "FPIDC"
+    bits = "20"
+    type = "wtc"
+  [[register.field]]
+    name = "FPDZC"
+    bits = "19"
+    type = "wtc"
+  [[register.field]]
+    name = "TCM_ASLV_CE"
+    bits = "18"
+    type = "wtc"
+  [[register.field]]
+    name = "TCM_ASLV_FAT"
+    bits = "17"
+    type = "wtc"
+  [[register.field]]
+    name = "TCM_LST_CE"
+    bits = "16"
+    type = "wtc"
+  [[register.field]]
+    name = "TCM_PREFETCH_CE"
+    bits = "15"
+    type = "wtc"
+  [[register.field]]
+    name = "B1TCM_CE"
+    bits = "14"
+    type = "wtc"
+  [[register.field]]
+    name = "B0TCM_CE"
+    bits = "13"
+    type = "wtc"
+  [[register.field]]
+    name = "ATCM_CE"
+    bits = "12"
+    type = "wtc"
+  [[register.field]]
+    name = "B1TCM_UE"
+    bits = "11"
+    type = "wtc"
+  [[register.field]]
+    name = "B0TCM_UE"
+    bits = "10"
+    type = "wtc"
+  [[register.field]]
+    name = "ATCM_UE"
+    bits = "9"
+    type = "wtc"
+  [[register.field]]
+    name = "DTAG_DIRTY_FAT"
+    bits = "8"
+    type = "wtc"
+  [[register.field]]
+    name = "DDATA_FAT"
+    bits = "7"
+    type = "wtc"
+  [[register.field]]
+    name = "TCM_LST_FAT"
+    bits = "6"
+    type = "wtc"
+  [[register.field]]
+    name = "TCM_PREFETCH_FAT"
+    bits = "5"
+    type = "wtc"
+  [[register.field]]
+    name = "DDATA_CE"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "DTAG_DIRTY_CE"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "IDATA_CE"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "ITAG_CE"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "APB_ERR"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "RPU1_IMR"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Mask Register"
+  default = "0x01FFFFFF"
+  offset = "0x00000218"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:25"
+    type = "raz"
+  [[register.field]]
+    name = "FPUFC"
+    bits = "24"
+    type = "ro"
+  [[register.field]]
+    name = "FPOFC"
+    bits = "23"
+    type = "ro"
+  [[register.field]]
+    name = "FPIXC"
+    bits = "22"
+    type = "ro"
+  [[register.field]]
+    name = "FPIOC"
+    bits = "21"
+    type = "ro"
+  [[register.field]]
+    name = "FPIDC"
+    bits = "20"
+    type = "ro"
+  [[register.field]]
+    name = "FPDZC"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "TCM_ASLV_CE"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "TCM_ASLV_FAT"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "TCM_LST_CE"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "TCM_PREFETCH_CE"
+    bits = "15"
+    type = "ro"
+  [[register.field]]
+    name = "B1TCM_CE"
+    bits = "14"
+    type = "ro"
+  [[register.field]]
+    name = "B0TCM_CE"
+    bits = "13"
+    type = "ro"
+  [[register.field]]
+    name = "ATCM_CE"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "B1TCM_UE"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "B0TCM_UE"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "ATCM_UE"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "DTAG_DIRTY_FAT"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "DDATA_FAT"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "TCM_LST_FAT"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "TCM_PREFETCH_FAT"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "DDATA_CE"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "DTAG_DIRTY_CE"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "IDATA_CE"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "ITAG_CE"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "APB_ERR"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "RPU1_IEN"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Enable Register"
+  default = "0x00000000"
+  offset = "0x0000021C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:25"
+    type = "raz"
+  [[register.field]]
+    name = "FPUFC"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "FPOFC"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "FPIXC"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "FPIOC"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "FPIDC"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "FPDZC"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "TCM_ASLV_CE"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "TCM_ASLV_FAT"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "TCM_LST_CE"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "TCM_PREFETCH_CE"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "B1TCM_CE"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "B0TCM_CE"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "ATCM_CE"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "B1TCM_UE"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "B0TCM_UE"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "ATCM_UE"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "DTAG_DIRTY_FAT"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "DDATA_FAT"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "TCM_LST_FAT"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "TCM_PREFETCH_FAT"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "DDATA_CE"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "DTAG_DIRTY_CE"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "IDATA_CE"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "ITAG_CE"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "APB_ERR"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "RPU1_IDS"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Disable Register"
+  default = "0x00000000"
+  offset = "0x00000220"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:25"
+    type = "raz"
+  [[register.field]]
+    name = "FPUFC"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "FPOFC"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "FPIXC"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "FPIOC"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "FPIDC"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "FPDZC"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "TCM_ASLV_CE"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "TCM_ASLV_FAT"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "TCM_LST_CE"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "TCM_PREFETCH_CE"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "B1TCM_CE"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "B0TCM_CE"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "ATCM_CE"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "B1TCM_UE"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "B0TCM_UE"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "ATCM_UE"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "DTAG_DIRTY_FAT"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "DDATA_FAT"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "TCM_LST_FAT"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "TCM_PREFETCH_FAT"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "DDATA_CE"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "DTAG_DIRTY_CE"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "IDATA_CE"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "ITAG_CE"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "APB_ERR"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "RPU1_SLV_BASE"
+  type = "mixed"
+  width = 32
+  description = "Slave Base Address Register"
+  default = "0x00000000"
+  offset = "0x00000224"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "raz"
+  [[register.field]]
+    name = "ADDR"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''Slave address is appended wih 8 bits to generate 23 bit address.'''
+    longdesc = '''If incomign access is going to caches, RPU use this register to generate final address passed to R5 {RPU_1_SLV_BASE_ADDR[7:0], ARADDR[14:0]}'''
+[[register]]
+  name = "RPU1_AXI_OVER"
+  type = "mixed"
+  width = 32
+  description = "RPU 1 AXI Override Register"
+  default = "0x00000000"
+  offset = "0x00000228"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:10"
+    type = "raz"
+  [[register.field]]
+    name = "AWCACHE"
+    bits = "9:6"
+    type = "rw"
+  [[register.field]]
+    name = "ARCACHE"
+    bits = "5:2"
+    type = "rw"
+  [[register.field]]
+    name = "AWCACHE_EN"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "ARCACHE_EN"
+    bits = "0"
+    type = "rw"

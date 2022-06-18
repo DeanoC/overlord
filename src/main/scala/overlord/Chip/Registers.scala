@@ -11,7 +11,8 @@ case class RegisterBank(name: String,
                         baseAddress: BigInt,
                         addressIncrement: BigInt,
                         registerWindowSize: BigInt,
-                        registerListName: String)
+                        registerListName: String,
+                        cpus: Seq[String])
 
 case class Register(name: String,
                     regType: String,
@@ -42,6 +43,10 @@ case class RegisterFieldEnum(name: String,
 object Registers {
 	val registerListCache: mutable.Map[String, RegisterList] = mutable.Map[String, RegisterList]()
 
+	private val cpuRegEx = "\\s*,\\s*".r
+
+	private def decodeCpusString(cpus: String): Seq[String] = if (cpus == "_") Seq() else cpuRegEx.split(cpus).toSeq.map(_.toLowerCase())
+
 	def apply(instance: InstanceTrait, registerDefs: Seq[Variant]): Seq[RegisterBank] = {
 
 		val tomls = mutable.ArrayBuffer[(String, Map[String, Variant])]()
@@ -57,6 +62,7 @@ object Registers {
 			val baseAddress        = Utils.lookupBigInt(item, "base_address", -1)
 			val addressIncrement   = Utils.lookupBigInt(item, "address_increment", 0)
 			val registerWindowSize = Utils.lookupBigInt(item, "register_window_size", -1)
+			val cpus               = decodeCpusString(Utils.lookupString(item, "cpus", "_"))
 
 			val path: Path = Game.tryPaths(instance, resource)
 
@@ -64,10 +70,10 @@ object Registers {
 			tomls += ((resource, source))
 
 			if (Registers.registerListCache.contains(resource)) {
-				Some(RegisterBank(name, baseAddress, addressIncrement, registerWindowSize, resource))
+				Some(RegisterBank(name, baseAddress, addressIncrement, registerWindowSize, resource, cpus))
 			} else parseRegisterList(resource, source).flatMap { list =>
 				Registers.registerListCache(resource) = list
-				Some(RegisterBank(name, baseAddress, addressIncrement, registerWindowSize, resource))
+				Some(RegisterBank(name, baseAddress, addressIncrement, registerWindowSize, resource, cpus))
 			}
 		}
 		registerBanks.flatten
@@ -136,7 +142,10 @@ object Registers {
 		val desc       = if (parsed.contains("description"))
 			parsed("description").asInstanceOf[StringV].value
 		else "No Description"
+		val finalName  = if (parsed.contains("name"))
+			parsed("name").asInstanceOf[StringV].value
+		else name
 
-		Some(RegisterList(name, desc, registers))
+		Some(RegisterList(finalName, desc, registers))
 	}
 }

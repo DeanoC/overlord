@@ -1,6 +1,6 @@
 #pragma once
 
-#include "hw_regs/pmu/pmu_iomodule.h"
+#include "platform/registers/pmu_iomodule.h"
 namespace Interrupts {
 enum class Name : uint32_t {
 	IN_PIT0 = PMU_IOMODULE_IRQ_ENABLE_PIT0,

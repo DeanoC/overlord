@@ -27,13 +27,14 @@ case class InOutWireDirection() extends WireDirection
 sealed case class BitsDesc(text: String) {
 	private val txt        : String  = text.filterNot(c => c == '[' || c == ']')
 	private val singleDigit: Boolean = txt.split(":").length < 2
+
+	lazy val mask: Long = ((1L << bitCount.toLong) - 1L) << lo.toLong
 	val hi       : Int     = Integer.parseInt(txt.split(":")(0))
 	val lo       : Int     =
 		if (singleDigit) hi
 		else Integer.parseInt(txt.split(":")(1))
 	val bitCount : Int     = (hi - lo) + 1
 	val singleBit: Boolean = singleDigit || bitCount == 1
-	lazy val mask: Long = ((1L << bitCount.toLong) - 1L) << lo.toLong
 }
 
 object BitsDesc {
@@ -55,7 +56,8 @@ object WireDirection {
 
 case class Port(name: String,
                 width: BitsDesc,
-                direction: WireDirection = InOutWireDirection())
+                direction: WireDirection = InOutWireDirection(),
+                knownWidth: Boolean = true)
 
 object Ports {
 	def apply(array: Array[Variant]): Seq[Port] =

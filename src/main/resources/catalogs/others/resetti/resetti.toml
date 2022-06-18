@@ -5,7 +5,6 @@ actions = [
     "read_verilog_top"
 ]
 
-
 [[process]]
 name = 'make_config'
 processor = 'toml'
@@ -20,7 +19,6 @@ processor = 'sbt'
 main_scala = "resetti.scala"
 with_build_sbt = true
 args = '+runMain Resetti config.toml .. ${name}'
-path_op = 'push'
 
 [[process]]
 name = 'src'
@@ -30,4 +28,4 @@ sources = [{ file = "${outPath}/${name}.v", language = "verilog" }]
 [[process]]
 name = 'read_verilog_top'
 processor = 'read_verilog_top'
-source = "${name}"
+source = "${outPath}/${name}.v"

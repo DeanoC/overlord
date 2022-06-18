@@ -7,9 +7,9 @@
 #include "dbg/print.h"
 #include "platform/reg_access.h"
 #include "platform/memory_map.h"
-#include "hw_regs/dp.h"
-#include "hw_regs/dp_dpcd.h"
-#include "hw_regs/serdes.h"
+#include "platform/registers/dp.h"
+#include "platform/registers/dp_dpcd.h"
+#include "platform/registers/serdes.h"
 
 
 namespace DisplayPort::Display::Serdes {

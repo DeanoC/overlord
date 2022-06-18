@@ -1,0 +1,669 @@
+description = "CoreSight top level ROM in DAP, DAP ROM"
+[[register]]
+  name = "ENTRY00"
+  type = "ro"
+  width = 32
+  description = "ROM entry 0"
+  default = "0x00100003"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "BASE_ADDR"
+    bits = "30:12"
+    type = "ro"
+  [[register.field]]
+    name = "FORMAT"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ENTRY_PRESENT"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ENTRY01"
+  type = "ro"
+  width = 32
+  description = "ROM entry 1"
+  default = "0x00110003"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "BASE_ADDR"
+    bits = "30:12"
+    type = "ro"
+  [[register.field]]
+    name = "FORMAT"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ENTRY_PRESENT"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ENTRY02"
+  type = "ro"
+  width = 32
+  description = "ROM entry 2"
+  default = "0x00120003"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "BASE_ADDR"
+    bits = "30:12"
+    type = "ro"
+  [[register.field]]
+    name = "FORMAT"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ENTRY_PRESENT"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ENTRY03"
+  type = "ro"
+  width = 32
+  description = "ROM entry 3"
+  default = "0x00130003"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "BASE_ADDR"
+    bits = "30:12"
+    type = "ro"
+  [[register.field]]
+    name = "FORMAT"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ENTRY_PRESENT"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ENTRY04"
+  type = "ro"
+  width = 32
+  description = "ROM entry 4"
+  default = "0x00140003"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "BASE_ADDR"
+    bits = "30:12"
+    type = "ro"
+  [[register.field]]
+    name = "FORMAT"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ENTRY_PRESENT"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ENTRY05"
+  type = "ro"
+  width = 32
+  description = "ROM entry 5"
+  default = "0x00150003"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "BASE_ADDR"
+    bits = "30:12"
+    type = "ro"
+  [[register.field]]
+    name = "FORMAT"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ENTRY_PRESENT"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ENTRY06"
+  type = "ro"
+  width = 32
+  description = "ROM entry 6"
+  default = "0x00160003"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "BASE_ADDR"
+    bits = "30:12"
+    type = "ro"
+  [[register.field]]
+    name = "FORMAT"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ENTRY_PRESENT"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ENTRY07"
+  type = "ro"
+  width = 32
+  description = "ROM entry 7"
+  default = "0x00170003"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "BASE_ADDR"
+    bits = "30:12"
+    type = "ro"
+  [[register.field]]
+    name = "FORMAT"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ENTRY_PRESENT"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ENTRY08"
+  type = "ro"
+  width = 32
+  description = "ROM entry 8"
+  default = "0x00180003"
+  offset = "0x00000020"
+  [[register.field]]
+    name = "BASE_ADDR"
+    bits = "30:12"
+    type = "ro"
+  [[register.field]]
+    name = "FORMAT"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ENTRY_PRESENT"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ENTRY09"
+  type = "ro"
+  width = 32
+  description = "ROM entry 9"
+  default = "0x00190003"
+  offset = "0x00000024"
+  [[register.field]]
+    name = "BASE_ADDR"
+    bits = "30:12"
+    type = "ro"
+  [[register.field]]
+    name = "FORMAT"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ENTRY_PRESENT"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ENTRY10"
+  type = "ro"
+  width = 32
+  description = "ROM entry 10"
+  default = "0x001A0003"
+  offset = "0x00000028"
+  [[register.field]]
+    name = "BASE_ADDR"
+    bits = "30:12"
+    type = "ro"
+  [[register.field]]
+    name = "FORMAT"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ENTRY_PRESENT"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ENTRY11"
+  type = "ro"
+  width = 32
+  description = "ROM entry 11"
+  default = "0x001B0003"
+  offset = "0x0000002C"
+  [[register.field]]
+    name = "BASE_ADDR"
+    bits = "30:12"
+    type = "ro"
+  [[register.field]]
+    name = "FORMAT"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ENTRY_PRESENT"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ENTRY12"
+  type = "ro"
+  width = 32
+  description = "ROM entry 12"
+  default = "0x001C0003"
+  offset = "0x00000030"
+  [[register.field]]
+    name = "BASE_ADDR"
+    bits = "30:12"
+    type = "ro"
+  [[register.field]]
+    name = "FORMAT"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ENTRY_PRESENT"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ENTRY13"
+  type = "ro"
+  width = 32
+  description = "ROM entry 13"
+  default = "0x001D0003"
+  offset = "0x00000034"
+  [[register.field]]
+    name = "BASE_ADDR"
+    bits = "30:12"
+    type = "ro"
+  [[register.field]]
+    name = "FORMAT"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ENTRY_PRESENT"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ENTRY14"
+  type = "ro"
+  width = 32
+  description = "ROM entry 14"
+  default = "0x001E0003"
+  offset = "0x00000038"
+  [[register.field]]
+    name = "BASE_ADDR"
+    bits = "30:12"
+    type = "ro"
+  [[register.field]]
+    name = "FORMAT"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ENTRY_PRESENT"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ENTRY15"
+  type = "ro"
+  width = 32
+  description = "ROM entry 15"
+  default = "0x001F0003"
+  offset = "0x0000003C"
+  [[register.field]]
+    name = "BASE_ADDR"
+    bits = "30:12"
+    type = "ro"
+  [[register.field]]
+    name = "FORMAT"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ENTRY_PRESENT"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ENTRY16"
+  type = "ro"
+  width = 32
+  description = "ROM entry 16"
+  default = "0x003E0003"
+  offset = "0x00000040"
+  [[register.field]]
+    name = "BASE_ADDR"
+    bits = "30:12"
+    type = "ro"
+  [[register.field]]
+    name = "FORMAT"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ENTRY_PRESENT"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ENTRY17"
+  type = "ro"
+  width = 32
+  description = "ROM entry 17"
+  default = "0x00400003"
+  offset = "0x00000044"
+  [[register.field]]
+    name = "BASE_ADDR"
+    bits = "30:12"
+    type = "ro"
+  [[register.field]]
+    name = "FORMAT"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ENTRY_PRESENT"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ENTRY18"
+  type = "ro"
+  width = 32
+  description = "Non-zero filler"
+  default = "0x00000010"
+  offset = "0x00000048"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "ro"
+[[register]]
+  name = "ENTRY19"
+  type = "ro"
+  width = 32
+  description = "Non-zero filler"
+  default = "0x00000010"
+  offset = "0x0000004C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "ro"
+[[register]]
+  name = "ENTRY20"
+  type = "ro"
+  width = 32
+  description = "Non-zero filler"
+  default = "0x00000010"
+  offset = "0x00000050"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "ro"
+[[register]]
+  name = "ENTRY21"
+  type = "ro"
+  width = 32
+  description = "Non-zero filler"
+  default = "0x00000010"
+  offset = "0x00000054"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "ro"
+[[register]]
+  name = "ENTRY22"
+  type = "ro"
+  width = 32
+  description = "Non-zero filler"
+  default = "0x00000010"
+  offset = "0x00000058"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "ro"
+[[register]]
+  name = "ENTRY23"
+  type = "ro"
+  width = 32
+  description = "Non-zero filler"
+  default = "0x00000010"
+  offset = "0x0000005C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "ro"
+[[register]]
+  name = "ENTRY24"
+  type = "ro"
+  width = 32
+  description = "Non-zero filler"
+  default = "0x00000010"
+  offset = "0x00000060"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "ro"
+[[register]]
+  name = "ENTRY25"
+  type = "ro"
+  width = 32
+  description = "Non-zero filler"
+  default = "0x00000010"
+  offset = "0x00000064"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "ro"
+[[register]]
+  name = "ENTRY26"
+  type = "ro"
+  width = 32
+  description = "Non-zero filler"
+  default = "0x00000010"
+  offset = "0x00000068"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "ro"
+[[register]]
+  name = "ENTRY27"
+  type = "ro"
+  width = 32
+  description = "Non-zero filler"
+  default = "0x00000010"
+  offset = "0x0000006C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "ro"
+[[register]]
+  name = "ENTRY28"
+  type = "ro"
+  width = 32
+  description = "Non-zero filler"
+  default = "0x00000010"
+  offset = "0x00000070"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "ro"
+[[register]]
+  name = "ENTRY29"
+  type = "ro"
+  width = 32
+  description = "Non-zero filler"
+  default = "0x00000010"
+  offset = "0x00000074"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "ro"
+[[register]]
+  name = "ENTRY30"
+  type = "ro"
+  width = 32
+  description = "Non-zero filler"
+  default = "0x00000010"
+  offset = "0x00000078"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "ro"
+[[register]]
+  name = "ENTRY31"
+  type = "ro"
+  width = 32
+  description = "Non-zero filler"
+  default = "0x00000010"
+  offset = "0x0000007C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "ro"
+[[register]]
+  name = "DEVID"
+  type = "ro"
+  width = 32
+  description = "This register indicates the capabilities."
+  default = "0x00000000"
+  offset = "0x00000FC8"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "DEVTYPE"
+  type = "ro"
+  width = 32
+  description = "It provides a debugger with information about the component."
+  default = "0x00000000"
+  offset = "0x00000FCC"
+  [[register.field]]
+    name = "SUB_TYPE"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "MAJOR_TYPE"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "PIDR4"
+  type = "ro"
+  width = 32
+  description = "Peripheral Identification register 4"
+  default = "0x00000001"
+  offset = "0x00000FD0"
+  [[register.field]]
+    name = "SIZE"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "DES_2"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "PIDR5"
+  type = "rw"
+  width = 32
+  description = "Peripheral Identification register 5"
+  default = "0x00000000"
+  offset = "0x00000FD4"
+[[register]]
+  name = "PIDR6"
+  type = "rw"
+  width = 32
+  description = "Peripheral Identification register 6"
+  default = "0x00000000"
+  offset = "0x00000FD8"
+[[register]]
+  name = "PIDR7"
+  type = "rw"
+  width = 32
+  description = "Peripheral Identification register 7"
+  default = "0x00000000"
+  offset = "0x00000FDC"
+[[register]]
+  name = "PIDR0"
+  type = "ro"
+  width = 32
+  description = "Peripheral Identification register 0"
+  default = "0x00000038"
+  offset = "0x00000FE0"
+  [[register.field]]
+    name = "PART_0"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "PIDR1"
+  type = "ro"
+  width = 32
+  description = "Peripheral Identification register 1"
+  default = "0x00000037"
+  offset = "0x00000FE4"
+  [[register.field]]
+    name = "DES_0"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "PART_1"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "PIDR2"
+  type = "ro"
+  width = 32
+  description = "Peripheral Identification register 2"
+  default = "0x00000009"
+  offset = "0x00000FE8"
+  [[register.field]]
+    name = "REVISION"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "JEDEC"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "DES_1"
+    bits = "2:0"
+    type = "ro"
+[[register]]
+  name = "PIDR3"
+  type = "ro"
+  width = 32
+  description = "Peripheral Identification register 3"
+  default = "0x00000000"
+  offset = "0x00000FEC"
+  [[register.field]]
+    name = "REVAND"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "CMOD"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "CIDR0"
+  type = "ro"
+  width = 32
+  description = "Component Identification Register 0"
+  default = "0x0000000D"
+  offset = "0x00000FF0"
+  [[register.field]]
+    name = "PRMBL_0"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "CIDR1"
+  type = "ro"
+  width = 32
+  description = "Component Identification Register 1"
+  default = "0x00000010"
+  offset = "0x00000FF4"
+  [[register.field]]
+    name = "CLASS"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''Class of the component.'''
+    longdesc = '''Constitutes bits [15:12] of the component identification.'''
+  [[register.field]]
+    name = "PRMBL_1"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "CIDR2"
+  type = "ro"
+  width = 32
+  description = "Component Identification Register 2"
+  default = "0x00000005"
+  offset = "0x00000FF8"
+  [[register.field]]
+    name = "PRMBL_2"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "CIDR3"
+  type = "ro"
+  width = 32
+  description = "Component Identification Register 3"
+  default = "0x000000B1"
+  offset = "0x00000FFC"
+  [[register.field]]
+    name = "PRMBL_3"
+    bits = "7:0"
+    type = "ro"

@@ -14,7 +14,7 @@ case class TomlAction(filename: String)
 	override def execute(instance: InstanceTrait, parameters: Map[String, Variant]): Unit = {
 		val sb = new mutable.StringBuilder()
 		for {(k, vf) <- parameters} {
-			sb ++= s"$k] = ${vf.toTomlString}\n"
+			sb ++= s"$k = ${vf.toTomlString}\n"
 		}
 
 		val moddedOutPath = Game.outPath.resolve(Game.resolvePathMacros(instance, instance.name))

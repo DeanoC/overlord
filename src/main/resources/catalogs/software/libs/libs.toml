@@ -87,7 +87,7 @@ cpus = "a53,host"
 [[definition]]
 type = "library.resource_bundle_writer"
 depends = ["core", "data_utils", "dbg", "memory", "platform", "vfile", "tiny_stl",
-    "data_binify", "data_utils", "resource_bundle", "utils"]
+    "data_binify", "resource_bundle", "utils"]
 cpus = "host"
 
 [[definition]]

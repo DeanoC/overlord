@@ -1,10 +1,10 @@
 package overlord.Instances
 
-import overlord.Interfaces.UnConnectedLike
+import overlord.Interfaces.UnconnectedLike
 
 trait Container {
 	var children   : Seq[InstanceTrait]
-	var unconnected: Seq[UnConnectedLike]
+	var unconnected: Seq[UnconnectedLike]
 	val physical   : Boolean
 
 	def flatChildren: Seq[InstanceTrait] =
@@ -19,6 +19,6 @@ trait Container {
 case class RootContainer() extends Container {
 	override val physical   : Boolean              = true
 	override var children   : Seq[InstanceTrait]   = Seq()
-	override var unconnected: Seq[UnConnectedLike] = Seq()
+	override var unconnected: Seq[UnconnectedLike] = Seq()
 }
 

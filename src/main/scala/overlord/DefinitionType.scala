@@ -14,8 +14,6 @@ case class RamDefinitionType(ident: Seq[String]) extends ChipDefinitionType
 
 case class CpuDefinitionType(ident: Seq[String]) extends ChipDefinitionType
 
-case class BusDefinitionType(ident: Seq[String]) extends ChipDefinitionType
-
 case class GraphicDefinitionType(ident: Seq[String]) extends ChipDefinitionType
 
 case class StorageDefinitionType(ident: Seq[String]) extends ChipDefinitionType
@@ -50,7 +48,6 @@ object DefinitionType {
 		defTypeName.head.toLowerCase match {
 			case "ram"     => RamDefinitionType(tt)
 			case "cpu"     => CpuDefinitionType(tt)
-			case "bus"     => BusDefinitionType(tt)
 			case "storage" => StorageDefinitionType(tt)
 			case "graphic" => GraphicDefinitionType(tt)
 			case "net"     => NetDefinitionType(tt)

@@ -1,4 +1,4 @@
-get_filename_component(IKUY_PATH ./programs_host/ REALPATH)
+get_filename_component(IKUY_PATH ../../compilers/ REALPATH)
 get_filename_component(COMPILER_PATH ${IKUY_PATH}/${triple} REALPATH)
 
 set(GCC_VERSION "11.2.0")

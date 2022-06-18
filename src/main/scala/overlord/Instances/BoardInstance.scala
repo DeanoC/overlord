@@ -1,7 +1,7 @@
 package overlord.Instances
 
 import ikuy_utils._
-import overlord.Interfaces.UnConnectedLike
+import overlord.Interfaces.UnconnectedLike
 import overlord.{ChipDefinitionTrait, Definition}
 import toml.Value
 
@@ -38,7 +38,7 @@ case class BoardInstance(name: String,
                          override var children: Seq[InstanceTrait] = Seq()
                         ) extends ChipInstance with Container {
 	override val physical   : Boolean              = true
-	override var unconnected: Seq[UnConnectedLike] = Seq()
+	override var unconnected: Seq[UnconnectedLike] = Seq()
 
 	override def isVisibleToSoftware: Boolean = true
 }
@@ -91,8 +91,7 @@ object BoardInstance {
 			val table = Utils.toTable(pinv)
 			if (table.contains("name")) {
 				val name  = Utils.toString(table("name"))
-				val clock = table ++ Map[String, Variant]("type" -> StringV(s"clock" +
-				                                                            s".$name"))
+				val clock = table ++ Map[String, Variant]("type" -> StringV(name))
 				Definition(TableV(clock), defaults).createInstance(s"$name", clock)
 			} else {
 				println(s"clocks must either have a name field")

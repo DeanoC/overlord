@@ -3,14 +3,14 @@
 #include "core/core.h"
 #include "platform/reg_access.h"
 #include "platform/memory_map.h"
-#include "hw_regs/pmu_global.h"
-#include "hw_regs/pmu/pmu_lmb_bram.h"
-#include "hw_regs/pmu/pmu_local.h"
+#include "platform/registers/pmu_global.h"
+#include "platform/registers/pmu_lmb_bram.h"
+#include "platform/registers/pmu_local.h"
 
-#include "hw_regs/lpd_slcr.h"
-#include "hw_regs/ipi.h"
-#include "hw_regs/ttc.h"
-#include "hw_regs/uart.h"
+#include "platform/registers/lpd_slcr.h"
+#include "platform/registers/ipi.h"
+#include "platform/registers/ttc.h"
+#include "platform/registers/uart.h"
 #include "dbg/raw_print.h"
 #include "dbg/ansi_escapes.h"
 #include "dbg/print.h"
@@ -24,6 +24,13 @@
 #include "os_heap.hpp"
 #include "main_loop.hpp"
 #include "osservices/osservices.h"
+
+#define UART_DEBUG_BASE_ADDR UART1_BASE_ADDR
+#define UART_DEBUG_REGISTER(reg) UART_##reg##_OFFSET
+#define UART_DEBUG_FIELD(reg, field) UART_##reg##_##field
+#define UART_DEBUG_FIELD_MASK(reg, field) UART_##reg##_##field##_MASK
+#define UART_DEBUG_FIELD_LSHIFT(reg, field) UART_##reg##_##field##_LSHIFT
+#define UART_DEBUG_FIELD_ENUM(reg, field, enm) UART_##reg##_##field##_##enm
 
 typedef struct {
 	uint32_t namesz;
@@ -43,7 +50,7 @@ static void MainCallsCallback() {
 extern const ElfNoteSection_t g_note_build_id;
 void PrintBanner(void)
 {
-	raw_debug_print(ANSI_YELLOW_PEN "IKUY PMU Monitor\n" ANSI_RESET_ATTRIBUTES);
+	raw_debug_print(ANSI_YELLOW_PEN "IKUY PMU Monitor\n" ANSI_WHITE_PEN);
 	const uint8_t *build_id_data = &((uint8_t*)(&g_note_build_id)+1)[g_note_build_id.namesz];
 
 	// print Build ID

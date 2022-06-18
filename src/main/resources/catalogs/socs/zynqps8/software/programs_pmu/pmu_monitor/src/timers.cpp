@@ -6,7 +6,7 @@
 #include "interrupts/interrupts.hpp"
 #include "platform/reg_access.h"
 #include "platform/memory_map.h"
-#include "hw_regs/pmu/pmu_iomodule.h"
+#include "platform/registers/pmu_iomodule.h"
 #include "main_loop.hpp"
 
 #define MICROBLAZE_FREQ_KHZ 180000

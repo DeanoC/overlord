@@ -2,7 +2,7 @@ package output
 
 import ikuy_utils._
 import overlord.Chip.Registers
-import overlord.Instances.{BoardInstance, ChipInstance, Container, InstanceTrait}
+import overlord.Instances.{BoardInstance, ChipInstance, Container, CpuInstance, InstanceTrait}
 import overlord._
 import scalax.collection.Graph
 import scalax.collection.GraphEdge.DiEdge
@@ -20,44 +20,31 @@ object Report {
 	private type NodeResult = Option[(DotGraph, DotNodeStmt)]
 	private val cpuDotAttribs      = Seq(DotAttr("shape", "diamond"),
 	                                     DotAttr("style", "filled"),
-	                                     DotAttr("color", "white"),
-	                                     DotAttr("fillcolor", "green"))
+	                                     DotAttr("fillcolor", "darkolivegreen"))
 	private val ioDotAttribs       = Seq(DotAttr("shape", "box"),
 	                                     DotAttr("style", "filled"),
-	                                     DotAttr("color", "white"),
 	                                     DotAttr("fillcolor", "lightblue"))
 	private val ramDotAttribs      = Seq(DotAttr("shape", "box"),
 	                                     DotAttr("style", "filled"),
-	                                     DotAttr("color", "white"),
 	                                     DotAttr("fillcolor", "tomato"))
 	private val storageDotAttribs  = Seq(DotAttr("shape", "box"),
 	                                     DotAttr("style", "filled"),
-	                                     DotAttr("color", "white"),
 	                                     DotAttr("fillcolor", "palevioletred"))
-	private val busDotAttribs      = Seq(DotAttr("shape", "oval"),
+	private val switchDotAttribs   = Seq(DotAttr("shape", "oval"),
 	                                     DotAttr("style", "filled"),
-	                                     DotAttr("color", "white"),
-	                                     DotAttr("fillcolor", "darkolivegreen"))
-	private val bridgeDotAttribs   = Seq(DotAttr("label", "Bridge"),
-	                                     DotAttr("shape", "invtriangle"),
-	                                     DotAttr("fontsize", 6),
-	                                     DotAttr("style", "filled"),
-	                                     DotAttr("color", "white"),
-	                                     DotAttr("fillcolor", "whitesmoke"))
+	                                     DotAttr("fillcolor", "green"))
 	private val pinGroupDotAttribs = Seq(DotAttr("shape", "oval"),
 	                                     DotAttr("style", "filled"),
-	                                     DotAttr("fontcolor", "white"),
 	                                     DotAttr("fillcolor", "darkblue"))
 
 	private val defaultDotAttribs     = Seq(DotAttr("shape", "box"))
 	private val ramEdgeDotAttribs     = Seq(DotAttr("style", "dashed"))
-	private val busEdgeDotAttribs     = Seq(DotAttr("color", "red"))
-	private val bridgeEdgeDotAttribs  = Seq(DotAttr("style", "dashed"))
+	private val switchEdgeDotAttribs  = Seq(DotAttr("style", "dashed"), DotAttr("color", "red"))
 	private val defaultEdgeDotAttribs = Seq(DotAttr("color", "black"))
 
 	def apply(game: Game): Unit = {
 
-		val sb   = new StringBuilder
+		val sb   = new mutable.StringBuilder
 		val cpus = game.cpus
 
 		val cpuTypes = cpus.map(_.definition).toSet
@@ -114,6 +101,12 @@ object Report {
 
 		sb ++= game.distanceMatrix.debugPrint
 
+		sb ++= f"%n------------------%n"
+		sb ++= f"Bus Distance Matrix%n"
+		sb ++= f"------------------%n%n"
+
+		sb ++= game.busDistanceMatrix.debugPrint
+
 		Utils.writeFile(Game.outPath.resolve("report.txt"), sb.result())
 
 		outputDotGraph(game)
@@ -126,7 +119,7 @@ object Report {
 	private def outputDotGraph(game: Game) = {
 		var (graph, maxDistance) = convertToGraph(game)
 
-		graph = makeLegendGraph(graph, maxDistance)
+		//		graph = makeLegendGraph(graph, maxDistance)
 
 		val root   = DotRootGraph(directed = true,
 		                          id = Some(s"${game.name}"),
@@ -154,6 +147,19 @@ object Report {
 			)
 
 		Utils.writeFile(Game.outPath.resolve(s"${game.name}.dot"), dotText)
+
+		for {cpu <- game.cpus} {
+			val (cpuGraph, maxDistance) = cpuToGraph(game, cpu)
+
+			val dotText = cpuGraph.toDot(
+				dotRoot = root,
+				edgeTransformer = context.edgePrep,
+				cNodeTransformer = Some(context.nodePrep),
+				)
+
+			Utils.writeFile(Game.outPath.resolve(s"${cpu.name}.dot"), dotText)
+		}
+
 	}
 
 	private def makeLegendGraph(graph: GraphType, maxDistance: Int): GraphType = {
@@ -229,6 +235,34 @@ object Report {
 		(graph, maxDistance)
 	}
 
+	private def cpuToGraph(game: Game, cpu: CpuInstance) = {
+		var graph: GraphType = Graph[(String, DefinitionType, NodeStyleTypeTag), DiEdge]()
+		for (node <- game.distanceMatrix.instanceArray) {
+			graph += ((node.name, node.definition.defType, ChipTypeTag))
+		}
+
+		var maxDistance = 0
+
+		val i = game.distanceMatrix.instanceArray.indexWhere(_ == cpu)
+		for {j <- 0 until game.distanceMatrix.dim
+		     if !game.distanceMatrix.isIsolated(j)} {
+			maxDistance = maxDistance.max(game.distanceMatrix.distanceBetween(i, j))
+
+			val route      = game.distanceMatrix.routeBetween(i, j)
+			var startIndex = i
+			for {endIndex <- route.indices} {
+				val sinst = game.distanceMatrix.instanceArray(startIndex)
+				val einst = game.distanceMatrix.instanceArray(route(endIndex))
+				graph += ((sinst.name, sinst.definition.defType, ChipTypeTag)
+				          ~>
+				          (einst.name, einst.definition.defType, ChipTypeTag))
+				startIndex = route(endIndex)
+			}
+		}
+
+		(graph, maxDistance)
+	}
+
 	private def reportContainer(container: Container,
 	                            indentLevel: Int = 0): String = {
 		container.children.map(reportInstance(_, indentLevel)).mkString("")
@@ -271,7 +305,7 @@ object Report {
 				{
 					edef match {
 						case RamDefinitionType(ident)    => ramEdgeDotAttribs
-						case BusDefinitionType(ident)    => busEdgeDotAttribs
+						case SwitchDefinitionType(ident) => switchEdgeDotAttribs
 						case _                           => defaultEdgeDotAttribs
 					}
 				} ++ {
@@ -314,7 +348,7 @@ object Report {
 				case IoDefinitionType(_)       => ioDotAttribs
 				case RamDefinitionType(_)      => ramDotAttribs
 				case StorageDefinitionType(_)  => storageDotAttribs
-				case BusDefinitionType(_)      => busDotAttribs
+				case SwitchDefinitionType(_)   => switchDotAttribs
 				case PinGroupDefinitionType(_) => graph = pins; pinGroupDotAttribs
 				case _                         => defaultDotAttribs
 			}

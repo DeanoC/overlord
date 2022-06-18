@@ -3,7 +3,7 @@
 #include "zynqps8/display_port/display.hpp"
 #include "platform/reg_access.h"
 #include "platform/memory_map.h"
-#include "hw_regs/dp.h"
+#include "platform/registers/dp.h"
 #include "utils/busy_sleep.h"
 #include "dbg/print.h"
 #include "dbg/assert.h"

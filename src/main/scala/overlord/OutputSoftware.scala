@@ -1,7 +1,7 @@
 package overlord
 
 import ikuy_utils._
-import overlord.Chip.{BitsDesc, RegisterBank, RegisterList, Registers}
+import overlord.Chip.{BitsDesc, RegisterList, Registers}
 import overlord.Connections._
 import overlord.Instances._
 import overlord.Interfaces.{RamLike, RegisterBankLike}
@@ -11,25 +11,23 @@ import scala.collection.mutable
 
 object OutputSoftware {
 	def cpuInvariantActions(software: Seq[SoftwareInstance],
-	                        connected: Seq[Connected]): Unit = {
-		for (instance <- software) executeCpuInvariantSoftwareActions(instance, connected)
+	                        constants: Seq[Constant]): Unit = {
+		for (instance <- software) executeCpuInvariantSoftwareActions(instance, constants)
 	}
 
 	private def executeCpuInvariantSoftwareActions(instance: SoftwareInstance,
-	                                               connected: Seq[Connected]): Unit = {
+	                                               constants: Seq[Constant]): Unit = {
 		val software = instance.definition
 		val actions  = software.actionsFile.actions
 
 		for (action <- actions.filter(_.phase == 1)) {
-			val conParameters = connected
-				.filter(_.isInstanceOf[ConnectedConstant])
-				.map(_.asInstanceOf[ConnectedConstant])
+			val conParameters = constants.collect { case cc: Constant => cc }
 				.map(c => {
-					val name = c.secondFullName.split('.').lastOption match {
-						case Some(value) => value
-						case None        => c.secondFullName
+					val name = if (c.parameter.name.isEmpty) c.instance.name else c.parameter.name
+					c.parameter.parameterType match {
+						case ConstantParameterType(value) => Map[String, Variant](name -> value)
+						case FrequencyParameterType(freq) => Map[String, Variant](name -> DoubleV(freq))
 					}
-					Map[String, Variant](name -> c.constant)
 				}).fold(Map[String, Variant]())((o, n) => o ++ n)
 
 			val instanceSpecificParameters = instance match {
@@ -40,9 +38,9 @@ object OutputSoftware {
 
 			instance.mergeAllAttributes(parameters)
 
-			val parametersTbl = for ((k, v) <- parameters) yield k -> v
+			instance.finalParameterTable.addAll(for ((k, v) <- parameters) yield k -> v)
 
-			action.execute(instance, parametersTbl)
+			action.execute(instance, instance.finalParameterTable.toMap)
 		}
 
 	}
@@ -81,7 +79,7 @@ object OutputSoftware {
 		val actions = instance.definition.actionsFile.actions
 
 		for (action <- actions.filter(_.phase == 2)) {
-			for (iCpu <- cpus.indices) action.execute(instance, keywordsPerCpu(iCpu) + ("${name}" -> StringV(instance.name)))
+			for (iCpu <- cpus.indices) action.execute(instance, keywordsPerCpu(iCpu) + ("${name}" -> StringV(instance.name)) ++ instance.finalParameterTable.toMap)
 		}
 	}
 
@@ -103,14 +101,12 @@ object OutputSoftware {
 		(mmsb.result(), hesb.result())
 	}
 
-	private def cPostFix(s: BigInt): String = if (s > Int.MaxValue) "ULL" else "U"
-
 	private def genChipMemoryMapFor(cpu: CpuInstance, distanceMatrix: DistanceMatrix, connected: Seq[Connected]): (String, String) = {
 
-		val (ramRanges, chipAddresses) = extractRegisters(cpu, distanceMatrix, connected)
+		val (ramRanges, chipAddresses) = extractRamAndRegisters(cpu, distanceMatrix, connected)
 
 		// add cpu specific register banks
-		for (rb <- cpu.banks) if (rb.baseAddress != -1) chipAddresses += ((rb.name, cpu, rb.baseAddress))
+		for (rb <- cpu.banks) if (rb.baseAddress != -1) chipAddresses += ((rb.name, rb.name, cpu, rb.baseAddress))
 
 		val ramSizesByRam = mutable.Map[String, BigInt]()
 		for ((ram, _, _, size) <- ramRanges) {
@@ -131,60 +127,62 @@ object OutputSoftware {
 		}
 
 		val hesb = new mutable.StringBuilder
-		for ((name, _, address) <- chipAddresses) {
-			val nameU = s"${name}".toUpperCase
-			rsb ++= f"%n#define ${nameU}_BASE_ADDR 0x$address%x${cPostFix(address)}%n"
-			hesb ++= f"#define ${name}_FIELD(reg, field) ${nameU}_##reg##_##field%n"
-			hesb ++= f"#define ${name}_FIELD_MASK(reg, field) ${nameU}_##reg##_##field##_MASK%n"
-			hesb ++= f"#define ${name}_FIELD_LSHIFT(reg, field) ${nameU}_##reg##_##field##_LSHIFT%n"
-			hesb ++= f"#define ${name}_FIELD_ENUM(reg, field, enm) ${nameU}_##reg##_##field##_##enm%n"
+		for ((rbName, rlName, _, address) <- chipAddresses) {
+			val rbNameU = rbName.toUpperCase
+			val rlNameU = rlName.toUpperCase
+
+			if (address >= 0) {
+				rsb ++= f"%n#define ${rbNameU}_BASE_ADDR 0x$address%x${cPostFix(address)}%n"
+				hesb ++= f"#define ${rbNameU}_REGISTER(reg) ${rlNameU}_##reg##_OFFSET%n"
+			} else {
+				// -1 bank address mean non MMIO register so no base address is valid
+				hesb ++= f"// These registers aren't MMIO accessible so require platform intrinsics to use%n"
+			}
+			hesb ++= f"#define ${rbNameU}_FIELD(reg, field) ${rlNameU}_##reg##_##field%n"
+			hesb ++= f"#define ${rbNameU}_FIELD_MASK(reg, field) ${rlNameU}_##reg##_##field##_MASK%n"
+			hesb ++= f"#define ${rbNameU}_FIELD_LSHIFT(reg, field) ${rlNameU}_##reg##_##field##_LSHIFT%n"
+			hesb ++= f"#define ${rbNameU}_FIELD_ENUM(reg, field, enm) ${rlNameU}_##reg##_##field##_##enm%n"
 
 		}
 
 		(rsb.result(), hesb.result())
-
-
-		/*
-	val busStack: mutable.Stack[(BusLike, BigInt)] = {
-		val builder = mutable.Stack.newBuilder[(BusLike, BigInt)]
-		game.getInterfacesDirectlyConnectedTo[BusLike](cpu)
-			.filter(inf => game.connected.exists(p => p.connectedTo(inf.getOwner)))
-			.foreach(bus => builder += ((bus, bus.getBaseAddress)))
-		builder.result()
 	}
 
-	while (busStack.nonEmpty) {
-		val (bus, busAddr) = busStack.pop()
+	private def cPostFix(s: BigInt): String = if (s > (BigInt(Int.MaxValue) * 2) - 1) "ULL" else "U"
 
-		for (instance <- bus.consumerInstances) {
-			val asplits = bus.getConsumerAddressesAndSizes(instance)
-			for ((address, size) <- asplits) {
+	def hardwareRegistersOutput(cpus: Seq[CpuInstance], distanceMatrix: DistanceMatrix, connected: Seq[Connected]): Unit = {
+		val uniqueRegisterLists = mutable.Set[String]()
 
-				instance match {
-					case bridge: BridgeInstance =>
-						val obuses = game.getDirectBusesConnectedTo(bridge).filter(_ != bus)
-						for (obus <- obuses) busStack.push((obus, address))
-					case _                      =>
-						if (instance.registerBanks.isEmpty && instance.registerLists.nonEmpty) {
-							sb ++= writeRegisterBank(busAddr,
-																			 RegisterBank(instance.ident.toUpperCase,
-																										address,
-																										instance.registerLists(0).name))
-						} else {
-							for (rb <- instance.registerBanks) sb ++= writeRegisterBank(busAddr, rb)
-						}
+		for (cpu <- cpus) {
+			Utils.ensureDirectories(hwPath(Game.outPath))
 
-				}
-			}
+			val (_, chipAddresses) = extractRamAndRegisters(cpu, distanceMatrix, connected)
+
+			val allRegLists = (for ((_, _, chip, _) <- chipAddresses; bank <- chip.banks) yield bank.registerListName) ++ cpu.banks.map(f => f.registerListName)
+
+			uniqueRegisterLists ++= allRegLists.toSet
 		}
-	}*/
 
+		for (rl <- uniqueRegisterLists) genHeadersFor(rl)
 	}
 
-	private def extractRegisters(cpu: CpuInstance, distanceMatrix: DistanceMatrix, connected: Seq[Connected]) = {
+	private def extractRamAndRegisters(cpu: CpuInstance, distanceMatrix: DistanceMatrix, connected: Seq[Connected]) = {
 
 		val ramRanges     = mutable.ArrayBuffer[(RamLike, Int, BigInt, BigInt)]()
-		val chipAddresses = mutable.ArrayBuffer[(String, ChipInstance, BigInt)]()
+		val chipAddresses = mutable.ArrayBuffer[(String, String, ChipInstance, BigInt)]()
+
+		// handle cpu system registers
+		if (cpu.hasInterface[RegisterBankLike]) {
+			val rbi = cpu.getInterfaceUnwrapped[RegisterBankLike]
+			for {rb <- rbi.banks
+			     if rb.baseAddress == -1
+			     if rb.cpus.isEmpty || rb.cpus.contains(cpu.cpuType)} {
+				chipAddresses += ((rb.name,
+					rb.registerListName.split('/').last.split('.').head.toUpperCase(),
+					cpu,
+					rb.baseAddress))
+			}
+		}
 
 		distanceMatrix.connectedTo(cpu).filter(_.isVisibleToSoftware).foreach(ep => {
 			// is possible to have several routes between chips (multiple buses) by having multiple connects with different buses
@@ -193,7 +191,7 @@ object OutputSoftware {
 				case (src, dst) => {
 					val cons = connected.filter(con => con.connectedBetween(src, dst, FirstToSecondConnection()))
 					val hd   = cons.head
-					// try an swap port group for a parallel bus connection which has info about which bus was used
+					// try and swap port group for a parallel bus connection which has info about which bus was used
 					if (hd.isInstanceOf[ConnectedPortGroup]) {
 						val found = connected.find(p => p.isInstanceOf[ConnectedBus] &&
 						                                p.firstFullName == hd.firstFullName &&
@@ -204,37 +202,55 @@ object OutputSoftware {
 					} else cons.head
 				}
 			}
+			var hasBus                           = false
+			routeConnections.foreach {
+				case _: ConnectedBus => hasBus = true
+				case _               =>
+			}
 
-			var address: BigInt = 0
-			routeConnections.foreach { r =>
-				r match {
-					case bus: ConnectedBus => address += bus.bus.getBaseAddress
-					case _                 =>
-				}
-				// only do chips once per cpu
-				if (r.second.nonEmpty) {
-					if (r.second.get.instance.hasInterface[RamLike]) {
-						val ram = r.second.get.instance.getInterfaceUnwrapped[RamLike]
-						for (((addr, size), index) <- ram.getRanges.zipWithIndex) ramRanges += ((ram, index, address + addr, size))
+			if (hasBus) {
+				var address: BigInt = 0
+				routeConnections.foreach { r =>
+					r match {
+						case bus: ConnectedBus =>
+							if (bus.bus.fixedBaseBusAddress)
+								address = bus.bus.getBaseAddress
+							else
+								address += bus.bus.getBaseAddress
+						case _                 =>
 					}
-
-					val other = r.second.get.instance.asInstanceOf[ChipInstance]
-					if ((!chipAddresses.exists { case (_, o, _) => (o == other) }) &&
-					    other.isVisibleToSoftware &&
-					    other.hasInterface[RegisterBankLike]) {
-						val registerBank = other.getInterfaceUnwrapped[RegisterBankLike]
-						if (other.instanceNumber >= registerBank.maxInstances)
-							println(s"${other.name}: not enough instances\n")
-						else {
-							if (registerBank.banks.isEmpty) chipAddresses += ((other.name, other, address))
-							registerBank.banks.foreach { rb =>
-								if (rb.baseAddress != -1) {
-									val rbName = if (rb.name.isEmpty) r.secondFullName
-									else rb.name.replace("""${index}""", other.instanceNumber.toString)
-									chipAddresses += ((rbName,
-										other,
-										address + rb.baseAddress + (rb.addressIncrement * other.instanceNumber)))
+					// only do chips once per cpu
+					if (r.second.nonEmpty) {
+						if (r.second.get.instance.hasInterface[RamLike]) {
+							val ram   = r.second.get.instance.getInterfaceUnwrapped[RamLike]
+							var index = 0
+							for ((addr, size, fixed, cpus) <- ram.getRanges) {
+								// per process cpu target lists
+								if (cpus.isEmpty || cpus.contains(cpu.cpuType)) {
+									val fa = if (fixed) addr else address + addr
+									ramRanges += ((ram, index, fa, size))
+									index += 1
 								}
+							}
+						}
+
+						val other = r.second.get.instance.asInstanceOf[ChipInstance]
+						if ((!chipAddresses.exists { case (_, _, o, _) => o == other }) &&
+						    other.isVisibleToSoftware &&
+						    other.hasInterface[RegisterBankLike]) {
+							val registerBank = other.getInterfaceUnwrapped[RegisterBankLike]
+							if (other.instanceNumber >= registerBank.maxInstances)
+								println(s"${other.name}: not enough instances\n")
+							else for {rb <- registerBank.banks
+							          if rb.cpus.isEmpty || rb.cpus.contains(cpu.cpuType)} {
+
+
+								val rbName         = if (rb.name.isEmpty) r.secondFullName else rb.name
+								val rbInstanceName = rbName.replace("${index}", other.instanceNumber.toString)
+								chipAddresses += ((rbInstanceName,
+									rb.registerListName.split('/').last.split('.').head.toUpperCase(),
+									other,
+									if (rb.baseAddress == -1) -1 else address + rb.baseAddress + (rb.addressIncrement * other.instanceNumber)))
 							}
 						}
 					}
@@ -244,23 +260,7 @@ object OutputSoftware {
 		(ramRanges, chipAddresses)
 	}
 
-	def hardwareRegistersOutput(cpus: Seq[CpuInstance], distanceMatrix: DistanceMatrix, connected: Seq[Connected]): Unit = {
-		for (cpu <- cpus) {
-			Utils.ensureDirectories(hwPath(cpu, Game.outPath))
-
-			val (ramRanges, chipAddresses) = extractRegisters(cpu, distanceMatrix, connected)
-
-			var allRegLists = (for ((_, chip, _) <- chipAddresses; bank <- chip.banks) yield bank.registerListName) ++ cpu.banks.map(f => f.registerListName)
-
-			val uniqueRegisterLists = allRegLists.toSet.toSeq
-
-			for (rl <- uniqueRegisterLists) genCpuHeadersFor(cpu, rl)
-
-			genInstanceHeadersFor(cpu, Game.outPath)
-		}
-	}
-
-	private def genCpuHeadersFor(cpu: CpuInstance, registerListName: String): Unit = {
+	private def genHeadersFor(registerListName: String): Unit = {
 		// output register definitions
 		val rl    = Registers.registerListCache(registerListName)
 		val name  = rl.name.split('/').last.replace(".toml", "")
@@ -273,14 +273,14 @@ object OutputSoftware {
 		sb ++= f"// ${rl.name}%n"
 		if (rl.description.nonEmpty) sb ++= f"// ${rl.description}%n"
 
-		sb ++= genRegisterList(s"${uname}_".toUpperCase(), rl)
+		sb ++= genRegisterList(s"${uname}_", rl)
 
-		Utils.writeFile(filePath(hwPath(cpu, Game.outPath), rl.name), sb.result())
+		Utils.writeFile(filePath(hwPath(Game.outPath), rl.name.replace(".toml", "")), sb.result())
 	}
 
-	private def hwPath(cpu: CpuInstance, out: Path) = hwRegsPath(cpu, out).resolve(cpu.cpuType).resolve("registers")
+	private def hwPath(out: Path) = hwRegsPath(out).resolve("registers")
 
-	private def hwRegsPath(cpu: CpuInstance, out: Path) =
+	private def hwRegsPath(out: Path) =
 		out.resolve("libs")
 			.resolve("platform")
 			.resolve("include")
@@ -314,7 +314,7 @@ object OutputSoftware {
 				if (bits.singleBit) sb ++= f"#define $prefix${name}_$fieldName ${bits.mask}%#10xU%n"
 
 				for (elem <- f.enums) {
-					if (elem.description.isDefined) sb ++= f"// ${elem.description.get.toString}%n"
+					if (elem.description.isDefined) sb ++= f"// ${elem.description.get}%n"
 					sb ++= f"#define $prefix${name}_${fieldName}_${elem.name.toUpperCase} ${elem.value.toString}%n"
 				}
 			})
@@ -325,110 +325,10 @@ object OutputSoftware {
 		sb.result()
 	}
 
-	private def genInstanceHeadersFor(cpu: CpuInstance, out: Path): Unit = {
-		val definitionsWritten = mutable.HashMap[String, String]()
-		/*
-				val directBuses = game.getDirectBusesConnectedTo(cpu)
-				val busStack    = mutable.Stack[(BusInstance, BigInt)]()
-				for (bus <- directBuses) busStack.push((bus, bus.busBaseAddr))
-
-				while (busStack.nonEmpty) {
-					val (bus, busAddr) = busStack.pop()
-
-					for (instance <- bus.consumerInstances) {
-						val asplits = bus.getConsumerAddressesAndSizes(instance)
-						for ((address, size) <- asplits) {
-
-							instance match {
-								case bridge: BridgeInstance =>
-									val obuses = game.getDirectBusesConnectedTo(bridge).filter(_ != bus)
-									for (obus <- obuses) busStack.push((obus, address))
-								case _                      =>
-									val rbs = if (instance.registerBanks.isEmpty &&
-																instance.registerLists.nonEmpty) {
-										for (rl <- instance.registerLists) yield
-											RegisterBank(instance.ident.toUpperCase, address, rl.name)
-									} else instance.registerBanks
-									val rls = instance.registerLists ++ {
-										if (instance.definition.registers.isEmpty) Seq()
-										else instance.definition.registers.get.lists
-									}
-
-									for (rb <- rbs) {
-										val name  = rb.registerListName.split('/').last
-										val uname = name.toUpperCase()
-										val rlo   = rls.find(_.name == rb.registerListName)
-										if (rlo.isEmpty) println(s"${cpu.ident} $rb.registerListName} not found")
-										else if (!definitionsWritten.contains(rb.registerListName)) {
-											rls.find(_.name == rb.registerListName) match {
-												case Some(rl) =>
-													if (!definitionsWritten.contains(rb.registerListName)) {
-														val sbrl = new StringBuilder
-														sbrl ++= f"#pragma once%n"
-														sbrl ++= f"// Copyright Deano Calver%n"
-														sbrl ++= f"// SPDX-License-Identifier: MIT%n"
-														sbrl ++= f"// $name%n"
-														if (rl.description.nonEmpty) sbrl ++= f"// ${rl.description}%n"
-														sbrl ++= genRegisterList(s"${uname}_", rl)
-														Utils.writeFile(filePath(hwRegsPath(cpu, out), name),
-																						sbrl.result())
-
-														definitionsWritten += (rb.registerListName -> name)
-													}
-												case None     =>
-													println(f"Cannot find ${rb.registerListName} register list%n")
-											}
-										}
-									}
-							}
-						}
-					}
-				}*/
-	}
-
 	private def filePath(out: Path, name: String): Path = {
 		val fn       = s"${name.replace('.', '_')}.h".toLowerCase()
 		val filename = Path.of(fn).getFileName
 		out.resolve(filename)
-	}
-
-	private def writeRegisterBank(busAddr: BigInt,
-	                              rb: RegisterBank): (String, String) = {
-		val sb    = new mutable.StringBuilder
-		val mmsb  = new mutable.StringBuilder
-		val name  = rb.name.replace('.', '_')
-		val uname = name.toUpperCase()
-
-		/*	val uname = rb.registerListName.split('/').last.toUpperCase().replace('.', '_')
-
-			sb ++= f"// ${name} 0x${busAddr + rb.address}%x ${rb.registerListName}%n"
-	*/
-		// -1 bank address mean non MMIO register so no base address is valid
-		if (rb.baseAddress > -1) {
-			//			mmsb ++= f"#define ${name}_BASE_ADDR 0x${busAddr + rb.address}%x%n"
-			sb ++= f"#define ${name}_REGISTER(reg) ${uname}_##reg##_OFFSET%n"
-		} else {
-			sb ++= f"// These registers aren't MMIO accessible so require platform intrinsics to use%n"
-		}
-		sb ++= f"#define ${name}_FIELD(reg, field) ${uname}_##reg##_##field%n"
-		sb ++= f"#define ${name}_FIELD_MASK(reg, field) ${uname}_##reg##_##field##_MASK%n"
-		sb ++= f"#define ${name}_FIELD_LSHIFT(reg, field) ${uname}_##reg##_##field##_LSHIFT%n"
-		sb ++= f"#define ${name}_FIELD_ENUM(reg, field, enm) ${uname}_##reg##_##field##_##enm%n"
-		(mmsb.result(), sb.result())
-	}
-
-	private def genCpuRegisterBanksMemoryMapFor(cpu: CpuInstance, game: Game): (String, String) = {
-		val mmsb = new mutable.StringBuilder
-		val sb   = new mutable.StringBuilder
-
-		// write banks
-		//		for (bank <- cpu.banks) {
-		//			val (rbmm, rb) = writeRegisterBank(0, bank)
-		//			mmsb ++= rbmm
-		//			sb ++= rb
-		//		}
-
-		(mmsb.result(), sb.result())
 	}
 
 }

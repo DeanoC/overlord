@@ -1,7 +1,7 @@
 [[definition]]
 type = "other.timer.watchdog.zynqps8"
 registers = [
-    { resource = "zynqps8/swdt.toml", base_address = "0xffcb0000" },
+    { resource = "zynqps8/swdt.toml", base_address = "0x1cb0000" },
 ]
 buses = [
     { protocol = "internal_swdt", supplier = false, data_width = 32 },

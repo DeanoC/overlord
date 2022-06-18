@@ -72,19 +72,19 @@ object Software {
 			val cpuLibPath = out.resolve(s"libs_$cpuName")
 			Utils.deleteDirectories(cpuLibPath)
 			Utils.ensureDirectories(cpuLibPath)
-			var libraryDefines = ArrayBuffer[String]()
+			val libraryDefines = ArrayBuffer[String]()
 
 			for (lib <- libraries) {
 				val all_cpus = if (lib.attributes.contains("cpus")) {
 					val cpusString = Utils.toString(lib.attributes("cpus"))
 					if (cpusString == "_") None
-					else Some(cpuRegEx.split(cpusString).toSeq)
+					else Some(cpuRegEx.split(cpusString).toSeq.map(_.toLowerCase()))
 				} else None
 
 				if (all_cpus.isEmpty || all_cpus.get.contains(cpuName)) {
 					val sourcePath = libPath.resolve(lib.name)
 					val targetPath = out.resolve(s"libs_$cpuName").resolve(lib.name)
-					libraryDefines += lib.name
+					libraryDefines += lib.name.replace('.', '_')
 
 					Utils.createSymbolicLink(sourcePath, targetPath)
 				}

@@ -2,7 +2,7 @@ path = "graphics/gpus"
 [[definition]]
 type = "graphic.gpu.mali400.zynqps8"
 registers = [
-    { resource = "mali400/zynqps8/gpu.toml", name = "GPU${index}", base_address = "0xfd4b_0000" },
+    { resource = "mali400/zynqps8/gpu.toml", name = "GPU", base_address = "0x4b_0000" },
 ]
 buses = [
     { name = "siou_gpu", supplier = false, data_width = 64, address_width = 40 },

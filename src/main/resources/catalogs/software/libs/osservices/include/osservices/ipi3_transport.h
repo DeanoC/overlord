@@ -1,6 +1,6 @@
 #pragma once
-#include "hw_regs/ipi.h"
-#include "hw_regs/ipi_buffer.h"
+#include "platform/registers/ipi.h"
+#include "platform/registers/ipi_buffer.h"
 #include "platform/memory_map.h"
 #include "osservices.h"
 #ifdef __cplusplus

@@ -13,34 +13,37 @@ object Compiler {
 
 		println(s"Creating Compiler scripts at $out")
 
-		game.cpus.foreach(genCompilerScript(_, out))
+		if (generateMakeCompilersScript(game, out)) return
+
 		game.cpus.foreach(genCMakeToolChains(_, out))
+	}
+
+	private def generateMakeCompilersScript(game: Game, out: Path): Boolean = {
+		val compilerScriptBuilder = new StringBuilder
+		compilerScriptBuilder ++= (Utils.readFile(Resources.stdResourcePath().resolve("catalogs/software/make_compilers.sh")) match {
+			case Some(script) => script
+			case None         =>
+				println("ERROR: resource make_compilers.sh not found!")
+				return true
+		})
+		game.cpus.filterNot(_.host).foreach({ cpu =>
+			val (triple, gccFlags) = (cpu.triple, cpu.gccFlags)
+
+			compilerScriptBuilder ++=
+			s"""
+				 |build_binutils $triple $$PWD/compilers
+				 |build_gcc $triple $$PWD/compilers "$gccFlags"
+				 |""".stripMargin
+
+		})
+
+		Utils.writeFile(out.resolve("make_compilers.sh"), compilerScriptBuilder.result())
+		Utils.setFileExecutable(out.resolve(s"make_compilers.sh"))
+		false
 	}
 
 	private def sanatizeTriple(triple: String): String = {
 		triple.replace("-", "_")
-	}
-
-	private def genCompilerScript(cpu: CpuInstance, out: Path): Unit = {
-		if (cpu.host) return
-
-		val (triple, gccFlags) = (cpu.triple, cpu.gccFlags)
-
-		val sb = new mutable.StringBuilder
-		sb ++= (Utils.readFile(Resources.stdResourcePath().resolve("catalogs/software/make_compilers.sh")) match {
-			case Some(script) => script
-			case None         =>
-				println("ERROR: resource make_compilers.sh not found!")
-				return
-		})
-		sb ++=
-		s"""
-			 |build_binutils $triple $$PWD/programs_host
-			 |build_gcc $triple $$PWD/programs_host "$gccFlags"
-			 |""".stripMargin
-
-		Utils.writeFile(out.resolve("make_compilers.sh"), sb.result())
-		Utils.setFileExecutable(out.resolve(s"make_compilers.sh"))
 	}
 
 	private def genCMakeToolChains(cpu: CpuInstance, out: Path): Unit = {

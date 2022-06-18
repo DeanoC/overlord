@@ -1,6 +1,7 @@
 package output
 
 import ikuy_utils._
+import overlord.Connections.{ConstantParameterType, FrequencyParameterType}
 import overlord.{DiffPinConstraint, Game, PinConstraint}
 
 import scala.collection.mutable
@@ -47,19 +48,36 @@ object Xdc {
 		}
 
 		for (clk <- game.clocks) {
-			sb ++=
-			s"""set_property -dict {
-				 |    PACKAGE_PIN ${clk.pin}
-				 |    IOSTANDARD ${clk.standard}
-				 |} [get_ports {${sanatizeIdent(clk.name)}}];
-				 |""".stripMargin
 
-			//@formatter:off
-			sb ++=
-			s"""create_clock -add -name ${sanatizeIdent(clk.name)} -period ${clk.period} -waveform ${clk.waveform} [get_ports {${sanatizeIdent(clk.name)}}]
-				 |""".stripMargin
-			//@formatter:on
+			if (clk.pin != "INTERNAL") {
+				sb ++=
+				s"""set_property -dict {
+					 |    PACKAGE_PIN ${clk.pin}
+					 |    IOSTANDARD ${clk.standard}
+					 |} [get_ports {${sanatizeIdent(clk.name)}}];
+					 |""".stripMargin
+			}
 
+			val waveformTxt  = if (clk.waveform.nonEmpty) s"-waveform ${clk.waveform}" else ""
+			val pinOrPortTxt = if (clk.pin != "INTERNAL") s"get_ports {${sanatizeIdent(clk.name)}}" else s"get_pins {${sanatizeIdent(clk.name)}}"
+			val periodTxt    = if (clk.period > 0) s"-period ${clk.period}" else {
+				val freq   = {
+					val const = game.constants.find(c => c.parameter.name == clk.name.split("/").last)
+					if (const.nonEmpty) const.get.parameter.parameterType match {
+						case ConstantParameterType(_)     =>
+							println(s"ERROR ${clk.name} must specify period or frequency using default 100Mhz")
+							"100 Mhz"
+						case FrequencyParameterType(freq) => s"$freq Mhz"
+					} else if (clk.frequency.isEmpty) {
+						println(s"ERROR ${clk.name} must specify period or frequency using default 100Mhz")
+						"100Mhz"
+					} else clk.frequency
+				}
+				val period = 1000.0 / Utils.toFrequency(StringV(freq))
+				f"-period $period%.2f"
+			}
+
+			sb ++= s"""create_clock -add -name ${sanatizeIdent(clk.name)} $periodTxt $waveformTxt [$pinOrPortTxt]\n"""
 		}
 
 		Utils.writeFile(Game.outPath.resolve(s"${game.name}.xdc"), sb.result())

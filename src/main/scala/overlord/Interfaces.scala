@@ -2,8 +2,8 @@ package overlord.Interfaces
 
 import ikuy_utils.Variant
 import overlord.Chip.{Port, RegisterBank}
-import overlord.Connections.{Connected, ConnectionDirection}
-import overlord.Instances.ChipInstance
+import overlord.Connections.{Connected, ConnectionDirection, Constant}
+import overlord.Instances.{ChipInstance, InstanceTrait}
 
 import scala.reflect.ClassTag
 
@@ -44,11 +44,11 @@ trait SupplierBusLike extends BusLike {
 
 	def consumerVariant: Variant
 
-	def getConsumerAddressAndSize(instance: ChipInstance): (BigInt, BigInt)
-
 	def getBusAlignment: BigInt
 
 	def getBaseAddress: BigInt
+
+	def fixedBaseBusAddress: Boolean
 }
 
 
@@ -68,20 +68,18 @@ trait MultiBusLike extends ChipLike {
 }
 
 trait RamLike extends ChipLike {
-	// sequence of start and size in bytes
-	def getRanges: Seq[(BigInt, BigInt)]
+	// sequence of start and size in bytes with cpu filtering
+	def getRanges: Seq[(BigInt, BigInt, Boolean, Seq[String])]
 }
 
-trait UnConnectedLike extends QueryInterface {
-	def firstFullName: String
-
+trait UnconnectedLike extends QueryInterface {
 	def direction: ConnectionDirection
-
-	def secondFullName: String
 
 	def preConnect(unexpanded: Seq[ChipInstance]): Unit
 
 	def finaliseBuses(unexpanded: Seq[ChipInstance]): Unit
+
+	def collectConstants(unexpanded: Seq[InstanceTrait]): Seq[Constant]
 
 	def connect(unexpanded: Seq[ChipInstance]): Seq[Connected]
 }
@@ -97,6 +95,4 @@ trait RegisterBankLike extends QueryInterface {
 	def maxInstances: Int
 
 	def banks: Seq[RegisterBank]
-
-	def generateInstancedRegisterBank(): Unit
 }

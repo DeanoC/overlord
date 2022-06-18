@@ -10,6 +10,7 @@ import java.nio.file.Path
 case class GatewareDefinition(defType: DefinitionType,
                               sourcePath: Path,
                               attributes: Map[String, Variant],
+                              dependencies: Seq[String],
                               ports: Map[String, Port],
                               maxInstances: Int = 1,
                               registersV: Seq[Variant],
@@ -25,41 +26,52 @@ object GatewareDefinition {
 		val defTypeName = Utils.toString(table("type"))
 
 		val attribs = table.filter(a => a._1 match {
-			case "type" | "gateware" | "ports" | "registers" => false
-			case _                                           => true
+			case "type" | "gateware" | "ports" | "registers" | "parameters" | "drivers" => false
+			case _                                                                      => true
 		})
 
-		val name = defTypeName.split('.')
-
-		val registers: Seq[Variant] = Utils.lookupArray(table, "registers").toSeq
-
-		val ports = {
-			if (table.contains("ports"))
-				Ports(Utils.toArray(table("ports"))).map(t => t.name -> t).toMap
-			else Map[String, Port]()
+		val dependencies: Seq[String]  = if (table.contains("drivers")) {
+			val depends = Utils.toArray(table("drivers"))
+			depends.map(Utils.toString).toSeq
+		} else {
+			Seq()
 		}
+		val registers   : Seq[Variant] = Utils.lookupArray(table, "registers").toSeq
+
+		val ports                            =
+			if (table.contains("ports")) Ports(Utils.toArray(table("ports"))).map(t => t.name -> t).toMap
+			else Map[String, Port]()
+		val parameters: Map[String, Variant] =
+			if (table.contains("parameters")) Utils.toTable(table("parameters"))
+			else Map[String, Variant]()
 
 		val defType = DefinitionType(defTypeName)
 
 		Some(GatewareDefinition(defType,
 		                        attribs,
+		                        dependencies,
 		                        ports,
 		                        registers,
+		                        parameters,
 		                        Utils.toString(table("gateware"))).get)
 
 	}
 
 	def apply(defType: DefinitionType,
 	          attributes: Map[String, Variant],
+	          dependencies: Seq[String],
 	          ports: Map[String, Port],
 	          registers: Seq[Variant],
+	          parameters: Map[String, Variant],
 	          fileName: String): Option[GatewareDefinition] = {
 		val fileNameAlone = Path.of(fileName).getFileName
-		Game.pushCatalogPath(Path.of(fileName).getParent)
+		Game.pushCatalogPath(Path.of(fileName))
 		val result = parse(defType,
 		                   attributes,
+		                   dependencies,
 		                   ports,
 		                   registers,
+		                   parameters,
 		                   fileName,
 		                   Utils.readToml(Game.catalogPath.resolve(fileNameAlone)))
 		Game.popCatalogPath()
@@ -68,8 +80,10 @@ object GatewareDefinition {
 
 	private def parse(defType: DefinitionType,
 	                  attributes: Map[String, Variant],
+	                  dependencies: Seq[String],
 	                  iports: Map[String, Port],
 	                  registers: Seq[Variant],
+	                  parameters: Map[String, Variant],
 	                  fileName: String,
 	                  parsed: Map[String, Variant]): Option[GatewareDefinition] = {
 
@@ -84,18 +98,18 @@ object GatewareDefinition {
 			iports ++ Ports(Utils.toArray(parsed("ports"))).map(t => t.name -> t).toMap
 		else iports
 
-		val parameters = if (parsed.contains("parameters"))
-			Utils.toTable(parsed("parameters"))
-		else Map[String, Variant]()
-
+		val combinedParameters = if (parsed.contains("parameters"))
+			Utils.toTable(parsed("parameters")) ++ parameters
+		else parameters
 
 		Some(GatewareDefinition(defType,
 		                        Game.catalogPath,
 		                        attributes,
+		                        dependencies,
 		                        ports,
 		                        1,
 		                        registers,
-		                        parameters,
+		                        combinedParameters,
 		                        actionsFile.get))
 	}
 

@@ -21,7 +21,6 @@ processor = 'sbt'
 main_scala = "apb_ctrl.scala"
 with_build_sbt = true
 args = '+runMain UartApbCtrl config.toml .. ${name}'
-path_op = 'push'
 
 [[process]]
 name = 'src'

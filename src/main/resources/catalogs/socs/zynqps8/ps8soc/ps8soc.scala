@@ -1,10 +1,13 @@
-
+import spinal.core._
+import spinal.lib.bus.amba4.axi.Axi4Config
+import spinal.lib.bus.amba4.axis.Axi4StreamConfig
+import scala.language.postfixOps
 
 case class PS8() extends BlackBox {
 
 	val io = new Bundle {
 		val MAXIGP = for (i <- 0 until 3) yield new Bundle {
-			val ACLK = out Bool()
+			val ACLK = in Bool()
 
 			val AWID    = out UInt (PS8.PsToPLConfig.idWidth bits)
 			val AWADDR  = out UInt (PS8.PsToPLConfig.addressWidth bits)
@@ -51,7 +54,6 @@ case class PS8() extends BlackBox {
 			val RREADY = out Bool()
 		}
 		val SAXIGP = for (i <- 0 until 7) yield new Bundle {
-
 			val RCLK = in Bool()
 			val WCLK = in Bool()
 
@@ -64,6 +66,7 @@ case class PS8() extends BlackBox {
 			val AWCACHE = in Bits (4 bits)
 			val AWPROT  = in Bits (3 bits)
 			val AWVALID = in Bool()
+			val AWUSER  = in Bits (PS8.PlToPsConfig.awUserWidth bits)
 			val AWREADY = out Bool()
 			val AWQOS   = in Bits (4 bits)
 
@@ -87,6 +90,7 @@ case class PS8() extends BlackBox {
 			val ARCACHE = in Bits (4 bits)
 			val ARPROT  = in Bits (3 bits)
 			val ARVALID = in Bool()
+			val ARUSER  = in Bits (PS8.PlToPsConfig.arUserWidth bits)
 			val ARREADY = out Bool()
 			val ARQOS   = in Bits (4 bits)
 
@@ -103,7 +107,7 @@ case class PS8() extends BlackBox {
 			val AWCOUNT = out UInt (4 bits)
 		}
 
-		val SAXIACP = for (i <- 0 until 1) yield new Bundle {
+		val SAXIACP = new Bundle {
 			val ACLK = in Bool()
 
 			val AWID    = in UInt (PS8.PlToPsAcpConfig.idWidth bits)
@@ -115,7 +119,7 @@ case class PS8() extends BlackBox {
 			val AWCACHE = in Bits (4 bits)
 			val AWPROT  = in Bits (3 bits)
 			val AWVALID = in Bool()
-			val AWUSER  = out Bits (PS8.PlToPsAcpConfig.awUserWidth bits)
+			val AWUSER  = in Bits (PS8.PlToPsAcpConfig.awUserWidth bits)
 			val AWREADY = out Bool()
 			val AWQOS   = in Bits (4 bits)
 
@@ -139,7 +143,7 @@ case class PS8() extends BlackBox {
 			val ARCACHE = in Bits (4 bits)
 			val ARPROT  = in Bits (3 bits)
 			val ARVALID = in Bool()
-			val ARUSER  = out Bits (PS8.PlToPsAcpConfig.arUserWidth bits)
+			val ARUSER  = in Bits (PS8.PlToPsAcpConfig.arUserWidth bits)
 			val ARREADY = out Bool()
 			val ARQOS   = in Bits (4 bits)
 
@@ -150,38 +154,114 @@ case class PS8() extends BlackBox {
 			val RVALID = out Bool()
 			val RREADY = in Bool()
 		}
+		val SAXIACE = new Bundle {
+			val ACLK = in Bool()
+
+			val AWID     = in UInt (PS8.PlToPsAceConfig.idWidth bits)
+			val AWADDR   = in UInt (PS8.PlToPsAceConfig.addressWidth bits)
+			val AWLEN    = in UInt (8 bits)
+			val AWSIZE   = in UInt (3 bits)
+			val AWBURST  = in Bits (2 bits)
+			val AWLOCK   = in Bits (1 bits)
+			val AWCACHE  = in Bits (4 bits)
+			val AWPROT   = in Bits (3 bits)
+			val AWREGION = in Bits (4 bits)
+			val AWVALID  = in Bool()
+			val AWREADY  = out Bool()
+			val AWQOS    = in Bits (4 bits)
+			val AWDOMAIN = in Bits (2 bits)
+			val AWSNOOP  = in Bits (3 bits)
+			val AWBAR    = in Bits (2 bits)
+
+			val WDATA  = in Bits (128 bits)
+			val WSTRB  = in Bits (16 bits)
+			val WLAST  = in Bool()
+			val WVALID = in Bool()
+			val WREADY = out Bool()
+			val WUSER  = in Bits (PS8.PlToPsAceConfig.wUserWidth bits)
+
+			val BID    = out UInt (PS8.PlToPsAceConfig.idWidth bits)
+			val BRESP  = out Bits (2 bits)
+			val BVALID = out Bool()
+			val BREADY = in Bool()
+			val BUSER  = in Bits (PS8.PlToPsAceConfig.bUserWidth bits)
+
+			val ARID     = in UInt (PS8.PlToPsAceConfig.idWidth bits)
+			val ARADDR   = in UInt (PS8.PlToPsAceConfig.addressWidth bits)
+			val ARLEN    = in UInt (8 bits)
+			val ARSIZE   = in UInt (3 bits)
+			val ARBURST  = in Bits (2 bits)
+			val ARLOCK   = in Bits (1 bits)
+			val ARCACHE  = in Bits (4 bits)
+			val ARPROT   = in Bits (3 bits)
+			val ARVALID  = in Bool()
+			val ARREADY  = out Bool()
+			val ARQOS    = in Bits (4 bits)
+			val ARREGION = in Bits (4 bits)
+			val ARDOMAIN = in Bits (2 bits)
+			val ARSNOOP  = in Bits (4 bits)
+			val ARBAR    = in Bits (2 bits)
+
+			val RID    = out UInt (PS8.PlToPsAceConfig.idWidth bits)
+			val RDATA  = out Bits (128 bits)
+			val RRESP  = out Bits (4 bits)
+			val RLAST  = out Bool()
+			val RVALID = out Bool()
+			val RREADY = in Bool()
+			val RUSER  = out Bits (PS8.PlToPsAceConfig.rUserWidth bits)
+
+			val ACVALID = out Bool()
+			val ACREADY = in Bool()
+			val ACADDR  = out Bits (44 bits)
+			val ACSNOOP = out Bits (4 bits)
+			val ACPROT  = out Bits (3 bits)
+			val CRVALID = in Bool()
+			val CRREADY = out Bool()
+			val CRRESP  = in Bits (5 bits)
+			val CDVALID = in Bool()
+			val CDREADY = out Bool()
+			val CDDATA  = in Bits (128 bits)
+			val CDLAST  = in Bool()
+			val WACK    = in Bool()
+			val RACK    = out Bool()
+
+		}
 
 		val DP = new Bundle {
-			val VIDEOREFCLK = out Bool()
-			val AUDIOREFCLK = out Bool()
 
-			val VIDEOINCLK    = in Bool()
-			val SAXISAUDIOCLK = in Bool()
-
-			// axi streams for ps <> pl audio
-			val SAXISAUDIOTDATA  = in Bits (32 bits)
-			val SAXISAUDIOTID    = in Bool()
-			val SAXISAUDIOTVALID = in Bool()
-			val SAXISAUDIOTREADY = out Bool()
-
+			// axi stream for ps to pl audio
+			val AUDIOREFCLK           = out Bool()
 			val MAXISMIXEDAUDIOTDATA  = out Bits (32 bits)
-			val MAXISMIXEDAUDIOTID    = out Bool()
+			val MAXISMIXEDAUDIOTID    = out UInt (1 bit)
 			val MAXISMIXEDAUDIOTVALID = out Bool()
 			val MAXISMIXEDAUDIOTREADY = in Bool()
 
-			// PL generated video into the PS
-			val LIVEVIDEOINVSYNC  = in Bool()
-			val LIVEVIDEOINHSYNC  = in Bool()
-			val LIVEVIDEOINDE     = in Bool()
+			// axi stream for pl to ps audio
+			val SAXISAUDIOCLK    = in Bool()
+			val SAXISAUDIOTDATA  = in Bits (32 bits)
+			val SAXISAUDIOTID    = in UInt (1 bit)
+			val SAXISAUDIOTVALID = in Bool()
+			val SAXISAUDIOTREADY = out Bool()
+
+			// PL generated video
+			val VIDEOINCLK        = in Bool()
 			val LIVEVIDEOINPIXEL1 = in Bits (36 bits)
-			val LIVEVIDEODEOUT    = out Bool()
 			val LIVEGFXALPHAIN    = in Bits (8 bits)
 			val LIVEGFXPIXEL1IN   = in Bits (36 bits)
 
-			// display port video from PS
+			// PS generated video timing
 			val VIDEOOUTHSYNC  = out Bool()
 			val VIDEOOUTVSYNC  = out Bool()
-			val VIDEOOUTPIXEL1 = out Bool()
+			val LIVEVIDEODEOUT = out Bool()
+
+			// PL generated video timing
+			val LIVEVIDEOINHSYNC = in Bool()
+			val LIVEVIDEOINVSYNC = in Bool()
+			val LIVEVIDEOINDE    = in Bool()
+
+			// display port video from PS
+			val VIDEOREFCLK    = out Bool()
+			val VIDEOOUTPIXEL1 = out Bits (36 bits)
 
 			// Display port aux data in and out
 			val AUXDATAIN  = in Bool()
@@ -194,6 +274,249 @@ case class PS8() extends BlackBox {
 			val EXTERNALCUSTOMEVENT2 = in Bool()
 			val EXTERNALVSYNCEVENT   = in Bool()
 		}
+
+		val I2C = for (i <- 0 until 2) yield new Bundle {
+			val SCLI  = in Bool()
+			val SCLO  = out Bool()
+			val SCLTN = out Bool()
+			val SDAI  = in Bool()
+			val SDAO  = out Bool()
+			val SDATN = out Bool()
+		}
+
+		val UART = for (i <- 0 until 2) yield new Bundle {
+			val TX   = out Bool()
+			val RX   = in Bool()
+			val CTSN = in Bool()
+			val RTSN = out Bool()
+			val DSRN = in Bool()
+			val DCDN = in Bool()
+			val RIN  = in Bool()
+			val DTRN = out Bool()
+		}
+
+		val TTC = for (i <- 0 until 4) yield new Bundle {
+			val CLKI  = in Bits (3 bits)
+			val WAVEO = out Bits (3 bits)
+		}
+		val WDT = for (i <- 0 until 2) yield new Bundle {
+			val CLKI = in Bool()
+			val RSTO = out Bool()
+		}
+		val SPI = for (i <- 0 until 2) yield new Bundle {
+			val SCLKI  = in Bool()
+			val SCLKO  = out Bool()
+			val SCLKTN = out Bool()
+			val MI     = in Bool()
+			val MO     = out Bool()
+			val MOTN   = out Bool()
+			val SI     = in Bool()
+			val SO     = out Bool()
+			val STN    = out Bool()
+			val SSIN   = in Bool()
+			val SSON   = out Bits (3 bits)
+			val SSNTN  = out Bool()
+
+		}
+
+		val SDIO = for (i <- 0 until 2) yield new Bundle {
+			val CLKOUT     = out Bool()
+			val FBCLKIN    = in Bool()
+			val CMDOUT     = out Bool()
+			val CMDIN      = in Bool()
+			val CMDENA     = out Bool()
+			val DATAIN     = in Bits (8 bits)
+			val DATAOUT    = out Bits (8 bits)
+			val DATAENA    = out Bits (8 bits)
+			val CDN        = in Bool()
+			val WP         = in Bool()
+			val LEDCONTROL = out Bool()
+			val BUSPOWER   = out Bool()
+			val BUSVOLT    = out Bits (3 bits)
+		}
+
+		val CAN = for (i <- 0 until 2) yield new Bundle {
+			val PHYTX = out Bool()
+			val PHYRX = in Bool()
+		}
+
+		val GPIO = new Bundle {
+			val I  = in Bits (96 bits)
+			val O  = out Bits (96 bits)
+			val TN = out Bits (96 bits)
+		}
+
+		val PLCLK = out Bits (4 bits)
+
+		val TRACE = new Bundle {
+			val CLK  = out Bool()
+			val CTL  = out Bool()
+			val DATA = out Bits (32 bits)
+		}
+
+		val USB = for (i <- 0 until 2) yield new Bundle {
+			val HUBPORTOVERCRNTUSB3  = in Bool()
+			val HUBPORTOVERCRNTUSB2  = in Bool()
+			val U2DSPORTVBUSCTRLUSB3 = out Bool()
+			val U3DSPORTVBUSCTRLUSB3 = out Bool()
+		}
+
+		// shared by all ENET instances
+		val ENET_GEM_TSU = new Bundle {
+			val CLKFROMPL   = in Bool()
+			val CLKTOPLBUFG = out Bool()
+			val CLK         = in Bool()
+			val TIMERCNT    = out Bits (94 bits)
+		}
+
+		val ENET = for (i <- 0 until 4) yield new Bundle {
+			val GMII = new Bundle {
+				val RXCLK     = in Bool()
+				val SPEEDMODE = out Bits (3 bits)
+				val CRS       = in Bool()
+				val COL       = in Bool()
+				val RXD       = in Bits (8 bits)
+				val RXER      = in Bool()
+				val RXDV      = in Bool()
+				val TXCLK     = in Bool()
+				val TXD       = out Bits (8 bits)
+				val TXEN      = out Bool()
+				val TXER      = out Bool()
+			}
+			val MDIO = new Bundle {
+				val MDC = out Bool()
+				val I   = in Bool()
+				val O   = out Bool()
+				val TN  = out Bool()
+			}
+			val FIFO = new Bundle {
+				val TXRDATARDY     = in Bool()
+				val TXRRD          = out Bool()
+				val TXRVALID       = in Bool()
+				val TXRDATA        = in Bits (8 bits)
+				val TXRSOP         = in Bool()
+				val TXREOP         = in Bool()
+				val TXRERR         = in Bool()
+				val TXRUNDERFLOW   = in Bool()
+				val TXRFLUSHED     = in Bool()
+				val TXRCONTROL     = in Bool()
+				val DMATXENDTOG    = out Bool()
+				val DMATXSTATUSTOG = in Bool()
+				val TXRSTATUS      = out Bits (4 bits)
+
+				val RXWWR       = out Bool()
+				val RXWDATA     = out Bits (8 bits)
+				val RXWSOP      = out Bool()
+				val RXWEOP      = out Bool()
+				val RXWSTATUS   = out Bits (45 bits)
+				val RXWERR      = out Bool()
+				val RXWOVERFLOW = out Bool()
+				val RXWFLUSH    = out Bool()
+				val TXRFIXEDLAT = out Bool()
+
+				val SIGNALDETECT = in Bool()
+			}
+			val GEM  = new Bundle {
+				val FMIO    = new Bundle {
+					val TXCLKFROMPL   = in Bool()
+					val RXCLKFROMPL   = in Bool()
+					val TXCLKTOPLBUFG = out Bool()
+					val RXCLKTOPLBUFG = out Bool()
+				}
+				val GEM1588 = new Bundle {
+
+					val TXSOF        = out Bool()
+					val SYNCFRAMETX  = out Bool()
+					val DELAYREQTX   = out Bool()
+					val PDELAYREQTX  = out Bool()
+					val PDELAYRESPTX = out Bool()
+
+					val RXSOF        = out Bool()
+					val SYNCFRAMERX  = out Bool()
+					val DELAYREQRX   = out Bool()
+					val PDELAYREQRX  = out Bool()
+					val PDELAYRESPRX = out Bool()
+
+					val TSUINCCTRL     = in Bits (2 bits)
+					val TSUTIMERCMPVAL = out Bool()
+				}
+
+				val MISC = new Bundle {
+					val EXTINTIN    = in Bool()
+					val DMABUSWIDTH = out Bits (2 bits)
+				}
+			}
+		}
+
+		val MISC = new Bundle {
+			val DDRCEXTREFRESHRANK0REQ = in Bool()
+			val DDRCEXTREFRESHRANK1REQ = in Bool()
+			val DDRCREFRESHPLCLK       = in Bool()
+			val PLACPINACT             = in Bool()
+		}
+
+		val PSS_ALTO_CORE_PAD = new Bundle {
+			val MGTTXN0OUT = out Bool()
+			val MGTTXN1OUT = out Bool()
+			val MGTTXN2OUT = out Bool()
+			val MGTTXN3OUT = out Bool()
+			val MGTTXP0OUT = out Bool()
+			val MGTTXP1OUT = out Bool()
+			val MGTTXP2OUT = out Bool()
+			val MGTTXP3OUT = out Bool()
+			val MGTRXN0IN  = in Bool()
+			val MGTRXN1IN  = in Bool()
+			val MGTRXN2IN  = in Bool()
+			val MGTRXN3IN  = in Bool()
+			val MGTRXP0IN  = in Bool()
+			val MGTRXP1IN  = in Bool()
+			val MGTRXP2IN  = in Bool()
+			val MGTRXP3IN  = in Bool()
+
+			val PADO        = out Bool()
+			val BOOTMODE    = out Bits (4 bits)
+			val CLK         = out Bool()
+			val DONEB       = out Bool()
+			val DRAMA       = out Bits (18 bits)
+			val DRAMACTN    = out Bool()
+			val DRAMALERTN  = out Bool()
+			val DRAMBA      = out Bits (2 bits)
+			val DRAMBG      = out Bits (2 bits)
+			val DRAMCK      = out Bits (2 bits)
+			val DRAMCKE     = out Bits (2 bits)
+			val DRAMCKN     = out Bits (2 bits)
+			val DRAMCSN     = out Bits (2 bits)
+			val DRAMDM      = out Bits (9 bits)
+			val DRAMDQ      = out Bits (72 bits)
+			val DRAMDQS     = out Bits (9 bits)
+			val DRAMDQSN    = out Bits (9 bits)
+			val DRAMODT     = out Bits (2 bits)
+			val DRAMPARITY  = out Bool()
+			val DRAMRAMRSTN = out Bool()
+			val ERROROUT    = out Bool()
+			val ERRORSTATUS = out Bool()
+			val INITB       = out Bool()
+			val JTAGTCK     = out Bool()
+			val JTAGTDI     = out Bool()
+			val JTAGTDO     = out Bool()
+			val JTAGTMS     = out Bool()
+			val MIO         = out Bool()
+			val PORB        = out Bool()
+			val PROGB       = out Bool()
+			val RCALIBINOUT = out Bool()
+			val SRSTB       = out Bool()
+			val ZQ          = out Bool()
+			val PADI        = in Bool()
+			val REFN0IN     = in Bool()
+			val REFN1IN     = in Bool()
+			val REFN2IN     = in Bool()
+			val REFN3IN     = in Bool()
+			val REFP0IN     = in Bool()
+			val REFP1IN     = in Bool()
+			val REFP2IN     = in Bool()
+			val REFP3IN     = in Bool()
+		}
+
 	}
 	noIoPrefix()
 
@@ -206,7 +529,8 @@ case class PS8() extends BlackBox {
 				bt.setName(bt.getName().replace(replaceSrc, replaceDst))
 			}
 			bt.setName(bt.getName().replace("DP_", "DP"))
-			bt.setName(bt.getName().replace("SAXIACP0", "SAXIACP"))
+			bt.setName(bt.getName().replace("SAXIACP_", "SAXIACP"))
+			bt.setName(bt.getName().replace("SAXIACE_", "SACEFPD"))
 			bt.setName(bt.getName().replace("SAXIGP0ARCOUNT", "SAXIGP0RACOUNT"))
 			bt.setName(bt.getName().replace("SAXIGP1ARCOUNT", "SAXIGP1RACOUNT"))
 			bt.setName(bt.getName().replace("SAXIGP2ARCOUNT", "SAXIGP2RACOUNT"))
@@ -221,6 +545,67 @@ case class PS8() extends BlackBox {
 			bt.setName(bt.getName().replace("SAXIGP4AWCOUNT", "SAXIGP4WACOUNT"))
 			bt.setName(bt.getName().replace("SAXIGP5AWCOUNT", "SAXIGP5WACOUNT"))
 			bt.setName(bt.getName().replace("SAXIGP6AWCOUNT", "SAXIGP6WACOUNT"))
+			bt.setName(bt.getName().replace("SACEFPDACLK", "PLACECLK"))
+
+			bt.setName {
+				if (bt.getName().contains("USB")) {
+					bt.getName()
+						.replace("USB0", "EMIO")
+						.replace("USB1", "EMIO")
+						.appended(bt.getName()(3))
+				} else bt.getName()
+			}
+			bt.setName(bt.getName().replace("GPIO_", "EMIOGPIO"))
+			bt.setName(bt.getName().replace("I2C", "EMIOI2C"))
+			bt.setName(bt.getName().replace("UART", "EMIOUART"))
+			bt.setName(bt.getName().replace("TTC", "EMIOTTC"))
+			bt.setName(bt.getName().replace("WDT", "EMIOWDT"))
+			bt.setName(bt.getName().replace("SPI", "EMIOSPI"))
+			bt.setName(bt.getName().replace("SDIO", "EMIOSDIO"))
+			bt.setName(bt.getName().replace("CAN", "EMIOCAN"))
+			bt.setName(bt.getName().replace("TRACE_CLK", "PLPSTRACECLK"))
+			bt.setName(bt.getName().replace("TRACE_CTL", "PSPLTRACECTL"))
+			bt.setName(bt.getName().replace("TRACE_DATA", "PSPLTRACEDATA"))
+			bt.setName(bt.getName().replace("MISC_", ""))
+
+
+			bt.setName(bt.getName().replace("GMII_", "GMII"))
+			bt.setName(bt.getName().replace("MDIO_", "MDIO"))
+			bt.setName(bt.getName().replace("FIFO_", ""))
+			bt.setName(bt.getName().replace("GEM_GEM1588_", "GEM_"))
+			bt.setName(bt.getName().replace("_GEM_TSU_", "TSU"))
+			bt.setName(bt.getName().replace("GEM_MISC_", ""))
+			bt.setName(bt.getName().replace("ENET0GEM_", "EMIOGEM0"))
+			bt.setName(bt.getName().replace("ENET1GEM_", "EMIOGEM1"))
+			bt.setName(bt.getName().replace("ENET2GEM_", "EMIOGEM2"))
+			bt.setName(bt.getName().replace("ENET3GEM_", "EMIOGEM3"))
+			bt.setName(bt.getName().replace("EMIOGEM0FMIO_", "FMIOGEM0FIFO"))
+			bt.setName(bt.getName().replace("EMIOGEM1FMIO_", "FMIOGEM1FIFO"))
+			bt.setName(bt.getName().replace("EMIOGEM2FMIO_", "FMIOGEM2FIFO"))
+			bt.setName(bt.getName().replace("EMIOGEM3FMIO_", "FMIOGEM3FIFO"))
+			bt.setName(bt.getName().replace("ENET", "EMIOENET"))
+			bt.setName(bt.getName().replace("GMIISPEEDMODE", "SPEEDMODE"))
+
+			bt.setName(bt.getName().replace("EMIOENETTSUTIMERCNT", "EMIOENET0GEMTSUTIMERCNT"))
+			bt.setName(bt.getName().replace("EMIOENETTSUCLKFROM", "FMIOGEMTSUCLKFROM"))
+			bt.setName(bt.getName().replace("EMIOENETTSUCLKTO", "FMIOGEMTSUCLKTO"))
+			bt.setName(bt.getName().replace("EMIOENET0TXRFIXEDLAT", "EMIOGEM0TXRFIXEDLAT"))
+			bt.setName(bt.getName().replace("EMIOENET1TXRFIXEDLAT", "EMIOGEM1TXRFIXEDLAT"))
+			bt.setName(bt.getName().replace("EMIOENET2TXRFIXEDLAT", "EMIOGEM2TXRFIXEDLAT"))
+			bt.setName(bt.getName().replace("EMIOENET3TXRFIXEDLAT", "EMIOGEM3TXRFIXEDLAT"))
+			bt.setName(bt.getName().replace("EMIOENET0SIGNALDETECT", "FMIOGEM0SIGNALDETECT"))
+			bt.setName(bt.getName().replace("EMIOENET1SIGNALDETECT", "FMIOGEM1SIGNALDETECT"))
+			bt.setName(bt.getName().replace("EMIOENET2SIGNALDETECT", "FMIOGEM2SIGNALDETECT"))
+			bt.setName(bt.getName().replace("EMIOENET3SIGNALDETECT", "FMIOGEM3SIGNALDETECT"))
+			bt.setName(bt.getName().replace("EMIOGEM0DMABUSWIDTH", "EMIOENET0DMABUSWIDTH"))
+			bt.setName(bt.getName().replace("EMIOGEM1DMABUSWIDTH", "EMIOENET1DMABUSWIDTH"))
+			bt.setName(bt.getName().replace("EMIOGEM2DMABUSWIDTH", "EMIOENET2DMABUSWIDTH"))
+			bt.setName(bt.getName().replace("EMIOGEM3DMABUSWIDTH", "EMIOENET3DMABUSWIDTH"))
+			bt.setName(bt.getName().replace("EMIOGEM0EXTINTIN", "EMIOENET0EXTINTIN"))
+			bt.setName(bt.getName().replace("EMIOGEM1EXTINTIN", "EMIOENET1EXTINTIN"))
+			bt.setName(bt.getName().replace("EMIOGEM2EXTINTIN", "EMIOENET2EXTINTIN"))
+			bt.setName(bt.getName().replace("EMIOGEM3EXTINTIN", "EMIOENET3EXTINTIN"))
+
 
 		})
 	}
@@ -244,6 +629,8 @@ object PS8 {
 		addressWidth = 48,
 		dataWidth = 128,
 		idWidth = 6,
+		arUserWidth = 1,
+		awUserWidth = 1,
 		useRegion = false,
 		)
 
@@ -255,457 +642,51 @@ object PS8 {
 		awUserWidth = 2,
 		useRegion = false,
 		)
+	val PlToPsAceConfig = Axi4Config(
+		addressWidth = 44,
+		dataWidth = 128,
+		idWidth = 6,
+		rUserWidth = 1,
+		wUserWidth = 1,
+		bUserWidth = 1,
+		useRegion = true,
+		)
+
+	val AudioStreamConfig = Axi4StreamConfig(
+		dataWidth = 4,
+		idWidth = 1,
+		useId = true
+		)
 }
 
 
 /*
-val PLACECLK = in Bool
-val SACEFPDAWVALID = in Bool
-val SACEFPDAWREADY = in Bool
-val SACEFPDAWID = in Bool
-val SACEFPDAWADDR = in Bool
-val SACEFPDAWREGION = in Bool
-val SACEFPDAWLEN = in Bool
-val SACEFPDAWSIZE = in Bool
-val SACEFPDAWBURST = in Bool
-val SACEFPDAWLOCK = in Bool
-val SACEFPDAWCACHE = in Bool
-val SACEFPDAWPROT = in Bool
-val SACEFPDAWDOMAIN = in Bool
-val SACEFPDAWSNOOP = in Bool
-val SACEFPDAWBAR = in Bool
-val SACEFPDAWQOS = in Bool
-val SACEFPDAWUSER = in Bool
-val SACEFPDWVALID = in Bool
-val SACEFPDWREADY = in Bool
-val SACEFPDWDATA = in Bool
-val SACEFPDWSTRB = in Bool
-val SACEFPDWLAST = in Bool
-val SACEFPDWUSER = in Bool
-val SACEFPDBVALID = in Bool
-val SACEFPDBREADY = in Bool
-val SACEFPDBID = in Bool
-val SACEFPDBRESP = in Bool
-val SACEFPDBUSER = in Bool
-val SACEFPDARVALID = in Bool
-val SACEFPDARREADY = in Bool
-val SACEFPDARID = in Bool
-val SACEFPDARADDR = in Bool
-val SACEFPDARREGION = in Bool
-val SACEFPDARLEN = in Bool
-val SACEFPDARSIZE = in Bool
-val SACEFPDARBURST = in Bool
-val SACEFPDARLOCK = in Bool
-val SACEFPDARCACHE = in Bool
-val SACEFPDARPROT = in Bool
-val SACEFPDARDOMAIN = in Bool
-val SACEFPDARSNOOP = in Bool
-val SACEFPDARBAR = in Bool
-val SACEFPDARQOS = in Bool
-val SACEFPDARUSER = in Bool
-val SACEFPDRVALID = in Bool
-val SACEFPDRREADY = in Bool
-val SACEFPDRID = in Bool
-val SACEFPDRDATA = in Bool
-val SACEFPDRRESP = in Bool
-val SACEFPDRLAST = in Bool
-val SACEFPDRUSER = in Bool
-val SACEFPDACVALID = in Bool
-val SACEFPDACREADY = in Bool
-val SACEFPDACADDR = in Bool
-val SACEFPDACSNOOP = in Bool
-val SACEFPDACPROT = in Bool
-val SACEFPDCRVALID = in Bool
-val SACEFPDCRREADY = in Bool
-val SACEFPDCRRESP = in Bool
-val SACEFPDCDVALID = in Bool
-val SACEFPDCDREADY = in Bool
-val SACEFPDCDDATA = in Bool
-val SACEFPDCDLAST = in Bool
-val SACEFPDWACK = in Bool
-val SACEFPDRACK = in Bool
-val EMIOCAN0PHYTX = in Bool
-val EMIOCAN0PHYRX = in Bool
-val EMIOCAN1PHYTX = in Bool
-val EMIOCAN1PHYRX = in Bool
-val EMIOENET0GMIIRXCLK = in Bool
-val EMIOENET0SPEEDMODE = in Bool
-val EMIOENET0GMIICRS = in Bool
-val EMIOENET0GMIICOL = in Bool
-val EMIOENET0GMIIRXD = in Bool
-val EMIOENET0GMIIRXER = in Bool
-val EMIOENET0GMIIRXDV = in Bool
-val EMIOENET0GMIITXCLK = in Bool
-val EMIOENET0GMIITXD = in Bool
-val EMIOENET0GMIITXEN = in Bool
-val EMIOENET0GMIITXER = in Bool
-val EMIOENET0MDIOMDC = in Bool
-val EMIOENET0MDIOI = in Bool
-val EMIOENET0MDIOO = in Bool
-val EMIOENET0MDIOTN = in Bool
-val EMIOENET1GMIIRXCLK = in Bool
-val EMIOENET1SPEEDMODE = in Bool
-val EMIOENET1GMIICRS = in Bool
-val EMIOENET1GMIICOL = in Bool
-val EMIOENET1GMIIRXD = in Bool
-val EMIOENET1GMIIRXER = in Bool
-val EMIOENET1GMIIRXDV = in Bool
-val EMIOENET1GMIITXCLK = in Bool
-val EMIOENET1GMIITXD = in Bool
-val EMIOENET1GMIITXEN = in Bool
-val EMIOENET1GMIITXER = in Bool
-val EMIOENET1MDIOMDC = in Bool
-val EMIOENET1MDIOI = in Bool
-val EMIOENET1MDIOO = in Bool
-val EMIOENET1MDIOTN = in Bool
-val EMIOENET2GMIIRXCLK = in Bool
-val EMIOENET2SPEEDMODE = in Bool
-val EMIOENET2GMIICRS = in Bool
-val EMIOENET2GMIICOL = in Bool
-val EMIOENET2GMIIRXD = in Bool
-val EMIOENET2GMIIRXER = in Bool
-val EMIOENET2GMIIRXDV = in Bool
-val EMIOENET2GMIITXCLK = in Bool
-val EMIOENET2GMIITXD = in Bool
-val EMIOENET2GMIITXEN = in Bool
-val EMIOENET2GMIITXER = in Bool
-val EMIOENET2MDIOMDC = in Bool
-val EMIOENET2MDIOI = in Bool
-val EMIOENET2MDIOO = in Bool
-val EMIOENET2MDIOTN = in Bool
-val EMIOENET3GMIIRXCLK = in Bool
-val EMIOENET3SPEEDMODE = in Bool
-val EMIOENET3GMIICRS = in Bool
-val EMIOENET3GMIICOL = in Bool
-val EMIOENET3GMIIRXD = in Bool
-val EMIOENET3GMIIRXER = in Bool
-val EMIOENET3GMIIRXDV = in Bool
-val EMIOENET3GMIITXCLK = in Bool
-val EMIOENET3GMIITXD = in Bool
-val EMIOENET3GMIITXEN = in Bool
-val EMIOENET3GMIITXER = in Bool
-val EMIOENET3MDIOMDC = in Bool
-val EMIOENET3MDIOI = in Bool
-val EMIOENET3MDIOO = in Bool
-val EMIOENET3MDIOTN = in Bool
-val EMIOENET0TXRDATARDY = in Bool
-val EMIOENET0TXRRD = in Bool
-val EMIOENET0TXRVALID = in Bool
-val EMIOENET0TXRDATA = in Bool
-val EMIOENET0TXRSOP = in Bool
-val EMIOENET0TXREOP = in Bool
-val EMIOENET0TXRERR = in Bool
-val EMIOENET0TXRUNDERFLOW = in Bool
-val EMIOENET0TXRFLUSHED = in Bool
-val EMIOENET0TXRCONTROL = in Bool
-val EMIOENET0DMATXENDTOG = in Bool
-val EMIOENET0DMATXSTATUSTOG = in Bool
-val EMIOENET0TXRSTATUS = in Bool
-val EMIOENET0RXWWR = in Bool
-val EMIOENET0RXWDATA = in Bool
-val EMIOENET0RXWSOP = in Bool
-val EMIOENET0RXWEOP = in Bool
-val EMIOENET0RXWSTATUS = in Bool
-val EMIOENET0RXWERR = in Bool
-val EMIOENET0RXWOVERFLOW = in Bool
-val FMIOGEM0SIGNALDETECT = in Bool
-val EMIOENET0RXWFLUSH = in Bool
-val EMIOGEM0TXRFIXEDLAT = in Bool
-val FMIOGEM0FIFOTXCLKFROMPL = in Bool
-val FMIOGEM0FIFORXCLKFROMPL = in Bool
-val FMIOGEM0FIFOTXCLKTOPLBUFG = in Bool
-val FMIOGEM0FIFORXCLKTOPLBUFG = in Bool
-val EMIOENET1TXRDATARDY = in Bool
-val EMIOENET1TXRRD = in Bool
-val EMIOENET1TXRVALID = in Bool
-val EMIOENET1TXRDATA = in Bool
-val EMIOENET1TXRSOP = in Bool
-val EMIOENET1TXREOP = in Bool
-val EMIOENET1TXRERR = in Bool
-val EMIOENET1TXRUNDERFLOW = in Bool
-val EMIOENET1TXRFLUSHED = in Bool
-val EMIOENET1TXRCONTROL = in Bool
-val EMIOENET1DMATXENDTOG = in Bool
-val EMIOENET1DMATXSTATUSTOG = in Bool
-val EMIOENET1TXRSTATUS = in Bool
-val EMIOENET1RXWWR = in Bool
-val EMIOENET1RXWDATA = in Bool
-val EMIOENET1RXWSOP = in Bool
-val EMIOENET1RXWEOP = in Bool
-val EMIOENET1RXWSTATUS = in Bool
-val EMIOENET1RXWERR = in Bool
-val EMIOENET1RXWOVERFLOW = in Bool
-val FMIOGEM1SIGNALDETECT = in Bool
-val EMIOENET1RXWFLUSH = in Bool
-val EMIOGEM1TXRFIXEDLAT = in Bool
-val FMIOGEM1FIFOTXCLKFROMPL = in Bool
-val FMIOGEM1FIFORXCLKFROMPL = in Bool
-val FMIOGEM1FIFOTXCLKTOPLBUFG = in Bool
-val FMIOGEM1FIFORXCLKTOPLBUFG = in Bool
-val EMIOENET2TXRDATARDY = in Bool
-val EMIOENET2TXRRD = in Bool
-val EMIOENET2TXRVALID = in Bool
-val EMIOENET2TXRDATA = in Bool
-val EMIOENET2TXRSOP = in Bool
-val EMIOENET2TXREOP = in Bool
-val EMIOENET2TXRERR = in Bool
-val EMIOENET2TXRUNDERFLOW = in Bool
-val EMIOENET2TXRFLUSHED = in Bool
-val EMIOENET2TXRCONTROL = in Bool
-val EMIOENET2DMATXENDTOG = in Bool
-val EMIOENET2DMATXSTATUSTOG = in Bool
-val EMIOENET2TXRSTATUS = in Bool
-val EMIOENET2RXWWR = in Bool
-val EMIOENET2RXWDATA = in Bool
-val EMIOENET2RXWSOP = in Bool
-val EMIOENET2RXWEOP = in Bool
-val EMIOENET2RXWSTATUS = in Bool
-val EMIOENET2RXWERR = in Bool
-val EMIOENET2RXWOVERFLOW = in Bool
-val FMIOGEM2SIGNALDETECT = in Bool
-val EMIOENET2RXWFLUSH = in Bool
-val EMIOGEM2TXRFIXEDLAT = in Bool
-val FMIOGEM2FIFOTXCLKFROMPL = in Bool
-val FMIOGEM2FIFORXCLKFROMPL = in Bool
-val FMIOGEM2FIFOTXCLKTOPLBUFG = in Bool
-val FMIOGEM2FIFORXCLKTOPLBUFG = in Bool
-val EMIOENET3TXRDATARDY = in Bool
-val EMIOENET3TXRRD = in Bool
-val EMIOENET3TXRVALID = in Bool
-val EMIOENET3TXRDATA = in Bool
-val EMIOENET3TXRSOP = in Bool
-val EMIOENET3TXREOP = in Bool
-val EMIOENET3TXRERR = in Bool
-val EMIOENET3TXRUNDERFLOW = in Bool
-val EMIOENET3TXRFLUSHED = in Bool
-val EMIOENET3TXRCONTROL = in Bool
-val EMIOENET3DMATXENDTOG = in Bool
-val EMIOENET3DMATXSTATUSTOG = in Bool
-val EMIOENET3TXRSTATUS = in Bool
-val EMIOENET3RXWWR = in Bool
-val EMIOENET3RXWDATA = in Bool
-val EMIOENET3RXWSOP = in Bool
-val EMIOENET3RXWEOP = in Bool
-val EMIOENET3RXWSTATUS = in Bool
-val EMIOENET3RXWERR = in Bool
-val EMIOENET3RXWOVERFLOW = in Bool
-val FMIOGEM3SIGNALDETECT = in Bool
-val EMIOENET3RXWFLUSH = in Bool
-val EMIOGEM3TXRFIXEDLAT = in Bool
-val FMIOGEM3FIFOTXCLKFROMPL = in Bool
-val FMIOGEM3FIFORXCLKFROMPL = in Bool
-val FMIOGEM3FIFOTXCLKTOPLBUFG = in Bool
-val FMIOGEM3FIFORXCLKTOPLBUFG = in Bool
-val EMIOGEM0TXSOF = in Bool
-val EMIOGEM0SYNCFRAMETX = in Bool
-val EMIOGEM0DELAYREQTX = in Bool
-val EMIOGEM0PDELAYREQTX = in Bool
-val EMIOGEM0PDELAYRESPTX = in Bool
-val EMIOGEM0RXSOF = in Bool
-val EMIOGEM0SYNCFRAMERX = in Bool
-val EMIOGEM0DELAYREQRX = in Bool
-val EMIOGEM0PDELAYREQRX = in Bool
-val EMIOGEM0PDELAYRESPRX = in Bool
-val EMIOGEM0TSUINCCTRL = in Bool
-val EMIOGEM0TSUTIMERCMPVAL = in Bool
-val EMIOGEM1TXSOF = in Bool
-val EMIOGEM1SYNCFRAMETX = in Bool
-val EMIOGEM1DELAYREQTX = in Bool
-val EMIOGEM1PDELAYREQTX = in Bool
-val EMIOGEM1PDELAYRESPTX = in Bool
-val EMIOGEM1RXSOF = in Bool
-val EMIOGEM1SYNCFRAMERX = in Bool
-val EMIOGEM1DELAYREQRX = in Bool
-val EMIOGEM1PDELAYREQRX = in Bool
-val EMIOGEM1PDELAYRESPRX = in Bool
-val EMIOGEM1TSUINCCTRL = in Bool
-val EMIOGEM1TSUTIMERCMPVAL = in Bool
-val EMIOGEM2TXSOF = in Bool
-val EMIOGEM2SYNCFRAMETX = in Bool
-val EMIOGEM2DELAYREQTX = in Bool
-val EMIOGEM2PDELAYREQTX = in Bool
-val EMIOGEM2PDELAYRESPTX = in Bool
-val EMIOGEM2RXSOF = in Bool
-val EMIOGEM2SYNCFRAMERX = in Bool
-val EMIOGEM2DELAYREQRX = in Bool
-val EMIOGEM2PDELAYREQRX = in Bool
-val EMIOGEM2PDELAYRESPRX = in Bool
-val EMIOGEM2TSUINCCTRL = in Bool
-val EMIOGEM2TSUTIMERCMPVAL = in Bool
-val EMIOGEM3TXSOF = in Bool
-val EMIOGEM3SYNCFRAMETX = in Bool
-val EMIOGEM3DELAYREQTX = in Bool
-val EMIOGEM3PDELAYREQTX = in Bool
-val EMIOGEM3PDELAYRESPTX = in Bool
-val EMIOGEM3RXSOF = in Bool
-val EMIOGEM3SYNCFRAMERX = in Bool
-val EMIOGEM3DELAYREQRX = in Bool
-val EMIOGEM3PDELAYREQRX = in Bool
-val EMIOGEM3PDELAYRESPRX = in Bool
-val EMIOGEM3TSUINCCTRL = in Bool
-val EMIOGEM3TSUTIMERCMPVAL = in Bool
-val FMIOGEMTSUCLKFROMPL = in Bool
-val FMIOGEMTSUCLKTOPLBUFG = in Bool
-val EMIOENETTSUCLK = in Bool
-val EMIOENET0GEMTSUTIMERCNT = in Bool
-val EMIOENET0EXTINTIN = in Bool
-val EMIOENET1EXTINTIN = in Bool
-val EMIOENET2EXTINTIN = in Bool
-val EMIOENET3EXTINTIN = in Bool
-val EMIOENET0DMABUSWIDTH = in Bool
-val EMIOENET1DMABUSWIDTH = in Bool
-val EMIOENET2DMABUSWIDTH = in Bool
-val EMIOENET3DMABUSWIDTH = in Bool
-val EMIOGPIOI = in Bool
-val EMIOGPIOO = in Bool
-val EMIOGPIOTN = in Bool
-val EMIOI2C0SCLI = in Bool
-val EMIOI2C0SCLO = in Bool
-val EMIOI2C0SCLTN = in Bool
-val EMIOI2C0SDAI = in Bool
-val EMIOI2C0SDAO = in Bool
-val EMIOI2C0SDATN = in Bool
-val EMIOI2C1SCLI = in Bool
-val EMIOI2C1SCLO = in Bool
-val EMIOI2C1SCLTN = in Bool
-val EMIOI2C1SDAI = in Bool
-val EMIOI2C1SDAO = in Bool
-val EMIOI2C1SDATN = in Bool
-val EMIOUART0TX = in Bool
-val EMIOUART0RX = in Bool
-val EMIOUART0CTSN = in Bool
-val EMIOUART0RTSN = in Bool
-val EMIOUART0DSRN = in Bool
-val EMIOUART0DCDN = in Bool
-val EMIOUART0RIN = in Bool
-val EMIOUART0DTRN = in Bool
-val EMIOUART1TX = in Bool
-val EMIOUART1RX = in Bool
-val EMIOUART1CTSN = in Bool
-val EMIOUART1RTSN = in Bool
-val EMIOUART1DSRN = in Bool
-val EMIOUART1DCDN = in Bool
-val EMIOUART1RIN = in Bool
-val EMIOUART1DTRN = in Bool
-val EMIOSDIO0CLKOUT = in Bool
-val EMIOSDIO0FBCLKIN = in Bool
-val EMIOSDIO0CMDOUT = in Bool
-val EMIOSDIO0CMDIN = in Bool
-val EMIOSDIO0CMDENA = in Bool
-val EMIOSDIO0DATAIN = in Bool
-val EMIOSDIO0DATAOUT = in Bool
-val EMIOSDIO0DATAENA = in Bool
-val EMIOSDIO0CDN = in Bool
-val EMIOSDIO0WP = in Bool
-val EMIOSDIO0LEDCONTROL = in Bool
-val EMIOSDIO0BUSPOWER = in Bool
-val EMIOSDIO0BUSVOLT = in Bool
-val EMIOSDIO1CLKOUT = in Bool
-val EMIOSDIO1FBCLKIN = in Bool
-val EMIOSDIO1CMDOUT = in Bool
-val EMIOSDIO1CMDIN = in Bool
-val EMIOSDIO1CMDENA = in Bool
-val EMIOSDIO1DATAIN = in Bool
-val EMIOSDIO1DATAOUT = in Bool
-val EMIOSDIO1DATAENA = in Bool
-val EMIOSDIO1CDN = in Bool
-val EMIOSDIO1WP = in Bool
-val EMIOSDIO1LEDCONTROL = in Bool
-val EMIOSDIO1BUSPOWER = in Bool
-val EMIOSDIO1BUSVOLT = in Bool
-val EMIOSPI0SCLKI = in Bool
-val EMIOSPI0SCLKO = in Bool
-val EMIOSPI0SCLKTN = in Bool
-val EMIOSPI0MI = in Bool
-val EMIOSPI0MO = in Bool
-val EMIOSPI0MOTN = in Bool
-val EMIOSPI0SI = in Bool
-val EMIOSPI0SO = in Bool
-val EMIOSPI0STN = in Bool
-val EMIOSPI0SSIN = in Bool
-val EMIOSPI0SSON = in Boolemio_spi0_ss1_o_n,emio_spi0_ss_o_n}),
-val EMIOSPI0SSNTN = in Bool
-val EMIOSPI1SCLKI = in Bool
-val EMIOSPI1SCLKO = in Bool
-val EMIOSPI1SCLKTN = in Bool
-val EMIOSPI1MI = in Bool
-val EMIOSPI1MO = in Bool
-val EMIOSPI1MOTN = in Bool
-val EMIOSPI1SI = in Bool
-val EMIOSPI1SO = in Bool
-val EMIOSPI1STN = in Bool
-val EMIOSPI1SSIN = in Bool
-val EMIOSPI1SSON = in Boolemio_spi1_ss1_o_n,emio_spi1_ss_o_n}),
-val EMIOSPI1SSNTN = in Bool
-val PLPSTRACECLK = in Bool
-val PSPLTRACECTL = in Bool
-val PSPLTRACEDATA = in Bool
-val EMIOTTC0WAVEO = in Bool
-val EMIOTTC0CLKI = in Bool
-val EMIOTTC1WAVEO = in Bool
-val EMIOTTC1CLKI = in Bool
-val EMIOTTC2WAVEO = in Bool
-val EMIOTTC2CLKI = in Bool
-val EMIOTTC3WAVEO = in Bool
-val EMIOTTC3CLKI = in Bool
-val EMIOWDT0CLKI = in Bool
-val EMIOWDT0RSTO = in Bool
-val EMIOWDT1CLKI = in Bool
-val EMIOWDT1RSTO = in Bool
-val EMIOHUBPORTOVERCRNTUSB30 = in Bool
-val EMIOHUBPORTOVERCRNTUSB31 = in Bool
-val EMIOHUBPORTOVERCRNTUSB20 = in Bool
-val EMIOHUBPORTOVERCRNTUSB21 = in Bool
-val EMIOU2DSPORTVBUSCTRLUSB30 = in Bool
-val EMIOU2DSPORTVBUSCTRLUSB31 = in Bool
-val EMIOU3DSPORTVBUSCTRLUSB30 = in Bool
-val EMIOU3DSPORTVBUSCTRLUSB31 = in Bool
+
+
 val ADMAFCICLK = in Bool
 val PL2ADMACVLD = in Bool
 val PL2ADMATACK = in Bool
 val ADMA2PLCACK = in Bool
 val ADMA2PLTVLD = in Bool
+
 val GDMAFCICLK = in Bool
 val PL2GDMACVLD = in Bool
 val PL2GDMATACK = in Bool
 val GDMA2PLCACK = in Bool
 val GDMA2PLTVLD = in Bool
+
 val PLFPGASTOP = in Bool
 val PLLAUXREFCLKLPD = in Bool
 val PLLAUXREFCLKFPD = in Bool
-val DPSAXISAUDIOTDATA = in Bool
-val DPSAXISAUDIOTID = in Bool
-val DPSAXISAUDIOTVALID = in Bool
-val DPSAXISAUDIOTREADY = in Bool
-val DPMAXISMIXEDAUDIOTDATA = in Bool
-val DPMAXISMIXEDAUDIOTID = in Bool
-val DPMAXISMIXEDAUDIOTVALID = in Bool
-val DPMAXISMIXEDAUDIOTREADY = in Bool
-val DPSAXISAUDIOCLK = in Bool
-val DPLIVEVIDEOINVSYNC = in Bool
-val DPLIVEVIDEOINHSYNC = in Bool
-val DPLIVEVIDEOINDE = in Bool
-val DPLIVEVIDEOINPIXEL1 = in Bool
-val DPVIDEOINCLK = in Bool
-val DPVIDEOOUTHSYNC = in Bool
-val DPVIDEOOUTVSYNC = in Bool
-val DPVIDEOOUTPIXEL1 = in Bool
-val DPAUXDATAIN = in Bool
-val DPAUXDATAOUT = in Bool
-val DPAUXDATAOEN = in Bool
-val DPLIVEGFXALPHAIN = in Bool
-val DPLIVEGFXPIXEL1IN = in Bool
-val DPHOTPLUGDETECT = in Bool
-val DPEXTERNALCUSTOMEVENT1 = in Bool
-val DPEXTERNALCUSTOMEVENT2 = in Bool
-val DPEXTERNALVSYNCEVENT = in Bool
-val DPLIVEVIDEODEOUT = in Bool
+
 val PLPSEVENTI = in Bool
 val PSPLEVENTO = in Bool
 val PSPLSTANDBYWFE = in Bool
 val PSPLSTANDBYWFI = in Bool
+
 val PLPSAPUGICIRQ = in Bool
 val PLPSAPUGICFIQ = in Bool
+
 val RPUEVENTI0 = in Bool
 val RPUEVENTI1 = in Bool
 val RPUEVENTO0 = in Bool
@@ -714,6 +695,7 @@ val NFIQ0LPDRPU = in Bool
 val NFIQ1LPDRPU = in Bool
 val NIRQ0LPDRPU = in Bool
 val NIRQ1LPDRPU = in Bool
+
 val STMEVENT = in Bool
 val PLPSTRIGACK = in Bool
 val PLPSTRIGGER = in Bool
@@ -721,6 +703,7 @@ val PSPLTRIGACK = in Bool
 val PSPLTRIGGER = in Bool
 val FTMGPO = in Bool
 val FTMGPI = in Bool
+
 val PLPSIRQ0 = in Bool
 val PLPSIRQ1 = in Bool
 
@@ -820,6 +803,7 @@ ps_to_pl_irq_ddr_ss,
 irq_fpd_dev_null[11 = in0]}),
 
 val OSCRTCCLK  = in Bool
+
 val PLPMUGPI  = in Bool
 val PMUPLGPO  = in Bool
 val AIBPMUAFIFMFPDACK  = in Bool
@@ -828,69 +812,10 @@ val PMUAIBAFIFMFPDREQ  = in Bool
 val PMUAIBAFIFMLPDREQ  = in Bool
 val PMUERRORTOPL  = in Bool
 val PMUERRORFROMPL  = in Bool
+
 val DDRCEXTREFRESHRANK0REQ  = in Bool
 val DDRCEXTREFRESHRANK1REQ  = in Bool
 val DDRCREFRESHPLCLK  = in Bool
-val PLACPINACT  = in Bool
-val PLCLK  = in Bool
-val DPVIDEOREFCLK  = in Bool
-val DPAUDIOREFCLK  = in Bool
-val PSS_ALTO_CORE_PAD_MGTTXN0OUT  = in Bool
-val PSS_ALTO_CORE_PAD_MGTTXN1OUT  = in Bool
-val PSS_ALTO_CORE_PAD_MGTTXN2OUT  = in Bool
-val PSS_ALTO_CORE_PAD_MGTTXN3OUT  = in Bool
-val PSS_ALTO_CORE_PAD_MGTTXP0OUT  = in Bool
-val PSS_ALTO_CORE_PAD_MGTTXP1OUT  = in Bool
-val PSS_ALTO_CORE_PAD_MGTTXP2OUT  = in Bool
-val PSS_ALTO_CORE_PAD_MGTTXP3OUT  = in Bool
-val PSS_ALTO_CORE_PAD_PADO  = in Bool
-val PSS_ALTO_CORE_PAD_BOOTMODE  = in Bool
-val PSS_ALTO_CORE_PAD_CLK  = in Bool
-val PSS_ALTO_CORE_PAD_DONEB  = in Bool
-val PSS_ALTO_CORE_PAD_DRAMA  = in Bool
-val PSS_ALTO_CORE_PAD_DRAMACTN  = in Bool
-val PSS_ALTO_CORE_PAD_DRAMALERTN  = in Bool
-val PSS_ALTO_CORE_PAD_DRAMBA  = in Bool
-val PSS_ALTO_CORE_PAD_DRAMBG  = in Bool
-val PSS_ALTO_CORE_PAD_DRAMCK  = in Bool
-val PSS_ALTO_CORE_PAD_DRAMCKE  = in Bool
-val PSS_ALTO_CORE_PAD_DRAMCKN  = in Bool
-val PSS_ALTO_CORE_PAD_DRAMCSN  = in Bool
-val PSS_ALTO_CORE_PAD_DRAMDM  = in Bool
-val PSS_ALTO_CORE_PAD_DRAMDQ  = in Bool
-val PSS_ALTO_CORE_PAD_DRAMDQS  = in Bool
-val PSS_ALTO_CORE_PAD_DRAMDQSN  = in Bool
-val PSS_ALTO_CORE_PAD_DRAMODT  = in Bool
-val PSS_ALTO_CORE_PAD_DRAMPARITY  = in Bool
-val PSS_ALTO_CORE_PAD_DRAMRAMRSTN  = in Bool
-val PSS_ALTO_CORE_PAD_ERROROUT  = in Bool
-val PSS_ALTO_CORE_PAD_ERRORSTATUS  = in Bool
-val PSS_ALTO_CORE_PAD_INITB  = in Bool
-val PSS_ALTO_CORE_PAD_JTAGTCK  = in Bool
-val PSS_ALTO_CORE_PAD_JTAGTDI  = in Bool
-val PSS_ALTO_CORE_PAD_JTAGTDO  = in Bool
-val PSS_ALTO_CORE_PAD_JTAGTMS  = in Bool
-val PSS_ALTO_CORE_PAD_MIO  = in Bool
-val PSS_ALTO_CORE_PAD_PORB  = in Bool
-val PSS_ALTO_CORE_PAD_PROGB  = in Bool
-val PSS_ALTO_CORE_PAD_RCALIBINOUT  = in Bool
-val PSS_ALTO_CORE_PAD_SRSTB  = in Bool
-val PSS_ALTO_CORE_PAD_ZQ  = in Bool
-val PSS_ALTO_CORE_PAD_MGTRXN0IN  = in Bool
-val PSS_ALTO_CORE_PAD_MGTRXN1IN  = in Bool
-val PSS_ALTO_CORE_PAD_MGTRXN2IN  = in Bool
-val PSS_ALTO_CORE_PAD_MGTRXN3IN  = in Bool
-val PSS_ALTO_CORE_PAD_MGTRXP0IN  = in Bool
-val PSS_ALTO_CORE_PAD_MGTRXP1IN  = in Bool
-val PSS_ALTO_CORE_PAD_MGTRXP2IN  = in Bool
-val PSS_ALTO_CORE_PAD_MGTRXP3IN  = in Bool
-val PSS_ALTO_CORE_PAD_PADI  = in Bool
-val PSS_ALTO_CORE_PAD_REFN0IN  = in Bool
-val PSS_ALTO_CORE_PAD_REFN1IN  = in Bool
-val PSS_ALTO_CORE_PAD_REFN2IN  = in Bool
-val PSS_ALTO_CORE_PAD_REFN3IN  = in Bool
-val PSS_ALTO_CORE_PAD_REFP0IN  = in Bool
-val PSS_ALTO_CORE_PAD_REFP1IN  = in Bool
-val PSS_ALTO_CORE_PAD_REFP2IN  = in Bool
-val PSS_ALTO_CORE_PAD_REFP3IN  = input Bool
+
+
 */

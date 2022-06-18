@@ -11,7 +11,7 @@ uintptr_lo_t OsService_DdrLoBlockAlloc(uint32_t blocks64KB_) {
 	IPI3_Response response;
 	IPI3_OnService_SubmitAndFetchResponse(&msg, &response);
 	if(response.result == IRR_SUCCESS) {
-		return (uintptr_lo_t)(MAINDDR4_0_BASE_ADDR + response.DdrLoBlockAlloc.offset);
+		return (uintptr_lo_t)(DDR_0_BASE_ADDR + response.DdrLoBlockAlloc.offset);
 	} else {
 		OsService_InlinePrint(OSS_INLINE_TEXT("DdrLoBlockAlloc failed"));
 		switch(response.result) {
@@ -31,7 +31,7 @@ uintptr_lo_t OsService_DdrLoBlockAlloc(uint32_t blocks64KB_) {
 void OsService_DdrLoBlockFree(uintptr_lo_t ptr_, uint32_t blockCount_) {
 	IPI3_Msg msg = {
 			.function = OSF_DDR_LO_BLOCK_FREE,
-			.Payload.DdrLoBlockFree.offset = ((uintptr_t)ptr_ - MAINDDR4_0_BASE_ADDR),
+			.Payload.DdrLoBlockFree.offset = ((uintptr_t)ptr_ - DDR_0_BASE_ADDR),
 			.Payload.DdrLoBlockFree.blockCount = blockCount_,
 			};
 
@@ -47,7 +47,7 @@ uintptr_all_t OsService_DdrHiBlockAlloc(uint32_t blocks64KB_) {
 	IPI3_Response response;
 	IPI3_OnService_SubmitAndFetchResponse(&msg, &response);
 	if(response.result == IRR_SUCCESS) {
-		return (uintptr_t) (MAINDDR4_1_BASE_ADDR + response.DdrLoBlockAlloc.offset);
+		return (uintptr_t) (DDR_1_BASE_ADDR + response.DdrLoBlockAlloc.offset);
 	} else {
 		OsService_InlinePrint(OSS_INLINE_TEXT("DdrLoBlocKAlloc failed"));
 		switch(response.result) {
@@ -70,7 +70,7 @@ void OsService_DdrHiBlockFree(uintptr_all_t ptr, uint32_t blockCount_) {
 #if CPU_a53
 	IPI3_Msg msg = {
 			.function = OSF_DDR_HI_BLOCK_FREE,
-			.Payload.DdrLoBlockFree.offset = ((uintptr_t)ptr - MAINDDR4_0_BASE_ADDR),
+			.Payload.DdrLoBlockFree.offset = ((uintptr_t)ptr - DDR_0_BASE_ADDR),
 			.Payload.DdrLoBlockFree.blockCount = blockCount_,
 	};
 

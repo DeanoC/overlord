@@ -11,6 +11,7 @@ import scala.reflect.ClassTag
 trait ChipInstance extends InstanceTrait with PortsLike with RegisterBankLike with MultiBusLike {
 	override def definition: ChipDefinitionTrait
 
+	var moduleName: String = name
 	lazy         val instanceNumber       : Int                               = Utils.lookupInt(attributes, "instance", 0)
 	lazy         val ports                : mutable.HashMap[String, Port]     = mutable.HashMap[String, Port](definition.ports.toSeq: _*)
 	lazy         val instanceRegisterBanks: mutable.ArrayBuffer[RegisterBank] = {
@@ -25,6 +26,7 @@ trait ChipInstance extends InstanceTrait with PortsLike with RegisterBankLike wi
 			).toSeq
 	}
 	val instanceParameterKeys: mutable.HashSet[String] = mutable.HashSet()
+
 	val splitIdent           : Array[String]           = name.split('.')
 	private val busSpecs: Seq[BusSpec] = {
 		if (!attributes.contains("buses")) Seq()
@@ -37,7 +39,8 @@ trait ChipInstance extends InstanceTrait with PortsLike with RegisterBankLike wi
 				        prefix = Utils.lookupString(table, "prefix", "internal"),
 				        baseAddr = Utils.lookupBigInt(table, "base_address", 0),
 				        dataWidth = Utils.lookupBigInt(table, "data_width", 32),
-				        addrWidth = Utils.lookupBigInt(table, "address_width", 32))
+				        addrWidth = Utils.lookupBigInt(table, "address_width", 32),
+				        fixedAddress = Utils.lookupBoolean(table, "fixed_base_address", or = false))
 			})
 	}
 	private val buses   : Seq[Bus]     = busSpecs.map(Bus(this, name, definition.attributes, _))
@@ -57,47 +60,7 @@ trait ChipInstance extends InstanceTrait with PortsLike with RegisterBankLike wi
 
 	lazy val parameterKeys: Set[String] = instanceParameterKeys.toSet
 
-	def getPort(lastName: String): Option[Port] =
-		if (ports.contains(lastName)) Some(ports(lastName)) else None
-
-	def getMatchNameAndPort(nameToMatch: String): (Option[String], Option[Port]) = {
-		val nameWithoutBits = nameToMatch.split('[').head
-
-		def WildCardMatch(nameId: Array[String], instanceId: Array[String]) = {
-			// wildcard match
-			val is = for ((id, i) <- instanceId.zipWithIndex) yield
-				if ((i < nameId.length) && (id == "_" || id == "*"))
-					nameId(i)
-				else id
-
-			val ms = for ((id, i) <- nameId.zipWithIndex) yield
-				if ((i < is.length) && (id == "_" || id == "*")) is(i)
-				else id
-
-			if (ms sameElements is)
-				(Some(ms.mkString(".")), getPort(ms(0)))
-			else {
-				val msv = ms.reverse
-				val mp  = msv.head
-				val tms = if (msv.length > 1) msv.tail.reverse else msv
-
-				val port = getPort(mp)
-				if ((is sameElements tms) && port.nonEmpty)
-					(Some(s"${ms.mkString(".")}"), port)
-				else (None, None)
-			}
-		}
-
-		if (nameToMatch == name)
-			(Some(nameToMatch), getPort(nameToMatch.split('.').last))
-		else if (nameWithoutBits == name)
-			(Some(nameWithoutBits), getPort(nameWithoutBits.split('.').last))
-		else {
-			val match0 = WildCardMatch(nameWithoutBits.split('.'), name.split('.'))
-			if (match0._1.isDefined) return match0
-			WildCardMatch(nameWithoutBits.split('.'), definition.defType.ident.toArray)
-		}
-	}
+	override def getPort(lastName: String): Option[Port] = if (ports.contains(lastName)) Some(ports(lastName)) else None
 
 	override def getInterface[T](implicit tag: ClassTag[T]): Option[T] = {
 		val PortsLike_        = classOf[PortsLike]
@@ -123,8 +86,6 @@ trait ChipInstance extends InstanceTrait with PortsLike with RegisterBankLike wi
 	override def maxInstances: Int = definition.maxInstances
 
 	override def banks: Seq[RegisterBank] = registerBanks
-
-	override def generateInstancedRegisterBank(): Unit = {}
 
 	override def getBus(index: Int): Option[BusLike] = if (index < numberOfBuses) Some(buses(index)) else None
 

@@ -26,21 +26,26 @@ type = "graphic.display.displayport.zynqps8"
 [[instance]]
 name = "FPD_SLCR"
 type = "other.internal.fpd_slcr.zynqps8"
+
 [[instance]]
 name = "FPDDMA"
 type = "other.dma.fpd.zynqps8"
 
 [[instance]]
-name = "DP_HP0_MULTIPLEXER"
+name = "DP_HP0_MP"
 type = "switch.internal.two_to_one_multiplexer.zynqps8"
 
 [[instance]]
-name = "HP1_HP2_MULTIPLEXER"
+name = "HP1_HP2_MP"
 type = "switch.internal.two_to_one_multiplexer.zynqps8"
 
 [[instance]]
-name = "HP3_FPDDMA_MULTIPLEXER"
+name = "HP3_FPDDMA_MP"
 type = "switch.internal.two_to_one_multiplexer.zynqps8"
+
+[[instance]]
+name = "CORESIGHT_HPC0_HPC1_MP"
+type = "switch.internal.three_to_one_multiplexer.zynqps8"
 
 [[instance]]
 name = "FPD_DDR_SPLITTER0"
@@ -68,12 +73,6 @@ bus_name = "fpd_siou"
 [[connection]]
 type = "logical"
 connection = "FPDMainSwitch -> PS8Soc"
-bus_name = "fpd_hpm{$index}"
-
-[[connection]]
-type = "logical"
-connection = "FPDMainSwitch -> PS8Soc"
-bus_name = "fpd_hpm{$index}"
 
 [[connection]]
 type = "bus"
@@ -102,62 +101,95 @@ bus_name = "siou_dp"
 
 [[connection]]
 type = "bus"
-connection = "FPDMainSwitch -> FPDDMA"
-bus_name = "fpd_fpddma"
+connection = "SIOUSwitch -> FPDDMA"
+bus_name = "siou_fpddma"
 
 [[connection]]
 type = "bus"
-connection = "DP -> DP_HP0_MULTIPLEXER"
-bus_protocol = "internal_multiplexer0"
+connection = "FPDMainSwitch -> LPDInboundSwitch"
+bus_name = "fpd_lpdinbound"
+
+# Multiplexers
 [[connection]]
-type = "logical"
-connection = "PS8Soc -> DP_HP0_MULTIPLEXER"
-bus_protocol = "internal_multiplexer1"
+type = "bus"
+connection = "DP -> DP_HP0_MP"
+bus_name = "dp_out"
+consumer_bus_name = "in0"
 
 [[connection]]
 type = "logical"
-connection = "PS8Soc -> HP1_HP2_MULTIPLEXER"
-bus_protocol = "internal_multiplexer0"
-[[connection]]
-type = "logical"
-connection = "PS8Soc -> HP1_HP2_MULTIPLEXER"
-bus_protocol = "internal_multiplexer1"
+connection = "PS8Soc -> DP_HP0_MP"
+bus_name = "in1"
 
 [[connection]]
 type = "logical"
-connection = "PS8Soc -> HP3_FPDDMA_MULTIPLEXER"
-bus_protocol = "internal_multiplexer0"
+connection = "PS8Soc -> HP1_HP2_MP"
+bus_name = "in0"
 [[connection]]
 type = "logical"
-connection = "FPDDMA -> HP1_HP2_MULTIPLEXER"
-bus_protocol = "internal_multiplexer1"
+connection = "PS8Soc -> HP1_HP2_MP"
+bus_name = "in1"
+
+[[connection]]
+type = "logical"
+connection = "PS8Soc -> HP3_FPDDMA_MP"
+bus_name = "in0"
+[[connection]]
+type = "logical"
+connection = "FPDDMA -> HP1_HP2_MP"
+bus_name = "in1"
+
+#[[connection]]
+#type = "logical"
+#connection = "CORESIGHT -> CORESIGHT_HPC0_HPC1_MP"
+#bus_name = "in0"
+[[connection]]
+type = "logical"
+connection = "PS8Soc -> CORESIGHT_HPC0_HPC1_MP"
+bus_name = "in1"
+[[connection]]
+type = "logical"
+connection = "PS8Soc -> CORESIGHT_HPC0_HPC1_MP"
+bus_name = "in2"
+[[connection]]
+type = "bus"
+connection = "CORESIGHT_HPC0_HPC1_MP -> CCI"
+bus_name = "out"
+
 
 [[connection]]
 type = "bus"
-connection = "DP_HP0_MULTIPLEXER -> FPD_DDR_SPLITTER0"
-bus_protocol = "internal_splitter"
+connection = "DP_HP0_MP -> FPD_DDR_SPLITTER0"
+bus_name = "out"
+consumer_bus_name = "in"
 
 [[connection]]
 type = "bus"
-connection = "HP1_HP2_MULTIPLEXER -> FPD_DDR_SPLITTER1"
-bus_protocol = "internal_splitter"
+connection = "HP1_HP2_MP -> FPD_DDR_SPLITTER1"
+bus_name = "out"
+consumer_bus_name = "in"
 
 [[connection]]
 type = "bus"
-connection = "HP3_FPDDMA_MULTIPLEXER -> FPD_DDR_SPLITTER2"
-bus_protocol = "internal_splitter"
+connection = "HP3_FPDDMA_MP -> FPD_DDR_SPLITTER2"
+bus_name = "out"
+consumer_bus_name = "in"
 
 [[connection]]
 type = "bus"
 connection = "FPD_DDR_SPLITTER0 -> FPDMainSwitch"
-bus_protocol = "internal_splitter_out"
+bus_name = "out0"
+consumer_bus_name = "splitter0_fpd"
 
 [[connection]]
 type = "bus"
 connection = "FPD_DDR_SPLITTER1 -> FPDMainSwitch"
-bus_protocol = "internal_splitter_out"
+bus_name = "out0"
+consumer_bus_name = "splitter1_fpd"
 
 [[connection]]
 type = "bus"
 connection = "FPD_DDR_SPLITTER2 -> FPDMainSwitch"
-bus_protocol = "internal_splitter_out"
+bus_name = "out0"
+consumer_bus_name = "splitter2_fpd"
+

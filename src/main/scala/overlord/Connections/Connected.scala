@@ -13,6 +13,8 @@ case class WildCardConnectionPriority() extends ConnectionPriority
 
 case class ExplicitConnectionPriority() extends ConnectionPriority
 
+case class FakeConnectionPriority() extends ConnectionPriority
+
 case class InstanceLoc(instance: InstanceTrait,
                        port: Option[Port],
                        fullName: String) {

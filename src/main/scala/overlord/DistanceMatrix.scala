@@ -73,7 +73,7 @@ case class DistanceMatrix(instanceArray: Array[ChipInstance]) {
 
 		// display compressed matrix (isolated nodes hidden)
 		{
-			sb ++= f"DistanceMatrix $dim x $dim src:vertical dest:horizontal%n"
+			sb ++= f"DistanceMatrix $dim x $dim start:horiz end:vertical%n"
 			sb ++= f"     | "
 			val ulsb = new StringBuilder()
 			ulsb ++= "-------"

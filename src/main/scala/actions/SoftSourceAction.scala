@@ -60,10 +60,10 @@ object SoftSourceAction {
 		val srcs = Utils.toArray(process("sources")).map(Utils.toTable)
 
 		// per process cpu target lists
-		val all_cpus = if (process.contains("cpus")) {
+		val allCpus = if (process.contains("cpus")) {
 			val cpusString = Utils.toString(process("cpus"))
 			if (cpusString == "_") Some(Seq())
-			else Some(cpuRegEx.split(cpusString).toSeq)
+			else Some(cpuRegEx.split(cpusString).toSeq.map(_.toLowerCase()))
 		} else None
 
 		// pre source cpu target lists
@@ -73,11 +73,11 @@ object SoftSourceAction {
 					val cpusString = Utils.toString(entry("cpus"))
 					if (cpusString == "_") (2, Seq())
 					else {
-						val cpus = cpuRegEx.split(cpusString)
-						if (all_cpus.isDefined) (2, cpus.intersect(all_cpus.get).toSeq)
+						val cpus = cpuRegEx.split(cpusString).map(_.toLowerCase())
+						if (allCpus.isDefined) (2, cpus.intersect(allCpus.get).toSeq)
 						else (2, cpus.toSeq)
 					}
-				} else if (all_cpus.isDefined) (2, all_cpus.get)
+				} else if (allCpus.isDefined) (2, allCpus.get)
 				else (1, Seq())
 
 			val inFilename  = Utils.toString(entry("in"))

@@ -2,7 +2,7 @@
 #include "core/snprintf.h"
 #include "platform/memory_map.h"
 #include "platform/reg_access.h"
-#include "hw_regs/uart.h"
+#include "platform/registers/uart.h"
 #include "osservices/ipi3_transport.h"
 #include "ipi3_os_server.hpp"
 #include "../os_heap.hpp"
@@ -10,6 +10,13 @@
 
 extern uint32_t uartDebugTransmitLast;
 extern uint32_t uartDebugTransmitHead;
+
+#define UART_DEBUG_BASE_ADDR UART1_BASE_ADDR
+#define UART_DEBUG_REGISTER(reg) UART_##reg##_OFFSET
+#define UART_DEBUG_FIELD(reg, field) UART_##reg##_##field
+#define UART_DEBUG_FIELD_MASK(reg, field) UART_##reg##_##field##_MASK
+#define UART_DEBUG_FIELD_LSHIFT(reg, field) UART_##reg##_##field##_LSHIFT
+#define UART_DEBUG_FIELD_ENUM(reg, field, enm) UART_##reg##_##field##_##enm
 
 namespace IPI3_OsServer {
 
@@ -38,7 +45,7 @@ void PutSizedData(uint32_t size, const uint8_t *text) {
 	HW_REG_SET(UART_DEBUG, INTRPT_EN, UART_INTRPT_EN_TEMPTY);
 }
 
-#define IsTransmitFull() (HW_REG_GET_BIT(UART0, CHANNEL_STS, TNFUL))
+#define IsTransmitFull() (HW_REG_GET_BIT(UART_DEBUG, CHANNEL_STS, TNFUL))
 
 void DebugInlinePrint(IPI3_Msg const *msgBuffer) {
 	uint8_t size = msgBuffer->Payload.InlinePrint.size;

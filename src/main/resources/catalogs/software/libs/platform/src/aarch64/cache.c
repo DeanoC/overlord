@@ -5,7 +5,7 @@
 #include "platform/memory_map.h"
 #include "platform/reg_access.h"
 #include "platform/aarch64/intrinsics_gcc.h"
-#include "hw_regs/a53/a53_system.h"
+#include "platform/registers/a53_system.h"
 
 #define IRQ_FIQ_MASK 0xC0U	/* Mask IRQ and FIQ interrupts in cpsr */
 #define L1_DATA_PREFETCH_CONTROL_MASK  0xE000

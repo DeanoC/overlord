@@ -24,11 +24,9 @@ object Top {
 		for (instance <- game.setOfConnectedGateware) {
 			sb ++=
 			s"""
-				 |  (*dont_touch = "true"*) ${instance.name}""".stripMargin
+				 |  (*dont_touch = "true"*) ${instance.moduleName}""".stripMargin
 
-			val merged = game.constants
-				.map(_.asParameter)
-				.fold(instance.attributes)((o, n) => o ++ n)
+			val merged = instance.finalParameterTable.toMap
 				.filter(c => instance.parameterKeys.contains(c._1))
 
 			if (merged.nonEmpty) {
@@ -121,8 +119,11 @@ object Top {
 
 		for {wire <- c2cs
 		     if wire.startLoc.port.nonEmpty} {
-			val port = wire.startLoc.port.get
-			val bits = if (port.width.singleBit) "" else s"${port.width.text}"
+			val port  = wire.startLoc.port.get
+			val width = if (!port.knownWidth) {
+				wire.endLocs.map(i => if (i.port.nonEmpty) i.port.get.width.bitCount else 0).max
+			} else port.width.bitCount
+			val bits  = if (width == 1) "" else s"[${width - 1}:0]"
 			sb ++= s"wire $bits ${sanitizeIdent(wire.startLoc.fullName)};\n"
 		}
 		sb.result()
@@ -160,7 +161,7 @@ object Top {
 				val inst = wire.startLoc.instance
 				if (wire.startLoc.isClock) {
 					val clk = inst.asInstanceOf[ClockInstance]
-					sb ++= s"${sanitizeIdent(clk.name)})"
+					if (clk.pin != "INTERNAL") sb ++= s"${sanitizeIdent(clk.name)})"
 				} else if (wire.startLoc.isPin) {
 					val pg = inst.asInstanceOf[PinGroupInstance]
 					sb ++= s"${sanitizeIdent(pg.name)})"

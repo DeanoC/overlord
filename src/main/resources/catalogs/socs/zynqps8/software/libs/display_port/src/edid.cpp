@@ -5,7 +5,7 @@
 #include "dbg/print.h"
 #include "platform/reg_access.h"
 #include "platform/memory_map.h"
-#include "hw_regs/eedid.h"
+#include "platform/registers/eedid.h"
 #include "dbg/assert.h"
 
 namespace DisplayPort::Display::Eedid {

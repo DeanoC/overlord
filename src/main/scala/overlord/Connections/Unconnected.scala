@@ -2,19 +2,12 @@ package overlord.Connections
 
 import ikuy_utils.{Utils, Variant}
 import overlord.Chip._
-import overlord.DefinitionCatalog
 import overlord.Instances._
-import overlord.Interfaces.{QueryInterface, UnConnectedLike}
+import overlord.Interfaces.{QueryInterface, UnconnectedLike}
 
-trait UnConnected extends QueryInterface with UnConnectedLike {
+trait Unconnected extends QueryInterface with UnconnectedLike {
 
-	def direction: ConnectionDirection
-
-	def firstFullName: String
-
-	def secondFullName: String
-
-	protected def matchInstances(nameToMatch: String, unexpanded: Seq[ChipInstance]): Seq[InstanceLoc] = {
+	protected def matchInstances(nameToMatch: String, unexpanded: Seq[InstanceTrait]): Seq[InstanceLoc] = {
 		unexpanded.flatMap(c => {
 			val (nm, port) = c.getMatchNameAndPort(nameToMatch)
 			if (nm.nonEmpty) Some(InstanceLoc(c, port, nm.get))
@@ -70,8 +63,7 @@ trait UnConnected extends QueryInterface with UnConnectedLike {
 
 object Unconnected {
 
-	def apply(connection: Variant,
-	          catalogs: DefinitionCatalog): Option[UnConnectedLike] = {
+	def apply(connection: Variant): Option[UnconnectedLike] = {
 		val table = Utils.toTable(connection)
 
 		if (!table.contains("type")) {
@@ -102,27 +94,29 @@ object Unconnected {
 
 
 		conntype match {
-			case "port"       => Some(UnConnectedPortGroup(first, dir, secondary, "", "", Seq()))
-			case "clock"      => Some(UnConnectedClock(first, dir, secondary))
-			case "constant"   => Some(UnConnectedConstant(first, dir, secondary, Utils.stringToVariant(first)))
-			case "port_group" => Some(UnConnectedPortGroup(first, dir, secondary,
+			case "port"       => Some(UnconnectedPort(first, dir, secondary))
+			case "clock"      => Some(UnconnectedClock(first, dir, secondary))
+			case "parameters" => if (first != "_") None else Some(UnconnectedParameters(dir, secondary, Utils.lookupArray(table, "parameters")))
+			case "port_group" => Some(UnconnectedPortGroup(first, dir, secondary,
 			                                               Utils.lookupString(table, "first_prefix", ""),
 			                                               Utils.lookupString(table, "second_prefix", ""),
 			                                               Utils.lookupArray(table, "excludes").toSeq.map(Utils.toString)))
 			case "bus"        => {
-				Some(UnConnectedBus(first,
+				val supplierBusName = Utils.lookupString(table, "bus_name", "")
+				val consumerBusName = Utils.lookupString(table, "consumer_bus_name", supplierBusName)
+				Some(UnconnectedBus(first,
 				                    dir,
 				                    secondary,
 				                    Utils.lookupString(table, "bus_protocol", "internal"),
-				                    Utils.lookupString(table, "bus_name", ""),
+				                    supplierBusName,
+				                    consumerBusName,
 				                    Utils.lookupBoolean(table, "silent", or = false)
 				                    ))
 			}
-			case "logical"    => Some(UnConnectedLogical(first, dir, secondary))
+			case "logical"    => Some(UnconnectedLogical(first, dir, secondary))
 			case _            =>
 				println(s"$conntype is an unknown connection type")
 				None
-			//				PortConnectionType()
 		}
 	}
 }
