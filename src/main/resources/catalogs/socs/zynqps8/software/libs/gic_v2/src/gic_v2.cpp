@@ -15,7 +15,7 @@ static Core_Mutex mutex;
 
 void InitDist() {
 	// disable distributor
-	HW_REG_SET(ACPU_GICD, CTLR, 0x0);
+	HW_REG_WRITE1(ACPU_GICD, CTLR, 0x0);
 
 	// set shared interrupts to edge level active high (2 bits, 16 interrupts at time)
 	for (int i = INT_UNKNOWN_0; i < Interrupt_Names::INT_SMMU; i += 16) {
@@ -34,19 +34,19 @@ void InitDist() {
 		hw_RegWrite(ACPU_GICD_BASE_ADDR, ACPU_GICD_ICENABLER0_OFFSET + (i >> 3), 0xffffffffU);
 	}
 	// enable distributor for both groups
-	HW_REG_SET(ACPU_GICD, CTLR, 0x3);
+	HW_REG_WRITE1(ACPU_GICD, CTLR, 0x3);
 }
 
 void InitCPU() {
 	disable_exceptions(CPSR_IRQ_ENABLE | CPSR_FIQ_ENABLE);
 
-	HW_REG_MERGE_FIELD(ACPU_GICC, PMR, PRIORITY, 0xF0);
+	HW_REG_SET_FIELD(HW_REG_GET_ADDRESS(ACPU_GICC), ACPU_GICC, PMR, PRIORITY, 0xF0);
 
 	// enable cpu for both groups
-	HW_REG_SET(ACPU_GICC, CTLR, 0x0);
-	HW_REG_SET_BIT(ACPU_GICC, CTLR, ENABLE_GROUP_0);
-	HW_REG_SET_BIT(ACPU_GICC, CTLR, ENABLE_GROUP_1);
-	HW_REG_SET_BIT(ACPU_GICC, CTLR, GROUP_0_FIQ);
+	HW_REG_WRITE1(ACPU_GICC, CTLR, 0x0);
+	HW_REG_SET_BIT1(ACPU_GICC, CTLR, ENABLE_GROUP_0);
+	HW_REG_SET_BIT1(ACPU_GICC, CTLR, ENABLE_GROUP_1);
+	HW_REG_SET_BIT1(ACPU_GICC, CTLR, GROUP_0_FIQ);
 
 	enable_exceptions(CPSR_IRQ_ENABLE | CPSR_FIQ_ENABLE);
 }

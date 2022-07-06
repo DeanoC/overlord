@@ -227,19 +227,19 @@ void serdes_fixcal(void)
 	{
 		if (count == MASK_POLL_TIME )
 			break;
-		rdata = HW_REG_GET(SERDES, POWER_GOOD);
+		rdata = HW_REG_READ1(SERDES, POWER_GOOD);
 		count++;
 	}while((rdata&0x0000000E) !=0x0000000E);
 
 	do {
 		//Clear ICM_CFG value
-		HW_REG_SET(SERDES2, ICM_CFG0, 0x00000000);
-		HW_REG_SET(SERDES2, ICM_CFG1, 0x00000000);
+		HW_REG_WRITE1(SERDES2, ICM_CFG0, 0x00000000);
+		HW_REG_WRITE1(SERDES2, ICM_CFG1, 0x00000000);
 
 		//Set ICM_CFG value
 		//This will trigger re-calibration of all stages
-		HW_REG_SET(SERDES2, ICM_CFG0, 0x00000001);
-		HW_REG_SET(SERDES2, ICM_CFG1, 0x00000000);
+		HW_REG_WRITE1(SERDES2, ICM_CFG0, 0x00000001);
+		HW_REG_WRITE1(SERDES2, ICM_CFG1, 0x00000000);
 
 		// is calibration done? polling on L3_CALIB_DONE_STATUS
 		count = 0;
@@ -248,16 +248,16 @@ void serdes_fixcal(void)
 				raw_debug_printf("SERDES initialization timed out\n\r");
 				return;
 			}
-			rdata = HW_REG_GET(SERDES, L3_CALIB_DONE_STATUS) & 0x2;
+			rdata = HW_REG_READ1(SERDES, L3_CALIB_DONE_STATUS) & 0x2;
 			count++;
 		} while( !rdata );
 
-		p_code = HW_REG_GET(SERDES, PMOS_CODE);
-		n_code = HW_REG_GET(SERDES, NMOS_CODE);
-		//m_code = HW_REG_GET(SERDES, MPHY_CODE);
-		i_code = HW_REG_GET(SERDES, ICAL_CODE);
-		r_code = HW_REG_GET(SERDES, RX_CODE);
-		//u_code = HW_REG_GET(SERDES, USB2_CODE);
+		p_code = HW_REG_READ1(SERDES, PMOS_CODE);
+		n_code = HW_REG_READ1(SERDES, NMOS_CODE);
+		//m_code = HW_REG_READ1(SERDES, MPHY_CODE);
+		i_code = HW_REG_READ1(SERDES, ICAL_CODE);
+		r_code = HW_REG_READ1(SERDES, RX_CODE);
+		//u_code = HW_REG_READ1(SERDES, USB2_CODE);
 
 		// PMOS code in acceptable range
 		if ((p_code >= 0x26) && (p_code <= 0x3C))
@@ -329,10 +329,10 @@ void serdes_fixcal(void)
 	HW_REG_MERGE(SERDES, L3_TM_CALIB_DIG14, 0xC0, ((i_code & 0x1) << 7) | 0x40 );
 
 	// Enable PLL Coarse Code saturation Logic
-	HW_REG_SET(SERDES, L0_TM_PLL_DIG_37, 0x00000010);
-	HW_REG_SET(SERDES, L1_TM_PLL_DIG_37, 0x00000010);
-	HW_REG_SET(SERDES, L2_TM_PLL_DIG_37, 0x00000010);
-	HW_REG_SET(SERDES, L3_TM_PLL_DIG_37, 0x00000010);
+	HW_REG_WRITE1(SERDES, L0_TM_PLL_DIG_37, 0x00000010);
+	HW_REG_WRITE1(SERDES, L1_TM_PLL_DIG_37, 0x00000010);
+	HW_REG_WRITE1(SERDES, L2_TM_PLL_DIG_37, 0x00000010);
+	HW_REG_WRITE1(SERDES, L3_TM_PLL_DIG_37, 0x00000010);
 }
 
 void serdesRunInitProgram(void)

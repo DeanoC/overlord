@@ -10,7 +10,6 @@ sources = [
     { in = "CMakeLists.txt", out = "CMakeLists.txt" },
     { in = "include/platform/cpu_percpu.h", out = "include/platform/${cpuName}/cpu.h", cpus = "_" },
     { in = "include/platform/memory_map_percpu.h", out = "include/platform/${cpuName}/memory_map.h", cpus = "_" },
-    { in = "include/platform/register_helpers_percpu.h", out = "include/platform/${cpuName}/register_helpers.h", cpus = "_" },
 ]
 
 [[process]]

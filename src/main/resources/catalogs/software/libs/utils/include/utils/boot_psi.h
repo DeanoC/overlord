@@ -35,7 +35,7 @@ typedef uint32_t PSI_IWord;
 #define PSI_DELAY_US(us) (PSIC_DELAY | (us))
 #define PSI_DELAY_MS(ms) PSI_DELAY_US((ms) * 1000)
 
-#define PSI_REG(type, reg) ((((uint32_t)(type##_REGISTER(reg)>>2))) << PSIC_REGISTER_SHIFT)
+#define PSI_REG(registerlist, reg) ((((uint32_t)(registerlist##_##reg##_OFFSET>>2))) << PSIC_REGISTER_SHIFT)
 
 #define PSI_WRITE_32(type, reg, value) (PSIC_WRITE_32BIT | (1 << PSIC_LOOP_SHIFT) | PSI_REG(type,reg)), (value)
 #define PSI_WRITE_MASKED_32(type, reg, mask, value) (PSIC_WRITE_MASKED_32BIT | (1 << PSIC_LOOP_SHIFT) | PSI_REG(type,reg)), (mask), (value)

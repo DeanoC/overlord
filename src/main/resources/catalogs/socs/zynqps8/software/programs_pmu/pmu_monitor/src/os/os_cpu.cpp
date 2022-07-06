@@ -34,23 +34,23 @@ void CpuWakeOrSleep(IPI3_Msg const *const msgBuffer) {
 	auto const lowAddress = (uint32_t) (addr & 0x0000'0000'FFFF'FFFFull);
 	auto const hiAddress = (uint32_t) ((addr & 0xFFFF'FFFF'0000'0000ull) >> 32ull);
 	if(msgBuffer->Payload.CPUWakeOrSleep.wakeA53_0) {
-		HW_REG_SET(APU, RVBARADDR0L, lowAddress);
-		HW_REG_SET(APU, RVBARADDR0H, hiAddress);
+		HW_REG_WRITE1(APU, RVBARADDR0L, lowAddress);
+		HW_REG_WRITE1(APU, RVBARADDR0H, hiAddress);
 		A53WakeUp0();
 	}
 	if(msgBuffer->Payload.CPUWakeOrSleep.wakeA53_1) {
-		HW_REG_SET(APU, RVBARADDR1L, lowAddress);
-		HW_REG_SET(APU, RVBARADDR1H, hiAddress);
+		HW_REG_WRITE1(APU, RVBARADDR1L, lowAddress);
+		HW_REG_WRITE1(APU, RVBARADDR1H, hiAddress);
 		A53WakeUp1();
 	}
 	if(msgBuffer->Payload.CPUWakeOrSleep.wakeA53_2) {
-		HW_REG_SET(APU, RVBARADDR2L, lowAddress);
-		HW_REG_SET(APU, RVBARADDR2H, hiAddress);
+		HW_REG_WRITE1(APU, RVBARADDR2L, lowAddress);
+		HW_REG_WRITE1(APU, RVBARADDR2H, hiAddress);
 		A53WakeUp2();
 	}
 	if(msgBuffer->Payload.CPUWakeOrSleep.wakeA53_3) {
-		HW_REG_SET(APU, RVBARADDR3L, lowAddress);
-		HW_REG_SET(APU, RVBARADDR3H, hiAddress);
+		HW_REG_WRITE1(APU, RVBARADDR3L, lowAddress);
+		HW_REG_WRITE1(APU, RVBARADDR3H, hiAddress);
 		A53WakeUp3();
 	}
 	if(msgBuffer->Payload.CPUWakeOrSleep.wakeR5f_0) {

@@ -44,3 +44,7 @@ target_link_libraries(${project} PRIVATE utils)
 
 target_include_directories(${project} PUBLIC include)
 add_compile_definitions(${project} BOARD_${BOARD}=1 SOC_${SOC}=1 CPU_${CPU}=1 CPU_ARCH_${CPU_ARCH}=1)
+if(${CPU} STREQUAL "pmu")
+	# if changing font size needs needs changin in pmu monitor as well
+	add_compile_definitions(${project} GFXDEBUG_FONTS_MINIMAL_MEMORY=2)
+endif()

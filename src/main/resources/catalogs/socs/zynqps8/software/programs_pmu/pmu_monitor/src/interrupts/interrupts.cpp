@@ -73,15 +73,15 @@ static uint32_t ShadowIrqEnable;
 
 
 static void PulseInterrupts() {
-	const uint32_t IntMaskReg1 = ~(HW_REG_GET(PMU_GLOBAL, ERROR_INT_MASK_1));
-	const uint32_t IntMaskReg2 = ~(HW_REG_GET(PMU_GLOBAL, ERROR_INT_MASK_2));
+	const uint32_t IntMaskReg1 = ~(HW_REG_READ1(PMU_GLOBAL, ERROR_INT_MASK_1));
+	const uint32_t IntMaskReg2 = ~(HW_REG_READ1(PMU_GLOBAL, ERROR_INT_MASK_2));
 
 	// Disable PMU interrupts in PMU Global register
-	HW_REG_SET(PMU_GLOBAL, ERROR_INT_DIS_1, IntMaskReg1);
-	HW_REG_SET(PMU_GLOBAL, ERROR_INT_DIS_2, IntMaskReg2);
+	HW_REG_WRITE1(PMU_GLOBAL, ERROR_INT_DIS_1, IntMaskReg1);
+	HW_REG_WRITE1(PMU_GLOBAL, ERROR_INT_DIS_2, IntMaskReg2);
 	// Enable PMU interrupts in PMU Global register
-	HW_REG_SET(PMU_GLOBAL, ERROR_INT_EN_1, IntMaskReg1);
-	HW_REG_SET(PMU_GLOBAL, ERROR_INT_EN_2, IntMaskReg2);
+	HW_REG_WRITE1(PMU_GLOBAL, ERROR_INT_EN_1, IntMaskReg1);
+	HW_REG_WRITE1(PMU_GLOBAL, ERROR_INT_EN_2, IntMaskReg2);
 }
 
 void Exception_Handler() {
@@ -91,12 +91,12 @@ void Exception_Handler() {
 
 void Disable(Name name) {
 	ShadowIrqEnable = ShadowIrqEnable & ~((uint32_t)name);
-	HW_REG_SET(PMU_IOMODULE, IRQ_ENABLE, ShadowIrqEnable);
+	HW_REG_WRITE1(PMU_IOMODULE, IRQ_ENABLE, ShadowIrqEnable);
 }
 
 void Enable(Name name) {
 	ShadowIrqEnable = ShadowIrqEnable | (uint32_t)name;
-	HW_REG_SET(PMU_IOMODULE, IRQ_ENABLE, ShadowIrqEnable);
+	HW_REG_WRITE1(PMU_IOMODULE, IRQ_ENABLE, ShadowIrqEnable);
 }
 
 void SetHandler(Name name, HandlerFunction handler) {
@@ -108,15 +108,15 @@ void Init() {
 		InterruptTable[i] = &NullHandler;
 	}
 
-	HW_REG_SET(PMU_IOMODULE, IRQ_ENABLE, 0);
+	HW_REG_WRITE1(PMU_IOMODULE, IRQ_ENABLE, 0);
 	microblaze_disable_exceptions();
 	microblaze_disable_interrupts();
-	HW_REG_SET(PMU_IOMODULE, IRQ_ACK, 0xffffffffU);
+	HW_REG_WRITE1(PMU_IOMODULE, IRQ_ACK, 0xffffffffU);
 	ShadowIrqEnable = 0;
 }
 
 void Start() {
-	HW_REG_SET(PMU_IOMODULE, IRQ_ENABLE, ShadowIrqEnable);
+	HW_REG_WRITE1(PMU_IOMODULE, IRQ_ENABLE, ShadowIrqEnable);
 	microblaze_enable_exceptions();
 	microblaze_enable_interrupts();
 }
@@ -127,8 +127,8 @@ __attribute__((noreturn)) void XPfw_Exception_Handler(void) {
 									 "MSR: 0x%x, EAR: 0x%x, EDR: 0x%x, ESR: 0x%x\r\n",
 									 mfmsr(), mfear(), mfedr(), mfesr());
 	/* Write error occurrence to PERS register and trigger FW Error1 */
-	HW_REG_MERGE(PMU_GLOBAL, PERS_GLOB_GEN_STORAGE5, HW_EXCEPTION_RECEIVED, HW_EXCEPTION_RECEIVED);
-	HW_REG_MERGE(PMU_LOCAL, PMU_SERV_ERR, PMU_LOCAL_PMU_SERV_ERR_FWERR_MASK, PMU_LOCAL_PMU_SERV_ERR_FWERR_MASK);
+	HW_REG_RMW1(PMU_GLOBAL, PERS_GLOB_GEN_STORAGE5, HW_EXCEPTION_RECEIVED, HW_EXCEPTION_RECEIVED);
+	HW_REG_RMW1(PMU_LOCAL, PMU_SERV_ERR, PMU_LOCAL_PMU_SERV_ERR_FWERR_MASK, PMU_LOCAL_PMU_SERV_ERR_FWERR_MASK);
 
 	while (1) { ;
 	}
@@ -139,7 +139,7 @@ __attribute__((noreturn)) void XPfw_Exception_Handler(void) {
 EXTERN_C void Interrupt_Handler() {
 	using namespace Interrupts;
 	// Latch the IRQ_PENDING register into a local variable
-	const uint32_t irqReg = HW_REG_GET(PMU_IOMODULE, IRQ_PENDING);
+	const uint32_t irqReg = HW_REG_READ1(PMU_IOMODULE, IRQ_PENDING);
 //	raw_debug_printf("pre irq 0x%lx\n", irqReg);
 	//raw_debug_printf("NullHandler %p\n", &NullHandler);
 
@@ -153,9 +153,9 @@ EXTERN_C void Interrupt_Handler() {
 		}
 	}
 	// ACK we have processed the interrupts
-	HW_REG_SET(PMU_IOMODULE, IRQ_ACK, irqReg);
+	HW_REG_WRITE1(PMU_IOMODULE, IRQ_ACK, irqReg);
 
-	//	const uint32_t irqReg2 = HW_REG_GET(PMU_IOMODULE, IRQ_PENDING);
+	//	const uint32_t irqReg2 = HW_REG_READ1(PMU_IOMODULE, IRQ_PENDING);
 	//	debug_printf("post irq2 0x%lx\n", irqReg2);
 
 	// Disable and Enable PMU interrupts in PMU Global register.

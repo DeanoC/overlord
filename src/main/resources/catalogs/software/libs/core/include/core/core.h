@@ -18,9 +18,9 @@
 #define PACKED  __attribute__((__packed__))
 #define HIDDEN __attribute__((__visibility__("hidden")))
 
-#define ALIGN(x) alignas(x)
-#define KEEP __attribute((used))
-#define ALIAS(x) __attribute((alias(#x)))
+#define ALIGN(x) __attribute__((aligned(x)))
+#define KEEP __attribute__((used))
+#define ALIAS(x) __attribute__((alias(#x)))
 
 #define INLINE __attribute__((gnu_inline)) inline
 #define ONLY_INLINE __attribute__((gnu_inline)) extern inline

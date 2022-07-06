@@ -51,6 +51,7 @@ void RGBA8::SetPixel(int x, int y, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
 }
 
 void RGBA8::PutChar(int col, int row, char c) const {
+	// GFXDEBUG_FONTS_MINIMAL_MEMORY == 2 has both 8 and 16 height font and can swap at runtime
 #if GFXDEBUG_FONTS_MINIMAL_MEMORY != 0
 	PutChar8(col, row, c);
 #else
@@ -61,10 +62,17 @@ void RGBA8::PutChar(int col, int row, char c) const {
 	}
 #endif
 }
-
 void RGBA8::PutChar8(int col, int row, char c) const {
-	if (c < GFXDEBUG_FONTS_MIN_CHAR || c >= GFXDEBUG_FONTS_MAX_CHAR)
-		return;
+	if (c < GFXDEBUG_FONTS_MIN_CHAR || c > GFXDEBUG_FONTS_MAX_CHAR)
+#if GFXDEBUG_FONTS_MINIMAL_MEMORY == 2
+		c = GFXDEBUG_FONTS_MAX_CHAR - GFXDEBUG_FONTS_MIN_CHAR;
+#else
+		c = ' ' - GFXDEBUG_FONTS_MIN_CHAR;
+#endif
+	else {
+		c = (char)(((int)c) - GFXDEBUG_FONTS_MIN_CHAR);
+	}
+
 	if(this->fontZoom > MaxFontZoom)
 		return;
 
@@ -77,8 +85,7 @@ void RGBA8::PutChar8(int col, int row, char c) const {
 
 	auto charLineBuf = (uint32_t*) fontTmpBuffer;
 	for (int y = 0; y < 8; ++y) {
-		int ac = ((int)c) - GFXDEBUG_FONTS_MIN_CHAR;
-		uint8_t const fd = font8x8[(ac * 8) + y];
+		uint8_t const fd = font8x8[(c * 8) + y];
 		for (int x = 0; x < 8; ++x) {
 #if GFXDEBUG_FONTS_MINIMAL_MEMORY == 2
 			bool const bit = !!(fd & (1 << x));
@@ -102,11 +109,18 @@ void RGBA8::PutChar8(int col, int row, char c) const {
 		}
 	}
 }
-#if GFXDEBUG_FONTS_MINIMAL_MEMORY == 0
 
+#if GFXDEBUG_FONTS_MINIMAL_MEMORY == 0
 void RGBA8::PutChar8x16(int col, int row, char c) const {
-	if (c < GFXDEBUG_FONTS_MIN_CHAR || c >= GFXDEBUG_FONTS_MAX_CHAR)
-		return;
+	if (c < GFXDEBUG_FONTS_MIN_CHAR || c > GFXDEBUG_FONTS_MAX_CHAR)
+#if GFXDEBUG_FONTS_MINIMAL_MEMORY == 2
+		c = GFXDEBUG_FONTS_MAX_CHAR - GFXDEBUG_FONTS_MIN_CHAR;
+#else
+		c = ' ' - GFXDEBUG_FONTS_MIN_CHAR;
+#endif
+	else {
+		c = (char)(((int)c) - GFXDEBUG_FONTS_MIN_CHAR);
+	}
 	if(this->fontZoom > MaxFontZoom)
 		return;
 
@@ -125,8 +139,7 @@ void RGBA8::PutChar8x16(int col, int row, char c) const {
 	memset(charLineBuf, 0xFF, 8*4*this->fontZoom);
 
 	for (int y = 0; y < 16; ++y) {
-		int ac = ((int)c) - GFXDEBUG_FONTS_MIN_CHAR;
-		uint8_t const fd = font8x16[(ac * 16) + y];
+		uint8_t const fd = font8x16[(c * 16) + y];
 
 		for (int x = 0; x < 8; ++x) {
 			bool const bit = !!(fd & (1 << (7-x)));

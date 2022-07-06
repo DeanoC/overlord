@@ -16,7 +16,7 @@ static void StallWhileAuxBusy(Connection* link) {
 	static uint32_t const mask = DP_REPLY_STATUS_REQUEST_IN_PROGRESS | DP_REPLY_STATUS_REPLY_IN_PROGRESS;
 
 	do {
-		uint32_t const status = HW_REG_GET(DP, REPLY_STATUS);
+		uint32_t const status = HW_REG_READ1(DP, REPLY_STATUS);
 		if((status & mask) == 0) return;
 		Utils_BusyMicroSleep(20);
 		timeout--;
@@ -30,7 +30,7 @@ static void StallUntilAuxReplyIsDone(Connection* link) {
 	uint32_t timeout = 100;
 
 	do {
-		uint32_t const status = HW_REG_GET(DP, REPLY_STATUS);
+		uint32_t const status = HW_REG_READ1(DP, REPLY_STATUS);
 
 		if((status & DP_REPLY_STATUS_REPLY_RECEIVED) &&
 			!(status & DP_REPLY_STATUS_REPLY_IN_PROGRESS)) return;
@@ -46,7 +46,7 @@ static void StallForAuxReady(Connection* display) {
 	uint32_t timeout = 100;
 
 	do {
-		uint32_t const status = HW_REG_GET(DP, INTERRUPT_SIGNAL_STATE);
+		uint32_t const status = HW_REG_READ1(DP, INTERRUPT_SIGNAL_STATE);
 		if(	(status & DP_INTERRUPT_SIGNAL_STATE_REQUEST_STATE) == false) return;
 
 		Utils_BusyMicroSleep(20);
@@ -64,8 +64,8 @@ static bool AuxReadUpto16Bytes(Connection *link, uint32_t address, uint32_t cons
 	uint32_t tryCount = 100;
 	Retry:;
 	StallForAuxReady(link);
-	HW_REG_SET(DP, AUX_ADDRESS, address);
-	HW_REG_SET(DP, AUX_COMMAND_REGISTER,
+	HW_REG_WRITE1(DP, AUX_ADDRESS, address);
+	HW_REG_WRITE1(DP, AUX_COMMAND_REGISTER,
 						 HW_REG_ENCODE_FIELD(DP,
 																 AUX_COMMAND_REGISTER,
 																 AUX_CH_COMMAND,
@@ -73,7 +73,7 @@ static bool AuxReadUpto16Bytes(Connection *link, uint32_t address, uint32_t cons
 								 HW_REG_ENCODE_FIELD(DP, AUX_COMMAND_REGISTER, NUM_OF_BYTES, numBytes - 1));
 
 	StallUntilAuxReplyIsDone(link);
-	uint32_t const replyCode = HW_REG_GET(DP, AUX_REPLY_CODE);
+	uint32_t const replyCode = HW_REG_READ1(DP, AUX_REPLY_CODE);
 	if (HW_REG_DECODE_FIELD(DP, AUX_REPLY_CODE, CODE0, replyCode) == DP_AUX_REPLY_CODE_CODE0_AUX_NACK)
 		return false;
 	else if (HW_REG_DECODE_FIELD(DP, AUX_REPLY_CODE, CODE0, replyCode) == DP_AUX_REPLY_CODE_CODE0_AUX_DEFER) {
@@ -89,7 +89,7 @@ static bool AuxReadUpto16Bytes(Connection *link, uint32_t address, uint32_t cons
 
 	tryCount = 100;
 	RetryDataCount:;
-	uint32_t const byteCount = HW_REG_GET(DP, REPLY_DATA_COUNT);
+	uint32_t const byteCount = HW_REG_READ1(DP, REPLY_DATA_COUNT);
 	if (byteCount != numBytes && tryCount > 0) {
 		Utils_BusyMicroSleep(100);
 		tryCount--;
@@ -97,7 +97,7 @@ static bool AuxReadUpto16Bytes(Connection *link, uint32_t address, uint32_t cons
 	}
 	if (byteCount == numBytes) {
 		for (unsigned int i = 0; i < byteCount; ++i) {
-			data[i] = HW_REG_GET(DP, AUX_REPLY_DATA);
+			data[i] = HW_REG_READ1(DP, AUX_REPLY_DATA);
 		}
 		return true;
 	} else {
@@ -130,13 +130,13 @@ static bool AuxWriteUpto16Bytes(Connection *link, uint32_t address, uint32_t num
 
 Retry:;
 	StallForAuxReady(link);
-	HW_REG_SET(DP, AUX_ADDRESS, address);
+	HW_REG_WRITE1(DP, AUX_ADDRESS, address);
 
 	for (uint32_t i = 0; i < numBytes; ++i) {
-		HW_REG_SET(DP, AUX_WRITE_FIFO, data[i]);
+		HW_REG_WRITE1(DP, AUX_WRITE_FIFO, data[i]);
 	}
 
-	HW_REG_SET(DP, AUX_COMMAND_REGISTER,
+	HW_REG_WRITE1(DP, AUX_COMMAND_REGISTER,
 						 HW_REG_ENCODE_FIELD(DP,
 																 AUX_COMMAND_REGISTER,
 																 AUX_CH_COMMAND,
@@ -145,7 +145,7 @@ Retry:;
 
 	StallUntilAuxReplyIsDone(link);
 
-	uint32_t const replyCode = HW_REG_GET(DP, AUX_REPLY_CODE);
+	uint32_t const replyCode = HW_REG_READ1(DP, AUX_REPLY_CODE);
 	if (HW_REG_DECODE_FIELD(DP, AUX_REPLY_CODE, CODE0, replyCode) == DP_AUX_REPLY_CODE_CODE0_AUX_NACK)
 		return false;
 	else if (HW_REG_DECODE_FIELD(DP, AUX_REPLY_CODE, CODE0, replyCode) == DP_AUX_REPLY_CODE_CODE0_AUX_DEFER) {
@@ -186,16 +186,16 @@ static bool I2CReadUpto16Bytes(Connection *link, bool mot, uint32_t address, uin
 	uint32_t tryCount = 100;
 	Retry:;
 	StallForAuxReady(link);
-	HW_REG_SET(DP, AUX_ADDRESS, address);
+	HW_REG_WRITE1(DP, AUX_ADDRESS, address);
 	if(mot) {
-		HW_REG_SET(DP, AUX_COMMAND_REGISTER,
+		HW_REG_WRITE1(DP, AUX_COMMAND_REGISTER,
 							 HW_REG_ENCODE_FIELD(DP,
 																	 AUX_COMMAND_REGISTER,
 																	 AUX_CH_COMMAND,
 																	 DP_AUX_COMMAND_REGISTER_AUX_CH_COMMAND_I2C_READ_MOT) |
 									 HW_REG_ENCODE_FIELD(DP, AUX_COMMAND_REGISTER, NUM_OF_BYTES, numBytes - 1));
 	} else {
-		HW_REG_SET(DP, AUX_COMMAND_REGISTER,
+		HW_REG_WRITE1(DP, AUX_COMMAND_REGISTER,
 							 HW_REG_ENCODE_FIELD(DP,
 																	 AUX_COMMAND_REGISTER,
 																	 AUX_CH_COMMAND,
@@ -203,7 +203,7 @@ static bool I2CReadUpto16Bytes(Connection *link, bool mot, uint32_t address, uin
 									 HW_REG_ENCODE_FIELD(DP, AUX_COMMAND_REGISTER, NUM_OF_BYTES, numBytes - 1));
 	}
 	StallUntilAuxReplyIsDone(link);
-	uint32_t const replyCode = HW_REG_GET(DP, AUX_REPLY_CODE);
+	uint32_t const replyCode = HW_REG_READ1(DP, AUX_REPLY_CODE);
 	if (HW_REG_DECODE_FIELD(DP, AUX_REPLY_CODE, CODE1, replyCode) == DP_AUX_REPLY_CODE_CODE1_I2C_NACK) {
 		debug_print("!DP_AUX_REPLY_CODE_CODE1_I2C_NACK\n");
 		return false;
@@ -222,7 +222,7 @@ static bool I2CReadUpto16Bytes(Connection *link, bool mot, uint32_t address, uin
 
 	tryCount = 100;
 	RetryDataCount:;
-	uint32_t const byteCount = HW_REG_GET(DP, REPLY_DATA_COUNT);
+	uint32_t const byteCount = HW_REG_READ1(DP, REPLY_DATA_COUNT);
 	if (byteCount != numBytes && tryCount > 0) {
 		Utils_BusyMicroSleep(100);
 		tryCount--;
@@ -230,7 +230,7 @@ static bool I2CReadUpto16Bytes(Connection *link, bool mot, uint32_t address, uin
 	}
 	if (byteCount == numBytes) {
 		for (unsigned int i = 0; i < byteCount; ++i) {
-			data[i] = HW_REG_GET(DP, AUX_REPLY_DATA);
+			data[i] = HW_REG_READ1(DP, AUX_REPLY_DATA);
 		}
 		return true;
 	} else {
@@ -263,21 +263,21 @@ static bool I2CWriteUpto16Bytes(Connection *link, bool mot, uint32_t address, ui
 
 	Retry:;
 	StallForAuxReady(link);
-	HW_REG_SET(DP, AUX_ADDRESS, address);
+	HW_REG_WRITE1(DP, AUX_ADDRESS, address);
 
 	for (uint32_t i = 0; i < numBytes; ++i) {
-		HW_REG_SET(DP, AUX_WRITE_FIFO, data[i]);
+		HW_REG_WRITE1(DP, AUX_WRITE_FIFO, data[i]);
 	}
 
 	if(mot) {
-		HW_REG_SET(DP, AUX_COMMAND_REGISTER,
+		HW_REG_WRITE1(DP, AUX_COMMAND_REGISTER,
 							 HW_REG_ENCODE_FIELD(DP,
 																	 AUX_COMMAND_REGISTER,
 																	 AUX_CH_COMMAND,
 																	 DP_AUX_COMMAND_REGISTER_AUX_CH_COMMAND_I2C_WRITE_MOT) |
 									 HW_REG_ENCODE_FIELD(DP, AUX_COMMAND_REGISTER, NUM_OF_BYTES, (numBytes - 1)));
 	} else {
-		HW_REG_SET(DP, AUX_COMMAND_REGISTER,
+		HW_REG_WRITE1(DP, AUX_COMMAND_REGISTER,
 							 HW_REG_ENCODE_FIELD(DP,
 																	 AUX_COMMAND_REGISTER,
 																	 AUX_CH_COMMAND,
@@ -286,7 +286,7 @@ static bool I2CWriteUpto16Bytes(Connection *link, bool mot, uint32_t address, ui
 	}
 	StallUntilAuxReplyIsDone(link);
 
-	uint32_t const replyCode = HW_REG_GET(DP, AUX_REPLY_CODE);
+	uint32_t const replyCode = HW_REG_READ1(DP, AUX_REPLY_CODE);
 	if (HW_REG_DECODE_FIELD(DP, AUX_REPLY_CODE, CODE1, replyCode) == DP_AUX_REPLY_CODE_CODE1_I2C_NACK)
 		return false;
 	else if (HW_REG_DECODE_FIELD(DP, AUX_REPLY_CODE, CODE1, replyCode) == DP_AUX_REPLY_CODE_CODE1_I2C_DEFER) {

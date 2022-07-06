@@ -24,8 +24,8 @@
  **/
 
 // Constant: font8x8_basic
-// Contains an 8x8 font map for unicode points U+0000 - U+007F (basic latin)
-static uint8_t font8x8_basic[][8] = {
+// Contains an 8x8 font map for unicode points U+0021 - U+007F (basic latin)
+static uint8_t font8x8_basic[95][8] = {
 		{ 0x18, 0x3C, 0x3C, 0x18, 0x18, 0x00, 0x18, 0x00},   // U+0021 (!)
 		{ 0x36, 0x36, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},   // U+0022 (")
 		{ 0x36, 0x36, 0x7F, 0x36, 0x7F, 0x36, 0x36, 0x00},   // U+0023 (#)
@@ -125,7 +125,9 @@ static uint8_t font8x8_basic[][8] = {
 
 uint8_t const * font8x8 = &font8x8_basic[0][0];
 
-#else // GFXDEBUG_FONTS_MINIMAL_MEMORY
+#else
+// both GFXDEBUG_FONTS_MINIMAL_MEMORY == 0 | 1 have the full 8 bit font
+// GFXDEBUG_FONTS_MINIMAL_MEMORY == 0 has additional 8x16 font
 
 // This fonts come from ftp://ftp.simtel.net/pub/simtelnet/msdos/screen/fntcol16.zip
 // The package is (c) by Joseph Gil

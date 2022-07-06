@@ -13,16 +13,16 @@
 #include "gic_proxy.hpp"
 
 void IPI0_Handler(Interrupts::Name irq_name) {
-	uint32_t isr = HW_REG_GET(IPI, PMU_0_ISR);
+	uint32_t isr = HW_REG_READ1(IPI, PMU_0_ISR);
 	// write to clear to inform IPI PMU buffer is free to use now
-	HW_REG_SET(IPI, PMU_0_ISR, isr);
+	HW_REG_WRITE1(IPI, PMU_0_ISR, isr);
 
 //	debug_printf ("IPI0_Handler 0x%lx\n", isr);
 	RomServiceTable[REN_IPI0]();
 }
 
 void IPI3_Handler(Interrupts::Name irq_name) {
-	uint32_t isr = HW_REG_GET(IPI, PMU_3_ISR);
+	uint32_t isr = HW_REG_READ1(IPI, PMU_3_ISR);
 //	debug_printf ("irq_name 0x%x IPI3_Handler 0x%lx\n", irq_name, isr);
 
 	for (uint32_t name = 0x80000000U; name != 0; name >>= 1) {
@@ -34,16 +34,16 @@ void IPI3_Handler(Interrupts::Name irq_name) {
 	}
 
 	// write to clear interrupt
-	HW_REG_SET(IPI, PMU_3_ISR, isr);
+	HW_REG_WRITE1(IPI, PMU_3_ISR, isr);
 }
 
 void CorrectableECCErrors_Handler(Interrupts::Name irq_name) {
 	// write to clear status bit
-	HW_REG_SET_BIT(PMU_LMB_BRAM, ECC_STATUS, CE);
+	HW_REG_SET_BIT1(PMU_LMB_BRAM, ECC_STATUS, CE);
 }
 
 void GPI0_Handler(Interrupts::Name irq_name) {
-	uint32_t gpi0 = HW_REG_GET(PMU_IOMODULE, GPI0);
+	uint32_t gpi0 = HW_REG_READ1(PMU_IOMODULE, GPI0);
 	// TODO use find first bit
 	for (uint32_t name = 0x80000000U; name != 0; name >>= 1) {
 		if ((gpi0 & name) == 0) continue;
@@ -84,8 +84,8 @@ void GPI0_Handler(Interrupts::Name irq_name) {
 }
 
 void GPI1_Handler(Interrupts::Name irq_name) {
-	uint32_t gpi1 = HW_REG_GET(PMU_IOMODULE, GPI1);
-//	raw_debug_printf("GPI1 0x%lx\n", HW_REG_GET(PMU_IOMODULE, GPI1));
+	uint32_t gpi1 = HW_REG_READ1(PMU_IOMODULE, GPI1);
+//	raw_debug_printf("GPI1 0x%lx\n", HW_REG_READ1(PMU_IOMODULE, GPI1));
 
 	// TODO use find first bit
 	for (uint32_t name = 0x80000000U; name != 0; name >>= 1) {
@@ -145,12 +145,12 @@ void GPI1_Handler(Interrupts::Name irq_name) {
 			default: break;
 		}
 	}
-//	raw_debug_printf("GPI1 0x%lx\n", HW_REG_GET(PMU_IOMODULE, GPI1));
+//	raw_debug_printf("GPI1 0x%lx\n", HW_REG_READ1(PMU_IOMODULE, GPI1));
 
 }
 
 void GPI2_Handler(Interrupts::Name irq_name) {
-	uint32_t gpi2 = HW_REG_GET(PMU_IOMODULE, GPI2);
+	uint32_t gpi2 = HW_REG_READ1(PMU_IOMODULE, GPI2);
 
 	// TODO use find first bit
 	for (uint32_t name = 0x80000000U; name != 0; name >>= 1) {
@@ -204,7 +204,7 @@ void GPI2_Handler(Interrupts::Name irq_name) {
 }
 
 void GPI3_Handler(Interrupts::Name irq_name) {
-	uint32_t gpi3 = HW_REG_GET(PMU_IOMODULE, GPI3);
+	uint32_t gpi3 = HW_REG_READ1(PMU_IOMODULE, GPI3);
 
 	// TODO use find first bit
 	for (uint32_t name = 0x80000000U; name != 0; name >>= 1) {

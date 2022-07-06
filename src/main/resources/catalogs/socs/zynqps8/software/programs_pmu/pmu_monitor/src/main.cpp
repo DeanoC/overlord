@@ -64,15 +64,15 @@ void setupInterruptHandlers() {
 
 	// install IPI0 as PMU sleep handlers (TODO seems a waste of an entire IPI...)
 	raw_debug_print("  PMU sleep handler\n");
-	HW_REG_SET(IPI, PMU_0_ISR, IPI_PMU_0_ISR_USERMASK);
-	HW_REG_SET(IPI, PMU_0_IER, IPI_PMU_0_IER_USERMASK);
+	HW_REG_WRITE1(IPI, PMU_0_ISR, IPI_PMU_0_ISR_USERMASK);
+	HW_REG_WRITE1(IPI, PMU_0_IER, IPI_PMU_0_IER_USERMASK);
 	Interrupts::SetHandler(Interrupts::Name::IN_IPI0, &IPI0_Handler);
 	Interrupts::Enable(Interrupts::Name::IN_IPI0);
 
 	// IPI3 OS service handler
 	raw_debug_print("  PMU OS handler\n");
-	HW_REG_SET(IPI, PMU_3_ISR, IPI_PMU_3_ISR_USERMASK);
-	HW_REG_SET(IPI, PMU_3_IER, IPI_PMU_3_IER_USERMASK);
+	HW_REG_WRITE1(IPI, PMU_3_ISR, IPI_PMU_3_ISR_USERMASK);
+	HW_REG_WRITE1(IPI, PMU_3_IER, IPI_PMU_3_IER_USERMASK);
 	Interrupts::SetHandler(Interrupts::Name::IN_IPI3, &IPI3_Handler);
 	Interrupts::Enable(Interrupts::Name::IN_IPI3);
 
@@ -83,7 +83,7 @@ void setupInterruptHandlers() {
 
 	// GPI1 (Wakeup events)
 	raw_debug_print("  Wakeup handler\n");
-	HW_REG_SET(PMU_LOCAL, GPI1_ENABLE, PMU_LOCAL_GPI1_ENABLE_USERMASK);
+	HW_REG_WRITE1(PMU_LOCAL, GPI1_ENABLE, PMU_LOCAL_GPI1_ENABLE_USERMASK);
 	Interrupts::SetHandler(Interrupts::Name::IN_GPI1, &GPI1_Handler);
 	Interrupts::Enable(Interrupts::Name::IN_GPI1);
 
@@ -91,26 +91,26 @@ void setupInterruptHandlers() {
 	// GPI1 is also used for GIC_PROXY
 	// what UART are we using? set the interrupt based on that
 #if UART_DEBUG_BASE_ADDR == 0xff010000
-	HW_REG_SET(LPD_SLCR, GICP0_IRQ_ENABLE, LPD_SLCR_GICP0_IRQ_ENABLE_SRC22);
+	HW_REG_WRITE1(LPD_SLCR, GICP0_IRQ_ENABLE, LPD_SLCR_GICP0_IRQ_ENABLE_SRC22);
 #else
-	HW_REG_SET(LPD_SLCR, GICP0_IRQ_ENABLE, LPD_SLCR_GICP0_IRQ_ENABLE_SRC21);
+	HW_REG_WRITE1(LPD_SLCR, GICP0_IRQ_ENABLE, LPD_SLCR_GICP0_IRQ_ENABLE_SRC21);
 #endif
 
-	HW_REG_SET(LPD_SLCR, GICP_PMU_IRQ_ENABLE, LPD_SLCR_GICP_PMU_IRQ_ENABLE_SRC0);
-	HW_REG_SET(UART_DEBUG, INTRPT_DIS, 	~UART_CHNL_INT_STS_RTRIG);
-	HW_REG_SET(UART_DEBUG, INTRPT_EN, 	UART_CHNL_INT_STS_RTRIG);
-	HW_REG_SET(UART_DEBUG, RCVR_TIMEOUT, 32);
-	HW_REG_SET(UART_DEBUG, RCVR_FIFO_TRIGGER_LEVEL, 1);
+	HW_REG_WRITE1(LPD_SLCR, GICP_PMU_IRQ_ENABLE, LPD_SLCR_GICP_PMU_IRQ_ENABLE_SRC0);
+	HW_REG_WRITE(HW_REG_GET_ADDRESS(UART_DEBUG), UART, INTRPT_DIS, 	~UART_CHNL_INT_STS_RTRIG);
+	HW_REG_WRITE(HW_REG_GET_ADDRESS(UART_DEBUG), UART, INTRPT_EN, 	UART_CHNL_INT_STS_RTRIG);
+	HW_REG_WRITE(HW_REG_GET_ADDRESS(UART_DEBUG), UART, RCVR_TIMEOUT, 32);
+	HW_REG_WRITE(HW_REG_GET_ADDRESS(UART_DEBUG), UART, RCVR_FIFO_TRIGGER_LEVEL, 1);
 
 	// GPI2 (Reset and sleep events)
 	raw_debug_print("  Reset and Sleep handler\n");
-	HW_REG_SET(PMU_LOCAL, GPI2_ENABLE, PMU_LOCAL_GPI2_ENABLE_USERMASK);
+	HW_REG_WRITE1(PMU_LOCAL, GPI2_ENABLE, PMU_LOCAL_GPI2_ENABLE_USERMASK);
 	Interrupts::SetHandler(Interrupts::Name::IN_GPI2, &GPI2_Handler);
 	Interrupts::Enable(Interrupts::Name::IN_GPI2);
 
 	// GPI3 (PL to PMU events)
 	raw_debug_print("  PL to PMU handler\n");
-	HW_REG_SET(PMU_LOCAL, GPI3_ENABLE, PMU_LOCAL_GPI3_ENABLE_USERMASK);
+	HW_REG_WRITE1(PMU_LOCAL, GPI3_ENABLE, PMU_LOCAL_GPI3_ENABLE_USERMASK);
 	Interrupts::SetHandler(Interrupts::Name::IN_GPI3, &GPI3_Handler);
 	Interrupts::Enable(Interrupts::Name::IN_GPI3);
 
@@ -123,12 +123,12 @@ void main() __attribute__((noreturn));
 
 void main()
 {
-	HW_REG_CLR_BIT(PMU_GLOBAL, SAFETY_GATE, SCAN_ENABLE);
+	HW_REG_CLR_BIT1(PMU_GLOBAL, SAFETY_GATE, SCAN_ENABLE);
 
 	// init disables interrupts and exceptions, start will enable them
 	Interrupts::Init();
 
-	HW_REG_CLR_BIT(PMU_GLOBAL, GLOBAL_CNTRL, DONT_SLEEP);
+	HW_REG_CLR_BIT1(PMU_GLOBAL, GLOBAL_CNTRL, DONT_SLEEP);
 
 	PrintBanner();
 
@@ -155,13 +155,13 @@ void main()
 	raw_debug_print("Interrupt Start\n");
 	Interrupts::Start();
 
-	HW_REG_SET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0,
-						 HW_REG_GET(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) | OS_GLOBAL0_PMU_READY);
+	HW_REG_WRITE1(PMU_GLOBAL, GLOBAL_GEN_STORAGE0,
+						 HW_REG_READ1(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) | OS_GLOBAL0_PMU_READY);
 
 	debug_print("IKUY PMU Firmware setup complete\n");
 	Timers::Start();
 
-	HW_REG_SET_BIT(PMU_GLOBAL, GLOBAL_CNTRL, FW_IS_PRESENT);
+	HW_REG_SET_BIT1(PMU_GLOBAL, GLOBAL_CNTRL, FW_IS_PRESENT);
 
 	osHeap->hundredHzCallbacks[(int)HundredHzTasks::HOST_MAIN_CALLS] = &MainCallsCallback;
 

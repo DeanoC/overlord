@@ -85,7 +85,7 @@ silent = true
 [[connection]]
 type = "bus"
 connection = "USB0 -> LPDOutboundSwitch"
-bus_name = "usb0_lpdoutbound"
+bus_name = "usb${index}_lpdoutbound"
 silent = true
 
 [[connection]]

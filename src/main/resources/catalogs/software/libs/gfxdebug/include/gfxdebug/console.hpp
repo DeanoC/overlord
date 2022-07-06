@@ -3,7 +3,9 @@
 #include "core/snprintf.h"
 #include "utils/string_utils.hpp"
 #include "gfxdebug/rgba8.hpp"
+#include "dbg/ansi_escapes.h"
 #include "dbg/assert.h"
+#include "dbg/print.h"
 
 namespace GfxDebug {
 
@@ -15,19 +17,7 @@ struct ConsoleBase {
 		uint8_t back: 3;
 	};
 
-	void Init(uint16_t w, uint16_t h, uint8_t* tb, Attribute* ab) {
-		dirty = true;
-		flashState = false;
-		width = w;
-		height = h;
-		curCol = 0;
-		curRow = 0;
-		currentAttribute = DefaultAttribute;
-		textBuffer = tb;
-		attributeBuffer = ab;
-		memset(textBuffer, 0, width * height);
-		memset(attributeBuffer, *(uint8_t *) &DefaultAttribute, width * height);
-	}
+	void Init(uint16_t w, uint16_t h, uint8_t* tb, Attribute* ab);
 	uint32_t ProcessANSI(uint32_t size, char const *str, uint32_t i);
 
 	constexpr static Attribute const DefaultAttribute = {0, 0, 0x7, 0};
@@ -75,6 +65,21 @@ struct Console : ConsoleBase {
 
 	void Init() {
 		ConsoleBase::Init(WIDTH, HEIGHT, textArray, attributeArray);
+
+#if GFXDEBUG_FONTS_MINIMAL_MEMORY == 0
+		debug_print( ANSI_CYAN_PEN "8x16 Font + 8x8 Font (6144 bytes in data seg)\n");
+		int fontBytes = 4096 + 2048;
+#elif GFXDEBUG_FONTS_MINIMAL_MEMORY == 1
+		debug_print( ANSI_CYAN_PEN "8x8 Font (2048 bytes in data seg)\n");
+		int fontBytes = 2048;
+#elif GFXDEBUG_FONTS_MINIMAL_MEMORY == 2
+		debug_print( ANSI_CYAN_PEN "8x8 Font Printable Only (736 bytes in data seg)\n");
+		int fontBytes = 736;
+#endif
+		int textBytes = WIDTH * HEIGHT * 2;
+
+		debug_printf( "%i x %i text buffer (%i bytes) TOTAL: %i bytes" ANSI_WHITE_PEN "\n", WIDTH, HEIGHT, textBytes, textBytes + fontBytes);
+		debug_print(ANSI_CYAN_PEN "Screen Console " ANSI_GREEN_PEN "OK \n" ANSI_WHITE_PEN);
 		ThirtyHzCounter = 0;
 	}
 

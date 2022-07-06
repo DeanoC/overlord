@@ -99,17 +99,17 @@ uint32_t GetCounter(Name const name_) {
 
 void SetType(Name const name_, Type type_) {
 	switch(type_) {
-		case Type::Counter: ClearCounterControlBits(name_, HW_REG_FIELD_MASK(TTC0, COUNTER_CONTROL_1, INT)); break;
-		case Type::Interval: SetCounterControlBits(name_, HW_REG_FIELD_MASK(TTC0, COUNTER_CONTROL_1, INT)); break;
+		case Type::Counter: ClearCounterControlBits(name_, HW_REG_FIELD_MASK(TTC, COUNTER_CONTROL_1, INT)); break;
+		case Type::Interval: SetCounterControlBits(name_, HW_REG_FIELD_MASK(TTC, COUNTER_CONTROL_1, INT)); break;
 	}
 }
 
 void EnableMatchInterrupts(Name const name_) {
-	SetCounterControlBits(name_, HW_REG_FIELD_MASK(TTC0, COUNTER_CONTROL_1, MATCH));
+	SetCounterControlBits(name_, HW_REG_FIELD_MASK(TTC, COUNTER_CONTROL_1, MATCH));
 }
 
 void DisableMatchInterrupts(Name const name_, uint32_t match_) {
-	ClearCounterControlBits(name_, HW_REG_FIELD_MASK(TTC0, COUNTER_CONTROL_1, MATCH));
+	ClearCounterControlBits(name_, HW_REG_FIELD_MASK(TTC, COUNTER_CONTROL_1, MATCH));
 }
 
 void SetMatch(Name const name_, uint32_t index_, uint32_t match_) {
@@ -141,12 +141,12 @@ void AckInterrupts(Name const name_) {
 }
 
 void Start(Name const name_) {
-	ClearCounterControlBits(name_, HW_REG_FIELD_MASK(TTC0, COUNTER_CONTROL_1, DIS));
-	SetCounterControlBits(name_, HW_REG_FIELD_MASK(TTC0, COUNTER_CONTROL_1, RST));
+	ClearCounterControlBits(name_, HW_REG_FIELD_MASK(TTC, COUNTER_CONTROL_1, DIS));
+	SetCounterControlBits(name_, HW_REG_FIELD_MASK(TTC, COUNTER_CONTROL_1, RST));
 }
 
 void Stop(Name const name_) {
-	SetCounterControlBits(name_, HW_REG_FIELD_MASK(TTC0, COUNTER_CONTROL_1, DIS));
+	SetCounterControlBits(name_, HW_REG_FIELD_MASK(TTC, COUNTER_CONTROL_1, DIS));
 }
 
 IntervalAndPrescaler CalcIntervalFromFreq(uint32_t const desiredFreq_)
@@ -185,7 +185,7 @@ void SetPrescaler(Name const name_, uint8_t value_) {
 		uint32_t const name = NameToRegister(name_);
 		uint32_t const index = NameToTimer(name_) * 4;
 		uint32_t clockControl = hw_RegRead( name,TTC_CLOCK_CONTROL_1_OFFSET + index);
-		uint32_t const v = HW_REG_ENCODE_FIELD(TTC0, CLOCK_CONTROL_1, PS_V, (value_ - 1));
+		uint32_t const v = HW_REG_ENCODE_FIELD(TTC, CLOCK_CONTROL_1, PS_V, (value_ - 1));
 		clockControl = (clockControl & (~v)) | v;
 		hw_RegWrite(name,TTC_CLOCK_CONTROL_1_OFFSET + index,clockControl);
 		SetClockControlBits(name_, TTC_CLOCK_CONTROL_1_PS_EN);

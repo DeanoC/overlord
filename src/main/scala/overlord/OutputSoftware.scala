@@ -51,8 +51,8 @@ object OutputSoftware {
 	                       distanceMatrix: DistanceMatrix,
 	                       connected: Seq[Connected]): Unit = {
 		val keywordsPerCpu: Array[Map[String, Variant]] = (for (cpu <- cpus) yield {
-			val sanitizedTriple           = cpu.triple.replace("-", "_")
-			val (memMap, registerHelpers) = generateMemoryMapFor(cpu, distanceMatrix, connected)
+			val sanitizedTriple = cpu.triple.replace("-", "_")
+			val memMap          = generateMemoryMapFor(cpu, distanceMatrix, connected)
 			Map[String, Variant](
 				"${triple}" -> StringV(sanitizedTriple),
 				"${TRIPLE}" -> StringV(sanitizedTriple.toUpperCase),
@@ -65,7 +65,6 @@ object OutputSoftware {
 				"${isSoftCore}" -> BooleanV(!cpu.isHardware),
 				"${isHardCore}" -> BooleanV(cpu.isHardware),
 				"${memoryMap}" -> StringV(memMap),
-				"${registerHelpers}" -> StringV(registerHelpers),
 				"${board}" -> StringV(boardName)
 				)
 		}).toArray
@@ -85,23 +84,17 @@ object OutputSoftware {
 
 	private def generateMemoryMapFor(cpu: CpuInstance,
 	                                 distanceMatrix: DistanceMatrix,
-	                                 connected: Seq[Connected]): (String, String) = {
+	                                 connected: Seq[Connected]): String = {
 		val mmsb = new mutable.StringBuilder
-		val hesb = new mutable.StringBuilder
 
-		val (mm, helpers) = genChipMemoryMapFor(cpu, distanceMatrix, connected)
+		val mm = genChipMemoryMapFor(cpu, distanceMatrix, connected)
 		mmsb ++= mm
-		hesb ++= helpers
 
-		mmsb ++=
-		"""
-			|#include "register_helpers.h"
-			|""".stripMargin
 
-		(mmsb.result(), hesb.result())
+		mmsb.result()
 	}
 
-	private def genChipMemoryMapFor(cpu: CpuInstance, distanceMatrix: DistanceMatrix, connected: Seq[Connected]): (String, String) = {
+	private def genChipMemoryMapFor(cpu: CpuInstance, distanceMatrix: DistanceMatrix, connected: Seq[Connected]): String = {
 
 		val (ramRanges, chipAddresses) = extractRamAndRegisters(cpu, distanceMatrix, connected)
 
@@ -126,26 +119,19 @@ object OutputSoftware {
 			rsb ++= f"#define ${name}_SIZE_IN_BYTES $size${cPostFix(size)}%n"
 		}
 
-		val hesb = new mutable.StringBuilder
 		for ((rbName, rlName, _, address) <- chipAddresses) {
 			val rbNameU = rbName.toUpperCase
 			val rlNameU = rlName.toUpperCase
 
 			if (address >= 0) {
 				rsb ++= f"%n#define ${rbNameU}_BASE_ADDR 0x$address%x${cPostFix(address)}%n"
-				hesb ++= f"#define ${rbNameU}_REGISTER(reg) ${rlNameU}_##reg##_OFFSET%n"
 			} else {
 				// -1 bank address mean non MMIO register so no base address is valid
-				hesb ++= f"// These registers aren't MMIO accessible so require platform intrinsics to use%n"
+				rsb ++= f"// These registers aren't MMIO accessible so require platform intrinsics to use%n"
 			}
-			hesb ++= f"#define ${rbNameU}_FIELD(reg, field) ${rlNameU}_##reg##_##field%n"
-			hesb ++= f"#define ${rbNameU}_FIELD_MASK(reg, field) ${rlNameU}_##reg##_##field##_MASK%n"
-			hesb ++= f"#define ${rbNameU}_FIELD_LSHIFT(reg, field) ${rlNameU}_##reg##_##field##_LSHIFT%n"
-			hesb ++= f"#define ${rbNameU}_FIELD_ENUM(reg, field, enm) ${rlNameU}_##reg##_##field##_##enm%n"
-
 		}
 
-		(rsb.result(), hesb.result())
+		rsb.result()
 	}
 
 	private def cPostFix(s: BigInt): String = if (s > (BigInt(Int.MaxValue) * 2) - 1) "ULL" else "U"

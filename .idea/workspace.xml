@@ -5,14 +5,39 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="73b7f681-932b-4979-9f4f-6aee48997ac8" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gfxdebug/include/gfxdebug/bitmap.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gfxdebug/src/bitmap.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/ios/uarts/uarts.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/ios/uarts/uarts.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/lpd.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/lpd.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/display_port/src/aux.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/display_port/src/aux.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/display_port/src/display.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/display_port/src/display.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/display_port/src/serdes.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/display_port/src/serdes.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/display_port/src/train.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/display_port/src/train.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/gic_v2/src/gic_v2.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/gic_v2/src/gic_v2.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/i2c/src/i2c.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/i2c/src/i2c.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/triple_timer_counter/src/ttc.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/triple_timer_counter/src/ttc.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/debug_script.tcl" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/debug_script.tcl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/myir_fz3/ddr_init.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/myir_fz3/ddr_init.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/myir_fz3/serdes_init.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/myir_fz3/serdes_init.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/cpuwake.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/cpuwake.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/host_interface.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/host_interface.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/interrupts/gic_proxy.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/interrupts/gic_proxy.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/interrupts/interrupt_handlers.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/interrupts/interrupt_handlers.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/interrupts/interrupts.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/interrupts/interrupts.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os/os_cpu.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os/os_cpu.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os/os_print.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/os/os_print.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Chip/Registers.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Chip/Registers.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/timers.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/timers.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/dbg/src/zynqmp/print.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/dbg/src/zynqmp/print.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gfxdebug/src/font8x8.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gfxdebug/src/font8x8.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/src/ipi3_transport.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/src/ipi3_transport.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/include/platform/reg_access.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/include/platform/reg_access.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/include/platform/register_helpers_percpu.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/platform.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/platform/platform.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/utils/include/utils/boot_psi.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/utils/include/utils/boot_psi.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/prefabs/boards/kv260.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/prefabs/boards/kv260.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/prefabs/socs/zynqps8/iop.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/prefabs/socs/zynqps8/iop.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/OutputSoftware.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/OutputSoftware.scala" afterDir="false" />
     </list>
     <list id="0751d2e6-7320-4108-a016-46fb703e79ea" name="Changes by SNAPSHOT-DEANO" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -96,20 +121,20 @@
     <option name="showLibraryContents" value="true" />
     <option name="showMembers" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/deano/projects/overlord/src/main/resources/catalogs/socs/zynqps8&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.sourceCode&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "/home/deano/projects/overlord/src/main/resources/catalogs/socs/zynqps8",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "configurable.group.editor"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8" />
@@ -358,28 +383,9 @@
       <workItem from="1655568391924" duration="17963000" />
       <workItem from="1655644266092" duration="22287000" />
       <workItem from="1655886754989" duration="54493000" />
-      <workItem from="1656746223519" duration="14799000" />
-    </task>
-    <task id="LOCAL-00007" summary="Missed resetti added file from last commit">
-      <created>1608103374655</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1608103374655</updated>
-    </task>
-    <task id="LOCAL-00008" summary="Renamed NXMinterconnect to bus&#10;added Advanced Peripheral Bus from Spinal to catalog&#10;added PipelinedMemoryBus to APB Bridge to Spinal&#10;Added bridges catalog&#10;Fixed compile in Report.scala">
-      <created>1608115175244</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1608115175244</updated>
-    </task>
-    <task id="LOCAL-00009" summary="&#10;Fixed use of boolean parameter (which isn't support yet)&#10;Uart APB control chip added&#10;Fixed Xdc generation error due to wildcard matching&#10;Fixed Top wires generation error due to wildcard matching&#10;Fixed pmb_to_apb parameter names&#10;Fixed pin group naming bug">
-      <created>1608146599371</created>
-      <option name="number" value="00009" />
-      <option name="presentableId" value="LOCAL-00009" />
-      <option name="project" value="LOCAL" />
-      <updated>1608146599371</updated>
+      <workItem from="1656746223519" duration="19485000" />
+      <workItem from="1657177608504" duration="1262000" />
+      <workItem from="1657364305799" duration="5195000" />
     </task>
     <task id="LOCAL-00010" summary="Added Variant type with BigInt handling">
       <created>1608497204030</created>
@@ -703,7 +709,28 @@
       <option name="project" value="LOCAL" />
       <updated>1656928048373</updated>
     </task>
-    <option name="localTasksCounter" value="56" />
+    <task id="LOCAL-00056" summary="Added alex forenchich axi verilog to resources (limited set of toml config at the mo)&#10;Removed path ops from actions&#10;PS8 config now compiles&#10;new parameters connections&#10;generated clocks now supported and xdc output&#10;better verilog top boundrary parsing&#10;clock.generated definition added &#10;ConstantConnections removed now Constant &#10;Case type in Unconnected fixed&#10;Bus Definition type removed (use Switch now)&#10;Constants are stored in game seperate from Connection (as can be sent into Gateware actions prior to connections being formed)&#10;Welcome to Index Systems visible on boot console again!&#10;ikuy_boot and pmu working fully">
+      <created>1656938004623</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1656938004624</updated>
+    </task>
+    <task id="LOCAL-00057" summary="Fixed a bug in 8x8 screen console&#10;Print data on font on PMU boot&#10;Fixed a bug where the 8x16 was being included even in 8x8 mode&#10;Added Cmake defines to always use 8x8 mode on PMU (also fix the setting not being applied) save 4K for pmu_rom&#10;Almost ready for a custom screen console on APU side&#10;&#10;Fixed warnings in XHCI to do with GCC align and packed not working together (now does). Need to test if it fixed anything...">
+      <created>1657099033006</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1657099033006</updated>
+    </task>
+    <task id="LOCAL-00058" summary="Fixed a bug in 8x8 screen console&#10;Print data on font on PMU boot&#10;Fixed a bug where the 8x16 was being included even in 8x8 mode&#10;Added Cmake defines to always use 8x8 mode on PMU (also fix the setting not being applied) save 4K for pmu_rom&#10;Almost ready for a custom screen console on APU side&#10;&#10;Fixed warnings in XHCI to do with GCC align and packed not working together (now does). Need to test if it fixed anything...">
+      <created>1657100068845</created>
+      <option name="number" value="00058" />
+      <option name="presentableId" value="LOCAL-00058" />
+      <option name="project" value="LOCAL" />
+      <updated>1657100068845</updated>
+    </task>
+    <option name="localTasksCounter" value="59" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -752,8 +779,6 @@
       <path value="$PROJECT_DIR$/../ikuy_utils" />
       <path value="$USER_HOME$/.sbt/1.0/staging/a7772c47d5d7e84d3e85/ikuy_utils" />
     </ignored-roots>
-    <MESSAGE value="source processor renamed to sources&#10;gic400 register definition updated&#10;a53 system registers added&#10;ipi buffer registers added&#10;pmu ecc local memory bus register added&#10;Serdes PLL registers added&#10;lib core added with aarch64 and microblaze support&#10;a53 ikuy_boot boot fsbl/rom added&#10;overlord SoftSource action for symbolic links&#10;overlord Template action for templated source file&#10;Software instances and output added&#10;cpu passed into actions for cpu specific sources" />
-    <MESSAGE value="refactored dbg - now raw_print.h functions write to uart directly whilst debug_print use the osservices functions. ansi escapes moved to own file&#10;Some changes to internal_math.h to fix some compile in release errors&#10;osservice library added, pmu ip3i transport system added&#10;os is being developed in xmasdemo but provides debug prints and ddr block allocators so far. will be moved here once its more settled&#10;C compiling set to gnu2x for single arg static assert" />
     <MESSAGE value="Cpu per zynqmp cpu added to defs&#10;atomic wifth and bitop width added to defs&#10;zdma register enums added&#10;cpp + CPU flags to cmake default cmake toolchain&#10;renamed some ikuy_boot to more standard style&#10;Register enum facility added&#10;extern &quot;c&quot; added in lots of headers&#10;Print for a pointer added to osservices&#10;OsServer ddr payload added&#10;BitOps for C and C++ added&#10;Atomics for C and C++ added&#10;bitmap_allocator_single_threaded.hpp added and tested&#10;bitmap_allocator.hpp WIP&#10;assert now waits forever" />
     <MESSAGE value="Moved most software libraries to soft_src&#10;rearranged include/src of most software projects&#10;Added assert_msg macro&#10;Added zynqmp display port library&#10;added zynqmp dma library&#10;ikuy_boot now packages pmu_monitor code and uploads its to pmu&#10;ikuy_boot sets up a 720p RGBA framebuffer&#10;utils library busy_sleep for aarch64, string utils, c++ compile time hash&#10;basic gfxdebug code with vga screen print" />
     <MESSAGE value="Moved most software libraries to soft_src&#10;rearranged include/src of most software projects&#10;Added assert_msg macro&#10;Added zynqmp display port library&#10;added zynqmp dma library&#10;ikuy_boot now packages pmu_monitor code and uploads its to pmu&#10;ikuy_boot sets up a 720p RGBA framebuffer&#10;utils library busy_sleep for aarch64, string utils, c++ compile time hash&#10;basic gfxdebug code with vga screen print&#10;Added ANSI screen console&#10;Fixed some pmu interrupt problems due to fast interrupts&#10;Added aarch64 exception registers and logger to ikuy_boot" />
@@ -777,7 +802,9 @@
     <MESSAGE value="Major refactor and improvements (WIP)&#10;Bus system completely rewritten, any chip instance can support multiple buses&#10;Path following for address and register generation reworked&#10;Lots of zynqps8 register defs moved to local instances&#10;Ps8 Blackbox and wrapper for connecting buses via scala or overlord made&#10;Zynqps8 hardware mapped out and connected using new bus syntax&#10;Overlord pathing redone, with multiple path stacks and macros for odd cases&#10;Project structured cleaned&#10;Definition stored where they were loaded from&#10;QueryInterface and xxLike interfaces added to allow more complex class hierachy&#10;Bridges are removed, just special case of switches (which have been added)&#10;instanced now don't have idents but names (to help track name/ident bugs)&#10;new graphics, doc and switch definition and instance type added (and bridges removed)" />
     <MESSAGE value="Added alex forenchich axi verilog to resources (limited set of toml config at the mo)&#10;Removed path ops from actions&#10;PS8 config now compiles&#10;new parameters connections&#10;generated clocks now supported and xdc output&#10;better verilog top boundrary parsing&#10;clock.generated definition added &#10;ConstantConnections removed now Constant &#10;Case type in Unconnected fixed&#10;Bus Definition type removed (use Switch now)&#10;Constants are stored in game seperate from Connection (as can be sent into Gateware actions prior to connections being formed)" />
     <MESSAGE value="Added alex forenchich axi verilog to resources (limited set of toml config at the mo)&#10;Removed path ops from actions&#10;PS8 config now compiles&#10;new parameters connections&#10;generated clocks now supported and xdc output&#10;better verilog top boundrary parsing&#10;clock.generated definition added &#10;ConstantConnections removed now Constant &#10;Case type in Unconnected fixed&#10;Bus Definition type removed (use Switch now)&#10;Constants are stored in game seperate from Connection (as can be sent into Gateware actions prior to connections being formed)&#10;Welcome to Index Systems visible on boot console again!" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added alex forenchich axi verilog to resources (limited set of toml config at the mo)&#10;Removed path ops from actions&#10;PS8 config now compiles&#10;new parameters connections&#10;generated clocks now supported and xdc output&#10;better verilog top boundrary parsing&#10;clock.generated definition added &#10;ConstantConnections removed now Constant &#10;Case type in Unconnected fixed&#10;Bus Definition type removed (use Switch now)&#10;Constants are stored in game seperate from Connection (as can be sent into Gateware actions prior to connections being formed)&#10;Welcome to Index Systems visible on boot console again!" />
+    <MESSAGE value="Added alex forenchich axi verilog to resources (limited set of toml config at the mo)&#10;Removed path ops from actions&#10;PS8 config now compiles&#10;new parameters connections&#10;generated clocks now supported and xdc output&#10;better verilog top boundrary parsing&#10;clock.generated definition added &#10;ConstantConnections removed now Constant &#10;Case type in Unconnected fixed&#10;Bus Definition type removed (use Switch now)&#10;Constants are stored in game seperate from Connection (as can be sent into Gateware actions prior to connections being formed)&#10;Welcome to Index Systems visible on boot console again!&#10;ikuy_boot and pmu working fully" />
+    <MESSAGE value="Fixed a bug in 8x8 screen console&#10;Print data on font on PMU boot&#10;Fixed a bug where the 8x16 was being included even in 8x8 mode&#10;Added Cmake defines to always use 8x8 mode on PMU (also fix the setting not being applied) save 4K for pmu_rom&#10;Almost ready for a custom screen console on APU side&#10;&#10;Fixed warnings in XHCI to do with GCC align and packed not working together (now does). Need to test if it fixed anything..." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed a bug in 8x8 screen console&#10;Print data on font on PMU boot&#10;Fixed a bug where the 8x16 was being included even in 8x8 mode&#10;Added Cmake defines to always use 8x8 mode on PMU (also fix the setting not being applied) save 4K for pmu_rom&#10;Almost ready for a custom screen console on APU side&#10;&#10;Fixed warnings in XHCI to do with GCC align and packed not working together (now does). Need to test if it fixed anything..." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>

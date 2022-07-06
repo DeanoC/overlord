@@ -29,8 +29,8 @@ static void SetVoltageSwing(Connection* display) {
 	uint8_t const swing = vs[peLevelRx][vsLevelRx];
 	for(int i=0;i < display->numLanes;++i) {
 		switch(i) {
-			case 0: HW_REG_SET(SERDES, L0_TXPMD_TM_48, swing); break;
-			case 1: HW_REG_SET(SERDES, L1_TXPMD_TM_48, swing); break;
+			case 0: HW_REG_WRITE1(SERDES, L0_TXPMD_TM_48, swing); break;
+			case 1: HW_REG_WRITE1(SERDES, L1_TXPMD_TM_48, swing); break;
 			default: break;
 		}
 	}
@@ -51,8 +51,8 @@ static void SetPreEmphasis(Connection* display) {
 	uint8_t const preEmp = pe[peLevelRx][vsLevelRx];
 	for(int i=0;i < display->numLanes;++i) {
 		switch(i) {
-			case 0: HW_REG_SET(SERDES, L0_TX_ANA_TM_18, preEmp); break;
-			case 1: HW_REG_SET(SERDES, L1_TX_ANA_TM_18, preEmp); break;
+			case 0: HW_REG_WRITE1(SERDES, L0_TX_ANA_TM_18, preEmp); break;
+			case 1: HW_REG_WRITE1(SERDES, L1_TX_ANA_TM_18, preEmp); break;
 			default: break;
 		}
 	}
@@ -120,21 +120,21 @@ LinkStatus CheckLinkStatus(Connection const* display) {
 }
 
 void ResetPhy(Connection* display) {
-	HW_REG_CLR_BIT(DP, TRANSMITTER_ENABLE, TX_EN);
+	HW_REG_CLR_BIT1(DP, TRANSMITTER_ENABLE, TX_EN);
 
-	HW_REG_SET(DP, PHY_RESET,
+	HW_REG_WRITE1(DP, PHY_RESET,
 						 HW_REG_ENCODE_FIELD(DP, PHY_RESET, EN_8B_10B, 1) |
 								 HW_REG_ENCODE_FIELD(DP, PHY_RESET, PHY_RESET, 1 ) );
 
 	Utils_BusyMicroSleep(100);
 
-	HW_REG_SET(DP, PHY_RESET,
+	HW_REG_WRITE1(DP, PHY_RESET,
 						 HW_REG_ENCODE_FIELD(DP, PHY_RESET, EN_8B_10B, 1) |
 								 HW_REG_ENCODE_FIELD(DP, PHY_RESET, PHY_RESET, 0) );
 
 	Serdes::StallForPhyReady(display);
 
-	HW_REG_SET_BIT(DP, TRANSMITTER_ENABLE, TX_EN);
+	HW_REG_SET_BIT1(DP, TRANSMITTER_ENABLE, TX_EN);
 }
 
 void UpdateLaneStatusAdjReqs(Connection* display) {
@@ -199,7 +199,7 @@ void StallForPhyReady(Connection *display) {
 														HW_REG_ENCODE_FIELD(DP, PHY_STATUS, RESET_LANES_0_1, 0x3) |
 																HW_REG_ENCODE_FIELD(DP, PHY_STATUS, PLL_LOCKED , 0x1);
 	do {
-		if((HW_REG_GET(DP, PHY_STATUS) & readyMask) == readyMask) return;
+		if((HW_REG_READ1(DP, PHY_STATUS) & readyMask) == readyMask) return;
 		Utils_BusyMicroSleep(20);
 		timeout--;
 	} while(timeout >= 0);
@@ -229,7 +229,7 @@ bool SetDownSpread(Connection* display, bool enable) {
 
 	}
 
-	HW_REG_SET(DP, DOWNSPREAD_CTRL, enable);
+	HW_REG_WRITE1(DP, DOWNSPREAD_CTRL, enable);
 	display->downSpreadEnabled = enable;
 
 	return true;
@@ -256,7 +256,7 @@ bool SetEnhancedFrameMode(Connection* display, bool enable) {
 
 	}
 
-	HW_REG_SET(DP, ENHANCED_FRAME_EN, enable);
+	HW_REG_WRITE1(DP, ENHANCED_FRAME_EN, enable);
 	display->enhancedFrameEnabled = enable;
 
 	return true;
@@ -264,26 +264,26 @@ bool SetEnhancedFrameMode(Connection* display, bool enable) {
 
 void SetLinkRate(Connection* display, LinkRate rate) {
 	auto const linkRate = (uint8_t)rate;
-	HW_REG_CLR_BIT(DP, TRANSMITTER_ENABLE, TX_EN);
+	HW_REG_CLR_BIT1(DP, TRANSMITTER_ENABLE, TX_EN);
 
 	switch (rate) {
 		case LinkRate::Rate_1_62Gbps:
-			HW_REG_SET(DP, PHY_CLOCK_SELECT,
+			HW_REG_WRITE1(DP, PHY_CLOCK_SELECT,
 								 HW_REG_ENCODE_ENUM(DP, PHY_CLOCK_SELECT, SEL, LINK_1_62GBS));
 			break;
 		case LinkRate::Rate_2_7Gbps:
-			HW_REG_SET(DP, PHY_CLOCK_SELECT,
+			HW_REG_WRITE1(DP, PHY_CLOCK_SELECT,
 								 HW_REG_ENCODE_ENUM(DP, PHY_CLOCK_SELECT, SEL, LINK_2_7GBS));
 			break;
 		case LinkRate::Rate_5_4Gbps:
-			HW_REG_SET(DP, PHY_CLOCK_SELECT,
+			HW_REG_WRITE1(DP, PHY_CLOCK_SELECT,
 								 HW_REG_ENCODE_ENUM(DP, PHY_CLOCK_SELECT, SEL, LINK_5_4GBS));
 			break;
 	}
 
-	HW_REG_SET(DP, LINK_BW_SET, (uint32_t)rate);
+	HW_REG_WRITE1(DP, LINK_BW_SET, (uint32_t)rate);
 
-	HW_REG_SET_BIT(DP, TRANSMITTER_ENABLE, TX_EN);
+	HW_REG_SET_BIT1(DP, TRANSMITTER_ENABLE, TX_EN);
 
 	StallForPhyReady(display);
 
@@ -294,7 +294,7 @@ void SetLinkRate(Connection* display, LinkRate rate) {
 
 	display->linkRate = rate;
 
-	HW_REG_SET(DP, LINK_BW_SET, linkRate);
+	HW_REG_WRITE1(DP, LINK_BW_SET, linkRate);
 
 }
 
@@ -310,7 +310,7 @@ void SetLaneCount(Connection* display, unsigned int count) {
 		return;
 	}
 
-	HW_REG_SET(DP, LANE_COUNT_SET, count);
+	HW_REG_WRITE1(DP, LANE_COUNT_SET, count);
 	display->numLanes = count;
 
 }

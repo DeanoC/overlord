@@ -19,6 +19,24 @@ static uint32_t GetNumber(uint32_t size, char const *str, int* outIndex = nullpt
 }
 
 namespace GfxDebug {
+void ConsoleBase::Init(uint16_t w, uint16_t h, uint8_t* tb, Attribute* ab) {
+	dirty = true;
+	flashState = false;
+	width = w;
+	height = h;
+	curCol = 0;
+	curRow = 0;
+	currentAttribute = DefaultAttribute;
+	textBuffer = tb;
+	attributeBuffer = ab;
+#if GFXDEBUG_FONTS_MINIMAL_MEMORY == 2
+	// 0x7f = GFXDEBUG_FONTS_MAX_CHAR
+	memset(textBuffer, 0x7f, width * height);
+#else
+	memset(textBuffer, 0, width * height);
+#endif
+	memset(attributeBuffer, *(uint8_t *) &DefaultAttribute, width * height);
+}
 
 uint32_t ConsoleBase::ProcessANSI(uint32_t size, char const *str, uint32_t i) {
 	enum class ANSIState {

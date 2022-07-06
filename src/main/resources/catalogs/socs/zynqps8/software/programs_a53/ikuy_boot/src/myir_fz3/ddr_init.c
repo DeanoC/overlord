@@ -327,20 +327,20 @@ static void ddrPhybringup(void)
 	unsigned int pll_locked = 0;
 
 	while ((pll_retry > 0) && (!pll_locked)) {
-		HW_REG_SET(DDR_PHY, PIR, 0x00040010);
-		HW_REG_SET(DDR_PHY, PIR, 0x00040011);
+		HW_REG_WRITE1(DDR_PHY, PIR, 0x00040010);
+		HW_REG_WRITE1(DDR_PHY, PIR, 0x00040011);
 
-		while ((HW_REG_GET(DDR_PHY, PGSR0) & 0x1) != 1) {
+		while ((HW_REG_READ1(DDR_PHY, PGSR0) & 0x1) != 1) {
 			/*****TODO*****/
 			/*TIMEOUT poll mechanism need to be inserted in this block*/
 		}
 
 
-		pll_locked  = (HW_REG_GET(DDR_PHY, PGSR0) & 0x80000000) >> 31;
-		pll_locked &= (HW_REG_GET(DDR_PHY, DX0GSR0) & 0x10000) >> 16;
-		pll_locked &= (HW_REG_GET(DDR_PHY, DX2GSR0) & 0x10000) >> 16;
-		pll_locked &= (HW_REG_GET(DDR_PHY, DX4GSR0) & 0x10000) >> 16;
-		pll_locked &= (HW_REG_GET(DDR_PHY, DX6GSR0) & 0x10000) >> 16;
+		pll_locked  = (HW_REG_READ1(DDR_PHY, PGSR0) & 0x80000000) >> 31;
+		pll_locked &= (HW_REG_READ1(DDR_PHY, DX0GSR0) & 0x10000) >> 16;
+		pll_locked &= (HW_REG_READ1(DDR_PHY, DX2GSR0) & 0x10000) >> 16;
+		pll_locked &= (HW_REG_READ1(DDR_PHY, DX4GSR0) & 0x10000) >> 16;
+		pll_locked &= (HW_REG_READ1(DDR_PHY, DX6GSR0) & 0x10000) >> 16;
 		pll_retry--;
 	}
 
@@ -351,45 +351,45 @@ static void ddrPhybringup(void)
 		return;
 	}
 
-	HW_REG_SET(DDR_PHY, PIR, 0x00040063U);
+	HW_REG_WRITE1(DDR_PHY, PIR, 0x00040063U);
 	/* PHY BRINGUP SEQ */
-	while ((HW_REG_GET(DDR_PHY, PGSR0) & 0x0000000FU) != 0x0000000FU) {
+	while ((HW_REG_READ1(DDR_PHY, PGSR0) & 0x0000000FU) != 0x0000000FU) {
 		/*****TODO*****/
 		/*TIMEOUT poll mechanism need to be inserted in this block*/
 	}
 
 	HW_REG_SET_BIT(DDR_PHY, PIR, INIT);
 		/* poll for PHY initialization to complete */
-	while ((HW_REG_GET(DDR_PHY, PGSR0) & 0x000000FFU) != 0x0000001FU) {
+	while ((HW_REG_READ1(DDR_PHY, PGSR0) & 0x000000FFU) != 0x0000001FU) {
 		/*****TODO*****/
 		/*TIMEOUT poll mechanism need to be inserted in this block*/
 	}
 
-	HW_REG_SET(DDRC, DFIMISC, 0x00000001U);
-	HW_REG_SET(DDRC, SWCTL, 0x00000001U);
-	while ((HW_REG_GET(DDRC, STAT) & 0x0000000FU) != 0x00000001U) {
+	HW_REG_WRITE1(DDRC, DFIMISC, 0x00000001U);
+	HW_REG_WRITE1(DDRC, SWCTL, 0x00000001U);
+	while ((HW_REG_READ1(DDRC, STAT) & 0x0000000FU) != 0x00000001U) {
 		/*****TODO*****/
 		/*TIMEOUT poll mechanism need to be inserted in this block*/
 	}
 
 	HW_REG_MERGE(DDR_PHY, PGCR1, 0x00000040U, (0x00000001U<< 0x06U));
 
-	HW_REG_SET(DDR_PHY, PIR, 0x0004FE01);
+	HW_REG_WRITE1(DDR_PHY, PIR, 0x0004FE01);
 
 	do {
-		regval = HW_REG_GET(DDR_PHY, PGSR0);
+		regval = HW_REG_READ1(DDR_PHY, PGSR0);
 	} while (regval != 0x80000FFF);
 
-	regval = ((HW_REG_GET(DDR_PHY, PGSR0) & 0x1FFF0000) >>18);
+	regval = ((HW_REG_READ1(DDR_PHY, PGSR0) & 0x1FFF0000) >>18);
 	if(regval != 0) {
 		raw_debug_printf("DDR PGSR0 != 0, DDR Init failed!!!\n");
 		return;
 	}
 
 // Run Vref training in static read mode
-	HW_REG_SET(DDR_PHY, DTCR0, 0x100091C7U);
+	HW_REG_WRITE1(DDR_PHY, DTCR0, 0x100091C7U);
 
-	uint32_t cur_R006_tREFPRD = HW_REG_GET(DDR_PHY, PGCR2);
+	uint32_t cur_R006_tREFPRD = HW_REG_READ1(DDR_PHY, PGCR2);
 	// this doesn't appear to do anything but i've left it in, in case its needed for a trigger
 	HW_REG_MERGE(DDR_PHY, PGCR2, 0x0003FFFFU, cur_R006_tREFPRD);
 
@@ -400,14 +400,14 @@ static void ddrPhybringup(void)
 	HW_REG_MERGE_FIELD(DDR_PHY, DX8SL3DXCTL2, RDMODE, 0x00000003U);
 	HW_REG_MERGE_FIELD(DDR_PHY, DX8SL4DXCTL2, RDMODE, 0x00000003U);
 
-	HW_REG_SET(DDR_PHY, PIR, 0x00060001);
+	HW_REG_WRITE1(DDR_PHY, PIR, 0x00060001);
 	do {
-		regval = HW_REG_GET(DDR_PHY, PGSR0);
+		regval = HW_REG_READ1(DDR_PHY, PGSR0);
 	} while ((regval & 0x80004001) != 0x80004001);
 
 // Vref training is complete
 // Check if any training errors then exit
-	regval = ((HW_REG_GET(DDR_PHY, PGSR0) & 0x1FFF0000) >>18);
+	regval = ((HW_REG_READ1(DDR_PHY, PGSR0) & 0x1FFF0000) >>18);
 	if(regval != 0) {
 		raw_debug_printf("DDR PGSR0 != 0 2, DDR Init failed!!!\n");
 		return;
@@ -421,16 +421,16 @@ static void ddrPhybringup(void)
 	HW_REG_MERGE_FIELD(DDR_PHY, DX8SL4DXCTL2, RDMODE, 0x0U);
 
 // Vref training is complete, disabling static read mode
-	HW_REG_SET(DDR_PHY, DTCR0, 0x800091C7U);
+	HW_REG_WRITE1(DDR_PHY, DTCR0, 0x800091C7U);
 	HW_REG_MERGE(DDR_PHY, PGCR2, 0x0003FFFFU, cur_R006_tREFPRD);
 
-	HW_REG_SET(DDR_PHY, PIR, 0x0000C001);
+	HW_REG_WRITE1(DDR_PHY, PIR, 0x0000C001);
 	do {
-		regval = HW_REG_GET(DDR_PHY, PGSR0);
+		regval = HW_REG_READ1(DDR_PHY, PGSR0);
 	} while ((regval & 0x80000C01) != 0x80000C01);
 
-	HW_REG_SET(DDRC, ZQCTL0, 0x01000040U);
-	HW_REG_SET(DDRC, RFSHCTL3, 0x00000000U);
+	HW_REG_WRITE1(DDRC, ZQCTL0, 0x01000040U);
+	HW_REG_WRITE1(DDRC, RFSHCTL3, 0x00000000U);
 	HW_REG_MERGE(DDR_PHY, PGCR1, 0x00000040U, 0x00000000U);
 }
 

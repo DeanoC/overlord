@@ -175,7 +175,6 @@ void HostInterface::WhatCommand() {
 		}
 	}
 
-
 	const auto findCount = Utils::StringFindMultiple(cmdBufferHeadTmp, (char *) this->cmdBuffer, ' ', MaxFinds, finds);
 	if (findCount != Utils::StringNotFound) {
 		Utils::StringScatterChar(cmdBufferHeadTmp, (char *) this->cmdBuffer, findCount, finds, 0);
@@ -326,14 +325,14 @@ void HostInterface::BootCpu(uint8_t const *cmdBuffer, unsigned int const *finds,
 			A53Sleep3();
 			auto const lowAddress = (uint32_t) (downloadAddress & 0x0000'0000'FFFF'FFFFull);
 			auto const hiAddress = (uint32_t) ((downloadAddress & 0xFFFF'FFFF'0000'0000ull) >> 32ull);
-			HW_REG_SET(APU, RVBARADDR0L, lowAddress);
-			HW_REG_SET(APU, RVBARADDR0H, hiAddress);
-			HW_REG_SET(APU, RVBARADDR1L, lowAddress);
-			HW_REG_SET(APU, RVBARADDR1H, hiAddress);
-			HW_REG_SET(APU, RVBARADDR2L, lowAddress);
-			HW_REG_SET(APU, RVBARADDR2H, hiAddress);
-			HW_REG_SET(APU, RVBARADDR3L, lowAddress);
-			HW_REG_SET(APU, RVBARADDR3H, hiAddress);
+			HW_REG_WRITE1(APU, RVBARADDR0L, lowAddress);
+			HW_REG_WRITE1(APU, RVBARADDR0H, hiAddress);
+			HW_REG_WRITE1(APU, RVBARADDR1L, lowAddress);
+			HW_REG_WRITE1(APU, RVBARADDR1H, hiAddress);
+			HW_REG_WRITE1(APU, RVBARADDR2L, lowAddress);
+			HW_REG_WRITE1(APU, RVBARADDR2H, hiAddress);
+			HW_REG_WRITE1(APU, RVBARADDR3L, lowAddress);
+			HW_REG_WRITE1(APU, RVBARADDR3H, hiAddress);
 			// wakey wakey rise and shine
 			A53WakeUp0();
 			A53WakeUp1();
@@ -370,8 +369,8 @@ void HostInterface::Reset(uint8_t const *cmdBuffer, unsigned int const *finds, u
 	Stall(Channels::ChannelSevern);
 	auto const lowAddress = (uint32_t) (osHeap->bootData.bootCodeStart & 0x0000'0000'FFFF'FFFFull);
 	auto const hiAddress = (uint32_t) ((osHeap->bootData.bootCodeStart & 0xFFFF'FFFF'0000'0000ull) >> 32ull);
-	HW_REG_SET(APU, RVBARADDR0L, lowAddress);
-	HW_REG_SET(APU, RVBARADDR0H, hiAddress);
+	HW_REG_WRITE1(APU, RVBARADDR0L, lowAddress);
+	HW_REG_WRITE1(APU, RVBARADDR0H, hiAddress);
 	A53WakeUp0();
 
 }

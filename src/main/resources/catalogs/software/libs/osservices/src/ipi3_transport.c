@@ -37,8 +37,8 @@ static Core_Mutex mutex;
 #else
 #error CPU not supported for IPI
 #endif
-//#define WAIT_FOR_ACK(a,b) while (HW_REG_GET(IPI, a) & (b)) { /*raw_debug_printf("%#010x %#010x",HW_REG_GET(IPI, a), (uint32_t)b); */}
-#define WAIT_FOR_ACK(a,b) while (HW_REG_GET(IPI, a) & (b)) {}
+//#define WAIT_FOR_ACK(a,b) while (HW_REG_READ1(IPI, a) & (b)) { /*raw_debug_printf("%#010x %#010x",HW_REG_READ1(IPI, a), (uint32_t)b); */}
+#define WAIT_FOR_ACK(a,b) while (HW_REG_READ1(IPI, a) & (b)) {}
 
 void IPI3_OsService_Submit(const IPI3_Msg *const msg) {
 	LOCK_MUTEX();
@@ -49,7 +49,7 @@ void IPI3_OsService_Submit(const IPI3_Msg *const msg) {
 	// but r5f each have there own buffer but this code will use the PMU one, which would have 3 user simultanously
 	memcpy(IPI_MSG(IPI_BUFFER, IA_PMU), msg, 32);
 	Cache_DCacheCleanAndInvalidateLine((uintptr_t)IPI_MSG(IPI_BUFFER, IA_PMU));
-	HW_REG_SET(IPI, IPI_TRIG, IC_PMU_3);
+	HW_REG_WRITE1(IPI, IPI_TRIG, IC_PMU_3);
 
 	UNLOCK_MUTEX();
 }

@@ -33,9 +33,9 @@ type = "io.uart.zynqps8"
 instance = 1
 
 [[instance]]
-name = "USB1"
+name = "USB0"
 type = "io.internal.usb.zynqps8"
-instance = 1
+instance = 0
 
 [[instance]]
 name = "QSPI"

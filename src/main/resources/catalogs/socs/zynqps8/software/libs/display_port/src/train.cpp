@@ -33,18 +33,18 @@ enum class TrainingPattern {
 static const uint32_t DISPLAY_PORT_ITERATION = 5;
 
 static void SetTrainingPattern(Connection* display, TrainingPattern pattern) {
-	HW_REG_SET(DP, TRAINING_PATTERN_SET, (uint32_t)pattern);
+	HW_REG_WRITE1(DP, TRAINING_PATTERN_SET, (uint32_t)pattern);
 	uint8_t tp = (uint8_t) pattern;
 
 	switch (pattern) {
 		case TrainingPattern::DISABLED:
-			HW_REG_SET(DP, SCRAMBLING_DISABLE, false);
+			HW_REG_WRITE1(DP, SCRAMBLING_DISABLE, false);
 			break;
 		case TrainingPattern::PATTERN_1:
 		case TrainingPattern::PATTERN_2:
 		case TrainingPattern::PATTERN_3:
 			tp |= HW_REG_FIELD(DP_DPCD, TRAINING_PATTERN_SET, SCRAMBLING_DISABLED);
-			HW_REG_SET(DP, SCRAMBLING_DISABLE, true);
+			HW_REG_WRITE1(DP, SCRAMBLING_DISABLE, true);
 			break;
 	}
 	if (!AuxWrite(display, DP_DPCD_TRAINING_PATTERN_SET_OFFSET, 1, &tp)) {

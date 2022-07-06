@@ -15,20 +15,16 @@ uint32_t uartDebugReceiveLast;
 uint32_t uartDebugReceiveHead;
 
 #define UART_DEBUG_BASE_ADDR UART1_BASE_ADDR
-#define UART_DEBUG_REGISTER(reg) UART_##reg##_OFFSET
-#define UART_DEBUG_FIELD(reg, field) UART_##reg##_##field
-#define UART_DEBUG_FIELD_MASK(reg, field) UART_##reg##_##field##_MASK
-#define UART_DEBUG_FIELD_LSHIFT(reg, field) UART_##reg##_##field##_LSHIFT
-#define UART_DEBUG_FIELD_ENUM(reg, field, enm) UART_##reg##_##field##_##enm
 
-#define IsTransmitFull() (HW_REG_GET_BIT(UART_DEBUG, CHANNEL_STS, TNFUL))
-#define IsReceiveEmpty() (HW_REG_GET_BIT(UART_DEBUG, CHANNEL_STS, REMPTY))
+#define IsTransmitFull() (HW_REG_GET_BIT(HW_REG_GET_ADDRESS(UART_DEBUG), UART, CHANNEL_STS, TNFUL))
+#define IsReceiveEmpty() (HW_REG_GET_BIT(HW_REG_GET_ADDRESS(UART_DEBUG), UART, CHANNEL_STS, REMPTY))
 
 static void UART_DEBUG_Interrupt() {
-	uint32_t status = HW_REG_GET(UART_DEBUG, CHNL_INT_STS) & HW_REG_GET(UART_DEBUG, INTRPT_MASK);
+	uint32_t status = HW_REG_READ(HW_REG_GET_ADDRESS(UART_DEBUG), UART, CHNL_INT_STS) &
+		HW_REG_READ(HW_REG_GET_ADDRESS(UART_DEBUG), UART, INTRPT_MASK);
 	// disabled UART interrupts
-	HW_REG_SET(UART_DEBUG, INTRPT_DIS, status);
-	HW_REG_SET(UART_DEBUG, CHNL_INT_STS, status);
+	HW_REG_WRITE(HW_REG_GET_ADDRESS(UART_DEBUG), UART, INTRPT_DIS, status);
+	HW_REG_WRITE(HW_REG_GET_ADDRESS(UART_DEBUG), UART, CHNL_INT_STS, status);
 
 	// if the transmit fifo is empty, or new data has been submitted
 	// push from the os heap buff until the fifo is full again
@@ -36,7 +32,7 @@ static void UART_DEBUG_Interrupt() {
 		while(!IsTransmitFull())
 		{
 			if(uartDebugTransmitLast != uartDebugTransmitHead) {
-				HW_REG_SET(UART_DEBUG, TX_RX_FIFO, osHeap->uartDEBUGTransmitBuffer[uartDebugTransmitLast]);
+				HW_REG_WRITE(HW_REG_GET_ADDRESS(UART_DEBUG), UART, TX_RX_FIFO, osHeap->uartDEBUGTransmitBuffer[uartDebugTransmitLast]);
 				// expand newline inline
 				if(osHeap->uartDEBUGTransmitBuffer[uartDebugTransmitLast] == '\n') {
 					osHeap->uartDEBUGTransmitBuffer[uartDebugTransmitLast] = '\r';
@@ -55,7 +51,7 @@ static void UART_DEBUG_Interrupt() {
 		while(!IsReceiveEmpty()) {
 			uint32_t head = uartDebugReceiveHead + 1;
 			uartDebugReceiveHead = (head >= OsHeap::UartBufferSize) ? 0 : head;
-			osHeap->uartDEBUGReceiveBuffer[head - 1] = HW_REG_GET(UART_DEBUG, TX_RX_FIFO);
+			osHeap->uartDEBUGReceiveBuffer[head - 1] = HW_REG_READ(HW_REG_GET_ADDRESS(UART_DEBUG), UART, TX_RX_FIFO);
 		}
 	}
 	if(status & UART_CHNL_INT_STS_REMPTY) {
@@ -68,7 +64,7 @@ static void UART_DEBUG_Interrupt() {
 		status &= ~UART_INTRPT_DIS_RTRIG;
 	}
 
-	HW_REG_SET(UART_DEBUG, INTRPT_EN, status); // enable interrupts
+	HW_REG_WRITE(HW_REG_GET_ADDRESS(UART_DEBUG), UART, INTRPT_EN, status); // enable interrupts
 }
 
 void GIC_Proxy(void) {
@@ -76,7 +72,7 @@ void GIC_Proxy(void) {
 	uint32_t restartCount = 0;
 
 restart:;
-	const uint32_t gicpIrqStatus = HW_REG_GET(LPD_SLCR, GICP_PMU_IRQ_STATUS);
+	const uint32_t gicpIrqStatus = HW_REG_READ1(LPD_SLCR, GICP_PMU_IRQ_STATUS);
 
 	for(uint32_t group = 0; group < 5; group++) {
 		const uint32_t bit = 1 << group;
@@ -97,9 +93,9 @@ restart:;
 					break;
 			}
 			hw_RegWrite(LPD_SLCR_BASE_ADDR, LPD_SLCR_GICP0_IRQ_STATUS_OFFSET + (group * GICPROXY_INTERRUPT_GROUP_SIZE), gicbits);
-			HW_REG_SET(LPD_SLCR, GICP_PMU_IRQ_STATUS, bit);
+			HW_REG_WRITE1(LPD_SLCR, GICP_PMU_IRQ_STATUS, bit);
 
-			if(HW_REG_GET(LPD_SLCR, GICP_PMU_IRQ_STATUS) & bit) {
+			if(HW_REG_READ1(LPD_SLCR, GICP_PMU_IRQ_STATUS) & bit) {
 				if(restartCount < maxRestartCount) {
 					restartCount++;
 					goto restart;
@@ -112,5 +108,3 @@ restart:;
 
 
 }
-
-

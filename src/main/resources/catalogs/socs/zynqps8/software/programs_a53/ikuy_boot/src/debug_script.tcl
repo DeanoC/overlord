@@ -17,8 +17,8 @@ targets -set -nocase -filter {name =~"APU*"}
 rst -system
 after 100
 
-targets -set -nocase -filter {name =~ "*A53*#0"}
-rst -processor
+targets -set -nocase -filter {name =~ "Cortex-A53 #0"}
+rst -cores -clear-registers
 dow ./ikuy_boot
 #bpadd main
-con -block
+con
