@@ -21,7 +21,7 @@ void BootComplete(IPI3_Msg const *msgBuffer) {
 		GfxDebug::RGBA8 drawer(width, height, frameBuffer);
 		drawer.backgroundColour = 0xFF808080;
 		drawer.Clear();
-		osHeap->console.console.PrintLn(ANSI_GREEN_PEN ANSI_BRIGHT "Welcome to Intex Systems" ANSI_RESET_ATTRIBUTES);
+		osHeap->console.console.PrintLn(ANSI_GREEN_PEN ANSI_BRIGHT_ON "Welcome to Intex Systems" ANSI_RESET_ATTRIBUTES);
 	} else {
 		osHeap->screenConsoleEnabled = false;
 	}

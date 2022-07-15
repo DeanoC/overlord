@@ -42,3 +42,5 @@ add_library(${project} ${CLIST} ${CPPLIST} ${ASMLIST} ${CHEADERLIST} ${CPPHEADER
 
 target_include_directories(${project} PUBLIC include)
 target_compile_definitions(${project} PRIVATE BOARD_${BOARD}=1 SOC_${SOC}=1 CPU_${CPU}=1 CPU_ARCH_${CPU_ARCH}=1)
+target_link_libraries(${project} PRIVATE library_defines)
+target_link_libraries(${project} PRIVATE dbg)

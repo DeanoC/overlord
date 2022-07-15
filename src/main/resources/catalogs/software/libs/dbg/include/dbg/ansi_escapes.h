@@ -2,8 +2,10 @@
 
 // SGR (Select Graphic Rendition) commands
 #define ANSI_RESET_ATTRIBUTES "\x1b[0m"
-#define ANSI_BLINK "\x1b[5m"
-#define ANSI_BRIGHT "\x1b[1m"
+#define ANSI_BRIGHT_ON "\x1b[1m"
+#define ANSI_BRIGHT_OFF "\x1b[22m"
+#define ANSI_BLINK_ON "\x1b[5m"
+#define ANSI_BLINK_OFF "\x1b[25m"
 
 #define ANSI_BLACK_PEN "\x1b[30m"
 #define ANSI_RED_PEN "\x1b[31m"

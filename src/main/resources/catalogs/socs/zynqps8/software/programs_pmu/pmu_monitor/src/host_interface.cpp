@@ -35,6 +35,9 @@ void HostInterface::Init() {
 	this->cmdBuffer = (uint8_t*) osHeap->tmpOsBufferAllocator.Alloc(CMD_BUF_SIZE/64);
 	this->cmdBufferHead = 0;
 	this->downloadAddress = 0x8'0000'0000;
+	this->lastReadAddress = 0;
+	this->lastCommandWasR = false;
+
 	osHeap->hundredHzCallbacks[(int)HundredHzTasks::HOST_INPUT] = &HostInputCallback;
 	osHeap->hundredHzCallbacks[(int)HundredHzTasks::HOST_COMMANDS_PROCESSING] = &HostCommandCallback;
 	zModem.Init();
@@ -130,7 +133,7 @@ void HostInterface::CommandCallback() {
 			switch (result) {
 				case ZModem::Result::FAIL:
 					osHeap->console.console.NewLine();
-					osHeap->console.console.PrintLn(ANSI_RED_PEN ANSI_BRIGHT "ZModem FAIL" ANSI_RESET_ATTRIBUTES);
+					osHeap->console.console.PrintLn(ANSI_RED_PAPER ANSI_BRIGHT_ON "ZModem FAIL" ANSI_RESET_ATTRIBUTES);
 					this->currentState = State::RECEIVING_COMMAND;
 					textConsoleSkip = 0;
 					return;
@@ -138,7 +141,7 @@ void HostInterface::CommandCallback() {
 					return;
 				case ZModem::Result::SUCCESS:
 					osHeap->console.console.NewLine();
-					osHeap->console.console.PrintLn(ANSI_GREEN_PEN ANSI_BRIGHT "ZModem SUCCESS" ANSI_RESET_ATTRIBUTES);
+					osHeap->console.console.PrintLn(ANSI_GREEN_PEN ANSI_BRIGHT_ON "ZModem SUCCESS" ANSI_RESET_ATTRIBUTES);
 					this->currentState = State::RECEIVING_COMMAND;
 					textConsoleSkip = 0;
 					return;
@@ -158,9 +161,14 @@ void HostInterface::WhatCommand() {
 	finds[0] = cmdBufferHeadTmp;
 
 	if(*this->cmdBuffer == 0) {
+		if(this->lastCommandWasR == true) {
+			Read16BCmd( nullptr, nullptr, Utils::StringNotFound);
+		}
 		this->currentState = State::RECEIVING_COMMAND;
 		return;
 	}
+
+	this->lastCommandWasR = false;
 
 	// special case Zmodem receive code first
 	if(cmdBufferHeadTmp > 4 && this->cmdBuffer[4] == 0x18) {
@@ -185,6 +193,19 @@ void HostInterface::WhatCommand() {
 	switch (Core::RuntimeHash(finds[0], (char *) this->cmdBuffer)) {
 		case "echo"_hash: {
 			EchoCmd(cmdBuffer, finds, findCount);
+			break;
+		}
+		case "read4b"_hash:
+		case "read4B"_hash: {
+			Read4BCmd(cmdBuffer, finds, findCount);
+			break;
+		}
+		case "R"_hash:
+		case "r"_hash:
+		case "read"_hash:
+		case "read16b"_hash:
+		case "read16B"_hash: {
+			Read16BCmd(cmdBuffer, finds, findCount);
 			break;
 		}
 		case "download_at"_hash: {
@@ -229,7 +250,7 @@ void HostInterface::WhatCommand() {
 
 void HostInterface::EchoCmd(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int const findCount) {
 	if (findCount != 2) {
-		debug_print(ANSI_RED_PEN ANSI_BRIGHT "\nARG ERROR: echo arg\n" ANSI_RESET_ATTRIBUTES);
+		debug_print(ANSI_RED_PAPER ANSI_BRIGHT_ON "\nARG ERROR: echo arg\n" ANSI_RESET_ATTRIBUTES);
 		this->currentState = State::RECEIVING_COMMAND;
 		return;
 	}
@@ -240,9 +261,61 @@ void HostInterface::EchoCmd(uint8_t const *cmdBuffer, unsigned int const *finds,
 	this->currentState = State::RECEIVING_COMMAND;
 }
 
+bool HostInterface::DecodeAddress(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int const findCount) {
+	uint32_t address = Utils::StringToU32(finds[1] - finds[0] - 1, (char const *) (cmdBuffer + finds[0] + 1)) & ~ 0x3;
+	if(address == 0xDEAD0CF1U) {
+		OsService_Print( ANSI_RED_PAPER ANSI_BRIGHT_ON "lo_address overflow" ANSI_RESET_ATTRIBUTES "\n" );
+		return false;
+	}
+	else {
+		this->lastReadAddress = address;
+		return true;
+	}
+}
+
+void HostInterface::Read4BCmd(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int const findCount) {
+	if (findCount > 2 && findCount != Utils::StringNotFound) {
+		debug_print(ANSI_RED_PAPER ANSI_BRIGHT_ON "\nARG ERROR: read4b [lo_address]" ANSI_RESET_ATTRIBUTES  "\n");
+		this->currentState = State::RECEIVING_COMMAND;
+		return;
+	}
+	debug_print( "\n" );
+	if(findCount == 2) DecodeAddress( cmdBuffer, finds, findCount );
+	else {
+		OsService_Printf( ANSI_CURSOR_UP );
+		this->lastReadAddress += 4;
+	}
+
+	OsService_Printf( ANSI_WHITE_PEN ANSI_BRIGHT_ON "%#010llx %#010lx" ANSI_RESET_ATTRIBUTES "\n", this->lastReadAddress, *((uintptr_lo_t *) this->lastReadAddress));
+
+	this->currentState = State::RECEIVING_COMMAND;
+}
+
+void HostInterface::Read16BCmd(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int const findCount) {
+	if (findCount > 2 && findCount != Utils::StringNotFound) {
+		debug_print(ANSI_RED_PAPER ANSI_BRIGHT_ON "\nARG ERROR: read16b lo_address\n" ANSI_RESET_ATTRIBUTES);
+		this->currentState = State::RECEIVING_COMMAND;
+		return;
+	}
+	debug_print( "\n" );
+	if(findCount == 2) DecodeAddress( cmdBuffer, finds, findCount );
+	else {
+		OsService_Printf( ANSI_CURSOR_UP );
+		this->lastReadAddress += 16;
+		this->lastCommandWasR = true;
+	}
+
+	uintptr_lo_t* address = (uintptr_lo_t*) this->lastReadAddress;
+	OsService_Printf(ANSI_WHITE_PEN ANSI_BRIGHT_ON "%#010lx: ", (uintptr_lo_t) address);
+	OsService_Printf("%#010lx %#010lx %#010lx %#010lx\n" ANSI_RESET_ATTRIBUTES, *address, *(address+1), *(address+2), *(address+3));
+
+	this->currentState = State::RECEIVING_COMMAND;
+}
+
+
 void HostInterface::DownloadAt(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int const findCount) {
 	if (findCount != 2) {
-		debug_print(ANSI_RED_PEN ANSI_BRIGHT "\nARG ERROR: download_at address\n" ANSI_RESET_ATTRIBUTES);
+		debug_print(ANSI_RED_PAPER ANSI_BRIGHT_ON "\nARG ERROR: download_at address\n" ANSI_RESET_ATTRIBUTES);
 		this->currentState = State::RECEIVING_COMMAND;
 		return;
 	}
@@ -256,7 +329,7 @@ void HostInterface::DownloadAt(uint8_t const *cmdBuffer, unsigned int const *fin
 
 void HostInterface::SleepCpu(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int const findCount) {
 	if (findCount != 2) {
-		debug_print(ANSI_RED_PEN ANSI_BRIGHT "\nARG ERROR: sleep_cpu [A53|R5F]\n");
+		debug_print(ANSI_RED_PAPER ANSI_BRIGHT_ON "\nARG ERROR: sleep_cpu [A53|R5F]\n");
 		this->currentState = State::RECEIVING_COMMAND;
 		return;
 	}
@@ -276,7 +349,7 @@ void HostInterface::SleepCpu(uint8_t const *cmdBuffer, unsigned int const *finds
 			break;
 		}
 		default:
-			debug_printf(ANSI_RED_PEN ANSI_BRIGHT "\nUnknown CPU target\n" ANSI_RESET_ATTRIBUTES);
+			debug_printf(ANSI_RED_PAPER ANSI_BRIGHT_ON "\nUnknown CPU target\n" ANSI_RESET_ATTRIBUTES);
 			this->currentState = State::RECEIVING_COMMAND;
 			return;
 	}
@@ -284,7 +357,7 @@ void HostInterface::SleepCpu(uint8_t const *cmdBuffer, unsigned int const *finds
 
 void HostInterface::WakeUpCpu(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int const findCount) {
 	if (findCount != 2) {
-		debug_print(ANSI_RED_PEN ANSI_BRIGHT "\nARG ERROR: wake_cpu [A53|R5F]\n" ANSI_RESET_ATTRIBUTES);
+		debug_print(ANSI_RED_PAPER ANSI_BRIGHT_ON "\nARG ERROR: wake_cpu [A53|R5F]\n" ANSI_RESET_ATTRIBUTES);
 		this->currentState = State::RECEIVING_COMMAND;
 		return;
 	}
@@ -304,7 +377,7 @@ void HostInterface::WakeUpCpu(uint8_t const *cmdBuffer, unsigned int const *find
 			break;
 		}
 		default:
-			debug_printf(ANSI_RED_PEN ANSI_BRIGHT "\nUnknown CPU target\n" ANSI_RESET_ATTRIBUTES);
+			debug_printf(ANSI_RED_PAPER ANSI_BRIGHT_ON "\nUnknown CPU target\n" ANSI_RESET_ATTRIBUTES);
 			this->currentState = State::RECEIVING_COMMAND;
 			return;
 	}
@@ -312,7 +385,7 @@ void HostInterface::WakeUpCpu(uint8_t const *cmdBuffer, unsigned int const *find
 
 void HostInterface::BootCpu(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int const findCount) {
 	if (findCount != 2) {
-		debug_print(ANSI_RED_PEN ANSI_BRIGHT "\nARG ERROR: boot_cpu [A53|R5F]\n" ANSI_RESET_ATTRIBUTES);
+		debug_print(ANSI_RED_PAPER ANSI_BRIGHT_ON "\nARG ERROR: boot_cpu [A53|R5F]\n" ANSI_RESET_ATTRIBUTES);
 		this->currentState = State::RECEIVING_COMMAND;
 		return;
 	}
@@ -344,7 +417,7 @@ void HostInterface::BootCpu(uint8_t const *cmdBuffer, unsigned int const *finds,
 //			break;
 //		}
 		default:
-			debug_printf(ANSI_RED_PEN ANSI_BRIGHT "\nUnknown CPU target\n" ANSI_RESET_ATTRIBUTES);
+			debug_printf(ANSI_RED_PAPER ANSI_BRIGHT_ON "\nUnknown CPU target\n" ANSI_RESET_ATTRIBUTES);
 			this->currentState = State::RECEIVING_COMMAND;
 			return;
 	}

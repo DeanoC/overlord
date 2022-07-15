@@ -7,6 +7,7 @@
 #include "image/image.h"
 #include "multi_core/core_local.h"
 #include "tiny_image_format/tiny_image_format_base.h"
+#define TINYKTX_HAVE_MEMCPY
 #include "tiny_ktx.h"
 #include "tiny_dds.h"
 //#include "al2o3_syoyo/tiny_exr.hpp"

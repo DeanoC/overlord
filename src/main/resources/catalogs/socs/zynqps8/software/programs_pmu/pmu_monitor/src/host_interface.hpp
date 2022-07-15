@@ -22,14 +22,19 @@ struct HostInterface {
 	void EchoCmd(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int findCount);
 	void PostDownload();
 	void WhatCommand();
-	static void TmpBufferRefill(uintptr_t &tmpBufferAddr, uint32_t &tmpBufferSize);
+	void Read4BCmd(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int findCount);
+	void Read16BCmd(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int findCount);
 
+	static void TmpBufferRefill(uintptr_t &tmpBufferAddr, uint32_t &tmpBufferSize);
+	bool DecodeAddress(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int const findCount);
 
 	static const int CMD_BUF_SIZE = 1024;
 	uint8_t* cmdBuffer;
 	uint32_t cmdBufferHead;
 	uintptr_all_t downloadAddress;
 	ZModem zModem;
+	uintptr_all_t lastReadAddress;
+	bool lastCommandWasR;
 	void DownloadAt(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int const findCount);
 	void SleepCpu(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int const findCount);
 	void WakeUpCpu(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int const findCount);

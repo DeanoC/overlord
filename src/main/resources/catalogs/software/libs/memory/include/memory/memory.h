@@ -49,9 +49,9 @@ typedef struct Memory_LinearAllocator {
 #define MEMORY_HEAP_ALLOCATOR_SIZE (sizeof(Memory_Allocator) + CPU_CORE_COUNT * sizeof(void*))
 #endif
 
-// for global heap allocators, you must call Memory_HeapAllocatorInit(name) before use
+// for global heap allocators, you must call Memory_HeapAllocatorInit(name) before any use
 #define GLOBAL_HEAP_ALLOCATOR(name_)                                                     \
-	uint8_t name_##_BLOCK[MEMORY_HEAP_ALLOCATOR_SIZE];                                              \
+	uint8_t name_##_BLOCK[MEMORY_HEAP_ALLOCATOR_SIZE];               \
 	Memory_Allocator* name_ = (Memory_Allocator * )name_##_BLOCK;
 
 #define HEAP_ALLOCATOR(name_)                                                            \

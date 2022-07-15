@@ -4,6 +4,7 @@
 
 #include "dbg/assert.h"
 #include "dbg/print.h"
+#include "dbg/ansi_escapes.h"
 #include "multi_core/core_local.h"
 #include "core/utf8.h"
 #include "memory/memory.h"
@@ -166,6 +167,8 @@ static AllocUnit *findAllocUnit(const void *reportedAddress) {
 }
 
 static bool GrowReservoir() {
+	debug_print(ANSI_BRIGHT_ON "Memory Tracker: Growing Reservoir" ANSI_BRIGHT_OFF "\n");
+
 	// Allocate 256 reservoir elements
 	reservoir = (AllocUnit *) reservoirAllocator->calloc(reservoirAllocator, 256, sizeof(AllocUnit));
 	// Danger Will Robinson!

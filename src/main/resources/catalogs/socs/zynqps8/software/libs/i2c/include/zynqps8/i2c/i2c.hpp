@@ -24,7 +24,8 @@ struct Message {
 
 void InitAsSupplier(Speed speed_);
 
-void Send(uint16_t address_, void* buffer_, uint8_t byteCount_);
+// true if send was okay, false if nack'ed
+bool Send(uint16_t address_, void* buffer_, uint8_t byteCount_);
 void Receive(uint16_t address_, void * outBuffer_, uint8_t byteCount_);
 void ReceiveLarge(uint16_t address_, void * outBuffer_, uint32_t byteCount_);
 

@@ -414,7 +414,7 @@ FrameType ZModem::zrbhdr32(uint8_t *hdr) {
 		crc = UPDC32(c, crc);
 	}
 	if (crc != 0xDEBB20E3) {
-		osHeap->console.console.Print(ANSI_RED_PEN ANSI_BRIGHT "Bad Header CRC\n" ANSI_RESET_ATTRIBUTES);
+		osHeap->console.console.Print(ANSI_RED_PAPER ANSI_BRIGHT_ON "Bad Header CRC\n" ANSI_RESET_ATTRIBUTES);
 		return FrameType::ZFERR;
 	}
 	return Rxtype;
@@ -440,7 +440,7 @@ FrameType ZModem::zrhhdr(uint8_t *hdr) {
 	if(c & ~0xFF) return FrameType::ZFERR;
 	crc = updcrc(c, crc);
 	if (crc & 0xFFFF) {
-		osHeap->console.console.Print(ANSI_RED_PEN ANSI_BRIGHT "Bad Header CRC\n" ANSI_RESET_ATTRIBUTES);
+		osHeap->console.console.Print(ANSI_RED_PAPER ANSI_BRIGHT_ON "Bad Header CRC\n" ANSI_RESET_ATTRIBUTES);
 		return FrameType::ZFERR;
 	}
 
@@ -481,23 +481,23 @@ crcfoo:
 					}
 					crc = updcrc(c, crc);
 					if (crc & 0xFFFF) {
-						osHeap->console.console.Printf(ANSI_RED_PEN ANSI_BRIGHT "CRC ERROR %#06x\n" ANSI_RESET_ATTRIBUTES, crc);
+						osHeap->console.console.Printf(ANSI_RED_PAPER ANSI_BRIGHT_ON "CRC ERROR %#06x\n" ANSI_RESET_ATTRIBUTES, crc);
 						return ZModemResult::CRC_ERROR;
 					}
 					Rxcount = length - (end - buf);
 					return d;
 				case GOTCAN:
-					osHeap->console.console.PrintLn(ANSI_RED_PEN ANSI_BRIGHT "Send Cancelled" ANSI_RESET_ATTRIBUTES);
+					osHeap->console.console.PrintLn(ANSI_RED_PAPER ANSI_BRIGHT_ON "Send Cancelled" ANSI_RESET_ATTRIBUTES);
 					return ZModemResult::GOTCAN;
 				default:
-					osHeap->console.console.PrintLn(ANSI_RED_PEN ANSI_BRIGHT "Bad data subpacket" ANSI_RESET_ATTRIBUTES);
+					osHeap->console.console.PrintLn(ANSI_RED_PAPER ANSI_BRIGHT_ON "Bad data subpacket" ANSI_RESET_ATTRIBUTES);
 					return c;
 			}
 		}
 		*buf++ = c;
 		crc = updcrc(c, crc);
 	}
-	osHeap->console.console.Print(ANSI_RED_PEN ANSI_BRIGHT "Data subpacket too long\n" ANSI_RESET_ATTRIBUTES);
+	osHeap->console.console.Print(ANSI_RED_PAPER ANSI_BRIGHT_ON "Data subpacket too long\n" ANSI_RESET_ATTRIBUTES);
 	return ZModemResult::ERROR;
 }
 
@@ -540,16 +540,16 @@ ZModemResult ZModem::zrdat32(uint8_t *buf, uint32_t length) {
 					b = c & 0xFF;
 					crc = UPDC32(b, crc);
 					if (crc != 0xDEBB20E3) {
-						osHeap->console.console.Printf(ANSI_RED_PEN ANSI_BRIGHT "CRC ERROR %#010lx\n" ANSI_RESET_ATTRIBUTES, crc);
+						osHeap->console.console.Printf(ANSI_RED_PAPER ANSI_BRIGHT_ON "CRC ERROR %#010lx\n" ANSI_RESET_ATTRIBUTES, crc);
 						return ZModemResult::CRC_ERROR;
 					}
 					Rxcount = length - (end - buf);
 					return d;
 				case GOTCAN:
-					osHeap->console.console.PrintLn(ANSI_RED_PEN ANSI_BRIGHT "Send Cancelled" ANSI_RESET_ATTRIBUTES);
+					osHeap->console.console.PrintLn(ANSI_RED_PAPER ANSI_BRIGHT_ON "Send Cancelled" ANSI_RESET_ATTRIBUTES);
 					return ZModemResult::GOTCAN;
 				default:
-					osHeap->console.console.PrintLn(ANSI_RED_PEN ANSI_BRIGHT "Bad data subpacket" ANSI_RESET_ATTRIBUTES);
+					osHeap->console.console.PrintLn(ANSI_RED_PAPER ANSI_BRIGHT_ON "Bad data subpacket" ANSI_RESET_ATTRIBUTES);
 					return c;
 			}
 		}

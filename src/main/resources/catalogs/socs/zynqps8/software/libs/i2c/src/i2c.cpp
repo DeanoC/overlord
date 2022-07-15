@@ -13,6 +13,7 @@
 #include "platform/reg_access.h"
 #include "zynqps8/gic_v2/gic_v2.hpp"
 #include "utils/slice.hpp"
+#include "dbg/raw_print.h"
 
 #define XPAR_XIICPS_1_I2C_CLK_FREQ_HZ 99990005
 
@@ -30,6 +31,7 @@ ALWAYS_INLINE void StallWhileBusIsBusy() {
 static void FillTransmitFiFO(Utils::TrackingSlice<uint8_t>& slice_) {
 	uint8_t const spaceInFifo = (uint8_t)FIFO_DEPTH - (uint8_t)HW_REG_READ(I2C_INSTANCE, I2C, TRANSFER_SIZE);
 	uint8_t const bytesToTransfer = (spaceInFifo > slice_.left()) ? slice_.left() : spaceInFifo;
+
 	for(uint8_t i = 0; i < bytesToTransfer; ++i) {
 		HW_REG_WRITE(I2C_INSTANCE, I2C, I2C_DATA, *slice_);
 		slice_++;
@@ -71,7 +73,7 @@ void InitAsSupplier(Speed speed_) {
 
 }
 
-void Send(uint16_t address_, void * buffer_, uint8_t byteCount_) {
+bool Send(uint16_t address_, void * buffer_, uint8_t byteCount_) {
 	Utils::TrackingSlice<uint8_t> tslice {{ .data = (uint8_t *)buffer_, .size = byteCount_ }, 0};
 
 	if(tslice.slice.size > FIFO_DEPTH) {
@@ -94,13 +96,14 @@ void Send(uint16_t address_, void * buffer_, uint8_t byteCount_) {
 	if(tslice.slice.size > FIFO_DEPTH) {
 		HW_REG_CLR_BIT(I2C_INSTANCE, I2C, CONTROL_REG, HOLD);
 	}
-
 	// stall until transfer is complete
 	while(!HW_REG_GET_BIT(I2C_INSTANCE, I2C, INTERRUPT_STATUS, COMP)){
-//		debug_printf("i2c1 interrupt status %#x\n", HW_REG_READ1(I2C1, INTERRUPT_STATUS));
+		if(HW_REG_GET_BIT(I2C_INSTANCE, I2C, INTERRUPT_STATUS, NACK)) return false;
+
 		assert(!HW_REG_GET_BIT(I2C_INSTANCE, I2C, INTERRUPT_STATUS, TO));
-//		Utils_BusySecondSleep(1);
+		Utils_BusySecondSleep(1);
 	};
+	return true;
 }
 
 void ReceiveLarge(uint16_t address_, void * outBuffer_, uint32_t byteCount_) {
@@ -127,12 +130,14 @@ void Receive(uint16_t address_, void * outBuffer_, uint8_t byteCount_) {
 	HW_REG_SET_FIELD(I2C_INSTANCE, I2C, TRANSFER_SIZE, TRANSFER_SIZE, byteCount_);
 	HW_REG_WRITE(I2C_INSTANCE, I2C, I2C_ADDRESS, address_);
 
+
 	while(tslice.left() > 0) {
 		if(HW_REG_GET_BIT(I2C_INSTANCE, I2C, STATUS_REG, RXDV)) {
 			*tslice = HW_REG_READ(I2C_INSTANCE, I2C, I2C_DATA);
 			tslice++;
 		}
 	}
+
 
 	if(tslice.slice.size > FIFO_DEPTH) {
 		HW_REG_CLR_BIT(I2C_INSTANCE, I2C, CONTROL_REG, HOLD);
@@ -143,26 +148,29 @@ void Receive(uint16_t address_, void * outBuffer_, uint8_t byteCount_) {
 }
 
 void SendMessages(uint16_t address_, uint32_t numberOfMessages_, Message const * messages_ ) {
+
 	for(uint32_t i = 0; i < numberOfMessages_; ++i ) {
 		Message const * msg = messages_ + i;
 		if(msg->flags & MF_8BitRegisterAddress) {
 			auto regAddr = (uint8_t)msg->registerAddress;
-			debug_print("BOBa\n");
-			Send(address_, &regAddr, 1);
-			debug_print("BOBb\n");
+			bool ack = Send(address_, &regAddr, 1);
+			if(!ack) {
+				debug_printf("I2C Device @ %i not found\n", address_);
+				return;
+			}
 		}	else {
 			uint16_t regAddr = msg->registerAddress;
-			Send(address_, &regAddr, 2);
+			bool ack = Send(address_, &regAddr, 2);
+			if(!ack) {
+				debug_printf("I2C Device @ %i not found\n", address_);
+				return;
+			}
 		}
 
 		if(msg->flags & MF_Read) {
-			debug_print("BOBc1\n");
 			Receive(address_, msg->buffer, msg->bufferLength);
-			debug_print("BOBd1\n");
 		} else {
-			debug_print("BOBc2\n");
 			Send(address_, msg->buffer, msg->bufferLength);
-			debug_print("BOBd2\n");
 		}
 	}
 }

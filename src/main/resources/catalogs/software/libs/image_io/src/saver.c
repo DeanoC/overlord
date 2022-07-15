@@ -6,7 +6,9 @@
 #include "image/image.h"
 
 #include "stb_image_write.h"
+#define TINYKTX_HAVE_MEMCPY
 #include "tiny_ktx.h"
+#define TINYDDS_HAVE_MEMCPY
 #include "tiny_dds.h"
 
 // TODO EXR

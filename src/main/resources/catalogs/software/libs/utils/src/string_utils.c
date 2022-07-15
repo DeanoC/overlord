@@ -83,14 +83,19 @@ NON_NULL(2) uint32_t Utils_HexStringToU32(unsigned int length, const char * str)
 
 	while((str-start) < length) {
 		uint8_t c = *str++;
-		if(c == '_' || c =='\'') continue;
+		if(c == '_' || c =='\'' || c < 20) continue;
 
-		uint8_t n = c - '0';
-		if (n > 9) {
-			n -= ('a' - ':');
+		uint8_t n = 0;
+		if(c >= '0' && c <= '9') n = c - '0';
+		else if (c >= 'a' && c <= 'f') n = c - 'a' + 10;
+		else if (c >= 'A' && c <= 'F') n = c - 'A' + 10;
+		else return val;
+		uint32_t tval = (16 * val) + n;
+		// check for overflow
+		if(tval < val) {
+			return 0xDEAD0CF1U; // marker should be easy to see
 		}
-		if(n > 15) return val;
-		val = (16 * val) + n;
+		val = tval;
 	}
 
 	return val;
@@ -102,8 +107,10 @@ NON_NULL(2) uint32_t Utils_StringToU32(unsigned int length, const char * str)
 	if(*str++ == '0') {
 		// octal, hex or binary
 		switch(*str) {
+			case 'X':
 			case 'x':
 				return Utils_HexStringToU32(length-2, str+1);
+			case 'B':
 			case 'b':
 				return Utils_BinaryStringToU32(length-2, str+1);
 			default:
@@ -199,12 +206,17 @@ NON_NULL(2) uint64_t Utils_HexStringToU64(unsigned int length, const char * str)
 		uint8_t c = *str++;
 		if(c == '_' || c =='\'') continue;
 
-		uint8_t n = c - '0';
-		if (n > 9) {
-			n -= ('a' - ':');
+		uint8_t n = 0;
+		if(c >= '0' && c <= '9') n = c - '0';
+		else if (c >= 'a' && c <= 'f') n = c - 'a' + 10;
+		else if (c >= 'A' && c <= 'F') n = c - 'A' + 10;
+		else return val;
+		uint64_t tval = (16 * val) + n;
+		// check for overflow
+		if(tval < val) {
+			return 0xDEAD0CF1DEAD0CF1ULL; // marker should be easy to see
 		}
-		if(n > 15) return val;
-		val = (16 * val) + n;
+		val = tval;
 	}
 
 	return val;
