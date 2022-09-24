@@ -29,6 +29,7 @@ file(GLOB CLIST CONFIGURE_DEPENDS
 		src/${SOC}/*.c
 		src/${CPU_ARCH}/*.c
 		src/${CPU}/*.c )
+
 file(GLOB CPPLIST CONFIGURE_DEPENDS
 		src/*.cpp
 		src/${BOARD}/*.cpp
@@ -51,7 +52,6 @@ foreach(FILENAME ${PROJECT_EMBED_FILES})
 	message(STATUS "Objcopy'ing ${FILENAME}")
 endforeach(FILENAME)
 
-
 add_executable(${project} ${CLIST} ${CPPLIST} ${ASMFILES} ${HEADERLIST} ${LINKSCRIPT} ${PROJECT_EMBED_OBJ_FILES})
 add_compile_definitions(${project} BOARD_${BOARD}=1 SOC_${SOC}=1 CPU_${CPU}=1 CPU_${CPU_ARCH}=1)
 target_link_libraries(${project} PRIVATE core)
@@ -60,6 +60,7 @@ target_link_libraries(${project} PRIVATE gfxdebug)
 target_link_libraries(${project} PRIVATE osservices)
 target_link_libraries(${project} PRIVATE platform)
 target_link_libraries(${project} PRIVATE utils)
+
 target_link_libraries(${project} PRIVATE xilinx)
 target_link_libraries(${project} PRIVATE zynqps8_display_port)
 

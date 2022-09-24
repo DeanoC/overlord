@@ -1,7 +1,4 @@
 description = "IOP System-level Control - Secure"
-[[bank]]
-  name = "IOU_SECURE_SLCR"
-  address = "0xff240000"
 [[register]]
   name = "IOU_AXI_WPRTCN"
   type = "mixed"

@@ -1,29 +1,15 @@
-/******************************************************************************
-*
-* Copyright (c) 2015 - 2021 Xilinx, Inc.  All rights reserved.
-* SPDX-License-Identifier: MIT
-******************************************************************************/
+/* needs to have 8K space free during early MMU function */
+_STACK_SIZE = DEFINED(_STACK_SIZE) ? _STACK_SIZE : 9K;
 
-/*******************************************************************/
-/*                                                                 */
-/* Description : FSBL A53 Linker Script                            */
-/*                                                                 */
-/*******************************************************************/
-_STACK_SIZE = DEFINED(_STACK_SIZE) ? _STACK_SIZE : 1K;
-_HEAP_SIZE = DEFINED(_HEAP_SIZE) ? _HEAP_SIZE : 50K ; /* Enough for registers + PMU Monitor */
-
-/* Define Memories in the system */
+/* Enough for registers + PMU Monitor */
+_HEAP_SIZE = DEFINED(_HEAP_SIZE) ? _HEAP_SIZE : 40K ;
 
 MEMORY
 {
    ocm_sram_BASEADDR : ORIGIN = 0xFFFC0000, LENGTH = 256K
 }
 
-/* Specify the default entry point to the program */
-
 ENTRY(_vector_table)
-
-/* Define the sections, and where they are mapped in memory */
 
 SECTIONS
 {
@@ -99,24 +85,6 @@ SECTIONS
    *(.gcc_except_table)
 } > ocm_sram_BASEADDR
 
-.mmu_tbl0 (ALIGN(4096)) : {
-   __mmu_tbl0_start = .;
-   *(.mmu_tbl0)
-   __mmu_tbl0_end = .;
-} > ocm_sram_BASEADDR
-
-.mmu_tbl1 (ALIGN(4096)) : {
-   __mmu_tbl1_start = .;
-   *(.mmu_tbl1)
-   __mmu_tbl1_end = .;
-} > ocm_sram_BASEADDR
-
-.mmu_tbl2 (ALIGN(4096)) : {
-   __mmu_tbl2_start = .;
-   *(.mmu_tbl2)
-   __mmu_tbl2_end = .;
-} > ocm_sram_BASEADDR
-
 .data (ALIGN(64)): {
    __data_start = .;
    *(.data)
@@ -155,30 +123,7 @@ SECTIONS
 .got2 : {
    *(.got2)
 } > ocm_sram_BASEADDR
-/*
-.ctors (ALIGN(64)): {
-   __CTOR_LIST__ = .;
-   ___CTORS_LIST___ = .;
-   KEEP (*crtbegin.o(.ctors))
-   KEEP (*(EXCLUDE_FILE(*crtend.o) .ctors))
-   KEEP (*(SORT(.ctors.*)))
-   KEEP (*(.ctors))
-   __CTOR_END__ = .;
-   ___CTORS_END___ = .;
-} > ocm_sram_BASEADDR
-*/
-/*
-.dtors (ALIGN(64)): {
-   __DTOR_LIST__ = .;
-   ___DTORS_LIST___ = .;
-   KEEP (*crtbegin.o(.dtors))
-   KEEP (*(EXCLUDE_FILE(*crtend.o) .dtors))
-   KEEP (*(SORT(.dtors.*)))
-   KEEP (*(.dtors))
-   __DTOR_END__ = .;
-   ___DTORS_END___ = .;
-} > ocm_sram_BASEADDR
-*/
+
 .fixup : {
    __fixup_start = .;
    *(.fixup)
@@ -198,22 +143,7 @@ SECTIONS
    KEEP (*(.preinit_array))
    __preinit_array_end = .;
 } > ocm_sram_BASEADDR
-/*
-.init_array (ALIGN(64)): {
-   __init_array_start = .;
-   KEEP (*(SORT(.init_array.*)))
-   KEEP (*(.init_array))
-   __init_array_end = .;
-} > ocm_sram_BASEADDR
-*/
-/*
-.fini_array (ALIGN(64)): {
-   __fini_array_start = .;
-   KEEP (*(SORT(.fini_array.*)))
-   KEEP (*(.fini_array))
-   __fini_array_end = .;
-} > ocm_sram_BASEADDR
-*/
+
 .ARM.attributes : {
    __ARM.attributes_start = .;
    *(.ARM.attributes)
@@ -278,7 +208,6 @@ _SDA_BASE_ = __sdata_start + ((__sbss_end - __sdata_start) / 2 );
 _SDA2_BASE_ = __sdata2_start + ((__sbss2_end - __sdata2_start) / 2 );
 
 /* Generate Stack and Heap definitions */
-
 .heap : {
    . = ALIGN(64);
    _heap = .;
@@ -293,19 +222,13 @@ _SDA2_BASE_ = __sdata2_start + ((__sbss2_end - __sdata2_start) / 2 );
 } > ocm_sram_BASEADDR
 
 .stack (NOLOAD) : {
-   . = ALIGN(64);
+   . = ALIGN(4096);
    _el3_stack_end = .;
    . += _STACK_SIZE;
    __el3_stack = .;
    __el2_stack = .;
    __el1_stack = .;
    __el0_stack = .;
-} > ocm_sram_BASEADDR
-
-.dup_data (ALIGN(64)): {
-   __dup_data_start = .;
-   . += __data_end - __data_start ;
-   __dup_data_end = .;
 } > ocm_sram_BASEADDR
 
 _end = .;

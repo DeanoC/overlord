@@ -221,6 +221,7 @@ object OutputSoftware {
 						}
 
 						val other = r.second.get.instance.asInstanceOf[ChipInstance]
+
 						if ((!chipAddresses.exists { case (_, _, o, _) => o == other }) &&
 						    other.isVisibleToSoftware &&
 						    other.hasInterface[RegisterBankLike]) {
@@ -229,8 +230,6 @@ object OutputSoftware {
 								println(s"${other.name}: not enough instances\n")
 							else for {rb <- registerBank.banks
 							          if rb.cpus.isEmpty || rb.cpus.contains(cpu.cpuType)} {
-
-
 								val rbName         = if (rb.name.isEmpty) r.secondFullName else rb.name
 								val rbInstanceName = rbName.replace("${index}", other.instanceNumber.toString)
 								chipAddresses += ((rbInstanceName,

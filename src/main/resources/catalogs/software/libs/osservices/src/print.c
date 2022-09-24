@@ -4,8 +4,6 @@
 #include "core/snprintf.h"
 #include "utils/string_utils.h"
 #include "platform/cache.h"
-#include "dbg/print.h"
-#include "dbg/raw_print.h"
 
 // prints upto 29 characters to uart via PMU.
 WEAK_LINKAGE void OsService_InlinePrint(uint8_t size, const char *const text) {
@@ -37,7 +35,8 @@ WEAK_LINKAGE void OsService_PrintWithSize(unsigned int count, const char *const 
 		msg->Payload.DdrPacket.packetDdrAddress = (uintptr_all_t)(uintptr_t)buffer;
 		msg->Payload.DdrPacket.packetSize = totalSize;
 		memcpy(msg->Payload.PtrPrint.text, text, count);
-		Cache_DCacheCleanRange((uintptr_t) buffer, totalSize);
+		// PMU isn't cache coherent so we need to flush our DDR changes out
+		Cache_DCacheCleanAndInvalidateRange((uintptr_t)buffer, totalSize);
 
 		// using stack memory directly so must be valid until response is fetched
 		IPI3_Response response;

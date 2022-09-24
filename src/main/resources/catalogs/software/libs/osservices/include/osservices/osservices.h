@@ -8,13 +8,8 @@ EXTERN_C {
 #define OS_GLOBAL0_BOOT_COMPLETE 	(1 << 1)
 
 typedef struct BootData {
-	uint16_t frameBufferWidth;
-	uint16_t frameBufferHeight;
-	uint16_t frameBufferHertz;
-	uint16_t videoBlockSizeInMB;	// video block size in MB
 	uint32_t bootCodeSize; 			 	// size of boot program in bytes
 
-	uintptr_lo_t videoBlock; 			// 4K dma desc space then framebuffer
 	uintptr_lo_t bootCodeStart; 	// location where the boot program begins
 } BootData;
 static_assert(sizeof(BootData) <= 29, "Boot Data Too big");

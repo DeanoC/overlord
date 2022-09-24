@@ -5,23 +5,48 @@
 
 namespace GfxDebug {
 
-RGBA8::RGBA8() :
-		backgroundColour(0x0),
-		penColour(0xFFFFFFFF),
-		width(0),
-		height(0),
-		fontZoom(1),
-		frameBuffer(nullptr) {
+consteval static uint32_t PackRGB(uint8_t red, uint8_t green, uint8_t blue) {
+	return (0xFF << 24) | (blue << 16) | (green << 8) | (red << 0);
+}
+// VGA Palette (except Yellow)
+constexpr uint32_t const RGBA8::palette[16] {
+	PackRGB(0, 0, 0), // Black
+	PackRGB(170, 0, 0), // Red
+	PackRGB(0, 170, 0), // Green
+	PackRGB(187, 187, 0), // Yellow
+	PackRGB(0, 0, 170), // Blue
+	PackRGB(170, 0, 170), // Magenta
+	PackRGB(0, 170, 170), // Cyan
+	PackRGB(170, 170, 170), // White
 
+	PackRGB(85, 85, 85), // Bright Black (Gray)
+	PackRGB(255, 85, 85), // Bright Red
+	PackRGB(85, 255, 85), // Bright Green
+	PackRGB(255, 255, 85), // Bright Yellow
+	PackRGB(85, 85, 255), // Bright Blue
+	PackRGB(255, 85, 255), // Bright Magenta
+	PackRGB(85, 255, 255), // Bright Cyan
+	PackRGB(255, 255, 255), // Bright White
+};
+
+RGBA8::RGBA8() :
+	backgroundColour( 0x0),
+	penColour( 0xFFFFFFFF),
+	width(0),
+	height(0),
+	fontZoom(1),
+	frameBuffer(nullptr),
+	fontTmpBuffer() {
 }
 
 RGBA8::RGBA8(uint16_t	width, uint16_t height, uint8_t *framebuffer) :
-	backgroundColour(0x0),
-	penColour(0xFFFFFFFF),
+	backgroundColour( 0x0),
+	penColour( 0xFFFFFFFF),
 	width (width),
 	height(height),
 	fontZoom(2),
-	frameBuffer(framebuffer) {
+	frameBuffer(framebuffer),
+	fontTmpBuffer()  {
 }
 
 void RGBA8::Clear() const {
@@ -29,16 +54,16 @@ void RGBA8::Clear() const {
 	auto const end = ptr + width * height;
 
 	while(ptr < end) {
-		memcpy(ptr++, &backgroundColour, 4);
+		memcpy( ptr++, &backgroundColour, 4);
 	}
 }
 
-void RGBA8::SetPixel(int x, int y, uint32_t val) {
+void RGBA8::SetPixel(int x, int y, uint8_t index) {
 	auto *tl = (uint32_t *) this->frameBuffer;
 	if(y >= this->height) return;
 	if(x >= this->width) return;
 	tl += (y * this->width) + x;
-	*tl = val;
+	*tl = palette[index];
 }
 void RGBA8::SetPixel(int x, int y, uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
 	uint32_t val = a << 24 | b << 16 | g << 8 | r << 0;

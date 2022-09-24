@@ -4,7 +4,7 @@
 
 void OsHeap::Init() {
 	raw_debug_print("OsHeap::Init\n");
-	// allocate the 1MB DDR heap for the OS
+	// allocate the OsHeap::TotalSize DDR heap for the OS
 	osHeap = (OsHeap *) DDR_0_BASE_ADDR;
 
 	// gcc warns osHeap is null, but really its just DDR start is 0x0 address
@@ -14,7 +14,7 @@ void OsHeap::Init() {
 	raw_debug_print("  osHeap clear\n");
 	memset(osHeap, 0, OsHeap::TotalSize);
 #pragma GCC diagnostic pop
-	raw_debug_printf("  osHeap = %08lx\n", (uint32_t)osHeap);
+	raw_debug_printf("  osHeap = start %08lx sizeof(OsHelp) = %iKB\n", (uint32_t)osHeap, sizeof(OsHeap)/1024);
 
 	raw_debug_print("  osHeap ddrLoAllocator Init\n");
 	osHeap->ddrLoAllocator.Init(OsHeap::TotalSize);

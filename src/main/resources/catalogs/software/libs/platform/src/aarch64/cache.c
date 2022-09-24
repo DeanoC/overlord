@@ -6,14 +6,20 @@
 #include "platform/reg_access.h"
 #include "platform/aarch64/intrinsics_gcc.h"
 #include "platform/registers/a53_system.h"
+#include "dbg/assert.h"
 
-#define IRQ_FIQ_MASK 0xC0U	/* Mask IRQ and FIQ interrupts in cpsr */
+#define IRQ_FIQ_MASK (CPSR_IRQ_ENABLE | CPSR_FIQ_ENABLE)
 #define L1_DATA_PREFETCH_CONTROL_MASK  0xE000
 #define L1_DATA_PREFETCH_CONTROL_SHIFT  13
 //void Xil_ConfigureL1Prefetch(u8 num);
 
-static void DCacheCleanAndMaybeInvalidate(bool invalidate)
-{
+#define CACHE_LINE_SIZE 64U
+#define CACHE_LEVELS 2
+
+
+static void DCacheMaybeCleanAndInvalidate(bool clean_, bool invalidate_) {
+	assert( clean_ || invalidate_);
+
 	uint32_t currmask = read_DAIF_register();
 	write_DAIF_register(currmask | IRQ_FIQ_MASK);
 
@@ -32,8 +38,10 @@ static void DCacheCleanAndMaybeInvalidate(bool invalidate)
 		// Flush all the cachelines
 		for (uint32_t Way = 0U; Way < NumWays; Way++) {
 			for (uint32_t Set = 0U; Set < NumSet; Set++) {
-				if(invalidate) {
+				if(invalidate_ && clean_) {
 					write_data_cache_register(CISW, (Way << (32 - __builtin_ctz(NumWays))) | (Set << LineSize) | (cacheLevel << 1));
+				} else if(invalidate_) {
+					write_data_cache_register(ISW, (Way << (32 - __builtin_ctz(NumWays))) | (Set << LineSize) | (cacheLevel << 1));
 				} else {
 					write_data_cache_register(CSW, (Way << (32 - __builtin_ctz(NumWays))) | (Set << LineSize) | (cacheLevel << 1));
 				}
@@ -46,42 +54,39 @@ static void DCacheCleanAndMaybeInvalidate(bool invalidate)
 	write_DAIF_register(currmask);
 }
 
-static void DCacheCleanAndMaybeInvalidateRange(uintptr_t  adr, uintptr_t len, bool invalidate)
-{
+
+static void DCacheMaybeCleanAndInvalidateRange( uintptr_t const adr_, uintptr_t const len_, bool clean_, bool invalidate_){
+	assert( clean_ || invalidate_);
+
+	// not cleaning could lose data, so make sure everything is aligned
+	if(!clean_) {
+		assert((adr_ & (CACHE_LINE_SIZE - 1)) == 0 );
+		assert((len_ & (CACHE_LINE_SIZE - 1)) == 0 );
+	}
+	if(len_ == 0) return;
 	uint32_t currmask = read_DAIF_register();
 	write_DAIF_register(currmask | IRQ_FIQ_MASK);
 
-	const uintptr_t cacheline = 64U;
-	uintptr_t end = adr + len;
-	adr = adr & (~0x3F);
-
-	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYSTEM, CSSELR_EL1, LEVEL, 0) );
-	if (len != 0U) {
-		while (adr < end) {
-			if(invalidate)
-				write_data_cache_register(CIVAC,adr);
-			else
-				write_data_cache_register(CVAC,adr);
-			adr += cacheline;
-		}
+	uintptr_t const start = adr_ & (~0x3F);
+	uintptr_t const end = adr_ + len_;
+	int cacheLevel = 0;
+doCache:
+	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYSTEM, CSSELR_EL1, LEVEL, cacheLevel) );
+	for(uintptr_t address = start; address < end; address += CACHE_LINE_SIZE) {
+		if(clean_ && invalidate_)
+			write_data_cache_register(CIVAC,address);
+		else if(invalidate_)
+			write_data_cache_register(IVAC,address);
+		else
+			write_data_cache_register(CVAC,address);
 	}
 	dsb();
-
-	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYSTEM, CSSELR_EL1, LEVEL, 1) );
-	if (len != 0U) {
-		while (adr < end) {
-			if(invalidate)
-				write_data_cache_register(CIVAC,adr);
-			else
-				write_data_cache_register(CVAC,adr);
-			adr += cacheline;
-		}
-	}
-	dsb();
+	cacheLevel++;
+	// do both l1 and l2
+	if(cacheLevel < CACHE_LEVELS) goto doCache;
 
 	write_DAIF_register(currmask);
 }
-
 
 void Cache_DCacheEnable(void)
 {
@@ -99,7 +104,7 @@ void Cache_ICacheEnable(void)
 	// enable caches only if they are disabled
 	if(!HW_REG_DECODE_FIELD(A53_SYSTEM, SCTLR_EL3, I, read_SCTLR_EL3_register())){
 		// invalidate the I cache
-		Cache_ICacheCleanAndInvalidate();
+		Cache_ICacheInvalidate();
 		// enable the I cache for el3
 		write_SCTLR_EL3_register(read_SCTLR_EL3_register() | HW_REG_ENCODE_FIELD(A53_SYSTEM, SCTLR_EL3, I, 0x1));
 	}
@@ -129,7 +134,7 @@ void Cache_DCacheDisable(void)
 void Cache_ICacheDisable(void)
 {
 	// invalidate the instruction cache
-	Cache_ICacheCleanAndInvalidate();
+	Cache_ICacheInvalidate();
 	write_SCTLR_EL3_register(read_SCTLR_EL3_register() | HW_REG_ENCODE_FIELD(A53_SYSTEM, SCTLR_EL3, I, 0x0));
 }
 
@@ -156,12 +161,17 @@ uint32_t Cache_GetDCacheNumSets(uint32_t level) {
 
 void Cache_DCacheClean(void)
 {
-	DCacheCleanAndMaybeInvalidate(false);
+	DCacheMaybeCleanAndInvalidate(true, false);
+}
+
+void Cache_DCacheInvalidate(void)
+{
+	DCacheMaybeCleanAndInvalidate(false, true);
 }
 
 void Cache_DCacheCleanAndInvalidate(void)
 {
-	DCacheCleanAndMaybeInvalidate(true);
+	DCacheMaybeCleanAndInvalidate(true, true);
 }
 
 void Cache_DCacheCleanLine(uintptr_t adr)
@@ -180,34 +190,92 @@ void Cache_DCacheCleanLine(uintptr_t adr)
 	write_DAIF_register(currmask);
 }
 
-void Cache_DCacheCleanAndInvalidateLine(uintptr_t adr)
-{
+void Cache_DCacheInvalidateLine(uintptr_t adr_) {
+	assert((adr_ & (CACHE_LINE_SIZE-1)) == 0);
 	uint32_t currmask = read_DAIF_register();
 	write_DAIF_register(currmask | IRQ_FIQ_MASK);
 
 	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYSTEM, CSSELR_EL1, LEVEL, 0) );
-	write_data_cache_register(CIVAC,(adr & (~0x3F)));
+	write_data_cache_register(IVAC,(adr_ & (~0x3F)));
 	dsb();
 
 	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYSTEM, CSSELR_EL1, LEVEL, 1) );
-	write_data_cache_register(CIVAC,(adr & (~0x3F)));
+	write_data_cache_register(IVAC,(adr_ & (~0x3F)));
+	dsb();
+
+	write_DAIF_register(currmask);
+}
+
+void Cache_DCacheCleanAndInvalidateLine(uintptr_t adr_) {
+	uint32_t currmask = read_DAIF_register();
+	write_DAIF_register(currmask | IRQ_FIQ_MASK);
+
+	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYSTEM, CSSELR_EL1, LEVEL, 0) );
+	write_data_cache_register(CIVAC,(adr_ & (~0x3F)));
+	dsb();
+
+	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYSTEM, CSSELR_EL1, LEVEL, 1) );
+	write_data_cache_register(CIVAC,(adr_ & (~0x3F)));
 	dsb();
 
 	write_DAIF_register(currmask);
 
 }
+void Cache_DCacheZeroLine(uintptr_t adr_) {
+	// not cleaning could lose data, so make sure everything is aligned
+	assert((adr_ & (CACHE_LINE_SIZE-1)) == 0);
+	uint32_t currmask = read_DAIF_register();
+	write_DAIF_register(currmask | IRQ_FIQ_MASK);
 
-void Cache_DCacheCleanAndInvalidateRange(uintptr_t  adr, uintptr_t len)
-{
-	DCacheCleanAndMaybeInvalidateRange(adr, len, true);
+	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYSTEM, CSSELR_EL1, LEVEL, 0) );
+	write_data_cache_register(ZVA, adr_);
+	dsb();
+
+	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYSTEM, CSSELR_EL1, LEVEL, 1) );
+	write_data_cache_register(ZVA, adr_);
+	dsb();
+
+	write_DAIF_register(currmask);
 }
 
-void Cache_DCacheCleanRange(uintptr_t  adr, uintptr_t len)
-{
-	DCacheCleanAndMaybeInvalidateRange(adr, len, false);
+void Cache_DCacheCleanAndInvalidateRange(uintptr_t  adr, uintptr_t len) {
+	DCacheMaybeCleanAndInvalidateRange( adr, len, true, true);
 }
 
-void Cache_ICacheCleanAndInvalidate(void)
+void Cache_DCacheInvalidateRange(uintptr_t  adr, uintptr_t len) {
+	DCacheMaybeCleanAndInvalidateRange( adr, len, false, true);
+}
+
+void Cache_DCacheCleanRange(uintptr_t  adr, uintptr_t len) {
+	DCacheMaybeCleanAndInvalidateRange( adr, len, true, false);
+}
+
+void Cache_DCacheZeroRange(uintptr_t adr_, uintptr_t len_)
+{
+	assert((adr_ & (CACHE_LINE_SIZE-1)) == 0);
+	assert((len_ & (CACHE_LINE_SIZE-1)) == 0);
+
+	if(len_ == 0) return;
+
+	uint32_t currmask = read_DAIF_register();
+	write_DAIF_register(currmask | IRQ_FIQ_MASK);
+
+	uintptr_t const start = adr_ & (~0x3F);
+	uintptr_t const end = adr_ + len_;
+	int cacheLevel = 0;
+	doCache:
+	write_CSSELR_EL1_register(HW_REG_ENCODE_FIELD(A53_SYSTEM, CSSELR_EL1, LEVEL, cacheLevel) );
+	for(uintptr_t address = start; address < end; address += CACHE_LINE_SIZE) {
+		write_data_cache_register(ZVA,address);
+	}
+	dsb();
+	cacheLevel++;
+	// do both l1 and l2
+	if(cacheLevel < CACHE_LEVELS) goto doCache;
+
+	write_DAIF_register(currmask);
+}
+void Cache_ICacheInvalidate(void)
 {
 	uint32_t currmask = read_DAIF_register();
 	write_DAIF_register(currmask | IRQ_FIQ_MASK);
@@ -222,7 +290,7 @@ void Cache_ICacheCleanAndInvalidate(void)
 	write_DAIF_register(currmask);
 }
 
-void Cache_ICacheCleanAndInvalidateLine(uintptr_t  adr)
+void Cache_ICacheInvalidateLine(uintptr_t  adr)
 {
 	uint32_t currmask = read_DAIF_register();
 	write_DAIF_register(currmask | IRQ_FIQ_MASK);
@@ -232,7 +300,7 @@ void Cache_ICacheCleanAndInvalidateLine(uintptr_t  adr)
 	write_DAIF_register(currmask);
 }
 
-void Cache_ICacheCleanAndInvalidateRange(uintptr_t  adr, uintptr_t len)
+void Cache_ICacheInvalidateRange(uintptr_t  adr, uintptr_t len)
 {
 	uint32_t currmask = read_DAIF_register();
 	write_DAIF_register(currmask | IRQ_FIQ_MASK);

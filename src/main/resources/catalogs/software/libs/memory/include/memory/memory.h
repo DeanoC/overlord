@@ -59,15 +59,19 @@ typedef struct Memory_LinearAllocator {
 	Memory_Allocator* name_ = (Memory_Allocator * )name_##_BLOCK;                         \
 	Memory_HeapAllocatorInit(name_);
 
+#define PERSISTANT_MEMORY_BUFFER_ALLOCATOR(name_, buffer_, sizeInBytes_)  \
+	memcpy(&(name_), &Memory_LinearAllocatorTEMPLATE, sizeof(Memory_LinearAllocator)); \
+	(name_).bufferStart = (void *) (buffer_);                                       \
+	(name_).current = (uint8_t *) (name_).bufferStart;                        \
+	(name_).bufferEnd = (void *)((name_).current + (sizeInBytes_));
+
+
 #define MEMORY_BUFFER_ALLOCATOR(name_, buffer_, sizeInBytes_)                           \
 	Memory_LinearAllocator name_##_BLOCK;                                                 \
-	Memory_Allocator* name_ = (Memory_Allocator * )&name_##_BLOCK;                        \
-	memcpy(&name_##_BLOCK, &Memory_LinearAllocatorTEMPLATE, sizeof(Memory_LinearAllocator)); \
-	name_##_BLOCK.bufferStart = (void *) (buffer_);                                       \
-	name_##_BLOCK.current = (uint8_t *) name_##_BLOCK.bufferStart;                        \
-	name_##_BLOCK.bufferEnd = (void *)(name_##_BLOCK.current + (sizeInBytes_));
+	Memory_Allocator* name_ = (Memory_Allocator * )&name_##_BLOCK;                         \
+	PERSISTANT_MEMORY_BUFFER_ALLOCATOR( name_##_BLOCK, buffer_, sizeInBytes_)
 
-// add some space when stack allocing and tracking for some overhead so exact stack allocation works
+	// add some space when stack allocing and tracking for some overhead so exact stack allocation works
 #if MEMORY_TRACKING_SETUP == 1
 #define MEMORY_STACK_ALLOCATOR(name, sizeInBytes) MEMORY_BUFFER_ALLOCATOR(name, STACK_ALLOC((sizeInBytes)+64), (sizeInBytes)+64)
 #else

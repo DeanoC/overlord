@@ -1,15 +1,16 @@
 #pragma once
 
 #include "core/bitmap_allocator_single_threaded.hpp"
-#include "text_console.hpp"
 #include "host_interface.hpp"
 #include "timers.hpp"
 #include "osservices/osservices.h"
 
-// the os heap is a 2MB chunk of DDR (at ddr base) that the pmu reserves
+// the os heap is a 1MB chunk of DDR (at ddr base) that the pmu reserves
 // for itself.
 // if possible other CPUs should trap access to this to help catch NULLs
 // it also ensure the data is safe if other CPU go mad
+// The default MMU code for A53 only has 2MB pages so even though only 1MB
+// so app should allocate a dummy 1MB or install a L3 MMU section
 
 // its available once IPI3_OSServiceInit is finished
 struct OsHeap {
@@ -17,7 +18,7 @@ struct OsHeap {
 	[[maybe_unused]] static void Fini();
 	const uint32_t nullBlock[1024]; // 4K poisoned to 0xDCDCDCDC for null page
 
-	static const unsigned int TotalSize = 2 * 1024*1024;
+	static const unsigned int TotalSize = 1 * 1024*1024;
 	static const unsigned int UartBufferSize = 32 * 1024;
 	static const unsigned int BounceBufferSize = 64 * 1024;
 
@@ -32,15 +33,12 @@ struct OsHeap {
 
 	uint8_t bounceBuffer[BounceBufferSize];
 
-
 	Timers::Callback hundredHzCallbacks[Timers::MaxHundredHzCallbacks];
 	Timers::Callback thirtyHzCallbacks[Timers::MaxThirtyHzCallbacks];
 
 	uint8_t bootOCMStore[256*1024];
-	TextConsole console;
 	HostInterface hostInterface;
 	BootData bootData;
-	bool screenConsoleEnabled;
 
 	static const int MaxMainCalls = 50;
 	typedef void (*MainCallCallback)();
@@ -56,7 +54,6 @@ enum class HundredHzTasks {
 };
 
 enum class ThirtyHzTasks {
-	TEXT_CONSOLE = 0,
 };
 
 static_assert(sizeof(OsHeap) < (OsHeap::TotalSize));

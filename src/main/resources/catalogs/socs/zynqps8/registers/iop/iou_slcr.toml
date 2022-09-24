@@ -1,7 +1,4 @@
 description = "IOP System-level Control"
-[[bank]]
-  name = "IOU_SLCR"
-  address = "0xff180000"
 [[register]]
   name = "MIO_PIN_0"
   type = "rw"
@@ -3386,25 +3383,32 @@ description = "IOP System-level Control"
   description = "SWDT clock source select"
   default = "0x00000000"
   offset = "0x00000300"
-  [[register.field]]
-    name = "RESERVED"
-    bits = "31:1"
-    type = "raz"
-    shortdesc = '''Reserved.'''
-    longdesc = '''Writes are ignored, read data is zero.'''
-  [[register.field]]
-    name = "SELECT"
-    bits = "0"
-    type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "31:1"
+type = "raz"
+shortdesc = '''Reserved.'''
+longdesc = '''Writes are ignored, read data is zero.'''
+[[register.field]]
+name = "SELECT"
+bits = "0"
+type = "rw"
+[[register.field.enum]]
+name = "APB_CLOCK"
+value = 0
+[[register.field.enum]]
+name = "EXTERNAL_CLOCK"
+value = 1
+
 [[register]]
-  name = "CAN_MIO_CTRL"
-  type = "mixed"
-  width = 32
-  description = "CAN MIO Control"
-  default = "0x00000000"
-  offset = "0x00000304"
-  [[register.field]]
-    name = "RESERVED"
+name = "CAN_MIO_CTRL"
+type = "mixed"
+width = 32
+description = "CAN MIO Control"
+default = "0x00000000"
+offset = "0x00000304"
+[[register.field]]
+name = "RESERVED"
     bits = "31:24"
     type = "raz"
     shortdesc = '''Reserved.'''
@@ -4398,37 +4402,74 @@ description = "IOP System-level Control"
   description = "TTC APB Interface Clock Select"
   default = "0x00000000"
   offset = "0x00000380"
-  [[register.field]]
-    name = "RESERVED"
-    bits = "31:8"
-    type = "raz"
-    shortdesc = '''Reserved.'''
-    longdesc = '''Writes are ignored, read data is zero.'''
-  [[register.field]]
-    name = "TTC3_SEL"
-    bits = "7:6"
-    type = "rw"
-  [[register.field]]
-    name = "TTC2_SEL"
-    bits = "5:4"
-    type = "rw"
-  [[register.field]]
-    name = "TTC1_SEL"
-    bits = "3:2"
-    type = "rw"
-  [[register.field]]
-    name = "TTC0_SEL"
-    bits = "1:0"
-    type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "31:8"
+type = "raz"
+shortdesc = '''Reserved.'''
+longdesc = '''Writes are ignored, read data is zero.'''
+[[register.field]]
+name = "TTC3_SEL"
+bits = "7:6"
+type = "rw"
+[[register.field.enum]]
+name = "APB_SWITCH_CLK"
+value = 0
+[[register.field.enum]]
+name = "PLL_REF_CLOCK"
+value = 1
+[[register.field.enum]]
+name = "R5_CLK"
+value = 2
+[[register.field]]
+name = "TTC2_SEL"
+bits = "5:4"
+type = "rw"
+[[register.field.enum]]
+name = "APB_SWITCH_CLK"
+value = 0
+[[register.field.enum]]
+name = "PLL_REF_CLOCK"
+value = 1
+[[register.field.enum]]
+name = "R5_CLK"
+value = 2
+[[register.field]]
+name = "TTC1_SEL"
+bits = "3:2"
+type = "rw"
+[[register.field.enum]]
+name = "APB_SWITCH_CLK"
+value = 0
+[[register.field.enum]]
+name = "PLL_REF_CLOCK"
+value = 1
+[[register.field.enum]]
+name = "R5_CLK"
+value = 2
+[[register.field]]
+name = "TTC0_SEL"
+bits = "1:0"
+type = "rw"
+[[register.field.enum]]
+name = "APB_SWITCH_CLK"
+value = 0
+[[register.field.enum]]
+name = "PLL_REF_CLOCK"
+value = 1
+[[register.field.enum]]
+name = "R5_CLK"
+value = 2
+
 [[register]]
-  name = "IOU_TAPDLY_BYPASS"
-  type = "mixed"
-  width = 32
-  description = "Tap Delay enables for the LQSPI and NAND controllers."
-  default = "0x00000007"
-  offset = "0x00000390"
-  [[register.field]]
-    name = "RESERVED"
+name = "IOU_TAPDLY_BYPASS"
+type = "mixed"
+width = 32
+description = "Tap Delay enables for the LQSPI and NAND controllers."
+default = "0x00000007"
+offset = "0x00000390"
+[[register.field]]
+name = "RESERVED"
     bits = "31:3"
     type = "raz"
     shortdesc = '''Reserved.'''

@@ -86,7 +86,6 @@ s32 XIicPs_SetupMaster(XIicPs *InstancePtr, s32 Role)
 	}else {
 		ControlReg &= ~((u32)XIICPS_CR_RD_WR_MASK);
 	}
-	debug_printf("%#10x\n", ControlReg);
 
 	XIicPs_WriteReg(BaseAddr, XIICPS_CR_OFFSET, ControlReg);
 

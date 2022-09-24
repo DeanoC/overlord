@@ -3,6 +3,7 @@
 #include "platform/reg_access.h"
 #include "platform/memory_map.h"
 #include "platform/registers/crf_apb.h"
+#include "platform/registers/lpd_slcr.h"
 
 void A53Sleep0() {
 	RomServiceTable[REN_ACPU0SLEEP]();
@@ -43,6 +44,7 @@ void A53WakeUp0() {
 							 HW_REG_ENCODE_FIELD(CRF_APB, RST_FPD_APU, ACPU0_RESET, 1) |
 							 HW_REG_ENCODE_FIELD(CRF_APB, RST_FPD_APU, ACPU0_PWRON_RESET, 1)
 						 );
+
 	RomServiceTable[REN_PWRUPACPU0]();
 	RomServiceTable[REN_ACPU0WAKE]();
 	HW_REG_RMW(HW_REG_GET_ADDRESS(CRF_APB), CRF_APB, RST_FPD_APU,

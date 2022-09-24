@@ -210,7 +210,7 @@ static bool I2CReadUpto16Bytes(Connection *link, bool mot, uint32_t address, uin
 	}
 	else if( (HW_REG_DECODE_FIELD(DP, AUX_REPLY_CODE, CODE1, replyCode) == DP_AUX_REPLY_CODE_CODE1_I2C_DEFER) ||
 			(HW_REG_DECODE_FIELD(DP, AUX_REPLY_CODE, CODE0, replyCode) == DP_AUX_REPLY_CODE_CODE0_AUX_DEFER) ) {
-		Utils_BusyMicroSleep(20);
+		Utils_BusyMilliSleep(1);
 		// try again
 		tryCount--;
 		if (tryCount > 0)

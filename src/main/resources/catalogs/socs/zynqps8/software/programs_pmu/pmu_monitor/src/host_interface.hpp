@@ -1,12 +1,9 @@
 #pragma once
 
-#include "zmodem.hpp"
-
 struct HostInterface {
 	enum class State : uint8_t {
 		RECEIVING_COMMAND,
 		PROCESSING_COMMAND,
-		ZMODEM,
 	} currentState;
 
 	enum class DownloadTarget : uint8_t {
@@ -32,7 +29,7 @@ struct HostInterface {
 	uint8_t* cmdBuffer;
 	uint32_t cmdBufferHead;
 	uintptr_all_t downloadAddress;
-	ZModem zModem;
+
 	uintptr_all_t lastReadAddress;
 	bool lastCommandWasR;
 	void DownloadAt(uint8_t const *cmdBuffer, unsigned int const *finds, unsigned int const findCount);

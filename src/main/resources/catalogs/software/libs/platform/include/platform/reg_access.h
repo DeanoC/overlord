@@ -41,6 +41,8 @@
 #define HW_REG_SET_BIT1(registerlist, reg, field) HW_REG_RMW( HW_REG_GET_ADDRESS(registerlist), registerlist, reg, HW_REG_FIELD_MASK(registerlist, reg, field), HW_REG_FIELD_MASK(registerlist, reg, field))
 #define HW_REG_CLR_BIT1(registerlist, reg, field) HW_REG_RMW( HW_REG_GET_ADDRESS(registerlist), registerlist, reg, HW_REG_FIELD_MASK(registerlist, reg, field), !HW_REG_FIELD_MASK(registerlist, reg, field))
 #define HW_REG_GET_BIT1(registerlist, reg, field) HW_REG_DECODE_BIT(registerlist, reg, field, HW_REG_READ(HW_REG_GET_ADDRESS(registerlist), registerlist, reg))
+#define HW_REG_GET_FIELD1(registerlist, reg, field) HW_REG_DECODE_FIELD(registerlist, reg, field, HW_REG_READ(HW_REG_GET_ADDRESS(registerlist), registerlist, reg))
+#define HW_REG_SET_FIELD1(registerlist, reg, field, value) HW_REG_RMW(HW_REG_GET_ADDRESS(registerlist), registerlist, reg, HW_REG_FIELD_MASK(registerlist, reg, field), HW_REG_ENCODE_FIELD(registerlist, reg, field, value))
 
 #ifdef __cplusplus
 EXTERN_C

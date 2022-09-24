@@ -11,7 +11,6 @@
 #include "platform/registers/crf_apb.h"
 #include "os/ipi3_os_server.hpp"
 #include "cpuwake.hpp"
-#include "zmodem.hpp"
 #include "zynqps8/dma/lpddma.hpp"
 
 #define SIZED_TEXT(text) sizeof(text), (uint8_t const*)text
@@ -40,11 +39,10 @@ void HostInterface::Init() {
 
 	osHeap->hundredHzCallbacks[(int)HundredHzTasks::HOST_INPUT] = &HostInputCallback;
 	osHeap->hundredHzCallbacks[(int)HundredHzTasks::HOST_COMMANDS_PROCESSING] = &HostCommandCallback;
-	zModem.Init();
+
 }
 
 [[maybe_unused]] void HostInterface::Fini() {
-	zModem.Fini();
 	osHeap->tmpOsBufferAllocator.Free((uintptr_t)this->cmdBuffer, CMD_BUF_SIZE/64 );
 }
 
@@ -82,6 +80,7 @@ void HostInterface::InputCallback() {
 
 	TmpBufferRefill(tmpBufferAddr, tmpBufferSize);
 
+
 	while(true) {
 		uint8_t c;
 		if (tmpBufferSize != 0) {
@@ -96,7 +95,11 @@ void HostInterface::InputCallback() {
 		} else {
 			return;
 		}
-
+#define ASCII_EOT 3
+#define ASCII_BACKSPACE 8
+#define ASCII_LF 10
+#define ASCII_CR 13
+#define ASCII_CAN 24
 		switch (c) {
 			case ASCII_BACKSPACE: // backspace
 				this->cmdBufferHead--;
@@ -128,25 +131,6 @@ void HostInterface::CommandCallback() {
 		case State::PROCESSING_COMMAND:
 			this->WhatCommand();
 			return;
-		case State::ZMODEM: {
-			ZModem::Result result = zModem.Receive();
-			switch (result) {
-				case ZModem::Result::FAIL:
-					osHeap->console.console.NewLine();
-					osHeap->console.console.PrintLn(ANSI_RED_PAPER ANSI_BRIGHT_ON "ZModem FAIL" ANSI_RESET_ATTRIBUTES);
-					this->currentState = State::RECEIVING_COMMAND;
-					textConsoleSkip = 0;
-					return;
-				case ZModem::Result::CONTINUE:
-					return;
-				case ZModem::Result::SUCCESS:
-					osHeap->console.console.NewLine();
-					osHeap->console.console.PrintLn(ANSI_GREEN_PEN ANSI_BRIGHT_ON "ZModem SUCCESS" ANSI_RESET_ATTRIBUTES);
-					this->currentState = State::RECEIVING_COMMAND;
-					textConsoleSkip = 0;
-					return;
-			}
-		}
 		default:
 			return;
 	}
@@ -170,25 +154,10 @@ void HostInterface::WhatCommand() {
 
 	this->lastCommandWasR = false;
 
-	// special case Zmodem receive code first
-	if(cmdBufferHeadTmp > 4 && this->cmdBuffer[4] == 0x18) {
-		if(Core::RuntimeHash(4, (char *) this->cmdBuffer) == "rz**"_hash) {
-			// zmodem download start
-			osHeap->console.console.PrintLn(ANSI_BLUE_PAPER "ZModem download started" ANSI_RESET_ATTRIBUTES);
-			textConsoleSkip = 30;
-			this->zModem.ReInit();
-			this->zModem.destinationAddress = this->downloadAddress;
-			this->currentState = State::ZMODEM;
-			return;
-		}
-	}
-
 	const auto findCount = Utils::StringFindMultiple(cmdBufferHeadTmp, (char *) this->cmdBuffer, ' ', MaxFinds, finds);
 	if (findCount != Utils::StringNotFound) {
 		Utils::StringScatterChar(cmdBufferHeadTmp, (char *) this->cmdBuffer, findCount, finds, 0);
 	}
-	osHeap->console.console.PrintWithSize(finds[0], (char *) this->cmdBuffer);
-	osHeap->console.console.PrintLn(" command received");
 
 	switch (Core::RuntimeHash(finds[0], (char *) this->cmdBuffer)) {
 		case "echo"_hash: {

@@ -1,8 +1,8 @@
 #include "core/core.h"
 #include "platform/memory_map.h"
 #include "platform/reg_access.h"
-#include "osservices/ipi3_transport.h"
 #include "platform/cache.h"
+#include "osservices/ipi3_transport.h"
 #include "multi_core/mutex.h"
 
 // Manual is wrong,
@@ -48,7 +48,6 @@ void IPI3_OsService_Submit(const IPI3_Msg *const msg) {
 	// we need to use the CPUs buffer not PMUs, it works now because APUs are mutexed as they only have one channel
 	// but r5f each have there own buffer but this code will use the PMU one, which would have 3 user simultanously
 	memcpy(IPI_MSG(IPI_BUFFER, IA_PMU), msg, 32);
-	Cache_DCacheCleanAndInvalidateLine((uintptr_t)IPI_MSG(IPI_BUFFER, IA_PMU));
 	HW_REG_WRITE1(IPI, IPI_TRIG, IC_PMU_3);
 
 	UNLOCK_MUTEX();

@@ -503,11 +503,11 @@ void Memory_TrackerDestroyAndLogLeaks() {
 				debug_printf("-=-=-=-=-=-=- Memory Leak Report -=-=-=-=-=-=-\n");
 			}
 			if(au->sourceFile) {
-				char const *fileNameOnly = sourceFileStripper(au->sourceFile);
-				debug_printf("%u bytes from %s(%u): %s number: %lu\n", au->reportedSize, fileNameOnly, au->sourceLine, au->sourceFunc, au->allocationNumber);
-			} else {
-				debug_printf("%u bytes from an unknown caller number: %lu\n", au->reportedSize, au->allocationNumber);
-			}
+				char const *fileNameOnly = sourceFileStripper( au->sourceFile );
+				debug_printf( "%lu bytes from %s(%lu): %s number: %llu\n", au->reportedSize, fileNameOnly, au->sourceLine, au->sourceFunc, au->allocationNumber );
+			} else
+				debug_printf( "%lu bytes from an unknown caller number: %llu\n", au->reportedSize, au->allocationNumber );
+
 			au = au->next;
 		}
 	}

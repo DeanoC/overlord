@@ -2,11 +2,11 @@
 #include "utils/boot_psi.h"
 #include "platform/reg_access.h"
 #include "platform/memory_map.h"
-#include "hw_regs/crl_apb.h"
-#include "hw_regs/crf_apb.h"
-#include "hw_regs/iou_slcr.h"
-#include "hw_regs/fpd_slcr.h"
-#include "hw_regs/lpd_slcr.h"
+#include "platform/registers/crl_apb.h"
+#include "platform/registers/crf_apb.h"
+#include "platform/registers/iou_slcr.h"
+#include "platform/registers/fpd_slcr.h"
+#include "platform/registers/lpd_slcr.h"
 
 __attribute__((__section__(".hwregs")))
 static PSI_IWord const clock_init[] = {

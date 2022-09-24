@@ -5,35 +5,12 @@
 #include "../os_heap.hpp"
 #include "dbg/assert.h"
 #include "zynqps8/dma/lpddma.hpp"
-#include "osservices/osservices.h"
-#include "dbg/ansi_escapes.h"
 
 OsHeap *osHeap;
-
-uint8_t textConsoleSkip;
-uint8_t textConsoleSkipCurrent;
-
-static void TextConsoleDrawCallback() {
-	if(osHeap->console.framebuffer != nullptr && osHeap->screenConsoleEnabled) {
-		if(textConsoleSkipCurrent == textConsoleSkip) {
-			textConsoleSkipCurrent = 0;
-			auto const frameBuffer = osHeap->console.framebuffer;
-			auto const width = osHeap->console.frameBufferWidth;
-			auto const height = osHeap->console.frameBufferHeight;
-
-			GfxDebug::RGBA8 drawer(width, height, frameBuffer);
-			osHeap->console.console.Display(&drawer, 0, 0);
-		} else {
-			textConsoleSkipCurrent++;
-		}
-	}
-}
 
 namespace IPI3_OsServer {
 
 void Init() {
-	osHeap->console.Init();
-	osHeap->thirtyHzCallbacks[(int)ThirtyHzTasks::TEXT_CONSOLE] = &TextConsoleDrawCallback;
 }
 
 static bool IsFireAndForget(OS_ServiceFunc func) {
@@ -49,11 +26,7 @@ void HandleFireAndForget(const IPI3_Msg *const msgBuffer) {
 			break;
 		case OSF_DDR_HI_BLOCK_FREE: DdrHiBlockFree(msgBuffer);
 			break;
-		case OSF_SCREEN_CONSOLE_INLINE_PRINT: ScreenConsoleInlinePrint(msgBuffer);
-			break;
 		case OSF_BOOT_COMPLETE: BootComplete(msgBuffer);
-			break;
-		case OSF_SCREEN_CONSOLE_ENABLE: ScreenConsoleEnable(msgBuffer);
 			break;
 		case OSF_CPU_WAKE_OR_SLEEP: CpuWakeOrSleep(msgBuffer);
 			break;
@@ -71,11 +44,8 @@ void HandleNeedResponse(IPI_Channel const senderChannel, const IPI3_Msg *const m
 			break;
 		case OSF_DDR_HI_BLOCK_ALLOC: DdrHiBlockAlloc(senderChannel, msgBuffer);
 			break;
-		case OSF_SCREEN_CONSOLE_PTR_PRINT: ScreenConsolePtrPrint(senderChannel, msgBuffer);
-			break;
 		case OSF_FETCH_BOOT_DATA: FetchBootData(senderChannel, msgBuffer);
 			break;
-
 		default: debug_printf("Invalid function 0x%x in need response handler IPI3\n", msgBuffer->function);
 	}
 }

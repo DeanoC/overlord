@@ -26,6 +26,7 @@ ALWAYS_INLINE void coreMemoryInit(Memory_HeapAllocator* heap) {
 static void* coreMallocMalloc(Memory_Allocator* allocator, size_t size) {
 	Memory_HeapAllocator * heap = (Memory_HeapAllocator*)allocator;
 	coreMemoryInit(heap);
+	// TODO if we have run out of ram from our mspace, would could try and steal it from another cores mspace
 	return mspace_malloc( READ_CORE_LOCAL(heap->threadMSpaces), size, NOLOCK);
 }
 
@@ -61,7 +62,7 @@ static void coreMallocFree(Memory_Allocator* allocator, void* ptr) {
 		// this will use a spin lock that could be contended as it is in another core's mspace
 		mspace_free(m, ptr, false);
 	} else {
-		// allocated from out cores mspace so we can free with no contention
+		// allocated from our cores mspace so we can free with no contention
 		mspace_free(m,ptr, NOLOCK);
 	}
 }

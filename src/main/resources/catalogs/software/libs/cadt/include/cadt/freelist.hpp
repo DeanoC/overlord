@@ -59,8 +59,7 @@ struct FreeList<T, true> : private BaseFreeList {
 		return (FreeList *) BaseFreeList::Clone( src );
 	}
 
-	WARN_UNUSED_RESULT T * alloc() { return (T*) CADT_FreeListAlloc((CADT_FreeListHandle) this ); };
-
+	WARN_UNUSED_RESULT T * alloc() { return (T*) BaseFreeList::alloc(); };
 
 	auto clone() { return Clone( this ); }
 

@@ -3,6 +3,7 @@
 #include "core/snprintf.h"
 #include "utils/string_utils.hpp"
 #include "gfxdebug/rgba8.hpp"
+#include "gfxdebug/clut8.hpp"
 #include "dbg/ansi_escapes.h"
 #include "dbg/assert.h"
 #include "dbg/print.h"
@@ -38,31 +39,6 @@ template<int WIDTH, int HEIGHT>
 struct Console : ConsoleBase {
 	static const uint8_t ThirtyHzFlashFlipCount = 3;
 
-	constexpr static uint32_t PackRGB(uint8_t red, uint8_t green, uint8_t blue) {
-		return (0xFF << 24) | (blue << 16) | (green << 8) | (red << 0);
-	}
-
-	// VGA Palette (except Yellow)
-	constexpr static const uint32_t palette[] = {
-			PackRGB(0, 0, 0), // Black
-			PackRGB(170, 0, 0), // Red
-			PackRGB(0, 170, 0), // Green
-			PackRGB(187, 187, 0), // Yellow
-			PackRGB(0, 0, 170), // Blue
-			PackRGB(170, 0, 170), // Magenta
-			PackRGB(0, 170, 170), // Cyan
-			PackRGB(170, 170, 170), // White
-
-			PackRGB(85, 85, 85), // Bright Black (Gray)
-			PackRGB(255, 85, 85), // Bright Red
-			PackRGB(85, 255, 85), // Bright Green
-			PackRGB(255, 255, 85), // Bright Yellow
-			PackRGB(85, 85, 255), // Bright Blue
-			PackRGB(255, 85, 255), // Bright Magenta
-			PackRGB(85, 255, 255), // Bright Cyan
-			PackRGB(255, 255, 255), // Bright White
-	};
-
 	void Init() {
 		ConsoleBase::Init(WIDTH, HEIGHT, textArray, attributeArray);
 
@@ -83,7 +59,7 @@ struct Console : ConsoleBase {
 		ThirtyHzCounter = 0;
 	}
 
-	void Display(RGBA8 *drawer, uint16_t offsetX, uint16_t offsetY) {
+	void Display(DrawerBase * drawer, uint16_t offsetX, uint16_t offsetY) {
 		bool flashUpdate = false;
 		ThirtyHzCounter++;
 		if(ThirtyHzCounter > ThirtyHzFlashFlipCount) {
@@ -92,32 +68,32 @@ struct Console : ConsoleBase {
 			ThirtyHzCounter = 0;
 		}
 
-		if (!dirty && !flashUpdate) {
+		if(!dirty && !flashUpdate) {
 			return;
 		}
 
 		Attribute attrib = DefaultAttribute;
-		for (int y = 0; y < HEIGHT; ++y) {
-			for (int x = 0; x < WIDTH; ++x) {
+		for(int y = 0; y < HEIGHT; ++y) {
+			for(int x = 0; x < WIDTH; ++x) {
 				Attribute const a = attributeBuffer[x + (y * WIDTH)];
 
 				bool const charNeedsUpdate = dirty || a.flash || attrib.flash;
 				if(charNeedsUpdate) {
-					if (a.back != attrib.back ||
-							a.pen != attrib.pen ||
-							a.bright != attrib.bright ||
-							a.flash != attrib.flash) {
-						if (a.flash && this->flashState) {
-							drawer->penColour = palette[a.back];
-							drawer->backgroundColour = palette[(a.bright * 8) + a.pen];
+					if(a.back != attrib.back ||
+					   a.pen != attrib.pen ||
+					   a.bright != attrib.bright ||
+					   a.flash != attrib.flash) {
+						if(a.flash && this->flashState) {
+							drawer->setPenColour(a.back);
+							drawer->setBackgroundColour((a.bright * 8) + a.pen);
 						} else {
-							drawer->penColour = palette[(a.bright * 8) + a.pen];
-							drawer->backgroundColour = palette[a.back];
+							drawer->setPenColour((a.bright * 8) + a.pen);
+							drawer->setBackgroundColour(a.back);
 						}
 						attrib = a;
 					}
 					char const c = textBuffer[x + (y * WIDTH)];
-					drawer->PutChar(offsetX + x, offsetY + y, c);
+					drawer->PutChar( offsetX + x, offsetY + y, c );
 				}
 			}
 		}

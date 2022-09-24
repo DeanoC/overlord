@@ -15,8 +15,8 @@ enum class Channels : uint8_t {
 };
 typedef Channels AsyncToken;
 
-AsyncToken SimpleDmaSet(Channels channel, uint32_t data, uintptr_all_t address, uint32_t size);
-AsyncToken SimpleDmaSet(Channels channel, uint8_t data, uintptr_all_t address, uint32_t size);
+AsyncToken SimpleDmaSet8(Channels channel, uint32_t data, uintptr_all_t address, uint32_t size);
+AsyncToken SimpleDmaSet32(Channels channel, uint8_t data, uintptr_all_t address, uint32_t size);
 
 AsyncToken SimpleDmaCopy(Channels channel, uintptr_all_t src, uintptr_all_t dest, uint32_t size);
 

@@ -480,19 +480,19 @@ void SetDisplay(Connection *link, Display *display, Mixer *mixer) {
 	uint32_t const mClockFactor = pixelClockKHz;
 	uint32_t const nClockFactor = (int) link->linkRate * 27000;
 
-	//debug_printf("bw %f minBPTU %d fractionBPTU %d M %d N %d\n",
-	//						 bw, minBytesPerTransferUnit, fractionBytesPerTransferUnit, mClockFactor, nClockFactor);
+//	debug_printf("bw %f minBPTU %d fractionBPTU %d M %d N %d\n",
+//							 bw, minBytesPerTransferUnit, fractionBytesPerTransferUnit, mClockFactor, nClockFactor);
 
 	uint16_t const hStart = display->videoTiming.hSyncPulseWidth + display->videoTiming.hBackPorch;
 	uint16_t const vStart = display->videoTiming.vSyncPulseWidth + display->videoTiming.vBackPorch;
 	uint16_t const initWait = (minBytesPerTransferUnit <= 4) ? transferUnitSize : transferUnitSize - minBytesPerTransferUnit;
 
-	//debug_printf("TSU %ld pixelClockKHz %ld videoBandwith %ld linkBandwidth %ld initWait %d\n",
-	//						 transferUnitSize, pixelClockKHz, videoBandwidth, linkBandwidth, initWait);
-	//debug_printf("H Addressable %d H total %d H Start %d H Sync Pulse %d H Polarity %d\n",
-	//						 display->videoTiming.width, display->videoTiming.hTotal, hStart, display->videoTiming.hSyncPulseWidth, display->videoTiming.hSyncPolarity);
-	//debug_printf("V Addressable %d V total %d V Start %d V Sync Pulse %d V Polarity %d\n",
-	//						 display->videoTiming.height, display->videoTiming.vTotal, vStart, display->videoTiming.vSyncPulseWidth, display->videoTiming.vSyncPolarity);
+//	debug_printf("TSU %ld pixelClockKHz %ld videoBandwith %ld linkBandwidth %ld initWait %d\n",
+//							 transferUnitSize, pixelClockKHz, videoBandwidth, linkBandwidth, initWait);
+//	debug_printf("H Addressable %d H total %d H Start %d H Sync Pulse %d H Polarity %d\n",
+//							 display->videoTiming.width, display->videoTiming.hTotal, hStart, display->videoTiming.hSyncPulseWidth, display->videoTiming.hSyncPolarity);
+//	debug_printf("V Addressable %d V total %d V Start %d V Sync Pulse %d V Polarity %d\n",
+//							 display->videoTiming.height, display->videoTiming.vTotal, vStart, display->videoTiming.vSyncPulseWidth, display->videoTiming.vSyncPolarity);
 
 	PSI_IWord const setMixerProgram[] = {
 			PSI_SET_REGISTER_BANK(DP),
@@ -685,7 +685,7 @@ void SetDisplay(Connection *link, Display *display, Mixer *mixer) {
 	SetPixelClock(pixelClockKHz * 1000);
 
 	HW_REG_WRITE1(DP, SOFTWARE_RESET, HW_REG_ENCODE_FIELD(DP, SOFTWARE_RESET, SOFT_RST, 1));
-	Utils_BusyMicroSleep(10);
+	Utils_BusyMilliSleep(1);
 	HW_REG_WRITE1(DP, SOFTWARE_RESET, HW_REG_ENCODE_FIELD(DP, SOFTWARE_RESET, SOFT_RST, 0));
 
 	psi_RunRegisterProgram(setMainStreamOutputProgram);
@@ -771,7 +771,7 @@ void SetMixerDMA(Mixer* mixer) {
 
 
 	HW_REG_WRITE1(DP, AV_BUF_SRST_REG, HW_REG_ENCODE_FIELD(DP, AV_BUF_SRST_REG, VID_RST, 1));
-	Utils_BusyMicroSleep(10);
+	Utils_BusyMilliSleep(1);
 	HW_REG_WRITE1(DP, AV_BUF_SRST_REG, HW_REG_ENCODE_FIELD(DP, AV_BUF_SRST_REG, VID_RST, 0));
 
 	HW_REG_WRITE1(DPDMA, CH0_CNTL, HW_REG_ENCODE_FIELD(DPDMA, CH0_CNTL, EN, 0));

@@ -9,33 +9,29 @@
 #include "platform/aarch64/intrinsics_gcc.h"
 #include "platform/memory_map.h"
 #include "platform/registers/csu.h"
-#include "platform/registers/ipi.h"
+
 #include "platform/registers/pmu_global.h"
 #include "platform/registers/acpu_gicc.h"
 #include "platform/registers/acpu_gicd.h"
-#include "platform/registers/zdma.h"
-#include "platform/registers/rpu.h"
-#include "platform/registers/crl_apb.h"
 #include "platform/registers/a53_system.h"
-#include "platform/registers/plsysmon.h"
-#include "zynqps8/display_port/display.hpp"
+
 #include "osservices/osservices.h"
 #include "utils/busy_sleep.h"
 #include "core/snprintf.h"
+#include "pmu.hpp"
+#include "dp.hpp"
+#include "mmu.hpp"
 
 void PrintBanner(void);
 void EnablePSToPL(void);
 void ClearPendingInterrupts(void);
-void MarkDdrAsMemory(void);
-
-void EccInit(uint64_t DestAddr, uint64_t LengthBytes);
-void PmuSleep();
-void PmuWakeup();
-void PmuSafeMemcpy(void * destination, const void* source, size_t num_in_bytes );
 
 EXTERN_C {
-	extern char _binary_pmu_monitor_bin_start[];
-	extern char _binary_pmu_monitor_bin_end[];
+	extern uint8_t _binary_pmu_monitor_bin_start[];
+	extern uint8_t _binary_pmu_monitor_bin_end[];
+
+	extern uint8_t _vector_table[];
+	extern uint8_t _end[];
 
 	extern void RegisterBringUp(void);
 
@@ -43,75 +39,56 @@ EXTERN_C {
 	extern uint8_t HeapBase[];
 	extern uint8_t HeapLimit[];
 
-	extern uint8_t MMUTableL1[];
-	extern uint8_t MMUTableL2[];
 }
 
 #define CPU_CORTEXA53_0_TIMESTAMP_CLK_FREQ 33333000
-
 #define PSSYSMON_ANALOG_BUS_OFFSET		0x114U
-#define ZDMA_ZDMA_CH_CTRL0_TOTAL_BYTE_OFFSET 0X0188U
 
-DisplayPort::Display::Connection link;
-DisplayPort::Display::Display display;
-DisplayPort::Display::Mixer mixer;
-
-void BringUpDisplayPort();
-
-uintptr_lo_t videoBlock;
-uintptr_lo_t FrameBuffer;
-
-EXTERN_C int main(void)
+// main should never exit
+EXTERN_C NO_RETURN void main()
 {
+	// TODO catch any printfs before RegisterBringUp OR UART early bringup
 	debug_force_raw_print(true);
 
+	// setup the early MMU enough to boot the PMU OS
+	EarlySetupMmu();
+
+	write_counter_timer_frequency_register(CPU_CORTEXA53_0_TIMESTAMP_CLK_FREQ);
+	ClearPendingInterrupts();
 	HW_REG_WRITE1(CSU, AES_RESET, CSU_AES_RESET_RESET);
 	HW_REG_WRITE1(CSU, SHA_RESET, CSU_SHA_RESET_RESET);
 
-	write_counter_timer_frequency_register(CPU_CORTEXA53_0_TIMESTAMP_CLK_FREQ);
+	RegisterBringUp();
 
-	Cache_DCacheEnable();
-	Cache_ICacheEnable();
 
-	ClearPendingInterrupts();
+	debug_printf(ANSI_BRIGHT_ON "Bootloader size %luKB\nPMU size = %luKB\n" ANSI_BRIGHT_OFF,
+	             ((size_t) _end - (size_t) _vector_table) >> 10,
+	             ((size_t) _binary_pmu_monitor_bin_end - (size_t) _binary_pmu_monitor_bin_start)>>10);
+	debug_printf("PMU load started\n");
+	PmuSleep();
 
-	if(!(HW_REG_READ1(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) & OS_GLOBAL0_BOOT_COMPLETE)) {
-		EnablePSToPL();
+	PmuSafeMemcpy((void *) PMURAM_0_BASE_ADDR,
+								(void *) _binary_pmu_monitor_bin_start,
+								(size_t) _binary_pmu_monitor_bin_end - (size_t) _binary_pmu_monitor_bin_start);
+	PmuWakeup();
 
-		RegisterBringUp();
+	debug_printf("Wait for PMU\n");
+	// stall until pmu says it loaded and ready to go
+	while (!(HW_REG_READ1(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) & OS_GLOBAL0_PMU_READY)) {}
+	debug_printf("PMU " ANSI_GREEN_PEN"Ready\n" ANSI_WHITE_PEN);
 
-		PrintBanner();
+	SetupMmu();
+	// PMU OS is enabled
+	debug_force_raw_print(false);
+	EnablePSToPL();
 
-		// this is a silicon bug fix
-		HW_REG_WRITE1(PSSYSMON, ANALOG_BUS, 0X00003210U);
-	}
+	// this is a silicon bug fix
+	HW_REG_WRITE1(PSSYSMON, ANALOG_BUS, 0X00003210U);
 
-	MarkDdrAsMemory();
-
-	if(!(HW_REG_READ1(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) & OS_GLOBAL0_BOOT_COMPLETE)) {
-		debug_printf("PMU size = %lu\n", (size_t) _binary_pmu_monitor_bin_end - (size_t) _binary_pmu_monitor_bin_start);
-		debug_printf("PMU load started\n");
-		PmuSleep();
-
-		PmuSafeMemcpy((void *) PMURAM_0_BASE_ADDR,
-									(void *) _binary_pmu_monitor_bin_start,
-									(size_t) _binary_pmu_monitor_bin_end - (size_t) _binary_pmu_monitor_bin_start);
-		PmuWakeup();
-
-		debug_printf("Wait for PMU\n");
-		// stall until pmu says it loaded and ready to go
-		while (!(HW_REG_READ1(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) & OS_GLOBAL0_PMU_READY)) {
-		}
-		debug_printf("PMU " ANSI_GREEN_PEN"Ready\n" ANSI_WHITE_PEN);
-	}
+	PrintBanner();
 
 	BootData bootData = {
-			.frameBufferWidth = 1280,
-			.frameBufferHeight = 720,
-			.frameBufferHertz = 60,
-			.videoBlockSizeInMB = 4,
 			.bootCodeSize = OCM_0_SIZE_IN_BYTES,
-			.videoBlock = 0,
 			.bootCodeStart = OCM_0_BASE_ADDR,
 	};
 
@@ -120,11 +97,9 @@ EXTERN_C int main(void)
 		debug_printf("Video boot console init\n");
 		BringUpDisplayPort();
 		debug_printf("Video boot console init " ANSI_GREEN_PEN "DONE\n" ANSI_WHITE_PEN);
-		bootData.videoBlock = videoBlock;
 	} else {
 		debug_printf("Video boot console ready\n");
 		OsService_FetchBootData(&bootData);
-		videoBlock = bootData.videoBlock;
 	}
 	debug_force_raw_print(false);
 
@@ -169,112 +144,11 @@ void PrintBanner(void )
 
 }
 
-void BringUpDisplayPort()
-{
-	debug_printf(ANSI_YELLOW_PEN "BringUpDisplayPort\n" ANSI_RESET_ATTRIBUTES);
-	using namespace DisplayPort::Display;
-
-	Init(&display);
-	Init(&mixer);
-
-	CopyStandardVideoMode(DisplayPort::Display::StandardVideoMode::VM_1280_720_60, &display.videoTiming);
-	if(videoBlock == 0) videoBlock = OsService_DdrLoBlockAlloc(8*8); // 4MB
-	auto dmaDesc = (DMADescriptor*) (uintptr_t)videoBlock;
-	FrameBuffer = (uintptr_lo_t)(uintptr_t)(videoBlock + 4096);
-
-	Init(dmaDesc);
-	dmaDesc->enableDescriptorUpdate = true;
-	dmaDesc->transferSize = 1280 * 720 * 4;
-	dmaDesc->width = (1280 * 4);
-	dmaDesc->stride = (1280 * 4) >> 4;
-	dmaDesc->nextDescriptorAddress = (uint32_t)(uintptr_t)dmaDesc;
-	dmaDesc->nextDescriptorAddressExt = (uint32_t)(((uintptr_t)dmaDesc) >> 32ULL);
-	dmaDesc->sourceAddress = (uint32_t)FrameBuffer;
-	dmaDesc->sourceAddressExt = (uint32_t)(((uintptr_t)FrameBuffer) >> 32ULL);
-
-	mixer.function = DisplayPort::Display::MixerFunction::GFX;
-	mixer.globalAlpha = 0x80;
-
-	mixer.videoPlane.source = DisplayPort::Display::DisplayVideoPlane::Source::TEST_GENERATOR;
-	mixer.videoPlane.format = DisplayPort::Display::DisplayVideoPlane::Format::RGBX8;
-	mixer.videoPlane.simpleDescPlane0Address = (uintptr_t)dmaDesc;
-
-	mixer.gfxPlane.source = DisplayPort::Display::DisplayGfxPlane::Source::BUFFER;
-	mixer.gfxPlane.format = DisplayPort::Display::DisplayGfxPlane::Format::RGBA8;
-	mixer.gfxPlane.simpleDescBufferAddress = (uintptr_t)dmaDesc;
-	Cache_DCacheCleanAndInvalidateRange(videoBlock, 4 * 1024 * 1024);
-
-	if(videoBlock == 0) {
-		if (!IsDisplayConnected(&link))
-			return;
-	}
-
-	Init(&link);
-	SetDisplay(&link, &display, &mixer);
-
-/*
- * #define DP_AV_BUF_PALETTE_MEMORY_OFFSET 0x0000b400U
-	for(int i = 0; i < 256;i++) {
-		hw_RegWrite(DP_BASE_ADDR, DP_REGISTER(AV_BUF_PALETTE_MEMORY) + (i*4*3)+0, i<<4); // blue
-		hw_RegWrite(DP_BASE_ADDR, DP_REGISTER(AV_BUF_PALETTE_MEMORY) + (i*4*3)+4, i<<4); // green
-		hw_RegWrite(DP_BASE_ADDR, DP_REGISTER(AV_BUF_PALETTE_MEMORY) + (i*4*3)+8, 0<<4); // red
-		debug_printf("CLUT[%03x] = %#010x\n", i, hw_RegRead(DP_BASE_ADDR, DP_REGISTER(AV_BUF_PALETTE_MEMORY) + (i*4*3)+0));
-		debug_printf("CLUT[%03x] = %#010x\n", i, hw_RegRead(DP_BASE_ADDR, DP_REGISTER(AV_BUF_PALETTE_MEMORY) + (i*4*3)+4));
-		debug_printf("CLUT[%03x] = %#010x\n", i, hw_RegRead(DP_BASE_ADDR, DP_REGISTER(AV_BUF_PALETTE_MEMORY) + (i*4*3)+8));
-	}
-
-	// [0xb700 - 0xb713]
-	for(int i = 0; i < 0x13;i++) {
-//		hw_RegWrite(DP_BASE_ADDR, DP_REGISTER(AV_BUF_PALETTE_MEMORY) + (i*4)+(256*12), i);
-		debug_printf("CLUT[%03x] = %#010x\n", i, hw_RegRead(DP_BASE_ADDR, DP_REGISTER(AV_BUF_PALETTE_MEMORY) + (i*4)+(256*12)));
-	}
-*/
-}
-
-void PmuSleep() {
-	// Enable PMU_0 IPI
-	HW_REG_SET_BIT1(IPI, PMU_0_IER, CH3);
-
-	// Trigger PMU0 IPI in PMU IPI TRIG Reg
-	HW_REG_SET_BIT1(IPI, PMU_0_TRIG, CH3);
-
-	// Wait until PMU Microblaze goes to sleep state,
-	// before starting firmware download to PMU RAM
-	while(!HW_REG_GET_BIT1(PMU_GLOBAL, GLOBAL_CNTRL, MB_SLEEP)) {
-		// stall
-	}
-
-	HW_REG_CLR_BIT1(PMU_GLOBAL, GLOBAL_CNTRL, FW_IS_PRESENT);
-}
-
-void PmuWakeup() {
-
-	HW_REG_SET_BIT1(PMU_GLOBAL, GLOBAL_CNTRL, DONT_SLEEP);
-
-	// pmu firmware set the FW_IS_PRESENT flag once it running
-	while(HW_REG_GET_BIT1(PMU_GLOBAL, GLOBAL_CNTRL, FW_IS_PRESENT) == 0) {
-		// stall
-	}
-}
-
-// pmu ram only accepts 32 bit access, this ensure thats true
-void PmuSafeMemcpy(void * destination, const void* source, size_t num_in_bytes ) {
-	uint32_t copy_count = 0;
-	uint32_t* dst = (uint32_t*)destination;
-	const uint32_t* src = (uint32_t*)source;
-
-	// copy in 32 bit words chunks into PMU_RAM
-	for(copy_count = 0; copy_count < (num_in_bytes+3)/4; copy_count++) {
-		*(dst + copy_count) = *(src + copy_count);
-	}
-}
-
 void EnablePSToPL(void)
 {
 	HW_REG_SET_BIT1(CSU, PCAP_PROG, PCFG_PROG_B);
 	HW_REG_SET_BIT1(PMU_GLOBAL, PS_CNTRL, PROG_GATE);
 }
-
 
 void ClearPendingInterrupts(void)
 {
@@ -311,214 +185,6 @@ void ClearPendingInterrupts(void)
 	HW_REG_WRITE1(ACPU_GICD, CPENDSGIR1, 0xFFFFFFFFU);
 	HW_REG_WRITE1(ACPU_GICD, CPENDSGIR2, 0xFFFFFFFFU);
 	HW_REG_WRITE1(ACPU_GICD, CPENDSGIR3, 0xFFFFFFFFU);
-
-}
-
-void PowerUpIsland(uint32_t PwrIslandMask)
-{
-
-	/* There is a single island for both R5_0 and R5_1 */
-	if ((PwrIslandMask & PMU_GLOBAL_PWR_STATE_R5_1_MASK) == PMU_GLOBAL_PWR_STATE_R5_1_MASK) {
-		PwrIslandMask &= ~(PMU_GLOBAL_PWR_STATE_R5_1_MASK);
-		PwrIslandMask |= PMU_GLOBAL_PWR_STATE_R5_0_MASK;
-	}
-
-	/* Power up request enable */
-	HW_REG_WRITE1(PMU_GLOBAL, REQ_PWRUP_INT_EN, PwrIslandMask);
-
-	/* Trigger power up request */
-	HW_REG_WRITE1(PMU_GLOBAL, REQ_PWRUP_TRIG, PwrIslandMask);
-
-	/* Poll for Power up complete */
-	do {
-		;// empty
-	} while ((HW_REG_READ1(PMU_GLOBAL, REQ_PWRUP_STATUS) & PwrIslandMask) != 0x0U);
-}
-
-#define BLOCK_SIZE_A53 0x200000U
-#define NUM_BLOCKS_A53 0x400U
-#define BLOCK_SIZE_A53_HIGH 0x40000000U
-#define NUM_BLOCKS_A53_HIGH (DDR_1_SIZE_IN_BYTES / BLOCK_SIZE_A53_HIGH)
-#define ATTRIB_MEMORY_A53 0x705U
-#define BLOCK_SIZE_2MB 0x200000U
-#define BLOCK_SIZE_1GB 0x40000000U
-#define ADDRESS_LIMIT_4GB 0x100000000UL
-
-
-void SetTlbAttributes(uintptr_t Addr, uintptr_t attrib)
-{
-	uintptr_t *ptr;
-	uintptr_t section;
-	uint64_t block_size;
-	/* if region is less than 4GB MMUTable level 2 need to be modified */
-	if(Addr < ADDRESS_LIMIT_4GB){
-		/* block size is 2MB for addressed < 4GB*/
-		block_size = BLOCK_SIZE_2MB;
-		section = Addr / block_size;
-		ptr = (uintptr_t*)MMUTableL2 + section;
-	}
-	/* if region is greater than 4GB MMUTable level 1 need to be modified */
-	else{
-		/* block size is 1GB for addressed > 4GB */
-		block_size = BLOCK_SIZE_1GB;
-		section = Addr / block_size;
-		ptr = (uintptr_t*)MMUTableL1 + section;
-	}
-	*ptr = (Addr & (~(block_size-1))) | attrib;
-
-	invalid_all_TLB();
-	dsb(); // ensure completion of the BP and TLB invalidation
-	isb(); // synchronize context on this processor
-}
-
-void MarkDdrAsMemory()
-{
-	uint64_t BlockNum;
-	for (BlockNum = 0; BlockNum < NUM_BLOCKS_A53; BlockNum++) {
-		SetTlbAttributes(DDR_0_BASE_ADDR + BlockNum * BLOCK_SIZE_A53, ATTRIB_MEMORY_A53);
-	}
-	for (BlockNum = 0; BlockNum < NUM_BLOCKS_A53_HIGH; BlockNum++) {
-		SetTlbAttributes(DDR_1_BASE_ADDR + BlockNum * BLOCK_SIZE_A53_HIGH, ATTRIB_MEMORY_A53);
-	}
-
-	Cache_DCacheCleanAndInvalidate();
-}
-
-#define XFSBL_ECC_INIT_VAL_WORD 0xDEADBEEFU
-#define ZDMA_TRANSFER_MAX_LEN (0x3FFFFFFFU - 7U)
-
-void EccInit(uint64_t DestAddr, uint64_t LengthBytes)
-{
-	uint32_t RegVal;
-	uint32_t Length;
-	uint64_t StartAddr = DestAddr;
-	uint64_t NumBytes = LengthBytes;
-
-	Cache_DCacheDisable();
-
-	while (NumBytes > 0U) {
-		if (NumBytes > ZDMA_TRANSFER_MAX_LEN) {
-			Length = ZDMA_TRANSFER_MAX_LEN;
-		} else {
-			Length = (uint32_t) NumBytes;
-		}
-
-		// Wait until the DMA is in idle state
-		do {
-			RegVal = HW_REG_GET_FIELD(HW_REG_GET_ADDRESS(LPD_DMA_CH0), ZDMA, ZDMA_CH_STATUS, STATE);
-		} while ((RegVal != 0U) && (RegVal != 3U)); // OK or ERR need enum support in overlord
-
-		// Enable Simple (Write Only) Mode
-
-		HW_REG_RMW(HW_REG_GET_ADDRESS(LPD_DMA_CH0), ZDMA,
-				ZDMA_CH_CTRL0,
-				HW_REG_FIELD_MASK(ZDMA, ZDMA_CH_CTRL0, POINT_TYPE) | HW_REG_FIELD_MASK(ZDMA, ZDMA_CH_CTRL0, MODE),
-				ZDMA_ZDMA_CH_CTRL0_MODE_WRITE_ONLY);
-
-
-		// Fill in the data to be written
-		HW_REG_WRITE(HW_REG_GET_ADDRESS(LPD_DMA_CH0), ZDMA, ZDMA_CH_WR_ONLY_WORD0, XFSBL_ECC_INIT_VAL_WORD);
-		HW_REG_WRITE(HW_REG_GET_ADDRESS(LPD_DMA_CH0), ZDMA, ZDMA_CH_WR_ONLY_WORD1, XFSBL_ECC_INIT_VAL_WORD);
-		HW_REG_WRITE(HW_REG_GET_ADDRESS(LPD_DMA_CH0), ZDMA, ZDMA_CH_WR_ONLY_WORD2, XFSBL_ECC_INIT_VAL_WORD);
-		HW_REG_WRITE(HW_REG_GET_ADDRESS(LPD_DMA_CH0), ZDMA, ZDMA_CH_WR_ONLY_WORD3, XFSBL_ECC_INIT_VAL_WORD);
-
-		// Write Destination Address (64 bit address though we know this address is <$GiB)
-		HW_REG_WRITE(HW_REG_GET_ADDRESS(LPD_DMA_CH0), ZDMA, ZDMA_CH_DST_DSCR_WORD0, (uint32_t)(StartAddr & 0xFFFFFFFF));
-		HW_REG_WRITE(HW_REG_GET_ADDRESS(LPD_DMA_CH0), ZDMA, ZDMA_CH_DST_DSCR_WORD1, (uint32_t)((StartAddr >> 32U) & 0X0001FFFFU));
-
-		// Size to be Transferred. Recommended to set both src and dest sizes
-		HW_REG_WRITE(HW_REG_GET_ADDRESS(LPD_DMA_CH0), ZDMA, ZDMA_CH_SRC_DSCR_WORD2, Length);
-		HW_REG_WRITE(HW_REG_GET_ADDRESS(LPD_DMA_CH0), ZDMA, ZDMA_CH_DST_DSCR_WORD2, Length);
-
-		// DMA Enable
-		HW_REG_SET_BIT(HW_REG_GET_ADDRESS(LPD_DMA_CH0), ZDMA, ZDMA_CH_CTRL2, EN);
-
-		// Check the status of the transfer by polling on DMA Done
-		do {
-			;// empty
-		} while (!HW_REG_GET_BIT(HW_REG_GET_ADDRESS(LPD_DMA_CH0), ZDMA, ZDMA_CH_ISR, DMA_DONE));
-
-		// Clear DMA status
-		HW_REG_CLR_BIT(HW_REG_GET_ADDRESS(LPD_DMA_CH0), ZDMA, ZDMA_CH_ISR, DMA_DONE);
-
-		// Read the channel status for errors
-		if (HW_REG_GET_FIELD(HW_REG_GET_ADDRESS(LPD_DMA_CH0), ZDMA, ZDMA_CH_STATUS, STATE) == 0x3) {
-			Cache_DCacheEnable();
-			raw_debug_print("LPD_DMA_CH0 ZDMA Error!");
-			return;
-		}
-
-		NumBytes -= Length;
-		StartAddr += Length;
-	}
-
-	Cache_DCacheEnable();
-
-	// Restore reset values for the DMA registers used
-	HW_REG_WRITE(HW_REG_GET_ADDRESS(LPD_DMA_CH0), ZDMA, ZDMA_CH_CTRL0, 0x00000080U);
-	HW_REG_WRITE(HW_REG_GET_ADDRESS(LPD_DMA_CH0), ZDMA, ZDMA_CH_WR_ONLY_WORD0, 0x00000000U);
-	HW_REG_WRITE(HW_REG_GET_ADDRESS(LPD_DMA_CH0), ZDMA, ZDMA_CH_WR_ONLY_WORD1, 0x00000000U);
-	HW_REG_WRITE(HW_REG_GET_ADDRESS(LPD_DMA_CH0), ZDMA, ZDMA_CH_WR_ONLY_WORD2, 0x00000000U);
-	HW_REG_WRITE(HW_REG_GET_ADDRESS(LPD_DMA_CH0), ZDMA, ZDMA_CH_WR_ONLY_WORD3, 0x00000000U);
-	HW_REG_WRITE(HW_REG_GET_ADDRESS(LPD_DMA_CH0), ZDMA, ZDMA_CH_DST_DSCR_WORD0, 0x00000000U);
-	HW_REG_WRITE(HW_REG_GET_ADDRESS(LPD_DMA_CH0), ZDMA, ZDMA_CH_DST_DSCR_WORD1, 0x00000000U);
-	HW_REG_WRITE(HW_REG_GET_ADDRESS(LPD_DMA_CH0), ZDMA, ZDMA_CH_SRC_DSCR_WORD2, 0x00000000U);
-	HW_REG_WRITE(HW_REG_GET_ADDRESS(LPD_DMA_CH0), ZDMA, ZDMA_CH_DST_DSCR_WORD2, 0x00000000U);
-	HW_REG_WRITE(HW_REG_GET_ADDRESS(LPD_DMA_CH0), ZDMA, ZDMA_CH_CTRL0_TOTAL_BYTE,0x00000000U);
-
-	raw_debug_printf( "Address 0x%0x%08x, Length 0x%0x%08x, ECC initialized \r\n",
-		(uint32_t)(DestAddr >> 32U), (uint32_t)DestAddr,
-		(uint32_t)(LengthBytes >> 32U), (uint32_t)LengthBytes);
-}
-
-#define XFSBL_R50_HIGH_ATCM_START_ADDRESS	(0xFFE00000U)
-#define XFSBL_R5_TCM_BANK_LENGTH			(0x10000U)
-
-void TcmInit()
-{
-	uint32_t LengthBytes;
-	uint32_t ATcmAddr;
-	uint32_t PwrStateMask;
-
-	raw_debug_printf("Initializing TCM ECC\r\n");
-
-	// power it up
-	PwrStateMask = (PMU_GLOBAL_PWR_STATE_R5_0_MASK |
-			PMU_GLOBAL_PWR_STATE_TCM0A_MASK |
-			PMU_GLOBAL_PWR_STATE_TCM0B_MASK |
-			PMU_GLOBAL_PWR_STATE_TCM1A_MASK |
-			PMU_GLOBAL_PWR_STATE_TCM1B_MASK);
-	PowerUpIsland(PwrStateMask);
-
-	// switch into rpu combined mode
-	HW_REG_CLR_BIT1(RPU, RPU_GLBL_CNTL, SLSPLIT);
-	HW_REG_SET_BIT1(RPU, RPU_GLBL_CNTL, SLCLAMP);
-	HW_REG_SET_BIT1(RPU, RPU_GLBL_CNTL, TCM_COMB);
-
-	// Place R5-0 and R5-1 in HALT state
-	HW_REG_SET_BIT1(RPU, RPU0_CFG, NCPUHALT);
-	HW_REG_SET_BIT1(RPU, RPU1_CFG, NCPUHALT);
-
-	// Enable the clock
-	HW_REG_SET_BIT1(CRL_APB, CPU_R5_CTRL, CLKACT);
-
-	// Provide some delay, so that clock propagates properly.
-	Utils_BusyMicroSleep(0x50U);
-
-	// Release reset to R5-0, R5-1 and amba
-	HW_REG_CLR_BIT1(CRL_APB, RST_LPD_TOP, RPU_R50_RESET);
-	HW_REG_CLR_BIT1(CRL_APB, RST_LPD_TOP, RPU_R51_RESET);
-	HW_REG_CLR_BIT1(CRL_APB, RST_LPD_TOP, RPU_AMBA_RESET);
-
-	// init all tcm in one go
-	ATcmAddr = XFSBL_R50_HIGH_ATCM_START_ADDRESS;
-	LengthBytes = XFSBL_R5_TCM_BANK_LENGTH * 4U;
-	EccInit(ATcmAddr, LengthBytes);
-
-	// power it down
-	HW_REG_SET_BIT1(CRL_APB, RST_LPD_TOP, RPU_AMBA_RESET);
-	HW_REG_SET_BIT1(CRL_APB, RST_LPD_TOP, RPU_R51_RESET);
-	HW_REG_SET_BIT1(CRL_APB, RST_LPD_TOP, RPU_R50_RESET);
 
 }
 

@@ -16,8 +16,8 @@ Handoff:
 
 	mrs x5, SCTLR_EL3	 /* Read control register */
 	mov x6, #0x1005  	 /* D, I , M bits disable */
-    bic     x5, x5, x6 	 /* Disable MMU, L1 and L2 I/D cache */
-    msr     SCTLR_EL3, x5    /*  */
+    bic x5, x5, x6 	 /* Disable MMU, L1 and L2 I/D cache */
+    msr SCTLR_EL3, x5
 
 	isb
 LoopWFE:

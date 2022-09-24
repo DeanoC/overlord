@@ -37,7 +37,6 @@ type = "switch.internal.siouswitch.zynqps8"
 registers = [
     { resource = "registers/siou.toml", name = "SIOU", base_address = "0x3d_0000" },
     { resource = "registers/serdes.toml", name = "SERDES", base_address = "0x40_0000" },
-    { resource = "registers/serdes2.toml", name = "SERDES2", base_address = "0x41_0000" },
 ]
 buses = [
     { name = "fpd_siou", supplier = false, data_width = 64, address_width = 32 },

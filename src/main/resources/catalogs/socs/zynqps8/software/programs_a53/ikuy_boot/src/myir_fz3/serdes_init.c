@@ -26,25 +26,6 @@ static PSI_IWord const put_serdes_in_reset_init[] = {
 	PSI_END_PROGRAM
 };
 
-#define SERDES_L0_TM_EQ11_OFFSET                                                   0x1978
-#define SERDES_L0_TM_ILL13_OFFSET                                                  0x1994
-#define SERDES_L0_TM_MISC3_OFFSET                                                  0x19AC
-
-#define SERDES_L1_TM_EQ11_OFFSET                                                   0x5978
-#define SERDES_L1_TM_ILL13_OFFSET                                                  0x5994
-#define SERDES_L1_TM_MISC3_OFFSET                                                  0x59AC
-
-#define SERDES_L2_TM_EQ11_OFFSET                                                   0x9978
-#define SERDES_L2_TM_ILL13_OFFSET                                                  0x9994
-#define SERDES_L2_TM_MISC3_OFFSET                                                  0x99AC
-
-#define SERDES_L3_TM_EQ11_OFFSET                                                   0xD978
-#define SERDES_L3_TM_ILL13_OFFSET                                                  0xD994
-#define SERDES_L3_TM_MISC3_OFFSET                                                  0xD9AC
-
-#define SERDES_L1_TX_DIG_TM_61_OFFSET                                              0x40F4
-
-#define SIOU_ECO_0_OFFSET                                                          0x001C
 
 __attribute__((__section__(".hwregs")))
 static PSI_IWord const serdes_init[] = {

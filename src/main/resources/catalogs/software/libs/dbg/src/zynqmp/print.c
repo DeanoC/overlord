@@ -10,7 +10,7 @@
 #define UART_DEBUG_BASE_ADDR UART1_BASE_ADDR
 #define IsTransmitFull() (HW_REG_GET_BIT(HW_REG_GET_ADDRESS(UART_DEBUG), UART, CHANNEL_STS, TNFUL))
 
-#define VPRINTF_STACK_SIZE 1024
+#define VPRINTF_STACK_SIZE 256
 static bool force_raw_print;
 
 void debug_force_raw_print(bool enabled) {

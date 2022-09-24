@@ -15,10 +15,6 @@ void DdrLoBlockFree(const IPI3_Msg *msgBuffer) NON_NULL(1);
 void DdrHiBlockAlloc(IPI_Channel senderChannel, const IPI3_Msg *msgBuffer) NON_NULL(2);
 void DdrHiBlockFree(const IPI3_Msg *msgBuffer) NON_NULL(1);
 
-void ScreenConsoleEnable(const IPI3_Msg *msgBuffer) NON_NULL(1);
-void ScreenConsoleInlinePrint(const IPI3_Msg *msgBuffer) NON_NULL(1);
-void ScreenConsolePtrPrint(IPI_Channel senderChannel, const IPI3_Msg *msgBuffer) NON_NULL(2);
-
 void BootComplete(const IPI3_Msg *msgBuffer) NON_NULL(1);
 void FetchBootData(IPI_Channel senderChannel, const IPI3_Msg *msgBuffer) NON_NULL(2);
 void CpuWakeOrSleep(IPI3_Msg const *msgBuffer) NON_NULL(1);

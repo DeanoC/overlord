@@ -95,25 +95,32 @@ description = "FPD System-level Control"
   description = "SWDT clock source select"
   default = "0x00000000"
   offset = "0x00000100"
-  [[register.field]]
-    name = "RESERVED"
-    bits = "31:1"
-    type = "raz"
-    shortdesc = '''Trigger an address decode error interrupt.'''
-    longdesc = '''0: Ignored 1: isr -> 1'''
-  [[register.field]]
-    name = "SELECT"
-    bits = "0"
-    type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "31:1"
+type = "raz"
+shortdesc = '''Trigger an address decode error interrupt.'''
+longdesc = '''0: Ignored 1: isr -> 1'''
+[[register.field]]
+name = "SELECT"
+bits = "0"
+type = "rw"
+[[register.field.enum]]
+name = "APB_CLOCK"
+value = 0
+[[register.field.enum]]
+name = "EXTERNAL_CLOCK"
+value = 1
+
 [[register]]
-  name = "INT_FPD"
-  type = "mixed"
-  width = 32
-  description = "Interconnect Clock Source Select"
-  default = "0x00000000"
-  offset = "0x00000200"
-  [[register.field]]
-    name = "RESERVED"
+name = "INT_FPD"
+type = "mixed"
+width = 32
+description = "Interconnect Clock Source Select"
+default = "0x00000000"
+offset = "0x00000200"
+[[register.field]]
+name = "RESERVED"
     bits = "31:1"
     type = "raz"
   [[register.field]]

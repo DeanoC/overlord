@@ -6,7 +6,7 @@
 #include "platform/reg_access.h"
 #include "platform/registers/apu.h"
 #include "../cpuwake.hpp"
-#include "../os_heap.hpp"
+#include "platform/registers/lpd_slcr.h"
 
 namespace IPI3_OsServer {
 

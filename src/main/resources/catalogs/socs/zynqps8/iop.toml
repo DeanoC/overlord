@@ -42,6 +42,11 @@ buses = [
     { name = "iopunitsswitch_nand", supplier = true, data_width = 32, address_width = 32 },
     { name = "iopunitsswitch_sdio${index}", supplier = true, data_width = 32, address_width = 32 },
 ]
+registers = [
+    { resource = "registers/iop/iou_gpv.toml", name = "IOU_GPV", base_address = "0x100_0000" },
+    { resource = "registers/iop/iou_slcr.toml", name = "IOU_SLCR", base_address = "0x218_0000" }, #0xff180000
+    { resource = "registers/iop/iou_secure_slcr.toml", name = "IOU_SECURE_SLCR", base_address = "0x224_0000" }, #0xff240000
+]
 
 [[definition]]
 type = "switch.internal.iopmasters.zynqps8"

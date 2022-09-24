@@ -139,25 +139,32 @@ description = "Low-power Domain System-level Control Registers"
   description = "SWDT clock source select"
   default = "0x00000000"
   offset = "0x00000050"
-  [[register.field]]
-    name = "RESERVED"
-    bits = "31:1"
-    type = "raz"
-    shortdesc = '''Reserved.'''
-    longdesc = '''Writes are ignored, read data is zero.'''
-  [[register.field]]
-    name = "SELECT"
-    bits = "0"
-    type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "31:1"
+type = "raz"
+shortdesc = '''Reserved.'''
+longdesc = '''Writes are ignored, read data is zero.'''
+[[register.field]]
+name = "SELECT"
+bits = "0"
+type = "rw"
+[[register.field.enum]]
+name = "APB_CLOCK"
+value = 0
+[[register.field.enum]]
+name = "PSS_REF_CLK"
+value = 1
+
 [[register]]
-  name = "ADMA_CFG"
-  type = "ro"
-  width = 7
-  description = "GDMA RF2 Configuation"
-  default = "0x00000028"
-  offset = "0x0000200C"
-  [[register.field]]
-    name = "BUS_WIDTH"
+name = "ADMA_CFG"
+type = "ro"
+width = 7
+description = "GDMA RF2 Configuation"
+default = "0x00000028"
+offset = "0x0000200C"
+[[register.field]]
+name = "BUS_WIDTH"
     bits = "6:5"
     type = "ro"
   [[register.field]]

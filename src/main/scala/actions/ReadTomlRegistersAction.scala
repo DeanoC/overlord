@@ -18,8 +18,8 @@ case class ReadTomlRegistersAction(filename: String)
 	}
 
 	override def execute(instance: ChipInstance, parameters: Map[String, Variant]): Unit = {
-		val name      = Game.resolvePathMacros(instance, instance.name)
-		val registers = input.TomlRegistersParser(instance, name.split("/").last)
+		val expandedName = Game.resolveInstanceMacros(instance, filename)
+		val registers    = input.TomlRegistersParser(instance, expandedName, instance.name)
 		instance.instanceRegisterBanks ++= registers
 	}
 }

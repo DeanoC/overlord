@@ -170,6 +170,4 @@ bool ReadBlock(struct Connection* display, uint32_t block, uint8_t* data) {
 	return I2CRead(display, EdidAddress, block * EedidBlockSize, EedidBlockSize, data);
 }
 
-bool SetNativeResolution(Connection* display);
-
 } // end namespace

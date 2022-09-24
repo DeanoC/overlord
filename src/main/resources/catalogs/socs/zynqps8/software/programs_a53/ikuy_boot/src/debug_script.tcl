@@ -20,5 +20,6 @@ after 100
 targets -set -nocase -filter {name =~ "Cortex-A53 #0"}
 rst -cores -clear-registers
 dow ./ikuy_boot
-#bpadd main
 con
+#puts "Waiting for debugger"
+#exec ~/projects/invaders/rungdb

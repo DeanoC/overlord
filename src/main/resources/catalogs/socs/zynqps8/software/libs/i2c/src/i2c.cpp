@@ -101,7 +101,7 @@ bool Send(uint16_t address_, void * buffer_, uint8_t byteCount_) {
 		if(HW_REG_GET_BIT(I2C_INSTANCE, I2C, INTERRUPT_STATUS, NACK)) return false;
 
 		assert(!HW_REG_GET_BIT(I2C_INSTANCE, I2C, INTERRUPT_STATUS, TO));
-		Utils_BusySecondSleep(1);
+		Utils_BusyMilliSleep(1);
 	};
 	return true;
 }

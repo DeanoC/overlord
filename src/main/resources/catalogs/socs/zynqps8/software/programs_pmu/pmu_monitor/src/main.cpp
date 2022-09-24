@@ -4,12 +4,10 @@
 #include "platform/reg_access.h"
 #include "platform/memory_map.h"
 #include "platform/registers/pmu_global.h"
-#include "platform/registers/pmu_lmb_bram.h"
 #include "platform/registers/pmu_local.h"
 
 #include "platform/registers/lpd_slcr.h"
 #include "platform/registers/ipi.h"
-#include "platform/registers/ttc.h"
 #include "platform/registers/uart.h"
 #include "dbg/raw_print.h"
 #include "dbg/ansi_escapes.h"
@@ -18,12 +16,12 @@
 #include "interrupts/interrupts.hpp"
 #include "interrupts/interrupt_handlers.hpp"
 #include "os/ipi3_os_server.hpp"
-#include "interrupts/gic_proxy.hpp"
 #include "rom_extensions.h"
 #include "timers.hpp"
 #include "os_heap.hpp"
 #include "main_loop.hpp"
 #include "osservices/osservices.h"
+#include "cpuwake.hpp"
 
 #define UART_DEBUG_BASE_ADDR UART1_BASE_ADDR
 #define UART_DEBUG_REGISTER(reg) UART_##reg##_OFFSET
@@ -50,7 +48,7 @@ static void MainCallsCallback() {
 extern const ElfNoteSection_t g_note_build_id;
 void PrintBanner(void)
 {
-	raw_debug_print(ANSI_YELLOW_PEN "IKUY PMU Monitor\n" ANSI_WHITE_PEN);
+	raw_debug_print(ANSI_YELLOW_PEN ANSI_BRIGHT_ON "IKUY PMU Monitor\n" ANSI_WHITE_PEN ANSI_BRIGHT_OFF);
 	const uint8_t *build_id_data = &((uint8_t*)(&g_note_build_id)+1)[g_note_build_id.namesz];
 
 	// print Build ID
@@ -132,14 +130,15 @@ void main()
 
 	PrintBanner();
 
-	// sleep all other hard core processors in SoC
-	// xsct fails with power down error if ACPU0 is asleep
-//	RomServiceTable[REN_ACPU0SLEEP]();
-	RomServiceTable[REN_ACPU1SLEEP]();
-	RomServiceTable[REN_ACPU2SLEEP]();
-	RomServiceTable[REN_ACPU3SLEEP]();
-	RomServiceTable[REN_R5F0SLEEP]();
-	RomServiceTable[REN_R5F1SLEEP]();
+	// sleep all but A53 core 0 hard core processors in SoC
+	A53Sleep1();
+	A53Sleep2();
+	A53Sleep3();
+	R5FSleep();
+
+	// use this chance to set the cache coherency broadcast (should be done during reset)
+	HW_REG_SET_BIT( HW_REG_GET_ADDRESS(LPD_SLCR), LPD_SLCR, LPD_APU, BRDC_INNER);
+	HW_REG_SET_BIT( HW_REG_GET_ADDRESS(LPD_SLCR), LPD_SLCR, LPD_APU, BRDC_OUTER);
 
 	OsHeap::Init();
 	loopy.Init();

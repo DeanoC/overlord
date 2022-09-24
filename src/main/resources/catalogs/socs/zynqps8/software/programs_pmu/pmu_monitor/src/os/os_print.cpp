@@ -7,6 +7,7 @@
 #include "ipi3_os_server.hpp"
 #include "../os_heap.hpp"
 #include "osservices/osservices.h"
+#include "utils/string_utils.hpp"
 
 extern uint32_t uartDebugTransmitLast;
 extern uint32_t uartDebugTransmitHead;
