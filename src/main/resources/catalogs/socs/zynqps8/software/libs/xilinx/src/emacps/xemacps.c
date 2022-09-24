@@ -100,9 +100,9 @@ LONG XEmacPs_CfgInitialize(XEmacPs *InstancePtr, XEmacPs_Config * CfgPtr,
 	InstancePtr->Config.S10MDiv1 = CfgPtr->S10MDiv1;
 
 	/* Set callbacks to an initial stub routine */
-	InstancePtr->SendHandler = ((XEmacPs_Handler)((void*)XEmacPs_StubHandler));
-	InstancePtr->RecvHandler = ((XEmacPs_Handler)(void*)XEmacPs_StubHandler);
-	InstancePtr->ErrorHandler = ((XEmacPs_ErrHandler)(void*)XEmacPs_StubHandler);
+	InstancePtr->SendHandler = ((XEmacPs_Handler)XEmacPs_StubHandler);
+	InstancePtr->RecvHandler = ((XEmacPs_Handler)XEmacPs_StubHandler);
+	InstancePtr->ErrorHandler = ((XEmacPs_ErrHandler)XEmacPs_StubHandler);
 
 	/* Reset the hardware and set default options */
 	InstancePtr->IsReady = XIL_COMPONENT_IS_READY;

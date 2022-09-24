@@ -3,7 +3,6 @@
 //
 #include "core/core.h"
 #include "dbg/assert.h"
-#include "platform/cache.h"
 #include "platform/aarch64/intrinsics_gcc.h"
 #include "platform/memory_map.h"
 #include "platform/reg_access.h"
@@ -174,7 +173,7 @@ Manager *Init( bool tablesFromHigh ) {
 		assert( sizeof( uintptr_t ) == sizeof( uint64_t ));
 	}
 
-	auto mmu = (Manager *) ((tablesFromHigh) ? OsService_DdrHiBlockAlloc( 1 ) : OsService_DdrLoBlockAlloc( 1 ));
+	auto mmu = (Manager *) ((tablesFromHigh) ? OsService_DdrHiBlockAlloc( 1, OS_SERVICE_TAG('M', 'M', 'U', ' ') ) : OsService_DdrLoBlockAlloc( 1, OS_SERVICE_TAG('M', 'M', 'U', ' ') ));
 	memset( mmu, 0, 64 * 1024 );
 	mmu->tablesFromHigh = tablesFromHigh;
 	mmu->curBlock = 0;
@@ -190,7 +189,7 @@ uintptr_all_t AllocatePageTable( Manager *mmu ) {
 	}
 
 	// no block found so a new block
-	mmu->blocks[mmu->highBlock].blockAddr = (mmu->tablesFromHigh) ? OsService_DdrHiBlockAlloc( 1 ) : OsService_DdrLoBlockAlloc( 1 );
+	mmu->blocks[mmu->highBlock].blockAddr = (mmu->tablesFromHigh) ? OsService_DdrHiBlockAlloc( 1, OS_SERVICE_TAG('M', 'M', 'U', ' ') ) : OsService_DdrLoBlockAlloc( 1, OS_SERVICE_TAG('M', 'M', 'U', ' ') );
 	mmu->blocks[mmu->highBlock].allocBitMask = 0xFFFF;
 	mmu->curBlock = mmu->highBlock;
 	mmu->highBlock++;
@@ -239,8 +238,8 @@ void ReleasePageTable( Manager *mmu, uintptr_all_t pageTableEntry ) {
 		if((mmu->highBlock - blockIndex) != 0)
 			memcpy( block, block + 1, (mmu->highBlock - blockIndex) * sizeof( Block ));
 
-		if(mmu->tablesFromHigh) OsService_DdrHiBlockFree( blockAddr, 1 );
-		else OsService_DdrLoBlockFree( blockAddr, 1 );
+		if(mmu->tablesFromHigh) OsService_DdrHiBlockFree( blockAddr, 1, OS_SERVICE_TAG('M', 'M', 'U', ' ') );
+		else OsService_DdrLoBlockFree( blockAddr, 1, OS_SERVICE_TAG('M', 'M', 'U', ' ') );
 
 		mmu->highBlock = mmu->highBlock - 1;
 		if(mmu->curBlock > mmu->highBlock) mmu->curBlock = mmu->highBlock;
@@ -439,17 +438,17 @@ char const * DumpEntry(uintptr_all_t entry, bool l3 ) {
 void DumpTlb(Manager * mmu, uintptr_all_t va) {
 	auto const l1Entry = GetL1Entry( mmu, va );
 	if(!l1Entry) {
-		debug_printf(ANSI_RED_PEN "DumpTlb: L1 lookup failure of %p" ANSI_WHITE_PEN "\n", va);
+		debug_printf(ANSI_RED_PEN "DumpTlb: L1 lookup failure of %p" ANSI_WHITE_PEN "\n", (void*)va);
 		return;
 	}
-	debug_printf("TLB at %p:\n", va);
-	debug_printf("  L1 %s %s (%#018x)\n", DumpEntry(*l1Entry, false), DumpType(*l1Entry), *l1Entry );
+	debug_printf("TLB at %p:\n", (void*) va);
+	debug_printf("  L1 %s %s (%#018lx)\n", DumpEntry(*l1Entry, false), DumpType(*l1Entry), *l1Entry );
 	if((*l1Entry & TT_TYPE_MASK) == TT_TABLE) {
 		auto const l2Entry = GetL2Entry( mmu, va );
-		debug_printf("    L2 %s %s (%#018x)\n", DumpEntry(*l2Entry, false), DumpType(*l2Entry), *l2Entry );
+		debug_printf("    L2 %s %s (%#018lx)\n", DumpEntry(*l2Entry, false), DumpType(*l2Entry), *l2Entry );
 		if((*l2Entry & TT_TYPE_MASK) == TT_TABLE) {
 			auto const l3Entry = GetL3Entry( mmu, va );
-			debug_printf("      L3 %s %s (%#018x) pa - %p\n", DumpEntry(*l3Entry, true),
+			debug_printf("      L3 %s %s (%#018lx) pa - %lu\n", DumpEntry(*l3Entry, true),
 									 DumpType(*l3Entry),
 									 *l3Entry,
 									 ((*l3Entry >> L3_LSHIFT) & L3_POST_MASK) << L3_LSHIFT);
@@ -499,7 +498,6 @@ EXTERN_C Mmu::Manager * SetupMmu() {
 	Mmu::SetPageTypeRange( mmu, LPS_BASE_ADDR, LPS_SIZE_IN_BYTES, Mmu::PageType::Device );
 	Mmu::SetPageTypeRange( mmu, PMUCSU_BASE_ADDR, PMUCSU_SIZE_IN_BYTES, Mmu::PageType::Device );
 	Mmu::SetPageTypeRange( mmu, OCMTCM_BASE_ADDR, OCMTCM_SIZE_IN_BYTES, Mmu::PageType::NormalCached );
-	Mmu::DumpTlb(mmu, 0x12'0000);
 	dsb();
 	isb();
 
@@ -507,6 +505,5 @@ EXTERN_C Mmu::Manager * SetupMmu() {
 	invalid_all_TLB();
 	dsb();
 	isb();
-
 	return mmu;
 }

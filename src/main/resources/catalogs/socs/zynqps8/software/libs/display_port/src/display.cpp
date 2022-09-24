@@ -846,7 +846,9 @@ void SetMixerDMA(Mixer* mixer) {
 									 (uint32_t) mixer->gfxPlane.source) |
 							 HW_REG_ENCODE_FIELD(DP, AV_BUF_OUTPUT_AUDIO_VIDEO_SELECT, AUD_STREAM1_SEL, 3) |
 							 HW_REG_ENCODE_FIELD(DP, AV_BUF_OUTPUT_AUDIO_VIDEO_SELECT, AUD_STREAM2_SEL, 0));
-/*
+
+	/*
+	 * 	HW_REG_SET_BIT1(DP, INT_EN, VBLNK_START);
 	for(int i = 0; i < 10;i++) {
 		debug_printf("DP_INT_STATUS 0x%x\n", HW_REG_READ1(DP, INT_STATUS));
 		debug_printf("DPDMA_ISR 0x%x\n", HW_REG_READ1(DPDMA, ISR));

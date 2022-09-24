@@ -8,10 +8,12 @@ EXTERN_C {
 #define OS_GLOBAL0_BOOT_COMPLETE 	(1 << 1)
 
 typedef struct BootData {
-	uint32_t bootCodeSize; 			 	// size of boot program in bytes
-
 	uintptr_lo_t bootCodeStart; 	// location where the boot program begins
+	uint32_t bootCodeSize; 			 	// size of boot program in bytes
+	uintptr_lo_t videoBlock;      // 4096 for Descriptor + 640 x 480 * 2 front buffer
+	uintptr_all_t mmu;            // Mmu manager
 } BootData;
+
 static_assert(sizeof(BootData) <= 29, "Boot Data Too big");
 
 #define OSS_INLINE_TEXT(text) sizeof(text), text
@@ -19,16 +21,11 @@ void OsService_InlinePrint(uint8_t size, const char *text) NON_NULL(2);
 void OsService_Print(const char * text) NON_NULL(1);
 void OsService_PrintWithSize(unsigned int count, const char * text) NON_NULL(2);
 void OsService_Printf(const char *format, ...) NON_NULL(1) __attribute__((format(printf, 1, 2)));
-void OsService_EnableScreenConsole(bool enable);
-void OsService_ScreenConsoleInlinePrint(uint8_t size, const char *text) NON_NULL(2);
-void OsService_ScreenConsolePrintWithSize(unsigned int count, const char * text) NON_NULL(2);
-void OsService_ScreenConsolePrint(const char *text) NON_NULL(1);
-void OsService_ScreenConsolePrintf(const char *format, ...) NON_NULL(1) __attribute__((format(printf, 1, 2)));
 
-WARN_UNUSED_RESULT uintptr_lo_t OsService_DdrLoBlockAlloc(uint32_t blocks64KB_);
-void OsService_DdrLoBlockFree(uintptr_lo_t ptr_, uint32_t blockCount_);
-WARN_UNUSED_RESULT uintptr_all_t OsService_DdrHiBlockAlloc(uint32_t blocks64KB_);
-void OsService_DdrHiBlockFree(uintptr_all_t ptr_, uint32_t blockCount_);
+WARN_UNUSED_RESULT uintptr_lo_t OsService_DdrLoBlockAlloc(uint32_t blocks64KB_, uint32_t tag_);
+void OsService_DdrLoBlockFree(uintptr_lo_t ptr_, uint32_t blockCount_, uint32_t tag_);
+WARN_UNUSED_RESULT uintptr_all_t OsService_DdrHiBlockAlloc(uint32_t blocks64KB_, uint32_t tag_);
+void OsService_DdrHiBlockFree(uintptr_all_t ptr_, uint32_t blockCount_, uint32_t tag_);
 
 void OsService_BootComplete(BootData const* bootData);
 void OsService_FetchBootData(BootData* bootData);
@@ -48,6 +45,8 @@ void OsService_SleepFPGA();
 void OsService_WakeFPGA();
 
 uint8_t OsService_GetCoreHart();
+
+#define OS_SERVICE_TAG(a,b,c,d) (((uint32_t)(a) << 24) | ((uint32_t)(b) << 16) | ((uint32_t)(c) << 8) | ((uint32_t)(d) << 0))
 
 #ifdef __cplusplus
 }

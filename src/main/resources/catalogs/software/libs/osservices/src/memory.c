@@ -3,11 +3,12 @@
 #include "osservices/ipi3_transport.h"
 #include "platform/memory_map.h"
 
-uintptr_lo_t OsService_DdrLoBlockAlloc(uint32_t blocks64KB_) {
+uintptr_lo_t OsService_DdrLoBlockAlloc(uint32_t blocks64KB_, uint32_t tag_) {
 	IPI3_Msg msg = {
 			.function = OSF_DDR_LO_BLOCK_ALLOC,
 			.Payload.DdrLoBlockAlloc.blocks64KB = blocks64KB_,
-			};
+			.Payload.DdrLoBlockAlloc.tag = tag_,
+		};
 	IPI3_Response response;
 	IPI3_OnService_SubmitAndFetchResponse(&msg, &response);
 	if(response.result == IRR_SUCCESS) {
@@ -28,21 +29,23 @@ uintptr_lo_t OsService_DdrLoBlockAlloc(uint32_t blocks64KB_) {
 	}
 }
 
-void OsService_DdrLoBlockFree(uintptr_lo_t ptr_, uint32_t blockCount_) {
+void OsService_DdrLoBlockFree(uintptr_lo_t ptr_, uint32_t blockCount_, uint32_t tag_) {
 	IPI3_Msg msg = {
 			.function = OSF_DDR_LO_BLOCK_FREE,
 			.Payload.DdrLoBlockFree.offset = ((uintptr_t)ptr_ - DDR_0_BASE_ADDR),
 			.Payload.DdrLoBlockFree.blockCount = blockCount_,
-			};
+			.Payload.DdrLoBlockFree.tag = tag_,
+	};
 
 	IPI3_OsService_Submit(&msg);
 }
 
-uintptr_all_t OsService_DdrHiBlockAlloc(uint32_t blocks64KB_) {
+uintptr_all_t OsService_DdrHiBlockAlloc(uint32_t blocks64KB_, uint32_t tag_) {
 #if CPU_a53
 	IPI3_Msg msg = {
 			.function = OSF_DDR_HI_BLOCK_ALLOC,
-			.Payload.DdrLoBlockAlloc.blocks64KB = blocks64KB_,
+			.Payload.DdrHiBlockAlloc.blocks64KB = blocks64KB_,
+			.Payload.DdrHiBlockAlloc.tag = tag_,
 	};
 	IPI3_Response response;
 	IPI3_OnService_SubmitAndFetchResponse(&msg, &response);
@@ -66,12 +69,13 @@ uintptr_all_t OsService_DdrHiBlockAlloc(uint32_t blocks64KB_) {
 #endif
 }
 
-void OsService_DdrHiBlockFree(uintptr_all_t ptr, uint32_t blockCount_) {
+void OsService_DdrHiBlockFree(uintptr_all_t ptr, uint32_t blockCount_, uint32_t tag_) {
 #if CPU_a53
 	IPI3_Msg msg = {
 			.function = OSF_DDR_HI_BLOCK_FREE,
-			.Payload.DdrLoBlockFree.offset = ((uintptr_t)ptr - DDR_0_BASE_ADDR),
-			.Payload.DdrLoBlockFree.blockCount = blockCount_,
+			.Payload.DdrHiBlockFree.offset = ((uintptr_t)ptr - DDR_0_BASE_ADDR),
+			.Payload.DdrHiBlockFree.blockCount = blockCount_,
+			.Payload.DdrHiBlockFree.tag = tag_,
 	};
 
 	IPI3_OsService_Submit(&msg);

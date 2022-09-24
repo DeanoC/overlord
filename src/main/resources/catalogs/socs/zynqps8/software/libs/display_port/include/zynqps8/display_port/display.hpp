@@ -169,6 +169,7 @@ struct PACKED DMADescriptor {
 };
 #pragma GCC diagnostic pop
 
+static_assert( sizeof(DMADescriptor) == 64);
 static_assert( offsetof(DMADescriptor, CONTROL) == 0);
 static_assert( offsetof(DMADescriptor, DSCR_ID) == 4);
 static_assert( offsetof(DMADescriptor, XFER_SIZE) == 8);

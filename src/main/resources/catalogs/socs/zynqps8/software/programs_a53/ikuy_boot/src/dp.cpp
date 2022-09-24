@@ -17,6 +17,10 @@ DisplayPort::Display::Mixer mixer;
 uintptr_lo_t videoBlock;
 uintptr_lo_t FrameBuffer;
 
+constexpr uint16_t MakeRGB565( uint8_t r_, uint8_t g_, uint8_t b_) {
+	return (((uint16_t)r_)& 0x1f) << 11 | (((uint16_t)g_) & 0x3f) << 6 | (((uint16_t)b_) & 0x1f) << 0;
+}
+
 void BringUpDisplayPort() {
 	debug_printf( ANSI_YELLOW_PEN "BringUpDisplayPort\n" ANSI_RESET_ATTRIBUTES );
 	using namespace DisplayPort::Display;
@@ -25,7 +29,7 @@ void BringUpDisplayPort() {
 	Init( &mixer );
 	Init( &link );
 	CopyStandardVideoMode( DisplayPort::Display::StandardVideoMode::VM_640_480_60, &display.videoTiming );
-	if(videoBlock == 0) videoBlock = OsService_DdrLoBlockAlloc( 16 ); // 1MB
+	if(videoBlock == 0) videoBlock = OsService_DdrLoBlockAlloc( 16, OS_SERVICE_TAG('V', 'I', 'D', 'B') ); // 1MB
 	Cache_DCacheZeroRange( videoBlock, 1 * 1024 * 1024 );
 
 	auto dmaDesc = (DMADescriptor *) (uintptr_t) videoBlock;
@@ -33,9 +37,9 @@ void BringUpDisplayPort() {
 
 	Init( dmaDesc );
 	dmaDesc->enableDescriptorUpdate = true;
-	dmaDesc->transferSize = 1280 * 480;
-	dmaDesc->width = (1280);
-	dmaDesc->stride = (1280) >> 4;
+	dmaDesc->transferSize = 640 * 480 * 2;
+	dmaDesc->width = 640 * 2;
+	dmaDesc->stride = (640 * 2) >> 4;
 	dmaDesc->nextDescriptorAddress = (uint32_t) (uintptr_t) dmaDesc;
 	dmaDesc->nextDescriptorAddressExt = (uint32_t) (((uintptr_t) dmaDesc) >> 32ULL);
 	dmaDesc->sourceAddress = (uint32_t) FrameBuffer;
@@ -49,7 +53,7 @@ void BringUpDisplayPort() {
 	mixer.videoPlane.simpleDescPlane0Address = (uintptr_t) dmaDesc;
 
 	mixer.gfxPlane.source = DisplayPort::Display::DisplayGfxPlane::Source::BUFFER;
-	mixer.gfxPlane.format = DisplayPort::Display::DisplayGfxPlane::Format::RGBA5551;
+	mixer.gfxPlane.format = DisplayPort::Display::DisplayGfxPlane::Format::RGB565;
 	mixer.gfxPlane.simpleDescBufferAddress = (uintptr_t) dmaDesc;
 	Cache_DCacheCleanAndInvalidateRange( videoBlock, 1 * 1024 * 1024 );
 
@@ -60,6 +64,7 @@ void BringUpDisplayPort() {
 
 	SetDisplay( &link, &display, &mixer );
 
+	/*
 #define DP_AV_BUF_PALETTE_MEMORY_OFFSET 0x0000b400U
 	for(int i = 0; i < 256;i++) {
 		hw_RegWrite(DP_BASE_ADDR, DP_AV_BUF_PALETTE_MEMORY_OFFSET + (256 * 0) + (i * 4), (i*2) << 4); // blue
@@ -67,14 +72,13 @@ void BringUpDisplayPort() {
 		hw_RegWrite(DP_BASE_ADDR, DP_AV_BUF_PALETTE_MEMORY_OFFSET + (256 * 8) + (i * 4), (i*3) << 4); // red
 		hw_RegWrite(DP_BASE_ADDR, DP_AV_BUF_PALETTE_MEMORY_OFFSET + (256 * 12) + (i * 4), 0x0); // alpha? doesn't appear to work
 	}
+	*/
 
-	uint16_t * fb = (uint16_t *)FrameBuffer;
+	auto fb = (uint16_t *)(uintptr_all_t)FrameBuffer;
 	for(int i=0;i < 480;++i) {
 		for(int j = 0;j < 640;++j) {
-			if(((j & 64) ^ (i & 64)) == 0) fb[j] = (255 - j) | (255 - j);
-			else fb[j] = j | (j << 8);
+			fb[j] = MakeRGB565(j, i, i/2);
 		}
-//		memset( fb, i & 0xFF, 640);
 		fb += 640;
 	}
 

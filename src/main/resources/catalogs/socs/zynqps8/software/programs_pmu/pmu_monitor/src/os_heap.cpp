@@ -14,7 +14,7 @@ void OsHeap::Init() {
 	raw_debug_print("  osHeap clear\n");
 	memset(osHeap, 0, OsHeap::TotalSize);
 #pragma GCC diagnostic pop
-	raw_debug_printf("  osHeap = start %08lx sizeof(OsHelp) = %iKB\n", (uint32_t)osHeap, sizeof(OsHeap)/1024);
+	raw_debug_printf("  osHeap = start %08lx sizeof(OsHeap) = %iKB\n", (uint32_t)osHeap, sizeof(OsHeap)/1024);
 
 	raw_debug_print("  osHeap ddrLoAllocator Init\n");
 	osHeap->ddrLoAllocator.Init(OsHeap::TotalSize);

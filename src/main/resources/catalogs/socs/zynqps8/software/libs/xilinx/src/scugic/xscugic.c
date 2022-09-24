@@ -135,6 +135,8 @@
 ******************************************************************************/
 
 /***************************** Include Files *********************************/
+#include "core/core.h"
+#include "dbg/print.h"
 #include "xil_types.h"
 #include "xil_assert.h"
 #include "a53/xil_spinlock.h"

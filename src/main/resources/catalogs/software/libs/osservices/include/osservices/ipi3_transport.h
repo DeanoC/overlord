@@ -140,18 +140,22 @@ typedef struct PACKED {
 			struct PACKED {
 				uint8_t padd0[2]; 			// align to 32 bit boundary as we have the space to spare
 				uint32_t blocks64KB;   // how many blocks (each 64KB) to allocate
+				uint32_t tag;          // purely for debug/log
 			} DdrLoBlockAlloc;
 			struct PACKED {
 				uint16_t blockCount; 	// how many 64KB blocks to free
 				uint32_t offset; 			// offset from base address to free
+				uint32_t tag;          // purely for debug/log
 			} DdrLoBlockFree;
 			struct PACKED {
 				uint8_t padd0[2]; 	// align to 32 bit boundary as we have the space to spare
 				uint32_t blocks64KB;   // how many blocks (each 64KB) to allocate
+				uint32_t tag;          // purely for debug/log
 			} DdrHiBlockAlloc;
 			struct PACKED {
 				uint16_t blockCount; 	// how many 64KB blocks to free
 				uint32_t offset; 			// offset from base address to free
+				uint32_t tag;          // purely for debug/log
 			} DdrHiBlockFree;
 			struct PACKED {
 				BootData bootData;

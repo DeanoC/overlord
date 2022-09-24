@@ -60,7 +60,6 @@ EXTERN_C NO_RETURN void main()
 
 	RegisterBringUp();
 
-
 	debug_printf(ANSI_BRIGHT_ON "Bootloader size %luKB\nPMU size = %luKB\n" ANSI_BRIGHT_OFF,
 	             ((size_t) _end - (size_t) _vector_table) >> 10,
 	             ((size_t) _binary_pmu_monitor_bin_end - (size_t) _binary_pmu_monitor_bin_start)>>10);
@@ -77,7 +76,8 @@ EXTERN_C NO_RETURN void main()
 	while (!(HW_REG_READ1(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) & OS_GLOBAL0_PMU_READY)) {}
 	debug_printf("PMU " ANSI_GREEN_PEN"Ready\n" ANSI_WHITE_PEN);
 
-	SetupMmu();
+	auto mmu = SetupMmu();
+
 	// PMU OS is enabled
 	debug_force_raw_print(false);
 	EnablePSToPL();
@@ -87,36 +87,30 @@ EXTERN_C NO_RETURN void main()
 
 	PrintBanner();
 
-	BootData bootData = {
-			.bootCodeSize = OCM_0_SIZE_IN_BYTES,
-			.bootCodeStart = OCM_0_BASE_ADDR,
-	};
-
-	if(!(HW_REG_READ1(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) & OS_GLOBAL0_BOOT_COMPLETE)) {
-		debug_force_raw_print(false);
-		debug_printf("Video boot console init\n");
-		BringUpDisplayPort();
-		debug_printf("Video boot console init " ANSI_GREEN_PEN "DONE\n" ANSI_WHITE_PEN);
-	} else {
-		debug_printf("Video boot console ready\n");
-		OsService_FetchBootData(&bootData);
-	}
 	debug_force_raw_print(false);
+
+	debug_printf("Video boot console init\n");
+	BringUpDisplayPort();
+	debug_printf("Video boot console init " ANSI_GREEN_PEN "DONE\n" ANSI_WHITE_PEN);
 
 	Cache_DCacheCleanAndInvalidate();
 
-	if(!(HW_REG_READ1(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) & OS_GLOBAL0_BOOT_COMPLETE)) {
-		debug_printf("Hard Boot Complete VideoBlock @ %#010x\n", videoBlock);
-		OsService_BootComplete(&bootData);
-		HW_REG_WRITE1(PMU_GLOBAL, GLOBAL_GEN_STORAGE0,
-							 HW_REG_READ1(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) | OS_GLOBAL0_BOOT_COMPLETE);
-	} else {
-		debug_printf("Soft Boot Finished VideoBlock @ %#010x\n", videoBlock);
-	}
+	debug_printf("Hard Boot Complete VideoBlock @ %#010x\n", videoBlock);
+
+	// tell PMU we have finished pass video block address and mmu for next program
+	BootData bootData = {
+		.bootCodeStart = OCM_0_BASE_ADDR,
+		.bootCodeSize = OCM_0_SIZE_IN_BYTES,
+		.videoBlock = videoBlock,
+		.mmu = (uintptr_all_t)mmu,
+	};
+	OsService_BootComplete(&bootData);
+
+	HW_REG_WRITE1(PMU_GLOBAL, GLOBAL_GEN_STORAGE0, HW_REG_READ1(PMU_GLOBAL, GLOBAL_GEN_STORAGE0) | OS_GLOBAL0_BOOT_COMPLETE);
 
 	debug_printf(ANSI_GREEN_PEN "BOOT DONE\n" ANSI_WHITE_PEN);
 
-	while(1) {
+	while(true) {
 		Utils_BusySecondSleep(1);
 	}
 }

@@ -501,20 +501,7 @@ void PSU_Mask_Write(unsigned long offset, unsigned long mask,
 	RegVal |= (val & mask);
 	Xil_Out32(offset, RegVal);
 }
-#define MASK_POLL_TIME 1100000
 
-static int mask_pollOnValue(u32 add, u32 mask, u32 value)
-{
-	volatile u32 *addr = (volatile u32 *)(unsigned long) add;
-	int i = 0;
-
-	while ((*addr & mask) != value) {
-		if (i == MASK_POLL_TIME)
-			return 0;
-		i++;
-	}
-	return 1;
-}
 #if 0
 unsigned long psu_apply_master_tz(void)
 {
