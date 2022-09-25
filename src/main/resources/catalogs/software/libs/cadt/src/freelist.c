@@ -20,7 +20,7 @@ CADT_FreeListHandle CADT_FreeListCreate(size_t elementSize, size_t capacity, Mem
 	assert(capacity > 0);
 
 	if(elementSize < sizeof(uintptr_t)) {
-		debug_printf("Free List element size has minimum %u\n", sizeof(uintptr_t));
+		debug_printf("Free List element size has minimum %lu\n", sizeof(uintptr_t));
 		elementSize = sizeof(uintptr_t);
 	}
 

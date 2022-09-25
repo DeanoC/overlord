@@ -11,7 +11,7 @@
 namespace Binny {
 	using namespace Binify;
 
-	BundleWriter::BundleWriter(int addressLength_, bool fixup64bit_, Memory_Allocator* allocator_) :
+	BundleWriter::BundleWriter(int addressLength_, Memory_Allocator* allocator_) :
 			addressLength(addressLength_),
 			allocator(allocator_),
 			chunkRegistry(allocator_),

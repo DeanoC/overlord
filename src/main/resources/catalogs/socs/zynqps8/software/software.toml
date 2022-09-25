@@ -35,6 +35,12 @@ cpus = "a53,r5f"
 depends = ["core", "dbg", "multi_core", "platform", "utils"]
 
 [[definition]]
+type = "library.zynqps8.xhci"
+software = "libs/xhci/xhci.toml"
+cpus = "a53"
+depends = ["core", "dbg", "multi_core", "platform", "utils", "usb", "zynqps8.gic_v2", "zynqps8.i2c", "zynqps8.mmu"]
+
+[[definition]]
 type = "library.zynqps8.xilinx"
 software = "libs/xilinx/xilinx.toml"
 cpus = "a53,pmu,r5f"

@@ -9,7 +9,6 @@
 #include "fmt/format.hpp"
 #include "vfile/vfile.h"
 #include "utils/slice.hpp"
-
 namespace Binify {
 
 class WriteHelper {

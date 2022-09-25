@@ -1,4 +1,5 @@
 #include "core/core.h"
+#include "dbg/print.h"
 #include "library_defines/library_defines.h"
 
 #if IKUY_HAVE_LIB_RESOURCE_BUNDLE_WRITER == 1

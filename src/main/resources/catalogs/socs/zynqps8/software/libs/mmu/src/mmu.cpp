@@ -167,7 +167,7 @@ void ReleasePageTable( Manager *mmu, uintptr_all_t pageTableEntry ) {
 		}
 	}
 	if(block == nullptr) {
-		debug_printf( "ERROR: Page table lock not found\n" );
+		debug_printf( "ERROR: Page table block not found\n" );
 		IKUY_DEBUG_BREAK();
 		return;
 	}

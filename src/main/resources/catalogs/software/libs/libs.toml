@@ -111,3 +111,8 @@ cpus = "a53"
 type = "library.gpio"
 cpus = "a53"
 depends = ["core", "dbg", "platform"]
+
+[[definition]]
+type = "library.usb"
+cpus = "a53"
+depends = ["core", "dbg", "platform", "cadt", "multi_core", "cadt", "memory", "utils"]

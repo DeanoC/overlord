@@ -19,6 +19,23 @@
 #include "lua.h"
 #include "lualib.h"
 
+/*
+** set functions from list 'l' into table at top - 'nup'; each
+** function gets the 'nup' elements at the top as upvalues.
+** Returns with only the table at the stack.
+*/
+static void luaL_setfuncs (lua_State *L, const luaL_Reg *l, int nup) {
+	luaL_checkstack(L, nup, "too many upvalues");
+	for (; l->name != NULL; l++) {  /* fill the table with given functions */
+		int i;
+		for (i = 0; i < nup; i++)  /* copy upvalues to the top */
+			lua_pushvalue(L, -nup);
+		lua_pushcclosure(L, l->func, l->name, nup);  /* closure with those upvalues */
+		lua_setfield(L, -(nup + 2), l->name);
+	}
+	lua_pop(L, nup);  /* remove upvalues */
+}
+
 #define LUA_ASSERT(test, state, msg) if(!(test)) { luaL_error((state), (msg)); }
 static char const MetaName[] = "ikuy.Image";
 static CORE_LOCAL(Memory_Allocator * , luaAllocator);
@@ -836,23 +853,6 @@ static int canSaveAsKTX(lua_State * L) {
 	return 1;
 }
 #endif // IKUY_HAVE_LIB_IMAGE_IO == 1
-
-/*
-** set functions from list 'l' into table at top - 'nup'; each
-** function gets the 'nup' elements at the top as upvalues.
-** Returns with only the table at the stack.
-*/
-LUALIB_API void luaL_setfuncs (lua_State *L, const luaL_Reg *l, int nup) {
-	luaL_checkstack(L, nup, "too many upvalues");
-	for (; l->name != NULL; l++) {  /* fill the table with given functions */
-		int i;
-		for (i = 0; i < nup; i++)  /* copy upvalues to the top */
-			lua_pushvalue(L, -nup);
-		lua_pushcclosure(L, l->func, l->name, nup);  /* closure with those upvalues */
-		lua_setfield(L, -(nup + 2), l->name);
-	}
-	lua_pop(L, nup);  /* remove upvalues */
-}
 
 int LuaImage_Open(lua_State* L, Memory_Allocator* allocator) {
 	static const struct luaL_Reg imageObj [] = {

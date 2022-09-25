@@ -18,9 +18,9 @@
 #include "image/create.h"
 #include "image/resource_writer.hpp"
 extern int LuaImage_Open(lua_State* L, Memory_Allocator* allocator);
+extern int LuaBundleWriter_Open(lua_State* L, Memory_Allocator* allocator);
 
 GLOBAL_HEAP_ALLOCATOR(globalAllocator)
-
 
 std::optional<std::string> readFile(const std::string& name) {
 	size_t size = 0;
@@ -160,7 +160,7 @@ void setupState(lua_State* L)
 	lua_pop(L, 1);
 
 	LuaImage_Open(L, globalAllocator);
-
+	LuaBundleWriter_Open(L, globalAllocator);
 	luaL_sandbox(L);
 }
 
@@ -225,78 +225,50 @@ std::string runCode(lua_State* L, std::string const& name, std::string const& so
 	}
 
 	lua_pop(L, 1);
-	return std::string();
+	return {};
 }
 
 void Usage(char const* programName) {
 	printf("%s: lua_script thats run to process images\n", programName);
 }
-
+static void *l_alloc (void *ud, void *ptr, size_t osize, size_t nsize) {
+	auto * allocator = (Memory_Allocator *)ud;
+	if (nsize == 0) {
+		MFREE(allocator, ptr);
+		return nullptr;
+	}
+	else {
+		// TODO When ptr is NULL, osize encodes the kind of object that Lua is allocating.
+		// osize is any of LUA_TSTRING, LUA_TTABLE, LUA_TFUNCTION, LUA_TUSERDATA, or LUA_TTHREAD when
+		// (and only when) Lua is creating a new object of that type.
+		// When osize is some other value, Lua is allocating memory for something else.
+		return MREALLOC(allocator, ptr, nsize);
+	}
+}
 int main(int argc, char const *argv[]) {
-	Memory_MallocInit();
-	Memory_HeapAllocatorInit(globalAllocator);
-	LZ4_SetAllocator(globalAllocator);
-
 	backward::SignalHandling sh;
 
 	if(argc != 2) {
-		Usage(argv[0]);
+		Usage( argv[0] );
 		return 1;
-	}
+	} else {
+		Memory_MallocInit();
+		Memory_HeapAllocatorInit( globalAllocator );
+		LZ4_SetAllocator( globalAllocator );
 
-	{
-		tiny_stl::vector<uint32_t> dependecies(globalAllocator);
-		auto image = Image_Create2D(32, 32, TinyImageFormat_R8G8B8A8_UNORM, globalAllocator);
-/*		for (auto y = 0; y < image->width; ++y) {
-			for (auto x = 0; x < image->width; ++x) {
-				float arr[4] = {static_cast<float>(x + y), static_cast<float>(x * y + 1), static_cast<float>(x + 2),
-				                static_cast<float>(x + 3)};
-				Image_SetBlocksAtF(image, arr, 1, Image_CalculateIndex(image, x, y, 0, 0));
-			}
-		}
-*/
-		auto image2 = Image_Create2D(64, 32, TinyImageFormat_R8G8B8A8_UNORM, globalAllocator);
-		Binny::BundleWriter bundleWriter(64, true, globalAllocator);
-		bundleWriter.registerChunk("IMG_"_bundle_id,
-		                           0,
-		                           dependecies,
-															 ImageChunkWriter,
-		                           ImageChunkWriter);
 
-		bundleWriter.addItemToChunk("IMG_"_bundle_id, tiny_stl::string("image_test", globalAllocator), image);
-		bundleWriter.addItemToChunk("IMG_"_bundle_id, tiny_stl::string("bob the test", globalAllocator), image2);
-
-		auto wfh = Os_VFileFromFile("test.bin", Os_FM_WriteBinary, globalAllocator);
-		bundleWriter.build(wfh);
-		VFile_Close(wfh);
-
-		std::unique_ptr<VFile_Interface_t,void (*)(VFile_Interface_t*)> fh(Os_VFileFromFile("test.bin", Os_FM_ReadBinary, globalAllocator), &VFile_Close);
-		auto bundleReturn = ResourceBundle_Load(fh.get(), globalAllocator, globalAllocator);
-		if (bundleReturn.errorCode != ResourceBundle_LoadReturn::RBEC_Okay) {
-			debug_printf("bundle error %i\n", bundleReturn.errorCode);
-		}
-		auto const bundle = bundleReturn.resourceBundle;
-		for (uint32_t i = 0; i < ResourceBundle_GetDirectoryCount(bundle); ++i) {
-			auto de = ResourceBundle_GetDirectory(bundle, i);
-			debug_printf("chunk %i - id %u version %i name %s at %p\n", i, de->id, de->version, de->namePtr, de->chunkPtr);
-		}
-
-		MFREE(globalAllocator, image2);
-		MFREE(globalAllocator, image);
-		MFREE(globalAllocator, bundle);
-
-		std::unique_ptr<lua_State, void (*)(lua_State *)> globalState(luaL_newstate(), lua_close);
+		std::unique_ptr<lua_State, void ( * )( lua_State * )> globalState( lua_newstate( l_alloc, globalAllocator ), lua_close );
 		lua_State *L = globalState.get();
-		setupState(L);
+		setupState( L );
 
-		auto const source = readFile(argv[1]);
-		if (!source) {
-			printf("%s: Could not read %s\n", argv[0], argv[1]);
+		auto const source = readFile( argv[1] );
+		if(!source) {
+			printf( "%s: Could not read %s\n", argv[0], argv[1] );
 			return 2;
 		}
-		auto const result = runCode(L, argv[1], source.value());
-		if (!result.empty()) {
-			printf("%s: %s\n", argv[0], result.c_str());
+		auto const result = runCode( L, argv[1], source.value());
+		if(!result.empty()) {
+			printf( "%s: %s\n", argv[0], result.c_str());
 			return 3;
 		}
 	}

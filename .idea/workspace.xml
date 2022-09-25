@@ -5,27 +5,42 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="73b7f681-932b-4979-9f4f-6aee48997ac8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/mmu/CMakeLists.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/mmu/include/zynqps8/mmu/mmu.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/mmu/mmu.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/mmu/src/mmu.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/mmu_init.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gpio/CMakeLists.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gpio/gpio.toml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gpio/include/gpio/gpio.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gpio/src/zynqmp/gpio.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/xhci/CMakeLists.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/xhci/include/zynqps8/xhci/trb.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/xhci/include/zynqps8/xhci/xhci.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/xhci/src/xhci_dump.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/xhci/src/xhci_trb.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/xhci/src/xhci_zynqmp.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/xhci/xhci.toml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/resource_bundle_writer/src/lua_resource_bundle_writer.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/usb/CMakeLists.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/usb/include/usb/usb.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/usb/include/usb/usb_device.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/usb/include/usb/usb_hid.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/usb/include/usb/usb_hid_report.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/usb/include/usb/usb_hub.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/usb/include/usb/usb_pipe.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/usb/src/usb.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/usb/src/usb_device.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/usb/src/usb_hid.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/usb/src/usb_hid_report.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/usb/src/usb_hub.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/usb/src/usb_pipe.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/usb/usb.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/boot.S" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/boot.S" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/mmu.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_a53/ikuy_boot/src/mmu.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/cpuwake.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/programs_pmu/pmu_monitor/src/cpuwake.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/mmu/src/mmu.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/mmu/src/mmu.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/software.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/software.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/cadt/src/freelist.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/cadt/src/freelist.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/include/data_binify/write_helper.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/data_binify/include/data_binify/write_helper.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image/src/lua_image.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image/src/lua_image.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image/src/resource_writer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/image/src/resource_writer.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/libs.toml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/libs.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/include/osservices/osservices.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/include/osservices/osservices.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/src/boot.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/osservices/src/boot.c" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/scala/overlord/Game.scala" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/scala/overlord/Game.scala" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/include/memory/memory.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/include/memory/memory.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/src/memory.c" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/memory/src/memory.c" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/resource_bundle_writer/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/resource_bundle_writer/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/resource_bundle_writer/include/resource_bundle_writer/resource_bundle_writer.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/resource_bundle_writer/include/resource_bundle_writer/resource_bundle_writer.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/resource_bundle_writer/src/resource_bundle_writer.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/resource_bundle_writer/src/resource_bundle_writer.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/image_convert.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/catalogs/software/programs/image_convert/src/image_convert.cpp" afterDir="false" />
     </list>
     <list id="0751d2e6-7320-4108-a016-46fb703e79ea" name="Changes by SNAPSHOT-DEANO" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -118,7 +133,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "/home/deano/projects/overlord/src/main/resources/catalogs/software/libs/gpio",
+    "last_opened_file_path": "/home/deano/projects/overlord/src/main/resources/catalogs/socs/zynqps8/software/libs/xhci/src",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -129,11 +144,11 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gpio" />
-      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gpio/src/zynqmp" />
-      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/gpio/include/gpio" />
-      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/mmu/src" />
-      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/mmu/include/zynqps8/mmu" />
+      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/xhci/src" />
+      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/xhci/include/xhci" />
+      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/software/libs/xhci" />
+      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/usb/include/usb" />
+      <recent name="$PROJECT_DIR$/src/main/resources/catalogs/software/libs/usb/src" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/main/resources/catalogs/socs/zynqps8/registers/iop" />
@@ -391,14 +406,7 @@
       <workItem from="1662555138877" duration="599000" />
       <workItem from="1663270444453" duration="1676000" />
       <workItem from="1663949120949" duration="9729000" />
-      <workItem from="1664083665600" duration="1232000" />
-    </task>
-    <task id="LOCAL-00014" summary="Output clock period and waveform for constraint&#10;HACK: Added dont_touch as vivido is stripping things and I can't figure out why...&#10;Utils toDouble and lookupDouble">
-      <created>1609404899304</created>
-      <option name="number" value="00014" />
-      <option name="presentableId" value="LOCAL-00014" />
-      <option name="project" value="LOCAL" />
-      <updated>1609404899304</updated>
+      <workItem from="1664083665600" duration="5062000" />
     </task>
     <task id="LOCAL-00015" summary="Finding my way around again after break">
       <created>1625593258441</created>
@@ -736,7 +744,14 @@
       <option name="project" value="LOCAL" />
       <updated>1664021030555</updated>
     </task>
-    <option name="localTasksCounter" value="63" />
+    <task id="LOCAL-00063" summary="Added MMU and GPIU libraries&#10;Changed ikuy_boot to use MMY libraries&#10;PMU boot data now correctly aligned to get MMU pointer in game&#10;Overlord now prints out any softwar dependecies it can't find">
+      <created>1664089218582</created>
+      <option name="number" value="00063" />
+      <option name="presentableId" value="LOCAL-00063" />
+      <option name="project" value="LOCAL" />
+      <updated>1664089218582</updated>
+    </task>
+    <option name="localTasksCounter" value="64" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -785,7 +800,6 @@
       <path value="$PROJECT_DIR$/../ikuy_utils" />
       <path value="$USER_HOME$/.sbt/1.0/staging/a7772c47d5d7e84d3e85/ikuy_utils" />
     </ignored-roots>
-    <MESSAGE value="Add String to binary, hex, octal and C style decoder (0x,0b, 0)&#10;Added download address to zmodem and dma each chunk&#10;Added monitor commands for download_at, sleep cpu, wake cpu and boot cpu&#10;Fixed bug in overload related to pathing programs" />
     <MESSAGE value="Fixed up cache system SYS -&gt; SYSTEM change&#10;Added RECURSE to pmu CMakeLists.txt&#10;Added subdirectories to tidy in various places&#10;Added cpu wake and sleep to os services&#10;Added reset to pmu" />
     <MESSAGE value="Fix for incorrect A53 base address register&#10;A53 resets now down in WakeUp&#10;Fix for wrong &quot;Unknown Command&quot; and empty strings" />
     <MESSAGE value="Added musl_math software library&#10;Re-organising cpu register banks (WIP)&#10;Re-organising zynqmp and SOCs tomls&#10;Changed and fixed bit rotten board handling&#10;Redid ident to require (in most games) 3 seperates, also both name and Definition Ident useable from project files&#10;Implemented hardware max instances/max cores and address offsets&#10;Fixed to new way ports and pin matches&#10;CPU folders named after cpu type not name&#10;Refactored Containers&#10;Added hidden attribute to CPP core header&#10;Refactor DDR structure&#10;Added IoDefinitionType&#10;Support fraction frame rates in zynqmp display port&#10;Made DistanceMatrix print more verbose (hiding unconnected chips)&#10;Added isIsolated to DistanceMatrix to test for unconnected chips&#10;Added FetchBootData to pmu_monitor&#10;Added board as command line parameters to overlord&#10;Added prefabs support&#10;Changed how pingroups are defined (in a table in the board object)&#10;refactored os functions in pmu_monitor&#10;Added board ident to software macro system&#10;Write register lists without register banks that have been used&#10;Added graph output to Report (outputs a graphviz dot file of the project)&#10;Added Xilinx software library for using the MIT libraries" />
@@ -810,7 +824,8 @@
     <MESSAGE value="I2C now handle nacks better&#10;removed typetraits from freelist.hpp&#10;Added memory reads to pmu_montor (r lo_address will display 16 bytes, r will display next 16 bytes, just enter afterward will show the next 16 bytes, also a read4b for 32 bits)&#10;Added on and off to ANSI blink and bright&#10;Added a log when the memory tracking reservoir grows&#10;Improved the hex string to number logic (now handles upper and lower case)&#10;Some tidying of image load/save includes to compiler on A53&#10;UCS2 to utf8" />
     <MESSAGE value="LPD/FPD_SLCR a few enums added to register toml&#10;Moved iop registers to correct place&#10;Display Port tidy up&#10;Untested implementation of PCAP&#10;Refactored FPD and LPD dma to use base funcitons&#10;Added xilinx emacps &#10;Convered some of the register start up to PSI&#10;Moved DP setup to ikuy_boot&#10;Adjusted MMU for bigger stack (for early MMU)&#10;ikuy_boot now setups MMU&#10;Refactor ikuy_boot into seperate files&#10;ikuy_boot traslation_table.S removed, now done at runtime&#10;ikuy_boot now doesn't save FPU registers on interrupt&#10;PMU has removed text console&#10;PMU has removed zmodem support&#10;PMU Os Heap down to 1MB&#10;Freelist can now handles alignment&#10;WARN_UNUSED_RESULT added the most math operators&#10;strncmp added to a compat&#10;gfxdebug gets some CLUT8 support&#10;Pulled PERSISTANT_MEMORY_BUFFER_ALLOCATOR from MEMORY_BUFFER_ALLOCATOR allowing allocators in more places&#10;Added Invalidate cache functions&#10;Fixed Toml registers from local gateware" />
     <MESSAGE value="Tidied up some warnings&#10;Added tag to OS memory allocs and free, so easier to work out who did it (due to async prints occur later so tag lets you tell where it came from)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Tidied up some warnings&#10;Added tag to OS memory allocs and free, so easier to work out who did it (due to async prints occur later so tag lets you tell where it came from)" />
+    <MESSAGE value="Added MMU and GPIU libraries&#10;Changed ikuy_boot to use MMY libraries&#10;PMU boot data now correctly aligned to get MMU pointer in game&#10;Overlord now prints out any softwar dependecies it can't find" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added MMU and GPIU libraries&#10;Changed ikuy_boot to use MMY libraries&#10;PMU boot data now correctly aligned to get MMU pointer in game&#10;Overlord now prints out any softwar dependecies it can't find" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>

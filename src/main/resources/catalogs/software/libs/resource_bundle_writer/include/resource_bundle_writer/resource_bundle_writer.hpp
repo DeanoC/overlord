@@ -2,7 +2,6 @@
 
 #include "core/core.h"
 #include "core/utils.hpp"
-#include "utils/slice.hpp"
 #include "memory/memory.hpp"
 #include "tiny_stl/string.hpp"
 #include "memory/memory.h"
@@ -15,7 +14,7 @@ namespace Binny {
 		{
 		public:
 
-				BundleWriter( int addressLength_, bool fixup64bit_, Memory_Allocator* allocator_);
+				BundleWriter( int addressLength_, Memory_Allocator* allocator_);
 
 				using ChunkWriter = std::function<void( void * userData, Binify::WriteHelper& helper )>;
 
@@ -33,7 +32,8 @@ namespace Binny {
 				/// @return true if successful
 				bool build(VFile_Handle result_ );
 
-				void setLogBinifyText() { logBinifyText = true; }
+				bool getLogBinifyText() const { return logBinifyText; }
+				void setLogBinifyText(bool e_) { logBinifyText = e_; }
 
 		private:
 				void writeBundleHeader(Binify::WriteHelper& h, size_t uncompressedSize, size_t decompressionBufferSize) const;
