@@ -422,7 +422,10 @@ object Game {
 						else Seq(LibraryDefinitionType(si.prepended("library").toSeq), ProgramDefinitionType(si.prepended("program").toSeq))
 					}
 
-					for (d <- defs) {
+					var found = false;
+
+					for (d <- defs
+					     if !found) {
 						catalogs.findDefinition(d) match {
 							case Some(defi) =>
 								val opt = defi.createInstance(n, Map[String, Variant]())
@@ -432,11 +435,13 @@ object Game {
 									rootContainer.children ++= Seq(inst)
 									depSet += inst.asInstanceOf[SoftwareInstance]
 									inst.definition.dependencies.filterNot(d => depStack.contains(d)).foreach(depStack.push)
+									found = true;
 								}
 								else println(s"ERROR: Software dependency $n ${defi.defType.ident.mkString(".")}")
-							case None       => if (defs.length != 2) println(s"ERROR: Software dependency $n (${d.ident.mkString(".")}) not found")
+							case None       =>
 						}
 					}
+					if (!found) println(s"ERROR: Software dependency $n not found")
 				}
 			}
 		}

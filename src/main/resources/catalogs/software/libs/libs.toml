@@ -106,3 +106,8 @@ depends = ["core", "dbg", "vfile", "memory"]
 type = "library.fatfs"
 depends = ["core", "dbg", "memory", "platform", "vfile", "utils"]
 cpus = "a53"
+
+[[definition]]
+type = "library.gpio"
+cpus = "a53"
+depends = ["core", "dbg", "platform"]

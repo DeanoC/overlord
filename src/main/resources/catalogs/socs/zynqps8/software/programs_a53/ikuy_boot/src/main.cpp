@@ -8,8 +8,9 @@
 #include "platform/cache.h"
 #include "platform/aarch64/intrinsics_gcc.h"
 #include "platform/memory_map.h"
-#include "platform/registers/csu.h"
+#include "zynqps8/mmu/mmu.hpp"
 
+#include "platform/registers/csu.h"
 #include "platform/registers/pmu_global.h"
 #include "platform/registers/acpu_gicc.h"
 #include "platform/registers/acpu_gicd.h"
@@ -20,7 +21,6 @@
 #include "core/snprintf.h"
 #include "pmu.hpp"
 #include "dp.hpp"
-#include "mmu.hpp"
 
 void PrintBanner(void);
 void EnablePSToPL(void);
@@ -40,6 +40,9 @@ EXTERN_C {
 	extern uint8_t HeapLimit[];
 
 }
+
+void EarlySetupMmu();
+Mmu::Manager * SetupMmu();
 
 #define CPU_CORTEXA53_0_TIMESTAMP_CLK_FREQ 33333000
 #define PSSYSMON_ANALOG_BUS_OFFSET		0x114U
@@ -182,6 +185,8 @@ void ClearPendingInterrupts(void)
 
 }
 
+
+
 EXTERN_C void SynchronousInterrupt(void) {
 	uint64_t const esr = read_ESR_EL3_register();
 	uint64_t const elr = read_ELR_EL3_register();
@@ -318,3 +323,4 @@ EXTERN_C void FIQInterrupt(void) {
 EXTERN_C void SErrorInterrupt(void) {
 	raw_debug_printf("SErrorInterruptHandler\n");
 }
+

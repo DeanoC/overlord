@@ -17,7 +17,7 @@
 
 .section .boot,"ax"
 _boot:
-	// Set vector table base and reserver vector address
+	// Set vector table base and reserve vector address
 	ldr	    x1, =vector_base
 	ldr	    w2, =rvbar_base
 	msr	    VBAR_EL3,x1

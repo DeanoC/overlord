@@ -20,13 +20,19 @@ depends = ["core", "dbg", "platform", "osservices"]
 type = "library.zynqps8.gic_v2"
 software = "libs/gic_v2/gic_v2.toml"
 cpus = "a53,r5f"
-depends = ["core", "dbg", "library_defines", "multi_core", "platform", "utils"]
+depends = ["core", "dbg", "multi_core", "platform", "utils"]
 
 [[definition]]
 type = "library.zynqps8.i2c"
 software = "libs/i2c/i2c.toml"
 cpus = "a53,r5f"
-depends = ["core", "dbg", "library_defines", "multi_core", "platform", "utils"]
+depends = ["core", "dbg", "multi_core", "platform", "utils"]
+
+[[definition]]
+type = "library.zynqps8.mmu"
+software = "libs/mmu/mmu.toml"
+cpus = "a53,r5f"
+depends = ["core", "dbg", "multi_core", "platform", "utils"]
 
 [[definition]]
 type = "library.zynqps8.xilinx"
@@ -39,7 +45,7 @@ name = "ikuy_boot"
 type = "program.zynqps8.ikuy_boot"
 software = "programs_a53/ikuy_boot/ikuy_boot.toml"
 cpus = "a53"
-depends = ["core", "dbg", "gfxdebug", "osservices", "platform", "utils", "zynqps8.xilinx", "zynqps8.display_port"]
+depends = ["core", "dbg", "gfxdebug", "osservices", "platform", "utils", "zynqps8.xilinx", "zynqps8.display_port", "zynqps8.mmu"]
 
 [[definition]]
 name = "pmu_monitor"

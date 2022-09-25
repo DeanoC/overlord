@@ -13,12 +13,12 @@ void OsService_BootComplete(BootData const* bootData) {
 }
 
 void OsService_FetchBootData(BootData* bootData) {
-	IPI3_Msg msg = {
+	IPI3_Msg ALIGN(64) msg = {
 			.ddrPtrFlag = false,
 			.function = OSF_FETCH_BOOT_DATA,
 	};
 	memcpy(&msg.Payload.BootData.bootData, bootData, sizeof(BootData));
-	IPI3_Response response;
+	IPI3_Response ALIGN(64) response;
 	IPI3_OnService_SubmitAndFetchResponse(&msg, &response);
 	if(response.result == IRR_SUCCESS) {
 		memcpy(bootData, &response.BootData, sizeof(BootData));

@@ -4,6 +4,7 @@
 #include "platform/memory_map.h"
 #include "platform/registers/crf_apb.h"
 #include "platform/registers/lpd_slcr.h"
+#include "dbg/print.h"
 
 void A53Sleep0() {
 	RomServiceTable[REN_ACPU0SLEEP]();

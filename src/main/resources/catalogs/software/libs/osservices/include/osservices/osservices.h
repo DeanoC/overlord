@@ -11,6 +11,7 @@ typedef struct BootData {
 	uintptr_lo_t bootCodeStart; 	// location where the boot program begins
 	uint32_t bootCodeSize; 			 	// size of boot program in bytes
 	uintptr_lo_t videoBlock;      // 4096 for Descriptor + 640 x 480 * 2 front buffer
+	uint32_t padd0;
 	uintptr_all_t mmu;            // Mmu manager
 } BootData;
 

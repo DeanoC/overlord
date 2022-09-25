@@ -63,5 +63,6 @@ target_link_libraries(${project} PRIVATE utils)
 
 target_link_libraries(${project} PRIVATE xilinx)
 target_link_libraries(${project} PRIVATE zynqps8_display_port)
+target_link_libraries(${project} PRIVATE zynqps8_mmu)
 
 add_dependencies(${project} pmu_monitor)
