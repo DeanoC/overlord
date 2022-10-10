@@ -7,12 +7,19 @@ EXTERN_C {
 #define OS_GLOBAL0_PMU_READY 		(1 << 0)
 #define OS_GLOBAL0_BOOT_COMPLETE 	(1 << 1)
 
+// video block is either null (no video output has been setup)
+// or
+// 640KB block setup as
+// 0B: 64B dma descriptor for front buffer
+// 64B: 4032B unused
+// 4KB: 600KB - 640 * 480 front buffer of RGB565 pixels
+// 604KB: 36KB unused
 typedef struct BootData {
+	uintptr_all_t mmu;            // Mmu manager
 	uintptr_lo_t bootCodeStart; 	// location where the boot program begins
 	uint32_t bootCodeSize; 			 	// size of boot program in bytes
-	uintptr_lo_t videoBlock;      // 4096 for Descriptor + 640 x 480 * 2 front buffer
+	uintptr_lo_t videoBlock;      // 1MB 4096B for Descriptor + 640 x 480 * 2 front buffer
 	uint32_t padd0;
-	uintptr_all_t mmu;            // Mmu manager
 } BootData;
 
 static_assert(sizeof(BootData) <= 29, "Boot Data Too big");

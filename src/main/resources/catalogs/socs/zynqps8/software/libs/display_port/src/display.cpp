@@ -298,7 +298,9 @@ void Init(Connection *link) {
 	uint8_t wakeUpData = 0x1;
 	// done twice to allow for sleepy heads to get out of bed
 	AuxRead(link, 0x600, 1, &wakeUpData);
+	Utils_BusyMilliSleep(20);
 	AuxRead(link, 0x600, 1, &wakeUpData);
+	Utils_BusyMilliSleep(20);
 
 
 	HW_REG_SET_BIT1(DP, INT_EN, HPD_PULSE_DET);
@@ -375,6 +377,9 @@ bool IsDisplayConnected(Connection *link) {
 }
 void EnableMainLink(bool enable) {
 	HW_REG_WRITE1(DP, FORCE_SCRAMBLER_RESET, 1);
+	Utils_BusyMilliSleep(25);
+	HW_REG_WRITE1(DP, FORCE_SCRAMBLER_RESET, 0);
+
 	HW_REG_WRITE1(DP, MAIN_STREAM_ENABLE, enable);
 }
 
@@ -469,7 +474,7 @@ void SetDisplay(Connection *link, Display *display, Mixer *mixer) {
 	//debug_printf("wordsPerLine %d bitsPerPixel %d userDataCountPerLane %d\n", wordsPerLine, bitsPerPixel, userDataCountPerLane);
 
 	uint32_t const transferUnitSize = 64;
-	uint32_t const pixelClockKHz = (display->videoTiming.vTotal * display->videoTiming.hTotal * display->videoTiming.frameRateHz) / 1000;
+	uint32_t const pixelClockKHz = (uint32_t)(((float)display->videoTiming.vTotal * (float)display->videoTiming.hTotal * display->videoTiming.frameRateHz) / 1000.0f);
 
 	uint32_t const videoBandwidth = (pixelClockKHz * bitsPerPixel) / 8;
 	uint32_t const linkBandwidth = link->numLanes * (int) link->linkRate * 27000;
@@ -480,8 +485,8 @@ void SetDisplay(Connection *link, Display *display, Mixer *mixer) {
 	uint32_t const mClockFactor = pixelClockKHz;
 	uint32_t const nClockFactor = (int) link->linkRate * 27000;
 
-//	debug_printf("bw %f minBPTU %d fractionBPTU %d M %d N %d\n",
-//							 bw, minBytesPerTransferUnit, fractionBytesPerTransferUnit, mClockFactor, nClockFactor);
+	debug_printf("bw %f minBPTU %d fractionBPTU %d M %d N %d\n",
+							 bw, minBytesPerTransferUnit, fractionBytesPerTransferUnit, mClockFactor, nClockFactor);
 
 	uint16_t const hStart = display->videoTiming.hSyncPulseWidth + display->videoTiming.hBackPorch;
 	uint16_t const vStart = display->videoTiming.vSyncPulseWidth + display->videoTiming.vBackPorch;
@@ -676,23 +681,31 @@ void SetDisplay(Connection *link, Display *display, Mixer *mixer) {
 			PSI_WRITE_32(DP, INIT_WAIT, initWait),
 			PSI_END_PROGRAM
 	};
-	EnableMainLink(false);
 
-	psi_RunRegisterProgram(setMixerProgram);
+	EnableMainLink( false );
 
-	Connect(link);
+	psi_RunRegisterProgram( setMixerProgram );
 
-	SetPixelClock(pixelClockKHz * 1000);
+	Connect( link );
 
-	HW_REG_WRITE1(DP, SOFTWARE_RESET, HW_REG_ENCODE_FIELD(DP, SOFTWARE_RESET, SOFT_RST, 1));
-	Utils_BusyMilliSleep(1);
-	HW_REG_WRITE1(DP, SOFTWARE_RESET, HW_REG_ENCODE_FIELD(DP, SOFTWARE_RESET, SOFT_RST, 0));
 
-	psi_RunRegisterProgram(setMainStreamOutputProgram);
+	SetPixelClock( pixelClockKHz * 1000 );
+	Utils_BusyMilliSleep(10);
 
-	SetMixerDMA(mixer);
+	HW_REG_WRITE1( DP, SOFTWARE_RESET, HW_REG_ENCODE_FIELD( DP, SOFTWARE_RESET, SOFT_RST, 1 ));
+	Utils_BusyMilliSleep( 10 );
+	HW_REG_WRITE1( DP, SOFTWARE_RESET, HW_REG_ENCODE_FIELD( DP, SOFTWARE_RESET, SOFT_RST, 0 ));
 
-	EnableMainLink(true);
+	psi_RunRegisterProgram( setMainStreamOutputProgram );
+
+	Utils_BusyMilliSleep(10);
+
+	SetMixerDMA( mixer );
+
+	Utils_BusyMilliSleep(10);
+
+	EnableMainLink( true );
+
 
 
 }
@@ -705,12 +718,143 @@ void SetMixerDMA(Mixer* mixer) {
 	assert(!thirtyTwoBitAddressBus || mixer->videoPlane.simpleDescPlane2Address <= 0xFFFFFFFF);
 	assert(!thirtyTwoBitAddressBus || mixer->gfxPlane.simpleDescBufferAddress <= 0xFFFFFFFF);
 
-	HW_REG_WRITE1(DP, INT_MASK, 0xFFFFFFFF);
+	HW_REG_WRITE1(DP, INT_DS, 0xFFFFFFFF);
 	HW_REG_WRITE1(DP, INT_STATUS, 0xFFFFFFFF);
 	HW_REG_WRITE1(DPDMA, IMR, 0xFFFFFFFF);
 	HW_REG_WRITE1(DPDMA, EIMR, 0xFFFFFFFF);
 	HW_REG_WRITE1(DPDMA, ISR, 0xFFFFFFFF);
 	HW_REG_WRITE1(DPDMA, EISR, 0xFFFFFFFF);
+	PSI_IWord const setMixerProgram[] = {
+		PSI_SET_REGISTER_BANK(DP),
+
+		// set the background colour
+		PSI_WRITE_32(DP, V_BLEND_BG_CLR_0, mixer->backgroundColour[0]),
+		PSI_WRITE_32(DP, V_BLEND_BG_CLR_1, mixer->backgroundColour[1]),
+		PSI_WRITE_32(DP, V_BLEND_BG_CLR_2, mixer->backgroundColour[2]),
+
+		// layer setup
+		PSI_WRITE_32(DP, V_BLEND_LAYER0_CONTROL,
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_LAYER0_CONTROL, BYPASS,
+		                                 (uint32_t) (mixer->function == MixerFunction::VIDEO)) |
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_LAYER0_CONTROL, RGB_MODE,
+		                                 (uint32_t) DisplayVideoPlane::IsFormatRGB(mixer->videoPlane.format)) |
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_LAYER0_CONTROL, EN_US,
+		                                 (uint32_t) DisplayVideoPlane::NeedColourUpSampling(mixer->videoPlane.format))),
+		PSI_WRITE_32(DP, V_BLEND_LAYER1_CONTROL,
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_LAYER1_CONTROL, BYPASS,
+		                                 (uint32_t) (mixer->function == MixerFunction::GFX)) |
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_LAYER1_CONTROL, RGB_MODE,
+		                                 (uint32_t) DisplayGfxPlane::IsFormatRGB(mixer->gfxPlane.format)) |
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_LAYER1_CONTROL, EN_US,
+		                                 (uint32_t) DisplayGfxPlane::NeedColourUpSampling(mixer->gfxPlane.format))),
+
+
+		// set chroma keying
+		PSI_WRITE_32(DP, V_BLEND_CHROMA_KEY_ENABLE,
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_CHROMA_KEY_ENABLE, M_SEL,
+		                                 (uint32_t) (mixer->function == MixerFunction::CHROMA_KEY_VIDEO)) |
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_CHROMA_KEY_ENABLE, EN,
+		                                 (uint32_t) (mixer->function == MixerFunction::CHROMA_KEY_VIDEO
+		                                             || mixer->function == MixerFunction::CHROMA_KEY_GFX))),
+
+		// set global alpha parameters
+		PSI_WRITE_32(DP, V_BLEND_SET_GLOBAL_ALPHA_REG,
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_SET_GLOBAL_ALPHA_REG, EN,
+		                                 (uint32_t) (mixer->function == MixerFunction::GLOBAL_PORTER_DUFF)) |
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_SET_GLOBAL_ALPHA_REG, VALUE, (uint32_t) mixer->globalAlpha)),
+		PSI_WRITE_32(DP, V_BLEND_CHROMA_KEY_COMP1,
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_CHROMA_KEY_COMP1, MIN, (uint32_t) mixer->chromaKeyMin[0]) |
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_CHROMA_KEY_COMP1, MAX, (uint32_t) mixer->chromaKeyMax[0])),
+		PSI_WRITE_32(DP, V_BLEND_CHROMA_KEY_COMP2,
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_CHROMA_KEY_COMP2, MIN, (uint32_t) mixer->chromaKeyMin[1]) |
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_CHROMA_KEY_COMP2, MAX, (uint32_t) mixer->chromaKeyMax[1])),
+		PSI_WRITE_32(DP, V_BLEND_CHROMA_KEY_COMP3,
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_CHROMA_KEY_COMP3, MIN, (uint32_t) mixer->chromaKeyMin[2]) |
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_CHROMA_KEY_COMP3, MAX, (uint32_t) mixer->chromaKeyMax[2])),
+
+
+		// set the video planes colour transform
+		PSI_WRITE_32(DP, V_BLEND_LUMA_IN1CSC_OFFSET,
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_LUMA_IN1CSC_OFFSET, PRE_OFFSET,
+		                                 (uint32_t) mixer->videoPlane.toRGBTransform.preTranslate[0]) |
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_LUMA_IN1CSC_OFFSET, POST_OFFSET,
+		                                 (uint32_t) mixer->videoPlane.toRGBTransform.postTranslate[0])),
+		PSI_WRITE_32(DP, V_BLEND_CR_IN1CSC_OFFSET,
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_CR_IN1CSC_OFFSET, PRE_OFFSET,
+		                                 (uint32_t) mixer->videoPlane.toRGBTransform.preTranslate[1]) |
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_CR_IN1CSC_OFFSET, POST_OFFSET,
+		                                 (uint32_t) mixer->videoPlane.toRGBTransform.postTranslate[1])),
+		PSI_WRITE_32(DP, V_BLEND_CB_IN1CSC_OFFSET,
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_CB_IN1CSC_OFFSET, PRE_OFFSET,
+		                                 (uint32_t) mixer->videoPlane.toRGBTransform.preTranslate[2]) |
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_CB_IN1CSC_OFFSET, POST_OFFSET,
+		                                 (uint32_t) mixer->videoPlane.toRGBTransform.postTranslate[2])),
+		PSI_WRITE_32(DP, V_BLEND_IN1CSC_COEFF0, mixer->videoPlane.toRGBTransform.matrix[0]),
+		PSI_WRITE_32(DP, V_BLEND_IN1CSC_COEFF1, mixer->videoPlane.toRGBTransform.matrix[1]),
+		PSI_WRITE_32(DP, V_BLEND_IN1CSC_COEFF2, mixer->videoPlane.toRGBTransform.matrix[2]),
+		PSI_WRITE_32(DP, V_BLEND_IN1CSC_COEFF3, mixer->videoPlane.toRGBTransform.matrix[3]),
+		PSI_WRITE_32(DP, V_BLEND_IN1CSC_COEFF4, mixer->videoPlane.toRGBTransform.matrix[4]),
+		PSI_WRITE_32(DP, V_BLEND_IN1CSC_COEFF5, mixer->videoPlane.toRGBTransform.matrix[5]),
+		PSI_WRITE_32(DP, V_BLEND_IN1CSC_COEFF6, mixer->videoPlane.toRGBTransform.matrix[6]),
+		PSI_WRITE_32(DP, V_BLEND_IN1CSC_COEFF7, mixer->videoPlane.toRGBTransform.matrix[7]),
+		PSI_WRITE_32(DP, V_BLEND_IN1CSC_COEFF8, mixer->videoPlane.toRGBTransform.matrix[8]),
+
+		// gfx colour space
+		PSI_WRITE_32(DP, V_BLEND_LUMA_IN2CSC_OFFSET,
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_LUMA_IN2CSC_OFFSET, PRE_OFFSET,
+		                                 (uint32_t) mixer->gfxPlane.toRGBTransform.preTranslate[0]) |
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_LUMA_IN2CSC_OFFSET, POST_OFFSET,
+		                                 (uint32_t) mixer->gfxPlane.toRGBTransform.postTranslate[0])),
+		PSI_WRITE_32(DP, V_BLEND_CR_IN2CSC_OFFSET,
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_CR_IN2CSC_OFFSET, PRE_OFFSET,
+		                                 (uint32_t) mixer->gfxPlane.toRGBTransform.preTranslate[1]) |
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_CR_IN2CSC_OFFSET, POST_OFFSET,
+		                                 (uint32_t) mixer->gfxPlane.toRGBTransform.postTranslate[1])),
+		PSI_WRITE_32(DP, V_BLEND_CB_IN2CSC_OFFSET,
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_CB_IN2CSC_OFFSET, PRE_OFFSET,
+		                                 (uint32_t) mixer->gfxPlane.toRGBTransform.preTranslate[2]) |
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_CB_IN2CSC_OFFSET, POST_OFFSET,
+		                                 (uint32_t) mixer->gfxPlane.toRGBTransform.postTranslate[2])),
+		PSI_WRITE_32(DP, V_BLEND_IN2CSC_COEFF0, mixer->gfxPlane.toRGBTransform.matrix[0]),
+		PSI_WRITE_32(DP, V_BLEND_IN2CSC_COEFF1, mixer->gfxPlane.toRGBTransform.matrix[1]),
+		PSI_WRITE_32(DP, V_BLEND_IN2CSC_COEFF2, mixer->gfxPlane.toRGBTransform.matrix[2]),
+		PSI_WRITE_32(DP, V_BLEND_IN2CSC_COEFF3, mixer->gfxPlane.toRGBTransform.matrix[3]),
+		PSI_WRITE_32(DP, V_BLEND_IN2CSC_COEFF4, mixer->gfxPlane.toRGBTransform.matrix[4]),
+		PSI_WRITE_32(DP, V_BLEND_IN2CSC_COEFF5, mixer->gfxPlane.toRGBTransform.matrix[5]),
+		PSI_WRITE_32(DP, V_BLEND_IN2CSC_COEFF6, mixer->gfxPlane.toRGBTransform.matrix[6]),
+		PSI_WRITE_32(DP, V_BLEND_IN2CSC_COEFF7, mixer->gfxPlane.toRGBTransform.matrix[7]),
+		PSI_WRITE_32(DP, V_BLEND_IN2CSC_COEFF8, mixer->gfxPlane.toRGBTransform.matrix[8]),
+
+		// output colour transform
+		PSI_WRITE_32(DP, V_BLEND_LUMA_OUTCSC_OFFSET,
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_LUMA_OUTCSC_OFFSET, PRE_OFFSET,
+		                                 (uint32_t) mixer->outRgb2YCrCbMatrix.preTranslate[0]) |
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_LUMA_OUTCSC_OFFSET, POST_OFFSET,
+		                                 (uint32_t) mixer->outRgb2YCrCbMatrix.postTranslate[0])),
+		PSI_WRITE_32(DP, V_BLEND_CR_OUTCSC_OFFSET,
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_CR_OUTCSC_OFFSET, PRE_OFFSET,
+		                                 (uint32_t) mixer->outRgb2YCrCbMatrix.preTranslate[1]) |
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_CR_OUTCSC_OFFSET, POST_OFFSET,
+		                                 (uint32_t) mixer->outRgb2YCrCbMatrix.postTranslate[1])),
+		PSI_WRITE_32(DP, V_BLEND_CB_OUTCSC_OFFSET,
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_CB_OUTCSC_OFFSET, PRE_OFFSET,
+		                                 (uint32_t) mixer->outRgb2YCrCbMatrix.preTranslate[2]) |
+		             HW_REG_ENCODE_FIELD(DP, V_BLEND_CB_OUTCSC_OFFSET, POST_OFFSET,
+		                                 (uint32_t) mixer->outRgb2YCrCbMatrix.postTranslate[2])),
+		PSI_WRITE_32(DP, V_BLEND_RGB2YCBCR_COEFF0, mixer->outRgb2YCrCbMatrix.matrix[0]),
+		PSI_WRITE_32(DP, V_BLEND_RGB2YCBCR_COEFF1, mixer->outRgb2YCrCbMatrix.matrix[1]),
+		PSI_WRITE_32(DP, V_BLEND_RGB2YCBCR_COEFF2, mixer->outRgb2YCrCbMatrix.matrix[2]),
+		PSI_WRITE_32(DP, V_BLEND_RGB2YCBCR_COEFF3, mixer->outRgb2YCrCbMatrix.matrix[3]),
+		PSI_WRITE_32(DP, V_BLEND_RGB2YCBCR_COEFF4, mixer->outRgb2YCrCbMatrix.matrix[4]),
+		PSI_WRITE_32(DP, V_BLEND_RGB2YCBCR_COEFF5, mixer->outRgb2YCrCbMatrix.matrix[5]),
+		PSI_WRITE_32(DP, V_BLEND_RGB2YCBCR_COEFF6, mixer->outRgb2YCrCbMatrix.matrix[6]),
+		PSI_WRITE_32(DP, V_BLEND_RGB2YCBCR_COEFF7, mixer->outRgb2YCrCbMatrix.matrix[7]),
+		PSI_WRITE_32(DP, V_BLEND_RGB2YCBCR_COEFF8, mixer->outRgb2YCrCbMatrix.matrix[8]),
+
+		PSI_END_PROGRAM
+
+	};
+	psi_RunRegisterProgram(setMixerProgram);
 
 	HW_REG_WRITE1(DP, AV_BUF_FORMAT,
 							 HW_REG_ENCODE_FIELD(DP, AV_BUF_FORMAT, NL_GRAPHX_FORMAT, (uint32_t)mixer->gfxPlane.format) |
@@ -735,24 +879,25 @@ void SetMixerDMA(Mixer* mixer) {
 	HW_REG_WRITE1(DP, AV_CHBUF2, HW_REG_ENCODE_FIELD(DP, AV_CHBUF2, FLUSH, 1));
 	HW_REG_WRITE1(DP, AV_CHBUF3, HW_REG_ENCODE_FIELD(DP, AV_CHBUF3, FLUSH, 1));
 
+	// TODO work out best burst len, 1 seem to work for all modes currently
 	if(planeEnable[0]) {
 		HW_REG_WRITE1(DP, AV_CHBUF0,
-							 HW_REG_ENCODE_FIELD(DP, AV_CHBUF0, BURST_LEN, 15) |
+							 HW_REG_ENCODE_FIELD(DP, AV_CHBUF0, BURST_LEN, 1) |
 							 HW_REG_ENCODE_FIELD(DP, AV_CHBUF0, EN, 1));
 	}
 	if(planeEnable[1]) {
 		HW_REG_WRITE1(DP, AV_CHBUF1,
-							 HW_REG_ENCODE_FIELD(DP, AV_CHBUF1, BURST_LEN, 15) |
+							 HW_REG_ENCODE_FIELD(DP, AV_CHBUF1, BURST_LEN, 1) |
 							 HW_REG_ENCODE_FIELD(DP, AV_CHBUF1, EN, 1));
 	}
 	if(planeEnable[2]) {
 		HW_REG_WRITE1(DP, AV_CHBUF2,
-							 HW_REG_ENCODE_FIELD(DP, AV_CHBUF2, BURST_LEN, 15) |
+							 HW_REG_ENCODE_FIELD(DP, AV_CHBUF2, BURST_LEN, 1) |
 							 HW_REG_ENCODE_FIELD(DP, AV_CHBUF2, EN, 1));
 	}
 	if(planeEnable[3]) {
 		HW_REG_WRITE1(DP, AV_CHBUF3,
-							 HW_REG_ENCODE_FIELD(DP, AV_CHBUF3, BURST_LEN, 15) |
+							 HW_REG_ENCODE_FIELD(DP, AV_CHBUF3, BURST_LEN, 1) |
 							 HW_REG_ENCODE_FIELD(DP, AV_CHBUF3, EN, 1));
 	}
 
@@ -771,7 +916,7 @@ void SetMixerDMA(Mixer* mixer) {
 
 
 	HW_REG_WRITE1(DP, AV_BUF_SRST_REG, HW_REG_ENCODE_FIELD(DP, AV_BUF_SRST_REG, VID_RST, 1));
-	Utils_BusyMilliSleep(1);
+	Utils_BusyMilliSleep(10);
 	HW_REG_WRITE1(DP, AV_BUF_SRST_REG, HW_REG_ENCODE_FIELD(DP, AV_BUF_SRST_REG, VID_RST, 0));
 
 	HW_REG_WRITE1(DPDMA, CH0_CNTL, HW_REG_ENCODE_FIELD(DPDMA, CH0_CNTL, EN, 0));
@@ -967,6 +1112,33 @@ bool CopyNativeResolution(Connection *link, VideoTiming *videoTiming) {
 	videoTiming->frameRateHz = (pixelClockKHz*1000) / (hTotal + vTotal);
 
 	return true;
+}
+
+void SetVBlankInterrupt(bool enable) {
+	if(enable) {
+		HW_REG_SET_BIT1(DP, INT_EN, VBLNK_START);
+	} else {
+		HW_REG_SET_BIT1(DP, INT_DS, VBLNK_START);
+	}
+}
+
+void SetCounterMatch0Interrupt(bool enable) {
+	if(enable) {
+		HW_REG_SET_BIT1(DP, INT_EN, PIXEL0_MATCH);
+	} else {
+		HW_REG_SET_BIT1(DP, INT_DS, PIXEL0_MATCH);
+	}
+	HW_REG_WRITE1(DP, AV_BUF_HCOUNT_VCOUNT_INT0, 0xFFFF'FFFF);
+
+}
+
+void SetCounterMatch1Interrupt(bool enable) {
+	if(enable) {
+		HW_REG_SET_BIT1(DP, INT_EN, PIXEL1_MATCH);
+	} else {
+		HW_REG_SET_BIT1(DP, INT_DS, PIXEL1_MATCH);
+	}
+	HW_REG_WRITE1(DP, AV_BUF_HCOUNT_VCOUNT_INT1, 0xFFFF'FFFF);
 }
 
 

@@ -103,7 +103,7 @@ EXTERN_C size_t Os_GetLastModifiedTime(const char *fileName) {
 EXTERN_C bool Os_GetCurrentDir(char *dirOut, size_t maxSize) {
 	char buffer[maxSize];
 	if (getcwd(buffer, maxSize) == nullptr) {
-		debug_print("ERROR: getcwd failed");
+		debug_print("ERROR: getcwd failed\n");
 		return false;
 	}
 	if (!Os_GetPlatformPathFromNormalisedPath(buffer, dirOut, maxSize)) {

@@ -12,7 +12,9 @@
 // as well
 // Whether memory tracking is actually done (not just the setup) is decided
 // inside memory.c
-//#define MEMORY_TRACKING_SETUP 0
+#undef MEMORY_TRACKING_SETUP
+#define MEMORY_TRACKING_SETUP 0
+
 
 #ifndef MEMORY_TRACKING_SETUP
 #define MEMORY_TRACKING_SETUP 1
@@ -80,9 +82,6 @@ typedef struct Memory_LinearAllocator {
 // this should be called before any malloc or heap is setup. In tracking build its sets up the tracking heap
 EXTERN_C void Memory_MallocInit();
 EXTERN_C void Memory_MallocFinish();
-
-// always returns true
-EXTERN_C bool Memory_TrackerPushNextSrcLoc(const char *sourceFile, const unsigned int sourceLine, const char *sourceFunc);
 
 // call this at exit, when tracking is on will log all non freed items, if no tracking does nothing
 EXTERN_C void Memory_TrackerDestroyAndLogLeaks();

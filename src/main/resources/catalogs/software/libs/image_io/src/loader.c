@@ -151,6 +151,8 @@ Image_ImageHeader * Image_LoadLDR(VFile_Handle handle, Memory_Allocator* allocat
 		case 4:
 			format = TinyImageFormat_R8G8B8A8_UNORM;
 			break;
+		default: debug_printf("LDR: Unknown image format %i\n", cmp);
+			return nullptr;
 	}
 
 	VFile_Seek(handle, origin, VFile_SD_Begin);

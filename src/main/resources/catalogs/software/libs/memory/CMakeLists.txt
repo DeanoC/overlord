@@ -51,7 +51,6 @@ set(PRIVATE_LIBRARIES
 if(NOT ${CPU} STREQUAL "host")
     list(APPEND PRIVATE_LIBRARIES osservices)
 endif()
-set_source_files_properties(foo.cpp PROPERTIES COMPILE_FLAGS -Wno-effc++)
 if(SRCS_LENGTH)
 	add_library(${project} ${SRCS})
 	target_include_directories(${project} PUBLIC include)

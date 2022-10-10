@@ -11,6 +11,16 @@
 namespace Binny {
 	using namespace Binify;
 
+	static char const * idToString(uint32_t id_) {
+		static char txt[5];
+		txt[0] = (char)(id_ >> 0);
+		txt[1] = (char)(id_ >> 8);
+		txt[2] = (char)(id_ >> 16);
+		txt[3] = (char)(id_ >> 24);
+		txt[4] = 0;
+		return txt;
+	}
+
 	BundleWriter::BundleWriter(int addressLength_, Memory_Allocator* allocator_) :
 			addressLength(addressLength_),
 			allocator(allocator_),
@@ -42,7 +52,10 @@ namespace Binny {
 	}
 
 	void BundleWriter::addItemToChunk(uint32_t id_, tiny_stl::string const & name_, void* item_) {
-		assert(chunkRegistry.find(id_) != chunkRegistry.end());
+		if(chunkRegistry.find(id_) == chunkRegistry.end()) {
+			debug_printf("Chunk %i not in bundle registery\n", id_);
+			assert( chunkRegistry.find( id_ ) != chunkRegistry.end());
+		}
 		chunkRegistry.find(id_)->second.items.push_back(tiny_stl::pair(name_, item_));
 	}
 
@@ -54,7 +67,7 @@ namespace Binny {
 
 		// mark beginning of the main block
 		o.reserveLabel("begin", true);
-		o.writeLabel("begin");
+		o.assignLabel("begin");
 		o.setStringTableBase("begin");
 
 		// add the compression header and set up variables next
@@ -63,8 +76,8 @@ namespace Binny {
 		// begin the directory
 
 		// dependency ordering
-		// chunks will be written so that any chunk that are depended on, become
-		// before teh chunks that depend on them. Loops and cycles would be *bad*
+		// chunks will be written so that any chunk that they depend on, becomes
+		// before them. Loops and cycles would be *bad*
 
 		// to flatten the dependency list, each id is pushed on a stack
 		tiny_stl::stack<uint32_t> dirIndices(allocator);
@@ -106,10 +119,9 @@ namespace Binny {
 			}
 		}
 
-		o.writeLabel("directory");
+		o.assignLabel("directory");
 
 		// each chunk gets a directory entry
-		uint32_t maxUncompressedSize = 0;
 		for (uint32_t id : final) {
 			DirEntryWriter const& dw = chunkRegistry.find(id)->second;
 
@@ -124,10 +136,25 @@ namespace Binny {
 			}
 		}
 
+
+		// output chunks
+		o.align();
+		o.assignLabel("chunks", true);
+		for(auto id : final) {
+			auto const & entry = *chunkRegistry.find(id);
+
+			o.align();
+			entry.second.setup(nullptr, o);
+			for( auto const & item : entry.second.items) {
+				o.assignLabel(item.first + "chunk", false);
+				entry.second.perItem(item.second, o);
+			}
+		}
+
 		// output string table
 		o.finishStringTable();
 
-		o.writeLabel("fixups");
+		o.assignLabel("fixups");
 		size_t const numFixups = o.getFixupCount();
 		o.setVariable("FixupCount", (int64_t) numFixups);
 		for(size_t i = 0;i < numFixups;++i)
@@ -135,21 +162,6 @@ namespace Binny {
 			tiny_stl::string const& label = o.getFixup(i);
 			o.useLabelAs<uint32_t>(label, "", false, false);
 		}
-
-		// output chunks
-		o.align();
-		o.writeLabel("chunks", true);
-		for (auto const & entry : chunkRegistry)
-		{
-			o.align();
-			entry.second.setup(nullptr, o);
-			for( auto const & item : entry.second.items) {
-				o.writeLabel(item.first + "chunk", false);
-				entry.second.perItem(item.second, o);
-			}
-		}
-
-		if (logBinifyText) debug_print(o.c_str());
 
 		Binify_ContextHandle ctx = Binify_Create(o.c_str(), allocator);
 		Utils::TrackingSlice<uint8_t> data {
@@ -180,7 +192,7 @@ namespace Binny {
 	{
 		// write header
 		h.comment("---------------------------------------------");
-		h.comment("Bundle");
+		h.comment("Bundle Header");
 		h.comment("---------------------------------------------");
 		h.setAddressLength(addressLength);
 		h.setDefaultType<uint32_t>();
@@ -214,6 +226,10 @@ namespace Binny {
 		h.useLabelAs<uint32_t>("directory","", true, false, "directory offset");
 		h.useLabelAs<uint32_t>("fixups","", true, false, "Fixups offset");
 		h.align(16);
+	}
+
+	tiny_stl::string BundleWriter::outputText() {
+		return {o.c_str(), allocator};
 	}
 
 } // end namespace

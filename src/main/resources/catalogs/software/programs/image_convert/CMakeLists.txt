@@ -22,11 +22,15 @@ set(PRIVATE_LIBRARIES
 			luau_compiler
 			luau_ast
 			luau_hvm
+			luau_utils
 			data_binify
 			data_utils
 			tiny_stl
 			resource_bundle
-			resource_bundle_writer)
+			resource_bundle_writer
+			gfx2d
+            gfx2d_cpu
+        )
 
 add_executable(${project} ${SRCLIST})
 target_link_libraries(${project} PRIVATE ${PRIVATE_LIBRARIES})

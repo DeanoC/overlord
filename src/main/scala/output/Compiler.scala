@@ -26,7 +26,7 @@ object Compiler {
 				println("ERROR: resource make_compilers.sh not found!")
 				return true
 		})
-		game.cpus.filterNot(_.host).foreach({ cpu =>
+		game.cpus.foreach({ cpu =>
 			val (triple, gccFlags) = (cpu.triple, cpu.gccFlags)
 
 			compilerScriptBuilder ++=
@@ -47,8 +47,6 @@ object Compiler {
 	}
 
 	private def genCMakeToolChains(cpu: CpuInstance, out: Path): Unit = {
-		if (cpu.host) return
-
 		val (cpuType, triple, gccFlags) = (cpu.cpuType, cpu.triple, cpu.gccFlags)
 
 		val template = Utils.readFile(Resources.stdResourcePath().resolve("catalogs/software/toolchain_template.cmake")) match {

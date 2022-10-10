@@ -23,37 +23,25 @@ file(GLOB ASMLIST CONFIGURE_DEPENDS
 		src/${CPU_ARCH}/*.S
 		src/${CPU}/*.S )
 
-set( SRCS ${CLIST} ${CPPLIST} ${ASMLIST})
-if(DEFINED SRCS)
-	list(LENGTH SRCS SRCS_LENGTH)
-endif()
-
-if(DEFINED SRCS)
-	list(LENGTH SRCS SRCS_LENGTH)
-endif()
-
 set(PRIVATE_LIBRARIES
 		core
 		library_defines
 		dbg
 		memory
-    multi_core
+    	multi_core
 		platform
 		tiny_image_format
 		)
 
 if(${IKUY_HAVE_LIB_LUAU})
-	list(APPEND PRIVATE_LIBRARIES
-			luau_compiler
-			luau_ast
-			luau_hvm)
+	list(APPEND PRIVATE_LIBRARIES luau_hvm luau_utils)
 	if(${IKUY_HAVE_LIB_IMAGE_IO})
-		list(APPEND PRIVATE_LIBRARIES
-				image_io)
+		list(APPEND PRIVATE_LIBRARIES image_io)
 	endif()
-
 endif()
-
+if(${IKUY_HAVE_LIB_LUAU_VM})
+	list(APPEND PRIVATE_LIBRARIES luau_vm luau_utils)
+endif()
 
 if(NOT ${CPU} STREQUAL "host")
 	list(APPEND PRIVATE_LIBRARIES musl_math)
@@ -66,6 +54,11 @@ else()
 		resource_bundle
 		resource_bundle_writer
 		host_os)
+endif()
+
+set( SRCS ${CLIST} ${CPPLIST} ${ASMLIST})
+if(DEFINED SRCS)
+	list(LENGTH SRCS SRCS_LENGTH)
 endif()
 
 if(SRCS_LENGTH)

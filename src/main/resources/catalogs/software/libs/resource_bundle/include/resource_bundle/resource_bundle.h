@@ -15,6 +15,8 @@ constexpr uint32_t operator "" _bundle_id(char const* s, size_t count)
 }
 #endif
 #define RESOURCE_BUNDLE_ID(a,b,c,d) (uint32_t)(((d) << 24UL) | ((c) << 16UL)| ((b) << 8UL) | (a) >> 0UL)
+#define RESOURCE_BUNDLE_ID_TO_STRING(s, id) s[0] = (id >> 0) & 0xFF; s[1] = (id >> 8) & 0xFF; s[2] = (id >> 16) & 0xFF; s[3] = (id >> 24) & 0xFF; s[4] = 0;
+
 
 typedef enum ResourceBundle_HeaderFlags {
 	RBHF_Is32Bit = (1 << 0),

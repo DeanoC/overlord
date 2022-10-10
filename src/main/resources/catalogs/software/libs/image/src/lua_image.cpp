@@ -18,25 +18,8 @@
 
 #include "lua.h"
 #include "lualib.h"
+#include "luau_utils/utils.hpp"
 
-/*
-** set functions from list 'l' into table at top - 'nup'; each
-** function gets the 'nup' elements at the top as upvalues.
-** Returns with only the table at the stack.
-*/
-static void luaL_setfuncs (lua_State *L, const luaL_Reg *l, int nup) {
-	luaL_checkstack(L, nup, "too many upvalues");
-	for (; l->name != NULL; l++) {  /* fill the table with given functions */
-		int i;
-		for (i = 0; i < nup; i++)  /* copy upvalues to the top */
-			lua_pushvalue(L, -nup);
-		lua_pushcclosure(L, l->func, l->name, nup);  /* closure with those upvalues */
-		lua_setfield(L, -(nup + 2), l->name);
-	}
-	lua_pop(L, nup);  /* remove upvalues */
-}
-
-#define LUA_ASSERT(test, state, msg) if(!(test)) { luaL_error((state), (msg)); }
 static char const MetaName[] = "ikuy.Image";
 static CORE_LOCAL(Memory_Allocator * , luaAllocator);
 
@@ -580,7 +563,8 @@ static int preciseConvert(lua_State *L) {
 	auto image = *(Image_ImageHeader const**)luaL_checkudata(L, 1, MetaName);
 	LUA_ASSERT(image, L, "image is NIL");
 	auto ud = imageud_create(L);
-	*ud = Image_PreciseConvert(image, TinyImageFormat_FromName(luaL_checkstring(L,2)) );
+	TinyImageFormat to = TinyImageFormat_FromName(luaL_checkstring(L,2));
+	if(to != TinyImageFormat_UNDEFINED) *ud = Image_PreciseConvert(image, to);
 	lua_pushboolean(L, *ud != nullptr);
 	return 2;
 }

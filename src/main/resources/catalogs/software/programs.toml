@@ -10,6 +10,10 @@ name = "image_convert"
 type = "program.image_convert"
 software = "programs/image_convert/image_convert.toml"
 cpus = "host"
-depends = ["cadt", "core", "dbg", "memory", "utils", "multi_core",
-    "vfile", "vfile_memory", "tiny_image_format", "image", "image_io", "host_os", "luau", "data_utils", "data_binify",
-    "tiny_stl", "resource_bundle", "resource_bundle_writer"]
+depends = [
+    "core", "dbg", "memory", "utils", "multi_core", "cadt",
+    "vfile", "vfile_memory", "data_utils",
+    "tiny_image_format", "image", "image_io", "gfx2d",
+    "host_os", "tiny_stl",
+    "luau", "luau_utils",
+    "data_binify", "resource_bundle", "resource_bundle_writer"]

@@ -405,4 +405,8 @@ bool CopyStandardVideoMode(StandardVideoMode videoMode, VideoTiming *videoTiming
 void SetDisplay(Connection *link, Display *display, Mixer *mixer);
 void SetMixerDMA(Mixer* mixer);
 
-}
+void SetVBlankInterrupt(bool enable);
+void SetCounterMatch0Interrupt(bool enable);
+void SetCounterMatch1Interrupt(bool enable);
+
+} // end namespace

@@ -21,7 +21,7 @@ case class CopyAction(filename: String, language: String, srcPath: String)
 		dstAbsPath = Game.outPath.resolve(s"${instance.name}/$fn").toAbsolutePath
 		Utils.ensureDirectories(dstAbsPath.getParent)
 
-		val source = Utils.readFile(srcAbsPath)
+		val source = Utils. readFile(srcAbsPath)
 		Utils.writeFile(dstAbsPath, source.toString)
 	}
 

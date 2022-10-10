@@ -7,6 +7,7 @@
 #include "memory/memory.h"
 #include "data_binify/write_helper.hpp"
 #include "resource_bundle/resource_bundle.h"
+#include <functional>
 
 namespace Binny {
 
@@ -32,8 +33,7 @@ namespace Binny {
 				/// @return true if successful
 				bool build(VFile_Handle result_ );
 
-				bool getLogBinifyText() const { return logBinifyText; }
-				void setLogBinifyText(bool e_) { logBinifyText = e_; }
+				tiny_stl::string outputText();
 
 		private:
 				void writeBundleHeader(Binify::WriteHelper& h, size_t uncompressedSize, size_t decompressionBufferSize) const;

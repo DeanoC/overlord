@@ -2,40 +2,43 @@
 //#include <format>
 #include "data_binify/fmt/format.hpp"
 #include "./binify.hpp"
-#include "scanner.h"
 #include "dbg/print.h"
 // still need these from system stl for now
-#include <istream>
 #include <ostream>
 #include <sstream>
-#include <stdexcept>
 
 
 // TODO determine this from compile PLATFORM
 #define BINIFY_LITTLE_ENDIAN
 
 namespace binify {
-
+static std::string StatementToString(binify::ast::Statement statement) {
+	switch(statement) {
+		case ast::Statement::Align: return ".align";
+		case ast::Statement::Blank: return ".blank";
+		case ast::Statement::LittleEndian: return ".littleendian";
+		case ast::Statement::BigEndian: return ".bigendian";
+		case ast::Statement::AddressLen: return ".addresslen";
+		case ast::Statement::Fixup: return ".fixup";
+		case ast::Statement::Type: return ".type";
+		case ast::Statement::AllowNan: return ".allownan";
+		case ast::Statement::AllowInfinity: return ".allowinfinity";
+		default: return "UNKNOWN";
+	}
+}
 bool Binify::parse( std::string const& txt_, std::ostream* out_ )
 {
 	int result = 0;
 	out = out_;
-
 	try {
 		symbolTable.clear();
-		std::istringstream inp( txt_.c_str() );
-		yy::scanner scanner(&inp);
-		yy::parser parser(&scanner, this);
-
-		result = parser.parse();
+		result = this->parseText(txt_);
 		if (result != 0) { return false; }
+		totalSize = offset;
 
 		offset = 0;
 		pass = 1;
-
-		inp.seekg( 0, std::ios::beg );
-
-		result = parser.parse();
+		result = this->parseText(txt_);
 		if (result != 0) { return false; }
 
 	}
@@ -70,27 +73,27 @@ bool Binify::parse( std::string const& txt_, std::ostream* out_ )
 	return true;
 }
 
-void Binify::SetSymbolToOffset( std::string name )
+void Binify::SetSymbolToOffset( yy::parser::location_type& loc, std::string name )
 {
 	if( pass == 0 )
 	{
 		auto const it = symbolTable.find( name );
 		if( it != symbolTable.end() )
-			log += fmt::format("WARNING: symbol  '{}' not found", name.c_str()).c_str();
+			throw yy::parser::syntax_error(loc, fmt::format("WARNING: symbol '{}' not found", name));
 
-		SetPass0Symbol(name, offset);
+		SetPass0Symbol(loc, name, offset);
 	}
 }
 
-void Binify::SetPass0Symbol( std::string name, int64_t i )
+void Binify::SetPass0Symbol( yy::parser::location_type& loc, std::string name, int64_t i )
 {
 	if( pass == 0 )
 	{
-		SetSymbol(name, i);
+		SetSymbol(loc, name, i);
 	}
 }
 
-void Binify::SetSymbol( std::string name, int64_t i )
+void Binify::SetSymbol( yy::parser::location_type& loc, std::string name, int64_t i )
 {
 	if( debugMode )
 		log += fmt::format("{} = {}", name.c_str(), i).c_str();
@@ -99,7 +102,7 @@ void Binify::SetSymbol( std::string name, int64_t i )
 }
 
 
-int64_t Binify::LookupSymbol( std::string name )
+int64_t Binify::LookupSymbol( yy::parser::location_type& loc, std::string name )
 {
 //	printf("Lookup( %s )\n", name );
 
@@ -111,7 +114,7 @@ int64_t Binify::LookupSymbol( std::string name )
 			return 1; // ignore without error on first pass
 		}
 
-		log += fmt::format("WARNING: symbol  '{}' not found", name.c_str()).c_str();
+		throw yy::parser::syntax_error(loc, fmt::format("WARNING: symbol  '{}' not found", name));
 		return 0;
 	}
 
@@ -166,11 +169,33 @@ void Binify::SetDefaultType( ast::Type type )
 	defaultType = type;
 }
 
-void Binify::SetByteOrder( ast::Statement order )
-{
-	assert(order == ast::Statement::BigEndian || order == ast::Statement::LittleEndian);
-	byteOrder = order;
+void Binify::Statement( yy::parser::location_type& loc, binify::ast::Statement statement ) {
+	switch(statement) {
+		case binify::ast::Statement::LittleEndian:
+		case binify::ast::Statement::BigEndian: byteOrder = statement; break;
+		default:
+			throw yy::parser::syntax_error(loc, fmt::format("Statement ({}) not the correct type", StatementToString(statement)));
+	}
 }
+void Binify::IntStatement( yy::parser::location_type& loc, binify::ast::Statement statement, int64_t i) {
+	switch(statement) {
+		case binify::ast::Statement::Align: Align(i); break;
+		case binify::ast::Statement::Blank: Blank(i); break;
+		case binify::ast::Statement::AddressLen: SetAddressLen(loc, i); break;
+		case binify::ast::Statement::Fixup: Fixup(loc, i); break;
+		case binify::ast::Statement::AllowNan: AllowNan(i); break;
+		case binify::ast::Statement::AllowInfinity: AllowInfinity(i); break;
+		default:
+			throw yy::parser::syntax_error(loc, fmt::format("IntStatement ({}) not the correct type", StatementToString(statement)));
+	}
+}
+
+void Binify::TypeStatement( yy::parser::location_type& loc, binify::ast::Statement statement, ast::Type type) {
+	if(statement != binify::ast::Statement::Type)
+		throw yy::parser::syntax_error(loc, fmt::format("TypeStatement ({}) not the correct type", StatementToString(statement)));
+	SetDefaultType(type);
+}
+
 void Binify::AllowNan( int64_t yesno )
 {
 	allowNan = (yesno != 0);
@@ -198,7 +223,7 @@ void Binify::Blank( int64_t count )
 }
 
 
-void Binify::String( std::string sstr )
+void Binify::String(  yy::parser::location_type& loc, std::string sstr )
 {
 	const char* p;
 	size_t i;
@@ -206,9 +231,9 @@ void Binify::String( std::string sstr )
 	char const* str = sstr.c_str();
 
 	size_t len = strlen(str);
-	assert( len >= 2 );
-	assert( str[0] == '\"' );
-	assert( str[len-1] == '\"' );
+	if(!( len >= 2 )) throw yy::parser::syntax_error(loc, "String is not NULL terminated");
+	if(!( str[0] == '\"' )) throw yy::parser::syntax_error(loc, "Strings must start with \"");
+	if(!( str[len-1] == '\"' )) throw yy::parser::syntax_error(loc, "Strings must end with \"");
 
 	p = str+1;
 	i=1;
@@ -218,7 +243,8 @@ void Binify::String( std::string sstr )
 		++i;
 		if( c == '\\' )
 		{
-			assert( i<len-1 );	// should be proper error check?
+			if(!( i<len-1 )) throw yy::parser::syntax_error(loc, "Strings found \\ as last character");
+
 			++i;
 			switch( *p++ )
 			{
@@ -248,6 +274,28 @@ template<typename T> T SafeConvert(std::string& log, uint64_t i)
 	return (T)i;
 }
 
+void Binify::IntValue(  yy::parser::location_type& loc, binify::ast::Type type, int64_t value) {
+	switch(type) {
+		case binify::ast::Type::U8: U8((uint8_t)value); break;
+		case binify::ast::Type::U16: U16((uint16_t)value); break;
+		case binify::ast::Type::U32: U32((uint32_t)value); break;
+		case binify::ast::Type::U64: U64((uint64_t)value); break; // TODO bug here
+		case binify::ast::Type::S8: S8((int8_t)value); break;
+		case binify::ast::Type::S16: S16((int16_t)value); break;
+		case binify::ast::Type::S32: S32((int32_t)value); break;
+		case binify::ast::Type::S64: S64((int64_t)value); break;
+		default:
+			break;
+	}
+}
+void Binify::FloatValue(  yy::parser::location_type& loc, binify::ast::Type type, double value) {
+	switch(type) {
+		case binify::ast::Type::Float: Float(value); break;
+		case binify::ast::Type::Double: Double(value); break;
+		default:
+			break;
+	}
+}
 
 void Binify::U8( uint64_t i )
 {
@@ -348,7 +396,7 @@ void Binify::Double( double d )
 	valueOut( &d, sizeof(double) );
 }
 
-void Binify::IntDefault( int64_t i )
+void Binify::IntValueAsDefault(  yy::parser::location_type& loc, int64_t i )
 {
 	switch( defaultType )
 	{
@@ -360,7 +408,7 @@ void Binify::IntDefault( int64_t i )
 		case ast::Type::S32: 	S32( i ); break;
 		case ast::Type::S64: 	S64( i ); break;
 		case ast::Type::U64: 	{
-			// this should fix buf with unsigned 64 bit constants
+			// this should fix bug with unsigned 64 bit constants
 			union
 			{
 				int64_t i64;
@@ -370,11 +418,12 @@ void Binify::IntDefault( int64_t i )
 			U64( u.ui64 );
 			break;
 		}
-		default: assert(false && "IntDefault called from non integer type!");
+		default:
+			throw yy::parser::syntax_error(loc, "IntDefault called from non integer type!");
 	}
 }
 
-void Binify::FloatDefault( double f )
+void Binify::FloatValueAsDefault(  yy::parser::location_type& loc, double f )
 {
 	// floats always output as floats, despite the default type.
 	// only exception is if defaulttype is double.
@@ -385,33 +434,26 @@ void Binify::FloatDefault( double f )
 	}
 }
 
-void Binify::SetAddressLen( int64_t bits )
+void Binify::SetAddressLen( yy::parser::location_type& loc, int64_t bits )
 {
-	if( (bits / 8) * 8 != bits)
-	{
-		log += "WARNING: Address Length set to non 8 bit value, ignoring\n";
-		return;
-	}
-
-	if( bits < 0)
-	{
-		log += "Address Length set to negative value, ignoring\n";
-		return;
-	}
+	if( (bits / 8) * 8 != bits)throw yy::parser::syntax_error(loc, "Address Length must be divisible by 8");
+	if( bits < 0) throw yy::parser::syntax_error(loc, "Address Length must be positive");
 
 	addressLen = bits;
 }
 
-void Binify::Fixup(uint64_t i)
+void Binify::Fixup( yy::parser::location_type& loc, uint64_t i)
 {
 	Align( addressLen / 8 );
 
-	if (addressLen == 32)
-	{
+	if(pass == 1 && i >= totalSize)
+		throw yy::parser::syntax_error(loc, fmt::format("Fixup offset {} is beyond end of the data ({})", i, totalSize));
+	if(pass == 1) log += fmt::format("Fixup @ offset {:#x} value {}\n", offset, i);
+
+	if (addressLen == 32) {
 		U32(i);
 	}
-	else
-	{
+	else {
 		U64(i);
 	}
 }
@@ -447,8 +489,11 @@ EXTERN_C Binify_ContextHandle Binify_Create(char const * const in, Memory_Alloca
 
 	okay = binny->parse( in, &dir );
 	if(!okay) {
-		debug_printf("Binny error log: %s\n", binny->getLog().c_str());
+		debug_printf("Binny error log:\n%s\n", binny->getLog().c_str());
 		goto failexit;
+	} else {
+		if(!binny->getLog().empty())
+			debug_printf("Binny log:\n%s\n", binny->getLog().c_str());
 	}
 	tmp = dir.str();
 	ctx->data = CADT_VectorCreate(sizeof(uint8_t), ctx->allocator);

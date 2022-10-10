@@ -3,13 +3,12 @@
 #include "core/core.h"
 #include <unordered_map>
 #include <string>
-#include "scanner.hpp"
-#include "parser.hpp"
+#include "driver.hpp"
 
 namespace binify
 {
 
-class Binify : public ParserOutput
+class Binify : public driver
 {
 public:
 	bool parse(std::string const& txt, std::ostream* out_);
@@ -17,36 +16,42 @@ public:
 	std::string const& getLog() const { return log; }
 
 	// ParserOutput implementation
-	void IntDefault( int64_t i ) override;
-	void FloatDefault( double f ) override;
-	void String( std::string str ) override;
-	void Float( double d ) override;
-	void Double( double d ) override;
-	void U8( uint64_t i ) override;
-	void U16( uint64_t i ) override;
-	void U32( uint64_t i ) override;
-	void U64( uint64_t i ) override;
-	void S8( int64_t i ) override;
-	void S16( int64_t i ) override;
-	void S32( int64_t i ) override;
-	void S64( int64_t i ) override;
+	void IntValueAsDefault(  yy::parser::location_type& loc, int64_t i ) override;
+	void FloatValueAsDefault(  yy::parser::location_type& loc, double f ) override;
+	void String(  yy::parser::location_type& loc, std::string str ) override;
 
-	void SetDefaultType( ast::Type type ) override;
-	void SetByteOrder( ast::Statement order ) override;
-	void AllowNan(int64_t yesno) override;
-	void AllowInfinity( int64_t yesno ) override;
-	void Align( int64_t boundary ) override;
-	void Blank( int64_t count ) override;
-	void SetAddressLen( int64_t bits ) override;
-	void Fixup( uint64_t i ) override;
+	void IntValue(  yy::parser::location_type& loc, ast::Type type, int64_t value) override;
+	void FloatValue(  yy::parser::location_type& loc, ast::Type type, double value) override;
 
-	void SetSymbolToOffset( std::string name ) override;
-	void SetPass0Symbol( std::string name, int64_t i ) override;
-	void SetSymbol( std::string name, int64_t i ) override;
+	void Statement( yy::parser::location_type& loc, binify::ast::Statement statement ) override;
+	void IntStatement( yy::parser::location_type& loc, binify::ast::Statement statement, int64_t i) override;
+	void TypeStatement( yy::parser::location_type& loc, binify::ast::Statement statement, ast::Type type) override;
 
-	int64_t LookupSymbol( std::string name) override;
+	void SetSymbolToOffset(  yy::parser::location_type& loc, std::string name ) override;
+	void SetPass0Symbol(  yy::parser::location_type& loc, std::string name, int64_t i ) override;
+	void SetSymbol(  yy::parser::location_type& loc,std::string name, int64_t i ) override;
+
+	int64_t LookupSymbol(  yy::parser::location_type& loc, std::string name) override;
 
 private:
+	void SetDefaultType( ast::Type type );
+	void AllowNan( int64_t yesno );
+	void AllowInfinity( int64_t yesno );
+	void Align( int64_t boundary );
+	void Blank( int64_t count );
+	void SetAddressLen( yy::parser::location_type& loc, int64_t bits );
+	void Fixup(yy::parser::location_type& loc,  uint64_t i);
+	void Float( double d );
+	void Double( double d );
+	void U8( uint64_t i );
+	void U16( uint64_t i );
+	void U32( uint64_t i );
+	void U64( uint64_t i );
+	void S8( int64_t i );
+	void S16( int64_t i );
+	void S32( int64_t i );
+	void S64( int64_t i );
+
 	std::ostream* out;
 
 	void byteOut( uint8_t b );
@@ -56,6 +61,9 @@ private:
 
 	int64_t offset = 0;
 	int pass = 0;
+
+	int64_t totalSize = 0;
+
 	SymbolTable symbolTable;
 
 	// defaults

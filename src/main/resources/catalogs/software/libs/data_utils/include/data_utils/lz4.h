@@ -28,7 +28,7 @@ EXTERN_C LZ4_FrameCompressionContext LZ4_CreateFrameCompressor(VFile_Handle dest
 EXTERN_C bool LZ4_FrameCompressNextChunk(LZ4_FrameCompressionContext ctx_, void* chunk_, size_t size_);
 EXTERN_C void LZ4_FrameCompressFinishAndDestroy(LZ4_FrameCompressionContext ctx_);
 
-EXTERN_C bool LZ4_FrameDecompress(VFile_Handle src_, void* dest, size_t destSize, void* chunkBuffer, LZ4_ChunkSize chunkSize_);
+EXTERN_C bool LZ4_FrameDecompress(VFile_Handle src_, void* dest, size_t destSize, void* chunkBuffer, LZ4_ChunkSize chunkSize_, Memory_Allocator * allocator);
 
 /*
  Small modifications by Deano Calver to the code by Mark and Robert just compat stuff

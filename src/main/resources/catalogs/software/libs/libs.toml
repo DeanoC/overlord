@@ -50,6 +50,11 @@ cpus = "a53"
 depends = ["core", "dbg"]
 
 [[definition]]
+type = "library.luau_utils"
+cpus = "host"
+depends = ["core", "dbg"]
+
+[[definition]]
 type = "library.memory"
 depends = ["core", "dbg", "multi_core", "platform"]
 
@@ -116,3 +121,13 @@ depends = ["core", "dbg", "platform"]
 type = "library.usb"
 cpus = "a53"
 depends = ["core", "dbg", "platform", "cadt", "multi_core", "cadt", "memory", "utils"]
+
+[[definition]]
+type = "library.gfx2d"
+cpus = "host, a53"
+depends = ["core", "dbg", "tiny_image_format"]
+
+[[definition]]
+type = "library.gfx2d_cpu"
+cpus = "host, a53"
+depends = ["core", "dbg", "tiny_image_format", "gfx2d"]

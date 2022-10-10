@@ -21,15 +21,21 @@ static enum ResourceBundle_ErrorCode DoFixups(ResourceBundle_Header * const actu
 			uintptr_t const varAddress = (uintptr_t)(uncompressedBase + fixupTable[fi]);
 			// check the fixup address itself valid
 			if (varAddress >= upperBound || varAddress < lowerBound) {
-				debug_printf("fixup error a!\n");
+				debug_printf("fixup error var address %#018lx a!\n", varAddress);
 				return RBEC_CorruptError;
 			}
+			// check its aligned correctly
+			if ((varAddress & 0x7) != 0) {
+				debug_printf("fixup alignment error var address %#018lx a!\n", varAddress);
+				return RBEC_CorruptError;
+			}
+
 			uintptr_all_t * const varPtr = ((uintptr_all_t *)varAddress);
 			uintptr_all_t offset = *varPtr;
 			//debug_printf("fixup %zu, table %i varAddress %lx offset %lx\n", fi, fixupTable[fi], varAddress, offset);
 			// check the place we are going to store the pointer address in is valid
 			if (offset >= sizeWithoutHeader) {
-				debug_printf("fixup error offset %lu b\n", offset);
+				debug_printf("fixup error var address %#018lx offset %#018lx b\n", varAddress, offset);
 				return RBEC_CorruptError;
 			}
 			*varPtr = (uintptr_all_t)(uintptr_t) (uncompressedBase + offset);
@@ -72,7 +78,7 @@ ResourceBundle_LoadReturn ResourceBundle_Load(VFile_Handle fileHandle,
 																					 Memory_Allocator* allocator,
 																					 Memory_Allocator* tempAllocator) {
 	ResourceBundle_LoadReturn ret;
-
+	LZ4_SetAllocator( allocator );
 	// read header and validate it
 	ResourceBundle_Header header;
 	if(VFile_Read(fileHandle, &header, sizeof(header)) != sizeof (header)) {
@@ -97,6 +103,7 @@ ResourceBundle_LoadReturn ResourceBundle_Load(VFile_Handle fileHandle,
 	void* decompressionBuffer = MALLOC(tempAllocator, header.decompressionBlockSize);
 	void* bundleMemory = MALLOC(allocator, header.uncompressedSize);
 	if(!decompressionBuffer || !bundleMemory) {
+		debug_printf("Out of Memory decomp buffer %p or bundle %p\n",decompressionBuffer, bundleMemory);
 		ret.errorCode = RBEC_MemoryError;
 		MFREE(allocator, bundleMemory);
 		MFREE(allocator, decompressionBuffer);
@@ -110,7 +117,8 @@ ResourceBundle_LoadReturn ResourceBundle_Load(VFile_Handle fileHandle,
 	uint32_t const sizeWithoutHeader = actualHeader->uncompressedSize - sizeof(header);
 
 	// decompress rest of the bundle
-	LZ4_FrameDecompress(fileHandle, (void*)uncompressedBase, sizeWithoutHeader, decompressionBuffer, actualHeader->decompressionBlockSize);
+	LZ4_FrameDecompress(fileHandle, (void*)uncompressedBase, sizeWithoutHeader, decompressionBuffer, actualHeader->decompressionBlockSize, tempAllocator);
+
 	MFREE(tempAllocator, decompressionBuffer);
 
 	// decode compression header, get directory, string table and fixup table

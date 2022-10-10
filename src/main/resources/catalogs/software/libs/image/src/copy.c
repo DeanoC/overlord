@@ -6,6 +6,7 @@
 #include "tiny_image_format/tiny_image_format_encode.h"
 #include "image/image.h"
 #include "image/copy.h"
+#include "dbg/print.h"
 
 
 void Image_CopyImageChain(Image_ImageHeader const *src, Image_ImageHeader *dst) {
@@ -131,6 +132,7 @@ Image_ImageHeader *Image_CloneStructure(Image_ImageHeader const *image) {
 Image_ImageHeader *Image_PreciseConvert(Image_ImageHeader const *image, TinyImageFormat const newFormat) {
 	Image_ImageHeader * dst = (Image_ImageHeader *) Image_Create(image->width, image->height, image->depth, image->slices, newFormat, image->memoryAllocator);
 	if (dst == nullptr) {
+		debug_print("Image_PreciseConvert failed to create\n");
 		return nullptr;
 	}
 	Image_CopyImage(image, dst);

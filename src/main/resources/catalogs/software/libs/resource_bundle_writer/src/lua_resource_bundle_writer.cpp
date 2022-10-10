@@ -10,30 +10,9 @@
 #include "multi_core/core_local.h"
 #include "lua.h"
 #include "lualib.h"
-
-#if IKUY_HAVE_LIB_IMAGE == 1
-#include "image/resource_writer.hpp"
+#include "luau_utils/utils.hpp"
 #include "dbg/print.h"
 #include "host_os/osvfile.h"
-
-#endif
-
-/*
-** set functions from list 'l' into table at top - 'nup'; each
-** function gets the 'nup' elements at the top as upvalues.
-** Returns with only the table at the stack.
-*/
-static void luaL_setfuncs (lua_State *L, const luaL_Reg *l, int nup) {
-	luaL_checkstack(L, nup, "too many upvalues");
-	for (; l->name != NULL; l++) {  /* fill the table with given functions */
-		int i;
-		for (i = 0; i < nup; i++)  /* copy upvalues to the top */
-			lua_pushvalue(L, -nup);
-		lua_pushcclosure(L, l->func, l->name, nup);  /* closure with those upvalues */
-		lua_setfield(L, -(nup + 2), l->name);
-	}
-	lua_pop(L, nup);  /* remove upvalues */
-}
 
 #define LUA_ASSERT(test, state, msg) if(!(test)) { luaL_error((state), (msg)); }
 static char const MetaName[] = "ikuy.ResourceBundleWriter";
@@ -64,33 +43,34 @@ static int create(lua_State *L) {
 	*ud = ALLOC_CLASS(luaAllocator, Binny::BundleWriter, bitWidth, luaAllocator);
 	if(*ud) {
 		auto rbw = (Binny::BundleWriter*) *ud;
-		tiny_stl::vector<uint32_t> dependecies(luaAllocator);
 #if IKUY_HAVE_LIB_IMAGE == 1
-		debug_print("Registering IMG_ writer\n");
-		rbw->registerChunk("IMG_"_bundle_id,
-	                       0,
-	                       dependecies,
-	                       ImageChunkWriter,
-	                       ImageChunkWriter);
+		{
+			extern void ImageChunkWriter( void *userData_, Binify::WriteHelper& helper );
+			tiny_stl::vector<uint32_t> dependecies(luaAllocator);
+			debug_print( "Registering IMG_ writer\n" );
+			rbw->registerChunk( "IMG_"_bundle_id,
+			                    0,
+			                    dependecies,
+			                    ImageChunkWriter,
+			                    ImageChunkWriter );
+		}
+#endif
+#if IKUY_HAVE_LIB_GFX2D == 1
+		{
+			extern void SpriteDataChunkWriter( void *userData_, Binify::WriteHelper& helper );
+			tiny_stl::vector<uint32_t> dependecies(luaAllocator);
+			dependecies.push_back("IMG_"_bundle_id);
+			debug_print( "Registering SPR_ writer\n" );
+			rbw->registerChunk( "SPR_"_bundle_id,
+			                    0,
+			                    dependecies,
+			                    SpriteDataChunkWriter,
+			                    SpriteDataChunkWriter );
+		}
 #endif
 	}
 	lua_pushboolean(L, *ud != nullptr);
 	return 2;
-}
-
-static int getTextMode(lua_State * L) {
-	auto rbw = *(Binny::BundleWriter **)luaL_checkudata(L, 1, MetaName);
-	LUA_ASSERT(rbw, L, "BundleWriter is NIL");
-	lua_pushboolean(L, rbw->getLogBinifyText() );
-	return 1;
-}
-
-static int setTextMode(lua_State * L) {
-	auto rbw = *(Binny::BundleWriter **)luaL_checkudata(L, 1, MetaName);
-	LUA_ASSERT(rbw, L, "BundleWriter is NIL");
-	bool textMode = luaL_checkboolean(L, 2);
-	rbw->setLogBinifyText(textMode);
-	return 0;
 }
 
 static int addItemToChunk(lua_State * L) {
@@ -114,6 +94,13 @@ static int buildToFile(lua_State * L) {
 	auto file = Os_VFileFromFile(fileName, Os_FM_WriteBinary, luaAllocator);
 	bool result = rbw->build(file);
 	VFile_Close(file);
+
+	auto logFileName = (tiny_stl::string(fileName, luaAllocator) + ".binify");
+	auto logfile = Os_VFileFromFile(logFileName.c_str(), Os_FM_Write, luaAllocator);
+	auto logString = rbw->outputText();
+	VFile_Write(logfile, logString.c_str(), logString.size());
+	VFile_Close(logfile);
+
 	lua_pushboolean(L, result );
 	return 1;
 }
@@ -121,8 +108,6 @@ static int buildToFile(lua_State * L) {
 int LuaBundleWriter_Open(lua_State* L, Memory_Allocator* allocator) {
 	static const struct luaL_Reg rbwObj [] = {
 #define ENTRY(name) { #name, &(name) }
-		ENTRY( getTextMode ),
-		ENTRY( setTextMode ),
 		ENTRY( addItemToChunk ),
 		ENTRY( buildToFile ),
 		{nullptr, nullptr}  /* sentinel */

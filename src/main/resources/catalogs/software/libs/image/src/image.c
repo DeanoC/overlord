@@ -238,8 +238,14 @@ Image_ImageHeader *Image_CreateNoClear(uint32_t width,
                                         uint32_t slices,
                                         TinyImageFormat format,
                                         Memory_Allocator* memoryAllocator) {
-	if(width == 0)return nullptr;
-	if (format == TinyImageFormat_UNDEFINED) return nullptr;
+	if(width == 0) {
+		debug_print("Image: Width must be > 0\n");
+		return nullptr;
+	}
+	if (format == TinyImageFormat_UNDEFINED) {
+		debug_print("Image: Format must not be UNDEFINED\n");
+		return nullptr;
+	}
 	if(height == 0) height = 1;
 	if(depth == 0) depth = 1;
 	if(slices == 0) slices = 1;
@@ -248,7 +254,10 @@ Image_ImageHeader *Image_CreateNoClear(uint32_t width,
 	Image_FillHeader(width, height, depth, slices, format, &tmp);
 
 	Image_ImageHeader *image = (Image_ImageHeader *) MALLOC(memoryAllocator, tmp.dataSizeInBytes);
-	if (!image) { return nullptr; }
+	if (!image) {
+		debug_printf("Image: memory alloc failed for w %i h %i d %i s %i format %s\n", width, height, depth, slices, TinyImageFormat_Name(format));
+		return nullptr;
+	}
 
 	memcpy(image, &tmp, sizeof(Image_ImageHeader));
 	image->memoryAllocator = memoryAllocator;

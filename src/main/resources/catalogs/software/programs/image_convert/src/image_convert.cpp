@@ -6,8 +6,8 @@
 #include "host_os/osvfile.h"
 #include "host_os/filesystem.h"
 #include "Luau/Compiler.h"
-#include "resource_bundle/resource_bundle.h"
 #include "data_utils/lz4.h"
+#include "data_utils/json.hpp"
 
 #define BACKWARD_HAS_DW 1
 #include "platform/host/backward.hpp"
@@ -19,6 +19,12 @@
 #include "image/resource_writer.hpp"
 extern int LuaImage_Open(lua_State* L, Memory_Allocator* allocator);
 extern int LuaBundleWriter_Open(lua_State* L, Memory_Allocator* allocator);
+extern int  LuaTexturePackerImport_Open(lua_State* L, Memory_Allocator* allocator);
+extern int  LuaGfx2d_Open(lua_State* L, Memory_Allocator* allocator);
+
+char srcPath[2048];
+char destPath[2048];
+char destName[2048];
 
 GLOBAL_HEAP_ALLOCATOR(globalAllocator)
 
@@ -26,10 +32,7 @@ std::optional<std::string> readFile(const std::string& name) {
 	size_t size = 0;
 
 	if(!Os_FileExists(name.c_str())) {
-		char currentDir[1024];
-		memset(currentDir, 0, 1024);
-		Os_GetCurrentDir(currentDir, 1024);
-		debug_printf("File not found at %s%s\n", currentDir, name.c_str());
+		debug_printf("File not found at %s\\%s\n", srcPath, name.c_str());
 		return {};
 	}
 	void* fileMem = Os_AllFromFile(name.c_str(), true, &size, globalAllocator);
@@ -145,6 +148,22 @@ static int lua_require(lua_State* L)
 	return finishrequire(L);
 }
 
+static int getSourcePath(lua_State* L)
+{
+	lua_pushstring(L, srcPath);
+	return 1;
+}
+static int getDestinationPath(lua_State* L)
+{
+	lua_pushstring(L, destPath);
+	return 1;
+}
+static int getDestinationName(lua_State* L)
+{
+	lua_pushstring(L, destName);
+	return 1;
+}
+
 void setupState(lua_State* L)
 {
 	luaL_openlibs(L);
@@ -152,6 +171,9 @@ void setupState(lua_State* L)
 	static const luaL_Reg funcs[] = {
 			{"loadstring", lua_loadstring},
 			{"require", lua_require},
+			{"getSourcePath", getSourcePath},
+			{"getDestinationPath", getDestinationPath},
+			{"getDestinationName", getDestinationName},
 			{nullptr, nullptr},
 	};
 
@@ -161,6 +183,8 @@ void setupState(lua_State* L)
 
 	LuaImage_Open(L, globalAllocator);
 	LuaBundleWriter_Open(L, globalAllocator);
+	LuaTexturePackerImport_Open(L, globalAllocator);
+	LuaGfx2d_Open(L, globalAllocator);
 	luaL_sandbox(L);
 }
 
@@ -221,7 +245,7 @@ std::string runCode(lua_State* L, std::string const& name, std::string const& so
 		error += "\nstack backtrace:\n";
 		error += lua_debugtrace(T);
 
-		fprintf(stdout, "%s", error.c_str());
+		debug_printf("%s", error.c_str());
 	}
 
 	lua_pop(L, 1);
@@ -229,7 +253,7 @@ std::string runCode(lua_State* L, std::string const& name, std::string const& so
 }
 
 void Usage(char const* programName) {
-	printf("%s: lua_script thats run to process images\n", programName);
+	printf("%s: lua_script [OPT:src path] [OPT:destination path] [OPT: dest name] lua_script is run to process images\n", programName);
 }
 static void *l_alloc (void *ud, void *ptr, size_t osize, size_t nsize) {
 	auto * allocator = (Memory_Allocator *)ud;
@@ -248,7 +272,7 @@ static void *l_alloc (void *ud, void *ptr, size_t osize, size_t nsize) {
 int main(int argc, char const *argv[]) {
 	backward::SignalHandling sh;
 
-	if(argc != 2) {
+	if(argc < 2 || argc > 5) {
 		Usage( argv[0] );
 		return 1;
 	} else {
@@ -256,10 +280,28 @@ int main(int argc, char const *argv[]) {
 		Memory_HeapAllocatorInit( globalAllocator );
 		LZ4_SetAllocator( globalAllocator );
 
-
 		std::unique_ptr<lua_State, void ( * )( lua_State * )> globalState( lua_newstate( l_alloc, globalAllocator ), lua_close );
 		lua_State *L = globalState.get();
 		setupState( L );
+
+		if(argc >= 3) {
+			strncpy(srcPath, argv[2], 2048);
+		} else {
+			Os_GetCurrentDir(srcPath, 2048);
+		}
+
+		if(argc >= 4) {
+			strncpy(destPath, argv[3], 2048);
+		} else {
+			Os_GetCurrentDir(destPath, 2048);
+		}
+		if(argc >= 5) {
+			strncpy(destName, argv[4], 2048);
+		} else {
+			strncpy(destName, "default", 2048);
+		}
+
+		Os_SetCurrentDir(srcPath);
 
 		auto const source = readFile( argv[1] );
 		if(!source) {
@@ -272,7 +314,6 @@ int main(int argc, char const *argv[]) {
 			return 3;
 		}
 	}
-
 	Memory_TrackerDestroyAndLogLeaks();
 	Memory_HeapAllocatorFinish(globalAllocator);
 	Memory_MallocFinish();

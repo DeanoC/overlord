@@ -161,12 +161,10 @@ object Report {
 		}
 
 	}
-
+/*
 	private def makeLegendGraph(graph: GraphType, maxDistance: Int): GraphType = {
 
-		val classCount                    = Utils
-			.KnownSubClassesOfSealedType[DefinitionType]()
-			.size
+		val classCount                    = Utils.KnownSubClassesOfSealedType[DefinitionType]().size
 		// title
 		var dinsts: Array[DefinitionType] = Array(BoardDefinitionType(Seq(s"Legend")))
 
@@ -205,7 +203,7 @@ object Report {
 		}
 		g
 	}
-
+*/
 	private def convertToGraph(game: Game) = {
 		var graph: GraphType = Graph[(String, DefinitionType, NodeStyleTypeTag), DiEdge]()
 		for (node <- game.distanceMatrix.instanceArray) {

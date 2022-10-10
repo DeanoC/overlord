@@ -61,7 +61,10 @@ void* Os_AllFromFile(char const *filename, bool text, size_t* outSize, Memory_Al
 	VFile_Handle fh = Os_VFileFromFile(filename, text ? Os_FM_Read : Os_FM_ReadBinary, allocator);
 	if(!fh) {
 		debug_printf("ERROR: File not found %s\n", filename);
+		if(outSize != nullptr) *outSize = 0;
+		return nullptr;
 	}
+
 	size_t const size = VFile_Size(fh);
 	void *ret = MALLOC(allocator, size);
 	if(ret != nullptr) {

@@ -1,5 +1,5 @@
 connect -url tcp:127.0.0.1:3121
-source /tools/Xilinx/Vitis/2021.2/scripts/vitis/util/zynqmp_utils.tcl
+#source /tools/Xilinx/Vitis/2021.2/scripts/vitis/util/zynqmp_utils.tcl
 targets
 
 #Change bootmode to jtag and reboot

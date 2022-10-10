@@ -39,9 +39,9 @@ public:
 	// default will make it the implicit label to use for size etc.
 	void reserveLabel(tiny_stl::string_view const &name_, bool makeDefault_ = false);
 
-	// writes the label itself at the current position (can reserve at the same time)
+	// assign the label itself at the current position (can reserve at the same time)
 	// this causes the label to be set to the current position
-	void writeLabel(tiny_stl::string_view const &name_,
+	void assignLabel(tiny_stl::string_view const &name_,
 									bool reserve_ = false,
 									tiny_stl::string_view const & comment_ = "",
 									bool noCommentEndStatement_ = true);
@@ -53,6 +53,18 @@ public:
 								bool addFixup_ = true,
 								tiny_stl::string_view const & comment_ = "",
 								bool noCommentEndStatement_ = true);
+
+	// these use the address itself as the label name, to make pointer easier to include and fixup
+	void useAddressAsLabel(void const * address,
+	              tiny_stl::string_view const & baseBlock_ = "",
+	              bool reserve_ = false,
+	              bool addFixup_ = true,
+	              tiny_stl::string_view const & comment_ = "",
+	              bool noCommentEndStatement_ = true);
+	void assignAddressAsLabel(void const * address,
+												 bool reserve_ = false,
+	                       tiny_stl::string_view const & comment_ = "",
+	                       bool noCommentEndStatement_ = true);
 
 	// constants
 	// consts are a separate variable namespace that are not mutable
@@ -354,7 +366,6 @@ public:
 	WARN_UNUSED_RESULT size_t getFixupCount() const { return fixups.size(); }
 	WARN_UNUSED_RESULT tiny_stl::string const & getFixup(size_t index) const { return fixups[index]; }
 
-
 private:
 	void clearStringTable();
 	void mergeStringTable(WriteHelper &other);
@@ -372,6 +383,7 @@ private:
 	tiny_stl::unordered_set<tiny_stl::string> labels;
 	tiny_stl::unordered_set<tiny_stl::string> variables;
 	tiny_stl::unordered_set<tiny_stl::string> constants;
+
 	typedef tiny_stl::unordered_map<tiny_stl::string, uint64_t> enumValue_t;
 	tiny_stl::vector<enumValue_t> enumValueVector;
 	tiny_stl::unordered_map<tiny_stl::string, size_t> enums;

@@ -7,7 +7,7 @@ namespace Binify {
 WriteHelper::WriteHelper(Memory_Allocator* allocator_) :
 	allocator(allocator_),
 	outputString(allocator),
-	stringTableBase("stringTable", allocator),
+	stringTableBase("STRINGTABLE", allocator),
 	labelToStringTable(allocator),
 	reverseStringTable(allocator),
 	fixups(allocator),
@@ -20,8 +20,8 @@ WriteHelper::WriteHelper(Memory_Allocator* allocator_) :
 	defaultBlock(allocator)
 {
 	// system labels
-	reserveLabel("stringTable");
-	reserveLabel("stringTableEnd");
+	reserveLabel("STRINGTABLE");
+	reserveLabel("STRINGTABLEEND");
 
 	buffer.reserve(1024*1024); // reserve 1 MB output buffer
 }
@@ -54,7 +54,7 @@ void WriteHelper::setVariableToExpression(tiny_stl::string_view const & name_,
 
 	// pass 0 variables output the last set in pass 0, so work for counters
 	if (pass0_) {
-		fmt::format_to(std::back_inserter(buffer), "*VAR_{}* {}", name.c_str(), exp.c_str());
+		fmt::format_to(std::back_inserter(buffer), "<VAR_{}> = {}", name.c_str(), exp.c_str());
 	} else {
 		fmt::format_to(std::back_inserter(buffer), "VAR_{} = {}", name.c_str(), exp.c_str());
 	}
@@ -86,7 +86,7 @@ void WriteHelper::setConstantToExpression(tiny_stl::string_view const & name_,
 	tiny_stl::string const exp(exp_, _);
 	assert(constants.find(name) == constants.end());
 	constants.insert(name);
-	fmt::format_to(std::back_inserter(buffer), "*CONST_{}* {}", name.c_str(), exp.c_str());
+	fmt::format_to(std::back_inserter(buffer), "<CONST_{}> = {}", name.c_str(), exp.c_str());
 	comment(comment_, noCommentEndStatement_);
 }
 tiny_stl::string WriteHelper::getVariable(tiny_stl::string_view const & name_) const
@@ -279,7 +279,7 @@ void WriteHelper::reserveLabel(tiny_stl::string_view const &name_, bool makeDefa
 	}
 }
 
-void WriteHelper::writeLabel(tiny_stl::string_view const &name_,
+void WriteHelper::assignLabel(tiny_stl::string_view const &name_,
                              bool reserve_,
                              tiny_stl::string_view const & comment_,
                              bool noCommentEndStatement_)
@@ -288,7 +288,11 @@ void WriteHelper::writeLabel(tiny_stl::string_view const &name_,
 
 	tiny_stl::string name(nameToLabel(name_), allocator);
 
-	assert(labels.find(name) != labels.end());
+	if(labels.find(name) == labels.end()) {
+		debug_printf("assignLabel: %s label is not reserved\n", name.c_str());
+		assert(labels.find(name) != labels.end());
+	}
+
 	align();
 	fmt::format_to(std::back_inserter(buffer), "{}:", name.c_str());
 	comment(comment_, noCommentEndStatement_);
@@ -306,27 +310,52 @@ void WriteHelper::useLabel(tiny_stl::string_view const & name_,
 
 	tiny_stl::string name(nameToLabel(name_), _);
 
-	assert(labels.find(name) != labels.end());
+	if(labels.find(name) == labels.end()) {
+		debug_printf("WriteHelper: Label %s not found", name.c_str());
+		assert( labels.find( name ) != labels.end());
+	}
+
 
 	if (addFixup_)
 	{
 		tiny_stl::string fixupLabel(allocator);
 		fmt::format_to(std::back_inserter(fixupLabel), "FIXUP_{}", fixups.size());
 		fixups.emplace_back(fixupLabel);
-		writeLabel(fixupLabel, true);
+		assignLabel(fixupLabel, true);
 	}
 
 	tiny_stl::string baseBlock(baseBlock_, _);
+	baseBlock = nameToLabel(baseBlock_);
 	if (baseBlock_.empty()) baseBlock = defaultBlock;
 	assert(name != baseBlock);
-	assert(labels.find(baseBlock) != labels.end());
-
+	if(labels.find(baseBlock) == labels.end()) {
+		debug_printf("WriteHelper: Base Block '%s' not found", baseBlock.c_str());
+		assert( labels.find( baseBlock ) != labels.end());
+	}
 	if (addFixup_) {
 		fmt::format_to(std::back_inserter(buffer), ".fixup ({} - {})", name.c_str(), baseBlock.c_str());
 	} else {
 		fmt::format_to(std::back_inserter(buffer), "({} - {})", name.c_str(), baseBlock.c_str());
 	}
 	comment(comment_, noCommentEndStatement_);
+}
+
+void WriteHelper::useAddressAsLabel(void const * address,
+                                    tiny_stl::string_view const & baseBlock_,
+                                    bool reserve_,
+                                    bool addFixup_,
+                                    tiny_stl::string_view const & comment_,
+                                    bool noCommentEndStatement_) {
+	tiny_stl::string addressLabel(allocator);
+	fmt::format_to(std::back_inserter(addressLabel), "ADDRESS_{}",address);
+	useLabel(addressLabel, baseBlock_, reserve_, addFixup_, comment_, noCommentEndStatement_);
+}
+
+void WriteHelper::assignAddressAsLabel(void const * address, bool reserve_, tiny_stl::string_view const & comment_, bool noCommentEndStatement_)
+{
+	tiny_stl::string addressLabel(allocator);
+	fmt::format_to(std::back_inserter(addressLabel), "ADDRESS_{}",address);
+	assignLabel(addressLabel, reserve_, comment_, noCommentEndStatement_);
 }
 
 void WriteHelper::setStringTableBase(tiny_stl::string_view const & label_)
@@ -366,9 +395,14 @@ tiny_stl::string WriteHelper::addStringToTable(tiny_stl::string_view const & str
 tiny_stl::string WriteHelper::nameToLabel(tiny_stl::string_view const & name_)
 {
 	tiny_stl::string clean { name_, allocator };
+	if(std::isdigit(clean[0])) {
+		clean[0] = clean[0] + 'A';
+	}
+
 	for(auto& ch : clean)
 	{
 		if(!isdigit(ch) && !isalpha(ch)) ch = '_';
+		ch = toupper(ch);
 	}
 
 	return clean;
@@ -393,15 +427,15 @@ void WriteHelper::mergeStringTable(WriteHelper& other_)
 void WriteHelper::finishStringTable()
 {
 	align();
-	writeLabel("stringTable");
+	assignLabel("stringTable");
 
 	for(auto const& en : labelToStringTable)
 	{
-		writeLabel(en.first);
+		assignLabel(en.first);
 		fmt::format_to(std::back_inserter(buffer), "\"{}\", 0\n", en.second.c_str());
 	}
 	align(8);
-	writeLabel("stringTableEnd");
+	assignLabel("stringTableEnd");
 }
 
 void WriteHelper::sizeOfBlock(tiny_stl::string_view const & name_, tiny_stl::string_view const & comment_, bool noCommentEndStatement_)

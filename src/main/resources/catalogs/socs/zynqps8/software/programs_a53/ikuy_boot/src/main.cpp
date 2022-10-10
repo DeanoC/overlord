@@ -85,6 +85,9 @@ EXTERN_C NO_RETURN void main()
 	debug_force_raw_print(false);
 	EnablePSToPL();
 
+	// ensure other a53 cores are asleep
+	OsService_SleepCpus(OSSC_A53_1 | OSSC_A53_2 | OSSC_A53_3);
+
 	// this is a silicon bug fix
 	HW_REG_WRITE1(PSSYSMON, ANALOG_BUS, 0X00003210U);
 
@@ -102,10 +105,10 @@ EXTERN_C NO_RETURN void main()
 
 	// tell PMU we have finished pass video block address and mmu for next program
 	BootData bootData = {
+		.mmu = (uintptr_all_t)mmu,
 		.bootCodeStart = OCM_0_BASE_ADDR,
 		.bootCodeSize = OCM_0_SIZE_IN_BYTES,
 		.videoBlock = videoBlock,
-		.mmu = (uintptr_all_t)mmu,
 	};
 	OsService_BootComplete(&bootData);
 

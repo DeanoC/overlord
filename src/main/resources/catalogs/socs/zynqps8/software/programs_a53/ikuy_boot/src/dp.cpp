@@ -25,18 +25,23 @@ void BringUpDisplayPort() {
 	debug_printf( ANSI_YELLOW_PEN "BringUpDisplayPort\n" ANSI_RESET_ATTRIBUTES );
 	using namespace DisplayPort::Display;
 
+	// 4K DMA descriptor space + 640 * 480 * 2B (RGB565)
+	static constexpr int Blocks = 10; // 10 * 64KB
+	static constexpr int TotalMem = Blocks * 64 * 1024;
+
 	Init( &display );
 	Init( &mixer );
 	Init( &link );
 	CopyStandardVideoMode( DisplayPort::Display::StandardVideoMode::VM_640_480_60, &display.videoTiming );
-	if(videoBlock == 0) videoBlock = OsService_DdrLoBlockAlloc( 16, OS_SERVICE_TAG('V', 'I', 'D', 'B') ); // 1MB
-	Cache_DCacheZeroRange( videoBlock, 1 * 1024 * 1024 );
+	if(videoBlock == 0) videoBlock = OsService_DdrLoBlockAlloc( Blocks, OS_SERVICE_TAG('V', 'I', 'D', 'B') );
+
+	Cache_DCacheZeroRange( videoBlock, TotalMem );
 
 	auto dmaDesc = (DMADescriptor *) (uintptr_t) videoBlock;
 	FrameBuffer = (uintptr_lo_t) (uintptr_t) (videoBlock + 4096);
 
 	Init( dmaDesc );
-	dmaDesc->enableDescriptorUpdate = true;
+	dmaDesc->enableDescriptorUpdate = false;
 	dmaDesc->transferSize = 640 * 480 * 2;
 	dmaDesc->width = 640 * 2;
 	dmaDesc->stride = (640 * 2) >> 4;
@@ -50,16 +55,17 @@ void BringUpDisplayPort() {
 
 	mixer.videoPlane.source = DisplayPort::Display::DisplayVideoPlane::Source::DISABLED;
 	mixer.videoPlane.format = DisplayPort::Display::DisplayVideoPlane::Format::RGB8;
-	mixer.videoPlane.simpleDescPlane0Address = (uintptr_t) dmaDesc;
 
 	mixer.gfxPlane.source = DisplayPort::Display::DisplayGfxPlane::Source::BUFFER;
 	mixer.gfxPlane.format = DisplayPort::Display::DisplayGfxPlane::Format::RGB565;
 	mixer.gfxPlane.simpleDescBufferAddress = (uintptr_t) dmaDesc;
-	Cache_DCacheCleanAndInvalidateRange( videoBlock, 1 * 1024 * 1024 );
+	Cache_DCacheCleanAndInvalidateRange( videoBlock, TotalMem );
 
 	if(videoBlock == 0) {
-		if(!IsDisplayConnected( &link ))
+		if(!IsDisplayConnected( &link )) {
+			debug_print("DP: No Display is connected\n");
 			return;
+		}
 	}
 
 	SetDisplay( &link, &display, &mixer );
@@ -81,5 +87,6 @@ void BringUpDisplayPort() {
 		}
 		fb += 640;
 	}
+	Cache_DCacheCleanAndInvalidateRange( videoBlock, TotalMem );
 
 }

@@ -38,7 +38,7 @@ file(GLOB CPPHEADERLIST CONFIGURE_DEPENDS
 		include/${CPU_ARCH}/*.hpp
 		include/${CPU}/*.hpp
 		)
-add_library(${project} ${CLIST} ${CPPLIST} ${ASMLIST} ${CHEADERLIST} ${CPPHEADERLIST})
+
 set(PRIVATE_LIBRARIES
 		core
 		dbg
@@ -48,7 +48,21 @@ if(NOT ${CPU} STREQUAL "host")
 	list(APPEND PRIVATE_LIBRARIES musl_math)
 endif()
 
-target_link_libraries(${project} PRIVATE ${PRIVATE_LIBRARIES})
+set( SRCS ${CLIST} ${CPPLIST} ${ASMLIST})
+if(DEFINED SRCS)
+  list(LENGTH SRCS SRCS_LENGTH)
+endif()
+
+if(SRCS_LENGTH)
+	add_library(${project} ${SRCS})
+	target_include_directories(${project} PUBLIC include)
+	target_link_libraries(${project} PUBLIC ${PRIVATE_LIBRARIES})
+else()
+	add_library(${project} INTERFACE)
+	target_include_directories(${project} INTERFACE include)
+	target_link_libraries(${project} INTERFACE ${PRIVATE_LIBRARIES})
+endif()
+
 
 target_include_directories(${project} PUBLIC include)
 target_include_directories(${project} PRIVATE include/luau_vm src)

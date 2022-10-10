@@ -50,10 +50,7 @@ set(PRIVATE_LIBRARIES
 		host_os
 		)
 if(${IKUY_HAVE_LIB_LUAU})
-	list(APPEND PRIVATE_LIBRARIES
-			luau_compiler
-			luau_ast
-			luau_hvm)
+	list(APPEND PRIVATE_LIBRARIES luau_hvm luau_utils)
 	if(${IKUY_HAVE_LIB_IMAGE})
 		list(APPEND PRIVATE_LIBRARIES image)
 	endif()

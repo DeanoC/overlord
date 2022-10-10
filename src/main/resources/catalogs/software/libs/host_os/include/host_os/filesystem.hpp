@@ -64,7 +64,7 @@ namespace Os {
 
 				inline std::string GetCurrentDir() {
 					char tmp[2048];
-					if (Os_GetCurrentDir(tmp, sizeof(2048))) {
+					if (Os_GetCurrentDir(tmp, sizeof(tmp))) {
 						return std::string(tmp);
 					} else {
 						return std::string();
