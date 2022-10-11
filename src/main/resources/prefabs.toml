@@ -1,5 +1,0 @@
-resources = [
-    "boards.toml",
-    "hosts.toml",
-    "socs.toml",
-]

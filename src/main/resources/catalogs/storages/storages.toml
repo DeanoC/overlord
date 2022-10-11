@@ -1,4 +1,0 @@
-resources = [
-    "qspi/qspi.toml",
-    "sdio/sdio.toml",
-]
