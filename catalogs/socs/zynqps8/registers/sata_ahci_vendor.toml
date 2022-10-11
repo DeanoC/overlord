@@ -1,0 +1,775 @@
+description = "SATA AHCI Vendor"
+[[bank]]
+  name = "SATA_AHCI_VENDOR"
+  address = "0xfd0c00a0"
+[[register]]
+  name = "PCTRL"
+  type = "mixed"
+  width = 32
+  description = "SerDes control AHB control port."
+  default = "0x00000000"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "BSY"
+    bits = "31"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:25"
+    type = "ro"
+  [[register.field]]
+    name = "SRI"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''SRI: Read/Write indicator to SERDES bus controller.'''
+    longdesc = '''0: Read. 1: Write.'''
+  [[register.field]]
+    name = "SRWD"
+    bits = "23:16"
+    type = "rw"
+    shortdesc = '''SRWD: SERDES Read/Write Data.'''
+    longdesc = '''Note: If this control port is not connected to the SERDES then these bits will always read as 8'h0.'''
+  [[register.field]]
+    name = "SAV"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "PCFG"
+  type = "mixed"
+  width = 32
+  description = "Dual lane port select, timer scalars, interrupt separation."
+  default = "0x00322002"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:23"
+    type = "ro"
+  [[register.field]]
+    name = "TPSS"
+    bits = "22:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15"
+    type = "ro"
+  [[register.field]]
+    name = "TPRS"
+    bits = "14:12"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:9"
+    type = "ro"
+  [[register.field]]
+    name = "CISE"
+    bits = "8"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:6"
+    type = "ro"
+  [[register.field]]
+    name = "PAD"
+    bits = "5:0"
+    type = "rw"
+[[register]]
+  name = "PPCFG"
+  type = "mixed"
+  width = 32
+  description = "Phy Control Layer 1 config for port 0 or 1."
+  default = "0xA001FFFE"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "ESDF"
+    bits = "31"
+    type = "rw"
+  [[register.field]]
+    name = "ERSN"
+    bits = "30"
+    type = "rw"
+    shortdesc = '''Enable reset speed negotiation (ERSN): If enabled then the Phy control layer will enable only a single speed on the Rx path during speed negotiation.'''
+    longdesc = '''This speed is determined as the fastest support for the first round falling to the lowest speed for the final round. Each round of speed negotiation is terminated by the host issuing a COMRESET and rerunning OOB before beginning the next round of speed negotiation as detailed in RSN Reset Speed Negotiation'''
+  [[register.field]]
+    name = "PSS"
+    bits = "29"
+    type = "rw"
+    shortdesc = '''PSS: PhyControl select SERDES Slumber CMU during Link Slumber.'''
+    longdesc = '''When the controller enters slumber if this bit is set an extra control signal is applied to the Serdes to slumber the Clock block within the Serdes. This will yield extra power savings but is Serdes specific.'''
+  [[register.field]]
+    name = "PSSO"
+    bits = "28"
+    type = "rw"
+    shortdesc = '''PSSO: PhyControl select SERDES OOB or internally decoded OOB signaling as inputs.'''
+    longdesc = '''0: INT_OOB. 1: SER_OOB.'''
+  [[register.field]]
+    name = "STB"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''STB: Status Bit.'''
+    longdesc = '''Reading this bit will show that status of the Gen Fixed clocks parameter. This bit indicates if the Phy Control layer is running from a fixed frequency clock or a variable clock derived from the tx clock of the SERDES.'''
+  [[register.field]]
+    name = "PBPNA"
+    bits = "26"
+    type = "rw"
+    shortdesc = '''PBPNA: PhyControl BIST Pattern no Aligns.'''
+    longdesc = '''Setting this bit will cause the Phy Ctrl Pattern generator to transmit each pattern continuously.'''
+  [[register.field]]
+    name = "PBCE"
+    bits = "25"
+    type = "rw"
+    shortdesc = '''PBCE: PhyControl BIST Clear Error.'''
+    longdesc = '''Setting this bit to 1 clears the pattern match error bit. When a pattern mismatch occurs this bit needs to be set then negated to clear the error.'''
+  [[register.field]]
+    name = "PBPE"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''PBPE: PhyControl BIST Pattern Enable.'''
+    longdesc = '''Setting this bit to 1 enables the Phy Control Test Pattern generation.'''
+  [[register.field]]
+    name = "PBPS"
+    bits = "23:21"
+    type = "rw"
+    shortdesc = '''PBPS: PhyControl BIST Pattern Select 0: LBP.'''
+    longdesc = '''1: LFTP. 2: MFTP. 3: HFTP. 4: PRBS. 5: BIST.'''
+  [[register.field]]
+    name = "FPR"
+    bits = "20"
+    type = "rw"
+    shortdesc = '''FPR: Force PHY Ready signal level.'''
+    longdesc = '''0: Normal. 1: frcPhyRdy.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "SNR"
+    bits = "18"
+    type = "rw"
+  [[register.field]]
+    name = "SNM"
+    bits = "17"
+    type = "rw"
+  [[register.field]]
+    name = "TTA"
+    bits = "16:0"
+    type = "rw"
+    shortdesc = '''TTA: This value determines the time period the Controller transmits and waits for ALIGNp during speed negotiation.'''
+    longdesc = '''This value is derived for the PM_CLK period.'''
+[[register]]
+  name = "PP2C"
+  type = "rw"
+  width = 32
+  description = "PP2C - Port Phy2Cfg Register. This register controls the configuration of the Phy Control OOB timing for the COMINIT parameters for either Port 0 or Port 1. The Port configured is controlled by the value programmed into the Port Config Register."
+  default = "0x28184D1B"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "CINMP"
+    bits = "31:24"
+    type = "rw"
+  [[register.field]]
+    name = "CIBGN"
+    bits = "23:16"
+    type = "rw"
+  [[register.field]]
+    name = "CIBGMX"
+    bits = "15:8"
+    type = "rw"
+  [[register.field]]
+    name = "CIBGMN"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "PP3C"
+  type = "rw"
+  width = 32
+  description = "PP3C - Port Phy3CfgRegister. This register controls the configuration of the Phy Control OOB timing for the COMWAKE parameters for either Port 0 or Port 1. The Port configured is controlled by the value programmed into the Port Config Register."
+  default = "0x0E081906"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "CWNMP"
+    bits = "31:24"
+    type = "rw"
+  [[register.field]]
+    name = "CWBGN"
+    bits = "23:16"
+    type = "rw"
+  [[register.field]]
+    name = "CWBGMX"
+    bits = "15:8"
+    type = "rw"
+  [[register.field]]
+    name = "CWBGMN"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "PP4C"
+  type = "rw"
+  width = 32
+  description = "PP4C - Port Phy4Cfg Register. This register controls the configuration of the Phy Control Burst timing for the COM parameters for either Port 0 or Port 1. The Port configured is controlled by the value programmed into the Port Config Register."
+  default = "0x064A0813"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "PTST"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''PTST: Partial to Slumber timer value, specific delay the controller should apply while in partial before entering slumber.'''
+    longdesc = '''The value is bases on the system clock divided by 128, total delay = (Sys Clock Period) * PTST * 128'''
+  [[register.field]]
+    name = "SFD"
+    bits = "23:16"
+    type = "rw"
+    shortdesc = '''SFD: Signal Failure Detection, if the signal detection de-asserts for a time greater than this then the OOB detector will determine this is a line idle and cause the PhyInit state machine to exit the Phy Ready State.'''
+    longdesc = '''A value of zero disables the Signal Failure Detector. The value is based on the OOB Detector Clock typically (PMCLK Clock Period) * SFD giving a nominal time of 500ns based on a 150MHz PMCLK.'''
+  [[register.field]]
+    name = "BNM"
+    bits = "15:8"
+    type = "rw"
+  [[register.field]]
+    name = "BMX"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "PP5C"
+  type = "rw"
+  width = 32
+  description = "PP5C - Port Phy5Cfg Register. This register controls the configuration of the Phy Control Retry Interval timing for either Port 0 or Port 1. The Port configured is controlled by the value programmed into the Port Config Register."
+  default = "0x3FFC96A4"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "RCT"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''RCT: Rate Change Timer, a value based on the 54.'''
+    longdesc = '''2us for which a SATA device will transmit at a fixed rate ALIGNp after OOB has completed, for a fast SERDES it is suggested that this value be 54.2us / 4'''
+  [[register.field]]
+    name = "RIT"
+    bits = "19:0"
+    type = "rw"
+    shortdesc = '''RIT: Retry Interval Timer.'''
+    longdesc = '''The calculated value divided by two, the lower digit of precision is not needed.'''
+[[register]]
+  name = "AXICC"
+  type = "mixed"
+  width = 32
+  description = "AXICC - AXI CACHE Control Register. This register controls the value of the AWCACHE and ARCACHE used to distinguish each address operation on the address bus."
+  default = "0x00100010"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:30"
+    type = "ro"
+  [[register.field]]
+    name = "EARC"
+    bits = "29"
+    type = "rw"
+  [[register.field]]
+    name = "AWCF"
+    bits = "27:24"
+    type = "rw"
+  [[register.field]]
+    name = "AWCD"
+    bits = "23:20"
+    type = "rw"
+  [[register.field]]
+    name = "AWCFD"
+    bits = "19:16"
+    type = "rw"
+  [[register.field]]
+    name = "ARCP"
+    bits = "15:12"
+    type = "rw"
+  [[register.field]]
+    name = "ARCH"
+    bits = "11:8"
+    type = "rw"
+  [[register.field]]
+    name = "ARCF"
+    bits = "7:4"
+    type = "rw"
+  [[register.field]]
+    name = "ARCA"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "PAXIC"
+  type = "mixed"
+  width = 32
+  description = "PAXIC - Port AXICfg Register. This register controls the configuration of the AXI Bus operation for either Port 0 or Port 1. The Port configured is controlled by the value programmed into the Port Config Register."
+  default = "0x00410102"
+  offset = "0x00000020"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:29"
+    type = "ro"
+  [[register.field]]
+    name = "ENZP"
+    bits = "28"
+    type = "rw"
+  [[register.field]]
+    name = "AXIPT"
+    bits = "27"
+    type = "rw"
+    shortdesc = '''AXI Parity Type (AXIPT): 0: Even parity.'''
+    longdesc = '''1: Odd parity.'''
+  [[register.field]]
+    name = "AXIPE"
+    bits = "26"
+    type = "rw"
+    shortdesc = '''AXI Parity Enable (AXIPE): Parity Checking is enabled in the Link layer.'''
+    longdesc = '''The Parity is generated and checked on each byte within the 128 bit data busses on the Master interface'''
+  [[register.field]]
+    name = "AAO"
+    bits = "25"
+    type = "rw"
+  [[register.field]]
+    name = "ECM"
+    bits = "24"
+    type = "rw"
+  [[register.field]]
+    name = "OTL"
+    bits = "23:20"
+    type = "rw"
+  [[register.field]]
+    name = "MARIDD"
+    bits = "19:16"
+    type = "rw"
+  [[register.field]]
+    name = "MARID"
+    bits = "15:12"
+    type = "rw"
+  [[register.field]]
+    name = "MAWIDD"
+    bits = "11:8"
+    type = "rw"
+  [[register.field]]
+    name = "MAWID"
+    bits = "7:4"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "3:2"
+    type = "ro"
+  [[register.field]]
+    name = "ADBW"
+    bits = "1:0"
+    type = "rw"
+    shortdesc = '''AXI Data Bus Width (ADBW) 0: BW32.'''
+    longdesc = '''1: BW64 (set to this value). 2: BW128.'''
+[[register]]
+  name = "AXIPC"
+  type = "mixed"
+  width = 32
+  description = "AXIPC - AXI PROT Control Register. This register controls the value of the AWPROT and ARPROT used to distinguish each address operation on the address bus."
+  default = "0x00000000"
+  offset = "0x00000024"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:30"
+    type = "ro"
+  [[register.field]]
+    name = "EARP"
+    bits = "29"
+    type = "rw"
+  [[register.field]]
+    name = "EAWP"
+    bits = "28"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "27"
+    type = "ro"
+  [[register.field]]
+    name = "AWPF"
+    bits = "26:24"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23"
+    type = "ro"
+  [[register.field]]
+    name = "AWPD"
+    bits = "22:20"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "AWPFD"
+    bits = "18:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15"
+    type = "ro"
+  [[register.field]]
+    name = "ARPP"
+    bits = "14:12"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "ARPH"
+    bits = "10:8"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "ARPF"
+    bits = "6:4"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "ARPD"
+    bits = "2:0"
+    type = "rw"
+[[register]]
+  name = "PTC"
+  type = "mixed"
+  width = 32
+  description = "PTC - Port TransCfg register. This register controls the configuration of the Transport Layer for either Port 0 or Port 1. The Port configured is controlled by the value programmed into the Port Config Register."
+  default = "0x08000020"
+  offset = "0x00000028"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "27"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "26:10"
+    type = "ro"
+  [[register.field]]
+    name = "ITM"
+    bits = "9"
+    type = "rw"
+  [[register.field]]
+    name = "ENBD"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''Enable Back down (ENBD): When a port multiplier is attached if an attempt to send a command to an attached drive results in 3 consecutive retries due to an R_ERR receptions then the command removed for the transport layer and returned to the pending queue.'''
+    longdesc = '''This is to avoid unnecessary retries owing to the device trying to send a Set device bits FIS while the host is trying to send a command. This feature should improve performance as it allows the controller queue any pending commands to the other drives.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "RXWM"
+    bits = "6:0"
+    type = "rw"
+    shortdesc = '''RxWaterMark (RXWM): This sets the minimum number of free location within the RX FIFO before the watermark is exceeded which in turn will cause the Transport Layer to instruct the Link Layer to transmit HOLDS to the transmitting end.'''
+    longdesc = '''Note that it can take some time for the HOLDs to get to the other end and that in the interim there must be enough room in the FIFO to absorb all data that could arrive. An initial value of 7'h20 is recommended.'''
+[[register]]
+  name = "PTS"
+  type = "ro"
+  width = 32
+  description = "PTS - Port TransStatus register. This register can be read to determine the status of the Transport Layer for either Port 0 or Port 1. The Port monitored is controlled by the value programmed into the Port Config Register. Note: All Status Registers have no predefined Reset value. The value shown in reset is a typical value that will be read after reset but will be dependent on the SERDES status, the actual value read can differ from this."
+  default = "0x0000012D"
+  offset = "0x0000002C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:9"
+    type = "ro"
+  [[register.field]]
+    name = "TXSM"
+    bits = "8:4"
+    type = "ro"
+  [[register.field]]
+    name = "RXSM"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "PLC"
+  type = "rw"
+  width = 32
+  description = "PLC - Port LinkCfg register. This register controls the configuration of the Link Layer for either Port 0 or Port 1. The Port configured is controlled by the value programmed into the Port Config Register."
+  default = "0x3800FF34"
+  offset = "0x00000030"
+  [[register.field]]
+    name = "PMPRA"
+    bits = "31:27"
+    type = "rw"
+  [[register.field]]
+    name = "POE"
+    bits = "26"
+    type = "rw"
+    shortdesc = '''Primitive Override Enable (POE): When set, this bit enables the replacement of a single primitive, as specified by Override Primitive/CD, when the Link Layer state machine is in the Prim Override State.'''
+    longdesc = '''This bit has to be toggled from a '0' to a '1' to enable this feature.'''
+  [[register.field]]
+    name = "PRT"
+    bits = "25:16"
+    type = "rw"
+    shortdesc = '''Phy Ready Timer (PRT): These 10 bits specify the timeout value of the PhyReady Timer.'''
+    longdesc = '''If EnPhyReadyTimeOut is set, the Link Layer will count down on every rising edge of txWordClk, as long as PhyReady is de-asserted. When the counter reaches zero, a PhyReset will be issued to the Phy to try and re-establish communications with the far-end. The timer is initially loaded with a value equal to the concatenation of { Phy Ready Timer, 9'h000}.'''
+  [[register.field]]
+    name = "AIR"
+    bits = "15:8"
+    type = "rw"
+    shortdesc = '''Align Insertion Rate (AIR): The Serial ATA specification requires that the Link Layer sends a pair of ALIGN primitives at least every 254 DWords of data.'''
+    longdesc = '''This is achieved by setting Align Insertion Rate to '11111111'. However, for test purposes it is possible to send ALIGNs at a higher rate. This can be achieved by setting Align Insertion Rate to a lower value i.e. (Align Insertion Rate-1) DWords will be sent by the Link Layer between each set of ALIGN primitive pairs. Note: If Send 4 Aligns is set, one should not set the Align Insertion Rate to be four or less. If Send 4 Aligns is not set, one should not set the Align Insertion Rate to be two or less.'''
+  [[register.field]]
+    name = "EPNRT"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "S4A"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "RXSE"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "TXSE"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "TXPJ"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''Tx Prim Junk (TXPJ): If this bit is de-asserted, then scrambled junk data is sent after a CONT primitive, as per the Serial ATA specification.'''
+    longdesc = '''If this bit is asserted, then the single character 32'hDEADBEEF is sent continuously instead. This is to aid debug.'''
+  [[register.field]]
+    name = "TXC"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Tx Cont (TXC): If this bit is asserted, then the transmission of CONT primitives is enabled.'''
+    longdesc = '''If de-asserted, then long sequences of repeated primitives can be sent by the Link Layer.'''
+  [[register.field]]
+    name = "RXBC"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Rx Bad CRC (RXBC): When a rising edge is detected on this bit, it causes a bad CRC to be detected for the current frame.'''
+    longdesc = '''This bit has to be toggled from a '0' to a '1' to enable this feature.'''
+  [[register.field]]
+    name = "TXBC"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Tx Bad CRC (TXBC): A bad CRC (inverted value of the correct CRC) value will be transmitted for one FIS only by the Link Layer when a rising edge is detected on this signal.'''
+    longdesc = '''This bit has to be toggled from a '0' to a '1' to enable this feature.'''
+[[register]]
+  name = "PLC1"
+  type = "mixed"
+  width = 32
+  description = "PLC1 - Port LinkCfg1 register. This register controls the configuration of the Link Layer for either Port 0 or Port 1. The Port configured is controlled by the value programmed into the Port Config Register."
+  default = "0x00000000"
+  offset = "0x00000034"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:7"
+    type = "ro"
+  [[register.field]]
+    name = "CD"
+    bits = "6"
+    type = "rw"
+    shortdesc = '''Data Character or Primitive (CD): This bit specifies whether the data used during the primitive override should be a data character or a primitive.'''
+    longdesc = '''E.g. if CD = 1, Prim Override State = L_SendEOF and Override Primitive = WTRM, then a WTRM primitive will be inserted into the data stream instead of an EOF (whenever a rising edge is seen on Primitive Override Enable). If CD = 0, then a normal data character (as specified by Override Primitive) is inserted into the data stream instead of the EOF.'''
+  [[register.field]]
+    name = "POS"
+    bits = "5:0"
+    type = "rw"
+    shortdesc = '''Primitive Override State (POS): These 6 bits are used in the Primitive Override Debug functionality.'''
+    longdesc = '''When the Link Layer detects a positive edge on Primitive Override Enable, it overrides the next primitive that would be inserted during the Prim Override State, with the data specified by the Override Primitive and CD configuration bits.'''
+[[register]]
+  name = "PLC2"
+  type = "rw"
+  width = 32
+  description = "PLC2 - Port LinkCfg2 register. This register controls the configuration of the Link Layer for either Port 0 or Port 1. The Port configured is controlled by the value programmed into the Port Config Register."
+  default = "0x00000000"
+  offset = "0x00000038"
+  [[register.field]]
+    name = "OP"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "PLS"
+  type = "ro"
+  width = 32
+  description = "PLS - Port LinkStatus register. This register indicates the status of the Link Layer for either Port 0 or Port 1. The Port monitored is controlled by the value programmed into the Port Config Register. Note: All Status Registers have no predefined Reset value. The value shown in reset is a typical value that will be read after reset but will be dependent on the SERDES status, the actual value read can differ from this."
+  default = "0x3121100A"
+  offset = "0x0000003C"
+  [[register.field]]
+    name = "SVN"
+    bits = "31:28"
+    type = "ro"
+    shortdesc = '''SATA Version (SVN): version of the SATA protocol.'''
+    longdesc = '''3: GEN3.'''
+  [[register.field]]
+    name = "DMB"
+    bits = "27:24"
+    type = "ro"
+  [[register.field]]
+    name = "DMBW"
+    bits = "23:20"
+    type = "ro"
+    shortdesc = '''DMA Master bus width (DMBW): 0: 32 bit.'''
+    longdesc = '''1: 64 bit. 2: 128 bit.'''
+  [[register.field]]
+    name = "SRRN"
+    bits = "19:12"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:6"
+    type = "ro"
+  [[register.field]]
+    name = "LLS"
+    bits = "5:0"
+    type = "ro"
+    shortdesc = '''LAT_LINK_STATE (LLS): These six bits specify the current value of the Link Layer State Machine at the time the Status0 register is read.'''
+    longdesc = '''0: L_Reset 1: L_Idle 2: HL_SendChkRdy 3: DL_SendChkRdy 4: L_TPMPartial 5: L_TPMSlumber 6: L_RcvWaitFifo 7: L_PMOff 8: L_PMDeny 9: L_NoCommErr 10: L_NoComm 11: L_SendAlign 12: L_SendSOF 13: L_SendData 14: WAIT_FOR_SYNC 15: L_SendCRC 16: L_SendHold 17: L_RcvHold 18: L_SendEOF 19: L_Wait 20: L_ChkPhyRdy 21: L_NoCommPower 22: L_WakeUp1 23: L_WakeUp2 24: L_RcvChkRdy 25: L_RcvData 26: L_BadEnd 27: L_RcvEOF 28: L_SendHoldA 29: L_Hold 30: L_GoodCRC 31: L_GoodEnd 32: BISTALIGN 33: BISTSOF 34: BIST0 35: BIST1 36: L_GoodEndLock 37: OneFSendOneSyncLock 38: SFSendOneSyncLock 39: HL_SendChkRdyLock 40: waitForSyncLock 42: L_NoPmnak'''
+[[register]]
+  name = "PLS1"
+  type = "wtc"
+  width = 32
+  description = "PLS1 - Port LinkStatus1 register. This register indicates the status of the Link Layer for either Port 0 or Port 1. The Port monitored is controlled by the value programmed into the Port Config Register. This register acts as an accumulator for the SERDES errors. Each counter can be cleared by writing 8'hFF to the individual byte. Note: All Status Registers have no predefined Reset value. The value shown in reset is a typical value that will be read after reset but will be dependent on the SERDES status, the actual value read can differ from this."
+  default = "0x00000000"
+  offset = "0x00000040"
+  [[register.field]]
+    name = "KCEC"
+    bits = "31:24"
+    type = "wtc"
+    shortdesc = '''Kchar Error Count (KCEC): The number of DWords that have been received from the Phy, where one or more control character errors have been detected.'''
+    longdesc = '''A value of 255 indicates an error count of 255 or more as this counter does not wrap around to zero. The count value is updated with its current value each time the Status1 register is read.'''
+  [[register.field]]
+    name = "PIEC"
+    bits = "23:16"
+    type = "wtc"
+    shortdesc = '''Phy Internal Error Count (PIEC): The number of DWords that have been received from the Phy, where one or more internal errors have been detected.'''
+    longdesc = '''A value of 255 indicates an error count of 255 or more as this counter does not wrap around to zero. The count value is updated with its current value each time the Status1 register is read.'''
+  [[register.field]]
+    name = "CEC"
+    bits = "15:8"
+    type = "wtc"
+    shortdesc = '''Code Error Count (CEC): The number of DWords that have been received from the Phy, where one or more code errors have been detected.'''
+    longdesc = '''A value of 255 indicates an error count of 255 or more as this counter does not wrap around to zero. The count value is updated with its current value each time the Status1 register is read.'''
+  [[register.field]]
+    name = "DEC"
+    bits = "7:0"
+    type = "wtc"
+    shortdesc = '''Disparity Error Count (DEC): The number of DWords that have been received from the Phy, where one or more disparity errors have been detected.'''
+    longdesc = '''A value of 255 indicates an error count of 255 or more as this counter does not wrap around to zero. The count value is updated with its current value each time the Status1 register is read.'''
+[[register]]
+  name = "PCMDC"
+  type = "mixed"
+  width = 32
+  description = "PCMDC - Port CmdConfig register. This register controls the operation of the Command Layer the status of the Link Layer for either Port 0 or Port 1. The Port monitored is controlled by the value programmed into the Port Config Register."
+  default = "0x00000000"
+  offset = "0x00000044"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:30"
+    type = "ro"
+  [[register.field]]
+    name = "TSVIE"
+    bits = "29"
+    type = "rw"
+  [[register.field]]
+    name = "TSVI"
+    bits = "28"
+    type = "wtc"
+  [[register.field]]
+    name = "TSVT"
+    bits = "27:12"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:2"
+    type = "ro"
+  [[register.field]]
+    name = "ETLL"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "ETLLB"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "PPCS"
+  type = "mixed"
+  width = 32
+  description = "PPCS - Port PhyControlStatus register. This register indicates the status of the Phy Control Layer for either Port 0 or Port 1. The Port monitored is controlled by the value programmed into the Port Config Register. Note: All Status Registers have no predefined Reset value. The value shown in reset is a typical value that will be read after reset but will be dependent on the SERDES status, the actual value read can differ from this."
+  default = "0xF8000000"
+  offset = "0x00000048"
+  [[register.field]]
+    name = "PHYCE"
+    bits = "31:30"
+    type = "ro"
+  [[register.field]]
+    name = "PHYDE"
+    bits = "29:28"
+    type = "ro"
+  [[register.field]]
+    name = "PHYKC"
+    bits = "27"
+    type = "ro"
+  [[register.field]]
+    name = "PHYD"
+    bits = "26:11"
+    type = "ro"
+  [[register.field]]
+    name = "CCAC"
+    bits = "10"
+    type = "wtc"
+  [[register.field]]
+    name = "CCA"
+    bits = "9:5"
+    type = "ro"
+  [[register.field]]
+    name = "PCTRLS"
+    bits = "4:0"
+    type = "ro"
+[[register]]
+  name = "AMS"
+  type = "ro"
+  width = 32
+  description = "AMS - AXI Master Status register. This register indicates the status of the AXI Master state machines for both Port 0 and Port 1. Note: All Status Registers have no predefined Reset value. The value shown in reset is a typical value that will be read after reset but will be dependent on the SERDES status, the actual value read can differ from this."
+  default = "0x00000084"
+  offset = "0x0000004C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:12"
+    type = "ro"
+  [[register.field]]
+    name = "AMS1"
+    bits = "11:7"
+    type = "ro"
+  [[register.field]]
+    name = "AMS0"
+    bits = "6:2"
+    type = "ro"
+  [[register.field]]
+    name = "WAS"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "RAS"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "TCR"
+  type = "mixed"
+  width = 32
+  description = "TCR - Timer Control register. This register controls the operation of the Timer Pre-scaler used to configure a 10us pulse generator used to control the operation of the Slumber and Dev Sleep timers. This pulse generator is used in both Port 0 and Port 1."
+  default = "0x00000100"
+  offset = "0x00000050"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:13"
+    type = "ro"
+  [[register.field]]
+    name = "TPS"
+    bits = "12:0"
+    type = "rw"
+    shortdesc = '''Timer PreScalar value.'''
+    longdesc = '''(TPS) The system clock is divided by the ratio to generate a 10us clock pulse to run the port layers.'''

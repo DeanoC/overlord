@@ -1,0 +1,399 @@
+description = "I2C Controller"
+[[register]]
+  name = "CONTROL_REG"
+  type = "mixed"
+  width = 16
+  description = "Control Register"
+  default = "0x00000000"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "DIVISOR_A"
+    bits = "15:14"
+    type = "rw"
+    shortdesc = '''Divisor for stage A clock divider.'''
+    longdesc = '''0 - 3: Divides the input pclk frequency by divisor_a + 1.'''
+  [[register.field]]
+    name = "DIVISOR_B"
+    bits = "13:8"
+    type = "rw"
+    shortdesc = '''Divisor for stage B clock divider.'''
+    longdesc = '''0 - 63: Divides the output frequency from divisor_a by divisor_b + 1.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "CLR_FIFO"
+    bits = "6"
+    type = "rw"
+    shortdesc = '''1 - initializes the FIFO to all zeros and clears the transfer size register.'''
+    longdesc = '''Automatically gets cleared on the next APB clock after being set.'''
+  [[register.field]]
+    name = "SLVMON"
+    bits = "5"
+    type = "rw"
+    shortdesc = '''Slave monitor mode 1 - monitor mode.'''
+    longdesc = '''0 - normal operation.'''
+  [[register.field]]
+    name = "HOLD"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''hold_bus 1 - when no more data is available for transmit or no more data can be received, hold the sclk line low until serviced by the host.'''
+    longdesc = '''0 - allow the transfer to terminate as soon as all the data has been transmitted or received.'''
+  [[register.field]]
+    name = "ACK_EN"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "NEA"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Addressing mode: This bit is used in master mode only.'''
+    longdesc = '''1 - normal (7-bit) address 0 - reserved'''
+  [[register.field]]
+    name = "MS"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "RW"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Direction of transfer: This bit is used in master mode only.'''
+    longdesc = '''1 - master receiver 0 - master transmitter.'''
+[[register]]
+  name = "STATUS_REG"
+  type = "ro"
+  width = 16
+  description = "Status register"
+  default = "0x00000000"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:9"
+    type = "ro"
+  [[register.field]]
+    name = "BA"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "RXOVF"
+    bits = "7"
+    type = "ro"
+    shortdesc = '''Receiver Overflow 1 - This bit is set whenever FIFO is full and a new byte is received.'''
+    longdesc = '''The new byte is not acknowledged and contents of the FIFO remains unchanged.'''
+  [[register.field]]
+    name = "TXDV"
+    bits = "6"
+    type = "ro"
+    shortdesc = '''Transmit Data Valid - SW should not use this to determine data completion, it is the RAW value on the interface.'''
+    longdesc = '''Please use COMP in the ISR. 1 - still a byte of data to be transmitted by the interface.'''
+  [[register.field]]
+    name = "RXDV"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "RXRW"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "2:0"
+    type = "ro"
+[[register]]
+  name = "I2C_ADDRESS"
+  type = "mixed"
+  width = 16
+  description = "IIC Address register"
+  default = "0x00000000"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "ADD"
+    bits = "9:0"
+    type = "rw"
+    shortdesc = '''Address 0 - 1024: Normal addressing mode uses add[6:0].'''
+    longdesc = '''Extended addressing mode uses add[9:0].'''
+[[register]]
+  name = "I2C_DATA"
+  type = "mixed"
+  width = 16
+  description = "IIC data register"
+  default = "0x00000000"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:8"
+    type = "ro"
+  [[register.field]]
+    name = "DATA"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''data 0 -255: When written to, the data register sets data to transmit.'''
+    longdesc = '''When read from, the data register reads the last received byte of data.'''
+[[register]]
+  name = "INTERRUPT_STATUS"
+  type = "wtc"
+  width = 16
+  description = "IIC interrupt status register"
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "wtc"
+  [[register.field]]
+    name = "ARB_LOST"
+    bits = "9"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "wtc"
+  [[register.field]]
+    name = "RX_UNF"
+    bits = "7"
+    type = "wtc"
+  [[register.field]]
+    name = "TX_OVF"
+    bits = "6"
+    type = "wtc"
+  [[register.field]]
+    name = "RX_OVF"
+    bits = "5"
+    type = "wtc"
+    shortdesc = '''Receive overflow 1 = This bit is set whenever FIFO is full and a new byte is received.'''
+    longdesc = '''The new byte is not acknowledged and contents of the FIFO remains unchanged.'''
+  [[register.field]]
+    name = "SLV_RDY"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "TO"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "NACK"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "DATA"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "COMP"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "TRANSFER_SIZE"
+  type = "rw"
+  width = 8
+  description = "Transfer Size Register"
+  default = "0x00000000"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "TRANSFER_SIZE"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "SLAVE_MON_PAUSE"
+  type = "mixed"
+  width = 8
+  description = "Slave Monitor Pause Register"
+  default = "0x00000000"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "PAUSE"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "TIME_OUT"
+  type = "rw"
+  width = 8
+  description = "Time out register. This bit is set whenever the SCL line is held Low by the master or the accessed slave for more than the period specified in the timeout register, a TO interrupt is generated to avoid stall conditions."
+  default = "0x0000001F"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "TO"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "INTRPT_MASK"
+  type = "ro"
+  width = 16
+  description = "Interrupt mask register"
+  default = "0x000002FF"
+  offset = "0x00000020"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "ARB_LOST"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "RX_UNF"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "TX_OVF"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "RX_OVF"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "SLV_RDY"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "TO"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "NACK"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "DATA"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "COMP"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "INTRPT_ENABLE"
+  type = "mixed"
+  width = 16
+  description = "Interrupt Enable Register"
+  default = "0x00000000"
+  offset = "0x00000024"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "ARB_LOST"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "RX_UNF"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "TX_OVF"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "RX_OVF"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "SLV_RDY"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "TO"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "NACK"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "DATA"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "COMP"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "INTRPT_DISABLE"
+  type = "mixed"
+  width = 16
+  description = "Interrupt Disable Register"
+  default = "0x00000000"
+  offset = "0x00000028"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "ARB_LOST"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "RX_UNF"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "TX_OVF"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "RX_OVF"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "SLV_RDY"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "TO"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "NACK"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "DATA"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "COMP"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "GLITCH_FILTER"
+  type = "mixed"
+  width = 16
+  description = "Glitch Filter Control Register It is used for setting the length of the glitch filter shift register. If the length of glitch filter shift register is set to zero (0x0) then the glitch filter is bypassed."
+  default = "0x00000005"
+  offset = "0x0000002C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:4"
+    type = "ro"
+  [[register.field]]
+    name = "GF"
+    bits = "3:0"
+    type = "rw"
+    shortdesc = '''Length of the glitch filter shift register.'''
+    longdesc = '''The filter length is specified in terms of APB interface clock cycles (LPD_LSBUS). The default value is 5. If it is set to zero (0x0) then the glitch filter is bypassed.'''

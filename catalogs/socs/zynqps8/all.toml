@@ -1,0 +1,87 @@
+[[include]]
+resource = "software/software.toml"
+
+[[include]]
+resource = "fabric.toml"
+
+[[definition]]
+type = "soc.zynqps8.ps8soc"
+gateware = "ps8soc/ps8soc.toml"
+buses = [
+    { name = "lpd", supplier = true, protocol = "axi4", prefix = "psToPlAxiLpd0_", fixed_base_address = true, base_address = "0x8000_0000", data_width = 128, address_width = 40 },
+    { name = "hpm0", supplier = true, protocol = "axi4", prefix = "psToPlAxiHpm0_", fixed_base_address = true, base_address = "0xA400_0000", data_width = 128, address_width = 40 },
+    { name = "hpm1", supplier = true, protocol = "axi4", prefix = "psToPlAxiHpm1_", fixed_base_address = true, base_address = "0xB000_0000", data_width = 128, address_width = 40 },
+    { name = "hpc0", supplier = false, protocol = "axi4", prefix = "plToPsAxiHpc0_", data_width = 128, address_width = 40 },
+    { name = "hpc1", supplier = false, protocol = "axi4", prefix = "plToPsAxiHpc1_", data_width = 128, address_width = 40 },
+    { name = "hp0", supplier = false, protocol = "axi4", prefix = "plToPsAxiHp0_", data_width = 128, address_width = 40 },
+    { name = "hp1", supplier = false, protocol = "axi4", prefix = "plToPsAxiHp1_", data_width = 128, address_width = 40 },
+    { name = "hp2", supplier = false, protocol = "axi4", prefix = "plToPsAxiHp2_", data_width = 128, address_width = 40 },
+    { name = "hp3", supplier = false, protocol = "axi4", prefix = "plToPsAxiHp3_", data_width = 128, address_width = 40 },
+    { name = "lpd", supplier = false, protocol = "axi4", prefix = "plToPsAxiLpd0_", data_width = 128, address_width = 40 },
+    { name = "acp", supplier = false, protocol = "axi4", prefix = "plToPsAxiAcp0_", data_width = 128, address_width = 40 },
+]
+registers = [
+    { resource = "registers/afifm.toml", name = "S_AXI_HPC0_FPD", base_address = "0x36_0000" },
+    { resource = "registers/afifm.toml", name = "S_AXI_HPC1_FPD", base_address = "0x37_0000" },
+    { resource = "registers/afifm.toml", name = "S_AXI_HP0_FPD", base_address = "0x38_0000" },
+    { resource = "registers/afifm.toml", name = "S_AXI_HP1_FPD", base_address = "0x39_0000" },
+    { resource = "registers/afifm.toml", name = "S_AXI_HP2_FPD", base_address = "0x3a_0000" },
+    { resource = "registers/afifm.toml", name = "S_AXI_HP3_FPD", base_address = "0x3b_0000" },
+    { resource = "registers/afifm.toml", name = "S_AXI_LPD", base_address = "0x29b_0000" },
+    { resource = "registers/apu.toml", name = "APU", base_address = "0x5c_0000" },
+    { resource = "registers/rpu.toml", name = "RPU", base_address = "0x29a_0000" },
+]
+
+[[definition]]
+type = "other.zynqps8.rawps8"
+gateware = "gateware/ps8.toml"
+registersX = [
+    { resource = "registers/ams" },
+    { resource = "registers/axipcie_dma" },
+    { resource = "registers/axipcie_egress" },
+    { resource = "registers/axipcie_ingress" },
+    { resource = "registers/axipcie_main" },
+    { resource = "registers/bbram" },
+    { resource = "registers/crl_apb" },
+    { resource = "registers/csu" },
+    { resource = "registers/csudma" },
+    { resource = "registers/efuse" },
+    { resource = "registers/etf4k" },
+    { resource = "registers/etf8k" },
+    { resource = "registers/etr" },
+    { resource = "registers/ftm" },
+    { resource = "registers/funnel3p" },
+    { resource = "registers/funnel4p" },
+    { resource = "registers/gic400" },
+    { resource = "registers/gic400_cpu" },
+    { resource = "registers/gic400_dist" },
+    { resource = "registers/gpio" },
+    { resource = "registers/iou_gpv" },
+    { resource = "registers/iou_scntr" },
+    { resource = "registers/iou_scntrs" },
+    { resource = "registers/iou_secure_slcr" },
+    { resource = "registers/iou_slcr" },
+    { resource = "registers/lpd_gpv" },
+    { resource = "registers/lpd_slcr_secure" },
+    { resource = "registers/lpd_slcr" },
+    { resource = "registers/mbistjtag" },
+    { resource = "registers/pcie_attrib" },
+    { resource = "registers/pl390" },
+    { resource = "registers/replic" },
+    { resource = "registers/rsa" },
+    { resource = "registers/rsa_core" },
+    { resource = "registers/rtc" },
+    { resource = "registers/smmu500" },
+    { resource = "registers/smmu_reg" },
+    { resource = "registers/stm" },
+    { resource = "registers/tpiu" },
+    { resource = "registers/tsgen" },
+    { resource = "registers/xmpu_ddr" },
+    { resource = "registers/xmpu_fpd" },
+    { resource = "registers/xmpu_ocm" },
+    { resource = "registers/xmpu_sink" },
+    { resource = "registers/xppu" },
+    { resource = "registers/xppu_sink" },
+    { resource = "registers/pmu_global" },
+]
+

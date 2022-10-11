@@ -1,0 +1,5290 @@
+description = "Low-power Domain System-level Control Registers"
+[[register]]
+  name = "WPROT0"
+  type = "rw"
+  width = 1
+  description = "LP Domain SLCR Write protection register"
+  default = "0x00000001"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "ACTIVE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "CTRL"
+  type = "rw"
+  width = 1
+  description = "General control register for the LP SLCR"
+  default = "0x00000000"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "SLVERR_ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''By default, invalid address requests are ignored.'''
+    longdesc = '''However, a maskable interrupt exsists. By enabling this slverr_enable invalid address requests cause a slverr to occur. Enable/Disable SLVERR during address decode failure. 0: SLVERR is disabled. For request address: Writes are ignored. Read returns 0. 1: SLVERR is enabled. For requestes address, SLVERR is asserted. Writes are ignored. Read returns 0.'''
+[[register]]
+  name = "ISR"
+  type = "wtc"
+  width = 1
+  description = "Interrupt Status Register"
+  default = "0x00000000"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "wtc"
+    shortdesc = '''Status for an address decode error.'''
+    longdesc = '''0: No Event 1: Event Occurred'''
+[[register]]
+  name = "IMR"
+  type = "ro"
+  width = 1
+  description = "Interrupt Mask Register"
+  default = "0x00000001"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Mask for an address decode error.'''
+    longdesc = '''0: Interrupt Enabled 1: Interrupt Disabled'''
+[[register]]
+  name = "IER"
+  type = "wo"
+  width = 1
+  description = "Interrupt Enable Register"
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Enable for an address decode error.'''
+    longdesc = '''0: Ignored 1: lpd_slcr_imr -> 0'''
+[[register]]
+  name = "IDR"
+  type = "wo"
+  width = 1
+  description = "Interrupt Disable Register"
+  default = "0x00000000"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Mask for an address decode error.'''
+    longdesc = '''0: Ignored 1: lpd_slcr_imr -> 1'''
+[[register]]
+  name = "ITR"
+  type = "wo"
+  width = 1
+  description = "Interrupt Trigger Register"
+  default = "0x00000000"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Trigger an address decode error interrupt.'''
+    longdesc = '''0: Ignored 1: lpd_slcr_isr -> 1'''
+[[register]]
+  name = "SAFETY_CHK0"
+  type = "rw"
+  width = 32
+  description = "Safety endpoint connectivity check Register"
+  default = "0x00000000"
+  offset = "0x00000040"
+  [[register.field]]
+    name = "CHK_VAL"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "SAFETY_CHK1"
+  type = "rw"
+  width = 32
+  description = "Safety endpoint connectivity check Register"
+  default = "0x00000000"
+  offset = "0x00000044"
+  [[register.field]]
+    name = "CHK_VAL"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "SAFETY_CHK2"
+  type = "rw"
+  width = 32
+  description = "Safety endpoint connectivity check Register"
+  default = "0x00000000"
+  offset = "0x00000048"
+  [[register.field]]
+    name = "CHK_VAL"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "SAFETY_CHK3"
+  type = "rw"
+  width = 32
+  description = "Safety endpoint connectivity check Register"
+  default = "0x00000000"
+  offset = "0x0000004C"
+  [[register.field]]
+    name = "CHK_VAL"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "CSUPMU_WDT_CLK_SEL"
+  type = "mixed"
+  width = 32
+  description = "SWDT clock source select"
+  default = "0x00000000"
+  offset = "0x00000050"
+[[register.field]]
+name = "RESERVED"
+bits = "31:1"
+type = "raz"
+shortdesc = '''Reserved.'''
+longdesc = '''Writes are ignored, read data is zero.'''
+[[register.field]]
+name = "SELECT"
+bits = "0"
+type = "rw"
+[[register.field.enum]]
+name = "APB_CLOCK"
+value = 0
+[[register.field.enum]]
+name = "PSS_REF_CLK"
+value = 1
+
+[[register]]
+name = "ADMA_CFG"
+type = "ro"
+width = 7
+description = "GDMA RF2 Configuation"
+default = "0x00000028"
+offset = "0x0000200C"
+[[register.field]]
+name = "BUS_WIDTH"
+    bits = "6:5"
+    type = "ro"
+  [[register.field]]
+    name = "NUM_CH"
+    bits = "4:0"
+    type = "ro"
+[[register]]
+  name = "ADMA_RAM"
+  type = "mixed"
+  width = 16
+  description = "RAM control register"
+  default = "0x00003B3B"
+  offset = "0x00002010"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7"
+    type = "rw"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+[[register]]
+  name = "ERR_AIBAXI_ISR"
+  type = "wtc"
+  width = 32
+  description = "Interrupt Status Register for intrN. This is a sticky register that holds the value of the interrupt until cleared by a value of 1."
+  default = "0x00000000"
+  offset = "0x00003000"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "29"
+    type = "wtc"
+  [[register.field]]
+    name = "AFIFS2"
+    bits = "28"
+    type = "wtc"
+  [[register.field]]
+    name = "LPD_DDR"
+    bits = "27"
+    type = "wtc"
+  [[register.field]]
+    name = "OCMS"
+    bits = "26"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "25"
+    type = "wtc"
+  [[register.field]]
+    name = "FPD_MAIN"
+    bits = "24"
+    type = "wtc"
+  [[register.field]]
+    name = "USB1S"
+    bits = "23"
+    type = "wtc"
+  [[register.field]]
+    name = "USB0S"
+    bits = "22"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "21"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "20"
+    type = "wtc"
+  [[register.field]]
+    name = "RPUS1"
+    bits = "19"
+    type = "wtc"
+  [[register.field]]
+    name = "RPUS0"
+    bits = "18"
+    type = "wtc"
+  [[register.field]]
+    name = "RPUM1"
+    bits = "17"
+    type = "wtc"
+  [[register.field]]
+    name = "RPUM0"
+    bits = "16"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "14"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "13"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "12"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "10"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "9"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "5"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "FPD_OCM"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "FPD_LPDIBS"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "AFIFS1"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "AFIFS0"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "ERR_AIBAXI_IMR"
+  type = "ro"
+  width = 32
+  description = "Interrupt Mask Register for intrN. This is a read-only location and can be atomically altered by either the IDR or the IER."
+  default = "0x1DCF000F"
+  offset = "0x00003008"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "29"
+    type = "ro"
+  [[register.field]]
+    name = "AFIFS2"
+    bits = "28"
+    type = "ro"
+  [[register.field]]
+    name = "LPD_DDR"
+    bits = "27"
+    type = "ro"
+  [[register.field]]
+    name = "OCMS"
+    bits = "26"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "25"
+    type = "ro"
+  [[register.field]]
+    name = "FPD_MAIN"
+    bits = "24"
+    type = "ro"
+  [[register.field]]
+    name = "USB1S"
+    bits = "23"
+    type = "ro"
+  [[register.field]]
+    name = "USB0S"
+    bits = "22"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "21"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "20"
+    type = "ro"
+  [[register.field]]
+    name = "RPUS1"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "RPUS0"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "RPUM1"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "RPUM0"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "14"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "13"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "FPD_OCM"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "FPD_LPDIBS"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "AFIFS1"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "AFIFS0"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ERR_AIBAXI_IER"
+  type = "wo"
+  width = 32
+  description = "Interrupt Enable Register. A write of to this location will unmask the interrupt. (IMR: 0)"
+  default = "0x00000000"
+  offset = "0x00003010"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "29"
+    type = "wo"
+  [[register.field]]
+    name = "AFIFS2"
+    bits = "28"
+    type = "wo"
+  [[register.field]]
+    name = "LPD_DDR"
+    bits = "27"
+    type = "wo"
+  [[register.field]]
+    name = "OCMS"
+    bits = "26"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "25"
+    type = "wo"
+  [[register.field]]
+    name = "FPD_MAIN"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "USB1S"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "USB0S"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "RPUS1"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "RPUS0"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "RPUM1"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "RPUM0"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "FPD_OCM"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "FPD_LPDIBS"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "AFIFS1"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "AFIFS0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "ERR_AIBAXI_IDR"
+  type = "wo"
+  width = 32
+  description = "Interrupt Disable Register. A write of one to this location will mask the interrupt. (IMR: 1)"
+  default = "0x00000000"
+  offset = "0x00003018"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "29"
+    type = "wo"
+  [[register.field]]
+    name = "AFIFS2"
+    bits = "28"
+    type = "wo"
+  [[register.field]]
+    name = "LPD_DDR"
+    bits = "27"
+    type = "wo"
+  [[register.field]]
+    name = "OCMS"
+    bits = "26"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "25"
+    type = "wo"
+  [[register.field]]
+    name = "FPD_MAIN"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "USB1S"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "USB0S"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "RPUS1"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "RPUS0"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "RPUM1"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "RPUM0"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "FPD_OCM"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "FPD_LPDIBS"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "AFIFS1"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "AFIFS0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "ERR_AIBAPB_ISR"
+  type = "wtc"
+  width = 32
+  description = "Interrupt Status Register for intrN. This is a sticky register that holds the value of the interrupt until cleared by a value of 1."
+  default = "0x00000000"
+  offset = "0x00003020"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "GPU"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "ERR_AIBAPB_IMR"
+  type = "ro"
+  width = 32
+  description = "Interrupt Mask Register for intrN. This is a read-only location and can be atomically altered by either the IDR or the IER."
+  default = "0x00000001"
+  offset = "0x00003024"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "GPU"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ERR_AIBAPB_IER"
+  type = "wo"
+  width = 32
+  description = "Interrupt Enable Register. A write of to this location will unmask the interrupt. (IMR: 0)"
+  default = "0x00000000"
+  offset = "0x00003028"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "GPU"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "ERR_AIBAPB_IDR"
+  type = "wo"
+  width = 32
+  description = "Interrupt Disable Register. A write of one to this location will mask the interrupt. (IMR: 1)"
+  default = "0x00000000"
+  offset = "0x0000302C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "GPU"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "ISO_AIBAXI_REQ"
+  type = "rw"
+  width = 32
+  description = "Request to AIB to start Isolation. '1' Isolate. '0' No Isolation"
+  default = "0x00000000"
+  offset = "0x00003030"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "29"
+    type = "rw"
+  [[register.field]]
+    name = "AFIFS2"
+    bits = "28"
+    type = "rw"
+  [[register.field]]
+    name = "LPD_DDR"
+    bits = "27"
+    type = "rw"
+  [[register.field]]
+    name = "OCMS"
+    bits = "26"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "25"
+    type = "rw"
+  [[register.field]]
+    name = "FPD_MAIN"
+    bits = "24"
+    type = "rw"
+  [[register.field]]
+    name = "USB1S"
+    bits = "23"
+    type = "rw"
+  [[register.field]]
+    name = "USB0S"
+    bits = "22"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "21"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "20"
+    type = "rw"
+  [[register.field]]
+    name = "RPUS1"
+    bits = "19"
+    type = "rw"
+  [[register.field]]
+    name = "RPUS0"
+    bits = "18"
+    type = "rw"
+  [[register.field]]
+    name = "RPUM1"
+    bits = "17"
+    type = "rw"
+  [[register.field]]
+    name = "RPUM0"
+    bits = "16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "14"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "13"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "12"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "10"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "9"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "FPD_OCM"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "FPD_LPDIBS"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "AFIFS1"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "AFIFS0"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "ISO_AIBAXI_TYPE"
+  type = "rw"
+  width = 32
+  description = "If '1' AIB sends SLVERR. If '0' AIB does not respond"
+  default = "0x19CF000F"
+  offset = "0x00003038"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "29"
+    type = "rw"
+  [[register.field]]
+    name = "AFIFS2"
+    bits = "28"
+    type = "rw"
+  [[register.field]]
+    name = "LPD_DDR"
+    bits = "27"
+    type = "rw"
+  [[register.field]]
+    name = "OCMS"
+    bits = "26"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "25"
+    type = "rw"
+  [[register.field]]
+    name = "FPD_MAIN"
+    bits = "24"
+    type = "rw"
+  [[register.field]]
+    name = "USB1S"
+    bits = "23"
+    type = "rw"
+  [[register.field]]
+    name = "USB0S"
+    bits = "22"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "21"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "20"
+    type = "rw"
+  [[register.field]]
+    name = "RPUS1"
+    bits = "19"
+    type = "rw"
+  [[register.field]]
+    name = "RPUS0"
+    bits = "18"
+    type = "rw"
+  [[register.field]]
+    name = "RPUM1"
+    bits = "17"
+    type = "rw"
+  [[register.field]]
+    name = "RPUM0"
+    bits = "16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "14"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "13"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "12"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "10"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "9"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "FPD_OCM"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "FPD_LPDIBS"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "AFIFS1"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "AFIFS0"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "ISO_AIBAXI_ACK"
+  type = "ro"
+  width = 32
+  description = "If '1' AIB has Functionally Isolated Master and Slave"
+  default = "0x00000000"
+  offset = "0x00003040"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "29"
+    type = "ro"
+  [[register.field]]
+    name = "AFIFS2"
+    bits = "28"
+    type = "ro"
+  [[register.field]]
+    name = "LPD_DDR"
+    bits = "27"
+    type = "ro"
+  [[register.field]]
+    name = "OCMS"
+    bits = "26"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "25"
+    type = "ro"
+  [[register.field]]
+    name = "FPD_MAIN"
+    bits = "24"
+    type = "ro"
+  [[register.field]]
+    name = "USB1S"
+    bits = "23"
+    type = "ro"
+  [[register.field]]
+    name = "USB0S"
+    bits = "22"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "21"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "20"
+    type = "ro"
+  [[register.field]]
+    name = "RPUS1"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "RPUS0"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "RPUM1"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "RPUM0"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "14"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "13"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "FPD_OCM"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "FPD_LPDIBS"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "AFIFS1"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "AFIFS0"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ISO_AIBAPB_REQ"
+  type = "rw"
+  width = 32
+  description = "Request to AIB to start Isolation. '1' Isolate. '0' No Isolation"
+  default = "0x00000000"
+  offset = "0x00003048"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "GPU"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "ISO_AIBAPB_TYPE"
+  type = "rw"
+  width = 32
+  description = "If '1' AIB sends SLVERR. If '0' AIB does not respond"
+  default = "0x00000001"
+  offset = "0x0000304C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "GPU"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "ISO_AIBAPB_ACK"
+  type = "ro"
+  width = 32
+  description = "If '1' AIB has Functionally Isolated Master and Slave"
+  default = "0x00000000"
+  offset = "0x00003050"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "GPU"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ERR_ATB_ISR"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Status Register for intrN. This is a sticky register that holds the value of the interrupt until cleared by a value of 1."
+  default = "0x00000000"
+  offset = "0x00006000"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:2"
+    type = "raz"
+  [[register.field]]
+    name = "AFIFS2"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "LPDM"
+    bits = "0"
+    type = "wtc"
+    shortdesc = '''ISR for ATB placed between lpd inbound switch and lpd main switch (trans.'''
+    longdesc = '''going to Slave in LPD including IOU)'''
+[[register]]
+  name = "ERR_ATB_IMR"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Mask Register for intrN. This is a read-only location and can be atomically altered by either the IDR or the IER."
+  default = "0x00000003"
+  offset = "0x00006004"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:2"
+    type = "raz"
+  [[register.field]]
+    name = "AFIFS2"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "LPDM"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''IMR for ATB placed between lpd inbound switch and lpd main switch (trans.'''
+    longdesc = '''going to Slave in LPD including IOU)'''
+[[register]]
+  name = "ERR_ATB_IER"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Enable Register. A write of to this location will unmask the interrupt. (IMR: 0)"
+  default = "0x00000000"
+  offset = "0x00006008"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:2"
+    type = "raz"
+  [[register.field]]
+    name = "AFIFS2"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "LPDM"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''IER for ATB placed between lpd inbound switch and lpd main switch (trans.'''
+    longdesc = '''going to Slave in LPD including IOU)'''
+[[register]]
+  name = "ERR_ATB_IDR"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Disable Register. A write of one to this location will mask the interrupt. (IMR: 1)"
+  default = "0x00000000"
+  offset = "0x0000600C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:2"
+    type = "raz"
+  [[register.field]]
+    name = "AFIFS2"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "LPDM"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''IDR for ATB placed between lpd inbound switch and lpd main switch (trans.'''
+    longdesc = '''going to Slave in LPD including IOU)'''
+[[register]]
+  name = "ATB_CMD_STORE_EN"
+  type = "mixed"
+  width = 32
+  description = "ATB Sideband Signals"
+  default = "0x00000003"
+  offset = "0x00006010"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:2"
+    type = "raz"
+  [[register.field]]
+    name = "AFIFS2"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''When '1', ATB keeps track of Read and Write transactions.'''
+    longdesc = '''If '0' ATB does not keep track of any transaction'''
+  [[register.field]]
+    name = "LPDM"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''When '1', ATB keeps track of Read and Write transactions.'''
+    longdesc = '''If '0' ATB does not keep track of any transaction'''
+[[register]]
+  name = "ATB_RESP_EN"
+  type = "mixed"
+  width = 32
+  description = "ATB Sideband Signals"
+  default = "0x00000000"
+  offset = "0x00006014"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:2"
+    type = "raz"
+  [[register.field]]
+    name = "AFIFS2"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''When '1', ATB will send response if it sees timeout.'''
+    longdesc = '''If '0' ATB will not send any response'''
+  [[register.field]]
+    name = "LPDM"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''When '1', ATB will send response if it sees timeout.'''
+    longdesc = '''If '0' ATB will not send any response'''
+[[register]]
+  name = "ATB_RESP_TYPE"
+  type = "mixed"
+  width = 32
+  description = "ATB Sideband Signals"
+  default = "0x00000003"
+  offset = "0x00006018"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:2"
+    type = "raz"
+  [[register.field]]
+    name = "AFIFS2"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''When '1', ATB will send SLVERR if it sees timeout.'''
+    longdesc = '''If '0' ATB will send OKAY when it sees timeout'''
+  [[register.field]]
+    name = "LPDM"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''When '1', ATB will send SLVERR if it sees timeout.'''
+    longdesc = '''If '0' ATB will send OKAY when it sees timeout'''
+[[register]]
+  name = "ATB_PRESCALE"
+  type = "mixed"
+  width = 32
+  description = "ATB Sideband Signals"
+  default = "0x0000FFFF"
+  offset = "0x00006020"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:17"
+    type = "raz"
+  [[register.field]]
+    name = "ENABLE"
+    bits = "16"
+    type = "rw"
+    shortdesc = '''Counter Enable.'''
+    longdesc = '''When set to 1, timer will start running and timeouts may be reported. When set to 0, timeouts will not be detected.'''
+  [[register.field]]
+    name = "VALUE"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''16 bit prescale value based on 100 MHz clock.'''
+    longdesc = '''The timeout will be set to 32000 * 10ns * this register.'''
+[[register]]
+  name = "MUTEX0"
+  type = "rw"
+  width = 32
+  description = "LP Domain SLCR Mutex 0 register"
+  default = "0x00000000"
+  offset = "0x00007000"
+  [[register.field]]
+    name = "ID"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''SW mutex can be activated by any master by writing it's non-zero ID value.'''
+    longdesc = '''Mutex Status: Availibility: When this register is zero means mutex is available for any master. After reset, this mutex is available to any master. Activation: When this mutex is available then any master can occupied by writing non-zero value to this register. Further non-zero writes to this register will be ignored. Deactivation/Release: Mater has to write zero to this register to release this Mutex.'''
+[[register]]
+  name = "MUTEX1"
+  type = "rw"
+  width = 32
+  description = "LP Domain SLCR Mutex 1 register"
+  default = "0x00000000"
+  offset = "0x00007004"
+  [[register.field]]
+    name = "ID"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''SW mutex can be activated by any master by writing it's non-zero ID value.'''
+    longdesc = '''Mutex Status: Availibility: When this register is zero means mutex is available for any master. After reset, this mutex is available to any master. Activation: When this mutex is available then any master can occupied by writing non-zero value to this register. Further non-zero writes to this register will be ignored. Deactivation/Release: Mater has to write zero to this register to release this Mutex.'''
+[[register]]
+  name = "MUTEX2"
+  type = "rw"
+  width = 32
+  description = "LP Domain SLCR Mutex 2 register"
+  default = "0x00000000"
+  offset = "0x00007008"
+  [[register.field]]
+    name = "ID"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''SW mutex can be activated by any master by writing it's non-zero ID value.'''
+    longdesc = '''Mutex Status: Availibility: When this register is zero means mutex is available for any master. After reset, this mutex is available to any master. Activation: When this mutex is available then any master can occupied by writing non-zero value to this register. Further non-zero writes to this register will be ignored. Deactivation/Release: Mater has to write zero to this register to release this Mutex.'''
+[[register]]
+  name = "MUTEX3"
+  type = "rw"
+  width = 32
+  description = "LP Domain SLCR Mutex 3 register"
+  default = "0x00000000"
+  offset = "0x0000700C"
+  [[register.field]]
+    name = "ID"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''SW mutex can be activated by any master by writing it's non-zero ID value.'''
+    longdesc = '''Mutex Status: Availibility: When this register is zero means mutex is available for any master. After reset, this mutex is available to any master. Activation: When this mutex is available then any master can occupied by writing non-zero value to this register. Further non-zero writes to this register will be ignored. Deactivation/Release: Mater has to write zero to this register to release this Mutex.'''
+[[register]]
+  name = "GICP0_IRQ_STATUS"
+  type = "wtc"
+  width = 32
+  description = "GIC Proxy Interrupt Status (1/2)"
+  default = "0x00000000"
+  offset = "0x00008000"
+  [[register.field]]
+    name = "SRC31"
+    bits = "31"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC30"
+    bits = "30"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC29"
+    bits = "29"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC28"
+    bits = "28"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC27"
+    bits = "27"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC26"
+    bits = "26"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC25"
+    bits = "25"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC24"
+    bits = "24"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC23"
+    bits = "23"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC22"
+    bits = "22"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC21"
+    bits = "21"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC20"
+    bits = "20"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC19"
+    bits = "19"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC18"
+    bits = "18"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC17"
+    bits = "17"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC16"
+    bits = "16"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC15"
+    bits = "15"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC14"
+    bits = "14"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC13"
+    bits = "13"
+    type = "wtc"
+    shortdesc = '''RPU CPU1 ECC errors interrupt.'''
+    longdesc = '''All ECC interrupt of CPU1 are combined into this interrup'''
+  [[register.field]]
+    name = "SRC12"
+    bits = "12"
+    type = "wtc"
+    shortdesc = '''RPU CPU0 ECC errors interrupt.'''
+    longdesc = '''All ECC interrupt of CPU0 are combined into this interrupt'''
+  [[register.field]]
+    name = "SRC11"
+    bits = "11"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC10"
+    bits = "10"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC9"
+    bits = "9"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC8"
+    bits = "8"
+    type = "wtc"
+[[register]]
+  name = "GICP0_IRQ_MASK"
+  type = "ro"
+  width = 32
+  description = "Interrupt Mask Register for intrN. This is a read-only location and can be atomically altered by either the IDR or the IER."
+  default = "0xFFFFFFFF"
+  offset = "0x00008004"
+  [[register.field]]
+    name = "SRC31"
+    bits = "31"
+    type = "ro"
+  [[register.field]]
+    name = "SRC30"
+    bits = "30"
+    type = "ro"
+  [[register.field]]
+    name = "SRC29"
+    bits = "29"
+    type = "ro"
+  [[register.field]]
+    name = "SRC28"
+    bits = "28"
+    type = "ro"
+  [[register.field]]
+    name = "SRC27"
+    bits = "27"
+    type = "ro"
+  [[register.field]]
+    name = "SRC26"
+    bits = "26"
+    type = "ro"
+  [[register.field]]
+    name = "SRC25"
+    bits = "25"
+    type = "ro"
+  [[register.field]]
+    name = "SRC24"
+    bits = "24"
+    type = "ro"
+  [[register.field]]
+    name = "SRC23"
+    bits = "23"
+    type = "ro"
+  [[register.field]]
+    name = "SRC22"
+    bits = "22"
+    type = "ro"
+  [[register.field]]
+    name = "SRC21"
+    bits = "21"
+    type = "ro"
+  [[register.field]]
+    name = "SRC20"
+    bits = "20"
+    type = "ro"
+  [[register.field]]
+    name = "SRC19"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "SRC18"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "SRC17"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "SRC16"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "SRC15"
+    bits = "15"
+    type = "ro"
+  [[register.field]]
+    name = "SRC14"
+    bits = "14"
+    type = "ro"
+  [[register.field]]
+    name = "SRC13"
+    bits = "13"
+    type = "ro"
+    shortdesc = '''RPU CPU1 ECC errors interrupt.'''
+    longdesc = '''All ECC interrupt of CPU1 are combined into this interrup'''
+  [[register.field]]
+    name = "SRC12"
+    bits = "12"
+    type = "ro"
+    shortdesc = '''RPU CPU0 ECC errors interrupt.'''
+    longdesc = '''All ECC interrupt of CPU0 are combined into this interrupt'''
+  [[register.field]]
+    name = "SRC11"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "SRC10"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "SRC9"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "SRC8"
+    bits = "8"
+    type = "ro"
+[[register]]
+  name = "GICP0_IRQ_ENABLE"
+  type = "wo"
+  width = 32
+  description = "Interrupt Enable Register. A write of to this location will unmask the interrupt. (IMR: 0)"
+  default = "0x00000000"
+  offset = "0x00008008"
+  [[register.field]]
+    name = "SRC31"
+    bits = "31"
+    type = "wo"
+  [[register.field]]
+    name = "SRC30"
+    bits = "30"
+    type = "wo"
+  [[register.field]]
+    name = "SRC29"
+    bits = "29"
+    type = "wo"
+  [[register.field]]
+    name = "SRC28"
+    bits = "28"
+    type = "wo"
+  [[register.field]]
+    name = "SRC27"
+    bits = "27"
+    type = "wo"
+  [[register.field]]
+    name = "SRC26"
+    bits = "26"
+    type = "wo"
+  [[register.field]]
+    name = "SRC25"
+    bits = "25"
+    type = "wo"
+  [[register.field]]
+    name = "SRC24"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "SRC23"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "SRC22"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "SRC21"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "SRC20"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "SRC19"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "SRC18"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "SRC17"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "SRC16"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "SRC15"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "SRC14"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "SRC13"
+    bits = "13"
+    type = "wo"
+    shortdesc = '''RPU CPU1 ECC errors interrupt.'''
+    longdesc = '''All ECC interrupt of CPU1 are combined into this interrup'''
+  [[register.field]]
+    name = "SRC12"
+    bits = "12"
+    type = "wo"
+    shortdesc = '''RPU CPU0 ECC errors interrupt.'''
+    longdesc = '''All ECC interrupt of CPU0 are combined into this interrupt'''
+  [[register.field]]
+    name = "SRC11"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "SRC10"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "SRC9"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "SRC8"
+    bits = "8"
+    type = "wo"
+[[register]]
+  name = "GICP0_IRQ_DISABLE"
+  type = "wo"
+  width = 32
+  description = "Interrupt Disable Register. A write of one to this location will mask the interrupt. (IMR: 1)"
+  default = "0x00000000"
+  offset = "0x0000800C"
+  [[register.field]]
+    name = "SRC31"
+    bits = "31"
+    type = "wo"
+  [[register.field]]
+    name = "SRC30"
+    bits = "30"
+    type = "wo"
+  [[register.field]]
+    name = "SRC29"
+    bits = "29"
+    type = "wo"
+  [[register.field]]
+    name = "SRC28"
+    bits = "28"
+    type = "wo"
+  [[register.field]]
+    name = "SRC27"
+    bits = "27"
+    type = "wo"
+  [[register.field]]
+    name = "SRC26"
+    bits = "26"
+    type = "wo"
+  [[register.field]]
+    name = "SRC25"
+    bits = "25"
+    type = "wo"
+  [[register.field]]
+    name = "SRC24"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "SRC23"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "SRC22"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "SRC21"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "SRC20"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "SRC19"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "SRC18"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "SRC17"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "SRC16"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "SRC15"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "SRC14"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "SRC13"
+    bits = "13"
+    type = "wo"
+    shortdesc = '''RPU CPU1 ECC errors interrupt.'''
+    longdesc = '''All ECC interrupt of CPU1 are combined into this interrup'''
+  [[register.field]]
+    name = "SRC12"
+    bits = "12"
+    type = "wo"
+    shortdesc = '''RPU CPU0 ECC errors interrupt.'''
+    longdesc = '''All ECC interrupt of CPU0 are combined into this interrupt'''
+  [[register.field]]
+    name = "SRC11"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "SRC10"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "SRC9"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "SRC8"
+    bits = "8"
+    type = "wo"
+[[register]]
+  name = "GICP0_IRQ_TRIGGER"
+  type = "wo"
+  width = 32
+  description = "Interrupt Trigger Register. A write of one to this location will set the interrupt status register related to this interrupt."
+  default = "0x00000000"
+  offset = "0x00008010"
+  [[register.field]]
+    name = "SRC31"
+    bits = "31"
+    type = "wo"
+  [[register.field]]
+    name = "SRC30"
+    bits = "30"
+    type = "wo"
+  [[register.field]]
+    name = "SRC29"
+    bits = "29"
+    type = "wo"
+  [[register.field]]
+    name = "SRC28"
+    bits = "28"
+    type = "wo"
+  [[register.field]]
+    name = "SRC27"
+    bits = "27"
+    type = "wo"
+  [[register.field]]
+    name = "SRC26"
+    bits = "26"
+    type = "wo"
+  [[register.field]]
+    name = "SRC25"
+    bits = "25"
+    type = "wo"
+  [[register.field]]
+    name = "SRC24"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "SRC23"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "SRC22"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "SRC21"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "SRC20"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "SRC19"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "SRC18"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "SRC17"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "SRC16"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "SRC15"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "SRC14"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "SRC13"
+    bits = "13"
+    type = "wo"
+    shortdesc = '''RPU CPU1 ECC errors interrupt.'''
+    longdesc = '''All ECC interrupt of CPU1 are combined into this interrup'''
+  [[register.field]]
+    name = "SRC12"
+    bits = "12"
+    type = "wo"
+    shortdesc = '''RPU CPU0 ECC errors interrupt.'''
+    longdesc = '''All ECC interrupt of CPU0 are combined into this interrupt'''
+  [[register.field]]
+    name = "SRC11"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "SRC10"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "SRC9"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "SRC8"
+    bits = "8"
+    type = "wo"
+[[register]]
+  name = "GICP1_IRQ_STATUS"
+  type = "wtc"
+  width = 32
+  description = "Interrupt Status Register for intrN. This is a sticky register that holds the value of the interrupt until cleared by a value of 1."
+  default = "0x00000000"
+  offset = "0x00008014"
+  [[register.field]]
+    name = "SRC31"
+    bits = "31"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC30"
+    bits = "30"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC29"
+    bits = "29"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC28"
+    bits = "28"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC27"
+    bits = "27"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC26"
+    bits = "26"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC25"
+    bits = "25"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC24"
+    bits = "24"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC23"
+    bits = "23"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC22"
+    bits = "22"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC21"
+    bits = "21"
+    type = "wtc"
+    shortdesc = '''WDT in the CSUPMU: This is Edge trigger interrupt and Interrupt pulse width case be prograbble window from 40ns to 320ns.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC20"
+    bits = "20"
+    type = "wtc"
+    shortdesc = '''WDT in the LPD (IOU).'''
+    longdesc = '''This is Edge trigger interrupt and Interrupt pulse width case be prograbble window from 40ns to 320ns. This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC19"
+    bits = "19"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC18"
+    bits = "18"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC17"
+    bits = "17"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC16"
+    bits = "16"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC15"
+    bits = "15"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC14"
+    bits = "14"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC13"
+    bits = "13"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC12"
+    bits = "12"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC11"
+    bits = "11"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC10"
+    bits = "10"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC9"
+    bits = "9"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC8"
+    bits = "8"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC7"
+    bits = "7"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC6"
+    bits = "6"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC5"
+    bits = "5"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC4"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC3"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC2"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC1"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC0"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "GICP1_IRQ_MASK"
+  type = "ro"
+  width = 32
+  description = "Interrupt Mask Register for intrN. This is a read-only location and can be atomically altered by either the IDR or the IER."
+  default = "0xFFFFFFFF"
+  offset = "0x00008018"
+  [[register.field]]
+    name = "SRC31"
+    bits = "31"
+    type = "ro"
+  [[register.field]]
+    name = "SRC30"
+    bits = "30"
+    type = "ro"
+  [[register.field]]
+    name = "SRC29"
+    bits = "29"
+    type = "ro"
+  [[register.field]]
+    name = "SRC28"
+    bits = "28"
+    type = "ro"
+  [[register.field]]
+    name = "SRC27"
+    bits = "27"
+    type = "ro"
+  [[register.field]]
+    name = "SRC26"
+    bits = "26"
+    type = "ro"
+  [[register.field]]
+    name = "SRC25"
+    bits = "25"
+    type = "ro"
+  [[register.field]]
+    name = "SRC24"
+    bits = "24"
+    type = "ro"
+  [[register.field]]
+    name = "SRC23"
+    bits = "23"
+    type = "ro"
+  [[register.field]]
+    name = "SRC22"
+    bits = "22"
+    type = "ro"
+  [[register.field]]
+    name = "SRC21"
+    bits = "21"
+    type = "ro"
+    shortdesc = '''WDT in the CSUPMU: This is Edge trigger interrupt and Interrupt pulse width case be prograbble window from 40ns to 320ns.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC20"
+    bits = "20"
+    type = "ro"
+    shortdesc = '''WDT in the LPD (IOU).'''
+    longdesc = '''This is Edge trigger interrupt and Interrupt pulse width case be prograbble window from 40ns to 320ns. This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC19"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "SRC18"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "SRC17"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "SRC16"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "SRC15"
+    bits = "15"
+    type = "ro"
+  [[register.field]]
+    name = "SRC14"
+    bits = "14"
+    type = "ro"
+  [[register.field]]
+    name = "SRC13"
+    bits = "13"
+    type = "ro"
+  [[register.field]]
+    name = "SRC12"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "SRC11"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "SRC10"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "SRC9"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "SRC8"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "SRC7"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "SRC6"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "SRC5"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "SRC4"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "SRC3"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "SRC2"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "SRC1"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "SRC0"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "GICP1_IRQ_ENABLE"
+  type = "wo"
+  width = 32
+  description = "Interrupt Enable Register. A write of to this location will unmask the interrupt. (IMR: 0)"
+  default = "0x00000000"
+  offset = "0x0000801C"
+  [[register.field]]
+    name = "SRC31"
+    bits = "31"
+    type = "wo"
+  [[register.field]]
+    name = "SRC30"
+    bits = "30"
+    type = "wo"
+  [[register.field]]
+    name = "SRC29"
+    bits = "29"
+    type = "wo"
+  [[register.field]]
+    name = "SRC28"
+    bits = "28"
+    type = "wo"
+  [[register.field]]
+    name = "SRC27"
+    bits = "27"
+    type = "wo"
+  [[register.field]]
+    name = "SRC26"
+    bits = "26"
+    type = "wo"
+  [[register.field]]
+    name = "SRC25"
+    bits = "25"
+    type = "wo"
+  [[register.field]]
+    name = "SRC24"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "SRC23"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "SRC22"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "SRC21"
+    bits = "21"
+    type = "wo"
+    shortdesc = '''WDT in the CSUPMU: This is Edge trigger interrupt and Interrupt pulse width case be prograbble window from 40ns to 320ns.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC20"
+    bits = "20"
+    type = "wo"
+    shortdesc = '''WDT in the LPD (IOU).'''
+    longdesc = '''This is Edge trigger interrupt and Interrupt pulse width case be prograbble window from 40ns to 320ns. This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC19"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "SRC18"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "SRC17"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "SRC16"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "SRC15"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "SRC14"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "SRC13"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "SRC12"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "SRC11"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "SRC10"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "SRC9"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "SRC8"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "SRC7"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "SRC6"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "SRC5"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "SRC4"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "SRC3"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "SRC2"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "SRC1"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "SRC0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "GICP1_IRQ_DISABLE"
+  type = "wo"
+  width = 32
+  description = "Interrupt Disable Register. A write of one to this location will mask the interrupt. (IMR: 1)"
+  default = "0x00000000"
+  offset = "0x00008020"
+  [[register.field]]
+    name = "SRC31"
+    bits = "31"
+    type = "wo"
+  [[register.field]]
+    name = "SRC30"
+    bits = "30"
+    type = "wo"
+  [[register.field]]
+    name = "SRC29"
+    bits = "29"
+    type = "wo"
+  [[register.field]]
+    name = "SRC28"
+    bits = "28"
+    type = "wo"
+  [[register.field]]
+    name = "SRC27"
+    bits = "27"
+    type = "wo"
+  [[register.field]]
+    name = "SRC26"
+    bits = "26"
+    type = "wo"
+  [[register.field]]
+    name = "SRC25"
+    bits = "25"
+    type = "wo"
+  [[register.field]]
+    name = "SRC24"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "SRC23"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "SRC22"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "SRC21"
+    bits = "21"
+    type = "wo"
+    shortdesc = '''WDT in the CSUPMU: This is Edge trigger interrupt and Interrupt pulse width case be prograbble window from 40ns to 320ns.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC20"
+    bits = "20"
+    type = "wo"
+    shortdesc = '''WDT in the LPD (IOU).'''
+    longdesc = '''This is Edge trigger interrupt and Interrupt pulse width case be prograbble window from 40ns to 320ns. This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC19"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "SRC18"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "SRC17"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "SRC16"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "SRC15"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "SRC14"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "SRC13"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "SRC12"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "SRC11"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "SRC10"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "SRC9"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "SRC8"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "SRC7"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "SRC6"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "SRC5"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "SRC4"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "SRC3"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "SRC2"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "SRC1"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "SRC0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "GICP1_IRQ_TRIGGER"
+  type = "wo"
+  width = 32
+  description = "Interrupt Trigger Register. A write of one to this location will set the interrupt status register related to this interrupt."
+  default = "0x00000000"
+  offset = "0x00008024"
+  [[register.field]]
+    name = "SRC31"
+    bits = "31"
+    type = "wo"
+  [[register.field]]
+    name = "SRC30"
+    bits = "30"
+    type = "wo"
+  [[register.field]]
+    name = "SRC29"
+    bits = "29"
+    type = "wo"
+  [[register.field]]
+    name = "SRC28"
+    bits = "28"
+    type = "wo"
+  [[register.field]]
+    name = "SRC27"
+    bits = "27"
+    type = "wo"
+  [[register.field]]
+    name = "SRC26"
+    bits = "26"
+    type = "wo"
+  [[register.field]]
+    name = "SRC25"
+    bits = "25"
+    type = "wo"
+  [[register.field]]
+    name = "SRC24"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "SRC23"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "SRC22"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "SRC21"
+    bits = "21"
+    type = "wo"
+    shortdesc = '''WDT in the CSUPMU: This is Edge trigger interrupt and Interrupt pulse width case be prograbble window from 40ns to 320ns.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC20"
+    bits = "20"
+    type = "wo"
+    shortdesc = '''WDT in the LPD (IOU).'''
+    longdesc = '''This is Edge trigger interrupt and Interrupt pulse width case be prograbble window from 40ns to 320ns. This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC19"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "SRC18"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "SRC17"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "SRC16"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "SRC15"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "SRC14"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "SRC13"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "SRC12"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "SRC11"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "SRC10"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "SRC9"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "SRC8"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "SRC7"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "SRC6"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "SRC5"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "SRC4"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "SRC3"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "SRC2"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "SRC1"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "SRC0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "GICP2_IRQ_STATUS"
+  type = "wtc"
+  width = 32
+  description = "Interrupt Status Register for intrN. This is a sticky register that holds the value of the interrupt until cleared by a value of 1."
+  default = "0x00000000"
+  offset = "0x00008028"
+  [[register.field]]
+    name = "SRC31"
+    bits = "31"
+    type = "wtc"
+    shortdesc = '''Bit 6 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC30"
+    bits = "30"
+    type = "wtc"
+    shortdesc = '''Bit 5 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC29"
+    bits = "29"
+    type = "wtc"
+    shortdesc = '''Bit 4 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC28"
+    bits = "28"
+    type = "wtc"
+    shortdesc = '''Bit 3 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC27"
+    bits = "27"
+    type = "wtc"
+    shortdesc = '''Bit 2 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC26"
+    bits = "26"
+    type = "wtc"
+    shortdesc = '''Bit 1 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC25"
+    bits = "25"
+    type = "wtc"
+    shortdesc = '''Bit 0 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC24"
+    bits = "24"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC23"
+    bits = "23"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC22"
+    bits = "22"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC21"
+    bits = "21"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC20"
+    bits = "20"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC19"
+    bits = "19"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC18"
+    bits = "18"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC17"
+    bits = "17"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC16"
+    bits = "16"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC15"
+    bits = "15"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC14"
+    bits = "14"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC13"
+    bits = "13"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC12"
+    bits = "12"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC11"
+    bits = "11"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC10"
+    bits = "10"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC9"
+    bits = "9"
+    type = "wtc"
+    shortdesc = '''USB3_1 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Control type'''
+  [[register.field]]
+    name = "SRC8"
+    bits = "8"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC7"
+    bits = "7"
+    type = "wtc"
+    shortdesc = '''USB3_1 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Isochronous'''
+  [[register.field]]
+    name = "SRC6"
+    bits = "6"
+    type = "wtc"
+    shortdesc = '''USB3_1 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Bulk'''
+  [[register.field]]
+    name = "SRC5"
+    bits = "5"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC4"
+    bits = "4"
+    type = "wtc"
+    shortdesc = '''USB3_0 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Control type'''
+  [[register.field]]
+    name = "SRC3"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC2"
+    bits = "2"
+    type = "wtc"
+    shortdesc = '''USB3_0 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Isochronous'''
+  [[register.field]]
+    name = "SRC1"
+    bits = "1"
+    type = "wtc"
+    shortdesc = '''USB3_0 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Bulk'''
+  [[register.field]]
+    name = "SRC0"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "GICP2_IRQ_MASK"
+  type = "ro"
+  width = 32
+  description = "Interrupt Mask Register for intrN. This is a read-only location and can be atomically altered by either the IDR or the IER."
+  default = "0xFFFFFFFF"
+  offset = "0x0000802C"
+  [[register.field]]
+    name = "SRC31"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''Bit 6 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC30"
+    bits = "30"
+    type = "ro"
+    shortdesc = '''Bit 5 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC29"
+    bits = "29"
+    type = "ro"
+    shortdesc = '''Bit 4 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC28"
+    bits = "28"
+    type = "ro"
+    shortdesc = '''Bit 3 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC27"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''Bit 2 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC26"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''Bit 1 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC25"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''Bit 0 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC24"
+    bits = "24"
+    type = "ro"
+  [[register.field]]
+    name = "SRC23"
+    bits = "23"
+    type = "ro"
+  [[register.field]]
+    name = "SRC22"
+    bits = "22"
+    type = "ro"
+  [[register.field]]
+    name = "SRC21"
+    bits = "21"
+    type = "ro"
+  [[register.field]]
+    name = "SRC20"
+    bits = "20"
+    type = "ro"
+  [[register.field]]
+    name = "SRC19"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "SRC18"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "SRC17"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "SRC16"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "SRC15"
+    bits = "15"
+    type = "ro"
+  [[register.field]]
+    name = "SRC14"
+    bits = "14"
+    type = "ro"
+  [[register.field]]
+    name = "SRC13"
+    bits = "13"
+    type = "ro"
+  [[register.field]]
+    name = "SRC12"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "SRC11"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "SRC10"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "SRC9"
+    bits = "9"
+    type = "ro"
+    shortdesc = '''USB3_1 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Control type'''
+  [[register.field]]
+    name = "SRC8"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "SRC7"
+    bits = "7"
+    type = "ro"
+    shortdesc = '''USB3_1 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Isochronous'''
+  [[register.field]]
+    name = "SRC6"
+    bits = "6"
+    type = "ro"
+    shortdesc = '''USB3_1 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Bulk'''
+  [[register.field]]
+    name = "SRC5"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "SRC4"
+    bits = "4"
+    type = "ro"
+    shortdesc = '''USB3_0 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Control type'''
+  [[register.field]]
+    name = "SRC3"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "SRC2"
+    bits = "2"
+    type = "ro"
+    shortdesc = '''USB3_0 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Isochronous'''
+  [[register.field]]
+    name = "SRC1"
+    bits = "1"
+    type = "ro"
+    shortdesc = '''USB3_0 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Bulk'''
+  [[register.field]]
+    name = "SRC0"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "GICP2_IRQ_ENABLE"
+  type = "wo"
+  width = 32
+  description = "Interrupt Enable Register. A write of to this location will unmask the interrupt. (IMR: 0)"
+  default = "0x00000000"
+  offset = "0x00008030"
+  [[register.field]]
+    name = "SRC31"
+    bits = "31"
+    type = "wo"
+    shortdesc = '''Bit 6 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC30"
+    bits = "30"
+    type = "wo"
+    shortdesc = '''Bit 5 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC29"
+    bits = "29"
+    type = "wo"
+    shortdesc = '''Bit 4 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC28"
+    bits = "28"
+    type = "wo"
+    shortdesc = '''Bit 3 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC27"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Bit 2 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC26"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Bit 1 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC25"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Bit 0 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC24"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "SRC23"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "SRC22"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "SRC21"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "SRC20"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "SRC19"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "SRC18"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "SRC17"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "SRC16"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "SRC15"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "SRC14"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "SRC13"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "SRC12"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "SRC11"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "SRC10"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "SRC9"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''USB3_1 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Control type'''
+  [[register.field]]
+    name = "SRC8"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "SRC7"
+    bits = "7"
+    type = "wo"
+    shortdesc = '''USB3_1 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Isochronous'''
+  [[register.field]]
+    name = "SRC6"
+    bits = "6"
+    type = "wo"
+    shortdesc = '''USB3_1 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Bulk'''
+  [[register.field]]
+    name = "SRC5"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "SRC4"
+    bits = "4"
+    type = "wo"
+    shortdesc = '''USB3_0 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Control type'''
+  [[register.field]]
+    name = "SRC3"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "SRC2"
+    bits = "2"
+    type = "wo"
+    shortdesc = '''USB3_0 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Isochronous'''
+  [[register.field]]
+    name = "SRC1"
+    bits = "1"
+    type = "wo"
+    shortdesc = '''USB3_0 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Bulk'''
+  [[register.field]]
+    name = "SRC0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "GICP2_IRQ_DISABLE"
+  type = "wo"
+  width = 32
+  description = "Interrupt Disable Register. A write of one to this location will mask the interrupt. (IMR: 1)"
+  default = "0x00000000"
+  offset = "0x00008034"
+  [[register.field]]
+    name = "SRC31"
+    bits = "31"
+    type = "wo"
+    shortdesc = '''Bit 6 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC30"
+    bits = "30"
+    type = "wo"
+    shortdesc = '''Bit 5 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC29"
+    bits = "29"
+    type = "wo"
+    shortdesc = '''Bit 4 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC28"
+    bits = "28"
+    type = "wo"
+    shortdesc = '''Bit 3 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC27"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Bit 2 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC26"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Bit 1 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC25"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Bit 0 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC24"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "SRC23"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "SRC22"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "SRC21"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "SRC20"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "SRC19"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "SRC18"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "SRC17"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "SRC16"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "SRC15"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "SRC14"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "SRC13"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "SRC12"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "SRC11"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "SRC10"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "SRC9"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''USB3_1 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Control type'''
+  [[register.field]]
+    name = "SRC8"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "SRC7"
+    bits = "7"
+    type = "wo"
+    shortdesc = '''USB3_1 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Isochronous'''
+  [[register.field]]
+    name = "SRC6"
+    bits = "6"
+    type = "wo"
+    shortdesc = '''USB3_1 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Bulk'''
+  [[register.field]]
+    name = "SRC5"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "SRC4"
+    bits = "4"
+    type = "wo"
+    shortdesc = '''USB3_0 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Control type'''
+  [[register.field]]
+    name = "SRC3"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "SRC2"
+    bits = "2"
+    type = "wo"
+    shortdesc = '''USB3_0 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Isochronous'''
+  [[register.field]]
+    name = "SRC1"
+    bits = "1"
+    type = "wo"
+    shortdesc = '''USB3_0 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Bulk'''
+  [[register.field]]
+    name = "SRC0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "GICP2_IRQ_TRIGGER"
+  type = "wo"
+  width = 32
+  description = "Interrupt Trigger Register. A write of one to this location will set the interrupt status register related to this interrupt."
+  default = "0x00000000"
+  offset = "0x00008038"
+  [[register.field]]
+    name = "SRC31"
+    bits = "31"
+    type = "wo"
+    shortdesc = '''Bit 6 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC30"
+    bits = "30"
+    type = "wo"
+    shortdesc = '''Bit 5 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC29"
+    bits = "29"
+    type = "wo"
+    shortdesc = '''Bit 4 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC28"
+    bits = "28"
+    type = "wo"
+    shortdesc = '''Bit 3 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC27"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Bit 2 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC26"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Bit 1 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC25"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Bit 0 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC24"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "SRC23"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "SRC22"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "SRC21"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "SRC20"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "SRC19"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "SRC18"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "SRC17"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "SRC16"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "SRC15"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "SRC14"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "SRC13"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "SRC12"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "SRC11"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "SRC10"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "SRC9"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''USB3_1 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Control type'''
+  [[register.field]]
+    name = "SRC8"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "SRC7"
+    bits = "7"
+    type = "wo"
+    shortdesc = '''USB3_1 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Isochronous'''
+  [[register.field]]
+    name = "SRC6"
+    bits = "6"
+    type = "wo"
+    shortdesc = '''USB3_1 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Bulk'''
+  [[register.field]]
+    name = "SRC5"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "SRC4"
+    bits = "4"
+    type = "wo"
+    shortdesc = '''USB3_0 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Control type'''
+  [[register.field]]
+    name = "SRC3"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "SRC2"
+    bits = "2"
+    type = "wo"
+    shortdesc = '''USB3_0 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Isochronous'''
+  [[register.field]]
+    name = "SRC1"
+    bits = "1"
+    type = "wo"
+    shortdesc = '''USB3_0 Endpoint related interrupts.'''
+    longdesc = '''Interrupt for Bulk'''
+  [[register.field]]
+    name = "SRC0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "GICP3_IRQ_STATUS"
+  type = "wtc"
+  width = 32
+  description = "Interrupt Status Register for intrN. This is a sticky register that holds the value of the interrupt until cleared by a value of 1."
+  default = "0x00000000"
+  offset = "0x0000803C"
+  [[register.field]]
+    name = "SRC31"
+    bits = "31"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC30"
+    bits = "30"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC29"
+    bits = "29"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC28"
+    bits = "28"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC27"
+    bits = "27"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC26"
+    bits = "26"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC25"
+    bits = "25"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC24"
+    bits = "24"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC23"
+    bits = "23"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC22"
+    bits = "22"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC21"
+    bits = "21"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC20"
+    bits = "20"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC19"
+    bits = "19"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC18"
+    bits = "18"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC17"
+    bits = "17"
+    type = "wtc"
+    shortdesc = '''FPD Top Level Watch Dog Timer Interrupt.'''
+    longdesc = '''This is Edge trigger interrupt and Interrupt pulse width case be prograbble window from 40ns to 320ns. This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC16"
+    bits = "16"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC15"
+    bits = "15"
+    type = "wtc"
+    shortdesc = '''Bit 7 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC14"
+    bits = "14"
+    type = "wtc"
+    shortdesc = '''Bit 6 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC13"
+    bits = "13"
+    type = "wtc"
+    shortdesc = '''Bit 5 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC12"
+    bits = "12"
+    type = "wtc"
+    shortdesc = '''Bit 4 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC11"
+    bits = "11"
+    type = "wtc"
+    shortdesc = '''Bit 3 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC10"
+    bits = "10"
+    type = "wtc"
+    shortdesc = '''Bit 2 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC9"
+    bits = "9"
+    type = "wtc"
+    shortdesc = '''Bit 1 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC8"
+    bits = "8"
+    type = "wtc"
+    shortdesc = '''Bit 0 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC0"
+    bits = "0"
+    type = "wtc"
+    shortdesc = '''Bit 7 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+[[register]]
+  name = "GICP3_IRQ_MASK"
+  type = "ro"
+  width = 32
+  description = "Interrupt Mask Register for intrN. This is a read-only location and can be atomically altered by either the IDR or the IER."
+  default = "0xFFFFFFFF"
+  offset = "0x00008040"
+  [[register.field]]
+    name = "SRC31"
+    bits = "31"
+    type = "ro"
+  [[register.field]]
+    name = "SRC30"
+    bits = "30"
+    type = "ro"
+  [[register.field]]
+    name = "SRC29"
+    bits = "29"
+    type = "ro"
+  [[register.field]]
+    name = "SRC28"
+    bits = "28"
+    type = "ro"
+  [[register.field]]
+    name = "SRC27"
+    bits = "27"
+    type = "ro"
+  [[register.field]]
+    name = "SRC26"
+    bits = "26"
+    type = "ro"
+  [[register.field]]
+    name = "SRC25"
+    bits = "25"
+    type = "ro"
+  [[register.field]]
+    name = "SRC24"
+    bits = "24"
+    type = "ro"
+  [[register.field]]
+    name = "SRC23"
+    bits = "23"
+    type = "ro"
+  [[register.field]]
+    name = "SRC22"
+    bits = "22"
+    type = "ro"
+  [[register.field]]
+    name = "SRC21"
+    bits = "21"
+    type = "ro"
+  [[register.field]]
+    name = "SRC20"
+    bits = "20"
+    type = "ro"
+  [[register.field]]
+    name = "SRC19"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "SRC18"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "SRC17"
+    bits = "17"
+    type = "ro"
+    shortdesc = '''FPD Top Level Watch Dog Timer Interrupt.'''
+    longdesc = '''This is Edge trigger interrupt and Interrupt pulse width case be prograbble window from 40ns to 320ns. This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC16"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "SRC15"
+    bits = "15"
+    type = "ro"
+    shortdesc = '''Bit 7 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC14"
+    bits = "14"
+    type = "ro"
+    shortdesc = '''Bit 6 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC13"
+    bits = "13"
+    type = "ro"
+    shortdesc = '''Bit 5 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC12"
+    bits = "12"
+    type = "ro"
+    shortdesc = '''Bit 4 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC11"
+    bits = "11"
+    type = "ro"
+    shortdesc = '''Bit 3 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC10"
+    bits = "10"
+    type = "ro"
+    shortdesc = '''Bit 2 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC9"
+    bits = "9"
+    type = "ro"
+    shortdesc = '''Bit 1 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC8"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Bit 0 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC0"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Bit 7 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+[[register]]
+  name = "GICP3_IRQ_ENABLE"
+  type = "wo"
+  width = 32
+  description = "Interrupt Enable Register. A write of to this location will unmask the interrupt. (IMR: 0)"
+  default = "0x00000000"
+  offset = "0x00008044"
+  [[register.field]]
+    name = "SRC31"
+    bits = "31"
+    type = "wo"
+  [[register.field]]
+    name = "SRC30"
+    bits = "30"
+    type = "wo"
+  [[register.field]]
+    name = "SRC29"
+    bits = "29"
+    type = "wo"
+  [[register.field]]
+    name = "SRC28"
+    bits = "28"
+    type = "wo"
+  [[register.field]]
+    name = "SRC27"
+    bits = "27"
+    type = "wo"
+  [[register.field]]
+    name = "SRC26"
+    bits = "26"
+    type = "wo"
+  [[register.field]]
+    name = "SRC25"
+    bits = "25"
+    type = "wo"
+  [[register.field]]
+    name = "SRC24"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "SRC23"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "SRC22"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "SRC21"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "SRC20"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "SRC19"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "SRC18"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "SRC17"
+    bits = "17"
+    type = "wo"
+    shortdesc = '''FPD Top Level Watch Dog Timer Interrupt.'''
+    longdesc = '''This is Edge trigger interrupt and Interrupt pulse width case be prograbble window from 40ns to 320ns. This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC16"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "SRC15"
+    bits = "15"
+    type = "wo"
+    shortdesc = '''Bit 7 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC14"
+    bits = "14"
+    type = "wo"
+    shortdesc = '''Bit 6 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC13"
+    bits = "13"
+    type = "wo"
+    shortdesc = '''Bit 5 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC12"
+    bits = "12"
+    type = "wo"
+    shortdesc = '''Bit 4 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC11"
+    bits = "11"
+    type = "wo"
+    shortdesc = '''Bit 3 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC10"
+    bits = "10"
+    type = "wo"
+    shortdesc = '''Bit 2 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC9"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Bit 1 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC8"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Bit 0 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Bit 7 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+[[register]]
+  name = "GICP3_IRQ_DISABLE"
+  type = "wo"
+  width = 32
+  description = "Interrupt Disable Register. A write of one to this location will mask the interrupt. (IMR: 1)"
+  default = "0x00000000"
+  offset = "0x00008048"
+  [[register.field]]
+    name = "SRC31"
+    bits = "31"
+    type = "wo"
+  [[register.field]]
+    name = "SRC30"
+    bits = "30"
+    type = "wo"
+  [[register.field]]
+    name = "SRC29"
+    bits = "29"
+    type = "wo"
+  [[register.field]]
+    name = "SRC28"
+    bits = "28"
+    type = "wo"
+  [[register.field]]
+    name = "SRC27"
+    bits = "27"
+    type = "wo"
+  [[register.field]]
+    name = "SRC26"
+    bits = "26"
+    type = "wo"
+  [[register.field]]
+    name = "SRC25"
+    bits = "25"
+    type = "wo"
+  [[register.field]]
+    name = "SRC24"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "SRC23"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "SRC22"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "SRC21"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "SRC20"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "SRC19"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "SRC18"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "SRC17"
+    bits = "17"
+    type = "wo"
+    shortdesc = '''FPD Top Level Watch Dog Timer Interrupt.'''
+    longdesc = '''This is Edge trigger interrupt and Interrupt pulse width case be prograbble window from 40ns to 320ns. This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC16"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "SRC15"
+    bits = "15"
+    type = "wo"
+    shortdesc = '''Bit 7 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC14"
+    bits = "14"
+    type = "wo"
+    shortdesc = '''Bit 6 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC13"
+    bits = "13"
+    type = "wo"
+    shortdesc = '''Bit 5 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC12"
+    bits = "12"
+    type = "wo"
+    shortdesc = '''Bit 4 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC11"
+    bits = "11"
+    type = "wo"
+    shortdesc = '''Bit 3 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC10"
+    bits = "10"
+    type = "wo"
+    shortdesc = '''Bit 2 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC9"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Bit 1 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC8"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Bit 0 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Bit 7 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+[[register]]
+  name = "GICP3_IRQ_TRIGGER"
+  type = "wo"
+  width = 32
+  description = "Interrupt Trigger Register. A write of one to this location will set the interrupt status register related to this interrupt."
+  default = "0x00000000"
+  offset = "0x0000804C"
+  [[register.field]]
+    name = "SRC31"
+    bits = "31"
+    type = "wo"
+  [[register.field]]
+    name = "SRC30"
+    bits = "30"
+    type = "wo"
+  [[register.field]]
+    name = "SRC29"
+    bits = "29"
+    type = "wo"
+  [[register.field]]
+    name = "SRC28"
+    bits = "28"
+    type = "wo"
+  [[register.field]]
+    name = "SRC27"
+    bits = "27"
+    type = "wo"
+  [[register.field]]
+    name = "SRC26"
+    bits = "26"
+    type = "wo"
+  [[register.field]]
+    name = "SRC25"
+    bits = "25"
+    type = "wo"
+  [[register.field]]
+    name = "SRC24"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "SRC23"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "SRC22"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "SRC21"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "SRC20"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "SRC19"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "SRC18"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "SRC17"
+    bits = "17"
+    type = "wo"
+    shortdesc = '''FPD Top Level Watch Dog Timer Interrupt.'''
+    longdesc = '''This is Edge trigger interrupt and Interrupt pulse width case be prograbble window from 40ns to 320ns. This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC16"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "SRC15"
+    bits = "15"
+    type = "wo"
+    shortdesc = '''Bit 7 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC14"
+    bits = "14"
+    type = "wo"
+    shortdesc = '''Bit 6 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC13"
+    bits = "13"
+    type = "wo"
+    shortdesc = '''Bit 5 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC12"
+    bits = "12"
+    type = "wo"
+    shortdesc = '''Bit 4 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC11"
+    bits = "11"
+    type = "wo"
+    shortdesc = '''Bit 3 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC10"
+    bits = "10"
+    type = "wo"
+    shortdesc = '''Bit 2 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC9"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Bit 1 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC8"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Bit 0 of PL_PS IRQ1.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+  [[register.field]]
+    name = "SRC0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Bit 7 of PL_PS IRQ0.'''
+    longdesc = '''This signal synchronized using double-flops; due to this method of synchronization, the duration of the narrowest 'pulse' must be accounted for.'''
+[[register]]
+  name = "GICP4_IRQ_STATUS"
+  type = "wtc"
+  width = 32
+  description = "Interrupt Status Register for intrN. This is a sticky register that holds the value of the interrupt until cleared by a value of 1."
+  default = "0x00000000"
+  offset = "0x00008050"
+  [[register.field]]
+    name = "SRC27"
+    bits = "27"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC26"
+    bits = "26"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC25"
+    bits = "25"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC24"
+    bits = "24"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC23"
+    bits = "23"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC22"
+    bits = "22"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC21"
+    bits = "21"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC20"
+    bits = "20"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC19"
+    bits = "19"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC18"
+    bits = "18"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC17"
+    bits = "17"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC16"
+    bits = "16"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC15"
+    bits = "15"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC14"
+    bits = "14"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC13"
+    bits = "13"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC12"
+    bits = "12"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC11"
+    bits = "11"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC10"
+    bits = "10"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC9"
+    bits = "9"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC8"
+    bits = "8"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC7"
+    bits = "7"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC6"
+    bits = "6"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC5"
+    bits = "5"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC4"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC3"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC2"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC1"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC0"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "GICP4_IRQ_MASK"
+  type = "ro"
+  width = 32
+  description = "Interrupt Mask Register for intrN. This is a read-only location and can be atomically altered by either the IDR or the IER."
+  default = "0xFFFFFFFF"
+  offset = "0x00008054"
+  [[register.field]]
+    name = "SRC27"
+    bits = "27"
+    type = "ro"
+  [[register.field]]
+    name = "SRC26"
+    bits = "26"
+    type = "ro"
+  [[register.field]]
+    name = "SRC25"
+    bits = "25"
+    type = "ro"
+  [[register.field]]
+    name = "SRC24"
+    bits = "24"
+    type = "ro"
+  [[register.field]]
+    name = "SRC23"
+    bits = "23"
+    type = "ro"
+  [[register.field]]
+    name = "SRC22"
+    bits = "22"
+    type = "ro"
+  [[register.field]]
+    name = "SRC21"
+    bits = "21"
+    type = "ro"
+  [[register.field]]
+    name = "SRC20"
+    bits = "20"
+    type = "ro"
+  [[register.field]]
+    name = "SRC19"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "SRC18"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "SRC17"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "SRC16"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "SRC15"
+    bits = "15"
+    type = "ro"
+  [[register.field]]
+    name = "SRC14"
+    bits = "14"
+    type = "ro"
+  [[register.field]]
+    name = "SRC13"
+    bits = "13"
+    type = "ro"
+  [[register.field]]
+    name = "SRC12"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "SRC11"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "SRC10"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "SRC9"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "SRC8"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "SRC7"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "SRC6"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "SRC5"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "SRC4"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "SRC3"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "SRC2"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "SRC1"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "SRC0"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "GICP4_IRQ_ENABLE"
+  type = "wo"
+  width = 32
+  description = "Interrupt Enable Register. A write of to this location will unmask the interrupt. (IMR: 0)"
+  default = "0x00000000"
+  offset = "0x00008058"
+  [[register.field]]
+    name = "SRC27"
+    bits = "27"
+    type = "wo"
+  [[register.field]]
+    name = "SRC26"
+    bits = "26"
+    type = "wo"
+  [[register.field]]
+    name = "SRC25"
+    bits = "25"
+    type = "wo"
+  [[register.field]]
+    name = "SRC24"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "SRC23"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "SRC22"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "SRC21"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "SRC20"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "SRC19"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "SRC18"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "SRC17"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "SRC16"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "SRC15"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "SRC14"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "SRC13"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "SRC12"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "SRC11"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "SRC10"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "SRC9"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "SRC8"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "SRC7"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "SRC6"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "SRC5"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "SRC4"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "SRC3"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "SRC2"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "SRC1"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "SRC0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "GICP4_IRQ_DISABLE"
+  type = "wo"
+  width = 32
+  description = "Interrupt Disable Register. A write of one to this location will mask the interrupt. (IMR: 1)"
+  default = "0x00000000"
+  offset = "0x0000805C"
+  [[register.field]]
+    name = "SRC27"
+    bits = "27"
+    type = "wo"
+  [[register.field]]
+    name = "SRC26"
+    bits = "26"
+    type = "wo"
+  [[register.field]]
+    name = "SRC25"
+    bits = "25"
+    type = "wo"
+  [[register.field]]
+    name = "SRC24"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "SRC23"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "SRC22"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "SRC21"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "SRC20"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "SRC19"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "SRC18"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "SRC17"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "SRC16"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "SRC15"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "SRC14"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "SRC13"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "SRC12"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "SRC11"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "SRC10"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "SRC9"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "SRC8"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "SRC7"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "SRC6"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "SRC5"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "SRC4"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "SRC3"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "SRC2"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "SRC1"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "SRC0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "GICP4_IRQ_TRIGGER"
+  type = "wo"
+  width = 32
+  description = "Interrupt Trigger Register. A write of one to this location will set the interrupt status register related to this interrupt."
+  default = "0x00000000"
+  offset = "0x00008060"
+  [[register.field]]
+    name = "SRC27"
+    bits = "27"
+    type = "wo"
+  [[register.field]]
+    name = "SRC26"
+    bits = "26"
+    type = "wo"
+  [[register.field]]
+    name = "SRC25"
+    bits = "25"
+    type = "wo"
+  [[register.field]]
+    name = "SRC24"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "SRC23"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "SRC22"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "SRC21"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "SRC20"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "SRC19"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "SRC18"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "SRC17"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "SRC16"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "SRC15"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "SRC14"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "SRC13"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "SRC12"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "SRC11"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "SRC10"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "SRC9"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "SRC8"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "SRC7"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "SRC6"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "SRC5"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "SRC4"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "SRC3"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "SRC2"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "SRC1"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "SRC0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "GICP_PMU_IRQ_STATUS"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Status Register for intrN. This is a sticky register that holds the value of the interrupt until cleared by a value of 1."
+  default = "0x00000000"
+  offset = "0x000080A0"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "raz"
+  [[register.field]]
+    name = "SRC4"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC3"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC2"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC1"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "SRC0"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "GICP_PMU_IRQ_MASK"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Mask Register for intrN. This is a read-only location and can be atomically altered by either the IDR or the IER."
+  default = "0x000000FF"
+  offset = "0x000080A4"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "raz"
+  [[register.field]]
+    name = "SRC4"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "SRC3"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "SRC2"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "SRC1"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "SRC0"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "GICP_PMU_IRQ_ENABLE"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Enable Register. A write of to this location will unmask the interrupt. (IMR: 0)"
+  default = "0x00000000"
+  offset = "0x000080A8"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "raz"
+  [[register.field]]
+    name = "SRC4"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "SRC3"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "SRC2"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "SRC1"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "SRC0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "GICP_PMU_IRQ_DISABLE"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Disable Register. A write of one to this location will mask the interrupt. (IMR: 1)"
+  default = "0x00000000"
+  offset = "0x000080AC"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "raz"
+  [[register.field]]
+    name = "SRC4"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "SRC3"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "SRC2"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "SRC1"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "SRC0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "GICP_PMU_IRQ_TRIGGER"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Trigger Register. A write of one to this location will set the interrupt status register related to this interrupt."
+  default = "0x00000000"
+  offset = "0x000080B0"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "raz"
+  [[register.field]]
+    name = "SRC4"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "SRC3"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "SRC2"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "SRC1"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "SRC0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "AFI_FS"
+  type = "mixed"
+  width = 16
+  description = "afi fs SLCR control register. Do not change the bits durin"
+  default = "0x00000200"
+  offset = "0x00009000"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "DW_SS2_SEL"
+    bits = "9:8"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:0"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+[[register]]
+  name = "LPD_CCI"
+  type = "rw"
+  width = 32
+  description = "CCI Configuration. This register may be written to only when FPD Interconnect is in reset."
+  default = "0x03801C07"
+  offset = "0x0000A000"
+  [[register.field]]
+    name = "QVNVNETS4"
+    bits = "27"
+    type = "rw"
+  [[register.field]]
+    name = "QVNVNETS3"
+    bits = "26"
+    type = "rw"
+  [[register.field]]
+    name = "QVNVNETS2"
+    bits = "25"
+    type = "rw"
+  [[register.field]]
+    name = "QVNVNETS1"
+    bits = "24"
+    type = "rw"
+  [[register.field]]
+    name = "QVNVNETS0"
+    bits = "23"
+    type = "rw"
+  [[register.field]]
+    name = "QOSOVERRIDE"
+    bits = "22:18"
+    type = "rw"
+  [[register.field]]
+    name = "QVNENABLE_M2"
+    bits = "17"
+    type = "rw"
+  [[register.field]]
+    name = "QVNENABLE_M1"
+    bits = "16"
+    type = "rw"
+  [[register.field]]
+    name = "STRIPING_GRANULE"
+    bits = "15:13"
+    type = "rw"
+    shortdesc = '''Sets the stripe granule size for regions devined as striping between interfaces M1 and M2.'''
+    longdesc = '''Use onf of the following settings: 3'b000=4KB; 3'b001=128Byte; 3'b010=256Byte; 3'b011=512Byte; 3'b100=1KB; 3'b101=2KB; 3'b110=Reserved; 3'b111=Reserved'''
+  [[register.field]]
+    name = "ACCHANNELEN4"
+    bits = "12"
+    type = "rw"
+  [[register.field]]
+    name = "ACCHANNELEN3"
+    bits = "11"
+    type = "rw"
+  [[register.field]]
+    name = "ACCHANNELEN0"
+    bits = "10"
+    type = "rw"
+  [[register.field]]
+    name = "ECOREVNUM"
+    bits = "9:6"
+    type = "rw"
+  [[register.field]]
+    name = "ASA2"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "ASA1"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "ASA0"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "OWO2"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "OWO1"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "OWO0"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "LPD_CCI_ADDRMAP"
+  type = "rw"
+  width = 32
+  description = "Address Decode for each reguion of the address map of CCI. This register may be written to only when FPD Interconnect is in reset."
+  default = "0x00C000FF"
+  offset = "0x0000A004"
+  [[register.field]]
+    name = "15"
+    bits = "31:30"
+    type = "rw"
+    shortdesc = '''2'b00=M0; 2'b01=M1; 2'b10=M2; 2'b11=M1 and M2 striped accoss the region.'''
+    longdesc = '''The stripe size is configured using the striping_granule register'''
+  [[register.field]]
+    name = "14"
+    bits = "29:28"
+    type = "rw"
+    shortdesc = '''2'b00=M0; 2'b01=M1; 2'b10=M2; 2'b11=M1 and M2 striped accoss the region.'''
+    longdesc = '''The stripe size is configured using the striping_granule register'''
+  [[register.field]]
+    name = "13"
+    bits = "27:26"
+    type = "rw"
+    shortdesc = '''2'b00=M0; 2'b01=M1; 2'b10=M2; 2'b11=M1 and M2 striped accoss the region.'''
+    longdesc = '''The stripe size is configured using the striping_granule register'''
+  [[register.field]]
+    name = "12"
+    bits = "25:24"
+    type = "rw"
+    shortdesc = '''2'b00=M0; 2'b01=M1; 2'b10=M2; 2'b11=M1 and M2 striped accoss the region.'''
+    longdesc = '''The stripe size is configured using the striping_granule register'''
+  [[register.field]]
+    name = "11"
+    bits = "23:22"
+    type = "rw"
+    shortdesc = '''2'b00=M0; 2'b01=M1; 2'b10=M2; 2'b11=M1 and M2 striped accoss the region.'''
+    longdesc = '''The stripe size is configured using the striping_granule register'''
+  [[register.field]]
+    name = "10"
+    bits = "21:20"
+    type = "rw"
+    shortdesc = '''2'b00=M0; 2'b01=M1; 2'b10=M2; 2'b11=M1 and M2 striped accoss the region.'''
+    longdesc = '''The stripe size is configured using the striping_granule register'''
+  [[register.field]]
+    name = "9"
+    bits = "19:18"
+    type = "rw"
+    shortdesc = '''2'b00=M0; 2'b01=M1; 2'b10=M2; 2'b11=M1 and M2 striped accoss the region.'''
+    longdesc = '''The stripe size is configured using the striping_granule register'''
+  [[register.field]]
+    name = "8"
+    bits = "17:16"
+    type = "rw"
+    shortdesc = '''2'b00=M0; 2'b01=M1; 2'b10=M2; 2'b11=M1 and M2 striped accoss the region.'''
+    longdesc = '''The stripe size is configured using the striping_granule register'''
+  [[register.field]]
+    name = "7"
+    bits = "15:14"
+    type = "rw"
+    shortdesc = '''2'b00=M0; 2'b01=M1; 2'b10=M2; 2'b11=M1 and M2 striped accoss the region.'''
+    longdesc = '''The stripe size is configured using the striping_granule register'''
+  [[register.field]]
+    name = "6"
+    bits = "13:12"
+    type = "rw"
+    shortdesc = '''2'b00=M0; 2'b01=M1; 2'b10=M2; 2'b11=M1 and M2 striped accoss the region.'''
+    longdesc = '''The stripe size is configured using the striping_granule register'''
+  [[register.field]]
+    name = "5"
+    bits = "11:10"
+    type = "rw"
+    shortdesc = '''2'b00=M0; 2'b01=M1; 2'b10=M2; 2'b11=M1 and M2 striped accoss the region.'''
+    longdesc = '''The stripe size is configured using the striping_granule register'''
+  [[register.field]]
+    name = "4"
+    bits = "9:8"
+    type = "rw"
+    shortdesc = '''2'b00=M0; 2'b01=M1; 2'b10=M2; 2'b11=M1 and M2 striped accoss the region.'''
+    longdesc = '''The stripe size is configured using the striping_granule register'''
+  [[register.field]]
+    name = "3"
+    bits = "7:6"
+    type = "rw"
+    shortdesc = '''2'b00=M0; 2'b01=M1; 2'b10=M2; 2'b11=M1 and M2 striped accoss the region.'''
+    longdesc = '''The stripe size is configured using the striping_granule register'''
+  [[register.field]]
+    name = "2"
+    bits = "5:4"
+    type = "rw"
+    shortdesc = '''2'b00=M0; 2'b01=M1; 2'b10=M2; 2'b11=M1 and M2 striped accoss the region.'''
+    longdesc = '''The stripe size is configured using the striping_granule register'''
+  [[register.field]]
+    name = "1"
+    bits = "3:2"
+    type = "rw"
+    shortdesc = '''2'b00=M0; 2'b01=M1; 2'b10=M2; 2'b11=M1 and M2 striped accoss the region.'''
+    longdesc = '''The stripe size is configured using the striping_granule register'''
+  [[register.field]]
+    name = "0"
+    bits = "1:0"
+    type = "rw"
+    shortdesc = '''2'b00=M0; 2'b01=M1; 2'b10=M2; 2'b11=M1 and M2 striped accoss the region.'''
+    longdesc = '''The stripe size is configured using the striping_granule register'''
+[[register]]
+  name = "LPD_CCI_QVNPREALLOC"
+  type = "mixed"
+  width = 32
+  description = "QVN Preallocation Configuration"
+  default = "0x00330330"
+  offset = "0x0000A008"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:24"
+    type = "raz"
+  [[register.field]]
+    name = "WM2"
+    bits = "23:20"
+    type = "rw"
+  [[register.field]]
+    name = "WM1"
+    bits = "19:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:12"
+    type = "ro"
+  [[register.field]]
+    name = "RM2"
+    bits = "11:8"
+    type = "rw"
+  [[register.field]]
+    name = "RM1"
+    bits = "7:4"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "LPD_SMMU"
+  type = "mixed"
+  width = 32
+  description = "SMMU Configuration. This register may be written to only when FPD Interconnect is in reset."
+  default = "0x0000003F"
+  offset = "0x0000A020"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "raz"
+  [[register.field]]
+    name = "INTEG_SEC_OVERRIDE"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "CTTW"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "SYSBARDISABLE_TBU5"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "SYSBARDISABLE_TBU4"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "SYSBARDISABLE_TBU3"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "SYSBARDISABLE_TBU2"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "SYSBARDISABLE_TBU1"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "SYSBARDISABLE_TBU0"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "LPD_APU"
+  type = "mixed"
+  width = 32
+  description = "APU Configuration. This register may be written to only when APU is in reset"
+  default = "0x00000001"
+  offset = "0x0000A040"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "raz"
+  [[register.field]]
+    name = "BRDC_BARRIER"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "BRDC_CMNT"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "BRDC_INNER"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "BRDC_OUTER"
+    bits = "0"
+    type = "rw"

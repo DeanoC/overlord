@@ -1,0 +1,5 @@
+path = "ram"
+resources = [
+    "ddr/ddr.toml",
+    "sram/sram.toml"
+]

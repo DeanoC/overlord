@@ -1,0 +1,352 @@
+description = "SPI Controller"
+[[register]]
+  name = "CONFIG"
+  type = "mixed"
+  width = 32
+  description = "SPI configuration"
+  default = "0x00020000"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:18"
+    type = "ro"
+  [[register.field]]
+    name = "MODEFAIL_GEN_EN"
+    bits = "17"
+    type = "rw"
+  [[register.field]]
+    name = "MAN_START_COM"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "MAN_START_EN"
+    bits = "15"
+    type = "rw"
+  [[register.field]]
+    name = "MANUAL_CS"
+    bits = "14"
+    type = "rw"
+  [[register.field]]
+    name = "CS"
+    bits = "13:10"
+    type = "rw"
+    shortdesc = '''Peripheral chip select lines; valid only if [Manual_CS] = 1.'''
+    longdesc = '''xxx0: slave 0 selected xx01: slave 1 selected x011: slave 2 selected 0111: reserved 1111: No slave selected Change only when controller is not actively transmitting or receiving data.'''
+  [[register.field]]
+    name = "PERI_SEL"
+    bits = "9"
+    type = "rw"
+  [[register.field]]
+    name = "REF_CLK"
+    bits = "8"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:6"
+    type = "rw"
+  [[register.field]]
+    name = "BAUD_RATE_DIV"
+    bits = "5:3"
+    type = "rw"
+    shortdesc = '''Master mode baud rate divisor controls the amount the SPI_REF_CLK is divided for the controller.'''
+    longdesc = '''000: reserved 001: divide by 4 010: divide by 8 011: divide by 16 100: divide by 32 101: divide by 64 110: divide by 128 111: divide by 256 Change only when controller is not actively transmitting or receiving data.'''
+  [[register.field]]
+    name = "CLK_PH"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "CLK_POL"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "MODE_SEL"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "ISR"
+  type = "mixed"
+  width = 32
+  description = "SPI interrupt status"
+  default = "0x00000004"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:7"
+    type = "ro"
+  [[register.field]]
+    name = "TX_FIFO_UNDERFLOW"
+    bits = "6"
+    type = "wtc"
+    shortdesc = '''TX FIFO underflow, write one to this bit location to clear.'''
+    longdesc = '''1: underflow is detected 0: no underflow has been detected'''
+  [[register.field]]
+    name = "RX_FIFO_FULL"
+    bits = "5"
+    type = "wtc"
+  [[register.field]]
+    name = "RX_FIFO_NOT_EMPTY"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "TX_FIFO_FULL"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "TX_FIFO_NOT_FULL"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "MODE_FAIL"
+    bits = "1"
+    type = "wtc"
+    shortdesc = '''Logic level on n_ss_in pin is inconsistent with the SPI mode.'''
+    longdesc = '''1: Use if n_ss_in is low in master mode (multi-master contention) or n_ss_in goes high during a transmission in slave mode. These conditions will clear the spi_enable bit and disable the SPI. This bit is reset only by a system reset and cleared only when this register is read. ModeFail interrupt, write one to this bit location to clear. 1: a mode fault has occurred 0: no mode fault has been detected'''
+  [[register.field]]
+    name = "RX_OVERFLOW"
+    bits = "0"
+    type = "wtc"
+    shortdesc = '''Receive Overflow interrupt, write one to this bit location to clear.'''
+    longdesc = '''1: overflow occured 0: no overflow occurred'''
+[[register]]
+  name = "IER"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Enable"
+  default = "0x00000000"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:7"
+    type = "ro"
+  [[register.field]]
+    name = "TX_FIFO_UNDERFLOW"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "RX_FIFO_FULL"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "RX_FIFO_NOT_EMPTY"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "TX_FIFO_FULL"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "TX_FIFO_NOT_FULL"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "MODE_FAIL"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "RX_OVERFLOW"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "IDR"
+  type = "mixed"
+  width = 32
+  description = "Interrupt disable"
+  default = "0x00000000"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:7"
+    type = "ro"
+  [[register.field]]
+    name = "TX_FIFO_UNDERFLOW"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "RX_FIFO_FULL"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "RX_FIFO_NOT_EMPTY"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "TX_FIFO_FULL"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "TX_FIFO_NOT_FULL"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "MODE_FAIL"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "RX_OVERFLOW"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "IMR"
+  type = "ro"
+  width = 32
+  description = "Interrupt mask"
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:7"
+    type = "ro"
+  [[register.field]]
+    name = "TX_FIFO_UNDERFLOW"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "RX_FIFO_FULL"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "RX_FIFO_NOT_EMPTY"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "TX_FIFO_FULL"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "TX_FIFO_NOT_FULL"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "MODE_FAIL"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "RX_OVERFLOW"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ENABLE"
+  type = "mixed"
+  width = 32
+  description = "SPI_Enable"
+  default = "0x00000000"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "ro"
+  [[register.field]]
+    name = "SPI_EN"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "DELAY"
+  type = "rw"
+  width = 32
+  description = "Clock Delay"
+  default = "0x00000000"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "D_NSS"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''Delay in SPI REFERENCE CLOCK or ext_clk cycles for the length that the master mode chip select outputs are de-asserted between words when Config_reg0 [CLK_PHA], cpha = 0.'''
+    longdesc = '''Change only when controller is not actively transmitting or receiving data.'''
+  [[register.field]]
+    name = "D_BTWN"
+    bits = "23:16"
+    type = "rw"
+    shortdesc = '''Delay in SPI REFERENCE CLOCK or ext_clk cycles between one chip select de-assertion and the assertion of the next chip select.'''
+    longdesc = '''Change only when controller is not actively transmitting or receiving data.'''
+  [[register.field]]
+    name = "D_AFTER"
+    bits = "15:8"
+    type = "rw"
+    shortdesc = '''Delay in SPI REFERENCE CLOCK or ext_clk cycles between last bit of current word and the first bit of the next word.'''
+    longdesc = '''Change only when controller is not actively transmitting or receiving data.'''
+  [[register.field]]
+    name = "D_INT"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''Added delay in SPI REFERENCE CLOCK or ext_clk cycles between n_ss_out going low and first bit transfer.'''
+    longdesc = '''Change only when controller is not actively transmitting or receiving data.'''
+[[register]]
+  name = "TX_DATA"
+  type = "wo"
+  width = 32
+  description = "Transmit Data."
+  default = "0x00000000"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "TX_FIFO_DATA"
+    bits = "31:0"
+    type = "wo"
+    shortdesc = '''Data written to TX FIFO.'''
+    longdesc = '''Valid data bits are [7:0].'''
+[[register]]
+  name = "RX_DATA"
+  type = "ro"
+  width = 32
+  description = "Receive Data"
+  default = "0x00000000"
+  offset = "0x00000020"
+  [[register.field]]
+    name = "RX_FIFO_DATA"
+    bits = "31:0"
+    type = "ro"
+    shortdesc = '''Data read from RX FIFO.'''
+    longdesc = '''Valid data bits are [7:0].'''
+[[register]]
+  name = "SLAVE_IDLE_COUNT"
+  type = "mixed"
+  width = 32
+  description = "Slave Idle Count"
+  default = "0x000000FF"
+  offset = "0x00000024"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "ro"
+  [[register.field]]
+    name = "SLAVE_IDLE_COUN"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''SPI in slave mode detects a start only when the external SPI master serial clock (sclk_in) is stable (quiescent state) for SPI REFERENCE CLOCK cycles specified by slave idle count register or when the SPI is deselected.'''
+    longdesc = '''Change only when controller is not actively transmitting or receiving data.'''
+[[register]]
+  name = "TX_THRES"
+  type = "rw"
+  width = 32
+  description = "TX FIFO Threshold"
+  default = "0x00000001"
+  offset = "0x00000028"
+  [[register.field]]
+    name = "THRESHOLD_OF_TX_FIFO"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "RX_THRES"
+  type = "rw"
+  width = 32
+  description = "RX FIFO Threshold"
+  default = "0x00000001"
+  offset = "0x0000002C"
+  [[register.field]]
+    name = "THRESHOLD_OF_RX_FIFO"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "MOD_ID"
+  type = "ro"
+  width = 32
+  description = "Module ID"
+  default = "0x00090108"
+  offset = "0x000000FC"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:25"
+    type = "ro"
+  [[register.field]]
+    name = "MODULE_ID"
+    bits = "24:0"
+    type = "ro"

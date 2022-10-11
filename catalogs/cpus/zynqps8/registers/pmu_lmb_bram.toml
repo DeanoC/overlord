@@ -1,0 +1,37 @@
+description = "PMU LMB ECC bram Control - Private"
+[[bank]]
+name = "PMU_LMB_BRAM"
+address = "0xffd50000U"
+
+[[register]]
+name = "ECC_STATUS"
+type = "mixed"
+width = 32
+description = "ECC status of local memory bus."
+default = "0x00000000"
+offset = "0x00000000"
+[[register.field]]
+name = "CE"
+bits = "1"
+type = "ro"
+
+[[register]]
+name = "ECC_IRQ_EN"
+type = "mixed"
+width = 32
+description = "ECC interrupt enable."
+default = "0x00000000"
+offset = "0x00000004"
+[[register.field]]
+name = "CE"
+bits = "1"
+type = "ro"
+
+[[register]]
+name = "CE_CNT"
+type = "ro"
+width = 32
+description = "Correctable Error Counts."
+default = "0x00000000"
+offset = "0x00000008"
+

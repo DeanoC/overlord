@@ -1,0 +1,189 @@
+description = "AXI Cache Coherent Interconnect Configuration"
+[[register]]
+  name = "MISC_CTRL"
+  type = "rw"
+  width = 1
+  description = "Controls for the register block."
+  default = "0x00000000"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "SLVERR_ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''By default, invalid address requests are ignored.'''
+    longdesc = '''However, a maskable interrupt exsists. By enabling this slverr_enable invalid address requests cause a slverr to occur. Enable/Disable SLVERR during address decode failure. 0: SLVERR is disabled. For request address: Writes are ignored. Read returns 0. 1: SLVERR is enabled. For requestes address, SLVERR is asserted. Writes are ignored. Read returns 0.'''
+[[register]]
+  name = "ISR_0"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Status Register. This is a sticky register that holds the value of the interrupt until cleared by a value of 1."
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "31"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:6"
+    type = "ro"
+  [[register.field]]
+    name = "CCNT_OFLW"
+    bits = "5"
+    type = "wtc"
+  [[register.field]]
+    name = "EC3_OFLW"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "EC2_OFLW"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "EC1_OFLW"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "EC0_OFLW"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "ERRORIRQ"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "IMR_0"
+  type = "ro"
+  width = 32
+  description = "Interrupt Mask Register. This is a read-only location and can be atomically altered by either the IDR or the IER."
+  default = "0x8000003F"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "31"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:6"
+    type = "ro"
+  [[register.field]]
+    name = "CCNT_OFLW"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "EC3_OFLW"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "EC2_OFLW"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "EC1_OFLW"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "EC0_OFLW"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ERRORIRQ"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "IER_0"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Enable Register. A write of 1 to this location will unmask the interrupt"
+  default = "0x00000000"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "31"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:6"
+    type = "ro"
+  [[register.field]]
+    name = "CCNT_OFLW"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "EC3_OFLW"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "EC2_OFLW"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "EC1_OFLW"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "EC0_OFLW"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "ERRORIRQ"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "IDR_0"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Disable Register. A write of 1 to this location will mask the interrupt"
+  default = "0x00000000"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "31"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:6"
+    type = "ro"
+  [[register.field]]
+    name = "CCNT_OFLW"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "EC3_OFLW"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "EC2_OFLW"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "EC1_OFLW"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "EC0_OFLW"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "ERRORIRQ"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "CCI_MISC_CTRL"
+  type = "mixed"
+  width = 32
+  description = "Misc control registesr"
+  default = "0x00000000"
+  offset = "0x00000040"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:2"
+    type = "raz"
+  [[register.field]]
+    name = "NIDEN"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "SPINDEN"
+    bits = "0"
+    type = "rw"

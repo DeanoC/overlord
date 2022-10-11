@@ -1,0 +1,1671 @@
+description = "R5 Embedded Trace Macrocell"
+[[register]]
+  name = "CR"
+  type = "rw"
+  width = 32
+  description = "Main Control Register"
+  default = "0x00000421"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "CORE_SELECT"
+    bits = "27:25"
+    type = "rw"
+    shortdesc = '''If an ETM is shared between multiple CPUs, selects which CPU to trace.'''
+    longdesc = '''For the maximum value permitted, see bits[14:12] of the System Configuration Register. To guarantee that the ETM is correctly synchronized to the new CPU, you must update these bits as follows: 1. Set bit[10], ETM programming, and bit[0], ETM power down, to 1. 2. Change the core select bits. 3. Clear bit[0], ETM power down, to 0. 4. Perform other programming required as normal.'''
+  [[register.field]]
+    name = "PORT_SIZE_3"
+    bits = "21"
+    type = "rw"
+  [[register.field]]
+    name = "DATA_ONLY"
+    bits = "20"
+    type = "rw"
+    shortdesc = '''0: Instruction trace enabled.'''
+    longdesc = '''1: Instruction trace disabled. Data-only tracing is possible in this mode.'''
+  [[register.field]]
+    name = "FILTER"
+    bits = "19"
+    type = "rw"
+  [[register.field]]
+    name = "SUPPRESS_DATA"
+    bits = "18"
+    type = "rw"
+  [[register.field]]
+    name = "PORT_MODE_1_0"
+    bits = "17:16"
+    type = "rw"
+    shortdesc = '''These bits are used, in conjunction with bit[13], to set the trace port clocking mode.'''
+    longdesc = '''ETM-R5 supports only dynamic mode, corresponding to the value b000, but you can write other values to these bits, and a read of the register returns the value written. Writing another value to these bits has no effect on the ETM. Bit[11] of the System Configuration Register indicates if these bits are set to select a supported clocking mode.'''
+  [[register.field]]
+    name = "CONTEXT_ID_SIZE"
+    bits = "15:14"
+    type = "rw"
+    shortdesc = '''The possible values of this field are: 00: No Context ID tracing.'''
+    longdesc = '''01: Context ID bits[7:0] traced. 10: Context ID bits[15:0] traced. 11: Context ID bits[31:0] traced. Note: Only the number of bytes specified are traced even if the new value is larger than this.'''
+  [[register.field]]
+    name = "PORT_MODE_2"
+    bits = "13"
+    type = "rw"
+  [[register.field]]
+    name = "CYCLE_ACCURATE"
+    bits = "12"
+    type = "rw"
+    shortdesc = '''Set this bit to 1 if you want the trace to include a precise cycle count of executed instructions.'''
+    longdesc = '''This is achieved by adding extra information into the trace, giving cycle counts even when TraceEnable is inactive.'''
+  [[register.field]]
+    name = "PROGRAMMING"
+    bits = "10"
+    type = "rw"
+  [[register.field]]
+    name = "DEBUG_REQUEST"
+    bits = "9"
+    type = "rw"
+    shortdesc = '''If you set this bit to 1, when the trigger event occurs, the DBGRQ output is asserted until DBGACK is observed.'''
+    longdesc = '''This enables the ARM processor to be forced into Debug state.'''
+  [[register.field]]
+    name = "BRANCH_OUTPUT"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''Set this bit to 1 if you want the ETM to output all branch addresses, even if the branch is because of a direct branch instruction.'''
+    longdesc = '''Setting this bit to 1 enables reconstruction of the program flow without having access to the memory image of the code being executed.'''
+  [[register.field]]
+    name = "PORT_SIZE_2_0"
+    bits = "6:4"
+    type = "rw"
+    shortdesc = '''Use this field with bit[21] to specify the port size.'''
+    longdesc = '''The port size determines how many external pins are available to output the trace information on ATDATA[31:0]. ETM-R5 supports only the 32-bit port size, corresponding to a Port size[2:0] value of b0100, but you can write other values to these bits, and a read of the register returns the value written. Writing another value to these bits has no effect on the ETM. Bit[10] of the System Configuration Register indicates if these bits are set to select an unsupported port size.'''
+  [[register.field]]
+    name = "DATA_ACCESS"
+    bits = "3:2"
+    type = "rw"
+    shortdesc = '''This field configures the data tracing mode.'''
+    longdesc = '''The possible values are: 00: No data tracing. 01: Trace only the data portion of the access. 10: Trace only the address portion of the access. 11: Trace both the address and the data of the access.'''
+  [[register.field]]
+    name = "MONITORCPRT"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''This field controls whether CPRTs are traced.'''
+    longdesc = '''This bit is used with bit[19]. 0: CPRTs not traced. 1: CPRTs traced.'''
+  [[register.field]]
+    name = "POWER_DOWN"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''A pin controlled by this bit enables the ETM power to be controlled externally.'''
+    longdesc = '''The sense of this bit is inverted, and drives the ETMPWRUP signal. This bit must be cleared by the trace software tools at the beginning of a debug session. When this bit is set to 1, ETM tracing is disabled and accesses to any registers other than this register and the Lock Access Register are ignored.'''
+[[register]]
+  name = "CCR"
+  type = "ro"
+  width = 32
+  description = "Configuration Code Register"
+  default = "0x8D014024"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "IDR_PRESENT"
+    bits = "31"
+    type = "ro"
+  [[register.field]]
+    name = "SW_ACCESS"
+    bits = "27"
+    type = "ro"
+  [[register.field]]
+    name = "TRACE_PRESENT"
+    bits = "26"
+    type = "ro"
+  [[register.field]]
+    name = "NO_OF_CIDCMP"
+    bits = "25:24"
+    type = "ro"
+  [[register.field]]
+    name = "FIFOFULL_PRESENT"
+    bits = "23"
+    type = "ro"
+  [[register.field]]
+    name = "NO_OF_EXTOUT"
+    bits = "21:20"
+    type = "ro"
+  [[register.field]]
+    name = "NO_OF_EXTIN"
+    bits = "19:17"
+    type = "ro"
+  [[register.field]]
+    name = "SEQUENCER_PRESENT"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "NO_OF_COUNTERS"
+    bits = "15:13"
+    type = "ro"
+  [[register.field]]
+    name = "NO_OF_MMAPS"
+    bits = "12:8"
+    type = "ro"
+  [[register.field]]
+    name = "NO_OF_DATACMP"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "NO_OF_ADDRCMPPAIR"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "TRIGGER"
+  type = "rw"
+  width = 32
+  description = "Trigger Event Register"
+  default = "0x00000000"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "EVENT"
+    bits = "16:0"
+    type = "rw"
+[[register]]
+  name = "ASICCTLR"
+  type = "rw"
+  width = 32
+  description = "ASIC Control Register"
+  default = "0x00000000"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "SR"
+  type = "mixed"
+  width = 32
+  description = "Status Register"
+  default = "0x00000002"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "TRIGGER"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''Trigger bit.'''
+    longdesc = '''Set when the trigger occurs, and prevents the trigger from being output until the ETM is next programmed.'''
+  [[register.field]]
+    name = "STATUS"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Holds the current status of the trace start/stop resource.'''
+    longdesc = '''If set to 1, it indicates that a trace on address has been matched, without a corresponding trace off address match.'''
+  [[register.field]]
+    name = "PROGRAMMING"
+    bits = "1"
+    type = "ro"
+    shortdesc = '''The current effective value of the ETM Programming bit (ETM Control Register bit [10]).'''
+    longdesc = '''You must wait for this bit to go to 1 before you start to program the ETM. If you read other bits in the ETM Status Register while this bit is 0, some instructions might not have taken effect. It is recommended that you set the ETM Programming bit and wait for this bit to go to 1 before reading the overflow bit. This bit remains 0 if there is any data in the FIFO. This ensures that the FIFO is empty before the ETM programming is changed.'''
+  [[register.field]]
+    name = "OVERFLOW"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''If set to 1, there is an overflow that has not yet been traced.'''
+    longdesc = '''This bit is cleared to 0 when either: - trace is restarted. - the ETM Power Down bit, bit [0] of the ETM Control Register, 0x00, is set to 1. Note: Setting or clearing the ETM Programming bit does not cause this bit to be cleared.'''
+[[register]]
+  name = "SCR"
+  type = "ro"
+  width = 32
+  description = "System Configruation Register"
+  default = "0x0002000C"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "NO_FETCH_CMP"
+    bits = "17"
+    type = "ro"
+    shortdesc = '''No Fetch comparisons.'''
+    longdesc = '''Address comparators are not capable of performing fetch-stage comparisons. Setting bits [2:0] of an Address Access Type Register to b000 (instruction fetch) causes the comparator to have UNPREDICTABLE behavior.'''
+  [[register.field]]
+    name = "NO_OF_SUP_CORES"
+    bits = "14:12"
+    type = "ro"
+    shortdesc = '''Number of supported cores minus 1.'''
+    longdesc = '''The value given here is the maximum value that can be written to bits [27:25] of the Control Register.'''
+  [[register.field]]
+    name = "PORT_MODE"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "PORT_SIZE"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "MAX_PORT_SIZE_3"
+    bits = "9"
+    type = "ro"
+    shortdesc = '''Maximum port size[3].'''
+    longdesc = '''This bit is used in conjunction with bits [2:0].'''
+  [[register.field]]
+    name = "FIFOFULL_SUPPORT"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''If set to 1, FIFOFULL is supported.'''
+    longdesc = '''This bit is used in conjunction with bit [23] of the ETM Configuration Register.'''
+  [[register.field]]
+    name = "FULL_RATE"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "HALF_RATE"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "MAX_PORT_SIZE_2_0"
+    bits = "2:0"
+    type = "ro"
+    shortdesc = '''Maximum port size[2:0].'''
+    longdesc = '''This bit is used in conjunction with bit [9].'''
+[[register]]
+  name = "TSSCR"
+  type = "rw"
+  width = 32
+  description = "TraceEnable Start/Stop Control Register"
+  default = "0x00000000"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "STOP_SELECT"
+    bits = "31:16"
+    type = "rw"
+    shortdesc = '''When a bit is set to 1, it selects a single address comparator 16-1 as stop addresses.'''
+    longdesc = '''For example, bit [16] set to 1 selects single address comparator 1 as a stop address.'''
+  [[register.field]]
+    name = "START_SELECT"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''When a bit is set to 1, it selects a single address comparator 16-1 as start addresses.'''
+    longdesc = '''For example, bit [0] set to 1 selects single address comparator 1 as a start address.'''
+[[register]]
+  name = "TECR2"
+  type = "rw"
+  width = 32
+  description = "TraceEnable Control 2 Register"
+  default = "0x00000000"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "ADDRCMP_SELECT"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''When a bit is set to 1, it selects a single address comparator 16-1 for include/exclude control.'''
+    longdesc = '''For example, bit [0] set to 1 selects single address comparator 1.'''
+[[register]]
+  name = "TEEVR"
+  type = "rw"
+  width = 32
+  description = "TraceEnable Event Register"
+  default = "0x00000000"
+  offset = "0x00000020"
+  [[register.field]]
+    name = "EVENT"
+    bits = "16:0"
+    type = "rw"
+[[register]]
+  name = "TECR1"
+  type = "rw"
+  width = 32
+  description = "TraceEnable Control1 Register"
+  default = "0x00000000"
+  offset = "0x00000024"
+  [[register.field]]
+    name = "START_STOP_ENABLE"
+    bits = "25"
+    type = "rw"
+    shortdesc = '''Trace start/stop enable.'''
+    longdesc = '''The possible values of this bit are: 0: Tracing is unaffected by the trace start/stop logic. 1: Tracing is controlled by the trace on and off addresses configured for the trace start/stop logic. The trace start/stop resource (resource 0x5F) is unaffected by the value of this bit.'''
+  [[register.field]]
+    name = "INC_EXC_CONTROL"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Include/exclude control.'''
+    longdesc = '''The possible values of this bit are: 0: Include. The specified resources indicate the regions where tracing can occur. When outside this region tracing is prevented. 1: Exclude. The resources, specified in bits [23:0] and in the TraceEnable Control 2 Register, indicate regions to be excluded from the trace. When outside an exclude region, tracing can occur.'''
+  [[register.field]]
+    name = "MMAP_SELECT"
+    bits = "23:8"
+    type = "rw"
+    shortdesc = '''When a bit is set to 1, it selects memory map decode 16-1 for include/exclude control.'''
+    longdesc = '''For example, bit [8] set to 1 selects MMD 1.'''
+  [[register.field]]
+    name = "RANGECMP_SELECT"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''When a bit is set to 1, it selects address range comparator 8-1 for include/exclude control.'''
+    longdesc = '''For example, bit [0] set to 1 selects address range comparator 1.'''
+[[register]]
+  name = "FFLR"
+  type = "rw"
+  width = 32
+  description = "FIFOFULL Level Register"
+  default = "0x00000000"
+  offset = "0x0000002C"
+  [[register.field]]
+    name = "LEVEL"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''The number of bytes left in the FIFO, below which the FIFOFULL or SuppressData signal is asserted.'''
+    longdesc = '''For example, setting this value to 15 causes data trace suppression or processor stalling, if enabled, when there are less than 15 free bytes in the FIFO.'''
+[[register]]
+  name = "VDEVR"
+  type = "rw"
+  width = 32
+  description = "ViewData Event Register"
+  default = "0x00000000"
+  offset = "0x00000030"
+  [[register.field]]
+    name = "EVENT"
+    bits = "16:0"
+    type = "rw"
+[[register]]
+  name = "VDCR1"
+  type = "rw"
+  width = 32
+  description = "ViewData Control 1 Register"
+  default = "0x00000000"
+  offset = "0x00000034"
+  [[register.field]]
+    name = "EXCLUDE_SELECT"
+    bits = "31:16"
+    type = "rw"
+    shortdesc = '''When a bit is set to 1, it selects single address comparator 16 to 1 for exclude control.'''
+    longdesc = '''For example, bit [16] set to 1 selects single address comparator 1.'''
+  [[register.field]]
+    name = "INCLUDE_SELECT"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''When a bit is set to 1, it selects single address comparator 16 to 1 for include control.'''
+    longdesc = '''For example, bit [0] set to 1 selects single address comparator 1.'''
+[[register]]
+  name = "VDCR3"
+  type = "rw"
+  width = 32
+  description = "ViewData Control 3 Register"
+  default = "0x00000000"
+  offset = "0x0000003C"
+  [[register.field]]
+    name = "EXCLUDE_SELECT"
+    bits = "31:16"
+    type = "rw"
+    shortdesc = '''When a bit is set to 1, it selects single address comparator 16 to 1 for exclude control.'''
+    longdesc = '''For example, bit [16] set to 1 selects single address comparator 1.'''
+  [[register.field]]
+    name = "INCLUDE_SELECT"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''When a bit is set to 1, it selects single address comparator 16 to 1 for include control.'''
+    longdesc = '''For example, bit [0] set to 1 selects single address comparator 1.'''
+[[register]]
+  name = "ACVR1"
+  type = "rw"
+  width = 32
+  description = "Address Comparator Value 1 Register"
+  default = "0x00000000"
+  offset = "0x00000040"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "ACVR2"
+  type = "rw"
+  width = 32
+  description = "Address Comparator Value 2 Register"
+  default = "0x00000000"
+  offset = "0x00000044"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "ACVR3"
+  type = "rw"
+  width = 32
+  description = "Address Comparator Value 3 Register"
+  default = "0x00000000"
+  offset = "0x00000048"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "ACVR4"
+  type = "rw"
+  width = 32
+  description = "Address Comparator Value 4 Register"
+  default = "0x00000000"
+  offset = "0x0000004C"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "ACVR5"
+  type = "rw"
+  width = 32
+  description = "Address Comparator Value 5 Register"
+  default = "0x00000000"
+  offset = "0x00000050"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "ACVR6"
+  type = "rw"
+  width = 32
+  description = "Address Comparator Value 6 Register"
+  default = "0x00000000"
+  offset = "0x00000054"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "ACVR7"
+  type = "rw"
+  width = 32
+  description = "Address Comparator Value 7 Register"
+  default = "0x00000000"
+  offset = "0x00000058"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "ACVR8"
+  type = "rw"
+  width = 32
+  description = "Address Comparator Value 8 Register"
+  default = "0x00000000"
+  offset = "0x0000005C"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "ACTR1"
+  type = "rw"
+  width = 32
+  description = "Address Comparator Access Type 1 Register"
+  default = "0x00000000"
+  offset = "0x00000080"
+  [[register.field]]
+    name = "SECURE_LEVEL"
+    bits = "11:10"
+    type = "rw"
+    shortdesc = '''Security level control.'''
+    longdesc = '''The permitted value is 00 (security level ignored) since the connected processor does not implements the Security Extensions.'''
+  [[register.field]]
+    name = "CONTEXT_CMP_CTRL"
+    bits = "9:8"
+    type = "rw"
+    shortdesc = '''Context ID comparator control.'''
+    longdesc = '''The permitted values of this field are: 00: Ignore Context ID comparator. 01: Address comparator matches only if Context ID comparator value 1 matches. 10: Address comparator matches only if Context ID comparator value 2 matches. 11: Address comparator matches only if Context ID comparator value 3 matches.'''
+  [[register.field]]
+    name = "EXACT_MATCH"
+    bits = "7"
+    type = "rw"
+    shortdesc = '''Exact match bit.'''
+    longdesc = '''Specifies comparator behavior when exceptions, aborts, and load misses occur.'''
+  [[register.field]]
+    name = "DATA_CMP_CTRL"
+    bits = "6:5"
+    type = "rw"
+    shortdesc = '''Data value comparison control.'''
+    longdesc = '''The permitted values of this field are: 00: No data value comparison is made. 10: Reserved and must not be used. 01: Comparator can match only if data value matches. 11: Comparator can match only if data value does not match.'''
+  [[register.field]]
+    name = "CMP_ACCESS_SIZE"
+    bits = "4:3"
+    type = "rw"
+    shortdesc = '''Comparison access size.'''
+    longdesc = '''The permitted values of this field are: 00: Java instruction or byte data. 01: Thumb instruction or halfword data. 10: Reserved and must not be used. 11: ARM instruction or word data.'''
+  [[register.field]]
+    name = "ACCESS_TYPE"
+    bits = "2:0"
+    type = "rw"
+    shortdesc = '''Access type.'''
+    longdesc = '''The permitted values of this field are: 000: Instruction fetch. 001: Instruction execute. 010: Instruction executed and passed condition code test. 011: Instruction executed and failed condition code test. 100: Data load or store. 101: Data load. 110: Data store. 111: Reserved and must not be used.'''
+[[register]]
+  name = "ACTR2"
+  type = "rw"
+  width = 32
+  description = "Address Comparator Access Type 2 Register"
+  default = "0x00000000"
+  offset = "0x00000084"
+  [[register.field]]
+    name = "SECURE_LEVEL"
+    bits = "11:10"
+    type = "rw"
+    shortdesc = '''Security level control.'''
+    longdesc = '''The permitted value is 00 (security level ignored) since the connected processor does not implements the Security Extensions.'''
+  [[register.field]]
+    name = "CONTEXT_CMP_CTRL"
+    bits = "9:8"
+    type = "rw"
+    shortdesc = '''Context ID comparator control.'''
+    longdesc = '''The permitted values of this field are: 00: Ignore Context ID comparator. 01: Address comparator matches only if Context ID comparator value 1 matches. 10: Address comparator matches only if Context ID comparator value 2 matches. 11: Address comparator matches only if Context ID comparator value 3 matches.'''
+  [[register.field]]
+    name = "EXACT_MATCH"
+    bits = "7"
+    type = "rw"
+    shortdesc = '''Exact match bit.'''
+    longdesc = '''Specifies comparator behavior when exceptions, aborts, and load misses occur.'''
+  [[register.field]]
+    name = "DATA_CMP_CTRL"
+    bits = "6:5"
+    type = "rw"
+    shortdesc = '''Data value comparison control.'''
+    longdesc = '''The permitted values of this field are: 00: No data value comparison is made. 10: Reserved and must not be used. 01: Comparator can match only if data value matches. 11: Comparator can match only if data value does not match.'''
+  [[register.field]]
+    name = "CMP_ACCESS_SIZE"
+    bits = "4:3"
+    type = "rw"
+    shortdesc = '''Comparison access size.'''
+    longdesc = '''The permitted values of this field are: 00: Java instruction or byte data. 01: Thumb instruction or halfword data. 10: Reserved and must not be used. 11: ARM instruction or word data.'''
+  [[register.field]]
+    name = "ACCESS_TYPE"
+    bits = "2:0"
+    type = "rw"
+    shortdesc = '''Access type.'''
+    longdesc = '''The permitted values of this field are: 000: Instruction fetch. 001: Instruction execute. 010: Instruction executed and passed condition code test. 011: Instruction executed and failed condition code test. 100: Data load or store. 101: Data load. 110: Data store. 111: Reserved and must not be used.'''
+[[register]]
+  name = "ACTR3"
+  type = "rw"
+  width = 32
+  description = "Address Comparator Access Type 3 Register"
+  default = "0x00000000"
+  offset = "0x00000088"
+  [[register.field]]
+    name = "SECURE_LEVEL"
+    bits = "11:10"
+    type = "rw"
+    shortdesc = '''Security level control.'''
+    longdesc = '''The permitted value is 00 (security level ignored) since the connected processor does not implements the Security Extensions.'''
+  [[register.field]]
+    name = "CONTEXT_CMP_CTRL"
+    bits = "9:8"
+    type = "rw"
+    shortdesc = '''Context ID comparator control.'''
+    longdesc = '''The permitted values of this field are: 00: Ignore Context ID comparator. 01: Address comparator matches only if Context ID comparator value 1 matches. 10: Address comparator matches only if Context ID comparator value 2 matches. 11: Address comparator matches only if Context ID comparator value 3 matches.'''
+  [[register.field]]
+    name = "EXACT_MATCH"
+    bits = "7"
+    type = "rw"
+    shortdesc = '''Exact match bit.'''
+    longdesc = '''Specifies comparator behavior when exceptions, aborts, and load misses occur.'''
+  [[register.field]]
+    name = "DATA_CMP_CTRL"
+    bits = "6:5"
+    type = "rw"
+    shortdesc = '''Data value comparison control.'''
+    longdesc = '''The permitted values of this field are: 00: No data value comparison is made. 10: Reserved and must not be used. 01: Comparator can match only if data value matches. 11: Comparator can match only if data value does not match.'''
+  [[register.field]]
+    name = "CMP_ACCESS_SIZE"
+    bits = "4:3"
+    type = "rw"
+    shortdesc = '''Comparison access size.'''
+    longdesc = '''The permitted values of this field are: 00: Java instruction or byte data. 01: Thumb instruction or halfword data. 10: Reserved and must not be used. 11: ARM instruction or word data.'''
+  [[register.field]]
+    name = "ACCESS_TYPE"
+    bits = "2:0"
+    type = "rw"
+    shortdesc = '''Access type.'''
+    longdesc = '''The permitted values of this field are: 000: Instruction fetch. 001: Instruction execute. 010: Instruction executed and passed condition code test. 011: Instruction executed and failed condition code test. 100: Data load or store. 101: Data load. 110: Data store. 111: Reserved and must not be used.'''
+[[register]]
+  name = "ACTR4"
+  type = "rw"
+  width = 32
+  description = "Address Comparator Access Type 4 Register"
+  default = "0x00000000"
+  offset = "0x0000008C"
+  [[register.field]]
+    name = "SECURE_LEVEL"
+    bits = "11:10"
+    type = "rw"
+    shortdesc = '''Security level control.'''
+    longdesc = '''The permitted value is 00 (security level ignored) since the connected processor does not implements the Security Extensions.'''
+  [[register.field]]
+    name = "CONTEXT_CMP_CTRL"
+    bits = "9:8"
+    type = "rw"
+    shortdesc = '''Context ID comparator control.'''
+    longdesc = '''The permitted values of this field are: 00: Ignore Context ID comparator. 01: Address comparator matches only if Context ID comparator value 1 matches. 10: Address comparator matches only if Context ID comparator value 2 matches. 11: Address comparator matches only if Context ID comparator value 3 matches.'''
+  [[register.field]]
+    name = "EXACT_MATCH"
+    bits = "7"
+    type = "rw"
+    shortdesc = '''Exact match bit.'''
+    longdesc = '''Specifies comparator behavior when exceptions, aborts, and load misses occur.'''
+  [[register.field]]
+    name = "DATA_CMP_CTRL"
+    bits = "6:5"
+    type = "rw"
+    shortdesc = '''Data value comparison control.'''
+    longdesc = '''The permitted values of this field are: 00: No data value comparison is made. 10: Reserved and must not be used. 01: Comparator can match only if data value matches. 11: Comparator can match only if data value does not match.'''
+  [[register.field]]
+    name = "CMP_ACCESS_SIZE"
+    bits = "4:3"
+    type = "rw"
+    shortdesc = '''Comparison access size.'''
+    longdesc = '''The permitted values of this field are: 00: Java instruction or byte data. 01: Thumb instruction or halfword data. 10: Reserved and must not be used. 11: ARM instruction or word data.'''
+  [[register.field]]
+    name = "ACCESS_TYPE"
+    bits = "2:0"
+    type = "rw"
+    shortdesc = '''Access type.'''
+    longdesc = '''The permitted values of this field are: 000: Instruction fetch. 001: Instruction execute. 010: Instruction executed and passed condition code test. 011: Instruction executed and failed condition code test. 100: Data load or store. 101: Data load. 110: Data store. 111: Reserved and must not be used.'''
+[[register]]
+  name = "ACTR5"
+  type = "rw"
+  width = 32
+  description = "Address Comparator Access Type 5 Register"
+  default = "0x00000000"
+  offset = "0x00000090"
+  [[register.field]]
+    name = "SECURE_LEVEL"
+    bits = "11:10"
+    type = "rw"
+    shortdesc = '''Security level control.'''
+    longdesc = '''The permitted value is 00 (security level ignored) since the connected processor does not implements the Security Extensions.'''
+  [[register.field]]
+    name = "CONTEXT_CMP_CTRL"
+    bits = "9:8"
+    type = "rw"
+    shortdesc = '''Context ID comparator control.'''
+    longdesc = '''The permitted values of this field are: 00: Ignore Context ID comparator. 01: Address comparator matches only if Context ID comparator value 1 matches. 10: Address comparator matches only if Context ID comparator value 2 matches. 11: Address comparator matches only if Context ID comparator value 3 matches.'''
+  [[register.field]]
+    name = "EXACT_MATCH"
+    bits = "7"
+    type = "rw"
+    shortdesc = '''Exact match bit.'''
+    longdesc = '''Specifies comparator behavior when exceptions, aborts, and load misses occur.'''
+  [[register.field]]
+    name = "DATA_CMP_CTRL"
+    bits = "6:5"
+    type = "rw"
+    shortdesc = '''Data value comparison control.'''
+    longdesc = '''The permitted values of this field are: 00: No data value comparison is made. 10: Reserved and must not be used. 01: Comparator can match only if data value matches. 11: Comparator can match only if data value does not match.'''
+  [[register.field]]
+    name = "CMP_ACCESS_SIZE"
+    bits = "4:3"
+    type = "rw"
+    shortdesc = '''Comparison access size.'''
+    longdesc = '''The permitted values of this field are: 00: Java instruction or byte data. 01: Thumb instruction or halfword data. 10: Reserved and must not be used. 11: ARM instruction or word data.'''
+  [[register.field]]
+    name = "ACCESS_TYPE"
+    bits = "2:0"
+    type = "rw"
+    shortdesc = '''Access type.'''
+    longdesc = '''The permitted values of this field are: 000: Instruction fetch. 001: Instruction execute. 010: Instruction executed and passed condition code test. 011: Instruction executed and failed condition code test. 100: Data load or store. 101: Data load. 110: Data store. 111: Reserved and must not be used.'''
+[[register]]
+  name = "ACTR6"
+  type = "rw"
+  width = 32
+  description = "Address Comparator Access Type 6 Register"
+  default = "0x00000000"
+  offset = "0x00000094"
+  [[register.field]]
+    name = "SECURE_LEVEL"
+    bits = "11:10"
+    type = "rw"
+    shortdesc = '''Security level control.'''
+    longdesc = '''The permitted value is 00 (security level ignored) since the connected processor does not implements the Security Extensions.'''
+  [[register.field]]
+    name = "CONTEXT_CMP_CTRL"
+    bits = "9:8"
+    type = "rw"
+    shortdesc = '''Context ID comparator control.'''
+    longdesc = '''The permitted values of this field are: 00: Ignore Context ID comparator. 01: Address comparator matches only if Context ID comparator value 1 matches. 10: Address comparator matches only if Context ID comparator value 2 matches. 11: Address comparator matches only if Context ID comparator value 3 matches.'''
+  [[register.field]]
+    name = "EXACT_MATCH"
+    bits = "7"
+    type = "rw"
+    shortdesc = '''Exact match bit.'''
+    longdesc = '''Specifies comparator behavior when exceptions, aborts, and load misses occur.'''
+  [[register.field]]
+    name = "DATA_CMP_CTRL"
+    bits = "6:5"
+    type = "rw"
+    shortdesc = '''Data value comparison control.'''
+    longdesc = '''The permitted values of this field are: 00: No data value comparison is made. 10: Reserved and must not be used. 01: Comparator can match only if data value matches. 11: Comparator can match only if data value does not match.'''
+  [[register.field]]
+    name = "CMP_ACCESS_SIZE"
+    bits = "4:3"
+    type = "rw"
+    shortdesc = '''Comparison access size.'''
+    longdesc = '''The permitted values of this field are: 00: Java instruction or byte data. 01: Thumb instruction or halfword data. 10: Reserved and must not be used. 11: ARM instruction or word data.'''
+  [[register.field]]
+    name = "ACCESS_TYPE"
+    bits = "2:0"
+    type = "rw"
+    shortdesc = '''Access type.'''
+    longdesc = '''The permitted values of this field are: 000: Instruction fetch. 001: Instruction execute. 010: Instruction executed and passed condition code test. 011: Instruction executed and failed condition code test. 100: Data load or store. 101: Data load. 110: Data store. 111: Reserved and must not be used.'''
+[[register]]
+  name = "ACTR7"
+  type = "rw"
+  width = 32
+  description = "Address Comparator Access Type 7 Register"
+  default = "0x00000000"
+  offset = "0x00000098"
+  [[register.field]]
+    name = "SECURE_LEVEL"
+    bits = "11:10"
+    type = "rw"
+    shortdesc = '''Security level control.'''
+    longdesc = '''The permitted value is 00 (security level ignored) since the connected processor does not implements the Security Extensions.'''
+  [[register.field]]
+    name = "CONTEXT_CMP_CTRL"
+    bits = "9:8"
+    type = "rw"
+    shortdesc = '''Context ID comparator control.'''
+    longdesc = '''The permitted values of this field are: 00: Ignore Context ID comparator. 01: Address comparator matches only if Context ID comparator value 1 matches. 10: Address comparator matches only if Context ID comparator value 2 matches. 11: Address comparator matches only if Context ID comparator value 3 matches.'''
+  [[register.field]]
+    name = "EXACT_MATCH"
+    bits = "7"
+    type = "rw"
+    shortdesc = '''Exact match bit.'''
+    longdesc = '''Specifies comparator behavior when exceptions, aborts, and load misses occur.'''
+  [[register.field]]
+    name = "DATA_CMP_CTRL"
+    bits = "6:5"
+    type = "rw"
+    shortdesc = '''Data value comparison control.'''
+    longdesc = '''The permitted values of this field are: 00: No data value comparison is made. 10: Reserved and must not be used. 01: Comparator can match only if data value matches. 11: Comparator can match only if data value does not match.'''
+  [[register.field]]
+    name = "CMP_ACCESS_SIZE"
+    bits = "4:3"
+    type = "rw"
+    shortdesc = '''Comparison access size.'''
+    longdesc = '''The permitted values of this field are: 00: Java instruction or byte data. 01: Thumb instruction or halfword data. 10: Reserved and must not be used. 11: ARM instruction or word data.'''
+  [[register.field]]
+    name = "ACCESS_TYPE"
+    bits = "2:0"
+    type = "rw"
+    shortdesc = '''Access type.'''
+    longdesc = '''The permitted values of this field are: 000: Instruction fetch. 001: Instruction execute. 010: Instruction executed and passed condition code test. 011: Instruction executed and failed condition code test. 100: Data load or store. 101: Data load. 110: Data store. 111: Reserved and must not be used.'''
+[[register]]
+  name = "ACTR8"
+  type = "rw"
+  width = 32
+  description = "Address Comparator Access Type 8 Register"
+  default = "0x00000000"
+  offset = "0x0000009C"
+  [[register.field]]
+    name = "SECURE_LEVEL"
+    bits = "11:10"
+    type = "rw"
+    shortdesc = '''Security level control.'''
+    longdesc = '''The permitted value is 00 (security level ignored) since the connected processor does not implements the Security Extensions.'''
+  [[register.field]]
+    name = "CONTEXT_CMP_CTRL"
+    bits = "9:8"
+    type = "rw"
+    shortdesc = '''Context ID comparator control.'''
+    longdesc = '''The permitted values of this field are: 00: Ignore Context ID comparator. 01: Address comparator matches only if Context ID comparator value 1 matches. 10: Address comparator matches only if Context ID comparator value 2 matches. 11: Address comparator matches only if Context ID comparator value 3 matches.'''
+  [[register.field]]
+    name = "EXACT_MATCH"
+    bits = "7"
+    type = "rw"
+    shortdesc = '''Exact match bit.'''
+    longdesc = '''Specifies comparator behavior when exceptions, aborts, and load misses occur.'''
+  [[register.field]]
+    name = "DATA_CMP_CTRL"
+    bits = "6:5"
+    type = "rw"
+    shortdesc = '''Data value comparison control.'''
+    longdesc = '''The permitted values of this field are: 00: No data value comparison is made. 10: Reserved and must not be used. 01: Comparator can match only if data value matches. 11: Comparator can match only if data value does not match.'''
+  [[register.field]]
+    name = "CMP_ACCESS_SIZE"
+    bits = "4:3"
+    type = "rw"
+    shortdesc = '''Comparison access size.'''
+    longdesc = '''The permitted values of this field are: 00: Java instruction or byte data. 01: Thumb instruction or halfword data. 10: Reserved and must not be used. 11: ARM instruction or word data.'''
+  [[register.field]]
+    name = "ACCESS_TYPE"
+    bits = "2:0"
+    type = "rw"
+    shortdesc = '''Access type.'''
+    longdesc = '''The permitted values of this field are: 000: Instruction fetch. 001: Instruction execute. 010: Instruction executed and passed condition code test. 011: Instruction executed and failed condition code test. 100: Data load or store. 101: Data load. 110: Data store. 111: Reserved and must not be used.'''
+[[register]]
+  name = "DCVR1"
+  type = "rw"
+  width = 32
+  description = "Data Comparator Value 1 Register"
+  default = "0x00000000"
+  offset = "0x000000C0"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "DCVR3"
+  type = "rw"
+  width = 32
+  description = "Data Comparator Value 3 Register"
+  default = "0x00000000"
+  offset = "0x000000C8"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "DCMR1"
+  type = "rw"
+  width = 32
+  description = "Data Comparator Mask 1 Register"
+  default = "0x00000000"
+  offset = "0x00000100"
+  [[register.field]]
+    name = "MASK"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "DCMR3"
+  type = "rw"
+  width = 32
+  description = "Data Comparator Mask 3 Register"
+  default = "0x00000000"
+  offset = "0x00000108"
+  [[register.field]]
+    name = "MASK"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "CNTRLDVR1"
+  type = "rw"
+  width = 32
+  description = "Counter Reload Value 1 Register"
+  default = "0x00000000"
+  offset = "0x00000140"
+  [[register.field]]
+    name = "INITIAL"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "CNTRLDVR2"
+  type = "rw"
+  width = 32
+  description = "Counter Reload Value 2 Register"
+  default = "0x00000000"
+  offset = "0x00000144"
+  [[register.field]]
+    name = "INITIAL"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "CNTENR1"
+  type = "rw"
+  width = 32
+  description = "Counter Enable Event 1 Register"
+  default = "0x00000000"
+  offset = "0x00000150"
+  [[register.field]]
+    name = "EVENT"
+    bits = "16:0"
+    type = "rw"
+[[register]]
+  name = "CNTENR2"
+  type = "rw"
+  width = 32
+  description = "Counter Enable Event 2 Register"
+  default = "0x00000000"
+  offset = "0x00000154"
+  [[register.field]]
+    name = "EVENT"
+    bits = "16:0"
+    type = "rw"
+[[register]]
+  name = "CNTRLDEVR1"
+  type = "rw"
+  width = 32
+  description = "Counter Reload Event 1 Register"
+  default = "0x00000000"
+  offset = "0x00000160"
+  [[register.field]]
+    name = "EVENT"
+    bits = "16:0"
+    type = "rw"
+[[register]]
+  name = "CNTRLDEVR2"
+  type = "rw"
+  width = 32
+  description = "Counter Reload Event 2 Register"
+  default = "0x00000000"
+  offset = "0x00000164"
+  [[register.field]]
+    name = "EVENT"
+    bits = "16:0"
+    type = "rw"
+[[register]]
+  name = "CNTVR1"
+  type = "rw"
+  width = 32
+  description = "Counter Value 1 Register"
+  default = "0x00000000"
+  offset = "0x00000170"
+  [[register.field]]
+    name = "VALUE"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "CNTVR2"
+  type = "rw"
+  width = 32
+  description = "Counter Value 2 Register"
+  default = "0x00000000"
+  offset = "0x00000174"
+  [[register.field]]
+    name = "VALUE"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "SQEVR1"
+  type = "rw"
+  width = 32
+  description = "Sequencer State Transition Event 1 Register"
+  default = "0x00000000"
+  offset = "0x00000180"
+  [[register.field]]
+    name = "EVENT"
+    bits = "16:0"
+    type = "rw"
+[[register]]
+  name = "SQEVR2"
+  type = "rw"
+  width = 32
+  description = "Sequencer State Transition Event 2 Register"
+  default = "0x00000000"
+  offset = "0x00000184"
+  [[register.field]]
+    name = "EVENT"
+    bits = "16:0"
+    type = "rw"
+[[register]]
+  name = "SQEVR3"
+  type = "rw"
+  width = 32
+  description = "Sequencer State Transition Event 3 Register"
+  default = "0x00000000"
+  offset = "0x00000188"
+  [[register.field]]
+    name = "EVENT"
+    bits = "16:0"
+    type = "rw"
+[[register]]
+  name = "SQEVR4"
+  type = "rw"
+  width = 32
+  description = "Sequencer State Transition Event 4 Register"
+  default = "0x00000000"
+  offset = "0x0000018C"
+  [[register.field]]
+    name = "EVENT"
+    bits = "16:0"
+    type = "rw"
+[[register]]
+  name = "SQEVR5"
+  type = "rw"
+  width = 32
+  description = "Sequencer State Transition Event 5 Register"
+  default = "0x00000000"
+  offset = "0x00000190"
+  [[register.field]]
+    name = "EVENT"
+    bits = "16:0"
+    type = "rw"
+[[register]]
+  name = "SQEVR6"
+  type = "rw"
+  width = 32
+  description = "Sequencer State Transition Event 6 Register"
+  default = "0x00000000"
+  offset = "0x00000194"
+  [[register.field]]
+    name = "EVENT"
+    bits = "16:0"
+    type = "rw"
+[[register]]
+  name = "SQR"
+  type = "rw"
+  width = 32
+  description = "Current Sequencer State Register"
+  default = "0x00000000"
+  offset = "0x0000019C"
+  [[register.field]]
+    name = "STATE"
+    bits = "1:0"
+    type = "rw"
+    shortdesc = '''Possible states: 00, 01, 10.'''
+    longdesc = '''Programmable only when the Programming bit is set'''
+[[register]]
+  name = "EXTOUTEVR1"
+  type = "rw"
+  width = 32
+  description = "External Output Event 1 Register"
+  default = "0x00000000"
+  offset = "0x000001A0"
+  [[register.field]]
+    name = "EVENT"
+    bits = "16:0"
+    type = "rw"
+[[register]]
+  name = "EXTOUTEVR2"
+  type = "rw"
+  width = 32
+  description = "External Output Event 2 Register"
+  default = "0x00000000"
+  offset = "0x000001A4"
+  [[register.field]]
+    name = "EVENT"
+    bits = "16:0"
+    type = "rw"
+[[register]]
+  name = "CIDCVR"
+  type = "rw"
+  width = 32
+  description = "Context ID Comparator Value Register"
+  default = "0x00000000"
+  offset = "0x000001B0"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "CIDCMR"
+  type = "rw"
+  width = 32
+  description = "Context ID Comparator Mask Register"
+  default = "0x00000000"
+  offset = "0x000001BC"
+  [[register.field]]
+    name = "MASK"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "SYNCFR"
+  type = "rw"
+  width = 32
+  description = "Synchronization Frequency Regsiter"
+  default = "0x00000400"
+  offset = "0x000001E0"
+  [[register.field]]
+    name = "COUNT"
+    bits = "11:0"
+    type = "rw"
+[[register]]
+  name = "IDR"
+  type = "ro"
+  width = 32
+  description = "ETM ID Register"
+  default = "0x4104F232"
+  offset = "0x000001E4"
+  [[register.field]]
+    name = "IMPLEMENTER"
+    bits = "31:24"
+    type = "ro"
+  [[register.field]]
+    name = "SECURITY"
+    bits = "19"
+    type = "ro"
+    shortdesc = '''Security Extensions support.'''
+    longdesc = '''The ETM behaves as if the processor is in Secure state at all times.'''
+  [[register.field]]
+    name = "THUMB2"
+    bits = "18"
+    type = "ro"
+    shortdesc = '''Thumb-2 support.'''
+    longdesc = '''All 32-bit Thumb instructions are traced as a single instruction, including BL and BLX immediate.'''
+  [[register.field]]
+    name = "LOAD_PC_FIRST"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "ARM_FAMILY"
+    bits = "15:12"
+    type = "ro"
+    shortdesc = '''ARM processor family.'''
+    longdesc = '''The value of b1111 means that the processor family is defined elsewhere.'''
+  [[register.field]]
+    name = "ARCH_MAJOR"
+    bits = "11:8"
+    type = "ro"
+    shortdesc = '''Major ETM architecture version number.'''
+    longdesc = '''A value of 0 in this field indicates ETMv1.'''
+  [[register.field]]
+    name = "ARCH_MINOR"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "REVISION"
+    bits = "3:0"
+    type = "ro"
+    shortdesc = '''Implementation revision.'''
+    longdesc = '''Value given is for the r2p0 release of the macrocell.'''
+[[register]]
+  name = "CCER"
+  type = "ro"
+  width = 32
+  description = "Configuration Code Extension Register"
+  default = "0x0000097A"
+  offset = "0x000001E8"
+  [[register.field]]
+    name = "ALL_READABLE"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "SIZE_OF_EEXTIN"
+    bits = "10:3"
+    type = "ro"
+  [[register.field]]
+    name = "NO_OF_EEXTIN_SEL"
+    bits = "2:0"
+    type = "ro"
+[[register]]
+  name = "EXTINSELR"
+  type = "rw"
+  width = 32
+  description = "Extended External Input Selection Register"
+  default = "0x00000000"
+  offset = "0x000001EC"
+  [[register.field]]
+    name = "SEL_2ND_EXTIN"
+    bits = "13:8"
+    type = "rw"
+  [[register.field]]
+    name = "SEL_1ST_EXTIN"
+    bits = "5:0"
+    type = "rw"
+[[register]]
+  name = "TRACEIDR"
+  type = "rw"
+  width = 32
+  description = "CoreSight Trace ID Register"
+  default = "0x00000000"
+  offset = "0x00000200"
+  [[register.field]]
+    name = "ID"
+    bits = "6:0"
+    type = "rw"
+[[register]]
+  name = "PDSR"
+  type = "rw"
+  width = 32
+  description = "Power-Down Status Register"
+  default = "0x00000001"
+  offset = "0x00000314"
+  [[register.field]]
+    name = "STICKY_REG"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Sticky Register State.'''
+    longdesc = '''ETM-R5 does not support multiple power domains.'''
+  [[register.field]]
+    name = "POWERED_UP"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''ETM Powered Up.'''
+    longdesc = '''The ETM Trace registers are accessible. ETM-R5 does not support multiple power domains.'''
+[[register]]
+  name = "ETMIF"
+  type = "ro"
+  width = 32
+  description = "Processor-ETM Interface Register"
+  default = "0x00000000"
+  offset = "0x00000ED8"
+  [[register.field]]
+    name = "EVNTBUS_54"
+    bits = "13"
+    type = "ro"
+  [[register.field]]
+    name = "EVNTBUS_0"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "ETMCID_31"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "ETMCID_0"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "ETMDD_63"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "ETMDD_0"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "ETMDA_31"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "ETMDA_0"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "ETMDCTL_11"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "ETMDCTL_0"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "ETMIA_31"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "ETMIA_1"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "ETMICTL_13"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ETMICTL_0"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "MISCOUT"
+  type = "rw"
+  width = 32
+  description = "Miscellaneous Outputs Register"
+  default = "0x00000000"
+  offset = "0x00000EDC"
+  [[register.field]]
+    name = "EXTOUT"
+    bits = "9:8"
+    type = "rw"
+  [[register.field]]
+    name = "ETMWFIREADY"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "ETMDBGRQ"
+    bits = "4"
+    type = "rw"
+[[register]]
+  name = "MISCIN"
+  type = "ro"
+  width = 32
+  description = "Miscellaneous Inputs Register"
+  default = "0x00000000"
+  offset = "0x00000EE0"
+  [[register.field]]
+    name = "ETMWFIPENDING"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "DBGACK"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "EXTIN"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "TRIGGERACK"
+  type = "ro"
+  width = 32
+  description = "Trigger Acknowledge Regsiter"
+  default = "0x00000000"
+  offset = "0x00000EE4"
+  [[register.field]]
+    name = "TRIGGERACK"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "TRIGGERREQ"
+  type = "rw"
+  width = 32
+  description = "Trigger Request Regsiter"
+  default = "0x00000000"
+  offset = "0x00000EE8"
+  [[register.field]]
+    name = "TRIGGER"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "ATBDATA0"
+  type = "rw"
+  width = 32
+  description = "ATB Data Register 0"
+  default = "0x00000000"
+  offset = "0x00000EEC"
+  [[register.field]]
+    name = "ATDATA"
+    bits = "4:0"
+    type = "rw"
+[[register]]
+  name = "ATBCTR2"
+  type = "ro"
+  width = 32
+  description = "ATB Control Register 2"
+  default = "0x00000000"
+  offset = "0x00000EF0"
+  [[register.field]]
+    name = "AFVALID"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ATREADY"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ATBCTR1"
+  type = "rw"
+  width = 32
+  description = "ATB Control Register 1"
+  default = "0x00000000"
+  offset = "0x00000EF4"
+  [[register.field]]
+    name = "ATID"
+    bits = "6:0"
+    type = "rw"
+[[register]]
+  name = "ATBCTR0"
+  type = "rw"
+  width = 32
+  description = "ATB Control Register 0"
+  default = "0x00000000"
+  offset = "0x00000EF8"
+  [[register.field]]
+    name = "ATBYTES"
+    bits = "9:8"
+    type = "rw"
+  [[register.field]]
+    name = "AFREADY"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "ATVALID"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "ITCTRL"
+  type = "rw"
+  width = 32
+  description = "Integration Mode Control Register"
+  default = "0x00000000"
+  offset = "0x00000F00"
+  [[register.field]]
+    name = "IME"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "CLAIMSET"
+  type = "rw"
+  width = 32
+  description = "Claim Tag Set Register"
+  default = "0x000000FF"
+  offset = "0x00000FA0"
+  [[register.field]]
+    name = "CLAIM"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''Claim set bits.'''
+    longdesc = '''RAO. Writing a 1 to one of these bits sets the corresponding CLAIM bit to 1. This is an indirect write to the CLAIM bits. A single write operation can set multiple bits to 1. Writing 0 to one of these bits has no effect.'''
+[[register]]
+  name = "CLAIMCLR"
+  type = "rw"
+  width = 32
+  description = "Claim Tag Clear Register"
+  default = "0x00000000"
+  offset = "0x00000FA4"
+  [[register.field]]
+    name = "CLAIM"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''Claim clear bits.'''
+    longdesc = '''Reading this field returns the current value of the CLAIM bits. Writing a 1 to one of these bits clears the corresponding CLAIM bit to 0. This is an indirect write to the CLAIM bits. A single write operation can clear multiple bits to 0. Writing 0 to one of these bits has no effect.'''
+[[register]]
+  name = "LAR"
+  type = "wo"
+  width = 32
+  description = "Lock Access Register"
+  default = "0x00000000"
+  offset = "0x00000FB0"
+  [[register.field]]
+    name = "KEY"
+    bits = "31:0"
+    type = "wo"
+    shortdesc = '''Lock Access control.'''
+    longdesc = '''Writing the key value 0xC5ACCE55 to this field unlocks the lock, enabling write accesses to this component's registers through a memory-mapped interface. Writing any other value to this register locks the lock, disabling write accesses to this component's registers through a memory mapped interface.'''
+[[register]]
+  name = "LSR"
+  type = "ro"
+  width = 32
+  description = "Lock Status Register"
+  default = "0x00000003"
+  offset = "0x00000FB4"
+  [[register.field]]
+    name = "TT"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "SLK"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "SLI"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "AUTHSTATUS"
+  type = "ro"
+  width = 32
+  description = "Authentication Status Register"
+  default = "0x00000080"
+  offset = "0x00000FB8"
+  [[register.field]]
+    name = "SNID_IMP"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "SNID_EN"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "SID_IMP"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "SID_EN"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "NSNID_IMP"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "NSNID_EN"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "NSID_IMP"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "NSID_EN"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "DEVID"
+  type = "ro"
+  width = 32
+  description = "Device Indentifier"
+  default = "0x00000000"
+  offset = "0x00000FC8"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "DEVTYPE"
+  type = "ro"
+  width = 32
+  description = "Device Type Register"
+  default = "0x00000013"
+  offset = "0x00000FCC"
+  [[register.field]]
+    name = "SUBTYPE"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "MAIN_CLASS"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "PIDR4"
+  type = "ro"
+  width = 32
+  description = "Peripheral ID Register 4"
+  default = "0x00000004"
+  offset = "0x00000FD0"
+  [[register.field]]
+    name = "SIZE"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "DES_2"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "PIDR5"
+  type = "ro"
+  width = 32
+  description = "Peripheral ID Register 5"
+  default = "0x00000000"
+  offset = "0x00000FD4"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "PIDR6"
+  type = "ro"
+  width = 32
+  description = "Peripheral ID Register 6"
+  default = "0x00000000"
+  offset = "0x00000FD8"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "PIDR7"
+  type = "ro"
+  width = 32
+  description = "Peripheral ID Register 7"
+  default = "0x00000000"
+  offset = "0x00000FDC"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "PIDR0"
+  type = "ro"
+  width = 32
+  description = "Peripheral ID Register 0"
+  default = "0x00000031"
+  offset = "0x00000FE0"
+  [[register.field]]
+    name = "PART_0"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "PIDR1"
+  type = "ro"
+  width = 32
+  description = "Peripheral ID Register 1"
+  default = "0x000000B9"
+  offset = "0x00000FE4"
+  [[register.field]]
+    name = "DES_0"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "PART_1"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "PIDR2"
+  type = "ro"
+  width = 32
+  description = "Peripheral ID Register 2"
+  default = "0x0000000B"
+  offset = "0x00000FE8"
+  [[register.field]]
+    name = "REVISION"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "JEDEC"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "DES_1"
+    bits = "2:0"
+    type = "ro"
+[[register]]
+  name = "PIDR3"
+  type = "ro"
+  width = 32
+  description = "Peripheral ID Register 3"
+  default = "0x00000000"
+  offset = "0x00000FEC"
+  [[register.field]]
+    name = "REVAND"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "CMOD"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "CIDR0"
+  type = "ro"
+  width = 32
+  description = "Component ID Register 0"
+  default = "0x0000000D"
+  offset = "0x00000FF0"
+  [[register.field]]
+    name = "PRMBL_0"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "CIDR1"
+  type = "ro"
+  width = 32
+  description = "Component ID Register 1"
+  default = "0x00000090"
+  offset = "0x00000FF4"
+  [[register.field]]
+    name = "CLASS"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "PRMBL_1"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "CIDR2"
+  type = "ro"
+  width = 32
+  description = "Component ID Register 2"
+  default = "0x00000005"
+  offset = "0x00000FF8"
+  [[register.field]]
+    name = "PRMBL_2"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "CIDR3"
+  type = "ro"
+  width = 32
+  description = "Component ID Register 3"
+  default = "0x000000B1"
+  offset = "0x00000FFC"
+  [[register.field]]
+    name = "PRMBL_3"
+    bits = "7:0"
+    type = "ro"

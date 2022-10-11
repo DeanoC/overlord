@@ -1,0 +1,933 @@
+description = "Inter-Processor buffers"
+[[register]]
+name = "CH0_MSG_CH0"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000000"
+[[register]]
+name = "CH0_RESPONSE_CH0"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000020"
+
+[[register]]
+name = "CH0_MSG_CH1"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000040"
+[[register]]
+name = "CH0_RESPONSE_CH1"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000060"
+
+[[register]]
+name = "CH0_MSG_CH2"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000080"
+[[register]]
+name = "CH0_RESPONSE_CH2"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x000000a0"
+
+[[register]]
+name = "CH0_MSG_CH3"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x000000c0"
+[[register]]
+name = "CH0_RESPONSE_CH3"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x000000e0"
+
+[[register]]
+name = "CH0_MSG_CH4"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000100"
+[[register]]
+name = "CH0_RESPONSE_CH4"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000120"
+
+[[register]]
+name = "CH0_MSG_CH5"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000140"
+[[register]]
+name = "CH0_RESPONSE_CH5"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000160"
+
+[[register]]
+name = "CH0_MSG_CH6"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000180"
+[[register]]
+name = "CH0_RESPONSE_CH6"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x000001a0"
+
+[[register]]
+name = "CH0_MSG_CH7"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x000001c0"
+[[register]]
+name = "CH0_RESPONSE_CH7"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x000001e0"
+
+[[register]]
+name = "CH1_MSG_CH0"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000200"
+[[register]]
+name = "CH1_RESPONSE_CH0"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000220"
+
+[[register]]
+name = "CH1_MSG_CH1"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000240"
+[[register]]
+name = "CH1_RESPONSE_CH1"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000260"
+
+[[register]]
+name = "CH1_MSG_CH2"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000280"
+[[register]]
+name = "CH1_RESPONSE_CH2"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x000002a0"
+
+[[register]]
+name = "CH1_MSG_CH3"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x000002c0"
+[[register]]
+name = "CH1_RESPONSE_CH3"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x000002e0"
+
+[[register]]
+name = "CH1_MSG_CH4"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000300"
+[[register]]
+name = "CH1_RESPONSE_CH4"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000320"
+
+[[register]]
+name = "CH1_MSG_CH5"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000340"
+[[register]]
+name = "CH1_RESPONSE_CH5"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000360"
+
+[[register]]
+name = "CH1_MSG_CH6"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000380"
+[[register]]
+name = "CH1_RESPONSE_CH6"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x000003a0"
+
+[[register]]
+name = "CH1_MSG_CH7"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x000003c0"
+[[register]]
+name = "CH1_RESPONSE_CH7"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x000003e0"
+
+[[register]]
+name = "CH2_MSG_CH0"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000400"
+[[register]]
+name = "CH2_RESPONSE_CH0"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000420"
+
+[[register]]
+name = "CH2_MSG_CH1"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000440"
+[[register]]
+name = "CH2_RESPONSE_CH1"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000460"
+
+[[register]]
+name = "CH2_MSG_CH2"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000480"
+[[register]]
+name = "CH2_RESPONSE_CH2"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x000004a0"
+
+[[register]]
+name = "CH2_MSG_CH3"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x000004c0"
+[[register]]
+name = "CH2_RESPONSE_CH3"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x000004e0"
+
+[[register]]
+name = "CH2_MSG_CH4"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000500"
+[[register]]
+name = "CH2_RESPONSE_CH4"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000520"
+
+[[register]]
+name = "CH2_MSG_CH5"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000540"
+[[register]]
+name = "CH2_RESPONSE_CH5"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000560"
+
+[[register]]
+name = "CH2_MSG_CH6"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000580"
+[[register]]
+name = "CH2_RESPONSE_CH6"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x000005a0"
+
+[[register]]
+name = "CH2_MSG_CH7"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x000005c0"
+[[register]]
+name = "CH2_RESPONSE_CH7"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x000005e0"
+
+[[register]]
+name = "CH3_MSG_CH0"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000600"
+
+[[register]]
+name = "CH3_RESPONSE_CH0"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000620"
+
+[[register]]
+name = "CH3_MSG_CH1"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000640"
+[[register]]
+name = "CH3_RESPONSE_CH1"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000660"
+
+[[register]]
+name = "CH3_MSG_CH2"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000680"
+[[register]]
+name = "CH3_RESPONSE_CH2"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x000006a0"
+
+[[register]]
+name = "CH3_MSG_CH3"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x000006c0"
+[[register]]
+name = "CH3_RESPONSE_CH3"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x000006e0"
+
+[[register]]
+name = "CH3_MSG_CH4"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000700"
+[[register]]
+name = "CH3_RESPONSE_CH4"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000720"
+
+[[register]]
+name = "CH3_MSG_CH5"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000740"
+[[register]]
+name = "CH3_RESPONSE_CH5"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000760"
+
+[[register]]
+name = "CH3_MSG_CH6"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000780"
+[[register]]
+name = "CH3_RESPONSE_CH6"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x000007a0"
+
+[[register]]
+name = "CH3_MSG_CH7"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x000007c0"
+[[register]]
+name = "CH3_RESPONSE_CH7"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x000007e0"
+
+[[register]]
+name = "CH4_RESPONSE_CH0"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000820"
+[[register]]
+name = "CH4_MSG_CH0"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000840"
+
+[[register]]
+name = "CH4_RESPONSE_CH1"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000860"
+[[register]]
+name = "CH4_MSG_CH2"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000880"
+
+[[register]]
+name = "CH4_RESPONSE_CH2"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x000008a0"
+
+[[register]]
+name = "CH4_MSG_CH3"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x000008c0"
+[[register]]
+name = "CH4_RESPONSE_CH3"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x000008e0"
+
+[[register]]
+name = "CH4_MSG_CH4"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000900"
+[[register]]
+name = "CH4_RESPONSE_CH4"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000920"
+
+[[register]]
+name = "CH4_MSG_CH5"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000940"
+[[register]]
+name = "CH4_RESPONSE_CH5"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000960"
+
+[[register]]
+name = "CH4_MSG_CH6"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000980"
+[[register]]
+name = "CH4_RESPONSE_CH6"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x000009a0"
+
+[[register]]
+name = "CH4_MSG_CH7"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x000009c0"
+[[register]]
+name = "CH4_RESPONSE_CH7"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x000009e0"
+
+[[register]]
+name = "CH5_RESPONSE_CH0"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000a20"
+
+[[register]]
+name = "CH5_MSG_CH1"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000a40"
+[[register]]
+name = "CH5_RESPONSE_CH1"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000a60"
+
+[[register]]
+name = "CH5_MSG_CH2"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000a80"
+[[register]]
+name = "CH5_RESPONSE_CH2"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000aa0"
+
+[[register]]
+name = "CH5_MSG_CH3"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000ac0"
+[[register]]
+name = "CH5_RESPONSE_CH3"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000ae0"
+
+[[register]]
+name = "CH5_MSG_CH4"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000b00"
+[[register]]
+name = "CH5_RESPONSE_CH4"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000b20"
+
+[[register]]
+name = "CH5_MSG_CH5"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000b40"
+[[register]]
+name = "CH5_RESPONSE_CH5"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000b60"
+
+[[register]]
+name = "CH5_MSG_CH6"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000b80"
+[[register]]
+name = "CH5_RESPONSE_CH6"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000ba0"
+
+[[register]]
+name = "CH5_MSG_CH7"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000bc0"
+[[register]]
+name = "CH5_RESPONSE_CH7"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000be0"
+
+[[register]]
+name = "CH6_RESPONSE_CH0"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000c20"
+
+[[register]]
+name = "CH6_MSG_CH1"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000c40"
+[[register]]
+name = "CH6_RESPONSE_CH1"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000c60"
+
+[[register]]
+name = "CH6_MSG_CH2"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000c80"
+[[register]]
+name = "CH6_RESPONSE_CH2"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000ca0"
+
+[[register]]
+name = "CH6_MSG_CH3"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000cc0"
+[[register]]
+name = "CH6_RESPONSE_CH3"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000ce0"
+
+[[register]]
+name = "CH6_MSG_CH4"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000d00"
+[[register]]
+name = "CH6_RESPONSE_CH4"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000d20"
+
+[[register]]
+name = "CH6_MSG_CH5"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000d40"
+[[register]]
+name = "CH6_RESPONSE_CH5"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000d60"
+
+[[register]]
+name = "CH6_MSG_CH6"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000d80"
+[[register]]
+name = "CH6_RESPONSE_CH6"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000da0"
+
+[[register]]
+name = "CH6_MSG_CH7"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000dc0"
+[[register]]
+name = "CH6_RESPONSE_CH7"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000de0"
+
+[[register]]
+name = "CH7_RESPONSE_CH0"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000e20"
+
+[[register]]
+name = "CH7_MSG_CH1"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000e40"
+[[register]]
+name = "CH7_RESPONSE_CH1"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000e60"
+
+[[register]]
+name = "CH7_MSG_CH2"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000e80"
+[[register]]
+name = "CH7_RESPONSE_CH2"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000ea0"
+
+[[register]]
+name = "CH7_MSG_CH3"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000ec0"
+[[register]]
+name = "CH7_RESPONSE_CH3"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000ee0"
+
+[[register]]
+name = "CH7_MSG_CH4"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000f00"
+[[register]]
+name = "CH7_RESPONSE_CH4"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000f20"
+
+[[register]]
+name = "CH7_MSG_CH5"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000f40"
+[[register]]
+name = "CH7_RESPONSE_CH5"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000f60"
+
+[[register]]
+name = "CH7_MSG_CH6"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000f80"
+[[register]]
+name = "CH7_RESPONSE_CH6"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000fa0"
+
+[[register]]
+name = "CH7_MSG_CH7"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte message buffer"
+default = "0x0"
+offset = "0x00000fc0"
+[[register]]
+name = "CH7_RESPONSE_CH7"
+type = "mixed"
+width = 32
+description = "offset of 32 Byte response buffer"
+default = "0x0"
+offset = "0x00000fe0"

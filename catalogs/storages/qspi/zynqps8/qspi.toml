@@ -1,0 +1,1609 @@
+description = "Quad SPI Controller"
+[[bank]]
+  name = "QSPI"
+  address = "0xff0f0000"
+[[register]]
+  name = "CONFIG"
+  type = "mixed"
+  width = 32
+  description = "QSPI configuration register"
+  default = "0x80000000"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "LEG_FLSH"
+    bits = "31"
+    type = "rw"
+    shortdesc = '''Flash memory interface mode control: 1: Flash memory interface mode 0: legacy SPI mode This control is required to enable or disable automatic recognition of instruction bytes in the first byte of a transfer.'''
+    longdesc = '''If this mode is disabled, the core will operate in standard SPI mode, with no dual- or quad-bit input or output capability; the extended bits will be configured as inputs to prevent any driver contention on these pins. If enabled, flash memory interface instructions are automatically recognized and the I/O configured accordingly.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:27"
+    type = "ro"
+  [[register.field]]
+    name = "ENDIAN"
+    bits = "26"
+    type = "rw"
+    shortdesc = '''0: little endian format when writing to the transmit data register 0x1C or reading from the receive data register 0x20.'''
+    longdesc = '''1: big endian format when writing to the transmit data register 0x1C or reading from the receive data register 0x20.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "25:20"
+    type = "ro"
+  [[register.field]]
+    name = "HOLDB_DR"
+    bits = "19"
+    type = "rw"
+    shortdesc = '''If set, Holdb and WPn pins are actively driven by the qspi controller in 1-bit and 2-bit modes.'''
+    longdesc = '''If not set, then external pull up is required on HOLDb and WPn pins. Note that this bit doesn't affect the quad (4-bit) mode as Controller always drives these pins in quad mode. It is highly recommended to set this bit always(irrespective of mode of operation) while using QSPI.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "18:17"
+    type = "rw"
+  [[register.field]]
+    name = "MAN_START_COM"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "MAN_START_EN"
+    bits = "15"
+    type = "rw"
+  [[register.field]]
+    name = "MANUAL_CS"
+    bits = "14"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "13:11"
+    type = "rw"
+  [[register.field]]
+    name = "PCS"
+    bits = "10"
+    type = "rw"
+    shortdesc = '''Peripheral chip select line, directly drive n_ss_out if Manual_CS is set.'''
+    longdesc = '''In manual CS mode, this bit should be programmed before writing Transmit Data Registers (TXDx).'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "9"
+    type = "rw"
+  [[register.field]]
+    name = "REF_CLK"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''Reserved.'''
+    longdesc = '''Must be 0'''
+  [[register.field]]
+    name = "FIFO_WIDTH"
+    bits = "7:6"
+    type = "rw"
+    shortdesc = '''FIFO width Must be set to 2'b11 (32bits).'''
+    longdesc = '''All other settings are not supported.'''
+  [[register.field]]
+    name = "BAUD_RATE_DIV"
+    bits = "5:3"
+    type = "rw"
+    shortdesc = '''Master mode baud rate divisor 000: divide by 2.'''
+    longdesc = '''This is the only baud rate setting that can be used if the loopback clock is enabled [USE_LPBK]. 001: divide by 4 010: divide by 8 011: divide by 16 100: divide by 32 101: divide by 64 110: divide by 128 111: divide by 256'''
+  [[register.field]]
+    name = "CLK_PH"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "CLK_POL"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "MODE_SEL"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Mode select 0: reserved 1: QSPI is in master mode In QSPI boot mode, ROM code will set this bit.'''
+    longdesc = '''In other boot modes, this bit must be set before using QSPI.'''
+[[register]]
+  name = "ISR"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Status"
+  default = "0x00000104"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:9"
+    type = "ro"
+  [[register.field]]
+    name = "TXFIFO_EMPTY"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''TX FIFO Empty interrupt: 0: TX FIFO is not empty.'''
+    longdesc = '''1: TX FIFO is empty.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "TX_FIFO_UNDERFLOW"
+    bits = "6"
+    type = "wtc"
+    shortdesc = '''TX FIFO underflow status: 0: no underflow has been detected.'''
+    longdesc = '''1: underflow is detected. Write 1 to this bit location to clear'''
+  [[register.field]]
+    name = "RX_FIFO_FULL"
+    bits = "5"
+    type = "ro"
+    shortdesc = '''RX FIFO full (current FIFO status): 0: FIFO is not full.'''
+    longdesc = '''1: FIFO is full.'''
+  [[register.field]]
+    name = "RX_FIFO_NOT_EMPTY"
+    bits = "4"
+    type = "ro"
+    shortdesc = '''RX FIFO not empty (current FIFO status): 0: FIFO has less than RX THRESHOLD entries.'''
+    longdesc = '''1: FIFO has more than or equal to RX THRESHOLD entries.'''
+  [[register.field]]
+    name = "TX_FIFO_FULL"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "TX_FIFO_NOT_FULL"
+    bits = "2"
+    type = "ro"
+    shortdesc = '''TX FIFO not full (current FIFO status): 0: FIFO has more than or equal to TX THRESHOLD entries.'''
+    longdesc = '''1: FIFO has less than TX THRESHOLD entries.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "RX_OVERFLOW"
+    bits = "0"
+    type = "wtc"
+    shortdesc = '''Receive Overflow interrupt: 0: no overflow occurred.'''
+    longdesc = '''1: overflow occurred. Write 1 to this bit location to clear.'''
+[[register]]
+  name = "IER"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Enable"
+  default = "0x00000000"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:9"
+    type = "ro"
+  [[register.field]]
+    name = "TXFIFO_EMPTY"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "TX_FIFO_UNDERFLOW"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "RX_FIFO_FULL"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "RX_FIFO_NOT_EMPTY"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "TX_FIFO_FULL"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "TX_FIFO_NOT_FULL"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "RX_OVERFLOW"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "IDR"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Disable"
+  default = "0x00000000"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:9"
+    type = "ro"
+  [[register.field]]
+    name = "TXFIFO_EMPTY"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "TX_FIFO_UNDERFLOW"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "RX_FIFO_FULL"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "RX_FIFO_NOT_EMPTY"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "TX_FIFO_FULL"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "TX_FIFO_NOT_FULL"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "RX_OVERFLOW"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "IMR"
+  type = "ro"
+  width = 32
+  description = "Interrupt Un-Mask (enabled)"
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:9"
+    type = "ro"
+  [[register.field]]
+    name = "TXFIFO_EMPTY"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "TX_FIFO_UNDERFLOW"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "RX_FIFO_FULL"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "RX_FIFO_NOT_EMPTY"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "TX_FIFO_FULL"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "TX_FIFO_NOT_FULL"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "RX_OVERFLOW"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "LQSPI_EN"
+  type = "mixed"
+  width = 32
+  description = "LQSPI Enable"
+  default = "0x00000000"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "ro"
+  [[register.field]]
+    name = "SPI_EN"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''SPI enable: 0: disable the SPI.'''
+    longdesc = '''1: enable the SPI. Note: Change this value only when controller is not communicating with the memory device.'''
+[[register]]
+  name = "DELAY"
+  type = "rw"
+  width = 32
+  description = "Timing Control Delay"
+  default = "0x00000000"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "D_NSS"
+    bits = "31:24"
+    type = "rw"
+  [[register.field]]
+    name = "D_BTWN"
+    bits = "23:16"
+    type = "rw"
+  [[register.field]]
+    name = "D_AFTER"
+    bits = "15:8"
+    type = "rw"
+  [[register.field]]
+    name = "D_INT"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "TXD0"
+  type = "wo"
+  width = 32
+  description = "Transmit Data, 4 Bytes"
+  default = "0x00000000"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "TXD"
+    bits = "31:0"
+    type = "wo"
+[[register]]
+  name = "RX_DATA"
+  type = "ro"
+  width = 32
+  description = "Receive Data in RX FIFO"
+  default = "0x00000000"
+  offset = "0x00000020"
+  [[register.field]]
+    name = "RX_FIFO_DATA"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "SLAVE_IDLE_COUNT"
+  type = "mixed"
+  width = 32
+  description = "Slave Idle Count"
+  default = "0x000000FF"
+  offset = "0x00000024"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "ro"
+[[register]]
+  name = "TX_THRES"
+  type = "rw"
+  width = 32
+  description = "TX FIFO Threshold"
+  default = "0x00000001"
+  offset = "0x00000028"
+  [[register.field]]
+    name = "THRESHOLD_OF_TX_FIFO"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "RX_THRES"
+  type = "rw"
+  width = 32
+  description = "RX FIFO Threshold"
+  default = "0x00000001"
+  offset = "0x0000002C"
+  [[register.field]]
+    name = "THRESHOLD_OF_RX_FIFO"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "GPIO"
+  type = "rw"
+  width = 32
+  description = "Write Protection Output"
+  default = "0x00000001"
+  offset = "0x00000030"
+  [[register.field]]
+    name = "WP_N"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Write Protect.'''
+    longdesc = '''0: output low. 1: output high (reset default). The active low function may be inverted externally for devices requiring an active high write protect signal. Note: Change this value only when controller is not communicating with the memory device.'''
+[[register]]
+  name = "LPBK_DLY_ADJ"
+  type = "rw"
+  width = 32
+  description = "Loopback Master Clock Delay Adjustment"
+  default = "0x00000033"
+  offset = "0x00000038"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:7"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "USE_LPBK"
+    bits = "5"
+    type = "rw"
+    shortdesc = '''Use internal loopback master clock for read data capturing when baud rate divisor is 2.'''
+    longdesc = '''Note: Change this value only when controller is not communicating with the memory device.'''
+  [[register.field]]
+    name = "DLY1"
+    bits = "4:3"
+    type = "rw"
+    shortdesc = '''Must be set to 00 if Loopback clk used.'''
+    longdesc = '''Note: Change this value only when controller is not communicating with the memory device.'''
+  [[register.field]]
+    name = "DLY0"
+    bits = "2:0"
+    type = "rw"
+    shortdesc = '''Must be set to 00 if Loopback clk used.'''
+    longdesc = '''Note: Change this value only when controller is not communicating with the memory device.'''
+[[register]]
+  name = "TXD1"
+  type = "wo"
+  width = 32
+  description = "Transmit Data, 1 Byte"
+  default = "0x00000000"
+  offset = "0x00000080"
+  [[register.field]]
+    name = "TXD"
+    bits = "31:0"
+    type = "wo"
+    shortdesc = '''Data to TX FIFO, for 1-byte instruction, not for normal data transfer.'''
+    longdesc = '''In little endian mode (default), only bits 7:0 are valid, bits 31:8 are ignored. In big endian mode, only the 8 MSB bits are valid.'''
+[[register]]
+  name = "TXD2"
+  type = "wo"
+  width = 32
+  description = "Transmit Data, 2 Byte"
+  default = "0x00000000"
+  offset = "0x00000084"
+  [[register.field]]
+    name = "TXD"
+    bits = "31:0"
+    type = "wo"
+    shortdesc = '''Data to TX FIFO, for 2-byte instruction, not for normal data transfer.'''
+    longdesc = '''In little endian mode (default), only bits 15:0 are valid, bits 31:16 are ignored. In big endian mode, only the 16 MSB bits are valid.'''
+[[register]]
+  name = "TXD3"
+  type = "wo"
+  width = 32
+  description = "Transmit Data, 3 Bytes"
+  default = "0x00000000"
+  offset = "0x00000088"
+  [[register.field]]
+    name = "TXD"
+    bits = "31:0"
+    type = "wo"
+    shortdesc = '''Data to TX FIFO, for 3-byte instruction, not for normal data transfer.'''
+    longdesc = '''In little endian mode (default), only bits 23:0 are valid, bits 31:24 are ignored. In big endian mode, only the 24 MSB bits are valid.'''
+[[register]]
+  name = "LQSPI_CFG"
+  type = "rw"
+  width = 32
+  description = "Configuration"
+  default = "0x000002EB"
+  offset = "0x000000A0"
+  [[register.field]]
+    name = "LQ_MODE"
+    bits = "31"
+    type = "rw"
+    shortdesc = '''Controller Select: 0: Generic Quad-SPI.'''
+    longdesc = '''1: Legacy LQSPI, Linear Quad-SPI. Note: Change this value only when controller is not communicating with the memory device.'''
+  [[register.field]]
+    name = "TWO_MEM"
+    bits = "30"
+    type = "rw"
+    shortdesc = '''I/O Configuration: 0: One memory device.'''
+    longdesc = '''1: Two memory devices. Note: Change this value only when controller is not communicating with the memory device.'''
+  [[register.field]]
+    name = "SEP_BUS"
+    bits = "29"
+    type = "rw"
+    shortdesc = '''I/O Configuration: 0: Single memory interface.'''
+    longdesc = '''1: Separate memory intefaces. This bit only has meaning if [TWO_MEM] = 1. Note: Change this value only when controller is not communicating with the memory device.'''
+  [[register.field]]
+    name = "U_PAGE"
+    bits = "28"
+    type = "rw"
+    shortdesc = '''Upper Page Select: 0: Lower memory page.'''
+    longdesc = '''1: Upper memory page. This bit only has meaning if: [TWO_MEM] = 1 (two devices) [SEP_BUS] = 0 (one interface) IO mode is not supported in LQSPI; [U_PAGE] selects the lower or upper memory for configuration or read/write operations. Note: Change this value only when controller is not communicating with the memory device.'''
+  [[register.field]]
+    name = "ADDR_32BIT"
+    bits = "27"
+    type = "rw"
+    shortdesc = '''Flash Memory Address based on AXI address: 0: Lower 24 bits of AXI address on linear port are used as address to the flash.'''
+    longdesc = '''1: Five zero bits & lower 27 bits of AXI address. Note: Change this value only when controller is not communicating with the memory device.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "26"
+    type = "rw"
+  [[register.field]]
+    name = "MODE_EN"
+    bits = "25"
+    type = "rw"
+    shortdesc = '''IO mode is not supported in LQSPI.'''
+    longdesc = '''1: Send MODE_BITS[23:16]. Must be set = 1 for dual or quad I/O read (specified through [7:0]). Must be clear = 0 for all other read modes as they do not have mode bits. If this bit is 0, [MODE_ON, 24] and [MODE_BITS] are ignored. Relationship of bits [25], [24] and [23:16] are related: if ( [ Bit25 == 0 ] && [ Bit24 == x ] ) then [ Bits23:16 = x ] if ( [ Bit25 == 1 ] && [ Bit24 == 0 ] ) then [ Bits23:16 = ~(8'bxx10xxxx) ] if ( [ Bit25 == 1 ] && [ Bit24 == 1 ] ) then [ Bits23:16 = 8'bxx10xxxx ]. Note: Change this value only when controller is not communicating with the memory device.'''
+  [[register.field]]
+    name = "MODE_ON"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''IO mode is not supported in LQSPI.'''
+    longdesc = '''0: Instruction code is sent for all read transfers. 1: Instruction code is sent only for first read transfer. This bit applies when [MODE_EN, 25] is set = 1. This bit is configured in association with [MODE_BITS]. For Winbond devices, this bit must be set = 1 if the [MODE_BITS] = 8'bxx10xxxx, else clear = 0. Note: Change this value only when the controller is not communicating with the memory device.'''
+  [[register.field]]
+    name = "MODE_BITS"
+    bits = "23:16"
+    type = "rw"
+    shortdesc = '''IO mode is not supported in LQSPI.'''
+    longdesc = '''These bits apply when [MODE_EN, 25] = 1. Required for both dual I/O read and quad I/O read. See Flash memory vendor's datasheet for more information on the mode bits. For the Winbond device, the continuous read mode value is 8'bxx10xxxx to skip the instruction code for the next read transfer, else instruction code is sent for all read transfers. Bit 24 has to be configured accordingly with this value. Note: Change this value only when controller is not communicating with the memory device.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:11"
+    type = "rw"
+  [[register.field]]
+    name = "INST_CODE"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''Read instruction code.'''
+    longdesc = '''The known read instruction codes are: 8'h03 - Read 8'h0B - Fast read 8'h3B - Fast read dual output 8'h6B - Fast read quad output 8'hBB - Fast read dual I/O 8'hEB - Fast read quad I/O 8'h13 - Four Byte Address Read 8'h0C - Four Byte Address Fast read 8'h3C - Four Byte Address Fast read dual output 8'h6C - Four Byte Address Fast read quad output 8'hBC - Four Byte Address Fast read dual I/O 8'hEC - Four Byte Address Fast read quad I/O This is a static signal - should not be changed while controller is actively transmitting/receiving data to/from Flash device'''
+[[register]]
+  name = "LQSPI_STS"
+  type = "ro"
+  width = 9
+  description = "Status"
+  default = "0x00000000"
+  offset = "0x000000A4"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8:3"
+    type = "ro"
+  [[register.field]]
+    name = "D_FSM_ERR"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "WR_RECVD"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "COMMAND"
+  type = "mixed"
+  width = 32
+  description = "Command control"
+  default = "0x00000000"
+  offset = "0x000000C0"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:21"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "RXFIFO_DRAIN"
+    bits = "20"
+    type = "wo"
+    shortdesc = '''When this bit is set to 1'b1, data in the RXFIFO is drained by the HW as soon as the data available in RXIFO.'''
+    longdesc = '''This bit can be set for any write transfer to the Flash so that the HW will discard the data captured while transmitting the write data. 0: Do not discard the data in RXFIFO. 1: Discard the data in RXFIFO. Note: Change this value only when controller is not communicating with the memory device.'''
+  [[register.field]]
+    name = "RXFIFO_DRAIN_STATUS"
+    bits = "19"
+    type = "ro"
+    shortdesc = '''This bit provides the status of RXFIFO_DRAIN.'''
+    longdesc = '''0: RXFIFO_DRAIN is reset. 1: RXFIFO_DRAIN is set.'''
+  [[register.field]]
+    name = "PARTIAL_BYTE_LEN"
+    bits = "18:16"
+    type = "rw"
+    shortdesc = '''Value in this field along with TXD1, TXD2, TXD3 represents the number of bits to be transmitted.'''
+    longdesc = '''(TXDx length - PARTIAL_BYTE_LEN) is the number of bits to be transmitted For example, if only 4 bits to be transmitted, program PARTIAL_BYTE_LEN with a value of 4 and then configure TXD1 register. Similar way to transmit 12 bits, program PARTIAL_BYTE_LEN a value of 4 and then configure TXD2 register. Value in this files is cleared by HW soon after completing transmission of partial byte. SW need to write into this register again if need to transfer partial byte. This is a static signal - should not be changed while controller is actively transmitting/receiving data to/from Flash device'''
+  [[register.field]]
+    name = "RX_DISCARD_REG"
+    bits = "14:8"
+    type = "rw"
+    shortdesc = '''Value in this field reflects the number of QSPI clocks for which the data need to be discarded before writing into RXFIFO.'''
+    longdesc = '''In general value in this field should be equal to QSPI clocks required to transmit Command+Address+Dummy cycles. This is a static signal - should not be changed while controller is actively transmitting/receiving data to/from Flash device'''
+  [[register.field]]
+    name = "DUMMY_CYCLES"
+    bits = "7:2"
+    type = "rw"
+    shortdesc = '''Number of dummy cycles to be inserted after the address phase to the flash.'''
+    longdesc = '''This is a static signal - should not be changed while controller is actively transmitting/receiving data to/from Flash device'''
+  [[register.field]]
+    name = "DMA_EN"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''This bit along with LQSPI_CFG[31] forms the mode selection.'''
+    longdesc = '''And the encoding is as mentioned below {DMA_EN, LQSPI_CFG[31]}: 01: Linear Mode. 10: DMA Mode. Others: reserved. Never set both the [DMA_EN] and LQSPI_SFG [31] bits to 1 as it is not a valid condition. This is a static signal - should not be changed while controller is actively transmitting/receiving data to/from Flash device'''
+[[register]]
+  name = "TRANSFER_SIZE"
+  type = "mixed"
+  width = 32
+  description = "Transfer Size"
+  default = "0x00000000"
+  offset = "0x000000C4"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:29"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "SIZE"
+    bits = "28:2"
+    type = "wo"
+    shortdesc = '''Specifies the number of 4-byte words the QSPI will read from memory Size is word aligned, so this field is only 27-bits.'''
+    longdesc = '''(2 lsb's are 0) The value in this register signifies the number of words to be read from memory. This is a static signal - should not be changed while controller is actively transmitting/receiving data to/from Flash device'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "1:0"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+[[register]]
+  name = "DUMMY_CYCLE_EN"
+  type = "mixed"
+  width = 32
+  description = "Dummy Cycles Enable"
+  default = "0x00000000"
+  offset = "0x000000C8"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "DUMMY_CYCLE_EN"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Use DUMMY_CYCLES.'''
+    longdesc = '''This bit is applicable only in Linear mode. This bit should not be used in DMA mode. 0: Disable using dummy cycle value. 1: Enable using dummy cycle value. This is a static signal - should not be changed while controller is actively transmitting/receiving data to/from Flash device'''
+[[register]]
+  name = "MOD_ID"
+  type = "rw"
+  width = 32
+  description = "Module Identification"
+  default = "0x01090101"
+  offset = "0x000000FC"
+[[register]]
+  name = "GQSPI_CFG"
+  type = "mixed"
+  width = 32
+  description = "GQSPI Configuration"
+  default = "0x00000000"
+  offset = "0x00000100"
+  [[register.field]]
+    name = "MODE_EN"
+    bits = "31:30"
+    type = "rw"
+  [[register.field]]
+    name = "GEN_FIFO_START_MODE"
+    bits = "29"
+    type = "rw"
+    shortdesc = '''Start mode of Generic FIFO 0: Auto Start Mode.'''
+    longdesc = '''1: Manual Start Mode. Note: Change this value only when controller is not communicating with the memory device.'''
+  [[register.field]]
+    name = "START_GEN_FIFO"
+    bits = "28"
+    type = "wo"
+    shortdesc = '''Trigger Generic FIFO Command Execution.'''
+    longdesc = '''0:disable executing requests. 1: enable executing requests. Note: Change this value only when controller is not communicating with the memory device.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "27"
+    type = "raz"
+  [[register.field]]
+    name = "ENDIAN"
+    bits = "26"
+    type = "rw"
+    shortdesc = '''Format when writing to the transmit data register 0x10C or reading from the receive data register 0x110: 0: little endian.'''
+    longdesc = '''1: big endian. Note: Change this value only when controller is not communicating with the memory device.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "25:21"
+    type = "raz"
+  [[register.field]]
+    name = "EN_POLL_TIMEOUT"
+    bits = "20"
+    type = "rw"
+    shortdesc = '''Poll Timeout Enable: 0: disable.'''
+    longdesc = '''1: enable. Note: Change this value only when controller is not communicating with the memory device.'''
+  [[register.field]]
+    name = "WP_HOLD"
+    bits = "19"
+    type = "rw"
+    shortdesc = '''If set, Holdb and WPn pins are actively driven by the qspi controller in 1-bit and 2-bit modes.'''
+    longdesc = '''If not set, then external pull up is required on HOLDb and WPn pins. Note that this bit doesn't affect the quad(4-bit) mode as Controller always drives these pins in quad mode. It is highly recommended to set this bit always(irrespective of mode of operation) while using GQSPI Note: Change this value only when controller is not communicating with the memory device.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "18:6"
+    type = "raz"
+  [[register.field]]
+    name = "BAUD_RATE_DIV"
+    bits = "5:3"
+    type = "rw"
+    shortdesc = '''Clock Prescaler: 000: divide by 2.'''
+    longdesc = '''001: divide by 4. 010: divide by 8. 011: divide by 16. 100: divide by 32. 101: divide by 64. 110: divide by 128. 111: divide by 256. Note: 000 is requried for loopback, [USE_LPBK]. Note: Change this value only when controller is not communicating with the memory device.'''
+  [[register.field]]
+    name = "CLK_PH"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Clock phase 1: the QSPI clock is inactive outside the word 0: the QSPI clock is active outside the word Note: For {CLK_PH, CLK_POL}, only 2'b11 and 2'b00 are supported.'''
+    longdesc = '''Note: Change this value only when controller is not communicating with the memory device.'''
+  [[register.field]]
+    name = "CLK_POL"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Clock polarity outside QSPI word.'''
+    longdesc = '''0: QSPI clock is quiescent low. 1: QSPI clock is quiescent high. Note: For [CLK_PH, CLK_POL], only 2'b11 and 2'b00 are supported. Note: Change this value only when controller is not communicating with the memory device.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "0"
+    type = "raz"
+[[register]]
+  name = "GQSPI_ISR"
+  type = "mixed"
+  width = 32
+  description = "Generic QSPI interrupt status"
+  default = "0x00000B84"
+  offset = "0x00000104"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:12"
+    type = "raz"
+  [[register.field]]
+    name = "RX_FIFO_EMPTY"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "GEN_FIFO_FULL"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "GEN_FIFO_NOT_FULL"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "TX_FIFO_EMPTY"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "GEN_FIFO_EMPTY"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6"
+    type = "raz"
+  [[register.field]]
+    name = "RX_FIFO_FULL"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "RX_FIFO_NOT_EMPTY"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "TX_FIFO_FULL"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "TX_FIFO_NOT_FULL"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "POLL_TIME_EXPIRE"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "0"
+    type = "raz"
+[[register]]
+  name = "GQSPI_IER"
+  type = "mixed"
+  width = 32
+  description = "GQSPI Interrupt Enable"
+  default = "0x00000000"
+  offset = "0x00000108"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:12"
+    type = "raz"
+  [[register.field]]
+    name = "RX_FIFO_EMPTY"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "GEN_FIFO_FULL"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "GEN_FIFO_NOT_FULL"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "TX_FIFO_EMPTY"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "GEN_FIFO_EMPTY"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6"
+    type = "raz"
+  [[register.field]]
+    name = "RX_FIFO_FULL"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "RX_FIFO_NOT_EMPTY"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "TX_FIFO_FULL"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "TX_FIFO_NOT_FULL"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "POLL_TIME_EXPIRE"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "0"
+    type = "raz"
+[[register]]
+  name = "GQSPI_IDR"
+  type = "mixed"
+  width = 32
+  description = "GQSPI Interrupt disable"
+  default = "0x00000000"
+  offset = "0x0000010C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:12"
+    type = "raz"
+  [[register.field]]
+    name = "RX_FIFO_EMPTY"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "GEN_FIFO_FULL"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "GEN_FIFO_NOT_FULL"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "TX_FIFO_EMPTY"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "GEN_FIFO_EMPTY"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6"
+    type = "raz"
+  [[register.field]]
+    name = "RX_FIFO_FULL"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "RX_FIFO_NOT_EMPTY"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "TX_FIFO_FULL"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "TX_FIFO_NOT_FULL"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "POLL_TIME_EXPIRE"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "0"
+    type = "raz"
+[[register]]
+  name = "GQSPI_IMR"
+  type = "mixed"
+  width = 32
+  description = "GQSPI Interrupt Mask"
+  default = "0x00000FBE"
+  offset = "0x00000110"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:12"
+    type = "raz"
+  [[register.field]]
+    name = "RX_FIFO_EMPTY"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "GEN_FIFO_FULL"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "GEN_FIFO_NOT_FULL"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "TX_FIFO_EMPTY"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "GEN_FIFO_EMPTY"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6"
+    type = "raz"
+  [[register.field]]
+    name = "RX_FIFO_FULL"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "RX_FIFO_NOT_EMPTY"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "TX_FIFO_FULL"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "TX_FIFO_NOT_FULL"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "POLL_TIME_EXPIRE"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "0"
+    type = "raz"
+[[register]]
+  name = "GQSPI_EN"
+  type = "mixed"
+  width = 32
+  description = "GQSPI_Enable"
+  default = "0x00000000"
+  offset = "0x00000114"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "ro"
+  [[register.field]]
+    name = "GQSPI_EN"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "GQSPI_TXD"
+  type = "wo"
+  width = 32
+  description = "GQSPI Transmit Data"
+  default = "0x00000000"
+  offset = "0x0000011C"
+  [[register.field]]
+    name = "TX_DATA"
+    bits = "31:0"
+    type = "wo"
+[[register]]
+  name = "GQSPI_RXD"
+  type = "ro"
+  width = 32
+  description = "GQSPI Receive Data"
+  default = "0x00000000"
+  offset = "0x00000120"
+  [[register.field]]
+    name = "RX_DATA"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "GQSPI_TX_THRESH"
+  type = "mixed"
+  width = 32
+  description = "GQSPI TX FIFO Threshold Level"
+  default = "0x00000001"
+  offset = "0x00000128"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:6"
+    type = "raz"
+  [[register.field]]
+    name = "LEVEL_TX_FIFO"
+    bits = "5:0"
+    type = "rw"
+    shortdesc = '''Defines the level at which the TX FIFO not full interrupt is generated.'''
+    longdesc = '''Note: Change this value only when controller is not communicating with the memory device.'''
+[[register]]
+  name = "GQSPI_RX_THRESH"
+  type = "mixed"
+  width = 32
+  description = "GQSPI RX FIFO Threshold Level"
+  default = "0x00000001"
+  offset = "0x0000012C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:6"
+    type = "raz"
+  [[register.field]]
+    name = "LEVEL_RX_FIFO"
+    bits = "5:0"
+    type = "rw"
+[[register]]
+  name = "GQSPI_GPIO"
+  type = "mixed"
+  width = 32
+  description = "GQSPI GPIO for Write Protect"
+  default = "0x00000001"
+  offset = "0x00000130"
+  [[register.field]]
+    name = "WP_N"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Write Protect.'''
+    longdesc = '''Write Protect output for flash devices supporting this function. Active low (may be inverted externally to the core if required for flash devices requiring active high write protect signal.) Note: Change this value only when controller is not communicating with the memory device.'''
+[[register]]
+  name = "GQSPI_LPBK_DLY_ADJ"
+  type = "mixed"
+  width = 32
+  description = "GQSPI Loopback clock delay adjustment Register"
+  default = "0x00000033"
+  offset = "0x00000138"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:6"
+    type = "raz"
+  [[register.field]]
+    name = "USE_LPBK"
+    bits = "5"
+    type = "rw"
+    shortdesc = '''Use internal loopback master clock for read data capturing when baud rate divisor is 2.'''
+    longdesc = '''Note: Change this value only when controller is not communicating with the memory device.'''
+  [[register.field]]
+    name = "DLY1"
+    bits = "4:3"
+    type = "rw"
+    shortdesc = '''Must be set to 00 if Loopback clk used.'''
+    longdesc = '''Note: Change this value only when controller is not communicating with the memory device.'''
+  [[register.field]]
+    name = "DLY0"
+    bits = "2:0"
+    type = "rw"
+    shortdesc = '''Must be set to 00 if Loopback clk used.'''
+    longdesc = '''Note: Change this value only when controller is not communicating with the memory device.'''
+[[register]]
+  name = "GQSPI_GEN_FIFO"
+  type = "mixed"
+  width = 32
+  description = "GQSPI Generic FIFO Configuration"
+  default = "0x00000000"
+  offset = "0x00000140"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:20"
+    type = "raz"
+  [[register.field]]
+    name = "GEN_DATA"
+    bits = "19:0"
+    type = "wo"
+[[register]]
+  name = "GQSPI_SEL"
+  type = "mixed"
+  width = 32
+  description = "GQSPI Select"
+  default = "0x00000000"
+  offset = "0x00000144"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "raz"
+  [[register.field]]
+    name = "GENERIC_QSPI_SEL"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Generic QSPI Controller Select: 0: Legacy LQSPI is selected 1: Generic QSPI is selected Set this bit when Generic QSPI Controller needs to be selected.'''
+    longdesc = '''Note: Change this value only when controller is not communicating with the memory device.'''
+[[register]]
+  name = "GQSPI_FIFO_CTRL"
+  type = "mixed"
+  width = 32
+  description = "GQSPI FIFO Control"
+  default = "0x00000000"
+  offset = "0x0000014C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:3"
+    type = "raz"
+  [[register.field]]
+    name = "RST_RX_FIFO"
+    bits = "2"
+    type = "wo"
+    shortdesc = '''Reset Receive FIFO: 0: Do not clear Receive FIFO Contents 1: Reset Receive FIFO contents Do not use RST_RX_FIFO while controller is actively transmitting/receiving data to/from Flash device.'''
+    longdesc = '''This bit should be used only when GQSPI is in IO mode (GQSPI_CFG.MODE_EN=0x0). Switch to IO mode if operating in DMA Mode. After RST_RX_FIFO bit is written, Controller takes few clock cycles to update the RX_FIFO_Empty status bit. Software can read the RX_FIFO_empty bit twice to allow enough time for the controller to update the status bit.'''
+  [[register.field]]
+    name = "RST_TX_FIFO"
+    bits = "1"
+    type = "wo"
+    shortdesc = '''Reset Transmit FIFO: 0: Do not clear Transmit FIFO Contents 1: Reset Transmit FIFO contents Do not use RST_TX_FIFO while controller is actively transmitting/receiving data to/from Flash device.'''
+    longdesc = '''After RST_TX_FIFO bit is written, Controller takes few clock cycles to update the TX_FIFO_Empty status bit. Software can read the TX_FIFO_empty bit twice to allow enough time for the controller to update the status bit.'''
+  [[register.field]]
+    name = "RST_GEN_FIFO"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Reset Generic FIFO: 0: Do not clear Generic FIFO Contents 1: Reset Generic FIFO contents Do not use RST_GEN_FIFO while controller is actively transmitting/receiving data to/from Flash device.'''
+    longdesc = '''After RST_GEN_FIFO bit is written, Controller takes few clock cycles to update the Gen_FIFO_Empty status bit. Software can read the Gen_FIFO_empty bit twice to allow enough time for the controller to update the status bit.'''
+[[register]]
+  name = "GQSPI_GF_THRESH"
+  type = "mixed"
+  width = 32
+  description = "GQSPI Generic FIFO Threshold Level"
+  default = "0x00000010"
+  offset = "0x00000150"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:5"
+    type = "raz"
+  [[register.field]]
+    name = "LEVEL_GF_FIFO"
+    bits = "4:0"
+    type = "rw"
+    shortdesc = '''Defines the level at which the Gen_FIFO_not_full interrupt is generated.'''
+    longdesc = '''Note: Change this value only when controller is not communicating with the memory device.'''
+[[register]]
+  name = "GQSPI_POLL_CFG"
+  type = "mixed"
+  width = 32
+  description = "GQSPI Poll Configuration Register"
+  default = "0x00000000"
+  offset = "0x00000154"
+  [[register.field]]
+    name = "EN_MASK_UPPER"
+    bits = "31"
+    type = "rw"
+    shortdesc = '''Enable Upper Data bus mask: 0: Disable.'''
+    longdesc = '''1: Enable. Note: Change this value only when controller is not polling.'''
+  [[register.field]]
+    name = "EN_MASK_LOWER"
+    bits = "30"
+    type = "rw"
+    shortdesc = '''Enable Lower Data bus mask: 0: Disable.'''
+    longdesc = '''1: Enable. This is a static signal - should not be changed while polling operation is in progress.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "29:16"
+    type = "raz"
+  [[register.field]]
+    name = "MASK_EN"
+    bits = "15:8"
+    type = "rw"
+    shortdesc = '''Data bus mask value during Poll operation 0: Do not mask the bit 1: Mask the bit When any of the 8 bits are set, the specific bit(s) will be masked during Poll operation and comparison with received data against the POLL_DATA field will not consider these bits.'''
+    longdesc = '''When all the bits are zero, no masking is used and all the 8 bits of POLL_DATA field will be used for comparison during Poll. Note: Change this value only when controller is not polling.'''
+  [[register.field]]
+    name = "DATA_VALUE"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''Poll data value.'''
+    longdesc = '''When Poll bit of Generic FIFO is set, Generic QSPI Controller continuously reads the data and checks with the POLL_DATA value. When the received data matches with the POLL_DATA filed, Generic QSPI Controller continues executing the next entry in the Generic FIFO. If the value is not matched and EN_POLL_TIMEOUT is set, poll operation will be terminated after POLL_TIMEOUT clock cycles. This is a static signal - should not be changed while polling operation is in progress.'''
+[[register]]
+  name = "GQSPI_P_TIMEOUT"
+  type = "rw"
+  width = 32
+  description = "GQSPI Poll Time out"
+  default = "0x00000000"
+  offset = "0x00000158"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Number of Reference Clock cycles to terminate the Poll operation.'''
+    longdesc = '''Interrupt will be provided to indicate that the timer is expired. Note: Change this value only when controller is not polling.'''
+[[register]]
+  name = "QSPI_DATA_DLY_ADJ"
+  type = "rw"
+  width = 32
+  description = "QSPI RX Data Delay"
+  default = "0x00000000"
+  offset = "0x000001F8"
+  [[register.field]]
+    name = "USE_DATA_DLY"
+    bits = "31"
+    type = "rw"
+  [[register.field]]
+    name = "DATA_DLY_ADJ"
+    bits = "30:28"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "27:0"
+    type = "rw"
+[[register]]
+  name = "GQSPI_MOD_ID"
+  type = "rw"
+  width = 32
+  description = "GQSPI Module Identification register"
+  default = "0x010A0000"
+  offset = "0x000001FC"
+  [[register.field]]
+    name = "MOD_ID"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "QSPIDMA_DST_ADDR"
+  type = "mixed"
+  width = 32
+  description = "DMA destination memory address"
+  default = "0x00000000"
+  offset = "0x00000800"
+  [[register.field]]
+    name = "ADDR"
+    bits = "31:2"
+    type = "wo"
+    shortdesc = '''Destination memory address for DMA stream to memory data transfer Address is word aligned, so this field is only 30-bits.'''
+    longdesc = '''(2 lsb's are 0) This field must be written initially before a DMA operation is started. In this case, it indicates the memory destination address the DMA will begin writing to. Note: Change this value only when controller is not communicating with the memory device.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "1:0"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+[[register]]
+  name = "QSPIDMA_DST_SIZE"
+  type = "mixed"
+  width = 32
+  description = "DMA transfer payload"
+  default = "0x00000000"
+  offset = "0x00000804"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:29"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "SIZE"
+    bits = "28:2"
+    type = "wo"
+    shortdesc = '''Specifies the number of 4-byte words the DMA will transfer from stream to memory Size is word aligned, so this field is only 27-bits.'''
+    longdesc = '''(2 lsb's are 0) The action of writing to this register starts a DMA transfer of length SIZE, moving data from the stream interface to ADDR. In this case, it indicates the total payload that the DMA will move from stream to memory. Note: Change this value only when controller is not communicating with the memory device.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "1:0"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+[[register]]
+  name = "QSPIDMA_DST_STS"
+  type = "mixed"
+  width = 32
+  description = "General DST DMA Status"
+  default = "0x00000000"
+  offset = "0x00000808"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "DONE_CNT"
+    bits = "15:13"
+    type = "wtc"
+    shortdesc = '''Number of completed DST DMA transfers that have not been acknowledged by software: 000 - all finished transfers have been acknowledged; 001 - one finished transfer is still outstanding; etc 111 - seven or more finished transfers is still outstanding.'''
+    longdesc = '''A finished transfer is acknowledged by clearing the interrupt status flag 'DONE". This count is cleared by an explicit write of 3'b111 to this field.'''
+  [[register.field]]
+    name = "BUSY"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''BUSY=1: The QSPI DMA stream->memory channel is busy processing the current command and cannot accept a new command.'''
+    longdesc = '''BUSY=0: implies DMA is DONE with the transfer, the DST FIFO and any associated pipeline registers are empty. DMA may accept a new command. Note that, BUSY essentially indicates that the DMA still has remaining work to do. BUSY will reflect this status irrespective of whether the PAUSE_* is asserted or not.'''
+[[register]]
+  name = "QSPIDMA_DST_CTRL"
+  type = "rw"
+  width = 32
+  description = "General DST DMA Control"
+  default = "0x803FFA00"
+  offset = "0x0000080C"
+  [[register.field]]
+    name = "FIFO_LVL_HIT_THRESH"
+    bits = "31:25"
+    type = "rw"
+    shortdesc = '''When the DST FIFO level is greater than or equal to this programmed value, the QSPI interface signal, "data_out_fifo_level_hit" will be asserted.'''
+    longdesc = '''7'h00: Reserved etc 7'h0F: Reserved 7'h10: Threshold is 17 entries etc 7'h7A: Threshold is 123 entries 7'h7B: Reserved etc 7'h7F: Reserved Note that "7'h10" is the minimum and "7'h7A" is the max value that should be programmed This is a static signal - should not be changed while block is actively processing commands'''
+  [[register.field]]
+    name = "APB_ERR_RESP"
+    bits = "24"
+    type = "rw"
+  [[register.field]]
+    name = "ENDIANNESS"
+    bits = "23"
+    type = "rw"
+  [[register.field]]
+    name = "AXI_BRST_TYPE"
+    bits = "22"
+    type = "rw"
+  [[register.field]]
+    name = "TIMEOUT_VAL"
+    bits = "21:10"
+    type = "rw"
+    shortdesc = '''Set the timeout value for SRC DMA.'''
+    longdesc = '''There are 2 physical timers, qualified with TIMEOUT_EN, that will compare against this value: 1. Timeout counter starts to run when data is provided to the AXI write channel (memory) interface and backpressure is observed. As soon as backpressure is removed, the timer is reset. When timer expires, it stops running. 2. Timeout counter runs whenever the DMA is active. Whenever a data beat is provided by the SSS, the timer is reset. When timer expires, it stops running. TIMEOUT_VAL field is interpreted as follows: Final timeout value = TIMEOUT_VAL * timeout_prescale_period where "timeout_prescale_period" is the period of the enable that is generated by the TIMEOUT_PRE. Examples (prescaler set to maximum of 4096 clk (~2.5ns) cycles) 12'h000: Final Timeout after 1 * (4096 * 2.5ns)] => 10.244 us 12'h001: Final Timeout after 2 * (4096 * 2.5ns)] => 20.48 us etc 12'hFFF: Final Timeout after 4096 * (4096 * 2.5ns)] => 41.94 ms Note that if PAUSE_MEM is asserted, timeout counter #1 will be paused and if PAUSE_STRM is asserted, timeout counter #2 will be paused. When either of the 2 timers expire, this register requires an explicit write of 12'hFFF to clear them - both will be cleared. Note: Change this value only when controller is not processing commands.'''
+  [[register.field]]
+    name = "FIFO_THRESH"
+    bits = "9:2"
+    type = "rw"
+    shortdesc = '''DST_FIFO programmed watermark value.'''
+    longdesc = '''This is the FIFO threshold used to trigger the FIFO_THRESHOLD_HIT interrupt. 8'h00: Threshold is 0 entries 8'h01: Threshold is 1 entry etc 8'h80: Threshold is 128 entries Note that the interrupt will be triggered when the FIFO hits this threshold, irrespective of whether it is on the way up or down. Note: Change this value only when controller is not processing commands.'''
+  [[register.field]]
+    name = "PAUSE_STRM"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''1: Temporarily stop the transfer of data to the internal DST data FIFO from the stream interface.'''
+    longdesc = '''This in effect will lead to the emptying of the DST FIFO. 0: DMA operates as usual. If previously PAUSED, it will continue on where it left off. Note. H/W has no means to apply backpressure to the stream interface. If PAUSE_STRM is asserted, the DMA will drop the stream data. This makes PAUSE mode functionally equivalent to as if the fifo were full. The value of PAUSE_STRM may therefore be limited to debug/verification only.'''
+  [[register.field]]
+    name = "PAUSE_MEM"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''1: Temporarily stop the issuing of new write commands to memory.'''
+    longdesc = '''This in effect will eventually lead to the filling of the DST FIFO. Write memory commands that are already outstanding will continue to be processed, but no new write commands will be issued to memory while PAUSE_MEM is asserted. 0: DMA operates as usual. If previously PAUSED, it will continue on where it left off.'''
+[[register]]
+  name = "QSPIDMA_DST_I_STS"
+  type = "mixed"
+  width = 32
+  description = "DST DMA Interrupt Status"
+  default = "0x00000000"
+  offset = "0x00000814"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "raz"
+  [[register.field]]
+    name = "FIFO_OVERFLOW"
+    bits = "7"
+    type = "wtc"
+    shortdesc = '''DST FIFO Overflow.'''
+    longdesc = '''No backpressure mechanism exists on the stream interface in this direction. If the FIFO is full and 1 more data beat is produced by the stream interface, this bit will be set and the data beat will be discarded. If [PAUSE_STRM] is asserted and the stream interface produces a beat of data, the beat will be discarded and [FIFO_OVERFLOW] will be set.'''
+  [[register.field]]
+    name = "INVALID_APB"
+    bits = "6"
+    type = "wtc"
+    shortdesc = '''APB Address Decode Error.'''
+    longdesc = '''The access request did not reach a register.'''
+  [[register.field]]
+    name = "THRESH_HIT"
+    bits = "5"
+    type = "wtc"
+    shortdesc = '''DST FIFO Reached Watermark Value.'''
+    longdesc = '''The watermark value is set via the [FIFO_THRESH] bitfield.'''
+  [[register.field]]
+    name = "TIMEOUT_MEM"
+    bits = "4"
+    type = "wtc"
+    shortdesc = '''Timeout Counter #1 Expired.'''
+    longdesc = '''DST DMA sees backpressure on AXI write data interface. Refer to [TIMEOUT_VAL] description for exact timeout duration and conditions.'''
+  [[register.field]]
+    name = "TIMEOUT_STRM"
+    bits = "3"
+    type = "wtc"
+    shortdesc = '''Timeout Counter #2 Expired.'''
+    longdesc = '''DST DMA sees delay on SSS DST interface. Refer to [TIMEOUT_VAL] description for exact timeout duration and conditions.'''
+  [[register.field]]
+    name = "AXI_BRESP_ERR"
+    bits = "2"
+    type = "wtc"
+    shortdesc = '''AXI Memory Write Command Error.'''
+    longdesc = '''BRESP=DECERR/SLVERR.'''
+  [[register.field]]
+    name = "DONE"
+    bits = "1"
+    type = "wtc"
+    shortdesc = '''DMA Completed Write Command.'''
+    longdesc = '''The last associated AXI memory write command has been issued and processed (SIZE=0), all data has been sent (DST FIFO is empty) and all outstanding BRESP's have been received.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "0"
+    type = "raz"
+[[register]]
+  name = "QSPIDMA_DST_I_EN"
+  type = "mixed"
+  width = 32
+  description = "DST DMA Interrupt Enable"
+  default = "0x00000000"
+  offset = "0x00000818"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "raz"
+  [[register.field]]
+    name = "FIFO_OVERFLOW"
+    bits = "7"
+    type = "wtc"
+  [[register.field]]
+    name = "INVALID_APB"
+    bits = "6"
+    type = "wtc"
+  [[register.field]]
+    name = "THRESH_HIT"
+    bits = "5"
+    type = "wtc"
+  [[register.field]]
+    name = "TIMEOUT_MEM"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "TIMEOUT_STRM"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "AXI_BRESP_ERR"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "DONE"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "0"
+    type = "raz"
+[[register]]
+  name = "QSPIDMA_DST_I_DIS"
+  type = "mixed"
+  width = 32
+  description = "DST DMA Interrupt Disable"
+  default = "0x00000000"
+  offset = "0x0000081C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "raz"
+  [[register.field]]
+    name = "FIFO_OVERFLOW"
+    bits = "7"
+    type = "wtc"
+  [[register.field]]
+    name = "INVALID_APB"
+    bits = "6"
+    type = "wtc"
+  [[register.field]]
+    name = "THRESH_HIT"
+    bits = "5"
+    type = "wtc"
+  [[register.field]]
+    name = "TIMEOUT_MEM"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "TIMEOUT_STRM"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "AXI_BRESP_ERR"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "DONE"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "0"
+    type = "raz"
+[[register]]
+  name = "QSPIDMA_DST_I_MASK"
+  type = "mixed"
+  width = 32
+  description = "DST DMA Interrupt Mask"
+  default = "0x000000FE"
+  offset = "0x00000820"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "raz"
+  [[register.field]]
+    name = "FIFO_OVERFLOW"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "INVALID_APB"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "THRESH_HIT"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "TIMEOUT_MEM"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "TIMEOUT_STRM"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "AXI_BRESP_ERR"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "DONE"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "0"
+    type = "raz"
+[[register]]
+  name = "QSPIDMA_DST_CTRL2"
+  type = "mixed"
+  width = 32
+  description = "General DST DMA Control Reg 2"
+  default = "0x081BFFF8"
+  offset = "0x00000824"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "raz"
+  [[register.field]]
+    name = "AWCACHE"
+    bits = "26:24"
+    type = "rw"
+    shortdesc = '''Controls the AWCACHE bits of the AXI Write transaction: Bit[24]: AXI AwCache[0] signal.'''
+    longdesc = '''Bit[25]: AXI AwCache[2] signal. Bit[26]: AXI AwCache[3] signal. Note: AXI AwCache[1] signal is always driven to 1. Note: Change this value only when controller is not processing commands.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23"
+    type = "raz"
+  [[register.field]]
+    name = "TIMEOUT_EN"
+    bits = "22"
+    type = "rw"
+    shortdesc = '''Timeout Counters 1 and 2 common enable: 0: disable.'''
+    longdesc = '''1: enable. Note: Change this value only when controller is not processing commands.'''
+  [[register.field]]
+    name = "TIMEOUT_PRE"
+    bits = "15:4"
+    type = "rw"
+    shortdesc = '''Set the prescaler value for the timeout in clk (~2.'''
+    longdesc = '''5ns) cycles (Refer to [TIMEOUT_VAL] description). The [TIMEOUT_PRE] field is interpreted as follows: 000: Prescaler enables timer every cycle. 001: Prescaler enables timer every 2 cycles. .. FFF: Prescaler enables timer every 4096 cycles. Note: Change this value only when controller is not processing commands.'''
+  [[register.field]]
+    name = "MAX_OUTS_CMDS"
+    bits = "3:0"
+    type = "rw"
+    shortdesc = '''Controls the maximum number of outstanding AXI write commands issued.'''
+    longdesc = '''The field is interpreted as follows: 0: Max of 1 Outstanding Write command allowed 1 to 8: Max of 2 to 9 Outstanding Write commands allowed Note: Change this value only when controller is not processing commands.'''
+[[register]]
+  name = "QSPIDMA_DST_ADDR_MSB"
+  type = "mixed"
+  width = 32
+  description = "DMA destination memory address (MSBs)"
+  default = "0x00000000"
+  offset = "0x00000828"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:12"
+    type = "raz"
+  [[register.field]]
+    name = "ADDR_MSB"
+    bits = "11:0"
+    type = "wo"
+    shortdesc = '''DMA destination memory address (msbs) for stream to memory data transfer.'''
+    longdesc = '''Refer to the description for [QSPIDMA_DST_ADDR]. This field is the 12 msbs of the full 44-bit DST address. MSBs for 44-bit DMA Destination Address. The address is comprised of three fields: [ADDR_MSB] with 12 MSBs. QSPIDMA_DST_ADDR [ADDR] with 30 bits. 00 of two LSBs. Note: Change this value only when controller is not processing commands.'''

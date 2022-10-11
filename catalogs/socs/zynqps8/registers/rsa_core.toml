@@ -1,0 +1,144 @@
+description = "RSA Core Data and Configuration"
+[[bank]]
+  name = "RSA_CORE"
+  address = "0xffce0000"
+[[register]]
+  name = "RSA_WR_DATA"
+  type = "wo"
+  width = 32
+  description = "Write Data"
+  default = "0x00000000"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "WR_DATA"
+    bits = "7:0"
+    type = "wo"
+    shortdesc = '''Write data for the memory.'''
+    longdesc = '''24 writes to this register complete a 192-bit word. The word is written into the memory once the WR_ADDR register is written to. First byte is the LB of the word.'''
+[[register]]
+  name = "RSA_WR_ADDR"
+  type = "wo"
+  width = 32
+  description = "Write Address"
+  default = "0x00000000"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "WR_ADDR"
+    bits = "6:0"
+    type = "wo"
+    shortdesc = '''Memory write address.'''
+    longdesc = '''Completes the data write into th ememory of the 192-bit word pre-written into the WR_DATA register'''
+[[register]]
+  name = "RSA_RD_DATA"
+  type = "ro"
+  width = 32
+  description = "Read Data"
+  default = "0x00000000"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "RD_DATA"
+    bits = "7:0"
+    type = "ro"
+    shortdesc = '''Read data from the memory.'''
+    longdesc = '''24 reads from this register completes the readout of the 192-bit word previously fetched by a write to the RD_ADDR register.'''
+[[register]]
+  name = "RSA_RD_ADDR"
+  type = "wo"
+  width = 32
+  description = "Read Address"
+  default = "0x00000000"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "RD_ADDR"
+    bits = "6:0"
+    type = "wo"
+    shortdesc = '''Memory read address.'''
+    longdesc = '''A write to this register fetches a 192-bit word from the memory. Data in the RD_DATA regsiter will be available to read 4 clock cycles after the write into this register.'''
+[[register]]
+  name = "CTRL"
+  type = "wo"
+  width = 32
+  description = "RSA Control"
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "LEN_CODE"
+    bits = "7:4"
+    type = "wo"
+  [[register.field]]
+    name = "DONE_CLR_ABORT"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "OPCODE"
+    bits = "2:0"
+    type = "wo"
+[[register]]
+  name = "STATUS"
+  type = "ro"
+  width = 32
+  description = "RSA Status"
+  default = "0x00000000"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "PROG_CNT"
+    bits = "7:3"
+    type = "ro"
+    shortdesc = '''Progress counter.'''
+    longdesc = '''Can be used to monitor the progress of the operation.'''
+  [[register.field]]
+    name = "ERROR"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "BUSY"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "DONE"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "MINV0"
+  type = "wo"
+  width = 32
+  description = "RSA MINV0"
+  default = "0x00000000"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "MINV0"
+    bits = "7:0"
+    type = "wo"
+[[register]]
+  name = "MINV1"
+  type = "wo"
+  width = 32
+  description = "RSA MINV1"
+  default = "0x00000000"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "MINV1"
+    bits = "7:0"
+    type = "wo"
+[[register]]
+  name = "MINV2"
+  type = "wo"
+  width = 32
+  description = "RSA MINV2"
+  default = "0x00000000"
+  offset = "0x00000020"
+  [[register.field]]
+    name = "MINV2"
+    bits = "7:0"
+    type = "wo"
+[[register]]
+  name = "MINV3"
+  type = "wo"
+  width = 32
+  description = "RSA MINV3"
+  default = "0x00000000"
+  offset = "0x00000024"
+  [[register.field]]
+    name = "MINV2"
+    bits = "7:0"
+    type = "wo"

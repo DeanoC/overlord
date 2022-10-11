@@ -1,0 +1,93 @@
+# LPD domain
+[[instance]]
+name = "LPDMainSwitch"
+type = "switch.internal.lpd.zynqps8"
+
+[[instance]]
+name = "LPDInboundSwitch"
+type = "switch.internal.lpdinbound.zynqps8"
+
+[[instance]]
+name = "LPDOutboundSwitch"
+type = "switch.internal.lpdoutbound.zynqps8"
+
+[[instance]]
+name = "RPUIOSwitch"
+type = "switch.internal.rpuio.zynqps8"
+
+[[instance]]
+name = "RPUSwitch"
+type = "switch.internal.rpuswitch.zynqps8"
+
+[[instance]]
+name = "OCMSwitch"
+type = "switch.internal.ocm.zynqps8"
+
+[[instance]]
+name = "OCM"
+type = "ram.sram.generic"
+ranges = [
+    { address = "0xFC_0000", size = "256 KiB" }
+]
+registers = [
+    { resource = "registers/ocm.toml", name = "OCM", base_address = "0x960000" },
+]
+
+[[instance]]
+name = "PMUOutSwitch"
+type = "switch.internal.pmuoutbound.zynqps8"
+
+# LPD connections
+[[connection]]
+type = "logical"
+connection = "OCMSwitch -> OCM"
+
+[[connection]]
+type = "bus"
+connection = "RPUSwitch -> OCMSwitch"
+bus_name = "rpu_ocm"
+
+[[connection]]
+type = "bus"
+connection = "RPUSwitch -> LPDMainSwitch"
+bus_name = "rpu_lpd"
+
+[[connection]]
+type = "bus"
+connection = "LPDMainSwitch -> LPDInboundSwitch"
+bus_name = "lpd_lpdinbound"
+
+[[connection]]
+type = "bus"
+connection = "LPDMainSwitch -> OCMSwitch"
+bus_name = "lpd_ocm"
+
+[[connection]]
+type = "bus"
+connection = "LPDInboundSwitch -> RPUIOSwitch"
+bus_name = "lpdinbound_rpuio"
+
+[[connection]]
+type = "bus"
+connection = "RPUIOSwitch -> IOPInboundSwitch"
+bus_name = "rpuio_iopinbound"
+
+[[connection]]
+type = "bus"
+connection = "IOPInboundSwitch -> IOPUnitsSwitch"
+bus_name = "iopinbound_iopunitsswitch${index}"
+
+[[connection]]
+type = "bus"
+connection = "IOPInboundSwitch -> IOPUnitsSwitch"
+bus_name = "iopinbound_iopunitsswitch${index}"
+
+[[connection]]
+type = "bus"
+connection = "LPDOutboundSwitch -> LPDMainSwitch"
+bus_name = "lpdoutbound_lpd"
+
+[[connection]]
+type = "bus"
+connection = "IOPInboundSwitch -> LPDUnitsSwitch"
+bus_name = "iopinbound_lpdunitsswitch"

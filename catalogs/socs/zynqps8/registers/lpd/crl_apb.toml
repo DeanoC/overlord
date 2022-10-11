@@ -1,0 +1,3767 @@
+description = "Clock and Reset control registers for LPD."
+[[register]]
+  name = "ERR_CTRL"
+  type = "rw"
+  width = 1
+  description = "SLVERR Error Signal Enable."
+  default = "0x00000000"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "SLVERR_ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Accesses to an unimplemented register asserts the SLVERR error signal on the APB bus interface and generates an interrupt.'''
+    longdesc = '''0: disable. 1: enable. Regardless of the setting of the [slverr_enable] bit setting: * The [addr_decode_err] interrupt bit is set in the interrupt status register. * APB writes are ignored and reads returns 0.'''
+[[register]]
+  name = "IR_STATUS"
+  type = "wtc"
+  width = 1
+  description = "Interrupt Status and Clear."
+  default = "0x00000000"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "IR_MASK"
+  type = "ro"
+  width = 1
+  description = "Interrupt Mask."
+  default = "0x00000001"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "IR_ENABLE"
+  type = "wo"
+  width = 1
+  description = "Interrupt Enable."
+  default = "0x00000000"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "IR_DISABLE"
+  type = "wo"
+  width = 1
+  description = "Interrupt Disable."
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "CRL_WPROT"
+  type = "rw"
+  width = 1
+  description = "CRL SLCR Write Register Protection Control."
+  default = "0x00000000"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "ACTIVE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "IOPLL_CTRL"
+  type = "rw"
+width = 32
+description = "IOPLL Clock Unit Control."
+default = "0x00012C09"
+offset = "0x00000020"
+[[register.field]]
+name = "POST_SRC"
+bits = "26:24"
+type = "rw"
+shortdesc = '''Select the pass-thru clock source for PLL Bypass mode.'''
+longdesc = '''0xx: PS_REF_CLK 100: VIDEO_REF_CLK 101: ALT_REF_CLK 110: AUX_REF_CLK 111: GT_REF_CLK'''
+[[register.field.enum]]
+name = "PS_REF_CLK"
+value = 0
+[[register.field.enum]]
+name = "VIDEO_REF_CLK"
+value = 4
+[[register.field.enum]]
+name = "ALT_REF_CLK"
+value = 6
+[[register.field.enum]]
+name = "GT_REF_CLK"
+value = 7
+[[register.field]]
+name = "PRE_SRC"
+bits = "22:20"
+type = "rw"
+shortdesc = '''Select the clock source for PLL input.'''
+longdesc = '''0xx: PS_REF_CLK 100: VIDEO_REF_CLK 101: ALT_REF_CLK 110: AUX_REF_CLK 111: GT_REF_CLK'''
+[[register.field.enum]]
+name = "PS_REF_CLK"
+value = 0
+[[register.field.enum]]
+name = "VIDEO_REF_CLK"
+value = 4
+[[register.field.enum]]
+name = "ALT_REF_CLK"
+value = 6
+[[register.field.enum]]
+name = "GT_REF_CLK"
+value = 7
+[[register.field]]
+name = "DIV2"
+bits = "16"
+type = "rw"
+shortdesc = '''Enable the divide by 2 function inside of the PLL.'''
+longdesc = '''0: no effect. 1: divide clock by 2. Note: this does not change the VCO frequency, just the output frequency.'''
+[[register.field]]
+name = "FBDIV"
+bits = "14:8"
+type = "rw"
+  [[register.field]]
+    name = "BYPASS"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''PLL Clock Bypass Mode.'''
+    longdesc = '''0: normal PLL mode; the source clock is selected using [PRE_SRC]. 1: bypass the PLL; the source clock is selected using [POST_SRC].'''
+  [[register.field]]
+    name = "RESET"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''PLL reset.'''
+    longdesc = '''0: active. 1: held in reset. Note: Program the PLL into bypass mode before resetting the PLL.'''
+[[register]]
+  name = "IOPLL_CFG"
+  type = "rw"
+  width = 32
+  description = "IOPLL Integer Helper Data Config."
+  default = "0x00000000"
+  offset = "0x00000024"
+  [[register.field]]
+    name = "LOCK_DLY"
+    bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "LOCK_CNT"
+    bits = "22:13"
+    type = "rw"
+  [[register.field]]
+    name = "LFHF"
+    bits = "11:10"
+    type = "rw"
+  [[register.field]]
+    name = "CP"
+    bits = "8:5"
+    type = "rw"
+  [[register.field]]
+    name = "RES"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "IOPLL_FRAC_CFG"
+  type = "rw"
+  width = 32
+  description = "Fractional control for the PLL"
+  default = "0x00000000"
+  offset = "0x00000028"
+  [[register.field]]
+    name = "ENABLED"
+    bits = "31"
+    type = "rw"
+    shortdesc = '''Fractional SDM bypass control.'''
+    longdesc = '''0: PLL is in integer mode and it ignores all fractional data. 1: PLL is in fractional mode and uses [DATA] bitfield for the fractional portion of the feedback divider.'''
+  [[register.field]]
+    name = "DATA"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "RPLL_CTRL"
+  type = "rw"
+width = 32
+description = "RPLL Clock Unit Control."
+default = "0x00012C09"
+offset = "0x00000030"
+[[register.field]]
+name = "POST_SRC"
+bits = "26:24"
+type = "rw"
+shortdesc = '''Select the pass-thru clock source for PLL Bypass mode.'''
+longdesc = '''0xx: PS_REF_CLK 100: VIDEO_REF_CLK 101: ALT_REF_CLK 110: AUX_REF_CLK 111: GT_REF_CLK'''
+[[register.field.enum]]
+name = "PS_REF_CLK"
+value = 0
+[[register.field.enum]]
+name = "VIDEO_REF_CLK"
+value = 4
+[[register.field.enum]]
+name = "ALT_REF_CLK"
+value = 6
+[[register.field.enum]]
+name = "GT_REF_CLK"
+value = 7
+[[register.field]]
+name = "PRE_SRC"
+bits = "22:20"
+type = "rw"
+shortdesc = '''Select the clock source for PLL input.'''
+longdesc = '''0xx: PS_REF_CLK 100: VIDEO_REF_CLK 101: ALT_REF_CLK 110: AUX_REF_CLK 111: GT_REF_CLK'''
+[[register.field.enum]]
+name = "PS_REF_CLK"
+value = 0
+[[register.field.enum]]
+name = "VIDEO_REF_CLK"
+value = 4
+[[register.field.enum]]
+name = "ALT_REF_CLK"
+value = 6
+[[register.field.enum]]
+name = "GT_REF_CLK"
+value = 7
+[[register.field]]
+name = "DIV2"
+bits = "16"
+type = "rw"
+shortdesc = '''Enable the divide by 2 function inside of the PLL.'''
+longdesc = '''0: no effect. 1: divide clock by 2. Note: this does not change the VCO frequency, just the output frequency.'''
+[[register.field]]
+name = "FBDIV"
+bits = "14:8"
+type = "rw"
+  [[register.field]]
+    name = "BYPASS"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''PLL Clock Bypass Mode.'''
+    longdesc = '''0: normal PLL mode; the source clock is selected using [PRE_SRC]. 1: bypass the PLL; the source clock is selected using [POST_SRC].'''
+  [[register.field]]
+    name = "RESET"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''PLL reset.'''
+    longdesc = '''0: active. 1: reset. Note: Program the PLL into bypass mode before resetting the PLL.'''
+[[register]]
+  name = "RPLL_CFG"
+  type = "rw"
+  width = 32
+  description = "RPLL Integer Helper Data Configuration."
+  default = "0x00000000"
+  offset = "0x00000034"
+  [[register.field]]
+    name = "LOCK_DLY"
+    bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "LOCK_CNT"
+    bits = "22:13"
+    type = "rw"
+  [[register.field]]
+    name = "LFHF"
+    bits = "11:10"
+    type = "rw"
+  [[register.field]]
+    name = "CP"
+    bits = "8:5"
+    type = "rw"
+  [[register.field]]
+    name = "RES"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "RPLL_FRAC_CFG"
+  type = "rw"
+  width = 32
+  description = "Fractional control for the PLL"
+  default = "0x00000000"
+  offset = "0x00000038"
+  [[register.field]]
+    name = "ENABLED"
+    bits = "31"
+    type = "rw"
+    shortdesc = '''Fractional SDM bypass control.'''
+    longdesc = '''0: PLL is in integer mode and it ignores all fractional data. 1: PLL is in fractional mode and uses [DATA] bitfield for the fractional portion of the feedback divider.'''
+  [[register.field]]
+    name = "DATA"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "PLL_STATUS"
+  type = "mixed"
+  width = 32
+  description = "LPD PLL Clocking Status."
+  default = "0x00000018"
+  offset = "0x00000040"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:6"
+    type = "rw"
+  [[register.field]]
+    name = "RPLL_STABLE"
+    bits = "4"
+    type = "ro"
+    shortdesc = '''RPLL stability status.'''
+    longdesc = '''0: not locked or bypassed. 1: locked or bypassed.'''
+  [[register.field]]
+    name = "IOPLL_STABLE"
+    bits = "3"
+    type = "ro"
+    shortdesc = '''IOPLL stability status.'''
+    longdesc = '''0: not locked or bypassed. 1: locked or bypassed.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "RPLL_LOCK"
+    bits = "1"
+    type = "ro"
+    shortdesc = '''RPLL lock status.'''
+    longdesc = '''0: not locked. 1: locked.'''
+  [[register.field]]
+    name = "IOPLL_LOCK"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''IOPLL lock status.'''
+    longdesc = '''0: not locked. 1: locked.'''
+[[register]]
+  name = "IOPLL_TO_FPD_CTRL"
+  type = "rw"
+  width = 16
+  description = "IOPLL clock divider for distribution in FPD."
+  default = "0x00000400"
+  offset = "0x00000044"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "RPLL_TO_FPD_CTRL"
+  type = "rw"
+  width = 16
+  description = "RPLL clock divider for distribution in FPD."
+  default = "0x00000400"
+  offset = "0x00000048"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "USB3_DUAL_REF_CTRL"
+  type = "rw"
+  width = 32
+  description = "USB 3.0 Unit Clock Generator Control."
+  default = "0x00052000"
+  offset = "0x0000004C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:26"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "25"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "24:22"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "GEM0_REF_CTRL"
+type = "rw"
+width = 32
+description = "GEM 0 Clock Generator Control."
+default = "0x00002500"
+offset = "0x00000050"
+[[register.field]]
+name = "RESERVED"
+bits = "31:27"
+    type = "rw"
+  [[register.field]]
+    name = "RX_CLKACT"
+    bits = "26"
+    type = "rw"
+    shortdesc = '''RX Channel Clock active control.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "CLKACT"
+    bits = "25"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "24:22"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+
+[[register]]
+name = "GEM1_REF_CTRL"
+type = "rw"
+width = 32
+description = "GEM 1 Clock Generator Control."
+default = "0x00002500"
+offset = "0x00000054"
+[[register.field]]
+name = "RESERVED"
+    bits = "31:27"
+    type = "rw"
+  [[register.field]]
+    name = "RX_CLKACT"
+    bits = "26"
+    type = "rw"
+    shortdesc = '''RX Channel Clock active control.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "CLKACT"
+    bits = "25"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "24:22"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "GEM2_REF_CTRL"
+type = "rw"
+width = 32
+description = "GEM 2 Clock Generator Config"
+default = "0x00002500"
+offset = "0x00000058"
+[[register.field]]
+name = "RESERVED"
+bits = "31:27"
+    type = "rw"
+  [[register.field]]
+    name = "RX_CLKACT"
+    bits = "26"
+    type = "rw"
+    shortdesc = '''RX Channel Clock active control.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "CLKACT"
+    bits = "25"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "24:22"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "GEM3_REF_CTRL"
+type = "rw"
+width = 32
+description = "GEM 3 Clock Generator Config"
+default = "0x00002500"
+offset = "0x0000005C"
+[[register.field]]
+name = "RESERVED"
+bits = "31:27"
+    type = "rw"
+  [[register.field]]
+    name = "RX_CLKACT"
+    bits = "26"
+    type = "rw"
+    shortdesc = '''RX Channel Clock active control.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "CLKACT"
+    bits = "25"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "24:22"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "USB0_BUS_REF_CTRL"
+type = "rw"
+width = 32
+description = "USB 0 Clock Generator Config"
+default = "0x00052000"
+offset = "0x00000060"
+[[register.field]]
+name = "RESERVED"
+bits = "31:26"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "25"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "24:22"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "USB1_BUS_REF_CTRL"
+type = "rw"
+width = 32
+description = "USB 1 Clock Generator Config"
+default = "0x00052000"
+offset = "0x00000064"
+[[register.field]]
+name = "RESERVED"
+bits = "31:26"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "25"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "24:22"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "QSPI_REF_CTRL"
+type = "rw"
+width = 32
+description = "Quad-SPI Clock Generator Config"
+default = "0x01000800"
+offset = "0x00000068"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "SDIO0_REF_CTRL"
+type = "rw"
+width = 32
+description = "SDIO 0 Clock Generator Config"
+default = "0x01000F00"
+offset = "0x0000006C"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+    type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: VPLL_CLK_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "VPLL_CLK_TO_LPD"
+value = 3
+[[register]]
+name = "SDIO1_REF_CTRL"
+type = "rw"
+width = 32
+description = "SDIO 1 Clock Generator Config"
+default = "0x01000F00"
+offset = "0x00000070"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+    type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: VPLL_CLK_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "VPLL_CLK_TO_LPD"
+value = 3
+[[register]]
+name = "UART0_REF_CTRL"
+type = "rw"
+width = 32
+description = "USRT 0 Clock Generator Config"
+default = "0x01001800"
+offset = "0x00000074"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "UART1_REF_CTRL"
+type = "rw"
+width = 32
+description = "UART 1 Clock Generator Config"
+default = "0x01001800"
+offset = "0x00000078"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "SPI0_REF_CTRL"
+type = "rw"
+width = 32
+description = "SPI 0 Clock Generator Config"
+default = "0x01001800"
+offset = "0x0000007C"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "SPI1_REF_CTRL"
+type = "rw"
+width = 32
+description = "SPI 1 Clock Generator Config"
+default = "0x01001800"
+offset = "0x00000080"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "CAN0_REF_CTRL"
+type = "rw"
+width = 32
+description = "CAN 0 Clock Generator Config"
+default = "0x01001800"
+offset = "0x00000084"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "CAN1_REF_CTRL"
+type = "rw"
+width = 32
+description = "CAN 1 Clock Generator Config"
+default = "0x01001800"
+offset = "0x00000088"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "CPU_R5_CTRL"
+type = "rw"
+width = 32
+description = "RPU MPCore and OCM Clock Generator Config"
+default = "0x03000600"
+offset = "0x00000090"
+[[register.field]]
+name = "RESERVED"
+bits = "31:26"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT_CORE"
+    bits = "25"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: RPLL 010: IOPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 2
+[[register.field.enum]]
+name = "RPLL"
+value = 0
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "IOU_SWITCH_CTRL"
+type = "rw"
+width = 32
+description = "IOP Switch Clock Generator Config"
+default = "0x00001500"
+offset = "0x0000009C"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: RPLL 010: IOPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 2
+[[register.field.enum]]
+name = "RPLL"
+value = 0
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+
+[[register]]
+name = "CSU_PLL_CTRL"
+type = "rw"
+width = 32
+description = "CSU Clock Generator Config"
+default = "0x01001500"
+offset = "0x000000A0"
+[[register.field]]
+name = "RESERVED"
+    bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:4"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "PCAP_CTRL"
+type = "rw"
+width = 32
+description = "PCAP Clock Generator Config"
+default = "0x00001500"
+offset = "0x000000A4"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "LPD_SWITCH_CTRL"
+type = "rw"
+width = 32
+description = "AXI Clock Generator Config in LPD"
+default = "0x01000500"
+offset = "0x000000A8"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: RPLL 010: IOPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 2
+[[register.field.enum]]
+name = "RPLL"
+value = 0
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "LPD_LSBUS_CTRL"
+type = "rw"
+width = 32
+description = "APB Clock Generator Config in LPD"
+default = "0x01001800"
+offset = "0x000000AC"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. Clock stop. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: RPLL 010: IOPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 2
+[[register.field.enum]]
+name = "RPLL"
+value = 0
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "DBG_LPD_CTRL"
+type = "rw"
+width = 32
+description = "Debug Clock Generator Config in LPD"
+default = "0x01002000"
+offset = "0x000000B0"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. Clock stop. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: RPLL 010: IOPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 2
+[[register.field.enum]]
+name = "RPLL"
+value = 0
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "NAND_REF_CTRL"
+type = "rw"
+width = 32
+description = "NAND Clock Generator Config."
+default = "0x00052000"
+offset = "0x000000B4"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. Clock stop. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "LPD_DMA_REF_CTRL"
+type = "rw"
+width = 32
+description = "LPD DMA Clock Generator Config."
+default = "0x00002000"
+offset = "0x000000B8"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. Clock stop. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: RPLL 010: IOPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 2
+[[register.field.enum]]
+name = "RPLL"
+value = 0
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "PL0_REF_CTRL"
+type = "rw"
+width = 32
+description = "PL 0 Clock Generator Config."
+default = "0x00052000"
+offset = "0x000000C0"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. Clock stop. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "PL1_REF_CTRL"
+type = "rw"
+width = 32
+description = "PL 1 Clock Generator Config."
+default = "0x00052000"
+offset = "0x000000C4"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. Clock stop. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "PL2_REF_CTRL"
+type = "rw"
+width = 32
+description = "PL 2 Clock Generator Config."
+default = "0x00052000"
+offset = "0x000000C8"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. Clock stop. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "PL3_REF_CTRL"
+type = "rw"
+width = 32
+description = "PL 3 Clock Generator Config."
+default = "0x00052000"
+offset = "0x000000CC"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. Clock stop. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "PL0_THR_CTRL"
+type = "mixed"
+width = 32
+description = "PL Clock 0 Threshold Control and status"
+default = "0x00000001"
+offset = "0x000000D0"
+[[register.field]]
+name = "CURR_VAL"
+bits = "31:16"
+    type = "ro"
+    shortdesc = '''Current clock value as it counts down to 0.'''
+    longdesc = '''Valid when the [RUNNING] bit = 0, undefined when [RUNNING] = 1.'''
+  [[register.field]]
+    name = "RUNNING"
+    bits = "15"
+    type = "ro"
+    shortdesc = '''Counter Status.'''
+    longdesc = '''0: not running. 1: running.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "14:2"
+    type = "rw"
+  [[register.field]]
+    name = "CPU_START"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Start counting.'''
+    longdesc = '''Prerequisite: program the count into PLx_THR_CNT [LAST_CNT].'''
+  [[register.field]]
+    name = "CNT_RST"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Reset internal counter.'''
+    longdesc = '''0: run. 1: held in reset.'''
+[[register]]
+  name = "PL0_THR_CNT"
+  type = "rw"
+  width = 16
+  description = "PL Clock 0 Count Value."
+  default = "0x00000000"
+  offset = "0x000000D4"
+  [[register.field]]
+    name = "LAST_CNT"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "PL1_THR_CTRL"
+  type = "mixed"
+  width = 32
+  description = "PL Clock 1 Threshold Control and status"
+  default = "0x00000001"
+  offset = "0x000000D8"
+  [[register.field]]
+    name = "CURR_VAL"
+    bits = "31:16"
+    type = "ro"
+    shortdesc = '''Current clock value as it counts down to 0.'''
+    longdesc = '''Valid when the [RUNNING] bit = 0, undefined when [RUNNING] = 1.'''
+  [[register.field]]
+    name = "RUNNING"
+    bits = "15"
+    type = "ro"
+    shortdesc = '''Counter Status.'''
+    longdesc = '''0: not running. 1: running.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "14:2"
+    type = "rw"
+  [[register.field]]
+    name = "CPU_START"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Start counting.'''
+    longdesc = '''Prerequisite: program the count into PLx_THR_CNT [LAST_CNT].'''
+  [[register.field]]
+    name = "CNT_RST"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Reset internal counter.'''
+    longdesc = '''0: run. 1: held in reset.'''
+[[register]]
+  name = "PL1_THR_CNT"
+  type = "rw"
+  width = 16
+  description = "PL Clock 1 Threshold Count Value."
+  default = "0x00000000"
+  offset = "0x000000DC"
+  [[register.field]]
+    name = "LAST_CNT"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "PL2_THR_CTRL"
+  type = "mixed"
+  width = 32
+  description = "PL Clock 2 Threshold Control and status"
+  default = "0x00000001"
+  offset = "0x000000E0"
+  [[register.field]]
+    name = "CURR_VAL"
+    bits = "31:16"
+    type = "ro"
+    shortdesc = '''Current clock value as it counts down to 0.'''
+    longdesc = '''Valid when the [RUNNING] bit = 0, undefined when [RUNNING] = 1.'''
+  [[register.field]]
+    name = "RUNNING"
+    bits = "15"
+    type = "ro"
+    shortdesc = '''Counter Status.'''
+    longdesc = '''0: not running. 1: running.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "14:2"
+    type = "rw"
+  [[register.field]]
+    name = "CPU_START"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Start counting.'''
+    longdesc = '''Prerequisite: program the count into PLx_THR_CNT [LAST_CNT].'''
+  [[register.field]]
+    name = "CNT_RST"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Reset internal counter.'''
+    longdesc = '''0: run. 1: held in reset.'''
+[[register]]
+  name = "PL2_THR_CNT"
+  type = "rw"
+  width = 16
+  description = "PL Clock 2 Threshold Count Value."
+  default = "0x00000000"
+  offset = "0x000000E4"
+  [[register.field]]
+    name = "LAST_CNT"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "PL3_THR_CTRL"
+  type = "mixed"
+  width = 32
+  description = "PL Clock 3 Threshold Control and status"
+  default = "0x00000001"
+  offset = "0x000000E8"
+  [[register.field]]
+    name = "CURR_VAL"
+    bits = "31:16"
+    type = "ro"
+    shortdesc = '''Current clock value as it counts down to 0.'''
+    longdesc = '''Valid when the [RUNNING] bit = 0, undefined when [RUNNING] = 1.'''
+  [[register.field]]
+    name = "RUNNING"
+    bits = "15"
+    type = "ro"
+    shortdesc = '''Counter Status.'''
+    longdesc = '''0: not running. 1: running.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "14:2"
+    type = "rw"
+  [[register.field]]
+    name = "CPU_START"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Start counting.'''
+    longdesc = '''Prerequisite: program the count into PLx_THR_CNT [LAST_CNT].'''
+  [[register.field]]
+    name = "CNT_RST"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Reset internal counter.'''
+    longdesc = '''0: run. 1: held in reset.'''
+[[register]]
+  name = "PL3_THR_CNT"
+  type = "rw"
+  width = 16
+  description = "PL Clock 3 Threshold Count Value."
+  default = "0x00000000"
+  offset = "0x000000FC"
+  [[register.field]]
+    name = "LAST_CNT"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "GEM_TSU_REF_CTRL"
+  type = "rw"
+  width = 32
+  description = "GEM TimeStamp Clock Generator Control."
+  default = "0x00051000"
+  offset = "0x00000100"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. Clock stop. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "DLL_REF_CTRL"
+type = "rw"
+width = 8
+description = "Clock Generator Control."
+default = "0x00000000"
+offset = "0x00000104"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 001: RPLL'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 1
+[[register]]
+name = "PSSYSMON_REF_CTRL"
+type = "rw"
+width = 32
+description = "PS SYSMON Clock Generator Control."
+default = "0x01001800"
+offset = "0x00000108"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. Clock stop. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: RPLL 010: IOPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 2
+[[register.field.enum]]
+name = "RPLL"
+value = 0
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "I2C0_REF_CTRL"
+type = "rw"
+width = 32
+description = "I2C 0 Clock Generator Control."
+default = "0x01000500"
+offset = "0x00000120"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. Clock stop. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "I2C1_REF_CTRL"
+type = "rw"
+width = 32
+description = "I2C 1 Clock Generator Control."
+default = "0x01000500"
+offset = "0x00000124"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. Clock stop. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: DPLL_TO_LPD'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register]]
+name = "TIMESTAMP_REF_CTRL"
+type = "rw"
+width = 32
+description = "Timestamp Clock Generator Control."
+default = "0x00001800"
+offset = "0x00000128"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. Clock stop. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+  type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL 010: RPLL 011: DPLL_TO_LPD 1xx: PS_REF_CLK'''
+[[register.field.enum]]
+name = "IOPLL"
+value = 0
+[[register.field.enum]]
+name = "RPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL_TO_LPD"
+value = 3
+[[register.field.enum]]
+name = "PS_REF_CLK"
+value = 4
+
+[[register]]
+name = "SAFETY_CHK"
+type = "rw"
+width = 32
+description = "Safety Endpoint Connectivity Check."
+default = "0x00000000"
+offset = "0x00000130"
+[[register.field]]
+name = "CHK_VAL"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "CLKMON_STATUS"
+  type = "wtc"
+  width = 16
+  description = "Clock Monitor Interrupt Status."
+  default = "0x00000000"
+  offset = "0x00000140"
+  [[register.field]]
+    name = "CNTA7_OVER_ERR"
+    bits = "15"
+    type = "wtc"
+  [[register.field]]
+    name = "MON7_ERR"
+    bits = "14"
+    type = "wtc"
+  [[register.field]]
+    name = "CNTA6_OVER_ERR"
+    bits = "13"
+    type = "wtc"
+  [[register.field]]
+    name = "MON6_ERR"
+    bits = "12"
+    type = "wtc"
+  [[register.field]]
+    name = "CNTA5_OVER_ERR"
+    bits = "11"
+    type = "wtc"
+  [[register.field]]
+    name = "MON5_ERR"
+    bits = "10"
+    type = "wtc"
+  [[register.field]]
+    name = "CNTA4_OVER_ERR"
+    bits = "9"
+    type = "wtc"
+  [[register.field]]
+    name = "MON4_ERR"
+    bits = "8"
+    type = "wtc"
+  [[register.field]]
+    name = "CNTA3_OVER_ERR"
+    bits = "7"
+    type = "wtc"
+  [[register.field]]
+    name = "MON3_ERR"
+    bits = "6"
+    type = "wtc"
+  [[register.field]]
+    name = "CNTA2_OVER_ERR"
+    bits = "5"
+    type = "wtc"
+  [[register.field]]
+    name = "MON2_ERR"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "CNTA1_OVER_ERR"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "MON1_ERR"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "CNTA0_OVER_ERR"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "MON0_ERR"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "CLKMON_MASK"
+  type = "ro"
+  width = 16
+  description = "Clock Monitor Interrupt Mask."
+  default = "0x0000FFFF"
+  offset = "0x00000144"
+  [[register.field]]
+    name = "CNTA7_OVER_ERR"
+    bits = "15"
+    type = "ro"
+  [[register.field]]
+    name = "MON7_ERR"
+    bits = "14"
+    type = "ro"
+  [[register.field]]
+    name = "CNTA6_OVER_ERR"
+    bits = "13"
+    type = "ro"
+  [[register.field]]
+    name = "MON6_ERR"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "CNTA5_OVER_ERR"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "MON5_ERR"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "CNTA4_OVER_ERR"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "MON4_ERR"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "CNTA3_OVER_ERR"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "MON3_ERR"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "CNTA2_OVER_ERR"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "MON2_ERR"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "CNTA1_OVER_ERR"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "MON1_ERR"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "CNTA0_OVER_ERR"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "MON0_ERR"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "CLKMON_ENABLE"
+  type = "wo"
+  width = 16
+  description = "Clock Monitor Interrupt Enable."
+  default = "0x00000000"
+  offset = "0x00000148"
+  [[register.field]]
+    name = "CNTA7_OVER_ERR"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "MON7_ERR"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "CNTA6_OVER_ERR"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "MON6_ERR"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "CNTA5_OVER_ERR"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "MON5_ERR"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "CNTA4_OVER_ERR"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "MON4_ERR"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "CNTA3_OVER_ERR"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "MON3_ERR"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "CNTA2_OVER_ERR"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "MON2_ERR"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "CNTA1_OVER_ERR"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "MON1_ERR"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "CNTA0_OVER_ERR"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "MON0_ERR"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "CLKMON_DISABLE"
+  type = "wo"
+  width = 16
+  description = "Clock Monitor Interrupt Disable."
+  default = "0x00000000"
+  offset = "0x0000014C"
+  [[register.field]]
+    name = "CNTA7_OVER_ERR"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "MON7_ERR"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "CNTA6_OVER_ERR"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "MON6_ERR"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "CNTA5_OVER_ERR"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "MON5_ERR"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "CNTA4_OVER_ERR"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "MON4_ERR"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "CNTA3_OVER_ERR"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "MON3_ERR"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "CNTA2_OVER_ERR"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "MON2_ERR"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "CNTA1_OVER_ERR"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "MON1_ERR"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "CNTA0_OVER_ERR"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "MON0_ERR"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "CLKMON_TRIGGER"
+  type = "wo"
+  width = 16
+  description = "Clock Monitor Interrupt Trigger."
+  default = "0x00000000"
+  offset = "0x00000150"
+  [[register.field]]
+    name = "CNTA7_OVER_ERR"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "MON7_ERR"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "CNTA6_OVER_ERR"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "MON6_ERR"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "CNTA5_OVER_ERR"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "MON5_ERR"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "CNTA4_OVER_ERR"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "MON4_ERR"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "CNTA3_OVER_ERR"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "MON3_ERR"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "CNTA2_OVER_ERR"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "MON2_ERR"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "CNTA1_OVER_ERR"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "MON1_ERR"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "CNTA0_OVER_ERR"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "MON0_ERR"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "CHKR0_CLKA_UPPER"
+  type = "rw"
+  width = 32
+  description = "Upper Clock Comparison Threshold."
+  default = "0x00000000"
+  offset = "0x00000160"
+  [[register.field]]
+    name = "THRSHLD"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Upper Threshold.'''
+    longdesc = '''This must be set up before a start bit is set (there is no clock crossing from this bus to the comparison logic.)'''
+[[register]]
+  name = "CHKR0_CLKA_LOWER"
+  type = "rw"
+  width = 32
+  description = "Lower Clock Comparison Threshold."
+  default = "0x00000000"
+  offset = "0x00000164"
+  [[register.field]]
+    name = "THRSHLD"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Lower Threshold.'''
+    longdesc = '''This must be set up before a start bit is set (there is no clock crossing from this bus to the comparison logic.)'''
+[[register]]
+  name = "CHKR0_CLKB_CNT"
+  type = "rw"
+  width = 32
+  description = "CLK B Counting Value."
+  default = "0x00000000"
+  offset = "0x00000168"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "CHKR0_CTRL"
+  type = "rw"
+  width = 9
+  description = "Clock Checker 0 Control."
+  default = "0x00000000"
+  offset = "0x0000016C"
+  [[register.field]]
+    name = "START_SINGLE"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''Start checking mechanism once.'''
+    longdesc = '''0: no effect. 1: check the clock once (self clearing to 0). The start bit must be asserted after all other control bits are set.'''
+  [[register.field]]
+    name = "START_CONTINUOUS"
+    bits = "7"
+    type = "rw"
+    shortdesc = '''Start the checking mechanism and keep checking until bit is set back to zero.'''
+    longdesc = '''0: single check. (or stop checking) 1: continous clock checking. The start bit must be asserted after all other control bits are set.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "CLKB_MUX_CTRL"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "CLKA_MUX_CTRL"
+    bits = "3:1"
+    type = "rw"
+    shortdesc = '''000: RPU clock.'''
+    longdesc = '''001: OCM clock. 010: LPD_SWITCH_CLK clock. 011: LPD_LSBUS_CLK clock. 100: PMU clock. 101: CSU_PLL_CLK 110: IRO_CLK 111: PS_REF_CLK'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "CHKR1_CLKA_UPPER"
+  type = "rw"
+  width = 32
+  description = "Upper Clock Comparison Threshold."
+  default = "0x00000000"
+  offset = "0x00000170"
+  [[register.field]]
+    name = "THRSHLD"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Upper Threshold.'''
+    longdesc = '''This must be set up before a start bit is set (there is no clock crossing from this bus to the comparison logic.)'''
+[[register]]
+  name = "CHKR1_CLKA_LOWER"
+  type = "rw"
+  width = 32
+  description = "Lower Clock Comparison Threshold."
+  default = "0x00000000"
+  offset = "0x00000174"
+  [[register.field]]
+    name = "THRSHLD"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Lower Threshold.'''
+    longdesc = '''This must be set up before a start bit is set (there is no clock crossing from this bus to the comparison logic.)'''
+[[register]]
+  name = "CHKR1_CLKB_CNT"
+  type = "rw"
+  width = 32
+  description = "CLK B Counting Value."
+  default = "0x00000000"
+  offset = "0x00000178"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "CHKR1_CTRL"
+  type = "rw"
+  width = 9
+  description = "Clock Checker 1 Control."
+  default = "0x00000000"
+  offset = "0x0000017C"
+  [[register.field]]
+    name = "START_SINGLE"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''Start checking mechanism once.'''
+    longdesc = '''0: no effect. 1: check the clock once (self clearing to 0). The start bit must be asserted after all other control bits are set.'''
+  [[register.field]]
+    name = "START_CONTINUOUS"
+    bits = "7"
+    type = "rw"
+    shortdesc = '''Start the checking mechanism and keep checking until bit is set back to zero.'''
+    longdesc = '''0: single check. (or stop checking) 1: continous clock checking. The start bit must be asserted after all other control bits are set.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "CLKB_MUX_CTRL"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "CLKA_MUX_CTRL"
+    bits = "3:1"
+    type = "rw"
+    shortdesc = '''000: RPU clock.'''
+    longdesc = '''001: OCM clock. 010: LPD_SWITCH_CLK clock. 011: LPD_LSBUS_CLK clock. 100: PMU clock. 101: CSU_PLL_CLK 110: IRO_CLK 111: PS_REF_CLK'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "CHKR2_CLKA_UPPER"
+  type = "rw"
+  width = 32
+  description = "Upper Clock Comparison Threshold."
+  default = "0x00000000"
+  offset = "0x00000180"
+  [[register.field]]
+    name = "THRSHLD"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Upper Threshold.'''
+    longdesc = '''This must be set up before a start bit is set (there is no clock crossing from this bus to the comparison logic.)'''
+[[register]]
+  name = "CHKR2_CLKA_LOWER"
+  type = "rw"
+  width = 32
+  description = "Lower Clock Comparison Threshold."
+  default = "0x00000000"
+  offset = "0x00000184"
+  [[register.field]]
+    name = "THRSHLD"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Lower Threshold.'''
+    longdesc = '''This must be set up before a start bit is set (there is no clock crossing from this bus to the comparison logic.)'''
+[[register]]
+  name = "CHKR2_CLKB_CNT"
+  type = "rw"
+  width = 32
+  description = "CLK B Counting Value."
+  default = "0x00000000"
+  offset = "0x00000188"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "CHKR2_CTRL"
+  type = "rw"
+  width = 9
+  description = "Clock Checker 2 Control."
+  default = "0x00000000"
+  offset = "0x0000018C"
+  [[register.field]]
+    name = "START_SINGLE"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''Start checking mechanism once.'''
+    longdesc = '''0: no effect. 1: check the clock once (self clearing to 0). The start bit must be asserted after all other control bits are set.'''
+  [[register.field]]
+    name = "START_CONTINUOUS"
+    bits = "7"
+    type = "rw"
+    shortdesc = '''Start the checking mechanism and keep checking until bit is set back to zero.'''
+    longdesc = '''0: single check. (or stop checking) 1: continous clock checking. The start bit must be asserted after all other control bits are set.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "CLKB_MUX_CTRL"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "CLKA_MUX_CTRL"
+    bits = "3:1"
+    type = "rw"
+    shortdesc = '''000: RPU clock.'''
+    longdesc = '''001: OCM clock. 010: LPD_SWITCH_CLK clock. 011: LPD_LSBUS_CLK clock. 100: PMU clock. 101: CSU_PLL_CLK 110: IRO_CLK 111: PS_REF_CLK'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "CHKR3_CLKA_UPPER"
+  type = "rw"
+  width = 32
+  description = "Upper Clock Comparison Threshold."
+  default = "0x00000000"
+  offset = "0x00000190"
+  [[register.field]]
+    name = "THRSHLD"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Upper Threshold.'''
+    longdesc = '''This must be set up before a start bit is set (there is no clock crossing from this bus to the comparison logic.)'''
+[[register]]
+  name = "CHKR3_CLKA_LOWER"
+  type = "rw"
+  width = 32
+  description = "Lower Clock Comparison Threshold."
+  default = "0x00000000"
+  offset = "0x00000194"
+  [[register.field]]
+    name = "THRSHLD"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Lower Threshold.'''
+    longdesc = '''This must be set up before a start bit is set (there is no clock crossing from this bus to the comparison logic.)'''
+[[register]]
+  name = "CHKR3_CLKB_CNT"
+  type = "rw"
+  width = 32
+  description = "CLK B Counting Value."
+  default = "0x00000000"
+  offset = "0x00000198"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "CHKR3_CTRL"
+  type = "rw"
+  width = 9
+  description = "Clock Checker 3 Control."
+  default = "0x00000000"
+  offset = "0x0000019C"
+  [[register.field]]
+    name = "START_SINGLE"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''Start checking mechanism once.'''
+    longdesc = '''0: no effect. 1: check the clock once (self clearing to 0). The start bit must be asserted after all other control bits are set.'''
+  [[register.field]]
+    name = "START_CONTINUOUS"
+    bits = "7"
+    type = "rw"
+    shortdesc = '''Start the checking mechanism and keep checking until bit is set back to zero.'''
+    longdesc = '''0: single check. (or stop checking) 1: continous clock checking. The start bit must be asserted after all other control bits are set.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "CLKB_MUX_CTRL"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "CLKA_MUX_CTRL"
+    bits = "3:1"
+    type = "rw"
+    shortdesc = '''000: RPU clock.'''
+    longdesc = '''001: OCM clock. 010: LPD_SWITCH_CLK clock. 011: LPD_LSBUS_CLK clock. 100: PMU clock. 101: CSU_PLL_CLK 110: IRO_CLK 111: PS_REF_CLK'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "CHKR4_CLKA_UPPER"
+  type = "rw"
+  width = 32
+  description = "Upper Clock Comparison Threshold."
+  default = "0x00000000"
+  offset = "0x000001A0"
+  [[register.field]]
+    name = "THRSHLD"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Upper Threshold.'''
+    longdesc = '''This must be set up before a start bit is set (there is no clock crossing from this bus to the comparison logic.)'''
+[[register]]
+  name = "CHKR4_CLKA_LOWER"
+  type = "rw"
+  width = 32
+  description = "Lower Clock Comparison Threshold."
+  default = "0x00000000"
+  offset = "0x000001A4"
+  [[register.field]]
+    name = "THRSHLD"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Lower Threshold.'''
+    longdesc = '''This must be set up before a start bit is set (there is no clock crossing from this bus to the comparison logic.)'''
+[[register]]
+  name = "CHKR4_CLKB_CNT"
+  type = "rw"
+  width = 32
+  description = "CLK B Counting Value."
+  default = "0x00000000"
+  offset = "0x000001A8"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "CHKR4_CTRL"
+  type = "rw"
+  width = 9
+  description = "Clock Checker 4 Control."
+  default = "0x00000000"
+  offset = "0x000001AC"
+  [[register.field]]
+    name = "START_SINGLE"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''Start checking mechanism once.'''
+    longdesc = '''0: no effect. 1: check the clock once (self clearing to 0). The start bit must be asserted after all other control bits are set.'''
+  [[register.field]]
+    name = "START_CONTINUOUS"
+    bits = "7"
+    type = "rw"
+    shortdesc = '''Start the checking mechanism and keep checking until bit is set back to zero.'''
+    longdesc = '''0: single check. (or stop checking) 1: continous clock checking. The start bit must be asserted after all other control bits are set.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "CLKB_MUX_CTRL"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "CLKA_MUX_CTRL"
+    bits = "3:1"
+    type = "rw"
+    shortdesc = '''000: RPU clock.'''
+    longdesc = '''001: OCM clock. 010: LPD_SWITCH_CLK clock. 011: LPD_LSBUS_CLK clock. 100: PMU clock. 101: CSU_PLL_CLK 110: IRO_CLK 111: PS_REF_CLK'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "CHKR5_CLKA_UPPER"
+  type = "rw"
+  width = 32
+  description = "Upper Clock Comparison Threshold."
+  default = "0x00000000"
+  offset = "0x000001B0"
+  [[register.field]]
+    name = "THRSHLD"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Upper Threshold.'''
+    longdesc = '''This must be set up before a start bit is set (there is no clock crossing from this bus to the comparison logic.)'''
+[[register]]
+  name = "CHKR5_CLKA_LOWER"
+  type = "rw"
+  width = 32
+  description = "Lower Clock Comparison Threshold."
+  default = "0x00000000"
+  offset = "0x000001B4"
+  [[register.field]]
+    name = "THRSHLD"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Lower Threshold.'''
+    longdesc = '''This must be set up before a start bit is set (there is no clock crossing from this bus to the comparison logic.)'''
+[[register]]
+  name = "CHKR5_CLKB_CNT"
+  type = "rw"
+  width = 32
+  description = "CLK B Counting Value."
+  default = "0x00000000"
+  offset = "0x000001B8"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "CHKR5_CTRL"
+  type = "rw"
+  width = 9
+  description = "Clock Checker 5 Control."
+  default = "0x00000000"
+  offset = "0x000001BC"
+  [[register.field]]
+    name = "START_SINGLE"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''Start checking mechanism once.'''
+    longdesc = '''0: no effect. 1: check the clock once (self clearing to 0). The start bit must be asserted after all other control bits are set.'''
+  [[register.field]]
+    name = "START_CONTINUOUS"
+    bits = "7"
+    type = "rw"
+    shortdesc = '''Start the checking mechanism and keep checking until bit is set back to zero.'''
+    longdesc = '''0: single check. (or stop checking) 1: continous clock checking. The start bit must be asserted after all other control bits are set.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "CLKB_MUX_CTRL"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "CLKA_MUX_CTRL"
+    bits = "3:1"
+    type = "rw"
+    shortdesc = '''000: RPU clock.'''
+    longdesc = '''001: OCM clock. 010: LPD_SWITCH_CLK clock. 011: LPD_LSBUS_CLK clock. 100: PMU clock. 101: CSU_PLL_CLK 110: IRO_CLK 111: PS_REF_CLK'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "CHKR6_CLKA_UPPER"
+  type = "rw"
+  width = 32
+  description = "Upper Clock Comparison Threshold."
+  default = "0x00000000"
+  offset = "0x000001C0"
+  [[register.field]]
+    name = "THRSHLD"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Upper Threshold.'''
+    longdesc = '''This must be set up before a start bit is set (there is no clock crossing from this bus to the comparison logic.)'''
+[[register]]
+  name = "CHKR6_CLKA_LOWER"
+  type = "rw"
+  width = 32
+  description = "Lower Clock Comparison Threshold."
+  default = "0x00000000"
+  offset = "0x000001C4"
+  [[register.field]]
+    name = "THRSHLD"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Lower Threshold.'''
+    longdesc = '''This must be set up before a start bit is set (there is no clock crossing from this bus to the comparison logic.)'''
+[[register]]
+  name = "CHKR6_CLKB_CNT"
+  type = "rw"
+  width = 32
+  description = "CLK B Counting Value."
+  default = "0x00000000"
+  offset = "0x000001C8"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "CHKR6_CTRL"
+  type = "rw"
+  width = 9
+  description = "Clock Checker 6 H723Control."
+  default = "0x00000000"
+  offset = "0x000001CC"
+  [[register.field]]
+    name = "START_SINGLE"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''Start checking mechanism once.'''
+    longdesc = '''0: no effect. 1: check the clock once (self clearing to 0). The start bit must be asserted after all other control bits are set.'''
+  [[register.field]]
+    name = "START_CONTINUOUS"
+    bits = "7"
+    type = "rw"
+    shortdesc = '''Start the checking mechanism and keep checking until bit is set back to zero.'''
+    longdesc = '''0: single check. (or stop checking) 1: continous clock checking. The start bit must be asserted after all other control bits are set.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "CLKB_MUX_CTRL"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "CLKA_MUX_CTRL"
+    bits = "3:1"
+    type = "rw"
+    shortdesc = '''000: RPU clock.'''
+    longdesc = '''001: OCM clock. 010: LPD_SWITCH_CLK clock. 011: LPD_LSBUS_CLK clock. 100: PMU clock. 101: CSU_PLL_CLK 110: IRO_CLK 111: PS_REF_CLK'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "CHKR7_CLKA_UPPER"
+  type = "rw"
+  width = 32
+  description = "Upper Clock Comparison Threshold."
+  default = "0x00000000"
+  offset = "0x000001D0"
+  [[register.field]]
+    name = "THRSHLD"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Upper Threshold.'''
+    longdesc = '''This must be set up before a start bit is set (there is no clock crossing from this bus to the comparison logic.)'''
+[[register]]
+  name = "CHKR7_CLKA_LOWER"
+  type = "rw"
+  width = 32
+  description = "Lower Clock Comparison Threshold."
+  default = "0x00000000"
+  offset = "0x000001D4"
+  [[register.field]]
+    name = "THRSHLD"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Lower Threshold.'''
+    longdesc = '''This must be set up before a start bit is set (there is no clock crossing from this bus to the comparison logic.)'''
+[[register]]
+  name = "CHKR7_CLKB_CNT"
+  type = "rw"
+  width = 32
+  description = "CLK B Counting Value."
+  default = "0x00000000"
+  offset = "0x000001D8"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "CHKR7_CTRL"
+  type = "rw"
+  width = 9
+  description = "Clock Checker 7 Control."
+  default = "0x00000000"
+  offset = "0x000001DC"
+  [[register.field]]
+    name = "START_SINGLE"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''Start checking mechanism once.'''
+    longdesc = '''0: no effect. 1: check the clock once (self clearing to 0). The start bit must be asserted after all other control bits are set.'''
+  [[register.field]]
+    name = "START_CONTINUOUS"
+    bits = "7"
+    type = "rw"
+    shortdesc = '''Start the checking mechanism and keep checking until bit is set back to zero.'''
+    longdesc = '''0: single check. (or stop checking) 1: continous clock checking. The start bit must be asserted after all other control bits are set.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "CLKB_MUX_CTRL"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "CLKA_MUX_CTRL"
+    bits = "3:1"
+    type = "rw"
+    shortdesc = '''000: RPU clock.'''
+    longdesc = '''001: OCM clock. 010: LPD_SWITCH_CLK clock. 011: LPD_LSBUS_CLK clock. 100: PMU clock. 101: CSU_PLL_CLK 110: IRO_CLK 111: PS_REF_CLK'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "BOOT_MODE_USER"
+  type = "mixed"
+  width = 20
+  description = "Software controlled BOOT MODE."
+  default = "0x00000000"
+  offset = "0x00000200"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "19:16"
+    type = "rw"
+  [[register.field]]
+    name = "ALT_BOOT_MODE"
+    bits = "15:12"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:9"
+    type = "rw"
+  [[register.field]]
+    name = "USE_ALT"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''Used to control which value is in the [boot_mode] field.'''
+    longdesc = '''0: POR reset value. 1: Software value [alt_boot_mode] bit field.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:4"
+    type = "rw"
+  [[register.field]]
+    name = "BOOT_MODE"
+    bits = "3:0"
+    type = "ro"
+    shortdesc = '''Boot Mode values from the mode pins captured at POR until software asserts the [use_alt] bit.'''
+    longdesc = '''Once that happens, this bit field will contain the [alt_boot_mode] value written by software. Since the initial value is defined from the Boot Mode pins, the reset value is listed as 'X.'''
+[[register]]
+  name = "BOOT_MODE_POR"
+  type = "mixed"
+  width = 16
+  description = "Hardware controlled BOOT MODE register."
+  default = "0x00000000"
+  offset = "0x00000204"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:12"
+    type = "rw"
+  [[register.field]]
+    name = "BOOT_MODE2"
+    bits = "11:8"
+    type = "ro"
+  [[register.field]]
+    name = "BOOT_MODE1"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "BOOT_MODE0"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "RESET_CTRL"
+  type = "rw"
+  width = 8
+  description = "PS_SRST_B Pin Control and Trigger."
+  default = "0x00000001"
+  offset = "0x00000218"
+  [[register.field]]
+    name = "SOFT_RESET"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''Software reset.'''
+    longdesc = '''Cause a system reset to occur. This is the equivalent to asserting the external PS_SRST_B reset signal pin.'''
+  [[register.field]]
+    name = "SRST_DIS"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''0: PS_SRST_B reset pin will functional properly.'''
+    longdesc = '''1: PS_SRST_B reset pin will be disabled. System reset will disable. BootROM will enable.'''
+[[register]]
+  name = "BLOCKONLY_RST"
+  type = "mixed"
+  width = 4
+  description = "Records the Reason for the Block-only Reset."
+  default = "0x00000000"
+  offset = "0x0000021C"
+  [[register.field]]
+    name = "DEBUG_ONLY"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "RESET_REASON"
+  type = "mixed"
+  width = 16
+  description = "Records the Reason for the Reset."
+  default = "0x00000001"
+  offset = "0x00000220"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "14:7"
+    type = "ro"
+  [[register.field]]
+    name = "DEBUG_SYS"
+    bits = "6"
+    type = "wtc"
+    shortdesc = '''Software Debugger Reset.'''
+    longdesc = '''Write to BLOCKONLY_RST [debug_only].'''
+  [[register.field]]
+    name = "SOFT"
+    bits = "5"
+    type = "wtc"
+    shortdesc = '''Software System Reset.'''
+    longdesc = '''Write to RESET_CTRL [soft_reset].'''
+  [[register.field]]
+    name = "SRST"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "PSONLY_RESET_REQ"
+    bits = "3"
+    type = "wtc"
+    shortdesc = '''PS-only Reset.'''
+    longdesc = '''Write to PMU_GLOBAL.GLOBAL_RESET [PS_ONLY_RST].'''
+  [[register.field]]
+    name = "PMU_SYS_RESET"
+    bits = "2"
+    type = "wtc"
+    shortdesc = '''Internal System Reset.'''
+    longdesc = '''A system error triggered a system reset.'''
+  [[register.field]]
+    name = "INTERNAL_POR"
+    bits = "1"
+    type = "wtc"
+    shortdesc = '''Internal POR.'''
+    longdesc = '''A system error triggered a POR reset.'''
+  [[register.field]]
+    name = "EXTERNAL_POR"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "RST_LPD_IOU0"
+  type = "rw"
+  width = 16
+  description = "Software Reset of Ethernet GEM Controllers"
+  default = "0x0000000F"
+  offset = "0x00000230"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:4"
+    type = "rw"
+  [[register.field]]
+    name = "GEM3_RESET"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "GEM2_RESET"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "GEM1_RESET"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "GEM0_RESET"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "RST_LPD_IOU2"
+  type = "rw"
+  width = 32
+  description = "IOP Software Reset Controls"
+  default = "0x0017FFFF"
+  offset = "0x00000238"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:21"
+    type = "rw"
+  [[register.field]]
+    name = "TIMESTAMP_RESET"
+    bits = "20"
+    type = "rw"
+  [[register.field]]
+    name = "IOU_CC_RESET"
+    bits = "19"
+    type = "rw"
+  [[register.field]]
+    name = "GPIO_RESET"
+    bits = "18"
+    type = "rw"
+  [[register.field]]
+    name = "LPD_DMA_RESET"
+    bits = "17"
+    type = "rw"
+  [[register.field]]
+    name = "NAND_RESET"
+    bits = "16"
+    type = "rw"
+  [[register.field]]
+    name = "SWDT_RESET"
+    bits = "15"
+    type = "rw"
+  [[register.field]]
+    name = "TTC3_RESET"
+    bits = "14"
+    type = "rw"
+  [[register.field]]
+    name = "TTC2_RESET"
+    bits = "13"
+    type = "rw"
+  [[register.field]]
+    name = "TTC1_RESET"
+    bits = "12"
+    type = "rw"
+  [[register.field]]
+    name = "TTC0_RESET"
+    bits = "11"
+    type = "rw"
+  [[register.field]]
+    name = "I2C1_RESET"
+    bits = "10"
+    type = "rw"
+  [[register.field]]
+    name = "I2C0_RESET"
+    bits = "9"
+    type = "rw"
+  [[register.field]]
+    name = "CAN1_RESET"
+    bits = "8"
+    type = "rw"
+  [[register.field]]
+    name = "CAN0_RESET"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "SDIO1_RESET"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "SDIO0_RESET"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "SPI1_RESET"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "SPI0_RESET"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "UART1_RESET"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "UART0_RESET"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "QSPI_RESET"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "RST_LPD_TOP"
+  type = "rw"
+  width = 24
+  description = "Software Reset Control for LPD System Elements."
+  default = "0x00188FDF"
+  offset = "0x0000023C"
+  [[register.field]]
+    name = "FPD_RESET"
+    bits = "23"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "22:21"
+    type = "rw"
+  [[register.field]]
+    name = "LPD_SWDT_RESET"
+    bits = "20"
+    type = "rw"
+  [[register.field]]
+    name = "S_AXI_LPD_RESET"
+    bits = "19"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "18"
+    type = "rw"
+  [[register.field]]
+    name = "SYSMON_RESET"
+    bits = "17"
+    type = "rw"
+  [[register.field]]
+    name = "RTC_RESET"
+    bits = "16"
+    type = "rw"
+  [[register.field]]
+    name = "APM_RESET"
+    bits = "15"
+    type = "rw"
+  [[register.field]]
+    name = "IPI_RESET"
+    bits = "14"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "13:12"
+    type = "rw"
+  [[register.field]]
+    name = "USB1_APB_RESET"
+    bits = "11"
+    type = "rw"
+  [[register.field]]
+    name = "USB0_APB_RESET"
+    bits = "10"
+    type = "rw"
+  [[register.field]]
+    name = "USB1_HIBERRESET"
+    bits = "9"
+    type = "rw"
+  [[register.field]]
+    name = "USB0_HIBERRESET"
+    bits = "8"
+    type = "rw"
+  [[register.field]]
+    name = "USB1_CORERESET"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "USB0_CORERESET"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "RPU_PGE_RESET"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "OCM_RESET"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "RPU_AMBA_RESET"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "RPU_R51_RESET"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "RPU_R50_RESET"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "RST_LPD_DBG"
+  type = "rw"
+  width = 16
+  description = "Debug control for both the LPD and FPD."
+  default = "0x00000033"
+  offset = "0x00000240"
+  [[register.field]]
+    name = "DBG_ACK"
+    bits = "15"
+    type = "rw"
+    shortdesc = '''This is the ACK signal to the debug reset request from DAP controller.'''
+    longdesc = '''After debugger requests reset, it is up to the user to toggle this and the debug signals correctly.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "14:6"
+    type = "rw"
+  [[register.field]]
+    name = "RPU_DBG1_RESET"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "RPU_DBG0_RESET"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "3:2"
+    type = "rw"
+  [[register.field]]
+    name = "DBG_LPD_RESET"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "DBG_FPD_RESET"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "BANK3_CTRL0"
+  type = "rw"
+  width = 10
+  description = "I/O Bank 503 Drive0 Control."
+  default = "0x000003FF"
+  offset = "0x00000270"
+  [[register.field]]
+    name = "DRIVE0"
+    bits = "9:0"
+    type = "rw"
+    shortdesc = '''Each bit applies to a single I/O.'''
+    longdesc = '''Bit[0]: Bit[1]: Bit[2]: Bit[3]: Bit[4]: Bit[5]: Bit[6]: Bit[7]:'''
+[[register]]
+  name = "BANK3_CTRL1"
+  type = "rw"
+  width = 10
+  description = "I/O Bank 503 Drive1 Control."
+  default = "0x000003FF"
+  offset = "0x00000274"
+  [[register.field]]
+    name = "DRIVE1"
+    bits = "9:0"
+    type = "rw"
+[[register]]
+  name = "BANK3_CTRL2"
+  type = "rw"
+  width = 10
+  description = "I/O Bank 503 Schmitt or CMOS Input Select."
+  default = "0x000003FF"
+  offset = "0x00000278"
+  [[register.field]]
+    name = "SCHMITT_CMOS_N"
+    bits = "9:0"
+    type = "rw"
+[[register]]
+  name = "BANK3_CTRL3"
+  type = "rw"
+  width = 10
+  description = "I/O Bank 503 Pull-up/down Select."
+  default = "0x000003FF"
+  offset = "0x0000027C"
+  [[register.field]]
+    name = "PULL_HIGH_LOW_N"
+    bits = "9:0"
+    type = "rw"
+[[register]]
+  name = "BANK3_CTRL4"
+  type = "rw"
+  width = 10
+  description = "I/O Bank 503 Pull-up/down Enable."
+  default = "0x000003FF"
+  offset = "0x00000280"
+  [[register.field]]
+    name = "PULL_ENABLE"
+    bits = "9:0"
+    type = "rw"
+[[register]]
+  name = "BANK3_CTRL5"
+  type = "rw"
+  width = 10
+  description = "I/O Bank 503 Slew Rate Control."
+  default = "0x00000000"
+  offset = "0x00000284"
+  [[register.field]]
+    name = "SLOW_FAST_SLEW_N"
+    bits = "9:0"
+    type = "rw"
+[[register]]
+  name = "BANK3_STATUS"
+  type = "ro"
+  width = 10
+  description = "Voltage mode status for DIO bank 3"
+  default = "0x00000000"
+  offset = "0x00000288"
+  [[register.field]]
+    name = "VMODE_1P8_3P3_N"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Single bit for the bank.'''
+    longdesc = '''0 = 2.5/3.3v mode. 1 = 1.8v mode.'''

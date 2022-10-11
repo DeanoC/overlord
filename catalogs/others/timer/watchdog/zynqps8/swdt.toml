@@ -1,0 +1,90 @@
+description = "CSU System Watchdog Timer"
+[[bank]]
+  name = "CSU_WDT"
+  address = "0xffcb0000"
+[[bank]]
+  name = "SWDT"
+  address = "0xff150000"
+[[bank]]
+  name = "WDT"
+  address = "0xfd4d0000"
+[[register]]
+  name = "MODE"
+  type = "mixed"
+  width = 24
+  description = "WD zero mode register"
+  default = "0x000001C2"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "ZKEY"
+    bits = "23:12"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:9"
+    type = "waz"
+  [[register.field]]
+    name = "IRQLN"
+    bits = "8:7"
+    type = "rw"
+  [[register.field]]
+    name = "RSTLN"
+    bits = "6:4"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "3"
+    type = "waz"
+  [[register.field]]
+    name = "IRQEN"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "RSTEN"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "WDEN"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "CONTROL"
+  type = "mixed"
+  width = 26
+  description = "Counter Control Register"
+  default = "0x00003FFC"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "CKEY"
+    bits = "25:14"
+    type = "wo"
+  [[register.field]]
+    name = "CRV"
+    bits = "13:2"
+    type = "rw"
+  [[register.field]]
+    name = "CLKSEL"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "RESTART"
+  type = "wo"
+  width = 16
+  description = "Restart key register - this not a real register as no data is stored"
+  default = "0x00000000"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "RSTKEY"
+    bits = "15:0"
+    type = "wo"
+[[register]]
+  name = "STATUS"
+  type = "ro"
+  width = 1
+  description = "Status Register"
+  default = "0x00000000"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "WDZ"
+    bits = "0"
+    type = "ro"

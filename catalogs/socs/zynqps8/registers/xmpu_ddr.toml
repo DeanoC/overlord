@@ -1,0 +1,1808 @@
+description = "Memory Protection Unit (XMPU) 0 Configuration"
+[[bank]]
+  name = "DDR_XMPU0_CFG"
+  address = "0xfd000000"
+[[bank]]
+  name = "DDR_XMPU1_CFG"
+  address = "0xfd010000"
+[[bank]]
+  name = "DDR_XMPU2_CFG"
+  address = "0xfd020000"
+[[bank]]
+  name = "DDR_XMPU3_CFG"
+  address = "0xfd030000"
+[[bank]]
+  name = "DDR_XMPU4_CFG"
+  address = "0xfd040000"
+[[bank]]
+  name = "DDR_XMPU5_CFG"
+  address = "0xfd050000"
+[[register]]
+  name = "CTRL"
+  type = "mixed"
+  width = 32
+  description = "Control and Implementation"
+  default = "0x0000000B"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "ro"
+  [[register.field]]
+    name = "ALIGNCFG"
+    bits = "3"
+    type = "ro"
+    shortdesc = '''Region Alignment, value fixed at 0.'''
+    longdesc = '''1: Aligned to 1MB page (20 address bits). Read-only.'''
+  [[register.field]]
+    name = "POISONCFG"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Poisoning Method.'''
+    longdesc = '''0: attribute Poisoning (recommended); asserts AxUser[10], the Poison signal to the DDR to a level defined by POISON [ATTRIB]. 1: address Poisoning; base address is in POISON [BASE]. Note: the DDR_XMPU normally uses attribute poisoning because the DDR expects it. Address poisoning is possible, but requires 1 MB of memory to be allocated at the [BASE] address.'''
+  [[register.field]]
+    name = "DEFWRALLOWED"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Default Write Allowed.'''
+    longdesc = '''If a write transaction address and master ID miss in the Region List, then: 0: poison the transaction with a Write Permission Violation. 1: allowed the transaction, regardless of security level.'''
+  [[register.field]]
+    name = "DEFRDALLOWED"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Default Read Allowed.'''
+    longdesc = '''If a read transaction address and master ID miss in the Region List, then: 0: poison the transaction with a Read Permission Violation. 1: allowed the transaction, regardless of security level.'''
+[[register]]
+  name = "ERR_STATUS1"
+  type = "ro"
+  width = 32
+  description = "Error Status, Reg 1."
+  default = "0x00000000"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "AXI_ADDR"
+    bits = "27:0"
+    type = "ro"
+    shortdesc = '''Address bits from a poisoned read or write transaction.'''
+    longdesc = '''Bits [27:0] correspond to address bits [39:12]. Read-only.'''
+[[register]]
+  name = "ERR_STATUS2"
+  type = "ro"
+  width = 32
+  description = "Error Status, Reg 2."
+  default = "0x00000000"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:10"
+    type = "ro"
+  [[register.field]]
+    name = "AXI_ID"
+    bits = "9:0"
+    type = "ro"
+    shortdesc = '''Master ID from a poisoned read or write transaction.'''
+    longdesc = '''Read-only.'''
+[[register]]
+  name = "POISON"
+  type = "mixed"
+  width = 32
+  description = "Poison Configuration."
+  default = "0x00000000"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:21"
+    type = "ro"
+  [[register.field]]
+    name = "ATTRIB"
+    bits = "20"
+    type = "rw"
+    shortdesc = '''Poison Attribute Value.'''
+    longdesc = '''Recommended value is 0. Applies when CTRL [PoisonCfg] = 0 (poison by attribute). The outbound AxUser[10] value is set: 0: to a logic 0 (poison). 1: to a logic 1 (not recommended).'''
+  [[register.field]]
+    name = "BASE"
+    bits = "19:0"
+    type = "ro"
+    shortdesc = '''Poison Base Address, value fixed at 0x0.'''
+    longdesc = '''For address poisoning, the DDR_XMPU replaces the incoming AXI address with 0x00_0000_0xxx where xxx = bits [11:0] of the incoming address. Note: poisoning by attribute is recommended (not by address).'''
+[[register]]
+  name = "ISR"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Status and Clear."
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "ro"
+  [[register.field]]
+    name = "SECURITYVIO"
+    bits = "3"
+    type = "wtc"
+    shortdesc = '''Security Violation by AXI Master.'''
+    longdesc = '''Two conditions can cause a security violation: 1) A non-secure master tries to access a secure memory space. 2) A secure master tries to access a non-secure memory space and Rxx_CONFIG [NSCheckType] = 1 (strict checking). Note: a secure transaction is detected when AxPROT[1] = 0.'''
+  [[register.field]]
+    name = "WRPERMVIO"
+    bits = "2"
+    type = "wtc"
+    shortdesc = '''Write Permission Violation by AXI Master.'''
+    longdesc = '''Write access attempted to enabled region with WrAllowed = 0. Or the transaction missed in the Region list and CNTRL [DefWrAllowed] = 0.'''
+  [[register.field]]
+    name = "RDPERMVIO"
+    bits = "1"
+    type = "wtc"
+    shortdesc = '''Read Permission Violation by AXI Master.'''
+    longdesc = '''Read access attempted to enabled region with RdAllowed = 0. Or the transaction missed in the Region list and CNTRL [DefRdAllowed] = 0.'''
+  [[register.field]]
+    name = "INV_APB"
+    bits = "0"
+    type = "wtc"
+    shortdesc = '''Register Access Error on APB.'''
+    longdesc = '''A register access was requested to an unimplemented register location. The PSLVERR error signal is also asserted back to the APB interconnect.'''
+[[register]]
+  name = "IMR"
+  type = "ro"
+  width = 32
+  description = "Interrupt Mask."
+  default = "0x0000000F"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "ro"
+  [[register.field]]
+    name = "SECURITYVIO"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "WRPERMVIO"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "RDPERMVIO"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "INV_APB"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "IEN"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Enable."
+  default = "0x00000000"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "ro"
+  [[register.field]]
+    name = "SECURITYVIO"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "WRPERMVIO"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "RDPERMVIO"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "INV_APB"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "IDS"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Disable."
+  default = "0x00000000"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "ro"
+  [[register.field]]
+    name = "SECURITYVIO"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "WRPERMVIO"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "RDPERMVIO"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "INV_APB"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "LOCK"
+  type = "rw"
+  width = 1
+  description = "Register Write Lock."
+  default = "0x00000000"
+  offset = "0x00000020"
+  [[register.field]]
+    name = "REGWRDIS"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Register Write Disable.'''
+    longdesc = '''Applies to all registers except ISR, IMR, IEN and IDS. 0: read/write allowed. 1: read-only. Once this bit is set, it can only be cleared by an DDR_XMPU reset.'''
+[[register]]
+  name = "R00_START"
+  type = "mixed"
+  width = 32
+  description = "Region 0 Start Address"
+  default = "0x00000000"
+  offset = "0x00000100"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R00_END"
+  type = "mixed"
+  width = 32
+  description = "Region 0 End Address"
+  default = "0x00000000"
+  offset = "0x00000104"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R00_MASTER"
+  type = "mixed"
+  width = 32
+  description = "Region 0 Master ID."
+  default = "0x00000000"
+  offset = "0x00000108"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:26"
+    type = "ro"
+  [[register.field]]
+    name = "MASK"
+    bits = "25:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "ID"
+    bits = "9:0"
+    type = "rw"
+[[register]]
+  name = "R00_CONFIG"
+  type = "mixed"
+  width = 32
+  description = "Region 0 Configuration."
+  default = "0x00000008"
+  offset = "0x0000010C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:5"
+    type = "ro"
+  [[register.field]]
+    name = "NSCHECKTYPE"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''Non-secure Region Check Type.'''
+    longdesc = '''Secure masters may or may not be allowed to access Non-Secure (NS) memory regions. 0: relaxed checking; secure requests may access a non-secure (NS) region. 1: strict checking; secure requests may only access a secure region.'''
+  [[register.field]]
+    name = "REGIONNS"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''Select security level of region: 0: secure.'''
+    longdesc = '''1: non-secure (NS).'''
+  [[register.field]]
+    name = "WRALLOWED"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Allow writes to region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "RDALLOWED"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Allow reads within region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Enable region: 0: disabled.'''
+    longdesc = '''1: enabled.'''
+[[register]]
+  name = "R01_START"
+  type = "mixed"
+  width = 32
+  description = "Region 1 Start Address."
+  default = "0x00000000"
+  offset = "0x00000110"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R01_END"
+  type = "mixed"
+  width = 32
+  description = "Region 1 End Address."
+  default = "0x00000000"
+  offset = "0x00000114"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R01_MASTER"
+  type = "mixed"
+  width = 32
+  description = "Region 1 Master ID."
+  default = "0x00000000"
+  offset = "0x00000118"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:26"
+    type = "ro"
+  [[register.field]]
+    name = "MASK"
+    bits = "25:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "ID"
+    bits = "9:0"
+    type = "rw"
+[[register]]
+  name = "R01_CONFIG"
+  type = "mixed"
+  width = 32
+  description = "Region 1 Configuration."
+  default = "0x00000008"
+  offset = "0x0000011C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:5"
+    type = "ro"
+  [[register.field]]
+    name = "NSCHECKTYPE"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''Non-secure Region Check Type.'''
+    longdesc = '''Secure masters may or may not be allowed to access Non-Secure (NS) memory regions. 0: relaxed checking; secure requests may access a non-secure (NS) region. 1: strict checking; secure requests may only access a secure region.'''
+  [[register.field]]
+    name = "REGIONNS"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''Select security level of region: 0: secure.'''
+    longdesc = '''1: non-secure (NS).'''
+  [[register.field]]
+    name = "WRALLOWED"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Allow writes to region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "RDALLOWED"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Allow reads within region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Enable region: 0: disabled.'''
+    longdesc = '''1: enabled.'''
+[[register]]
+  name = "R02_START"
+  type = "mixed"
+  width = 32
+  description = "Region 2 Start Address."
+  default = "0x00000000"
+  offset = "0x00000120"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R02_END"
+  type = "mixed"
+  width = 32
+  description = "Region 2 End Address."
+  default = "0x00000000"
+  offset = "0x00000124"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R02_MASTER"
+  type = "mixed"
+  width = 32
+  description = "Region 2 Master ID."
+  default = "0x00000000"
+  offset = "0x00000128"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:26"
+    type = "ro"
+  [[register.field]]
+    name = "MASK"
+    bits = "25:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "ID"
+    bits = "9:0"
+    type = "rw"
+[[register]]
+  name = "R02_CONFIG"
+  type = "mixed"
+  width = 32
+  description = "Region 2 Configuration."
+  default = "0x00000008"
+  offset = "0x0000012C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:5"
+    type = "ro"
+  [[register.field]]
+    name = "NSCHECKTYPE"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''Non-secure Region Check Type.'''
+    longdesc = '''Secure masters may or may not be allowed to access Non-Secure (NS) memory regions. 0: relaxed checking; secure requests may access a non-secure (NS) region. 1: strict checking; secure requests may only access a secure region.'''
+  [[register.field]]
+    name = "REGIONNS"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''Select security level of region: 0: secure.'''
+    longdesc = '''1: non-secure (NS).'''
+  [[register.field]]
+    name = "WRALLOWED"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Allow writes to region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "RDALLOWED"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Allow reads within region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Enable region: 0: disabled.'''
+    longdesc = '''1: enabled.'''
+[[register]]
+  name = "R03_START"
+  type = "mixed"
+  width = 32
+  description = "Region 3 Start Address."
+  default = "0x00000000"
+  offset = "0x00000130"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R03_END"
+  type = "mixed"
+  width = 32
+  description = "Region 3 End Address."
+  default = "0x00000000"
+  offset = "0x00000134"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R03_MASTER"
+  type = "mixed"
+  width = 32
+  description = "Region 3 Master ID."
+  default = "0x00000000"
+  offset = "0x00000138"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:26"
+    type = "ro"
+  [[register.field]]
+    name = "MASK"
+    bits = "25:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "ID"
+    bits = "9:0"
+    type = "rw"
+[[register]]
+  name = "R03_CONFIG"
+  type = "mixed"
+  width = 32
+  description = "Region 3 Configuration."
+  default = "0x00000008"
+  offset = "0x0000013C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:5"
+    type = "ro"
+  [[register.field]]
+    name = "NSCHECKTYPE"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''Non-secure Region Check Type.'''
+    longdesc = '''Secure masters may or may not be allowed to access Non-Secure (NS) memory regions. 0: relaxed checking; secure requests may access a non-secure (NS) region. 1: strict checking; secure requests may only access a secure region.'''
+  [[register.field]]
+    name = "REGIONNS"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''Select security level of region: 0: secure.'''
+    longdesc = '''1: non-secure (NS).'''
+  [[register.field]]
+    name = "WRALLOWED"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Allow writes to region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "RDALLOWED"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Allow reads within region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Enable region: 0: disabled.'''
+    longdesc = '''1: enabled.'''
+[[register]]
+  name = "R04_START"
+  type = "mixed"
+  width = 32
+  description = "Region 4 Start Address."
+  default = "0x00000000"
+  offset = "0x00000140"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R04_END"
+  type = "mixed"
+  width = 32
+  description = "Region 4 End Address."
+  default = "0x00000000"
+  offset = "0x00000144"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R04_MASTER"
+  type = "mixed"
+  width = 32
+  description = "Region 4 Master ID."
+  default = "0x00000000"
+  offset = "0x00000148"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:26"
+    type = "ro"
+  [[register.field]]
+    name = "MASK"
+    bits = "25:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "ID"
+    bits = "9:0"
+    type = "rw"
+[[register]]
+  name = "R04_CONFIG"
+  type = "mixed"
+  width = 32
+  description = "Region 4 Configuration."
+  default = "0x00000008"
+  offset = "0x0000014C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:5"
+    type = "ro"
+  [[register.field]]
+    name = "NSCHECKTYPE"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''Non-secure Region Check Type.'''
+    longdesc = '''Secure masters may or may not be allowed to access Non-Secure (NS) memory regions. 0: relaxed checking; secure requests may access a non-secure (NS) region. 1: strict checking; secure requests may only access a secure region.'''
+  [[register.field]]
+    name = "REGIONNS"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''Select security level of region: 0: secure.'''
+    longdesc = '''1: non-secure (NS).'''
+  [[register.field]]
+    name = "WRALLOWED"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Allow writes to region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "RDALLOWED"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Allow reads within region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Enable region: 0: disabled.'''
+    longdesc = '''1: enabled.'''
+[[register]]
+  name = "R05_START"
+  type = "mixed"
+  width = 32
+  description = "Region 5 Start Address."
+  default = "0x00000000"
+  offset = "0x00000150"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R05_END"
+  type = "mixed"
+  width = 32
+  description = "Region 5 End Address."
+  default = "0x00000000"
+  offset = "0x00000154"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R05_MASTER"
+  type = "mixed"
+  width = 32
+  description = "Region 5 Master ID."
+  default = "0x00000000"
+  offset = "0x00000158"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:26"
+    type = "ro"
+  [[register.field]]
+    name = "MASK"
+    bits = "25:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "ID"
+    bits = "9:0"
+    type = "rw"
+[[register]]
+  name = "R05_CONFIG"
+  type = "mixed"
+  width = 32
+  description = "Region 5 Configuration."
+  default = "0x00000008"
+  offset = "0x0000015C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:5"
+    type = "ro"
+  [[register.field]]
+    name = "NSCHECKTYPE"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''Non-secure Region Check Type.'''
+    longdesc = '''Secure masters may or may not be allowed to access Non-Secure (NS) memory regions. 0: relaxed checking; secure requests may access a non-secure (NS) region. 1: strict checking; secure requests may only access a secure region.'''
+  [[register.field]]
+    name = "REGIONNS"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''Select security level of region: 0: secure.'''
+    longdesc = '''1: non-secure (NS).'''
+  [[register.field]]
+    name = "WRALLOWED"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Allow writes to region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "RDALLOWED"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Allow reads within region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Enable region: 0: disabled.'''
+    longdesc = '''1: enabled.'''
+[[register]]
+  name = "R06_START"
+  type = "mixed"
+  width = 32
+  description = "Region 6 Start Address."
+  default = "0x00000000"
+  offset = "0x00000160"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R06_END"
+  type = "mixed"
+  width = 32
+  description = "Region 6 End Address."
+  default = "0x00000000"
+  offset = "0x00000164"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R06_MASTER"
+  type = "mixed"
+  width = 32
+  description = "Region 6 Master ID."
+  default = "0x00000000"
+  offset = "0x00000168"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:26"
+    type = "ro"
+  [[register.field]]
+    name = "MASK"
+    bits = "25:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "ID"
+    bits = "9:0"
+    type = "rw"
+[[register]]
+  name = "R06_CONFIG"
+  type = "mixed"
+  width = 32
+  description = "Region 6 Configuration."
+  default = "0x00000008"
+  offset = "0x0000016C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:5"
+    type = "ro"
+  [[register.field]]
+    name = "NSCHECKTYPE"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''Non-secure Region Check Type.'''
+    longdesc = '''Secure masters may or may not be allowed to access Non-Secure (NS) memory regions. 0: relaxed checking; secure requests may access a non-secure (NS) region. 1: strict checking; secure requests may only access a secure region.'''
+  [[register.field]]
+    name = "REGIONNS"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''Select security level of region: 0: secure.'''
+    longdesc = '''1: non-secure (NS).'''
+  [[register.field]]
+    name = "WRALLOWED"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Allow writes to region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "RDALLOWED"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Allow reads within region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Enable region: 0: disabled.'''
+    longdesc = '''1: enabled.'''
+[[register]]
+  name = "R07_START"
+  type = "mixed"
+  width = 32
+  description = "Region 7 Start Address."
+  default = "0x00000000"
+  offset = "0x00000170"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R07_END"
+  type = "mixed"
+  width = 32
+  description = "Region 7 End Address."
+  default = "0x00000000"
+  offset = "0x00000174"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R07_MASTER"
+  type = "mixed"
+  width = 32
+  description = "Region 7 Master ID."
+  default = "0x00000000"
+  offset = "0x00000178"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:26"
+    type = "ro"
+  [[register.field]]
+    name = "MASK"
+    bits = "25:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "ID"
+    bits = "9:0"
+    type = "rw"
+[[register]]
+  name = "R07_CONFIG"
+  type = "mixed"
+  width = 32
+  description = "Region 7 Configuration."
+  default = "0x00000008"
+  offset = "0x0000017C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:5"
+    type = "ro"
+  [[register.field]]
+    name = "NSCHECKTYPE"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''Non-secure Region Check Type.'''
+    longdesc = '''Secure masters may or may not be allowed to access Non-Secure (NS) memory regions. 0: relaxed checking; secure requests may access a non-secure (NS) region. 1: strict checking; secure requests may only access a secure region.'''
+  [[register.field]]
+    name = "REGIONNS"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''Select security level of region: 0: secure.'''
+    longdesc = '''1: non-secure (NS).'''
+  [[register.field]]
+    name = "WRALLOWED"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Allow writes to region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "RDALLOWED"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Allow reads within region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Enable region: 0: disabled.'''
+    longdesc = '''1: enabled.'''
+[[register]]
+  name = "R08_START"
+  type = "mixed"
+  width = 32
+  description = "Region 8 Start Address."
+  default = "0x00000000"
+  offset = "0x00000180"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R08_END"
+  type = "mixed"
+  width = 32
+  description = "Region 8 End Address."
+  default = "0x00000000"
+  offset = "0x00000184"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R08_MASTER"
+  type = "mixed"
+  width = 32
+  description = "Region 8 Master ID."
+  default = "0x00000000"
+  offset = "0x00000188"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:26"
+    type = "ro"
+  [[register.field]]
+    name = "MASK"
+    bits = "25:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "ID"
+    bits = "9:0"
+    type = "rw"
+[[register]]
+  name = "R08_CONFIG"
+  type = "mixed"
+  width = 32
+  description = "Region 8 Configuration."
+  default = "0x00000008"
+  offset = "0x0000018C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:5"
+    type = "ro"
+  [[register.field]]
+    name = "NSCHECKTYPE"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''Non-secure Region Check Type.'''
+    longdesc = '''Secure masters may or may not be allowed to access Non-Secure (NS) memory regions. 0: relaxed checking; secure requests may access a non-secure (NS) region. 1: strict checking; secure requests may only access a secure region.'''
+  [[register.field]]
+    name = "REGIONNS"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''Select security level of region: 0: secure.'''
+    longdesc = '''1: non-secure (NS).'''
+  [[register.field]]
+    name = "WRALLOWED"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Allow writes to region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "RDALLOWED"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Allow reads within region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Enable region: 0: disabled.'''
+    longdesc = '''1: enabled.'''
+[[register]]
+  name = "R09_START"
+  type = "mixed"
+  width = 32
+  description = "Region 9 Start Address."
+  default = "0x00000000"
+  offset = "0x00000190"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R09_END"
+  type = "mixed"
+  width = 32
+  description = "Region 9 End Address."
+  default = "0x00000000"
+  offset = "0x00000194"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R09_MASTER"
+  type = "mixed"
+  width = 32
+  description = "Region 9 Master ID."
+  default = "0x00000000"
+  offset = "0x00000198"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:26"
+    type = "ro"
+  [[register.field]]
+    name = "MASK"
+    bits = "25:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "ID"
+    bits = "9:0"
+    type = "rw"
+[[register]]
+  name = "R09_CONFIG"
+  type = "mixed"
+  width = 32
+  description = "Region 9 Configuration."
+  default = "0x00000008"
+  offset = "0x0000019C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:5"
+    type = "ro"
+  [[register.field]]
+    name = "NSCHECKTYPE"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''Non-secure Region Check Type.'''
+    longdesc = '''Secure masters may or may not be allowed to access Non-Secure (NS) memory regions. 0: relaxed checking; secure requests may access a non-secure (NS) region. 1: strict checking; secure requests may only access a secure region.'''
+  [[register.field]]
+    name = "REGIONNS"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''Select security level of region: 0: secure.'''
+    longdesc = '''1: non-secure (NS).'''
+  [[register.field]]
+    name = "WRALLOWED"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Allow writes to region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "RDALLOWED"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Allow reads within region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Enable region: 0: disabled.'''
+    longdesc = '''1: enabled.'''
+[[register]]
+  name = "R10_START"
+  type = "mixed"
+  width = 32
+  description = "Region 10 Start Address."
+  default = "0x00000000"
+  offset = "0x000001A0"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R10_END"
+  type = "mixed"
+  width = 32
+  description = "Region 10 End Address."
+  default = "0x00000000"
+  offset = "0x000001A4"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R10_MASTER"
+  type = "mixed"
+  width = 32
+  description = "Region 10 Master ID."
+  default = "0x00000000"
+  offset = "0x000001A8"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:26"
+    type = "ro"
+  [[register.field]]
+    name = "MASK"
+    bits = "25:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "ID"
+    bits = "9:0"
+    type = "rw"
+[[register]]
+  name = "R10_CONFIG"
+  type = "mixed"
+  width = 32
+  description = "Region 10 Configuration."
+  default = "0x00000008"
+  offset = "0x000001AC"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:5"
+    type = "ro"
+  [[register.field]]
+    name = "NSCHECKTYPE"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''Non-secure Region Check Type.'''
+    longdesc = '''Secure masters may or may not be allowed to access Non-Secure (NS) memory regions. 0: relaxed checking; secure requests may access a non-secure (NS) region. 1: strict checking; secure requests may only access a secure region.'''
+  [[register.field]]
+    name = "REGIONNS"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''Select security level of region: 0: secure.'''
+    longdesc = '''1: non-secure (NS).'''
+  [[register.field]]
+    name = "WRALLOWED"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Allow writes to region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "RDALLOWED"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Allow reads within region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Enable region: 0: disabled.'''
+    longdesc = '''1: enabled.'''
+[[register]]
+  name = "R11_START"
+  type = "mixed"
+  width = 32
+  description = "Region 11 Start Address."
+  default = "0x00000000"
+  offset = "0x000001B0"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R11_END"
+  type = "mixed"
+  width = 32
+  description = "Region 11 End Address."
+  default = "0x00000000"
+  offset = "0x000001B4"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R11_MASTER"
+  type = "mixed"
+  width = 32
+  description = "Region 11 Master ID."
+  default = "0x00000000"
+  offset = "0x000001B8"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:26"
+    type = "ro"
+  [[register.field]]
+    name = "MASK"
+    bits = "25:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "ID"
+    bits = "9:0"
+    type = "rw"
+[[register]]
+  name = "R11_CONFIG"
+  type = "mixed"
+  width = 32
+  description = "Region 11 Configuration."
+  default = "0x00000008"
+  offset = "0x000001BC"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:5"
+    type = "ro"
+  [[register.field]]
+    name = "NSCHECKTYPE"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''Non-secure Region Check Type.'''
+    longdesc = '''Secure masters may or may not be allowed to access Non-Secure (NS) memory regions. 0: relaxed checking; secure requests may access a non-secure (NS) region. 1: strict checking; secure requests may only access a secure region.'''
+  [[register.field]]
+    name = "REGIONNS"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''Select security level of region: 0: secure.'''
+    longdesc = '''1: non-secure (NS).'''
+  [[register.field]]
+    name = "WRALLOWED"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Allow writes to region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "RDALLOWED"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Allow reads within region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Enable region: 0: disabled.'''
+    longdesc = '''1: enabled.'''
+[[register]]
+  name = "R12_START"
+  type = "mixed"
+  width = 32
+  description = "Region 12 Start Address."
+  default = "0x00000000"
+  offset = "0x000001C0"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R12_END"
+  type = "mixed"
+  width = 32
+  description = "Region 12 End Address."
+  default = "0x00000000"
+  offset = "0x000001C4"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R12_MASTER"
+  type = "mixed"
+  width = 32
+  description = "Region 12 Master ID."
+  default = "0x00000000"
+  offset = "0x000001C8"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:26"
+    type = "ro"
+  [[register.field]]
+    name = "MASK"
+    bits = "25:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "ID"
+    bits = "9:0"
+    type = "rw"
+[[register]]
+  name = "R12_CONFIG"
+  type = "mixed"
+  width = 32
+  description = "Region 12 Configuration."
+  default = "0x00000008"
+  offset = "0x000001CC"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:5"
+    type = "ro"
+  [[register.field]]
+    name = "NSCHECKTYPE"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''Non-secure Region Check Type.'''
+    longdesc = '''Secure masters may or may not be allowed to access Non-Secure (NS) memory regions. 0: relaxed checking; secure requests may access a non-secure (NS) region. 1: strict checking; secure requests may only access a secure region.'''
+  [[register.field]]
+    name = "REGIONNS"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''Select security level of region: 0: secure.'''
+    longdesc = '''1: non-secure (NS).'''
+  [[register.field]]
+    name = "WRALLOWED"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Allow writes to region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "RDALLOWED"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Allow reads within region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Enable region: 0: disabled.'''
+    longdesc = '''1: enabled.'''
+[[register]]
+  name = "R13_START"
+  type = "mixed"
+  width = 32
+  description = "Region 13 Start Address."
+  default = "0x00000000"
+  offset = "0x000001D0"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R13_END"
+  type = "mixed"
+  width = 32
+  description = "Region 13 End Address."
+  default = "0x00000000"
+  offset = "0x000001D4"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R13_MASTER"
+  type = "mixed"
+  width = 32
+  description = "Region 13 Master ID."
+  default = "0x00000000"
+  offset = "0x000001D8"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:26"
+    type = "ro"
+  [[register.field]]
+    name = "MASK"
+    bits = "25:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "ID"
+    bits = "9:0"
+    type = "rw"
+[[register]]
+  name = "R13_CONFIG"
+  type = "mixed"
+  width = 32
+  description = "Region 13 Configuration."
+  default = "0x00000008"
+  offset = "0x000001DC"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:5"
+    type = "ro"
+  [[register.field]]
+    name = "NSCHECKTYPE"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''Non-secure Region Check Type.'''
+    longdesc = '''Secure masters may or may not be allowed to access Non-Secure (NS) memory regions. 0: relaxed checking; secure requests may access a non-secure (NS) region. 1: strict checking; secure requests may only access a secure region.'''
+  [[register.field]]
+    name = "REGIONNS"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''Select security level of region: 0: secure.'''
+    longdesc = '''1: non-secure (NS).'''
+  [[register.field]]
+    name = "WRALLOWED"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Allow writes to region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "RDALLOWED"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Allow reads within region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Enable region: 0: disabled.'''
+    longdesc = '''1: enabled.'''
+[[register]]
+  name = "R14_START"
+  type = "mixed"
+  width = 32
+  description = "Region 14 Start Address."
+  default = "0x00000000"
+  offset = "0x000001E0"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R14_END"
+  type = "mixed"
+  width = 32
+  description = "Region 14 End Address."
+  default = "0x00000000"
+  offset = "0x000001E4"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R14_MASTER"
+  type = "mixed"
+  width = 32
+  description = "Region 14 Master ID."
+  default = "0x00000000"
+  offset = "0x000001E8"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:26"
+    type = "ro"
+  [[register.field]]
+    name = "MASK"
+    bits = "25:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "ID"
+    bits = "9:0"
+    type = "rw"
+[[register]]
+  name = "R14_CONFIG"
+  type = "mixed"
+  width = 32
+  description = "Region 14 Configuration."
+  default = "0x00000008"
+  offset = "0x000001EC"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:5"
+    type = "ro"
+  [[register.field]]
+    name = "NSCHECKTYPE"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''Non-secure Region Check Type.'''
+    longdesc = '''Secure masters may or may not be allowed to access Non-Secure (NS) memory regions. 0: relaxed checking; secure requests may access a non-secure (NS) region. 1: strict checking; secure requests may only access a secure region.'''
+  [[register.field]]
+    name = "REGIONNS"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''Select security level of region: 0: secure.'''
+    longdesc = '''1: non-secure (NS).'''
+  [[register.field]]
+    name = "WRALLOWED"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Allow writes to region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "RDALLOWED"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Allow reads within region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Enable region: 0: disabled.'''
+    longdesc = '''1: enabled.'''
+[[register]]
+  name = "R15_START"
+  type = "mixed"
+  width = 32
+  description = "Region 15 Start Address."
+  default = "0x00000000"
+  offset = "0x000001F0"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R15_END"
+  type = "mixed"
+  width = 32
+  description = "Region 15 End Address."
+  default = "0x00000000"
+  offset = "0x000001F4"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR"
+    bits = "27:0"
+    type = "rw"
+    shortdesc = '''Bits [27:8] correspond to address bits [39:20].'''
+    longdesc = '''Bits [7:0] are reserved.'''
+[[register]]
+  name = "R15_MASTER"
+  type = "mixed"
+  width = 32
+  description = "Region 15 Master ID."
+  default = "0x00000000"
+  offset = "0x000001F8"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:26"
+    type = "ro"
+  [[register.field]]
+    name = "MASK"
+    bits = "25:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "ID"
+    bits = "9:0"
+    type = "rw"
+[[register]]
+  name = "R15_CONFIG"
+  type = "mixed"
+  width = 32
+  description = "Region 15 Configuration."
+  default = "0x00000008"
+  offset = "0x000001FC"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:5"
+    type = "ro"
+  [[register.field]]
+    name = "NSCHECKTYPE"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''Non-secure Region Check Type.'''
+    longdesc = '''Secure masters may or may not be allowed to access Non-Secure (NS) memory regions. 0: relaxed checking; secure requests may access a non-secure (NS) region. 1: strict checking; secure requests may only access a secure region.'''
+  [[register.field]]
+    name = "REGIONNS"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''Select security level of region: 0: secure.'''
+    longdesc = '''1: non-secure (NS).'''
+  [[register.field]]
+    name = "WRALLOWED"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Allow writes to region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "RDALLOWED"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Allow reads within region: 0: not allowed; transaction poisoned.'''
+    longdesc = '''1: allowed.'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Enable region: 0: disabled.'''
+    longdesc = '''1: enabled.'''

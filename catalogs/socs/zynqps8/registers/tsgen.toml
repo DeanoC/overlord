@@ -1,0 +1,253 @@
+description = "Master Timestamp generator"
+[[bank]]
+  name = "CORESIGHT_SOC_TSGEN"
+  address = "0xfe900000"
+[[register]]
+  name = "CNTCR"
+  type = "rw"
+  width = 32
+  description = "Controls counter operation by enabling or disabling or halting the counter"
+  default = "0x00000000"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "CNTCR_HDBG"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Halt the counter based on state of primary input.'''
+    longdesc = '''Halt on Debug'''
+  [[register.field]]
+    name = "CNTCR_EN"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "CNTSR"
+  type = "ro"
+  width = 32
+  description = "Counter status register"
+  default = "0x00000000"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "CNTSR_DBGH"
+    bits = "1"
+    type = "ro"
+[[register]]
+  name = "CNTCVL"
+  type = "rw"
+  width = 32
+  description = "Current value of Counter. Lower 32-bits."
+  default = "0x00000000"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "CNTCVL_L_32"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Current value of Counter.'''
+    longdesc = '''Lower 32-bits'''
+[[register]]
+  name = "CNTCVU"
+  type = "rw"
+  width = 32
+  description = "Current value of Counter. Upper 32-bits."
+  default = "0x00000000"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "CNTCVU_U_32"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Current value of Counter.'''
+    longdesc = '''Upper 32-bits'''
+[[register]]
+  name = "CNTFID0"
+  type = "rw"
+  width = 32
+  description = "Base Frequency ID"
+  default = "0x00000000"
+  offset = "0x00000020"
+  [[register.field]]
+    name = "CNTFID0"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "DEVID"
+  type = "ro"
+  width = 32
+  description = "This register indicates the capabilities."
+  default = "0x00000000"
+  offset = "0x00000FC8"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "DEVTYPE"
+  type = "ro"
+  width = 32
+  description = "It provides a debugger with information about the component."
+  default = "0x00000000"
+  offset = "0x00000FCC"
+  [[register.field]]
+    name = "SUB_TYPE"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "MAJOR_TYPE"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "PIDR4"
+  type = "ro"
+  width = 32
+  description = "Part of the set of Peripheral Identification registers. Contains part of the designer identity and the memory footprint indicator."
+  default = "0x00000004"
+  offset = "0x00000FD0"
+  [[register.field]]
+    name = "SIZE"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''This is a 4-bit value that indicates the total contiguous size of the memory window used by this component in powers of 2 from the standard 4KB.'''
+    longdesc = '''If a component only requires the standard 4KB, this must read as 0x0, 4KB only. For 8KB set to 0x1, for 16KB set to 0x2, for 32KB set to 0x3, and so on.'''
+  [[register.field]]
+    name = "DES_2"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "PIDR5"
+  type = "rw"
+  width = 32
+  description = "Reserved"
+  default = "0x00000000"
+  offset = "0x00000FD4"
+[[register]]
+  name = "PIDR6"
+  type = "rw"
+  width = 32
+  description = "Reserved"
+  default = "0x00000000"
+  offset = "0x00000FD8"
+[[register]]
+  name = "PIDR7"
+  type = "rw"
+  width = 32
+  description = "Reserved"
+  default = "0x00000000"
+  offset = "0x00000FDC"
+[[register]]
+  name = "PIDR0"
+  type = "ro"
+  width = 32
+  description = "Part of the set of Peripheral Identification registers. Contains part of the designer specific part number."
+  default = "0x00000001"
+  offset = "0x00000FE0"
+  [[register.field]]
+    name = "PART_0"
+    bits = "7:0"
+    type = "ro"
+    shortdesc = '''Bits [7:0] of the component part number.'''
+    longdesc = '''This is selected by the designer of the component.'''
+[[register]]
+  name = "PIDR1"
+  type = "ro"
+  width = 32
+  description = "Part of the set of Peripheral Identification registers. Contains part of the designer specific part number and part of the designer identity."
+  default = "0x000000B1"
+  offset = "0x00000FE4"
+  [[register.field]]
+    name = "DES_0"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "PART_1"
+    bits = "3:0"
+    type = "ro"
+    shortdesc = '''Bits [11:8] of the component part number.'''
+    longdesc = '''This is selected by the designer of the component.'''
+[[register]]
+  name = "PIDR2"
+  type = "ro"
+  width = 32
+  description = "Part of the set of Peripheral Identification registers. Contains part of the designer identity and the product revision."
+  default = "0x0000001B"
+  offset = "0x00000FE8"
+  [[register.field]]
+    name = "REVISION"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''The Revision field is an incremental value starting at 0x0 for the first design of this component.'''
+    longdesc = '''This only increases by 1 for both major and minor revisions and is used as a look-up to establish the exact major and minor revision.'''
+  [[register.field]]
+    name = "JEDEC"
+    bits = "3"
+    type = "ro"
+    shortdesc = '''Always set.'''
+    longdesc = '''Indicates that a JEDEC assigned value is used.'''
+  [[register.field]]
+    name = "DES_1"
+    bits = "2:0"
+    type = "ro"
+[[register]]
+  name = "PIDR3"
+  type = "ro"
+  width = 32
+  description = "Part of the set of Peripheral Identification registers. Contains the RevAnd and Customer Modified fields."
+  default = "0x00000000"
+  offset = "0x00000FEC"
+  [[register.field]]
+    name = "REVAND"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''This field indicates minor errata fixes specific to this design, for example metal fixes after implementation.'''
+    longdesc = '''In most cases this field is zero. It is recommended that component designers ensure this field can be changed by a metal fix if required, for example by driving it from registers that reset to zero.'''
+  [[register.field]]
+    name = "CMOD"
+    bits = "3:0"
+    type = "ro"
+    shortdesc = '''Where the component is reusable IP, this value indicates if the customer has modified the behavior of the component.'''
+    longdesc = '''In most cases this field is zero.'''
+[[register]]
+  name = "CIDR0"
+  type = "ro"
+  width = 32
+  description = "A component identification register, that indicates that the identification registers are present."
+  default = "0x0000000D"
+  offset = "0x00000FF0"
+  [[register.field]]
+    name = "PRMBL_0"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "CIDR1"
+  type = "ro"
+  width = 32
+  description = "A component identification register, that indicates that the identification registers are present. This register also indicates the component class."
+  default = "0x000000F0"
+  offset = "0x00000FF4"
+  [[register.field]]
+    name = "CLASS"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "PRMBL_1"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "CIDR2"
+  type = "ro"
+  width = 32
+  description = "A component identification register, that indicates that the identification registers are present."
+  default = "0x00000005"
+  offset = "0x00000FF8"
+  [[register.field]]
+    name = "PRMBL_2"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "CIDR3"
+  type = "ro"
+  width = 32
+  description = "A component identification register, that indicates that the identification registers are present."
+  default = "0x000000B1"
+  offset = "0x00000FFC"
+  [[register.field]]
+    name = "PRMBL_3"
+    bits = "7:0"
+    type = "ro"

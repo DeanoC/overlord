@@ -1,0 +1,437 @@
+description = "FPD System-level Control"
+[[register]]
+  name = "WPROT0"
+  type = "rw"
+  width = 1
+  description = "FP Domain SLCR Write protection register"
+  default = "0x00000001"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "ACTIVE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "CTRL"
+  type = "rw"
+  width = 1
+  description = "General control register for the FP Domain SLCR"
+  default = "0x00000000"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "SLVERR_ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''By default, invalid address requests are ignored.'''
+    longdesc = '''However, a maskable interrupt exsists. By enabling this slverr_enable invalid address requests cause a slverr to occur. Enable/Disable SLVERR during address decode failure. 0: SLVERR is disabled. For request address: Writes are ignored. Read returns 0. 1: SLVERR is enabled. For requestes address, SLVERR is asserted. Writes are ignored. Read returns 0.'''
+[[register]]
+  name = "ISR"
+  type = "wtc"
+  width = 1
+  description = "Interrupt Status Register"
+  default = "0x00000000"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "wtc"
+    shortdesc = '''Status for an address decode error.'''
+    longdesc = '''0: No Event 1: Event Occurred'''
+[[register]]
+  name = "IMR"
+  type = "ro"
+  width = 1
+  description = "Interrupt Mask Register"
+  default = "0x00000001"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Mask for an address decode error.'''
+    longdesc = '''0: Interrupt Enabled 1: Interrupt Disabled'''
+[[register]]
+  name = "IER"
+  type = "wo"
+  width = 1
+  description = "Interrupt Enable Register"
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Enable for an address decode error.'''
+    longdesc = '''0: Ignored 1: imr -> 0'''
+[[register]]
+  name = "IDR"
+  type = "wo"
+  width = 1
+  description = "Interrupt Disable Register"
+  default = "0x00000000"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Mask for an address decode error.'''
+    longdesc = '''0: Ignored 1: imr -> 1'''
+[[register]]
+  name = "ITR"
+  type = "wo"
+  width = 1
+  description = "Interrupt Trigger Register"
+  default = "0x00000000"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Trigger an address decode error interrupt.'''
+    longdesc = '''0: Ignored 1: isr -> 1'''
+[[register]]
+  name = "WDT_CLK_SEL"
+  type = "mixed"
+  width = 32
+  description = "SWDT clock source select"
+  default = "0x00000000"
+  offset = "0x00000100"
+[[register.field]]
+name = "RESERVED"
+bits = "31:1"
+type = "raz"
+shortdesc = '''Trigger an address decode error interrupt.'''
+longdesc = '''0: Ignored 1: isr -> 1'''
+[[register.field]]
+name = "SELECT"
+bits = "0"
+type = "rw"
+[[register.field.enum]]
+name = "APB_CLOCK"
+value = 0
+[[register.field.enum]]
+name = "EXTERNAL_CLOCK"
+value = 1
+
+[[register]]
+name = "INT_FPD"
+type = "mixed"
+width = 32
+description = "Interconnect Clock Source Select"
+default = "0x00000000"
+offset = "0x00000200"
+[[register.field]]
+name = "RESERVED"
+    bits = "31:1"
+    type = "raz"
+  [[register.field]]
+    name = "GFM_SEL"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Clock Source select for FPD Interconnect components that interface to LPD.'''
+    longdesc = '''This signal may only be toggled after 4 cycles of the old clock and 4 cycles of the new clock. 0: Default. Use LPD Clocks. This setting must be used when LPD and FPD need to commmunicate 1: Use clock originating in FPD. This option must be used when LPD and FPD are isolated.'''
+[[register]]
+  name = "GPU"
+  type = "mixed"
+  width = 32
+  description = "GPU Idle status Register"
+  default = "0x00000007"
+  offset = "0x0000100C"
+  [[register.field]]
+    name = "ARCACHE"
+    bits = "10:7"
+    type = "rw"
+  [[register.field]]
+    name = "AWCACHE"
+    bits = "6:3"
+    type = "rw"
+  [[register.field]]
+    name = "PP1_IDLE"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "PP0_IDLE"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "IDLE"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "GDMA_CFG"
+  type = "ro"
+  width = 7
+  description = "GDMA RF2 Configuation"
+  default = "0x00000048"
+  offset = "0x00003000"
+  [[register.field]]
+    name = "BUS_WIDTH"
+    bits = "6:5"
+    type = "ro"
+  [[register.field]]
+    name = "NUM_CH"
+    bits = "4:0"
+    type = "ro"
+[[register]]
+  name = "GDMA_RAM"
+  type = "mixed"
+  width = 16
+  description = "RAM control register"
+  default = "0x00003B3B"
+  offset = "0x00003010"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7"
+    type = "rw"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+[[register]]
+  name = "AFI_FS"
+  type = "mixed"
+  width = 32
+  description = "afi fs SLCR control register. This register is static and should not be modified during operation."
+  default = "0x00000A00"
+  offset = "0x00005000"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:12"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+  [[register.field]]
+    name = "DW_SS1_SEL"
+    bits = "11:10"
+    type = "rw"
+  [[register.field]]
+    name = "DW_SS0_SEL"
+    bits = "9:8"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:0"
+    type = "raz"
+    shortdesc = '''RESERVED.'''
+    longdesc = '''Return 0 when read. Writes ignored.'''
+[[register]]
+  name = "ERR_ATB_ISR"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Status Register for intrN. This is a sticky register that holds the value of the interrupt until cleared by a value of 1."
+  default = "0x00000000"
+  offset = "0x00006000"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:3"
+    type = "raz"
+  [[register.field]]
+    name = "AFIFS1"
+    bits = "2"
+    type = "wtc"
+    shortdesc = '''ISR for ATB placed between fpd main switch and AFI_FS1 (trans.'''
+    longdesc = '''going to PL through AFI FS1)'''
+  [[register.field]]
+    name = "AFIFS0"
+    bits = "1"
+    type = "wtc"
+    shortdesc = '''ISR for ATB placed between fpd main switch and AFI_FS0 (trans.'''
+    longdesc = '''going to PL through AFI FS0)'''
+  [[register.field]]
+    name = "FPDS"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "ERR_ATB_IMR"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Mask Register for intrN. This is a read-only location and can be atomically altered by either the IDR or the IER."
+  default = "0x00000007"
+  offset = "0x00006004"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:3"
+    type = "raz"
+  [[register.field]]
+    name = "AFIFS1"
+    bits = "2"
+    type = "ro"
+    shortdesc = '''IMR for ATB placed between fpd main switch and AFI_FS1 (trans.'''
+    longdesc = '''going to PL through AFI FS1)'''
+  [[register.field]]
+    name = "AFIFS0"
+    bits = "1"
+    type = "ro"
+    shortdesc = '''IMR for ATB placed between fpd main switch and AFI_FS0 (trans.'''
+    longdesc = '''going to PL through AFI FS0)'''
+  [[register.field]]
+    name = "FPDS"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ERR_ATB_IER"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Enable Register. A write of to this location will unmask the interrupt. (IMR: 0)"
+  default = "0x00000000"
+  offset = "0x00006008"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:3"
+    type = "raz"
+  [[register.field]]
+    name = "AFIFS1"
+    bits = "2"
+    type = "wo"
+    shortdesc = '''IER for ATB placed between fpd main switch and AFI_FS1 (trans.'''
+    longdesc = '''going to PL through AFI FS1)'''
+  [[register.field]]
+    name = "AFIFS0"
+    bits = "1"
+    type = "wo"
+    shortdesc = '''IER for ATB placed between fpd main switch and AFI_FS0 (trans.'''
+    longdesc = '''going to PL through AFI FS0)'''
+  [[register.field]]
+    name = "FPDS"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "ERR_ATB_IDR"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Disable Register. A write of one to this location will mask the interrupt. (IMR: 1)"
+  default = "0x00000000"
+  offset = "0x0000600C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:3"
+    type = "raz"
+  [[register.field]]
+    name = "AFIFS1"
+    bits = "2"
+    type = "wo"
+    shortdesc = '''IDR for ATB placed between fpd main switch and AFI_FS1 (trans.'''
+    longdesc = '''going to PL through AFI FS1)'''
+  [[register.field]]
+    name = "AFIFS0"
+    bits = "1"
+    type = "wo"
+    shortdesc = '''IDR for ATB placed between fpd main switch and AFI_FS0 (trans.'''
+    longdesc = '''going to PL through AFI FS0)'''
+  [[register.field]]
+    name = "FPDS"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "ATB_CMD_STORE_EN"
+  type = "mixed"
+  width = 32
+  description = "ATB Sideband Signals"
+  default = "0x00000007"
+  offset = "0x00006010"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:3"
+    type = "raz"
+  [[register.field]]
+    name = "AFIFS1"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''When '1', ATB keeps track of Read and Write transactions.'''
+    longdesc = '''If '0' ATB does not keep track of any transaction'''
+  [[register.field]]
+    name = "AFIFS0"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''When '1', ATB keeps track of Read and Write transactions.'''
+    longdesc = '''If '0' ATB does not keep track of any transaction'''
+  [[register.field]]
+    name = "FPDS"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''When '1', ATB keeps track of Read and Write transactions.'''
+    longdesc = '''If '0' ATB does not keep track of any transaction'''
+[[register]]
+  name = "ATB_RESP_EN"
+  type = "mixed"
+  width = 32
+  description = "ATB Sideband Signals"
+  default = "0x00000000"
+  offset = "0x00006014"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:3"
+    type = "raz"
+  [[register.field]]
+    name = "AFIFS1"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''When '1', ATB will send response if it sees timeout.'''
+    longdesc = '''If '0' ATB will not send any response'''
+  [[register.field]]
+    name = "AFIFS0"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''When '1', ATB will send response if it sees timeout.'''
+    longdesc = '''If '0' ATB will not send any response'''
+  [[register.field]]
+    name = "FPDS"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''When '1', ATB will send response if it sees timeout.'''
+    longdesc = '''If '0' ATB will not send any response'''
+[[register]]
+  name = "ATB_RESP_TYPE"
+  type = "mixed"
+  width = 32
+  description = "Register to specify the type of response generated by the AXI Timeout Block"
+  default = "0x00000007"
+  offset = "0x00006018"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:3"
+    type = "raz"
+  [[register.field]]
+    name = "AFIFS1"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''When '1', ATB will send SLVERR if it sees timeout.'''
+    longdesc = '''If '0' ATB will send OKAY when it sees timeout'''
+  [[register.field]]
+    name = "AFIFS0"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''When '1', ATB will send SLVERR if it sees timeout.'''
+    longdesc = '''If '0' ATB will send OKAY when it sees timeout'''
+  [[register.field]]
+    name = "FPDS"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''When '1', ATB will send SLVERR if it sees timeout.'''
+    longdesc = '''If '0' ATB will send OKAY when it sees timeout'''
+[[register]]
+  name = "ATB_PRESCALE"
+  type = "mixed"
+  width = 32
+  description = "ATB Sideband Signals"
+  default = "0x0000FFFF"
+  offset = "0x00006020"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:17"
+    type = "raz"
+  [[register.field]]
+    name = "ENABLE"
+    bits = "16"
+    type = "rw"
+    shortdesc = '''Counter Enable.'''
+    longdesc = '''When set to 1, timer will start running and timeouts may be reported. When set to 0, timeouts will not be detected.'''
+  [[register.field]]
+    name = "VALUE"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''16 bit prescale value based on 100 MHz clock.'''
+    longdesc = '''The timeout will be set to 32000 * 10ns * this register.'''

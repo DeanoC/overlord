@@ -1,0 +1,8 @@
+path = "cans"
+
+[[definition]]
+type = "io.internal.can.zynqps8"
+registers = [
+    { resource = "zynqps8/can.toml", name = "CAN${index}", base_address = "0x0106_0000", address_increment = "0x1_0000" },
+]
+max_instances = 2

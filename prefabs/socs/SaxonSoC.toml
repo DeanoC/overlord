@@ -1,0 +1,11 @@
+[[instance]]
+  type = "riscv32"
+
+[[instance]]
+  name = "ramA"
+  size = "8 KiB"
+
+[[instance]]
+  name = "SaxonPrivate"
+  type = "bus"
+  

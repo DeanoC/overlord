@@ -1,0 +1,34 @@
+actions = [
+    "make_config",
+    "sbt_run",
+    "src",
+    "read_verilog_top"
+]
+
+[[process]]
+name = 'make_config'
+processor = 'toml'
+filename = 'config.toml'
+parameters = [
+    "hpc_consumers",
+]
+
+[[process]]
+name = 'sbt_run'
+processor = 'sbt'
+main_scala = "Ps8Wrapper"
+with_build_sbt = true
+args = '+runMain Ps8Wrapper config.toml .. ${name}'
+
+[[process]]
+name = 'src'
+processor = 'sources'
+sources = [
+    { file = "${name}.v", language = "verilog" }
+]
+
+
+[[process]]
+name = 'read_verilog_top'
+processor = 'read_verilog_top'
+source = "${name}.v"

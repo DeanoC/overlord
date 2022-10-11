@@ -1,0 +1,31 @@
+[[instance]]
+name = "PMU"
+type = "cpu.pmu.zynqps8"
+
+[[instance]]
+name = "PMUSwitch"
+type = "switch.internal.pmuswitch"
+
+[[instance]]
+name = "PMURAM"
+type = "ram.sram.pmuram"
+
+[[connection]]
+type = "bus"
+connection = "PMU -> PMUSwitch"
+bus_name = "pmu_pmuswitch"
+
+[[connection]]
+type = "bus"
+connection = "PMUSwitch -> PMUOutSwitch"
+bus_name = "pmu_pmuoutbound"
+
+[[connection]]
+type = "bus"
+connection = "PMUSwitch -> PMURAM"
+bus_name = "pmuram"
+
+[[connection]]
+type = "bus"
+connection = "PMUOutSwitch -> IOPOutboundSwitch"
+bus_name = "pmuoutbound_iopoutbound"

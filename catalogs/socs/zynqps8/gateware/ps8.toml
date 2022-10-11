@@ -1,0 +1,13 @@
+actions = [
+    "src",
+    "read_verilog_top"
+]
+[[process]]
+name = 'src'
+processor = 'sources'
+sources = [{ file = "${src}/RawPS8.v", language = "verilog" }]
+
+[[process]]
+name = 'read_verilog_top'
+processor = 'read_verilog_top'
+source = "${src}/RawPS8"

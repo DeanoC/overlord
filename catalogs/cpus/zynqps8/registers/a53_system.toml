@@ -1,0 +1,934 @@
+description = "A53 EL3 System registers"
+[[register]]
+name = "CCSIDR_EL1"
+type = "rw"
+width = 32
+description = "Current Cache Size ID Register."
+default = "0x00000000"
+offset = "0x00000000"
+
+[[register.field]]
+name = "LINESIZE"
+description = "Log2(num bytes in cache line) - 4, 0 = 16 byte cache line"
+bits = "[2:0]"
+type = "r"
+
+[[register.field]]
+name = "ASSOCIATIVITY"
+description = "Associativity bit of cache - 1, 0 = 1 bit"
+bits = "[12:3]"
+type = "r"
+
+[[register.field]]
+name = "NUMSETS"
+description = "Num sets in cache - 1, 0 = 1 set"
+bits = "[27:13]"
+type = "r"
+
+[[register]]
+name = "CSSELR_EL1"
+type = "rw"
+width = 32
+description = "Cache Size Selection Register."
+default = "0x00000000"
+offset = "0x00000000"
+
+[[register.field]]
+name = "LEVEL"
+description = "Cache level 0 = L1 upto L7"
+bits = "[3:1]"
+type = "rw"
+
+[[register.field]]
+name = "INOTD"
+description = "Instruction not Data 0 = D Cache, 1 = I Cache"
+bits = "0"
+type = "rw"
+
+[[register]]
+name = "SCTLR_EL3"
+type = "rw"
+width = 32
+description = "The SCTLR_EL3 controls cache and other system function."
+default = "0x00000000"
+offset = "0x00000000"
+
+[[register.field]]
+name = "WXN"
+description = "Enable XN (Execute-never) for all EL3 translation regions"
+bits = "19"
+type = "rw"
+
+[[register.field]]
+name = "I"
+description = "0 = all EL3 Normal regions are not instruction cachable"
+bits = "12"
+type = "rw"
+
+[[register.field]]
+name = "SA"
+description = "SP Alignment check enable"
+bits = "3"
+type = "rw"
+
+[[register.field]]
+name = "C"
+description = "0 = all EL3 Normal regions are not data cachable"
+bits = "2"
+type = "rw"
+
+[[register.field]]
+name = "A"
+description = "Alignment fault checking enable"
+bits = "1"
+type = "rw"
+
+[[register.field]]
+name = "M"
+description = "E3 stage 1 MMU enable"
+bits = "0"
+type = "rw"
+
+[[register]]
+name = "ESR_EL3"
+type = "rw"
+width = 32
+description = "Exception Syndrome Register (EL3)"
+default = "0x00000000"
+offset = "0x00000000"
+
+[[register.field]]
+name = "EC"
+description = "Exception Class"
+bits = "[31:26]"
+type = "rw"
+[[register.field.enum]]
+name = "UNKNOWN"
+value = "0b000000"
+[[register.field.enum]]
+name = "WFx"
+value = "0b000001"
+[[register.field.enum]]
+name = "COP15_AARCH32"
+value = "0b000011"
+[[register.field.enum]]
+name = "TRAPPED_MCRR_MRRC_AARCH32"
+value = "0b000100"
+[[register.field.enum]]
+name = "COP14_AARCH32"
+value = "0b000101"
+[[register.field.enum]]
+name = "LDC_SRC_AARCH32"
+value = "0b000110"
+[[register.field.enum]]
+name = "SVE_SIMD_FP"
+value = "0b000111"
+[[register.field.enum]]
+name = "PAUTH"
+value = "0b001001"
+[[register.field.enum]]
+name = "MRRC_COP14_AARCH32"
+value = "0b001100"
+[[register.field.enum]]
+name = "BTI"
+value = "0b001101"
+[[register.field.enum]]
+name = "ILLEGAL_EXECUTION"
+value = "0b001110"
+[[register.field.enum]]
+name = "SVC"
+value = "0b010101"
+[[register.field.enum]]
+name = "HVC"
+value = "0b010110"
+[[register.field.enum]]
+name = "SMC"
+value = "0b010111"
+[[register.field.enum]]
+name = "MSR_MRS"
+value = "0b011000"
+[[register.field.enum]]
+name = "SVE"
+value = "0b011001"
+[[register.field.enum]]
+name = "FPAC"
+value = "0b011100"
+[[register.field.enum]]
+name = "IMPLEMENTATION_DEFINED"
+value = "0b011111"
+[[register.field.enum]]
+name = "INSTRUCTION_ABORT_FROM_LOWER_EL"
+value = "0b100000"
+[[register.field.enum]]
+name = "INSTRUCTION_ABORT"
+value = "0b100001"
+[[register.field.enum]]
+name = "PC_ALIGNMENT_FAULT"
+value = "0b100010"
+[[register.field.enum]]
+name = "DATA_ABORT_FROM_LOWER_EL"
+value = "0b100100"
+[[register.field.enum]]
+name = "DATA_ABORT"
+value = "0b100101"
+[[register.field.enum]]
+name = "SP_ALIGNMENT_FAULT"
+value = "0b100110"
+[[register.field.enum]]
+name = "FLOATING_POINT"
+value = "0b101100"
+[[register.field.enum]]
+name = "SERROR"
+value = "0b101111"
+[[register.field.enum]]
+name = "BRK"
+value = "0b111100"
+[[register.field]]
+name = "IL"
+description = "Instruction Length"
+bits = "25"
+type = "rw"
+[[register.field.enum]]
+name = "16_BIT_INSTRUCTION"
+value = "0"
+[[register.field.enum]]
+name = "32_BIT_INSTRUCTION"
+value = "1"
+[[register.field]]
+name = "ISS"
+description = "Instruction Specific Syndrome"
+bits = "[24:0]"
+type = "rw"
+# ISS register aren't real that live in the 24 bits of
+# the ESR_ELx register ISS part. The ISS_ psuedo register
+# matches each of the states of the EC
+[[register]]
+name = "ISS_NONE"
+type = "rw"
+width = 24
+description = "ISS register for UNKNOWN or ILLEGAL_EXECUTION or IMPLEMENTATION_DEFINED EC state"
+default = "0x00000000"
+offset = "0x00000000"
+
+[[register]]
+name = "ISS_WFx"
+type = "rw"
+width = 24
+description = "ISS register for WFx EC state"
+default = "0x00000000"
+offset = "0x00000000"
+[[register.field]]
+name = "CV"
+description = "Condition Value Aarch32"
+bits = "24"
+type = "rw"
+[[register.field]]
+name = "COND"
+description = "Condition Code Aarch32"
+bits = "[23:20]"
+type = "rw"
+[[register.field]]
+name = "TI"
+description = "Trapped Instruction"
+bits = "0"
+type = "rw"
+[[register.field.enum]]
+name = "WFI_TRAPPED"
+value = "0"
+[[register.field.enum]]
+name = "WFE_TRAPPED"
+value = "1"
+
+
+[[register]]
+name = "ISS_COP15_AARCH32"
+type = "rw"
+width = 24
+description = "ISS register for COP15_AARCH32 EC state"
+default = "0x00000000"
+offset = "0x00000000"
+[[register.field]]
+name = "CV"
+description = "Condition Value Aarch32"
+bits = "24"
+type = "rw"
+[[register.field]]
+name = "COND"
+description = "Condition Code Aarch32"
+bits = "[23:20]"
+type = "rw"
+[[register.field]]
+name = "OPC2"
+description = "Opc2 value from issued instruction"
+bits = "[19:17]"
+type = "rw"
+[[register.field]]
+name = "OPC1"
+description = "Opc1 value from issued instruction"
+bits = "[16:14]"
+type = "rw"
+[[register.field]]
+name = "CRN"
+description = "CRn value from issued instruction"
+bits = "[13:10]"
+type = "rw"
+[[register.field]]
+name = "RT"
+description = "Rt value from issued instruction"
+bits = "[9:5]"
+type = "rw"
+[[register.field]]
+name = "CRM"
+description = "CRm value from issued instruction"
+bits = "[4:1]"
+type = "rw"
+[[register.field]]
+name = "DIRECTION"
+description = "Direction of Instruction"
+bits = "0"
+type = "rw"
+[[register.field.enum]]
+name = "WRITE"
+value = 0
+[[register.field.enum]]
+name = "READ"
+value = 1
+
+[[register]]
+name = "ISS_TRAPPED_MCRR_MRRC_AARCH32"
+type = "rw"
+width = 24
+description = "ISS register for TRAPPED_MCRR_MRRC_AARCH32 EC state"
+default = "0x00000000"
+offset = "0x00000000"
+[[register.field]]
+name = "CV"
+description = "Condition Value Aarch32"
+bits = "24"
+type = "rw"
+[[register.field]]
+name = "COND"
+description = "Condition Code Aarch32"
+bits = "[23:20]"
+type = "rw"
+[[register.field]]
+name = "OPC1"
+description = "Opc1 value from issued instruction"
+bits = "[19:16]"
+type = "rw"
+[[register.field]]
+name = "RT2"
+description = "Rt2 value from issued instruction"
+bits = "[14:10]"
+type = "rw"
+[[register.field]]
+name = "RT"
+description = "Rt value from issued instruction"
+bits = "[9:5]"
+type = "rw"
+[[register.field]]
+name = "CRM"
+description = "CRm value from issued instruction"
+bits = "[4:1]"
+type = "rw"
+[[register.field]]
+name = "DIRECTION"
+description = "Direction of Instruction"
+bits = "0"
+type = "rw"
+[[register.field.enum]]
+name = "WRITE"
+value = 0
+[[register.field.enum]]
+name = "READ"
+value = 1
+
+[[register]]
+name = "ISS_COP14_AARCH32"
+type = "rw"
+width = 24
+description = "ISS register for COP14_AARCH32 EC state"
+default = "0x00000000"
+offset = "0x00000000"
+[[register.field]]
+name = "CV"
+description = "Condition Value Aarch32"
+bits = "24"
+type = "rw"
+[[register.field]]
+name = "COND"
+description = "Condition Code Aarch32"
+bits = "[23:20]"
+type = "rw"
+[[register.field]]
+name = "OPC2"
+description = "Opc2 value from issued instruction"
+bits = "[19:17]"
+type = "rw"
+[[register.field]]
+name = "OPC1"
+description = "Opc1 value from issued instruction"
+bits = "[16:14]"
+type = "rw"
+[[register.field]]
+name = "CRN"
+description = "CRn value from issued instruction"
+bits = "[13:10]"
+type = "rw"
+[[register.field]]
+name = "RT"
+description = "Rt value from issued instruction"
+bits = "[9:5]"
+type = "rw"
+[[register.field]]
+name = "CRM"
+description = "CRm value from issued instruction"
+bits = "[4:1]"
+type = "rw"
+[[register.field]]
+name = "DIRECTION"
+description = "Direction of Instruction"
+bits = "0"
+type = "rw"
+[[register.field.enum]]
+name = "WRITE"
+value = 0
+[[register.field.enum]]
+name = "READ"
+value = 1
+
+[[register]]
+name = "ISS_LDC_SRC_AARCH32"
+type = "rw"
+width = 24
+description = "ISS register for LDC_SRC_AARCH32 EC state"
+default = "0x00000000"
+offset = "0x00000000"
+[[register.field]]
+name = "CV"
+description = "Condition Value Aarch32"
+bits = "24"
+type = "rw"
+[[register.field]]
+name = "COND"
+description = "Condition Code Aarch32"
+bits = "[23:20]"
+type = "rw"
+[[register.field]]
+name = "IMM8"
+description = "Immediate value from instruction"
+bits = "[19:12]"
+type = "rw"
+[[register.field]]
+name = "RN"
+description = "Rn value from instruction"
+bits = "[9:5]"
+type = "rw"
+[[register.field]]
+name = "OFFSET_ADD_OR_SUB"
+description = "Is Offset added or subtracted?"
+bits = "[4]"
+type = "rw"
+[[register.field.enum]]
+name = "SUBTRACT"
+value = 0
+[[register.field.enum]]
+name = "ADD"
+value = 1
+[[register.field]]
+name = "AM"
+description = "Addressing Mode"
+bits = "[3:1]"
+type = "rw"
+[[register.field.enum]]
+name = "IMMEDIATE_UNINDEXED"
+value = "0b000"
+[[register.field.enum]]
+name = "IMMEDIATE_POSTINDEXED"
+value = "0b001"
+[[register.field.enum]]
+name = "IMMEDIATE"
+value = "0b010"
+[[register.field.enum]]
+name = "IMMEDIATE_PREINDEXED"
+value = "0b011"
+[[register.field.enum]]
+name = "LITERAL"
+value = "0b100"
+[[register.field.enum]]
+name = "LITERAL_P"
+value = "0b110"
+[[register.field]]
+name = "DIRECTION"
+description = "Direction of Instruction"
+bits = "0"
+type = "rw"
+[[register.field.enum]]
+name = "WRITE"
+value = 0
+[[register.field.enum]]
+name = "READ"
+value = 1
+
+
+[[register]]
+name = "ISS_SVE_SIMD_FP"
+type = "rw"
+width = 24
+description = "ISS register for SVE_SIMD_FP EC state"
+default = "0x00000000"
+offset = "0x00000000"
+[[register.field]]
+name = "CV"
+description = "Condition Value Aarch32"
+bits = "24"
+type = "rw"
+[[register.field]]
+name = "COND"
+description = "Condition Code Aarch32"
+bits = "[23:20]"
+type = "rw"
+
+[[register]]
+name = "ISS_PAUTH"
+type = "rw"
+width = 24
+description = "ISS register for PAUTH EC state"
+default = "0x00000000"
+offset = "0x00000000"
+
+[[register]]
+name = "ISS_MRRC_COP14_AARCH32"
+type = "rw"
+width = 24
+description = "ISS register for MRRC_COP14_AARCH32 EC state"
+default = "0x00000000"
+offset = "0x00000000"
+
+[[register]]
+name = "ISS_BTI"
+type = "rw"
+width = 24
+description = "ISS register for BTI EC state"
+default = "0x00000000"
+offset = "0x00000000"
+
+[[register]]
+name = "ISS_SMC_SVC_HVC"
+type = "rw"
+width = 24
+description = "ISS register for SMC or SVC or HVC EC state in Aarch64"
+default = "0x00000000"
+offset = "0x00000000"
+[[register.field]]
+name = "IMM16"
+description = "Immediate field of instruction"
+bits = "[15:0]"
+type = "rw"
+
+[[register]]
+name = "ISS_SMC32"
+type = "rw"
+width = 24
+description = "ISS register for SMC EC state in AArch32"
+default = "0x00000000"
+offset = "0x00000000"
+[[register.field]]
+name = "CV"
+description = "Condition Value Aarch32"
+bits = "24"
+type = "rw"
+[[register.field]]
+name = "COND"
+description = "Condition Code Aarch32"
+bits = "[23:20]"
+type = "rw"
+[[register.field]]
+name = "CCKNOWNPASS"
+description = "Indicates whether it might have failed its condition check"
+bits = "19"
+type = "rw"
+[[register.field.enum]]
+name = "UNCONDITIONAL_OR_PASSED"
+value = 0
+[[register.field.enum]]
+name = "MIGHT_HAVE_FAILED"
+value = 1
+
+[[register]]
+name = "ISS_MSR_MRS"
+type = "rw"
+width = 24
+description = "ISS register for MSR_MRS EC state"
+default = "0x00000000"
+offset = "0x00000000"
+[[register.field]]
+name = "OP0"
+description = "Op0 value from issued instruction"
+bits = "[21:20]"
+type = "rw"
+[[register.field]]
+name = "OP2"
+description = "Op2 value from issued instruction"
+bits = "[19:17]"
+type = "rw"
+[[register.field]]
+name = "OP1"
+description = "Op1 value from issued instruction"
+bits = "[16:14]"
+type = "rw"
+[[register.field]]
+name = "CRN"
+description = "CRn value from issued instruction"
+bits = "[13:10]"
+type = "rw"
+[[register.field]]
+name = "RT"
+description = "Rt value from issued instruction"
+bits = "[9:5]"
+type = "rw"
+[[register.field]]
+name = "CRM"
+description = "CRm value from issued instruction"
+bits = "[4:1]"
+type = "rw"
+[[register.field]]
+name = "DIRECTION"
+description = "Direction of Instruction"
+bits = "0"
+type = "rw"
+[[register.field.enum]]
+name = "WRITE"
+value = 0
+[[register.field.enum]]
+name = "READ"
+value = 1
+
+[[register]]
+name = "ISS_SVE"
+type = "rw"
+width = 24
+description = "ISS register for SVE EC state"
+default = "0x00000000"
+offset = "0x00000000"
+
+[[register]]
+name = "ISS_FPAC"
+type = "rw"
+width = 24
+description = "ISS register for FPAC EC state"
+default = "0x00000000"
+offset = "0x00000000"
+
+[[register]]
+name = "ISS_INSTRUCTION_ABORT"
+type = "rw"
+width = 24
+description = "ISS register for ISS_INSTRUCTION_ABORT or INSTRUCTION_ABORT_FROM_LOWER_EL EC state"
+default = "0x00000000"
+offset = "0x00000000"
+[[register.field]]
+name = "SET"
+description = "Synchronous Error Type only valid IFSC==SYNCHRONOUS_EXTERNAL_ABORT"
+bits = "[12:11]"
+type = "rw"
+[[register.field.enum]]
+name = "RECOVERABLE"
+value = "0b00"
+[[register.field.enum]]
+name = "UNCONTAINABLE"
+value = "0b10"
+[[register.field.enum]]
+name = "RESTARTABLE"
+value = "0b11"
+[[register.field]]
+name = "FAR_NOT_VALID"
+description = "FAR not valid only valid IFSC==SYNCHRONOUS_EXTERNAL_ABORT"
+bits = "10"
+type = "rw"
+[[register.field]]
+name = "EA"
+description = "External Abort"
+bits = "9"
+type = "rw"
+[[register.field]]
+name = "S1PTW"
+description = "For Stage 2 fault was fault on stage 2?"
+bits = "10"
+type = "rw"
+[[register.field]]
+name = "IFSC"
+description = "Instruction Fault Status Code"
+bits = "[5:0]"
+type = "rw"
+[[register.field.enum]]
+name = "ADDRESS_SIZE_FAULT_L0"
+value = "0b000000"
+[[register.field.enum]]
+name = "ADDRESS_SIZE_FAULT_L1"
+value = "0b000001"
+[[register.field.enum]]
+name = "ADDRESS_SIZE_FAULT_L2"
+value = "0b000010"
+[[register.field.enum]]
+name = "ADDRESS_SIZE_FAULT_L3"
+value = "0b000011"
+[[register.field.enum]]
+name = "TRANSLATION_FAULT_L0"
+value = "0b000100"
+[[register.field.enum]]
+name = "TRANSLATION_FAULT_L1"
+value = "0b000101"
+[[register.field.enum]]
+name = "TRANSLATION_FAULT_L2"
+value = "0b000110"
+[[register.field.enum]]
+name = "TRANSLATION_FAULT_L3"
+value = "0b000111"
+[[register.field.enum]]
+name = "ACCESS_FLAG_FAULT_L1"
+value = "0b001001"
+[[register.field.enum]]
+name = "ACCESS_FLAG_FAULT_L2"
+value = "0b001010"
+[[register.field.enum]]
+name = "ACCESS_FLAG_FAULT_L3"
+value = "0b001011"
+[[register.field.enum]]
+name = "PERMISSION_FLAG_FAULT_L1"
+value = "0b001101"
+[[register.field.enum]]
+name = "PERMISSION_FLAG_FAULT_L2"
+value = "0b001110"
+[[register.field.enum]]
+name = "PERMISSION_FLAG_FAULT_L3"
+value = "0b001111"
+[[register.field.enum]]
+name = "SYNCHRONOUS_EXTERNAL_ABORT_NOT_TTW"
+value = "0b010000"
+[[register.field.enum]]
+name = "SYNCHRONOUS_EXTERNAL_ABORT_L0"
+value = "0b010100"
+[[register.field.enum]]
+name = "SYNCHRONOUS_EXTERNAL_ABORT_L1"
+value = "0b010101"
+[[register.field.enum]]
+name = "SYNCHRONOUS_EXTERNAL_ABORT_L2"
+value = "0b010110"
+[[register.field.enum]]
+name = "SYNCHRONOUS_EXTERNAL_ABORT_L3"
+value = "0b010111"
+[[register.field.enum]]
+name = "ECC_ERROR_ABORT_NOT_TTW"
+value = "0b011000"
+[[register.field.enum]]
+name = "ECC_ERROR_ABORT_L0"
+value = "0b011100"
+[[register.field.enum]]
+name = "ECC_ERROR_ABORT_L1"
+value = "0b011101"
+[[register.field.enum]]
+name = "ECC_ERROR_ABORT_L2"
+value = "0b011110"
+[[register.field.enum]]
+name = "ECC_ERROR_ABORT_L3"
+value = "0b011111"
+[[register.field.enum]]
+name = "TLB_CONFLICT"
+value = "0b110000"
+[[register.field.enum]]
+name = "UNSUPPORTED_ATOMIC_HARDWARE_FAULT"
+value = "0b110001"
+
+[[register]]
+name = "ISS_PC_ALIGNMENT_FAULT"
+type = "rw"
+width = 24
+description = "ISS register for PC_ALIGNMENT_FAULT EC state"
+default = "0x00000000"
+offset = "0x00000000"
+
+[[register]]
+name = "ISS_DATA_ABORT"
+type = "rw"
+width = 24
+description = "ISS register for DATA_ABORT or ISS_DATA_ABORT_FROM_LOWER_EL EC state"
+default = "0x00000000"
+offset = "0x00000000"
+[[register.field]]
+name = "AR"
+description = "Instruction had Acquire/Release semantics"
+bits = "14"
+type = "rw"
+[[register.field]]
+name = "VNCR"
+description = "Instruction fault came form use of VNCR_EL2 by EL1 level code"
+bits = "13"
+type = "rw"
+[[register.field]]
+name = "SET"
+description = "Synchronous Error Type only valid IFSC==SYNCHRONOUS_EXTERNAL_ABORT"
+bits = "[12:11]"
+type = "rw"
+[[register.field.enum]]
+name = "RECOVERABLE"
+value = "0b00"
+[[register.field.enum]]
+name = "UNCONTAINABLE"
+value = "0b10"
+[[register.field.enum]]
+name = "RESTARTABLE"
+value = "0b11"
+[[register.field]]
+name = "FAR_NOT_VALID"
+description = "FAR not valid only valid IFSC==SYNCHRONOUS_EXTERNAL_ABORT"
+bits = "10"
+type = "rw"
+[[register.field]]
+name = "EA"
+description = "External Abort"
+bits = "9"
+type = "rw"
+[[register.field]]
+name = "CM"
+description = "Cache Maintenance"
+bits = "8"
+type = "rw"
+[[register.field]]
+name = "S1PTW"
+description = "For Stage 2 fault was fault on stage 2?"
+bits = "7"
+type = "rw"
+[[register.field]]
+name = "WnR"
+description = "Write not Read"
+bits = "8"
+type = "rw"
+[[register.field]]
+name = "DFSC"
+description = "Data Fault Status Code"
+bits = "[5:0]"
+type = "rw"
+[[register.field.enum]]
+name = "ADDRESS_SIZE_FAULT_L0"
+value = "0b000000"
+[[register.field.enum]]
+name = "ADDRESS_SIZE_FAULT_L1"
+value = "0b000001"
+[[register.field.enum]]
+name = "ADDRESS_SIZE_FAULT_L2"
+value = "0b000010"
+[[register.field.enum]]
+name = "ADDRESS_SIZE_FAULT_L3"
+value = "0b000011"
+[[register.field.enum]]
+name = "TRANSLATION_FAULT_L0"
+value = "0b000100"
+[[register.field.enum]]
+name = "TRANSLATION_FAULT_L1"
+value = "0b000101"
+[[register.field.enum]]
+name = "TRANSLATION_FAULT_L2"
+value = "0b000110"
+[[register.field.enum]]
+name = "TRANSLATION_FAULT_L3"
+value = "0b000111"
+[[register.field.enum]]
+name = "ACCESS_FLAG_FAULT_L1"
+value = "0b001001"
+[[register.field.enum]]
+name = "ACCESS_FLAG_FAULT_L2"
+value = "0b001010"
+[[register.field.enum]]
+name = "ACCESS_FLAG_FAULT_L3"
+value = "0b001011"
+[[register.field.enum]]
+name = "PERMISSION_FLAG_FAULT_L1"
+value = "0b001101"
+[[register.field.enum]]
+name = "PERMISSION_FLAG_FAULT_L2"
+value = "0b001110"
+[[register.field.enum]]
+name = "PERMISSION_FLAG_FAULT_L3"
+value = "0b001111"
+[[register.field.enum]]
+name = "SYNCHRONOUS_EXTERNAL_ABORT_NOT_TTW"
+value = "0b010000"
+[[register.field.enum]]
+name = "SYNCHRONOUS_EXTERNAL_ABORT_L0"
+value = "0b010100"
+[[register.field.enum]]
+name = "SYNCHRONOUS_EXTERNAL_ABORT_L1"
+value = "0b010101"
+[[register.field.enum]]
+name = "SYNCHRONOUS_EXTERNAL_ABORT_L2"
+value = "0b010110"
+[[register.field.enum]]
+name = "SYNCHRONOUS_EXTERNAL_ABORT_L3"
+value = "0b010111"
+[[register.field.enum]]
+name = "ECC_ERROR_ABORT_NOT_TTW"
+value = "0b011000"
+[[register.field.enum]]
+name = "ECC_ERROR_ABORT_L0"
+value = "0b011100"
+[[register.field.enum]]
+name = "ECC_ERROR_ABORT_L1"
+value = "0b011101"
+[[register.field.enum]]
+name = "ECC_ERROR_ABORT_L2"
+value = "0b011110"
+[[register.field.enum]]
+name = "ECC_ERROR_ABORT_L3"
+value = "0b011111"
+[[register.field.enum]]
+name = "ALIGNMENT_FAULT"
+value = "0b100001"
+[[register.field.enum]]
+name = "TLB_CONFLICT"
+value = "0b110000"
+[[register.field.enum]]
+name = "UNSUPPORTED_ATOMIC_HARDWARE_FAULT"
+value = "0b110001"
+[[register.field.enum]]
+name = "LOCKDOWN"
+value = "0b110100"
+[[register.field.enum]]
+name = "UNSUPPORTED_EXCLUSIVE_OR_ATOMIC"
+value = "0b110101"
+
+[[register]]
+name = "ISS_SP_ALIGNMENT_FAULT"
+type = "rw"
+width = 24
+description = "ISS register for SP_ALIGNMENT_FAULT EC state"
+default = "0x00000000"
+offset = "0x00000000"
+
+[[register]]
+name = "ISS_FLOATING_POINT"
+type = "rw"
+width = 24
+description = "ISS register for FLOATING_POINT EC state"
+default = "0x00000000"
+offset = "0x00000000"
+
+[[register]]
+name = "ISS_SERROR"
+type = "rw"
+width = 24
+description = "ISS register for SERROR EC state"
+default = "0x00000000"
+offset = "0x00000000"
+
+[[register]]
+name = "ISS_BRK"
+type = "rw"
+width = 24
+description = "ISS register for BRK EC state"
+default = "0x00000000"
+offset = "0x00000000"
+
+
+
+

@@ -1,0 +1,97 @@
+[[instance]]
+name = "LPDUnitsSwitch"
+type = "switch.internal.lpdunitsswitch.zynqps8"
+
+# System monitor
+[[instance]]
+name = "PSSysMon"
+type = "other.sysmon.zynqps8"
+
+# Triple Timers
+[[instance]]
+name = "TTC0"
+type = "other.timer.ttc.zynqps8"
+instance = 0
+
+[[instance]]
+name = "TTC1"
+type = "other.timer.ttc.zynqps8"
+instance = 1
+
+[[instance]]
+name = "TTC2"
+type = "other.timer.ttc.zynqps8"
+instance = 2
+
+[[instance]]
+name = "TTC3"
+type = "other.timer.ttc.zynqps8"
+instance = 3
+
+# SWDT
+[[instance]]
+name = "LPD_SWDT"
+type = "other.timer.watchdog.zynqps8"
+
+# GPIO
+[[instance]]
+name = "GPIO"
+type = "io.gpio.zynqps8"
+
+# IPI
+[[instance]]
+name = "IPI"
+type = "other.ipi.zynqps8"
+
+# connections
+[[connection]]
+type = "bus"
+connection = "LPDUnitsSwitch -> PSSysMon"
+bus_name = "lpdunitsswitch_pssysmon"
+
+[[connection]]
+type = "bus"
+connection = "LPDUnitsSwitch -> SPI0"
+bus_name = "lpdunitsswitch_spi${index}"
+silent = true
+
+[[connection]]
+type = "bus"
+connection = "LPDUnitsSwitch -> SPI1"
+bus_name = "lpdunitsswitch_spi${index}"
+silent = true
+
+[[connection]]
+type = "bus"
+connection = "LPDUnitsSwitch -> TTC0"
+bus_protocol = "internal_ttc"
+
+[[connection]]
+type = "bus"
+connection = "LPDUnitsSwitch -> TTC1"
+bus_protocol = "internal_ttc"
+
+[[connection]]
+type = "bus"
+connection = "LPDUnitsSwitch -> TTC2"
+bus_protocol = "internal_ttc"
+
+[[connection]]
+type = "bus"
+connection = "LPDUnitsSwitch -> TTC3"
+bus_protocol = "internal_ttc"
+
+[[connection]]
+type = "bus"
+connection = "LPDUnitsSwitch -> LPD_SWDT"
+bus_protocol = "internal_swdt"
+
+[[connection]]
+type = "bus"
+connection = "LPDUnitsSwitch -> IPI"
+bus_name = "lpdunitsswitch_ipi"
+
+[[connection]]
+type = "bus"
+connection = "LPDUnitsSwitch -> GPIO"
+bus_name = "lpdunitsswitch_gpio"

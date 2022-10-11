@@ -1,0 +1,134 @@
+description = "Low-power Domain System-level Control Registers - Secure"
+[[bank]]
+  name = "LPD_SLCR_SECURE"
+  address = "0xff4b0000"
+[[register]]
+  name = "CTRL"
+  type = "rw"
+  width = 1
+  description = "General control register for the LP SLCR"
+  default = "0x00000000"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "SLVERR_ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''By default, invalid address requests are ignored.'''
+    longdesc = '''However, a maskable interrupt exsists. By enabling this slverr_enable invalid address requests cause a slverr to occur. Enable/Disable SLVERR during address decode failure. 0: SLVERR is disabled. For request address: Writes are ignored. Read returns 0. 1: SLVERR is enabled. For requestes address, SLVERR is asserted. Writes are ignored. Read returns 0.'''
+[[register]]
+  name = "ISR"
+  type = "wtc"
+  width = 1
+  description = "Interrupt Status Register"
+  default = "0x00000000"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "wtc"
+    shortdesc = '''Status for an address decode error.'''
+    longdesc = '''Reads: 0: No Event. 1: Event Occurred. Writes: 0: ignored. 1: clear bit.'''
+[[register]]
+  name = "IMR"
+  type = "ro"
+  width = 1
+  description = "Interrupt Mask Register"
+  default = "0x00000001"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Mask for an address decode error.'''
+    longdesc = '''0: Interrupt Enabled 1: Interrupt Disabled'''
+[[register]]
+  name = "IER"
+  type = "wo"
+  width = 1
+  description = "Interrupt Enable Register"
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Enable for an address decode error.'''
+    longdesc = '''Writes: 0: ignored. 1: IMR register bit set to 0.'''
+[[register]]
+  name = "IDR"
+  type = "wo"
+  width = 1
+  description = "Interrupt Disable Register"
+  default = "0x00000000"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Mask for an address decode error.'''
+    longdesc = '''Writes: 0: ignored. 1: IMR register bit set to 1.'''
+[[register]]
+  name = "ITR"
+  type = "wo"
+  width = 1
+  description = "Interrupt Trigger Register"
+  default = "0x00000000"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Trigger an address decode error interrupt.'''
+    longdesc = '''Writes: 0: ignored. 1: ISR register bit set to 1.'''
+[[register]]
+  name = "SLCR_RPU"
+  type = "rw"
+  width = 2
+  description = "RPU TrustZone settings"
+  default = "0x00000000"
+  offset = "0x00000020"
+  [[register.field]]
+    name = "TZ_R5_1"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "TZ_R5_0"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "SLCR_ADMA"
+  type = "rw"
+  width = 8
+  description = "LPD DMA TrustZone setting."
+  default = "0x00000000"
+  offset = "0x00000024"
+  [[register.field]]
+    name = "TZ"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "SAFETY_CHK"
+  type = "rw"
+  width = 32
+  description = "Safety endpoint connectivity check."
+  default = "0x00000000"
+  offset = "0x00000030"
+  [[register.field]]
+    name = "CHK_VAL"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "SLCR_USB"
+  type = "rw"
+  width = 2
+  description = "USB TrustZone settings."
+  default = "0x00000003"
+  offset = "0x00000034"
+  [[register.field]]
+    name = "TZ_USB3_1"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "TZ_USB3_0"
+    bits = "0"
+    type = "rw"

@@ -1,0 +1,6 @@
+[[definition]]
+type = "net.ethernet.zynqps8"
+registers = [
+    { resource = "zynqps8/gem.toml", name = "GEM", base_address = "0x010B_0000", address_increment = "0x1_0000" }
+]
+max_instances = 4

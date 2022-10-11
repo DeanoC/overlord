@@ -1,0 +1,1207 @@
+description = "CCI-400 GPV"
+[[register]]
+  name = "CONTROL_OVERRIDE_REGISTER"
+  type = "rw"
+  width = 32
+  description = "Control_Override_Register"
+  default = "0x00000000"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "DISABLE_RETRY_REDUCTION_BUFFERS"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "DISABLE_PRIORITY_PROMOTION"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "TERMINATE_BARRIERS"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "DISABLE_SPECULATIVE_FETCHES"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "DVM_MESSAGE_DISABLE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "SNOOP_DISABLE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "SPECULATION_CONTROL_REGISTER"
+  type = "rw"
+  width = 32
+  description = "Speculation_Control_Register"
+  default = "0x00000000"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "DISABLE_SPECULATIVE_FETCHES_S4"
+    bits = "20"
+    type = "rw"
+  [[register.field]]
+    name = "DISABLE_SPECULATIVE_FETCHES_S3"
+    bits = "19"
+    type = "rw"
+  [[register.field]]
+    name = "DISABLE_SPECULATIVE_FETCHES_S2"
+    bits = "18"
+    type = "rw"
+  [[register.field]]
+    name = "DISABLE_SPECULATIVE_FETCHES_S1"
+    bits = "17"
+    type = "rw"
+  [[register.field]]
+    name = "DISABLE_SPECULATIVE_FETCHES_S0"
+    bits = "16"
+    type = "rw"
+  [[register.field]]
+    name = "DISABLE_SPECULATIVE_FETCHES_M2"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "DISABLE_SPECULATIVE_FETCHES_M1"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "DISABLE_SPECULATIVE_FETCHES_M0"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "SECURE_ACCESS_REGISTER"
+  type = "rw"
+  width = 32
+  description = "Secure_Access_Register"
+  default = "0x00000000"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "SECURE_ACCESS_CONTROL"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "STATUS_REGISTER"
+  type = "ro"
+  width = 32
+  description = "Status_Register"
+  default = "0x00000000"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "CCI_STATUS"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "IMPRECISE_ERROR_REGISTER"
+  type = "wtc"
+  width = 32
+  description = "Imprecise_Error_Register"
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "IMP_ERR_S4"
+    bits = "20"
+    type = "wtc"
+    shortdesc = '''Imprecise error indicator for slave interface S4.'''
+    longdesc = '''Write 1 to clear'''
+  [[register.field]]
+    name = "IMP_ERR_S3"
+    bits = "19"
+    type = "wtc"
+    shortdesc = '''Imprecise error indicator for slave interface S3.'''
+    longdesc = '''Write 1 to clear'''
+  [[register.field]]
+    name = "IMP_ERR_S2"
+    bits = "18"
+    type = "wtc"
+    shortdesc = '''Imprecise error indicator for slave interface S2.'''
+    longdesc = '''Write 1 to clear'''
+  [[register.field]]
+    name = "IMP_ERR_S1"
+    bits = "17"
+    type = "wtc"
+    shortdesc = '''Imprecise error indicator for slave interface S1.'''
+    longdesc = '''Write 1 to clear'''
+  [[register.field]]
+    name = "IMP_ERR_S0"
+    bits = "16"
+    type = "wtc"
+    shortdesc = '''Imprecise error indicator for slave interface S0.'''
+    longdesc = '''Write 1 to clear'''
+  [[register.field]]
+    name = "IMP_ERR_M2"
+    bits = "2"
+    type = "wtc"
+    shortdesc = '''Imprecise error indicator for master interface M2.'''
+    longdesc = '''Write 1 to clear'''
+  [[register.field]]
+    name = "IMP_ERR_M1"
+    bits = "1"
+    type = "wtc"
+    shortdesc = '''Imprecise error indicator for master interface M1.'''
+    longdesc = '''Write 1 to clear'''
+  [[register.field]]
+    name = "IMP_ERR_M0"
+    bits = "0"
+    type = "wtc"
+    shortdesc = '''Imprecise error indicator for master interface M0.'''
+    longdesc = '''Write 1 to clear'''
+[[register]]
+  name = "PERFORMANCE_MONITOR_CONTROL_REGISTER"
+  type = "mixed"
+  width = 32
+  description = "Performance_Monitor_Control_Register"
+  default = "0x00002000"
+  offset = "0x00000100"
+  [[register.field]]
+    name = "PMU_COUNT_NUM"
+    bits = "15:11"
+    type = "ro"
+  [[register.field]]
+    name = "DP"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "EX"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "CCD"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "CCR"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "RST"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "CEN"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "SNOOP_CONTROL_REGISTER_S0"
+  type = "mixed"
+  width = 32
+  description = "Snoop_Control_Register_S0"
+  default = "0x80000000"
+  offset = "0x00001000"
+  [[register.field]]
+    name = "SUPPORT_DVMS"
+    bits = "31"
+    type = "ro"
+  [[register.field]]
+    name = "SUPPORT_SNOOPS"
+    bits = "30"
+    type = "ro"
+  [[register.field]]
+    name = "ENABLE_DVMS"
+    bits = "1"
+    type = "rw"
+[[register]]
+  name = "SHAREABLE_OVERRIDE_REGISTER_S0"
+  type = "rw"
+  width = 32
+  description = "Shareable_Override_Register_S0"
+  default = "0x00000000"
+  offset = "0x00001004"
+  [[register.field]]
+    name = "AXDOMAIN_OVERRIDE"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "READ_QOS_OVERRIDE_REGISTER_S0"
+  type = "mixed"
+  width = 32
+  description = "Read_Qos_Override_Register_S0"
+  default = "0x00000000"
+  offset = "0x00001100"
+  [[register.field]]
+    name = "ARQOS_OVERRIDE_READBACK"
+    bits = "11:8"
+    type = "ro"
+  [[register.field]]
+    name = "ARQOS_VALUE"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "WRITE_QOS_OVERRIDE_REGISTER_S0"
+  type = "mixed"
+  width = 32
+  description = "Write_Qos_Override_Register_S0"
+  default = "0x00000000"
+  offset = "0x00001104"
+  [[register.field]]
+    name = "AWQOS_OVERRIDE_READBACK"
+    bits = "11:8"
+    type = "ro"
+  [[register.field]]
+    name = "AWQOS_VALUE"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "QOS_CONTROL_REGISTER_S0"
+  type = "mixed"
+  width = 32
+  description = "Qos_Control_Register_S0"
+  default = "0x00000000"
+  offset = "0x0000110C"
+  [[register.field]]
+    name = "QOS_REGULATION_DISABLED"
+    bits = "31"
+    type = "ro"
+  [[register.field]]
+    name = "BANDWIDTH_REGULATION_MODE"
+    bits = "21"
+    type = "rw"
+  [[register.field]]
+    name = "ARQOS_REGULATION_MODE"
+    bits = "20"
+    type = "rw"
+  [[register.field]]
+    name = "AWQOS_REGULATION_MODE"
+    bits = "16"
+    type = "rw"
+  [[register.field]]
+    name = "AR_OT_REGULATION"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "AW_OT_REGULATION"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "ARQOS_REGULATION"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "AWQOS_REGULATION"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "MAX_OT_REGISTER_S0"
+  type = "rw"
+  width = 32
+  description = "Max_OT_Register_S0"
+  default = "0x00000000"
+  offset = "0x00001110"
+  [[register.field]]
+    name = "INT_OT_AR"
+    bits = "29:24"
+    type = "rw"
+  [[register.field]]
+    name = "FRAC_OT_AR"
+    bits = "23:16"
+    type = "rw"
+  [[register.field]]
+    name = "INT_OT_AW"
+    bits = "13:8"
+    type = "rw"
+  [[register.field]]
+    name = "FRAC_OT_AW"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "TARGET_LATENCY_REGISTER_S0"
+  type = "rw"
+  width = 32
+  description = "Target_Latency_Register_S0"
+  default = "0x00000000"
+  offset = "0x00001130"
+  [[register.field]]
+    name = "AR_LAT"
+    bits = "27:16"
+    type = "rw"
+  [[register.field]]
+    name = "AW_LAT"
+    bits = "11:0"
+    type = "rw"
+[[register]]
+  name = "LATENCY_REGULATION_REGISTER_S0"
+  type = "rw"
+  width = 32
+  description = "Latency_Regulation_Register_S0"
+  default = "0x00000000"
+  offset = "0x00001134"
+  [[register.field]]
+    name = "AR_SCALE_FACT"
+    bits = "10:8"
+    type = "rw"
+  [[register.field]]
+    name = "AW_SCALE_FACT"
+    bits = "2:0"
+    type = "rw"
+[[register]]
+  name = "QOS_RANGE_REGISTER_S0"
+  type = "rw"
+  width = 32
+  description = "Qos_Range_Register_S0"
+  default = "0x00000000"
+  offset = "0x00001138"
+  [[register.field]]
+    name = "MAX_ARQOS"
+    bits = "27:24"
+    type = "rw"
+  [[register.field]]
+    name = "MIN_ARQOS"
+    bits = "19:16"
+    type = "rw"
+  [[register.field]]
+    name = "MAX_AWQOS"
+    bits = "11:8"
+    type = "rw"
+  [[register.field]]
+    name = "MIN_AWQOS"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "SNOOP_CONTROL_REGISTER_S1"
+  type = "ro"
+  width = 32
+  description = "Snoop_Control_Register_S1"
+  default = "0x00000000"
+  offset = "0x00002000"
+  [[register.field]]
+    name = "SUPPORT_DVMS"
+    bits = "31"
+    type = "ro"
+  [[register.field]]
+    name = "SUPPORT_SNOOPS"
+    bits = "30"
+    type = "ro"
+  [[register.field]]
+    name = "ENABLE_DVMS"
+    bits = "1"
+    type = "ro"
+[[register]]
+  name = "SHAREABLE_OVERRIDE_REGISTER_S1"
+  type = "rw"
+  width = 32
+  description = "Shareable_Override_Register_S1"
+  default = "0x00000000"
+  offset = "0x00002004"
+  [[register.field]]
+    name = "AXDOMAIN_OVERRIDE"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "READ_QOS_OVERRIDE_REGISTER_S1"
+  type = "mixed"
+  width = 32
+  description = "Read_Qos_Override_Register_S1"
+  default = "0x00000000"
+  offset = "0x00002100"
+  [[register.field]]
+    name = "ARQOS_OVERRIDE_READBACK"
+    bits = "11:8"
+    type = "ro"
+  [[register.field]]
+    name = "ARQOS_VALUE"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "WRITE_QOS_OVERRIDE_REGISTER_S1"
+  type = "mixed"
+  width = 32
+  description = "Write_Qos_Override_Register_S1"
+  default = "0x00000000"
+  offset = "0x00002104"
+  [[register.field]]
+    name = "AWQOS_OVERRIDE_READBACK"
+    bits = "11:8"
+    type = "ro"
+  [[register.field]]
+    name = "AWQOS_VALUE"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "QOS_CONTROL_REGISTER_S1"
+  type = "mixed"
+  width = 32
+  description = "Qos_Control_Register_S1"
+  default = "0x00000000"
+  offset = "0x0000210C"
+  [[register.field]]
+    name = "QOS_REGULATION_DISABLED"
+    bits = "31"
+    type = "ro"
+  [[register.field]]
+    name = "BANDWIDTH_REGULATION_MODE"
+    bits = "21"
+    type = "rw"
+  [[register.field]]
+    name = "ARQOS_REGULATION_MODE"
+    bits = "20"
+    type = "rw"
+  [[register.field]]
+    name = "AWQOS_REGULATION_MODE"
+    bits = "16"
+    type = "rw"
+  [[register.field]]
+    name = "AR_OT_REGULATION"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "AW_OT_REGULATION"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "ARQOS_REGULATION"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "AWQOS_REGULATION"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "MAX_OT_REGISTER_S1"
+  type = "rw"
+  width = 32
+  description = "Max_OT_Register_S1"
+  default = "0x00000000"
+  offset = "0x00002110"
+  [[register.field]]
+    name = "INT_OT_AR"
+    bits = "29:24"
+    type = "rw"
+  [[register.field]]
+    name = "FRAC_OT_AR"
+    bits = "23:16"
+    type = "rw"
+  [[register.field]]
+    name = "INT_OT_AW"
+    bits = "13:8"
+    type = "rw"
+  [[register.field]]
+    name = "FRAC_OT_AW"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "TARGET_LATENCY_REGISTER_S1"
+  type = "rw"
+  width = 32
+  description = "Target_Latency_Register_S1"
+  default = "0x00000000"
+  offset = "0x00002130"
+  [[register.field]]
+    name = "AR_LAT"
+    bits = "27:16"
+    type = "rw"
+  [[register.field]]
+    name = "AW_LAT"
+    bits = "11:0"
+    type = "rw"
+[[register]]
+  name = "LATENCY_REGULATION_REGISTER_S1"
+  type = "rw"
+  width = 32
+  description = "Latency_Regulation_Register_S1"
+  default = "0x00000000"
+  offset = "0x00002134"
+  [[register.field]]
+    name = "AR_SCALE_FACT"
+    bits = "10:8"
+    type = "rw"
+  [[register.field]]
+    name = "AW_SCALE_FACT"
+    bits = "2:0"
+    type = "rw"
+[[register]]
+  name = "QOS_RANGE_REGISTER_S1"
+  type = "rw"
+  width = 32
+  description = "Qos_Range_Register_S1"
+  default = "0x00000000"
+  offset = "0x00002138"
+  [[register.field]]
+    name = "MAX_ARQOS"
+    bits = "27:24"
+    type = "rw"
+  [[register.field]]
+    name = "MIN_ARQOS"
+    bits = "19:16"
+    type = "rw"
+  [[register.field]]
+    name = "MAX_AWQOS"
+    bits = "11:8"
+    type = "rw"
+  [[register.field]]
+    name = "MIN_AWQOS"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "SNOOP_CONTROL_REGISTER_S2"
+  type = "ro"
+  width = 32
+  description = "Snoop_Control_Register_S2"
+  default = "0x00000000"
+  offset = "0x00003000"
+  [[register.field]]
+    name = "SUPPORT_DVMS"
+    bits = "31"
+    type = "ro"
+  [[register.field]]
+    name = "SUPPORT_SNOOPS"
+    bits = "30"
+    type = "ro"
+  [[register.field]]
+    name = "ENABLE_DVMS"
+    bits = "1"
+    type = "ro"
+[[register]]
+  name = "SHAREABLE_OVERRIDE_REGISTER_S2"
+  type = "rw"
+  width = 32
+  description = "Shareable_Override_Register_S2"
+  default = "0x00000000"
+  offset = "0x00003004"
+  [[register.field]]
+    name = "AXDOMAIN_OVERRIDE"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "READ_QOS_OVERRIDE_REGISTER_S2"
+  type = "mixed"
+  width = 32
+  description = "Read_Qos_Override_Register_S2"
+  default = "0x00000000"
+  offset = "0x00003100"
+  [[register.field]]
+    name = "ARQOS_OVERRIDE_READBACK"
+    bits = "11:8"
+    type = "ro"
+  [[register.field]]
+    name = "ARQOS_VALUE"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "WRITE_QOS_OVERRIDE_REGISTER_S2"
+  type = "mixed"
+  width = 32
+  description = "Write_Qos_Override_Register_S2"
+  default = "0x00000000"
+  offset = "0x00003104"
+  [[register.field]]
+    name = "AWQOS_OVERRIDE_READBACK"
+    bits = "11:8"
+    type = "ro"
+  [[register.field]]
+    name = "AWQOS_VALUE"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "QOS_CONTROL_REGISTER_S2"
+  type = "mixed"
+  width = 32
+  description = "Qos_Control_Register_S2"
+  default = "0x00000000"
+  offset = "0x0000310C"
+  [[register.field]]
+    name = "QOS_REGULATION_DISABLED"
+    bits = "31"
+    type = "ro"
+  [[register.field]]
+    name = "BANDWIDTH_REGULATION_MODE"
+    bits = "21"
+    type = "rw"
+  [[register.field]]
+    name = "ARQOS_REGULATION_MODE"
+    bits = "20"
+    type = "rw"
+  [[register.field]]
+    name = "AWQOS_REGULATION_MODE"
+    bits = "16"
+    type = "rw"
+  [[register.field]]
+    name = "AR_OT_REGULATION"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "AW_OT_REGULATION"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "ARQOS_REGULATION"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "AWQOS_REGULATION"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "MAX_OT_REGISTER_S2"
+  type = "rw"
+  width = 32
+  description = "Max_OT_Register_S2"
+  default = "0x00000000"
+  offset = "0x00003110"
+  [[register.field]]
+    name = "INT_OT_AR"
+    bits = "29:24"
+    type = "rw"
+  [[register.field]]
+    name = "FRAC_OT_AR"
+    bits = "23:16"
+    type = "rw"
+  [[register.field]]
+    name = "INT_OT_AW"
+    bits = "13:8"
+    type = "rw"
+  [[register.field]]
+    name = "FRAC_OT_AW"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "TARGET_LATENCY_REGISTER_S2"
+  type = "rw"
+  width = 32
+  description = "Target_Latency_Register_S2"
+  default = "0x00000000"
+  offset = "0x00003130"
+  [[register.field]]
+    name = "AR_LAT"
+    bits = "27:16"
+    type = "rw"
+  [[register.field]]
+    name = "AW_LAT"
+    bits = "11:0"
+    type = "rw"
+[[register]]
+  name = "LATENCY_REGULATION_REGISTER_S2"
+  type = "rw"
+  width = 32
+  description = "Latency_Regulation_Register_S2"
+  default = "0x00000000"
+  offset = "0x00003134"
+  [[register.field]]
+    name = "AR_SCALE_FACT"
+    bits = "10:8"
+    type = "rw"
+  [[register.field]]
+    name = "AW_SCALE_FACT"
+    bits = "2:0"
+    type = "rw"
+[[register]]
+  name = "QOS_RANGE_REGISTER_S2"
+  type = "rw"
+  width = 32
+  description = "Qos_Range_Register_S2"
+  default = "0x00000000"
+  offset = "0x00003138"
+  [[register.field]]
+    name = "MAX_ARQOS"
+    bits = "27:24"
+    type = "rw"
+  [[register.field]]
+    name = "MIN_ARQOS"
+    bits = "19:16"
+    type = "rw"
+  [[register.field]]
+    name = "MAX_AWQOS"
+    bits = "11:8"
+    type = "rw"
+  [[register.field]]
+    name = "MIN_AWQOS"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "SNOOP_CONTROL_REGISTER_S3"
+  type = "mixed"
+  width = 32
+  description = "Snoop_Control_Register_S3"
+  default = "0xC0000000"
+  offset = "0x00004000"
+  [[register.field]]
+    name = "SUPPORT_DVMS"
+    bits = "31"
+    type = "ro"
+  [[register.field]]
+    name = "SUPPORT_SNOOPS"
+    bits = "30"
+    type = "ro"
+  [[register.field]]
+    name = "ENABLE_DVMS"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "ENABLE_SNOOPS"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "READ_QOS_OVERRIDE_REGISTER_S3"
+  type = "mixed"
+  width = 32
+  description = "Read_Qos_Override_Register_S3"
+  default = "0x00000000"
+  offset = "0x00004100"
+  [[register.field]]
+    name = "ARQOS_OVERRIDE_READBACK"
+    bits = "11:8"
+    type = "ro"
+  [[register.field]]
+    name = "ARQOS_VALUE"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "WRITE_QOS_OVERRIDE_REGISTER_S3"
+  type = "mixed"
+  width = 32
+  description = "Write_Qos_Override_Register_S3"
+  default = "0x00000000"
+  offset = "0x00004104"
+  [[register.field]]
+    name = "AWQOS_OVERRIDE_READBACK"
+    bits = "11:8"
+    type = "ro"
+  [[register.field]]
+    name = "AWQOS_VALUE"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "QOS_CONTROL_REGISTER_S3"
+  type = "mixed"
+  width = 32
+  description = "Qos_Control_Register_S3"
+  default = "0x00000000"
+  offset = "0x0000410C"
+  [[register.field]]
+    name = "QOS_REGULATION_DISABLED"
+    bits = "31"
+    type = "ro"
+  [[register.field]]
+    name = "BANDWIDTH_REGULATION_MODE"
+    bits = "21"
+    type = "rw"
+  [[register.field]]
+    name = "ARQOS_REGULATION_MODE"
+    bits = "20"
+    type = "rw"
+  [[register.field]]
+    name = "AWQOS_REGULATION_MODE"
+    bits = "16"
+    type = "rw"
+  [[register.field]]
+    name = "ARQOS_REGULATION"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "AWQOS_REGULATION"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "TARGET_LATENCY_REGISTER_S3"
+  type = "rw"
+  width = 32
+  description = "Target_Latency_Register_S3"
+  default = "0x00000000"
+  offset = "0x00004130"
+  [[register.field]]
+    name = "AR_LAT"
+    bits = "27:16"
+    type = "rw"
+  [[register.field]]
+    name = "AW_LAT"
+    bits = "11:0"
+    type = "rw"
+[[register]]
+  name = "LATENCY_REGULATION_REGISTER_S3"
+  type = "rw"
+  width = 32
+  description = "Latency_Regulation_Register_S3"
+  default = "0x00000000"
+  offset = "0x00004134"
+  [[register.field]]
+    name = "AR_SCALE_FACT"
+    bits = "10:8"
+    type = "rw"
+  [[register.field]]
+    name = "AW_SCALE_FACT"
+    bits = "2:0"
+    type = "rw"
+[[register]]
+  name = "QOS_RANGE_REGISTER_S3"
+  type = "rw"
+  width = 32
+  description = "Qos_Range_Register_S3"
+  default = "0x00000000"
+  offset = "0x00004138"
+  [[register.field]]
+    name = "MAX_ARQOS"
+    bits = "27:24"
+    type = "rw"
+  [[register.field]]
+    name = "MIN_ARQOS"
+    bits = "19:16"
+    type = "rw"
+  [[register.field]]
+    name = "MAX_AWQOS"
+    bits = "11:8"
+    type = "rw"
+  [[register.field]]
+    name = "MIN_AWQOS"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "SNOOP_CONTROL_REGISTER_S4"
+  type = "mixed"
+  width = 32
+  description = "Snoop_Control_Register_S4"
+  default = "0xC0000000"
+  offset = "0x00005000"
+  [[register.field]]
+    name = "SUPPORT_DVMS"
+    bits = "31"
+    type = "ro"
+  [[register.field]]
+    name = "SUPPORT_SNOOPS"
+    bits = "30"
+    type = "ro"
+  [[register.field]]
+    name = "ENABLE_DVMS"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "ENABLE_SNOOPS"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "READ_QOS_OVERRIDE_REGISTER_S4"
+  type = "mixed"
+  width = 32
+  description = "Read_Qos_Override_Register_S4"
+  default = "0x00000000"
+  offset = "0x00005100"
+  [[register.field]]
+    name = "ARQOS_OVERRIDE_READBACK"
+    bits = "11:8"
+    type = "ro"
+  [[register.field]]
+    name = "ARQOS_VALUE"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "WRITE_QOS_OVERRIDE_REGISTER_S4"
+  type = "mixed"
+  width = 32
+  description = "Write_Qos_Override_Register_S4"
+  default = "0x00000000"
+  offset = "0x00005104"
+  [[register.field]]
+    name = "AWQOS_OVERRIDE_READBACK"
+    bits = "11:8"
+    type = "ro"
+  [[register.field]]
+    name = "AWQOS_VALUE"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "QOS_CONTROL_REGISTER_S4"
+  type = "mixed"
+  width = 32
+  description = "Qos_Control_Register_S4"
+  default = "0x00000000"
+  offset = "0x0000510C"
+  [[register.field]]
+    name = "QOS_REGULATION_DISABLED"
+    bits = "31"
+    type = "ro"
+  [[register.field]]
+    name = "BANDWIDTH_REGULATION_MODE"
+    bits = "21"
+    type = "rw"
+  [[register.field]]
+    name = "ARQOS_REGULATION_MODE"
+    bits = "20"
+    type = "rw"
+  [[register.field]]
+    name = "AWQOS_REGULATION_MODE"
+    bits = "16"
+    type = "rw"
+  [[register.field]]
+    name = "ARQOS_REGULATION"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "AWQOS_REGULATION"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "TARGET_LATENCY_REGISTER_S4"
+  type = "rw"
+  width = 32
+  description = "Target_Latency_Register_S4"
+  default = "0x00000000"
+  offset = "0x00005130"
+  [[register.field]]
+    name = "AR_LAT"
+    bits = "27:16"
+    type = "rw"
+  [[register.field]]
+    name = "AW_LAT"
+    bits = "11:0"
+    type = "rw"
+[[register]]
+  name = "LATENCY_REGULATION_REGISTER_S4"
+  type = "rw"
+  width = 32
+  description = "Latency_Regulation_Register_S4"
+  default = "0x00000000"
+  offset = "0x00005134"
+  [[register.field]]
+    name = "AR_SCALE_FACT"
+    bits = "10:8"
+    type = "rw"
+  [[register.field]]
+    name = "AW_SCALE_FACT"
+    bits = "2:0"
+    type = "rw"
+[[register]]
+  name = "QOS_RANGE_REGISTER_S4"
+  type = "rw"
+  width = 32
+  description = "Qos_Range_Register_S4"
+  default = "0x00000000"
+  offset = "0x00005138"
+  [[register.field]]
+    name = "MAX_ARQOS"
+    bits = "27:24"
+    type = "rw"
+  [[register.field]]
+    name = "MIN_ARQOS"
+    bits = "19:16"
+    type = "rw"
+  [[register.field]]
+    name = "MAX_AWQOS"
+    bits = "11:8"
+    type = "rw"
+  [[register.field]]
+    name = "MIN_AWQOS"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "CYCLE_COUNTER"
+  type = "rw"
+  width = 32
+  description = "Cycle_Counter"
+  default = "0x00000000"
+  offset = "0x00009004"
+  [[register.field]]
+    name = "CCNT"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "CYCLE_COUNTER_CONTROL"
+  type = "rw"
+  width = 32
+  description = "Cycle_Counter_Control"
+  default = "0x00000000"
+  offset = "0x00009008"
+  [[register.field]]
+    name = "CCNT_EN"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "CYCLE_COUNT_OVERFLOW"
+  type = "wtc"
+  width = 32
+  description = "Cycle_Count_Overflow"
+  default = "0x00000000"
+  offset = "0x0000900C"
+  [[register.field]]
+    name = "CCNT_OVERFLOW"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "ESR0"
+  type = "rw"
+  width = 32
+  description = "ESR0"
+  default = "0x00000000"
+  offset = "0x0000A000"
+  [[register.field]]
+    name = "EVT_IF0"
+    bits = "7:5"
+    type = "rw"
+  [[register.field]]
+    name = "EVT_CNT0"
+    bits = "4:0"
+    type = "rw"
+[[register]]
+  name = "EVENT_COUNTER0"
+  type = "rw"
+  width = 32
+  description = "Event_Counter0"
+  default = "0x00000000"
+  offset = "0x0000A004"
+  [[register.field]]
+    name = "CNT0"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "EVENT_COUNTER0_CONTROL"
+  type = "rw"
+  width = 32
+  description = "Event_Counter0_Control"
+  default = "0x00000000"
+  offset = "0x0000A008"
+  [[register.field]]
+    name = "CNT0_EN"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "EVENT_COUNTER0_OVERFLOW"
+  type = "wtc"
+  width = 32
+  description = "Event_Counter0_Overflow"
+  default = "0x00000000"
+  offset = "0x0000A00C"
+  [[register.field]]
+    name = "CNT0_OVERFLOW"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "ESR1"
+  type = "rw"
+  width = 32
+  description = "ESR1"
+  default = "0x00000000"
+  offset = "0x0000B000"
+  [[register.field]]
+    name = "EVT_IF1"
+    bits = "7:5"
+    type = "rw"
+  [[register.field]]
+    name = "EVT_CNT1"
+    bits = "4:0"
+    type = "rw"
+[[register]]
+  name = "EVENT_COUNTER1"
+  type = "rw"
+  width = 32
+  description = "Event_Counter1"
+  default = "0x00000000"
+  offset = "0x0000B004"
+  [[register.field]]
+    name = "CNT1"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "EVENT_COUNTER1_CONTROL"
+  type = "rw"
+  width = 32
+  description = "Event_Counter1_Control"
+  default = "0x00000000"
+  offset = "0x0000B008"
+  [[register.field]]
+    name = "CNT1_EN"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "EVENT_COUNTER1_OVERFLOW"
+  type = "wtc"
+  width = 32
+  description = "Event_Counter1_Overflow"
+  default = "0x00000000"
+  offset = "0x0000B00C"
+  [[register.field]]
+    name = "CNT1_OVERFLOW"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "ESR2"
+  type = "rw"
+  width = 32
+  description = "ESR2"
+  default = "0x00000000"
+  offset = "0x0000C000"
+  [[register.field]]
+    name = "EVT_IF2"
+    bits = "7:5"
+    type = "rw"
+  [[register.field]]
+    name = "EVT_CNT2"
+    bits = "4:0"
+    type = "rw"
+[[register]]
+  name = "EVENT_COUNTER2"
+  type = "rw"
+  width = 32
+  description = "Event_Counter2"
+  default = "0x00000000"
+  offset = "0x0000C004"
+  [[register.field]]
+    name = "CNT2"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "EVENT_COUNTER2_CONTROL"
+  type = "rw"
+  width = 32
+  description = "Event_Counter2_Control"
+  default = "0x00000000"
+  offset = "0x0000C008"
+  [[register.field]]
+    name = "CNT2_EN"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "EVENT_COUNTER2_OVERFLOW"
+  type = "wtc"
+  width = 32
+  description = "Event_Counter2_Overflow"
+  default = "0x00000000"
+  offset = "0x0000C00C"
+  [[register.field]]
+    name = "CNT2_OVERFLOW"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "ESR3"
+  type = "rw"
+  width = 32
+  description = "ESR3"
+  default = "0x00000000"
+  offset = "0x0000D000"
+  [[register.field]]
+    name = "EVT_IF3"
+    bits = "7:5"
+    type = "rw"
+  [[register.field]]
+    name = "EVT_CNT3"
+    bits = "4:0"
+    type = "rw"
+[[register]]
+  name = "EVENT_COUNTER3"
+  type = "rw"
+  width = 32
+  description = "Event_Counter3"
+  default = "0x00000000"
+  offset = "0x0000D004"
+  [[register.field]]
+    name = "CNT3"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "EVENT_COUNTER3_CONTROL"
+  type = "rw"
+  width = 32
+  description = "Event_Counter3_Control"
+  default = "0x00000000"
+  offset = "0x0000D008"
+  [[register.field]]
+    name = "CNT3_EN"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "EVENT_COUNTER3_OVERFLOW"
+  type = "wtc"
+  width = 32
+  description = "Event_Counter3_Overflow"
+  default = "0x00000000"
+  offset = "0x0000D00C"
+  [[register.field]]
+    name = "CNT3_OVERFLOW"
+    bits = "0"
+    type = "wtc"

@@ -1,0 +1,7 @@
+[[definition]]
+type = "ram.ddr.ddr4.zynqps8"
+
+registers = [
+    { resource = "zynqps8/ddr_phy.toml", name = "DDR_PHY", base_address = "0x0008_0000" },
+    { resource = "zynqps8/ddr_qos_ctrl.toml", name = "DDR_QOS_CTRL", base_address = "0x0009_0000" },
+]
