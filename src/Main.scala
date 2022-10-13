@@ -11,15 +11,18 @@ val ProgramName = "overlord";
 val ProgramVersion = "0.0";
 
 enum Mode:
-  case None, Create, Update, Init
+  case None, Update, Init
 
 case class Config(
     mode: Mode = Mode.None,
     input: Option[File] = None,
     workspace: Option[File] = None,
+    force: Boolean = false,
+
+    // init command config items
     template: String = "host_hello_world",
     nostdresources: Boolean = false,
-    force: Boolean = false
+    nogit: Boolean = false
 )
 
 val builder = OParser.builder[Config]
@@ -28,47 +31,32 @@ val argParser = {
   OParser.sequence(
     programName(ProgramName),
     head(ProgramName, ProgramVersion),
-    // globals optionals
-    opt[Unit]("nostdresources")
-      .text("Don't get/update std resources")
-      .action((_, c) => c.copy(nostdresources = true)),
     opt[Unit]("force")
       .text("Force file operations even if it overwrites existing files")
       .action((_, c) => c.copy(force = true)),
+    arg[File]("workspace")
+      .required()
+      .action((in, c) => c.copy(workspace = Some(in)))
+      .text("the folder name of the workspace"),
     // modes
-    cmd("create")
-      .action((_, c) => c.copy(mode = Mode.Create))
-      .text("create a new workspace")
-      .children(
-        arg[File]("input")
-          .required()
-          .action((in, c) => c.copy(input = Some(in)))
-          .text("the folder name to read from"),
-        arg[File]("output")
-          .required()
-          .text("the folder name to generate workspace at")
-          .action((out, c) => c.copy(input = Some(out)))
-      ),
     cmd("update")
       .action((_, c) => c.copy(mode = Mode.Update))
       .text("update an existing workspace")
       .children(
-        arg[File]("workspace")
-          .required()
-          .action((in, c) => c.copy(workspace = Some(in)))
-          .text("the folder name of the workspace to update")
       ),
     cmd("init")
       .action((_, c) => c.copy(mode = Mode.Init))
       .text("create a new workspace")
       .children(
-        arg[File]("workspace")
-          .required()
-          .action((in, c) => c.copy(workspace = Some(in)))
-          .text("the folder name to init a workspace in"),
         opt[String]("template")
           .action((in, c) => c.copy(template = in))
-          .text("which template to use (host_hello_world is default")
+          .text("which template to use (host_hello_world is default"),
+        opt[Unit]("nostdresources")
+          .text("Don't get std resources")
+          .action((_, c) => c.copy(nostdresources = true)),
+        opt[Unit]("nogit")
+          .text("Don't setup git")
+          .action((_, c) => c.copy(nogit = true))
       ),
     // validate the config
     checkConfig { c =>
@@ -81,90 +69,18 @@ val argParser = {
 }
 
 object Main {
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     OParser.parse(argParser, args, Config()) match {
       case Some(config) =>
         println { s"$ProgramName $ProgramVersion" };
         // do stuff with config
         config.mode match
-          case Mode.Create => Create(config)
-          case Mode.Update => Update(config)
-          case Mode.Init   => Init(config)
+          case Mode.Update => updateCmd(config)
+          case Mode.Init   => initCmd(config)
           // already caught by args checker
           case Mode.None =>
       case _ =>
         System.exit(1)
     }
-  }
 
-  def Create(config: Config) = {}
-
-  def Update(config: Config) = {}
-
-  def Init(config: Config) = {
-    val targetPath = os.pwd / os.RelPath(config.workspace.get.getPath())
-    println(s"initialising workspace $targetPath");
-
-    if (os.exists(targetPath) && !config.force) {
-      println(s"Workspace already exists, Exiting")
-      System.exit(1)
-    }
-    assert(config.workspace.isDefined)
-    os.makeDir.all(targetPath)
-    assert(os.exists(targetPath))
-
-    // setup git
-    val initReturn = os
-      .proc(
-        "git",
-        "init"
-      )
-      .call(
-        cwd = targetPath,
-        check = false,
-        stdout = os.Inherit,
-        mergeErrIntoOut = true
-      )
-    assert(initReturn.exitCode == 0)
-    val commitReturn = os
-      .proc(
-        "git",
-        "commit",
-        "--allow-empty",
-        "-n",
-        "-m",
-        """"Initial""""
-      )
-      .call(
-        cwd = targetPath,
-        check = false,
-        stdout = os.Inherit,
-        mergeErrIntoOut = true
-      )
-    assert(commitReturn.exitCode == 0)
-
-    // add std resource subtree
-    if (!config.nostdresources) {
-      val subtreeResult = os
-        .proc(
-          "git",
-          "subtree",
-          "add",
-          "--prefix",
-          "ikuy_std_resource",
-          "git@github.com:DeanoC/ikuy_std_resources.git",
-          "master",
-          "--squash"
-        )
-        .call(
-          cwd = targetPath,
-          check = false,
-          stdout = os.Inherit,
-          mergeErrIntoOut = true
-        )
-      assert(subtreeResult.exitCode == 0)
-    }
-
-    println("init complete")
-  }
 }

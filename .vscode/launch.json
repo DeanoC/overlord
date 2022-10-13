@@ -23,7 +23,7 @@
             "mainClass": "Overlord.Main",
             "args": [
                 "update",
-                "workspace"
+                "../../test_init_workspace",
             ],
             "jvmOptions": []
         },
@@ -35,7 +35,6 @@
             "args": [
                 "init",
                 "../../test_init_workspace",
-                "--force"
             ],
             "jvmOptions": []
         }
