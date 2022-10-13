@@ -5,6 +5,8 @@ libraries:
     languages: [cpp]
   - name: host_os
     languages: [cpp]
+    dependencies: [host_os]
 programs:
   - name: hello_world
     languages: [cpp]
+    dependencies: [host_os]
