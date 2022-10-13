@@ -1,0 +1,15 @@
+path = "timer"
+
+resources = [
+    "watchdog/watchdog.toml"
+]
+
+[[definition]]
+type = "other.timer.ttc.zynqps8"
+buses = [
+    { protocol = "internal_ttc", supplier = false, data_width = 32 },
+]
+registers = [
+    { resource = "zynqps8/ttc.toml", name = "TTC${index}", base_address = "0x211_0000", address_increment = "0x1_0000" },
+]
+max_instances = 4

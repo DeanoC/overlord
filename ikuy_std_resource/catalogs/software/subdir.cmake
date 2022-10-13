@@ -1,0 +1,5 @@
+file(GLOB _all LIST_DIRECTORIES true RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} CONFIGURE_DEPENDS * )
+list(REMOVE_ITEM _all "CMakeLists.txt" )
+foreach(sd ${_all})
+	add_subdirectory(${sd})
+endforeach()

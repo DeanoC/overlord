@@ -1,0 +1,420 @@
+description = "Funnel for multiple trace streams to single ATB"
+[[bank]]
+  name = "CORESIGHT_SOC_FUNN"
+  address = "0xfe910000"
+[[register]]
+  name = "CTRL_REG"
+  type = "rw"
+  width = 32
+  description = "The Funnel Control Register enables the slave ports and defines the hold time of the slave ports. Hold time refers to the number of transactions that are output on the funnel master port from the same slave while that slave port atvalidsx is HIGH. Hold time does not refer to clock cycles in this context"
+  default = "0x00000300"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "HT"
+    bits = "11:8"
+    type = "rw"
+    shortdesc = '''The formatting scheme can easily become inefficient if fast switching occurs, so, where possible, this must be minimized.'''
+    longdesc = '''If a source has nothing to transmit, then another source is selected irrespective of the minimum number of transactions. The ATB Funnel holds for the minimum hold time and one additional cycle. The maximum value that can be entered is 0xE and this equates to 15 cycles. 0xF is reserved.'''
+  [[register.field]]
+    name = "ENS2"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Setting this bit enables this input, or slave, port.'''
+    longdesc = '''If the bit is not set then this has the effect of excluding the port from the priority selection scheme. The reset value is all clear, that is, all ports disabled.'''
+  [[register.field]]
+    name = "ENS1"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Setting this bit enables this input, or slave, port.'''
+    longdesc = '''If the bit is not set then this has the effect of excluding the port from the priority selection scheme. The reset value is all clear, that is, all ports disabled.'''
+  [[register.field]]
+    name = "ENS0"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Setting this bit enables this input, or slave, port.'''
+    longdesc = '''If the bit is not set then this has the effect of excluding the port from the priority selection scheme. The reset value is all clear, that is, all ports disabled.'''
+[[register]]
+  name = "PRIORITY_CTRL_REG"
+  type = "rw"
+  width = 32
+  description = "The Priority Control Register defines the order in which inputs are selected. Each 3-bit field represents a priority for each particular slave interface. Location 0 has the priority value for the first slave port. Location 1 is the priority value for the second slave port, Location 2 is the third, down to location 7, which has the priority value of the eighth slave port. Values represent the priority value for each port number. If you want to give highest priority to a particular slave port, the corresponding port must be programmed with the lowest value. Typically this is likely to be a port that has more important data or that has a small FIFO and is therefore likely to overflow. If you want to give lowest priority to a particular slave port, the corresponding slave port must be programmed with the highest value. Typically this is likely to be a device that has a large FIFO that is less likely to overflow or a source that has information that is of lower importance."
+  default = "0x00000000"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "PRIPORT2"
+    bits = "8:6"
+    type = "rw"
+  [[register.field]]
+    name = "PRIPORT1"
+    bits = "5:3"
+    type = "rw"
+  [[register.field]]
+    name = "PRIPORT0"
+    bits = "2:0"
+    type = "rw"
+    shortdesc = '''Priority value of the first slave port.'''
+    longdesc = '''The value written into this location is the value that you want to assign the first slave port.'''
+[[register]]
+  name = "ITATBDATA0"
+  type = "rw"
+  width = 32
+  description = "The Integration Test ATB Data 0 Register performs different functions depending on whether the access is a read or a write: A write outputs data on byte boundaries of ATDATAM. A read returns the data from ATDATASn, where n is defined by the status of the Funnel Control register at 0x000. The read data is only valid when ATVALIDSn is HIGH."
+  default = "0x00000000"
+  offset = "0x00000EEC"
+  [[register.field]]
+    name = "ATDATA31"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "ATDATAM23"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "ATDATA15"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "ATDATA7"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "ATDATA0"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "ITATBCTR2"
+  type = "rw"
+  width = 32
+  description = "The Integration Test ATB Control 2 Register performs different functions depending on whether the access is a read or a write: * A write outputs data on atreadysn, where n is defined by the status of the ATB Funnel Control Register at 0x000 * A read returns the data from atreadym."
+  default = "0x00000000"
+  offset = "0x00000EF0"
+  [[register.field]]
+    name = "AFVALID"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "ATREADY"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "ITATBCTR1"
+  type = "rw"
+  width = 32
+  description = "The Integration Test ATB Control 1 Register performs different functions depending on whether the access is a read or a write: * a write sets the value of the atidm. * a read returns the value of the atidmn signals, where n is defined by the status of the Control register at 0x000."
+  default = "0x00000000"
+  offset = "0x00000EF4"
+  [[register.field]]
+    name = "ATID"
+    bits = "6:0"
+    type = "rw"
+[[register]]
+  name = "ITATBCTR0"
+  type = "rw"
+  width = 32
+  description = "The Integration Test ATB Control 0 Register performs different functions depending on whether the access is a read or a write: * a write sets the value of the atvalidm. * a read returns the value of the atvalidsn signals, where n is defined by the status of the Control register at 0x000."
+  default = "0x00000000"
+  offset = "0x00000EF8"
+  [[register.field]]
+    name = "ATBYTES"
+    bits = "9:8"
+    type = "rw"
+  [[register.field]]
+    name = "AFREADY"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "ATVALID"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "ITCTRL"
+  type = "rw"
+  width = 32
+  description = "This register is used to enable topology detection. For more information see the CoreSight Architecture Specification. This register enables the component to switch from a functional mode, the default behavior, to integration mode where the inputs and outputs of the component can be directly controlled for the purpose of integration testing and topology solving Note When a device has been in integration mode, it might not function with the original behavior. After performing integration or topology detection, you must reset the system to ensure correct behavior of CoreSight and other connected system components that are affected by the integration or topology detection."
+  default = "0x00000000"
+  offset = "0x00000F00"
+  [[register.field]]
+    name = "INTEGRATION_MODE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Allows the component to switch from functional mode to integration mode or back.'''
+    longdesc = '''If no integration functionality is implemented, this register must read as zero.'''
+[[register]]
+  name = "CLAIMSET"
+  type = "rw"
+  width = 32
+  description = "This is used in conjunction with Claim Tag Clear Register, CLAIMCLR. This register forms one half of the Claim Tag value. This location allows individual bits to be set, write, and returns the number of bits that can be set, read."
+  default = "0x0000000F"
+  offset = "0x00000FA0"
+  [[register.field]]
+    name = "CLAIMSET"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "CLAIMCLR"
+  type = "rw"
+  width = 32
+  description = "This register is used in conjunction with Claim Tag Set Register, CLAIMSET. This register forms one half of the Claim Tag value. This location enables individual bits to be cleared, write, and returns the current Claim Tag value, read."
+  default = "0x00000000"
+  offset = "0x00000FA4"
+  [[register.field]]
+    name = "CLAIMCLR"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "LAR"
+  type = "wo"
+  width = 32
+  description = "This is used to enable write access to device registers."
+  default = "0x00000000"
+  offset = "0x00000FB0"
+  [[register.field]]
+    name = "KEY"
+    bits = "31:0"
+    type = "wo"
+[[register]]
+  name = "LSR"
+  type = "ro"
+  width = 32
+  description = "This indicates the status of the Lock control mechanism. This lock prevents accidental writes by code under debug. This register must always be present although there might not be any lock-access control mechanism. The lock mechanism, where present and locked, must block write accesses to any control register, except the Lock Access Register. For most components this covers all registers except for the Lock Access Register 0xFB0"
+  default = "0x00000003"
+  offset = "0x00000FB4"
+  [[register.field]]
+    name = "NTT"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "SLK"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "SLI"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "AUTHSTATUS"
+  type = "ro"
+  width = 32
+  description = "Reports the required security level and current status of those enables. Where functionality changes on a given security level then this change in status must be reported in this register"
+  default = "0x00000000"
+  offset = "0x00000FB8"
+  [[register.field]]
+    name = "SNID"
+    bits = "7:6"
+    type = "ro"
+  [[register.field]]
+    name = "SID"
+    bits = "5:4"
+    type = "ro"
+  [[register.field]]
+    name = "NSNID"
+    bits = "3:2"
+    type = "ro"
+  [[register.field]]
+    name = "NSID"
+    bits = "1:0"
+    type = "ro"
+[[register]]
+  name = "DEVID"
+  type = "ro"
+  width = 32
+  description = "This indicates the capabilities of the CoreSight Funnel."
+  default = "0x00000033"
+  offset = "0x00000FC8"
+  [[register.field]]
+    name = "SCHEME"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "PORTCOUNT"
+    bits = "3:0"
+    type = "ro"
+    shortdesc = '''This value represents the number of input ports connected.'''
+    longdesc = '''0x0 and 0x1 are illegal values.'''
+[[register]]
+  name = "DEVTYPE"
+  type = "ro"
+  width = 32
+  description = "It provides a debugger with information about the component when the Part Number field is not recognized. The debugger can then report this information."
+  default = "0x00000012"
+  offset = "0x00000FCC"
+  [[register.field]]
+    name = "SUB_TYPE"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "MAJOR_TYPE"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "PIDR4"
+  type = "ro"
+  width = 32
+  description = "Part of the set of Peripheral Identification registers. Contains part of the designer identity and the memory footprint indicator."
+  default = "0x00000004"
+  offset = "0x00000FD0"
+  [[register.field]]
+    name = "FOURKB_COUNT"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''This is a 4-bit value that indicates the total contiguous size of the memory window used by this component in powers of 2 from the standard 4KB.'''
+    longdesc = '''If a component only requires the standard 4KB then this should read as 0x0, 4KB only, for 8KB set to 0x1, 16KB == 0x2, 32KB == 0x3, and so on.'''
+  [[register.field]]
+    name = "JEP106_CONT"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "PIDR5"
+  type = "ro"
+  width = 32
+  description = "Reserved"
+  default = "0x00000000"
+  offset = "0x00000FD4"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "PIDR6"
+  type = "ro"
+  width = 32
+  description = "Reserved"
+  default = "0x00000000"
+  offset = "0x00000FD8"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "PIDR7"
+  type = "ro"
+  width = 32
+  description = "Reserved"
+  default = "0x00000000"
+  offset = "0x00000FDC"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "PIDR0"
+  type = "ro"
+  width = 32
+  description = "Part of the set of Peripheral Identification registers. Contains part of the designer specific part number."
+  default = "0x00000008"
+  offset = "0x00000FE0"
+  [[register.field]]
+    name = "PART_NUMBER_BITS7TO0"
+    bits = "7:0"
+    type = "ro"
+    shortdesc = '''Bits [7:0] of the component's part number.'''
+    longdesc = '''This is selected by the designer of the component.'''
+[[register]]
+  name = "PIDR1"
+  type = "ro"
+  width = 32
+  description = "Part of the set of Peripheral Identification registers. Contains part of the designer specific part number and part of the designer identity."
+  default = "0x000000B9"
+  offset = "0x00000FE4"
+  [[register.field]]
+    name = "JEP106_BITS3TO0"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "PART_NUMBER_BITS11TO8"
+    bits = "3:0"
+    type = "ro"
+    shortdesc = '''Bits [11:8] of the component's part number.'''
+    longdesc = '''This is selected by the designer of the component.'''
+[[register]]
+  name = "PIDR2"
+  type = "ro"
+  width = 32
+  description = "Part of the set of Peripheral Identification registers. Contains part of the designer identity and the product revision."
+  default = "0x0000002B"
+  offset = "0x00000FE8"
+  [[register.field]]
+    name = "REVISION"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''The Revision field is an incremental value starting at 0x0 for the first design of this component.'''
+    longdesc = '''This only increases by 1 for both major and minor revisions and is simply used as a look-up to establish the exact major/minor revision.'''
+  [[register.field]]
+    name = "JEDEC"
+    bits = "3"
+    type = "ro"
+    shortdesc = '''Always set.'''
+    longdesc = '''Indicates that a JEDEC assigned value is used'''
+  [[register.field]]
+    name = "JEP106_BITS6TO4"
+    bits = "2:0"
+    type = "ro"
+[[register]]
+  name = "PIDR3"
+  type = "ro"
+  width = 32
+  description = "Part of the set of Peripheral Identification registers. Contains the RevAnd and Customer Modified fields."
+  default = "0x00000000"
+  offset = "0x00000FEC"
+  [[register.field]]
+    name = "REVAND"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''This field indicates minor errata fixes specific to this design, for example metal fixes after implementation.'''
+    longdesc = '''In most cases this field is zero. It is recommended that component designers ensure this field can be changed by a metal fix if required, for example by driving it from registers that reset to zero.'''
+  [[register.field]]
+    name = "CUSTOMER_MODIFIED"
+    bits = "3:0"
+    type = "ro"
+    shortdesc = '''Where the component is reusable IP, this value indicates if the customer has modified the behavior of the component.'''
+    longdesc = '''In most cases this field is zero.'''
+[[register]]
+  name = "CIDR0"
+  type = "ro"
+  width = 32
+  description = "A component identification register, that indicates that the identification registers are present."
+  default = "0x0000000D"
+  offset = "0x00000FF0"
+  [[register.field]]
+    name = "PREAMBLE"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "CIDR1"
+  type = "ro"
+  width = 32
+  description = "A component identification register, that indicates that the identification registers are present. This register also indicates the component class."
+  default = "0x00000090"
+  offset = "0x00000FF4"
+  [[register.field]]
+    name = "CLASS"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''Class of the component.'''
+    longdesc = '''E.g. ROM table, CoreSight component etc.'''
+  [[register.field]]
+    name = "PREAMBLE"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "CIDR2"
+  type = "ro"
+  width = 32
+  description = "A component identification register, that indicates that the identification registers are present."
+  default = "0x00000005"
+  offset = "0x00000FF8"
+  [[register.field]]
+    name = "PREAMBLE"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "CIDR3"
+  type = "ro"
+  width = 32
+  description = "A component identification register, that indicates that the identification registers are present."
+  default = "0x000000B1"
+  offset = "0x00000FFC"
+  [[register.field]]
+    name = "PREAMBLE"
+    bits = "7:0"
+    type = "ro"

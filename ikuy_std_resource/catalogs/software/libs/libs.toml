@@ -1,0 +1,133 @@
+[[definition]]
+type = "library.cadt"
+depends = ["core", "dbg", "memory", "multi_core", "platform"]
+
+[[definition]]
+type = "library.core"
+
+[[definition]]
+type = "library.data_binify"
+cpus = "host"
+depends = ["cadt", "core", "dbg", "memory", "multi_core", "utils", "vfile", "tiny_stl"]
+
+[[definition]]
+type = "library.data_utils"
+cpus = "a53,host"
+depends = ["core", "dbg", "memory", "multi_core", "platform", "vfile"]
+
+[[definition]]
+type = "library.dbg"
+depends = ["core", "platform"]
+
+[[definition]]
+type = "library.image"
+cpus = "a53,host"
+depends = ["core", "dbg", "memory", "multi_core", "platform", "tiny_image_format", "musl_math",
+    "tiny_stl", "resource_bundle", "resource_bundle_writer", "data_binify", "vfile", "utils"]
+
+[[definition]]
+type = "library.image_io"
+cpus = "a53,host"
+depends = ["core", "dbg", "memory", "multi_core", "platform", "tiny_image_format", "musl_math", "vfile", "utils", "image"]
+
+[[definition]]
+type = "library.gfxdebug"
+cpus = "a53,r5f,pmu"
+depends = ["core", "dbg", "utils"]
+
+[[definition]]
+type = "library.host_os"
+cpus = "host"
+depends = ["core", "dbg", "memory", "platform", "vfile"]
+
+[[definition]]
+type = "library.luau"
+cpus = "host"
+
+[[definition]]
+type = "library.luau_vm"
+cpus = "a53"
+depends = ["core", "dbg"]
+
+[[definition]]
+type = "library.luau_utils"
+cpus = "host"
+depends = ["core", "dbg"]
+
+[[definition]]
+type = "library.memory"
+depends = ["core", "dbg", "multi_core", "platform"]
+
+[[definition]]
+type = "library.multi_core"
+depends = ["core", "platform"]
+
+[[definition]]
+type = "library.musl_math"
+cpus = "a53,r5f"
+depends = ["core", "dbg", "osservices", "platform"]
+
+[[definition]]
+type = "library.osservices"
+cpus = "a53,r5f,pmu"
+depends = ["core", "dbg", "multi_core", "platform", "utils"]
+
+[[definition]]
+type = "library.platform"
+depends = ["core", "dbg"]
+
+[[definition]]
+type = "library.tiny_image_format"
+depends = ["core", "platform", "musl_math"]
+
+[[definition]]
+type = "library.tiny_stl"
+depends = ["core", "dbg", "multi_core", "platform"]
+
+[[definition]]
+type = "library.resource_bundle"
+depends = ["core", "data_utils", "dbg", "memory", "platform", "vfile"]
+cpus = "a53,host"
+
+[[definition]]
+type = "library.resource_bundle_writer"
+depends = ["core", "data_utils", "dbg", "memory", "platform", "vfile", "tiny_stl",
+    "data_binify", "resource_bundle", "utils"]
+cpus = "host"
+
+[[definition]]
+type = "library.utils"
+depends = ["core", "dbg", "platform"]
+
+[[definition]]
+type = "library.vfile"
+depends = ["core", "dbg"]
+
+[[definition]]
+type = "library.vfile_memory"
+depends = ["core", "dbg", "vfile", "memory"]
+
+[[definition]]
+type = "library.fatfs"
+depends = ["core", "dbg", "memory", "platform", "vfile", "utils"]
+cpus = "a53"
+
+[[definition]]
+type = "library.gpio"
+cpus = "a53"
+depends = ["core", "dbg", "platform"]
+
+[[definition]]
+type = "library.usb"
+cpus = "a53"
+depends = ["core", "dbg", "platform", "cadt", "multi_core", "cadt", "memory", "utils"]
+
+[[definition]]
+type = "library.gfx2d"
+cpus = "host, a53"
+depends = ["core", "dbg", "tiny_image_format"]
+
+[[definition]]
+type = "library.gfx2d_cpu"
+cpus = "host, a53"
+depends = ["core", "dbg", "tiny_image_format", "gfx2d"]

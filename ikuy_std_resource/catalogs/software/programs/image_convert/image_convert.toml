@@ -1,0 +1,13 @@
+actions = [
+    "soft_src"
+]
+
+[[process]]
+name = 'soft_src'
+processor = 'software_sources'
+cpus = "host"
+sources = [
+    { in = "src", out = "src" },
+    { in = "CMakeLists.txt", out = "CMakeLists.txt" },
+    { in = "test.lua", out = "test.lua" },
+]

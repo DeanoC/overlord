@@ -1,0 +1,5423 @@
+description = "PMU Global Control"
+[[bank]]
+  name = "PMU_GLOBAL"
+  address = "0xffd80000"
+[[register]]
+  name = "GLOBAL_CNTRL"
+  type = "mixed"
+  width = 32
+  description = "PMU control and status register."
+  default = "0x00008800"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:17"
+    type = "ro"
+  [[register.field]]
+    name = "MB_SLEEP"
+    bits = "16"
+    type = "ro"
+    shortdesc = '''PMU processing mode: 0: active.'''
+    longdesc = '''1: sleep. Read-only.'''
+  [[register.field]]
+    name = "WRITE_QOS"
+    bits = "15:12"
+    type = "rw"
+    shortdesc = '''QoS regulator setting used by PMU for AXI Write requests.'''
+    longdesc = '''4-bit read/write.'''
+  [[register.field]]
+    name = "READ_QOS"
+    bits = "11:8"
+    type = "rw"
+    shortdesc = '''QoS regulator setting used by PMU for AXI Read requests.'''
+    longdesc = '''4-bit read/write.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:5"
+    type = "ro"
+  [[register.field]]
+    name = "FW_IS_PRESENT"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''Software sets this bit to indicate that the PMU firmware has been loaded in the PMU RAM.'''
+    longdesc = '''0: not loaded. 1: loaded. After the firmware is loaded, the software can call its service routines.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "COHERENT"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''PMU coherency with APU setting.'''
+    longdesc = '''0: outside of APU coherency. 1: coherent using the legacy ACP port on the APU.'''
+  [[register.field]]
+    name = "SLVERR_ENABLE"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Enable the SLVERR error signal back to the interconnect when a Register Access Error occurs.'''
+    longdesc = '''0: disable error signal. 1: assert error signal; write data is ignored and reads returns 0.'''
+  [[register.field]]
+    name = "DONT_SLEEP"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''PMU wake-up when the PMU is in sleep mode and the interrupts are disabled.'''
+    longdesc = '''0: no signal. 1: assert wake up signal. This feature is used after the PMU firmware is loaded into RAM.'''
+[[register]]
+  name = "PS_CNTRL"
+  type = "mixed"
+  width = 32
+  description = "PL Program Initiation Control."
+  default = "0x00000000"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:17"
+    type = "ro"
+  [[register.field]]
+    name = "PROG_GATE_STATUS"
+    bits = "16"
+    type = "ro"
+    shortdesc = '''Status.'''
+    longdesc = '''0: allowed to propagate to PL. 1: blocked. Debug feature. Read-only.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:2"
+    type = "ro"
+  [[register.field]]
+    name = "PROG_ENABLE"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Enable (ungating) bit.'''
+    longdesc = '''0: disable, PL is unaffected by reset. 1: enable, PL is reset by POR or [pcfg_prog_b]. Once this bit is set to 1, it can only be reset to 0 by a POR reset.'''
+  [[register.field]]
+    name = "PROG_GATE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Blocking (gating) bit.'''
+    longdesc = '''0: unblocked. 1: blocked. Once this bit is set to 1, it can only be reset to 0 by a POR reset.'''
+[[register]]
+  name = "APU_PWR_STATUS_INIT"
+  type = "mixed"
+  width = 32
+  description = "APU Power Initialization Status."
+  default = "0x00000000"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU3"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "ACPU2"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "ACPU1"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "ACPU0"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "MEM_CNTRL"
+  type = "mixed"
+  width = 32
+  description = "This Register controls the PMU RAM and ROM settings."
+  default = "0x00BB02CB"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:24"
+    type = "ro"
+  [[register.field]]
+    name = "ROM1_KEN"
+    bits = "23"
+    type = "rw"
+  [[register.field]]
+    name = "ROM1_EMA"
+    bits = "22:20"
+    type = "rw"
+  [[register.field]]
+    name = "ROM0_KEN"
+    bits = "19"
+    type = "rw"
+  [[register.field]]
+    name = "ROM0_EMA"
+    bits = "18:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:12"
+    type = "ro"
+  [[register.field]]
+    name = "ECC_RAM_EMAS"
+    bits = "11"
+    type = "rw"
+  [[register.field]]
+    name = "ECC_RAM_EMAW"
+    bits = "10:9"
+    type = "rw"
+  [[register.field]]
+    name = "ECC_RAM_EMA"
+    bits = "8:6"
+    type = "rw"
+  [[register.field]]
+    name = "DATA_RAM_EMAS"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "DATA_RAM_EMAW"
+    bits = "4:3"
+    type = "rw"
+  [[register.field]]
+    name = "DATA_RAM_EMA"
+    bits = "2:0"
+    type = "rw"
+[[register]]
+  name = "ADDR_ERROR_STATUS"
+  type = "mixed"
+  width = 32
+  description = "Register Address Error; Interrupt Status and Clear."
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "ro"
+  [[register.field]]
+    name = "STATUS"
+    bits = "0"
+    type = "wtc"
+    shortdesc = '''Read.'''
+    longdesc = '''0: no interrupt. 1: interrupt asserted. Write. 0: no effect. 1: clear bit to 0.'''
+[[register]]
+  name = "ADDR_ERROR_INT_MASK"
+  type = "ro"
+  width = 32
+  description = "Register Address Error; Interrupt Mask."
+  default = "0x00000001"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "ro"
+  [[register.field]]
+    name = "MASK"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Interrupt mask.'''
+    longdesc = '''Read operation. 0: unmasked (enabled). 1: masked (disabled).'''
+[[register]]
+  name = "ADDR_ERROR_INT_EN"
+  type = "wo"
+  width = 32
+  description = "Register Address Error; Interrupt Enable."
+  default = "0x00000000"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Interrupt Enable.'''
+    longdesc = '''Write operation. 0: no effect. 1: enable interrupt (set mask to 1).'''
+[[register]]
+  name = "ADDR_ERROR_INT_DIS"
+  type = "wo"
+  width = 32
+  description = "Register Address Error; Interrupt Disable."
+  default = "0x00000000"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "DISABLE"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Interrupt Disable.'''
+    longdesc = '''Write operation. 0: no effect. 1: disable interrupt (set mask to 1).'''
+[[register]]
+  name = "GLOBAL_GEN_STORAGE0"
+  type = "rw"
+  width = 32
+  description = "Global Storage, Reg 0."
+  default = "0x00000000"
+  offset = "0x00000030"
+  [[register.field]]
+    name = "REG"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Bits [31:0] are R/W.'''
+    longdesc = '''The bits do not affect the hardware. The bits are not modified by the hardware or ROM.'''
+[[register]]
+  name = "GLOBAL_GEN_STORAGE1"
+  type = "rw"
+  width = 32
+  description = "Global Storage, Reg 1."
+  default = "0x00000000"
+  offset = "0x00000034"
+  [[register.field]]
+    name = "REG"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Bits [31:0] are R/W.'''
+    longdesc = '''The bits do not affect the hardware. The bits are not modified by the hardware or ROM.'''
+[[register]]
+  name = "GLOBAL_GEN_STORAGE2"
+  type = "rw"
+  width = 32
+  description = "Global Storage, Reg 2."
+  default = "0x00000000"
+  offset = "0x00000038"
+  [[register.field]]
+    name = "REG"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Bits [31:0] are R/W.'''
+    longdesc = '''The bits do not affect the hardware. The bits are not modified by the hardware or ROM.'''
+[[register]]
+  name = "GLOBAL_GEN_STORAGE3"
+  type = "rw"
+  width = 32
+  description = "Global Storage, Reg 3."
+  default = "0x00000000"
+  offset = "0x0000003C"
+  [[register.field]]
+    name = "REG"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Bits [31:0] are R/W.'''
+    longdesc = '''The bits do not affect the hardware. The bits are not modified by the hardware or ROM.'''
+[[register]]
+  name = "GLOBAL_GEN_STORAGE4"
+  type = "rw"
+  width = 32
+  description = "Global Storage, Reg 4."
+  default = "0x00000000"
+  offset = "0x00000040"
+  [[register.field]]
+    name = "REG"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Bits [31:0] are R/W.'''
+    longdesc = '''The bits do not affect the hardware. The bits are not modified by the hardware or ROM.'''
+[[register]]
+  name = "GLOBAL_GEN_STORAGE5"
+  type = "rw"
+  width = 32
+  description = "Global Storage, Reg 5."
+  default = "0x00000000"
+  offset = "0x00000044"
+  [[register.field]]
+    name = "REG"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Bits [31:0] are R/W.'''
+    longdesc = '''The bits do not affect the hardware. The bits are not modified by the hardware or ROM.'''
+[[register]]
+  name = "GLOBAL_GEN_STORAGE6"
+  type = "rw"
+  width = 32
+  description = "Global Storage, Reg 6."
+  default = "0x00000000"
+  offset = "0x00000048"
+  [[register.field]]
+    name = "REG"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Bits [31:0] are R/W.'''
+    longdesc = '''The bits do not affect the hardware. The bits are not modified by the hardware or ROM.'''
+[[register]]
+  name = "PERS_GLOB_GEN_STORAGE0"
+  type = "rw"
+  width = 32
+  description = "Persistent Global Storage, Reg 0."
+  default = "0x00000000"
+  offset = "0x00000050"
+  [[register.field]]
+    name = "REG"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Bits [31:0] are R/W.'''
+    longdesc = '''The bits do not affect the hardware. The bits are not modified by the hardware or ROM.'''
+[[register]]
+  name = "PERS_GLOB_GEN_STORAGE1"
+  type = "rw"
+  width = 32
+  description = "Persistent Global Storage, Reg 1."
+  default = "0x00000000"
+  offset = "0x00000054"
+  [[register.field]]
+    name = "REG"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Bits [31:0] are R/W.'''
+    longdesc = '''The bits do not affect the hardware. The bits are not modified by the hardware or ROM.'''
+[[register]]
+  name = "PERS_GLOB_GEN_STORAGE2"
+  type = "rw"
+  width = 32
+  description = "Persistent Global Storage, Reg 2."
+  default = "0x00000000"
+  offset = "0x00000058"
+  [[register.field]]
+    name = "REG"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Bits [31:0] are R/W.'''
+    longdesc = '''The bits do not affect the hardware. The bits are not modified by the hardware or ROM.'''
+[[register]]
+  name = "PERS_GLOB_GEN_STORAGE3"
+  type = "rw"
+  width = 32
+  description = "Persistent Global Storage, Reg 3."
+  default = "0x00000000"
+  offset = "0x0000005C"
+  [[register.field]]
+    name = "REG"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Bits [31:0] are R/W.'''
+    longdesc = '''The bits do not affect the hardware. The bits are not modified by the hardware or ROM.'''
+[[register]]
+  name = "PERS_GLOB_GEN_STORAGE4"
+  type = "rw"
+  width = 32
+  description = "Persistent Global Storage, Reg 4."
+  default = "0x00000000"
+  offset = "0x00000060"
+  [[register.field]]
+    name = "REG"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Bits [31:0] are R/W.'''
+    longdesc = '''The bits do not affect the hardware. The bits are not modified by the hardware or ROM.'''
+[[register]]
+  name = "PERS_GLOB_GEN_STORAGE5"
+  type = "rw"
+  width = 32
+  description = "Persistent Global Storage, Reg 5."
+  default = "0x00000000"
+  offset = "0x00000064"
+  [[register.field]]
+    name = "REG"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Bits [31:0] are R/W.'''
+    longdesc = '''The bits do not affect the hardware. The bits are not modified by the hardware or ROM.'''
+[[register]]
+  name = "PERS_GLOB_GEN_STORAGE6"
+  type = "rw"
+  width = 32
+  description = "Persistent Global Storage, Reg 6."
+  default = "0x00000000"
+  offset = "0x00000068"
+  [[register.field]]
+    name = "REG"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Bits [31:0] are R/W.'''
+    longdesc = '''The bits do not affect the hardware. The bits are not modified by the hardware or ROM.'''
+[[register]]
+  name = "PERS_GLOB_GEN_STORAGE7"
+  type = "rw"
+  width = 32
+  description = "Persistent Global Storage, Reg 7."
+  default = "0x00000000"
+  offset = "0x0000006C"
+  [[register.field]]
+    name = "REG"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Bits [31:0] are R/W.'''
+    longdesc = '''The bits do not affect the hardware. The bits are not modified by the hardware or ROM.'''
+[[register]]
+  name = "DDR_CNTRL"
+  type = "rw"
+  width = 1
+  description = "DDR Output Signal Latch Control."
+  default = "0x00000000"
+  offset = "0x00000070"
+  [[register.field]]
+    name = "RET"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Signal Output Retention Control.'''
+    longdesc = '''Write sequence operation. Transition 0 to 1: latch DDR outputs to current state. Transition 1 to 0: allow DDR controller to control outputs. Transitions 0 to 0 and 1 to 1 have no effect. The PMU firmware can hold the state of the DDR output buffers while the DDR controller is powered-down.'''
+[[register]]
+  name = "PWR_STATE"
+  type = "ro"
+  width = 32
+  description = "Power State Status; PS Islands, PL Internal and FPD."
+  default = "0x00FFFCBF"
+  offset = "0x00000100"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:24"
+    type = "ro"
+  [[register.field]]
+    name = "PL"
+    bits = "23"
+    type = "ro"
+    shortdesc = '''PL Power Domain (PLPD) status.'''
+    longdesc = '''0: powered-down or isolated (PMU_LOCAL.DOMAIN_ISO_CTRL [PL_LP_ISO_1] = 1; this refers to the non-PCAP interface between the LPD and the PLPD). 1: powered-up and accessible. The PL power is usually controlled by an external FET via an MIO pin.'''
+  [[register.field]]
+    name = "FP"
+    bits = "22"
+    type = "ro"
+    shortdesc = '''Full-power Domain (FPD) status.'''
+    longdesc = '''0: powered-down or isolated (PMU_LOCAL.DOMAIN_ISO_CTRL [LP_FP_ISO_2] = 1). 1: powered-up and accessible. Note: If PMU_LOCAL.DOMAIN_ISO_CTRL [LP_FP_ISO_2] = 1, then the [FP] bit will = 0, but the FPD power supply may in-fact be powered up and the system accessible for debug. When the FPD is in locked isolation (PMU_LOCAL.DOMAIN_ISO_CTRL [FP_LOCKED] = 1), the [FP] bit will be cleared because [LP_FP_ISO_2] becomes inactive in order to allow clocks and resets to enter the FPD. Thus, this field cannot be used to determine FPD accessibility in the event the FPD is locked out. The PMU_LOCAL register set is only accessible by the PMU processor. Note: To request changes to the VCC_PSINTFP power supply, refer to the REQ_PWR{UP,DWN}_TRIG registers. Note: To determine the state of the VCC_PSINTFP power supply, refer to the PMU_GLOCAL.PWR_SUPPLY_STATUS [VCC_PSINTFP] bit.'''
+  [[register.field]]
+    name = "USB1"
+    bits = "21"
+    type = "ro"
+    shortdesc = '''USB Controller 1 power island.'''
+    longdesc = '''0: powered-down. 1: powered-up.'''
+  [[register.field]]
+    name = "USB0"
+    bits = "20"
+    type = "ro"
+  [[register.field]]
+    name = "OCM_BANK3"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "OCM_BANK2"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "OCM_BANK1"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "OCM_BANK0"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "TCM1B"
+    bits = "15"
+    type = "ro"
+  [[register.field]]
+    name = "TCM1A"
+    bits = "14"
+    type = "ro"
+  [[register.field]]
+    name = "TCM0B"
+    bits = "13"
+    type = "ro"
+  [[register.field]]
+    name = "TCM0A"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "R5_1"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "R5_0"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "L2_BANK0"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "PP1"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "PP0"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU3"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU2"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU1"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU0"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "AUX_PWR_STATE"
+  type = "ro"
+  width = 32
+  description = "Memory Retention and RPU Emulation State."
+  default = "0x000FF080"
+  offset = "0x00000104"
+  [[register.field]]
+    name = "ACPU3_EMULATION"
+    bits = "31"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU2_EMULATION"
+    bits = "30"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU1_EMULATION"
+    bits = "29"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU0_EMULATION"
+    bits = "28"
+    type = "ro"
+  [[register.field]]
+    name = "RPU_EMULATION"
+    bits = "27"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "26:20"
+    type = "ro"
+  [[register.field]]
+    name = "OCM_BANK3"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "OCM_BANK2"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "OCM_BANK1"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "OCM_BANK0"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "TCM1B"
+    bits = "15"
+    type = "ro"
+  [[register.field]]
+    name = "TCM1A"
+    bits = "14"
+    type = "ro"
+  [[register.field]]
+    name = "TCM0B"
+    bits = "13"
+    type = "ro"
+  [[register.field]]
+    name = "TCM0A"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:9"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "L2_BANK0"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6:0"
+    type = "ro"
+[[register]]
+  name = "RAM_RET_CNTRL"
+  type = "mixed"
+  width = 32
+  description = "Memory Retention Requests."
+  default = "0x00000000"
+  offset = "0x00000108"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:20"
+    type = "ro"
+  [[register.field]]
+    name = "OCM_BANK3"
+    bits = "19"
+    type = "rw"
+  [[register.field]]
+    name = "OCM_BANK2"
+    bits = "18"
+    type = "rw"
+  [[register.field]]
+    name = "OCM_BANK1"
+    bits = "17"
+    type = "rw"
+  [[register.field]]
+    name = "OCM_BANK0"
+    bits = "16"
+    type = "rw"
+  [[register.field]]
+    name = "TCM1B"
+    bits = "15"
+    type = "rw"
+  [[register.field]]
+    name = "TCM1A"
+    bits = "14"
+    type = "rw"
+  [[register.field]]
+    name = "TCM0B"
+    bits = "13"
+    type = "rw"
+  [[register.field]]
+    name = "TCM0A"
+    bits = "12"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:9"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "L2_BANK0"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6:0"
+    type = "ro"
+[[register]]
+  name = "PWR_SUPPLY_STATUS"
+  type = "ro"
+  width = 32
+  description = "PS Power Supply Status."
+  default = "0x00000004"
+  offset = "0x0000010C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:3"
+    type = "ro"
+  [[register.field]]
+    name = "VCC_INT"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "VCC_PSINTFP"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "REQ_PWRUP_STATUS"
+  type = "mixed"
+  width = 32
+  description = "Power-up Request; Interrupt Status and Clear."
+  default = "0x00000000"
+  offset = "0x00000110"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:24"
+    type = "ro"
+  [[register.field]]
+    name = "PL"
+    bits = "23"
+    type = "wtc"
+    shortdesc = '''Programmable Logic, PL.'''
+    longdesc = '''Controlled by external FET via MIO pin. This optional control uses MIO pin [33]. This is PMU signal [6], pmu_psio_gpo [1].'''
+  [[register.field]]
+    name = "FP"
+    bits = "22"
+    type = "wtc"
+    shortdesc = '''Full-power Domain, FPD.'''
+    longdesc = '''Controlled by external FET via MIO pin. This optional control uses MIO pin [32]. This is PMU signal [5], pmu_psio_gpo [0].'''
+  [[register.field]]
+    name = "USB1"
+    bits = "21"
+    type = "wtc"
+  [[register.field]]
+    name = "USB0"
+    bits = "20"
+    type = "wtc"
+  [[register.field]]
+    name = "OCM_BANK3"
+    bits = "19"
+    type = "wtc"
+  [[register.field]]
+    name = "OCM_BANK2"
+    bits = "18"
+    type = "wtc"
+  [[register.field]]
+    name = "OCM_BANK1"
+    bits = "17"
+    type = "wtc"
+  [[register.field]]
+    name = "OCM_BANK0"
+    bits = "16"
+    type = "wtc"
+  [[register.field]]
+    name = "TCM1B"
+    bits = "15"
+    type = "wtc"
+  [[register.field]]
+    name = "TCM1A"
+    bits = "14"
+    type = "wtc"
+  [[register.field]]
+    name = "TCM0B"
+    bits = "13"
+    type = "wtc"
+  [[register.field]]
+    name = "TCM0A"
+    bits = "12"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "RPU"
+    bits = "10"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "L2_BANK0"
+    bits = "7"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "PP1"
+    bits = "5"
+    type = "wtc"
+  [[register.field]]
+    name = "PP0"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "ACPU3"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "ACPU2"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "ACPU1"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "ACPU0"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "REQ_PWRUP_INT_MASK"
+  type = "ro"
+  width = 32
+  description = "Power-up Request; Interrupt Mask."
+  default = "0x00FFF4BF"
+  offset = "0x00000114"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:24"
+    type = "ro"
+  [[register.field]]
+    name = "PL"
+    bits = "23"
+    type = "ro"
+    shortdesc = '''Programmable Logic, PL.'''
+    longdesc = '''Controlled by external FET via MIO pin. This optional control uses MIO [32] and is equivalent to PMU signal [6].'''
+  [[register.field]]
+    name = "FP"
+    bits = "22"
+    type = "ro"
+    shortdesc = '''Full-power Domain, FPD.'''
+    longdesc = '''Controlled by external FET via MIO pin. This optional control uses MIO [31] and is equivalent to PMU signal [5].'''
+  [[register.field]]
+    name = "USB1"
+    bits = "21"
+    type = "ro"
+  [[register.field]]
+    name = "USB0"
+    bits = "20"
+    type = "ro"
+  [[register.field]]
+    name = "OCM_BANK3"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "OCM_BANK2"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "OCM_BANK1"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "OCM_BANK0"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "TCM1B"
+    bits = "15"
+    type = "ro"
+  [[register.field]]
+    name = "TCM1A"
+    bits = "14"
+    type = "ro"
+  [[register.field]]
+    name = "TCM0B"
+    bits = "13"
+    type = "ro"
+  [[register.field]]
+    name = "TCM0A"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "RPU"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "L2_BANK0"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "PP1"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "PP0"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU3"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU2"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU1"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU0"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "REQ_PWRUP_INT_EN"
+  type = "wo"
+  width = 32
+  description = "Power-up Request; Interrupt Enable."
+  default = "0x00000000"
+  offset = "0x00000118"
+  [[register.field]]
+    name = "PL"
+    bits = "23"
+    type = "wo"
+    shortdesc = '''Programmable Logic, PL.'''
+    longdesc = '''Controlled by external FET via MIO pin. This optional control uses MIO [32] and is equivalent to PMU signal [6].'''
+  [[register.field]]
+    name = "FP"
+    bits = "22"
+    type = "wo"
+    shortdesc = '''Full-power Domain, FPD.'''
+    longdesc = '''Controlled by external FET via MIO pin. This optional control uses MIO [31] and is equivalent to PMU signal [5].'''
+  [[register.field]]
+    name = "USB1"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "USB0"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_BANK3"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_BANK2"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_BANK1"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_BANK0"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "TCM1B"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "TCM1A"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "TCM0B"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "TCM0A"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "RPU"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "L2_BANK0"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "PP1"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "PP0"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU3"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU2"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU1"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "REQ_PWRUP_INT_DIS"
+  type = "wo"
+  width = 32
+  description = "Power-up Request; Interrupt Disable."
+  default = "0x00000000"
+  offset = "0x0000011C"
+  [[register.field]]
+    name = "PL"
+    bits = "23"
+    type = "wo"
+    shortdesc = '''Programmable Logic, PL.'''
+    longdesc = '''Controlled by external FET via MIO pin. This optional control uses MIO [32] and is equivalent to PMU signal [6].'''
+  [[register.field]]
+    name = "FP"
+    bits = "22"
+    type = "wo"
+    shortdesc = '''Full-power Domain, FPD.'''
+    longdesc = '''Controlled by external FET via MIO pin. This optional control uses MIO [31] and is equivalent to PMU signal [5].'''
+  [[register.field]]
+    name = "USB1"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "USB0"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_BANK3"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_BANK2"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_BANK1"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_BANK0"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "TCM1B"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "TCM1A"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "TCM0B"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "TCM0A"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "RPU"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "L2_BANK0"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "PP1"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "PP0"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU3"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU2"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU1"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "REQ_PWRUP_TRIG"
+  type = "wo"
+  width = 32
+  description = "Power-up Request; Interrupt Trigger."
+  default = "0x00000000"
+  offset = "0x00000120"
+  [[register.field]]
+    name = "PL"
+    bits = "23"
+    type = "wo"
+    shortdesc = '''Programmable Logic, PL.'''
+    longdesc = '''Controlled by external FET via MIO pin. This optional control uses MIO [32] and is equivalent to PMU signal [6].'''
+  [[register.field]]
+    name = "FP"
+    bits = "22"
+    type = "wo"
+    shortdesc = '''Full-power Domain, FPD.'''
+    longdesc = '''Controlled by external FET via MIO pin. This optional control uses MIO [31] and is equivalent to PMU signal [5].'''
+  [[register.field]]
+    name = "USB1"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "USB0"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_BANK3"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_BANK2"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_BANK1"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_BANK0"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "TCM1B"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "TCM1A"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "TCM0B"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "TCM0A"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "RPU"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "L2_BANK0"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "PP1"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "PP0"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU3"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU2"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU1"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "REQ_PWRDWN_STATUS"
+  type = "mixed"
+  width = 32
+  description = "Power-down or RAM Retention Request; Interrupt Status and Clear."
+  default = "0x00000000"
+  offset = "0x00000210"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:24"
+    type = "ro"
+  [[register.field]]
+    name = "PL"
+    bits = "23"
+    type = "wtc"
+    shortdesc = '''Programmable Logic, PL.'''
+    longdesc = '''Controlled by external FET via MIO pin. This optional control uses MIO [32] and is equivalent to PMU signal [6].'''
+  [[register.field]]
+    name = "FP"
+    bits = "22"
+    type = "wtc"
+    shortdesc = '''Full-power Domain, FPD.'''
+    longdesc = '''Controlled by external FET via MIO pin. This optional control uses MIO [31] and is equivalent to PMU signal [5].'''
+  [[register.field]]
+    name = "USB1"
+    bits = "21"
+    type = "wtc"
+  [[register.field]]
+    name = "USB0"
+    bits = "20"
+    type = "wtc"
+  [[register.field]]
+    name = "OCM_BANK3"
+    bits = "19"
+    type = "wtc"
+  [[register.field]]
+    name = "OCM_BANK2"
+    bits = "18"
+    type = "wtc"
+  [[register.field]]
+    name = "OCM_BANK1"
+    bits = "17"
+    type = "wtc"
+  [[register.field]]
+    name = "OCM_BANK0"
+    bits = "16"
+    type = "wtc"
+  [[register.field]]
+    name = "TCM1B"
+    bits = "15"
+    type = "wtc"
+  [[register.field]]
+    name = "TCM1A"
+    bits = "14"
+    type = "wtc"
+  [[register.field]]
+    name = "TCM0B"
+    bits = "13"
+    type = "wtc"
+  [[register.field]]
+    name = "TCM0A"
+    bits = "12"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "RPU"
+    bits = "10"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "L2_BANK0"
+    bits = "7"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "PP1"
+    bits = "5"
+    type = "wtc"
+  [[register.field]]
+    name = "PP0"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "ACPU3"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "ACPU2"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "ACPU1"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "ACPU0"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "REQ_PWRDWN_INT_MASK"
+  type = "ro"
+  width = 32
+  description = "Power-down or RAM Retention Request; Interrupt Mask."
+  default = "0x00FFF4BF"
+  offset = "0x00000214"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:24"
+    type = "ro"
+  [[register.field]]
+    name = "PL"
+    bits = "23"
+    type = "ro"
+    shortdesc = '''Programmable Logic, PL.'''
+    longdesc = '''Controlled by external FET via MIO pin. This optional control uses MIO [32] and is equivalent to PMU signal [6].'''
+  [[register.field]]
+    name = "FP"
+    bits = "22"
+    type = "ro"
+    shortdesc = '''Full-power Domain, FPD.'''
+    longdesc = '''Controlled by external FET via MIO pin. This optional control uses MIO [31] and is equivalent to PMU signal [5].'''
+  [[register.field]]
+    name = "USB1"
+    bits = "21"
+    type = "ro"
+  [[register.field]]
+    name = "USB0"
+    bits = "20"
+    type = "ro"
+  [[register.field]]
+    name = "OCM_BANK3"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "OCM_BANK2"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "OCM_BANK1"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "OCM_BANK0"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "TCM1B"
+    bits = "15"
+    type = "ro"
+  [[register.field]]
+    name = "TCM1A"
+    bits = "14"
+    type = "ro"
+  [[register.field]]
+    name = "TCM0B"
+    bits = "13"
+    type = "ro"
+  [[register.field]]
+    name = "TCM0A"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "RPU"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "L2_BANK0"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "PP1"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "PP0"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU3"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU2"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU1"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU0"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "REQ_PWRDWN_INT_EN"
+  type = "wo"
+  width = 32
+  description = "Power-down or RAM Retention Request; Interrupt Enable."
+  default = "0x00000000"
+  offset = "0x00000218"
+  [[register.field]]
+    name = "PL"
+    bits = "23"
+    type = "wo"
+    shortdesc = '''Programmable Logic, PL.'''
+    longdesc = '''Controlled by external FET via MIO pin. This optional control uses MIO [32] and is equivalent to PMU signal [6].'''
+  [[register.field]]
+    name = "FP"
+    bits = "22"
+    type = "wo"
+    shortdesc = '''Full-power Domain, FPD.'''
+    longdesc = '''Controlled by external FET via MIO pin. This optional control uses MIO [31] and is equivalent to PMU signal [5].'''
+  [[register.field]]
+    name = "USB1"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "USB0"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_BANK3"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_BANK2"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_BANK1"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_BANK0"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "TCM1B"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "TCM1A"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "TCM0B"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "TCM0A"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "RPU"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "L2_BANK0"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "PP1"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "PP0"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU3"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU2"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU1"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "REQ_PWRDWN_INT_DIS"
+  type = "wo"
+  width = 32
+  description = "Power-down or RAM Retention Request; Interrupt Disable."
+  default = "0x00000000"
+  offset = "0x0000021C"
+  [[register.field]]
+    name = "PL"
+    bits = "23"
+    type = "wo"
+    shortdesc = '''Programmable Logic, PL.'''
+    longdesc = '''Controlled by external FET via MIO pin. This optional control uses MIO [32] and is equivalent to PMU signal [6].'''
+  [[register.field]]
+    name = "FP"
+    bits = "22"
+    type = "wo"
+    shortdesc = '''Full-power Domain, FPD.'''
+    longdesc = '''Controlled by external FET via MIO pin. This optional control uses MIO [31] and is equivalent to PMU signal [5].'''
+  [[register.field]]
+    name = "USB1"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "USB0"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_BANK3"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_BANK2"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_BANK1"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_BANK0"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "TCM1B"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "TCM1A"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "TCM0B"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "TCM0A"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "RPU"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "L2_BANK0"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "PP1"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "PP0"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU3"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU2"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU1"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "REQ_PWRDWN_TRIG"
+  type = "wo"
+  width = 32
+  description = "Power-down or RAM Retention Request; Interrupt Trigger."
+  default = "0x00000000"
+  offset = "0x00000220"
+  [[register.field]]
+    name = "PL"
+    bits = "23"
+    type = "wo"
+    shortdesc = '''Programmable Logic, PL.'''
+    longdesc = '''Controlled by external FET via MIO pin. This optional control uses MIO [32] and is equivalent to PMU signal [6].'''
+  [[register.field]]
+    name = "FP"
+    bits = "22"
+    type = "wo"
+    shortdesc = '''Full-power Domain, FPD.'''
+    longdesc = '''Controlled by external FET via MIO pin. This optional control uses MIO [31] and is equivalent to PMU signal [5].'''
+  [[register.field]]
+    name = "USB1"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "USB0"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_BANK3"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_BANK2"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_BANK1"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_BANK0"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "TCM1B"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "TCM1A"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "TCM0B"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "TCM0A"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "RPU"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "L2_BANK0"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "PP1"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "PP0"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU3"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU2"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU1"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "REQ_ISO_STATUS"
+  type = "mixed"
+  width = 32
+  description = "Isolation Request; Interrupt Status and Clear."
+  default = "0x00000000"
+  offset = "0x00000310"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:5"
+    type = "ro"
+  [[register.field]]
+    name = "FP_LOCKED"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "PL_NONPCAP"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "PL"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "FP"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "REQ_ISO_INT_MASK"
+  type = "ro"
+  width = 32
+  description = "Isolation Request; Interrupt Mask."
+  default = "0x00000017"
+  offset = "0x00000314"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:5"
+    type = "ro"
+  [[register.field]]
+    name = "FP_LOCKED"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "PL_NONPCAP"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "PL"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "FP"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "REQ_ISO_INT_EN"
+  type = "wo"
+  width = 32
+  description = "Isolation Request; Interrupt Enable."
+  default = "0x00000000"
+  offset = "0x00000318"
+  [[register.field]]
+    name = "FP_LOCKED"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "PL_NONPCAP"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "PL"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "FP"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "REQ_ISO_INT_DIS"
+  type = "wo"
+  width = 32
+  description = "Isolation Request; Interrupt Disable."
+  default = "0x00000000"
+  offset = "0x0000031C"
+  [[register.field]]
+    name = "FP_LOCKED"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "PL_NONPCAP"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "PL"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "FP"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "REQ_ISO_TRIG"
+  type = "wo"
+  width = 32
+  description = "Isolation Request; Interrupt Trigger."
+  default = "0x00000000"
+  offset = "0x00000320"
+  [[register.field]]
+    name = "FP_LOCKED"
+    bits = "4"
+    type = "wo"
+    shortdesc = '''Isolate all signals between the FPD and LPD with the exception of the clock and reset signals.'''
+    longdesc = '''The PL Interface remains active. Note: If the FPD voltage node is not powered up when the PS_POR_B reset pin is released, then the FPD node is permanently locked out and this bit is set. To re-enable the FPD, a PS_POR_B reset is required with valid power on VCC_PSINTFP.'''
+  [[register.field]]
+    name = "PL_NONPCAP"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "PL"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "FP"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "REQ_SWRST_STATUS"
+  type = "mixed"
+  width = 32
+  description = "Reset Request; Interrupt Status and Clear."
+  default = "0x00000000"
+  offset = "0x00000410"
+  [[register.field]]
+    name = "PL"
+    bits = "31"
+    type = "wtc"
+  [[register.field]]
+    name = "FP"
+    bits = "30"
+    type = "wtc"
+    shortdesc = '''Full Power Domain, FPD reset request.'''
+    longdesc = '''System-level reset ensures FPD transactions are flushed and the FPD is blocked before the reset.'''
+  [[register.field]]
+    name = "LP"
+    bits = "29"
+    type = "wtc"
+  [[register.field]]
+    name = "PS_ONLY"
+    bits = "28"
+    type = "wtc"
+    shortdesc = '''PS-only reset request.'''
+    longdesc = '''System-level reset ensures the PS transactions are flushed and PS is blocked before the reset. First set PMU_GLOBAL.PS_CTRL [PROG_GATE] = 1 to block the reset to the PL.'''
+  [[register.field]]
+    name = "IOU"
+    bits = "27"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "26"
+    type = "ro"
+  [[register.field]]
+    name = "USB1"
+    bits = "25"
+    type = "wtc"
+  [[register.field]]
+    name = "USB0"
+    bits = "24"
+    type = "wtc"
+  [[register.field]]
+    name = "GEM3"
+    bits = "23"
+    type = "wtc"
+  [[register.field]]
+    name = "GEM2"
+    bits = "22"
+    type = "wtc"
+  [[register.field]]
+    name = "GEM1"
+    bits = "21"
+    type = "wtc"
+  [[register.field]]
+    name = "GEM0"
+    bits = "20"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "RPU"
+    bits = "18"
+    type = "wtc"
+    shortdesc = '''RPU Lockstep reset request.'''
+    longdesc = '''System-level reset ensures RPU transactions are flushed and the RPU master is blocked before the reset.'''
+  [[register.field]]
+    name = "R5_1"
+    bits = "17"
+    type = "wtc"
+  [[register.field]]
+    name = "R5_0"
+    bits = "16"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "ro"
+  [[register.field]]
+    name = "DISPLAY_PORT"
+    bits = "12"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "SATA"
+    bits = "10"
+    type = "wtc"
+  [[register.field]]
+    name = "PCIE"
+    bits = "9"
+    type = "wtc"
+  [[register.field]]
+    name = "GPU"
+    bits = "8"
+    type = "wtc"
+  [[register.field]]
+    name = "PP1"
+    bits = "7"
+    type = "wtc"
+  [[register.field]]
+    name = "PP0"
+    bits = "6"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "APU"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "ACPU3"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "ACPU2"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "ACPU1"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "ACPU0"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "REQ_SWRST_INT_MASK"
+  type = "ro"
+  width = 32
+  description = "Reset Request; Interrupt Mask. Check the REQ_SWRST_STATUS register bits for more information."
+  default = "0xFBF717DF"
+  offset = "0x00000414"
+  [[register.field]]
+    name = "PL"
+    bits = "31"
+    type = "ro"
+  [[register.field]]
+    name = "FP"
+    bits = "30"
+    type = "ro"
+  [[register.field]]
+    name = "LP"
+    bits = "29"
+    type = "ro"
+  [[register.field]]
+    name = "PS_ONLY"
+    bits = "28"
+    type = "ro"
+  [[register.field]]
+    name = "IOU"
+    bits = "27"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "26"
+    type = "ro"
+  [[register.field]]
+    name = "USB1"
+    bits = "25"
+    type = "ro"
+  [[register.field]]
+    name = "USB0"
+    bits = "24"
+    type = "ro"
+  [[register.field]]
+    name = "GEM3"
+    bits = "23"
+    type = "ro"
+  [[register.field]]
+    name = "GEM2"
+    bits = "22"
+    type = "ro"
+  [[register.field]]
+    name = "GEM1"
+    bits = "21"
+    type = "ro"
+  [[register.field]]
+    name = "GEM0"
+    bits = "20"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "LS_R5"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "R5_1"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "R5_0"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "ro"
+  [[register.field]]
+    name = "DISPLAY_PORT"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "SATA"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "PCIE"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "GPU"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "PP1"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "PP0"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "APU"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU3"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU2"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU1"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU0"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "REQ_SWRST_INT_EN"
+  type = "wo"
+  width = 32
+  description = "Reset Request; Interrupt Enable. Check the REQ_SWRST_STATUS register bits for more information."
+  default = "0x00000000"
+  offset = "0x00000418"
+  [[register.field]]
+    name = "PL"
+    bits = "31"
+    type = "wo"
+  [[register.field]]
+    name = "FP"
+    bits = "30"
+    type = "wo"
+  [[register.field]]
+    name = "LP"
+    bits = "29"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ONLY"
+    bits = "28"
+    type = "wo"
+  [[register.field]]
+    name = "IOU"
+    bits = "27"
+    type = "wo"
+  [[register.field]]
+    name = "USB1"
+    bits = "25"
+    type = "wo"
+  [[register.field]]
+    name = "USB0"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "GEM3"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "GEM2"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "GEM1"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "GEM0"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "LS_R5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "R5_1"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "R5_0"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "DISPLAY_PORT"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "SATA"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "PCIE"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "GPU"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "PP1"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "PP0"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "APU"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU3"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU2"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU1"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "REQ_SWRST_INT_DIS"
+  type = "wo"
+  width = 32
+  description = "Reset Request; Interrupt Disable. Check the REQ_SWRST_STATUS register bits for more information."
+  default = "0x00000000"
+  offset = "0x0000041C"
+  [[register.field]]
+    name = "PL"
+    bits = "31"
+    type = "wo"
+  [[register.field]]
+    name = "FP"
+    bits = "30"
+    type = "wo"
+  [[register.field]]
+    name = "LP"
+    bits = "29"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ONLY"
+    bits = "28"
+    type = "wo"
+  [[register.field]]
+    name = "IOU"
+    bits = "27"
+    type = "wo"
+  [[register.field]]
+    name = "USB1"
+    bits = "25"
+    type = "wo"
+  [[register.field]]
+    name = "USB0"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "GEM3"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "GEM2"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "GEM1"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "GEM0"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "LS_R5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "R5_1"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "R5_0"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "DISPLAY_PORT"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "SATA"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "PCIE"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "GPU"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "PP1"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "PP0"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "APU"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU3"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU2"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU1"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "REQ_SWRST_TRIG"
+  type = "wo"
+  width = 32
+  description = "Reset Request; Interrupt Trigger. Check the REQ_SWRST_STATUS register bits for more information."
+  default = "0x00000000"
+  offset = "0x00000420"
+  [[register.field]]
+    name = "PL"
+    bits = "31"
+    type = "wo"
+  [[register.field]]
+    name = "FP"
+    bits = "30"
+    type = "wo"
+  [[register.field]]
+    name = "LP"
+    bits = "29"
+    type = "wo"
+  [[register.field]]
+    name = "PS_ONLY"
+    bits = "28"
+    type = "wo"
+  [[register.field]]
+    name = "IOU"
+    bits = "27"
+    type = "wo"
+  [[register.field]]
+    name = "USB1"
+    bits = "25"
+    type = "wo"
+  [[register.field]]
+    name = "USB0"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "GEM3"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "GEM2"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "GEM1"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "GEM0"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "LS_R5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "R5_1"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "R5_0"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "DISPLAY_PORT"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "SATA"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "PCIE"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "GPU"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "PP1"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "PP0"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "APU"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU3"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU2"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU1"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "ACPU0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "CSU_BR_ERROR"
+  type = "mixed"
+  width = 32
+  description = "BootROM Error detection and code."
+  default = "0x00000000"
+  offset = "0x00000528"
+  [[register.field]]
+    name = "BR_ERROR"
+    bits = "31"
+    type = "rw"
+    shortdesc = '''BootROM error detected.'''
+    longdesc = '''0: no error. 1: error occurred and the code is in [ERR_TYPE]. This is a System Error routed to the interrupt status and clear registers. This bit is written by CSU BootROM.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "ro"
+  [[register.field]]
+    name = "ERR_TYPE"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''BootROM Error Code.'''
+    longdesc = '''Bits [15:0] are written by the BootROM when a fatal error occurs.'''
+[[register]]
+  name = "MB_FAULT_STATUS"
+  type = "ro"
+  width = 32
+  description = "PMU Fault Status; Lockstep, Fatal, Selfcheck, Sleep Instruction."
+  default = "0x00000000"
+  offset = "0x0000052C"
+  [[register.field]]
+    name = "R_FFAIL"
+    bits = "31:24"
+    type = "ro"
+    shortdesc = '''Redundant (secondary) fatal fault detection.'''
+    longdesc = '''First lockstep mismatch. Bit [24] between processor 1 and 2. Bit [25] between processor 1 and 3. Bit [26] between processor 2 and 3. Redundant (secondary) first selfcheck comparator Error. Bit [27] between processor 1 and 2. Bit [28] between processor 1 and 3. Bit [29] between processor 2 and 3. First Selfcheck Voter Error. Bit [30] Selfcheck Voter Error. First Uncorrectable ECC Error. Bit [31] Uncorrectable Error from PMU RAM ECC.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "R_SLEEP_RST"
+    bits = "19"
+    type = "ro"
+    shortdesc = '''Redundant (secondary) fault detection.'''
+    longdesc = '''PMU Sleep Instruction Response. 0: causes the PMU CPUs to go to sleep. 1: causes the PMU CPUs to reset. Read-only.'''
+  [[register.field]]
+    name = "R_LSFAIL"
+    bits = "18:16"
+    type = "ro"
+    shortdesc = '''Redundant (secondary) fault detection.'''
+    longdesc = '''Frist lockstep mismatch. Bit [16] processors 1 and 2. Bit [17] processors 1 and 3. Bit [18] processors 2 and 3.'''
+  [[register.field]]
+    name = "N_FFAIL"
+    bits = "15:8"
+    type = "ro"
+    shortdesc = '''Nominal (primary) fatal fault detection.'''
+    longdesc = '''First lockstep mismatch. Bit [8] between processor 1 and 2. Bit [9] between processor 1 and 3. Bit [10] between processor 2 and 3. Nominal (primary) first selfcheck comparator Error. Bit [11] between processor 1 and 2. Bit [12] between processor 1 and 3. Bit [13] between processor 2 and 3. First Selfcheck Voter Error. Bit [14] Selfcheck Voter Error. First Uncorrectable ECC Error. Bit [15] Uncorrectable Error from PMU RAM ECC.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "N_SLEEP_RST"
+    bits = "3"
+    type = "ro"
+    shortdesc = '''Nominal (primary) fault detection.'''
+    longdesc = '''PMU Sleep Instruction Response. 0: causes the PMU CPUs to go to sleep. 1: causes the PMU CPUs to reset. Read-only.'''
+  [[register.field]]
+    name = "N_LSFAIL"
+    bits = "2:0"
+    type = "ro"
+    shortdesc = '''Nominal (primary) fault detection.'''
+    longdesc = '''First lockstep mismatch. Bit [0] processors 1 and 2. Bit [1] processors 1 and 3. Bit [2] processors 2 and 3.'''
+[[register]]
+  name = "ERROR_STATUS_1"
+  type = "mixed"
+  width = 32
+  description = "System Errors; Interrupt Clear and Status, Reg 1."
+  default = "0x00000000"
+  offset = "0x00000530"
+  [[register.field]]
+    name = "CSU_SWDT"
+    bits = "27"
+    type = "wtc"
+  [[register.field]]
+    name = "CLK_MON"
+    bits = "26"
+    type = "wtc"
+    shortdesc = '''Clock Monitor (ClkMon) Error.'''
+    longdesc = '''Selected clock is not within acceptable frequency range. Refer to TRM.'''
+  [[register.field]]
+    name = "XMPU"
+    bits = "25:24"
+    type = "wtc"
+    shortdesc = '''Protect Unit errors.'''
+    longdesc = '''Bit [24] is OR of OCM_XMPU, XPPU error signals. Bit [25] is OR of FPD_XMPU, DDR_MPU error signals.'''
+  [[register.field]]
+    name = "PWR_SUPPLY"
+    bits = "23:16"
+    type = "wtc"
+    shortdesc = '''Bit [16] is for VCC_PS_LPD.'''
+    longdesc = '''Bit [17] is for VCC_PS_FPD. Bit [18] is for VCC_PS_AUX. Bit [19] is for VCCO_PS_DDR. Bit [20] is for VCCO_PS_3. Bit [21] is for VCCO_PS_0. Bit [22] is for VCCO_PS_1. Bit [23] is for VCCO_PS_2.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "ro"
+  [[register.field]]
+    name = "FPD_SWDT"
+    bits = "13"
+    type = "wtc"
+  [[register.field]]
+    name = "LPD_SWDT"
+    bits = "12"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:10"
+    type = "ro"
+  [[register.field]]
+    name = "RPU_CCF"
+    bits = "9"
+    type = "wtc"
+    shortdesc = '''RPU Common Cause Failure (CCF) Errors OR'ed together.'''
+    longdesc = '''Represents one or more errors.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "RPU_LS"
+    bits = "7:6"
+    type = "wtc"
+    shortdesc = '''RPU Lockstep Error detected: 00: no error.'''
+    longdesc = '''01: lockstep error. 10: lockstep error. 11: lockstep error.'''
+  [[register.field]]
+    name = "FPD_TEMP"
+    bits = "5"
+    type = "wtc"
+  [[register.field]]
+    name = "LPD_TEMP"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "RPU1"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "RPU0"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "OCM_ECC"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "DDR_ECC"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "ERROR_INT_MASK_1"
+  type = "ro"
+  width = 32
+  description = "System Errors to PMU; Interrupt Mask, Reg 1."
+  default = "0xFFFF32FF"
+  offset = "0x00000534"
+  [[register.field]]
+    name = "CSU_SWDT"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''CSU_SWDT timeout.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "CLK_MON"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''Clock Monitor (ClkMon).'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "XMPU"
+    bits = "25:24"
+    type = "ro"
+  [[register.field]]
+    name = "PWR_SUPPLY"
+    bits = "23:16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "ro"
+  [[register.field]]
+    name = "FPD_SWDT"
+    bits = "13"
+    type = "ro"
+  [[register.field]]
+    name = "LPD_SWDT"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:10"
+    type = "ro"
+  [[register.field]]
+    name = "RPU_CCF"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "RPU_LS"
+    bits = "7:6"
+    type = "ro"
+  [[register.field]]
+    name = "FPD_TEMP"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "LPD_TEMP"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "RPU1"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "RPU0"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "OCM_ECC"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "DDR_ECC"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ERROR_INT_EN_1"
+  type = "wo"
+  width = 32
+  description = "System Errors to PMU; Interrupt Enable, Reg 1."
+  default = "0x00000000"
+  offset = "0x00000538"
+  [[register.field]]
+    name = "CSU_SWDT"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''CSU_SWDT timeout.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "CLK_MON"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Clock Monitor (ClkMon).'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "XMPU"
+    bits = "25:24"
+    type = "wo"
+  [[register.field]]
+    name = "PWR_SUPPLY"
+    bits = "23:16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "wo"
+  [[register.field]]
+    name = "FPD_SWDT"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "LPD_SWDT"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:10"
+    type = "wo"
+  [[register.field]]
+    name = "RPU_CCF"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "RPU_LS"
+    bits = "7:6"
+    type = "wo"
+  [[register.field]]
+    name = "FPD_TEMP"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "LPD_TEMP"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "RPU1"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "RPU0"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_ECC"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "DDR_ECC"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "ERROR_INT_DIS_1"
+  type = "wo"
+  width = 32
+  description = "System Errors to PMU; Interrupt Disable, Reg 1."
+  default = "0x00000000"
+  offset = "0x0000053C"
+  [[register.field]]
+    name = "CSU_SWDT"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''CSU_SWDT timeout.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "CLK_MON"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Clock Monitor (ClkMon).'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "XMPU"
+    bits = "25:24"
+    type = "wo"
+  [[register.field]]
+    name = "PWR_SUPPLY"
+    bits = "23:16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "wo"
+  [[register.field]]
+    name = "FPD_SWDT"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "LPD_SWDT"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:10"
+    type = "wo"
+  [[register.field]]
+    name = "RPU_CCF"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "RPU_LS"
+    bits = "7:6"
+    type = "wo"
+  [[register.field]]
+    name = "FPD_TEMP"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "LPD_TEMP"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "RPU1"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "RPU0"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_ECC"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "DDR_ECC"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "ERROR_STATUS_2"
+  type = "mixed"
+  width = 32
+  description = "System Errors; Interrupt Clear and Status, Reg 2."
+  default = "0x00000000"
+  offset = "0x00000540"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:27"
+    type = "ro"
+  [[register.field]]
+    name = "CSU_ROM"
+    bits = "26"
+    type = "wtc"
+    shortdesc = '''CSU BootROM Sequence Error.'''
+    longdesc = '''CSU_BR_ERROR [BR_ERROR] bit is set and the [ERR_TYPE] bit field contains the error code.'''
+  [[register.field]]
+    name = "PMU_PB"
+    bits = "25"
+    type = "wtc"
+  [[register.field]]
+    name = "PMU_SERVICE"
+    bits = "24"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "ro"
+  [[register.field]]
+    name = "PMU_FW"
+    bits = "21:18"
+    type = "wtc"
+    shortdesc = '''Four (4) Firmware defined error bits.'''
+    longdesc = '''Bits [21:18] can be activated by user firmware.'''
+  [[register.field]]
+    name = "PMU_UC"
+    bits = "17"
+    type = "wtc"
+    shortdesc = '''PMU BootROM Error.'''
+    longdesc = '''Includes PMU ROM validation error, PMU Triple Module Redundancy (TMR) error, PMU RAM uncorrectable ECC error, and PMU Local Register address error.'''
+  [[register.field]]
+    name = "CSU"
+    bits = "16"
+    type = "wtc"
+    shortdesc = '''CSU hardware generated error including CSU ROM validation error.'''
+    longdesc = '''CSU boot fails, ROM is not executed.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "ro"
+  [[register.field]]
+    name = "PLL_LOCK"
+    bits = "12:8"
+    type = "wtc"
+    shortdesc = '''PLL Lock Errors.'''
+    longdesc = '''Bit [8] is for IOPLL. Bit [9] is for RPLL. Bit [10] is for APLL. Bit [11] is for DPLL. Bit [12] is for VPLL.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:6"
+    type = "ro"
+  [[register.field]]
+    name = "PL"
+    bits = "5:2"
+    type = "wtc"
+    shortdesc = '''PL to PS Signals.'''
+    longdesc = '''Bit [2] is PL System Error Signal. Bit [3] is PL System Error Signal. Bit [4] is PL System Error Signal. Bit [5] is PL System Error Signal.'''
+  [[register.field]]
+    name = "TO"
+    bits = "1:0"
+    type = "wtc"
+    shortdesc = '''AXI Timeout Buffer (ATB).'''
+    longdesc = '''Bit [0] is for ATB's in the LPD. Bit [1] is for ATB's in the FPD. The ATB timeout signals within a power domain are OR'ed together'''
+[[register]]
+  name = "ERROR_INT_MASK_2"
+  type = "ro"
+  width = 32
+  description = "System Errors to PMU; Interrupt Mask, Reg 2."
+  default = "0x073F1F3F"
+  offset = "0x00000544"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:27"
+    type = "ro"
+  [[register.field]]
+    name = "CSU_ROM"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''CSU BootROM Sequence failure.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "PMU_PB"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''PMU Pre-BootROM Sequence failure.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "PMU_SERVICE"
+    bits = "24"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "ro"
+  [[register.field]]
+    name = "PMU_FW"
+    bits = "21:18"
+    type = "ro"
+  [[register.field]]
+    name = "PMU_UC"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "CSU"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "ro"
+  [[register.field]]
+    name = "PLL_LOCK"
+    bits = "12:8"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:6"
+    type = "ro"
+  [[register.field]]
+    name = "PL"
+    bits = "5:2"
+    type = "ro"
+  [[register.field]]
+    name = "TO"
+    bits = "1:0"
+    type = "ro"
+[[register]]
+  name = "ERROR_INT_EN_2"
+  type = "wo"
+  width = 32
+  description = "System Errors to PMU; Interrupt Enable, Reg 2."
+  default = "0x00000000"
+  offset = "0x00000548"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:27"
+    type = "wo"
+  [[register.field]]
+    name = "CSU_ROM"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''CSU BootROM Sequence failure.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "PMU_PB"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''PMU Pre-BootROM Sequence failure.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "PMU_SERVICE"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "wo"
+  [[register.field]]
+    name = "PMU_FW"
+    bits = "21:18"
+    type = "wo"
+  [[register.field]]
+    name = "PMU_UC"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CSU"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "wo"
+  [[register.field]]
+    name = "PLL_LOCK"
+    bits = "12:8"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:6"
+    type = "wo"
+  [[register.field]]
+    name = "PL"
+    bits = "5:2"
+    type = "wo"
+  [[register.field]]
+    name = "TO"
+    bits = "1:0"
+    type = "wo"
+[[register]]
+  name = "ERROR_INT_DIS_2"
+  type = "wo"
+  width = 32
+  description = "System Errors to PMU; Interrupt Disable, Reg 2."
+  default = "0x00000000"
+  offset = "0x0000054C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:27"
+    type = "wo"
+  [[register.field]]
+    name = "CSU_ROM"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''CSU BootROM Sequence failure.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "PMU_PB"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''PMU Pre-BootROM Sequence failure.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "PMU_SERVICE"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "wo"
+  [[register.field]]
+    name = "PMU_FW"
+    bits = "21:18"
+    type = "wo"
+  [[register.field]]
+    name = "PMU_UC"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CSU"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "wo"
+  [[register.field]]
+    name = "PLL_LOCK"
+    bits = "12:8"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:6"
+    type = "wo"
+  [[register.field]]
+    name = "PL"
+    bits = "5:2"
+    type = "wo"
+  [[register.field]]
+    name = "TO"
+    bits = "1:0"
+    type = "wo"
+[[register]]
+  name = "ERROR_POR_MASK_1"
+  type = "ro"
+  width = 32
+  description = "System Errors to POR; Interrupt Mask, Reg 1."
+  default = "0xFFFF32FF"
+  offset = "0x00000550"
+  [[register.field]]
+    name = "CSU_SWDT"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''CSU_SWDT timeout.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "CLK_MON"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''Clock Monitor (ClkMon).'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "XMPU"
+    bits = "25:24"
+    type = "ro"
+  [[register.field]]
+    name = "PWR_SUPPLY"
+    bits = "23:16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "ro"
+  [[register.field]]
+    name = "FPD_SWDT"
+    bits = "13"
+    type = "ro"
+  [[register.field]]
+    name = "LPD_SWDT"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:10"
+    type = "ro"
+  [[register.field]]
+    name = "RPU_CCF"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "RPU_LS"
+    bits = "7:6"
+    type = "ro"
+  [[register.field]]
+    name = "FPD_TEMP"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "LPD_TEMP"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "RPU1"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "RPU0"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "OCM_ECC"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "DDR_ECC"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ERROR_POR_EN_1"
+  type = "wo"
+  width = 32
+  description = "System Errors to POR; Interrupt Enable, Reg 1."
+  default = "0x00000000"
+  offset = "0x00000554"
+  [[register.field]]
+    name = "CSU_SWDT"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''CSU_SWDT timeout.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "CLK_MON"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Clock Monitor (ClkMon).'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "XMPU"
+    bits = "25:24"
+    type = "wo"
+  [[register.field]]
+    name = "PWR_SUPPLY"
+    bits = "23:16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "wo"
+  [[register.field]]
+    name = "FPD_SWDT"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "LPD_SWDT"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:10"
+    type = "wo"
+  [[register.field]]
+    name = "RPU_CCF"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "RPU_LS"
+    bits = "7:6"
+    type = "wo"
+  [[register.field]]
+    name = "FPD_TEMP"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "LPD_TEMP"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "RPU1"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "RPU0"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_ECC"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "DDR_ECC"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "ERROR_POR_DIS_1"
+  type = "wo"
+  width = 32
+  description = "System Errors to POR; Interrupt Disable, Reg 1."
+  default = "0x00000000"
+  offset = "0x00000558"
+  [[register.field]]
+    name = "CSU_SWDT"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''CSU_SWDT timeout.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "CLK_MON"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Clock Monitor (ClkMon).'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "XMPU"
+    bits = "25:24"
+    type = "wo"
+  [[register.field]]
+    name = "PWR_SUPPLY"
+    bits = "23:16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "wo"
+  [[register.field]]
+    name = "FPD_SWDT"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "LPD_SWDT"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:10"
+    type = "wo"
+  [[register.field]]
+    name = "RPU_CCF"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "RPU_LS"
+    bits = "7:6"
+    type = "wo"
+  [[register.field]]
+    name = "FPD_TEMP"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "LPD_TEMP"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "RPU1"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "RPU0"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_ECC"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "DDR_ECC"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "ERROR_POR_MASK_2"
+  type = "ro"
+  width = 32
+  description = "System Error to POR; Interrupt Mask, Reg 2."
+  default = "0x073F1F3F"
+  offset = "0x0000055C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:27"
+    type = "ro"
+  [[register.field]]
+    name = "CSU_ROM"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''CSU BootROM Sequence failure.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "PMU_PB"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''PMU Pre-BootROM Sequence failure.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "PMU_SERVICE"
+    bits = "24"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "ro"
+  [[register.field]]
+    name = "PMU_FW"
+    bits = "21:18"
+    type = "ro"
+  [[register.field]]
+    name = "PMU_UC"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "CSU"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "ro"
+  [[register.field]]
+    name = "PLL_LOCK"
+    bits = "12:8"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:6"
+    type = "ro"
+  [[register.field]]
+    name = "PL"
+    bits = "5:2"
+    type = "ro"
+  [[register.field]]
+    name = "TO"
+    bits = "1:0"
+    type = "ro"
+[[register]]
+  name = "ERROR_POR_EN_2"
+  type = "wo"
+  width = 32
+  description = "System Errors to POR; Interrupt Enable, Reg 2."
+  default = "0x00000000"
+  offset = "0x00000560"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:27"
+    type = "wo"
+  [[register.field]]
+    name = "CSU_ROM"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''CSU BootROM Sequence failure.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "PMU_PB"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''PMU Pre-BootROM Sequence failure.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "PMU_SERVICE"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "wo"
+  [[register.field]]
+    name = "PMU_FW"
+    bits = "21:18"
+    type = "wo"
+  [[register.field]]
+    name = "PMU_UC"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CSU"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "wo"
+  [[register.field]]
+    name = "PLL_LOCK"
+    bits = "12:8"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:6"
+    type = "wo"
+  [[register.field]]
+    name = "PL"
+    bits = "5:2"
+    type = "wo"
+  [[register.field]]
+    name = "TO"
+    bits = "1:0"
+    type = "wo"
+[[register]]
+  name = "ERROR_POR_DIS_2"
+  type = "wo"
+  width = 32
+  description = "System Errors to POR; Interrupt Disable, Reg 2."
+  default = "0x00000000"
+  offset = "0x00000564"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:27"
+    type = "wo"
+  [[register.field]]
+    name = "CSU_ROM"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''CSU BootROM Sequence failure.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "PMU_PB"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''PMU Pre-BootROM Sequence failure.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "PMU_SERVICE"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "wo"
+  [[register.field]]
+    name = "PMU_FW"
+    bits = "21:18"
+    type = "wo"
+  [[register.field]]
+    name = "PMU_UC"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CSU"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "wo"
+  [[register.field]]
+    name = "PLL_LOCK"
+    bits = "12:8"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:6"
+    type = "wo"
+  [[register.field]]
+    name = "PL"
+    bits = "5:2"
+    type = "wo"
+  [[register.field]]
+    name = "TO"
+    bits = "1:0"
+    type = "wo"
+[[register]]
+  name = "ERROR_SRST_MASK_1"
+  type = "ro"
+  width = 32
+  description = "System Errors to Reset; Interrupt Mask, Reg 1."
+  default = "0xFFFF32FF"
+  offset = "0x00000568"
+  [[register.field]]
+    name = "CSU_SWDT"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''CSU_SWDT timeout.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "CLK_MON"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''Clock Monitor (ClkMon).'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "XMPU"
+    bits = "25:24"
+    type = "ro"
+  [[register.field]]
+    name = "PWR_SUPPLY"
+    bits = "23:16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "ro"
+  [[register.field]]
+    name = "FPD_SWDT"
+    bits = "13"
+    type = "ro"
+  [[register.field]]
+    name = "LPD_SWDT"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:10"
+    type = "ro"
+  [[register.field]]
+    name = "RPU_CCF"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "RPU_LS"
+    bits = "7:6"
+    type = "ro"
+  [[register.field]]
+    name = "FPD_TEMP"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "LPD_TEMP"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "RPU1"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "RPU0"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "OCM_ECC"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "DDR_ECC"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ERROR_SRST_EN_1"
+  type = "wo"
+  width = 32
+  description = "System Errors to Reset; Interrupt Enable, Reg 1."
+  default = "0x00000000"
+  offset = "0x0000056C"
+  [[register.field]]
+    name = "CSU_SWDT"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''CSU_SWDT timeout.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "CLK_MON"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Clock Monitor (ClkMon).'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "XMPU"
+    bits = "25:24"
+    type = "wo"
+  [[register.field]]
+    name = "PWR_SUPPLY"
+    bits = "23:16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "wo"
+  [[register.field]]
+    name = "FPD_SWDT"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "LPD_SWDT"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:10"
+    type = "wo"
+  [[register.field]]
+    name = "RPU_CCF"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "RPU_LS"
+    bits = "7:6"
+    type = "wo"
+  [[register.field]]
+    name = "FPD_TEMP"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "LPD_TEMP"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "RPU1"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "RPU0"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_ECC"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "DDR_ECC"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "ERROR_SRST_DIS_1"
+  type = "wo"
+  width = 32
+  description = "System Errors to Reset; Interrupt Disable, Reg 1."
+  default = "0x00000000"
+  offset = "0x00000570"
+  [[register.field]]
+    name = "CSU_SWDT"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''CSU_SWDT timeout.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "CLK_MON"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Clock Monitor (ClkMon).'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "XMPU"
+    bits = "25:24"
+    type = "wo"
+  [[register.field]]
+    name = "PWR_SUPPLY"
+    bits = "23:16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "wo"
+  [[register.field]]
+    name = "FPD_SWDT"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "LPD_SWDT"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:10"
+    type = "wo"
+  [[register.field]]
+    name = "RPU_CCF"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "RPU_LS"
+    bits = "7:6"
+    type = "wo"
+  [[register.field]]
+    name = "FPD_TEMP"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "LPD_TEMP"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "RPU1"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "RPU0"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_ECC"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "DDR_ECC"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "ERROR_SRST_MASK_2"
+  type = "ro"
+  width = 32
+  description = "System Errors to Reset; Interrupt Mask, Reg 2."
+  default = "0x073F1F3F"
+  offset = "0x00000574"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:27"
+    type = "ro"
+  [[register.field]]
+    name = "CSU_ROM"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''CSU BootROM Sequence failure.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "PMU_PB"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''PMU Pre-BootROM Sequence failure.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "PMU_SERVICE"
+    bits = "24"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "ro"
+  [[register.field]]
+    name = "PMU_FW"
+    bits = "21:18"
+    type = "ro"
+  [[register.field]]
+    name = "PMU_UC"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "CSU"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "ro"
+  [[register.field]]
+    name = "PLL_LOCK"
+    bits = "12:8"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:6"
+    type = "ro"
+  [[register.field]]
+    name = "PL"
+    bits = "5:2"
+    type = "ro"
+  [[register.field]]
+    name = "TO"
+    bits = "1:0"
+    type = "ro"
+[[register]]
+  name = "ERROR_SRST_EN_2"
+  type = "wo"
+  width = 32
+  description = "System Errors to Reset; Interrupt Enable, Reg 2."
+  default = "0x00000000"
+  offset = "0x00000578"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:27"
+    type = "wo"
+  [[register.field]]
+    name = "CSU_ROM"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''CSU BootROM Sequence failure.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "PMU_PB"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''PMU Pre-BootROM Sequence failure.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "PMU_SERVICE"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "wo"
+  [[register.field]]
+    name = "PMU_FW"
+    bits = "21:18"
+    type = "wo"
+  [[register.field]]
+    name = "PMU_UC"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CSU"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "wo"
+  [[register.field]]
+    name = "PLL_LOCK"
+    bits = "12:8"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:6"
+    type = "wo"
+  [[register.field]]
+    name = "PL"
+    bits = "5:2"
+    type = "wo"
+  [[register.field]]
+    name = "TO"
+    bits = "1:0"
+    type = "wo"
+[[register]]
+  name = "ERROR_SRST_DIS_2"
+  type = "wo"
+  width = 32
+  description = "System Errors to Reset; Interrupt Disable, Reg 2."
+  default = "0x00000000"
+  offset = "0x0000057C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:27"
+    type = "wo"
+  [[register.field]]
+    name = "CSU_ROM"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''CSU BootROM Sequence failure.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "PMU_PB"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''PMU Pre-BootROM Sequence failure.'''
+    longdesc = '''Bit is reset only by the PS_POR_B reset signal pin.'''
+  [[register.field]]
+    name = "PMU_SERVICE"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "wo"
+  [[register.field]]
+    name = "PMU_FW"
+    bits = "21:18"
+    type = "wo"
+  [[register.field]]
+    name = "PMU_UC"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CSU"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "wo"
+  [[register.field]]
+    name = "PLL_LOCK"
+    bits = "12:8"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:6"
+    type = "wo"
+  [[register.field]]
+    name = "PL"
+    bits = "5:2"
+    type = "wo"
+  [[register.field]]
+    name = "TO"
+    bits = "1:0"
+    type = "wo"
+[[register]]
+  name = "ERROR_SIG_MASK_1"
+  type = "ro"
+  width = 32
+  description = "System Errors to PL; Interrupt Mask, Reg 1."
+  default = "0x000000C3"
+  offset = "0x00000580"
+  [[register.field]]
+    name = "CSU_SWDT"
+    bits = "27"
+    type = "ro"
+  [[register.field]]
+    name = "CLK_MON"
+    bits = "26"
+    type = "ro"
+  [[register.field]]
+    name = "XMPU"
+    bits = "25:24"
+    type = "ro"
+  [[register.field]]
+    name = "PWR_SUPPLY"
+    bits = "23:16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "ro"
+  [[register.field]]
+    name = "FPD_SWDT"
+    bits = "13"
+    type = "ro"
+  [[register.field]]
+    name = "LPD_SWDT"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:10"
+    type = "ro"
+  [[register.field]]
+    name = "RPU_CCF"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "RPU_LS"
+    bits = "7:6"
+    type = "ro"
+  [[register.field]]
+    name = "FPD_TEMP"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "LPD_TEMP"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "RPU1"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "RPU0"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "OCM_ECC"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "DDR_ECC"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ERROR_SIG_EN_1"
+  type = "wo"
+  width = 32
+  description = "System Errors to PL; Interrupt Enable, Reg 1."
+  default = "0x00000000"
+  offset = "0x00000584"
+  [[register.field]]
+    name = "CSU_SWDT"
+    bits = "27"
+    type = "wo"
+  [[register.field]]
+    name = "CLK_MON"
+    bits = "26"
+    type = "wo"
+  [[register.field]]
+    name = "XMPU"
+    bits = "25:24"
+    type = "wo"
+  [[register.field]]
+    name = "PWR_SUPPLY"
+    bits = "23:16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "wo"
+  [[register.field]]
+    name = "FPD_SWDT"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "LPD_SWDT"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:10"
+    type = "wo"
+  [[register.field]]
+    name = "RPU_CCF"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "RPU_LS"
+    bits = "7:6"
+    type = "wo"
+  [[register.field]]
+    name = "FPD_TEMP"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "LPD_TEMP"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "RPU1"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "RPU0"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_ECC"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "DDR_ECC"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "ERROR_SIG_DIS_1"
+  type = "wo"
+  width = 32
+  description = "System Errors to PL; Interrupt Disable, Reg 1."
+  default = "0x00000000"
+  offset = "0x00000588"
+  [[register.field]]
+    name = "CSU_SWDT"
+    bits = "27"
+    type = "wo"
+  [[register.field]]
+    name = "CLK_MON"
+    bits = "26"
+    type = "wo"
+  [[register.field]]
+    name = "XMPU"
+    bits = "25:24"
+    type = "wo"
+  [[register.field]]
+    name = "PWR_SUPPLY"
+    bits = "23:16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "wo"
+  [[register.field]]
+    name = "FPD_SWDT"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "LPD_SWDT"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:10"
+    type = "wo"
+  [[register.field]]
+    name = "RPU_CCF"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "RPU_LS"
+    bits = "7:6"
+    type = "wo"
+  [[register.field]]
+    name = "FPD_TEMP"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "LPD_TEMP"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "RPU1"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "RPU0"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "OCM_ECC"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "DDR_ECC"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "ERROR_SIG_MASK_2"
+  type = "ro"
+  width = 32
+  description = "System Errors to PL; Interrupt Mask, Reg 2."
+  default = "0x00001F00"
+  offset = "0x0000058C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:27"
+    type = "ro"
+  [[register.field]]
+    name = "CSU_ROM"
+    bits = "26"
+    type = "ro"
+  [[register.field]]
+    name = "PMU_PB"
+    bits = "25"
+    type = "ro"
+  [[register.field]]
+    name = "PMU_SERVICE"
+    bits = "24"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "ro"
+  [[register.field]]
+    name = "PMU_FW"
+    bits = "21:18"
+    type = "ro"
+  [[register.field]]
+    name = "PMU_UC"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "CSU"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "ro"
+  [[register.field]]
+    name = "PLL_LOCK"
+    bits = "12:8"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:6"
+    type = "ro"
+  [[register.field]]
+    name = "PL"
+    bits = "5:2"
+    type = "ro"
+  [[register.field]]
+    name = "TO"
+    bits = "1:0"
+    type = "ro"
+[[register]]
+  name = "ERROR_SIG_EN_2"
+  type = "wo"
+  width = 32
+  description = "System Errors to PL; Interrupt Enable, Reg 2."
+  default = "0x00000000"
+  offset = "0x00000590"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:27"
+    type = "wo"
+  [[register.field]]
+    name = "CSU_ROM"
+    bits = "26"
+    type = "wo"
+  [[register.field]]
+    name = "PMU_PB"
+    bits = "25"
+    type = "wo"
+  [[register.field]]
+    name = "PMU_SERVICE"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "wo"
+  [[register.field]]
+    name = "PMU_FW"
+    bits = "21:18"
+    type = "wo"
+  [[register.field]]
+    name = "PMU_UC"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CSU"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "wo"
+  [[register.field]]
+    name = "PLL_LOCK"
+    bits = "12:8"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:6"
+    type = "wo"
+  [[register.field]]
+    name = "PL"
+    bits = "5:2"
+    type = "wo"
+  [[register.field]]
+    name = "TO"
+    bits = "1:0"
+    type = "wo"
+[[register]]
+  name = "ERROR_SIG_DIS_2"
+  type = "wo"
+  width = 32
+  description = "System Errors to PL; Interrupt Disable, Reg 2."
+  default = "0x00000000"
+  offset = "0x00000594"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:27"
+    type = "wo"
+  [[register.field]]
+    name = "CSU_ROM"
+    bits = "26"
+    type = "wo"
+  [[register.field]]
+    name = "PMU_PB"
+    bits = "25"
+    type = "wo"
+  [[register.field]]
+    name = "PMU_SERVICE"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "wo"
+  [[register.field]]
+    name = "PMU_FW"
+    bits = "21:18"
+    type = "wo"
+  [[register.field]]
+    name = "PMU_UC"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CSU"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "wo"
+  [[register.field]]
+    name = "PLL_LOCK"
+    bits = "12:8"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:6"
+    type = "wo"
+  [[register.field]]
+    name = "PL"
+    bits = "5:2"
+    type = "wo"
+  [[register.field]]
+    name = "TO"
+    bits = "1:0"
+    type = "wo"
+[[register]]
+  name = "ERROR_EN_1"
+  type = "rw"
+  width = 32
+  description = "System Error Enables, Reg 1."
+  default = "0x00000000"
+  offset = "0x000005A0"
+  [[register.field]]
+    name = "CSU_SWDT"
+    bits = "27"
+    type = "rw"
+  [[register.field]]
+    name = "CLK_MON"
+    bits = "26"
+    type = "rw"
+  [[register.field]]
+    name = "XMPU"
+    bits = "25:24"
+    type = "rw"
+  [[register.field]]
+    name = "PWR_SUPPLY"
+    bits = "23:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "FPD_SWDT"
+    bits = "13"
+    type = "rw"
+  [[register.field]]
+    name = "LPD_SWDT"
+    bits = "12"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:10"
+    type = "rw"
+  [[register.field]]
+    name = "RPU_CCF"
+    bits = "9"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "8"
+    type = "rw"
+  [[register.field]]
+    name = "RPU_LS"
+    bits = "7:6"
+    type = "rw"
+  [[register.field]]
+    name = "FPD_TEMP"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "LPD_TEMP"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "RPU1"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "RPU0"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "OCM_ECC"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "DDR_ECC"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "ERROR_EN_2"
+  type = "rw"
+  width = 32
+  description = "System Error Enables, Reg 2."
+  default = "0x073E0000"
+  offset = "0x000005A4"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:27"
+    type = "rw"
+  [[register.field]]
+    name = "CSU_ROM"
+    bits = "26"
+    type = "rw"
+  [[register.field]]
+    name = "PMU_PB"
+    bits = "25"
+    type = "rw"
+  [[register.field]]
+    name = "PMU_SERVICE"
+    bits = "24"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:22"
+    type = "rw"
+  [[register.field]]
+    name = "PMU_FW"
+    bits = "21:18"
+    type = "rw"
+  [[register.field]]
+    name = "PMU_UC"
+    bits = "17"
+    type = "rw"
+  [[register.field]]
+    name = "CSU"
+    bits = "16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "rw"
+  [[register.field]]
+    name = "PLL_LOCK"
+    bits = "12:8"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:6"
+    type = "rw"
+  [[register.field]]
+    name = "PL"
+    bits = "5:2"
+    type = "rw"
+  [[register.field]]
+    name = "TO"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "AIB_CNTRL"
+  type = "wo"
+  width = 32
+  description = "PS-PL AXI Bus Logic Isolation Requests."
+  default = "0x00000000"
+  offset = "0x00000600"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "wo"
+  [[register.field]]
+    name = "FPD_AFI_FS"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "FPD_AFI_FM"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "LPD_AFI_FS"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "LPD_AFI_FM"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "AIB_STATUS"
+  type = "ro"
+  width = 32
+  description = "PS-PL AXI Bus Logic Isolation Status."
+  default = "0x00000000"
+  offset = "0x00000604"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "ro"
+  [[register.field]]
+    name = "FPD_AFI_FS"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "FPD_AFI_FM"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "LPD_AFI_FS"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "LPD_AFI_FM"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "GLOBAL_RESET"
+  type = "mixed"
+  width = 32
+  description = "GLOBAL_RESET"
+  default = "0x00000000"
+  offset = "0x00000608"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:11"
+    type = "ro"
+  [[register.field]]
+    name = "PS_ONLY_RST"
+    bits = "10"
+    type = "rw"
+    shortdesc = '''The PS can be reset by itself by clearing [Prog_Gate] and using [PS_ONLY_RST] to initiate the reset.'''
+    longdesc = '''0: reset released to PS. 1: PS held in reset. Refer to PMU_GLOBAL.PS_CNTRL [Prog_Gate] for more information on blocking the reset from propagating to the entire device.'''
+  [[register.field]]
+    name = "FPD_RST"
+    bits = "9"
+    type = "rw"
+    shortdesc = '''FPD Reset to APUs, DDR memory Controller, AXI, etc.'''
+    longdesc = '''0: reset released to FPD. 1: FPD held in reset. Note: this reset should be used to reset the DDR memory controller.'''
+  [[register.field]]
+    name = "RPU_LS_RST"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''RPU Lockstep Reset.'''
+    longdesc = '''Split Mode: 0: reset released to RPU0. 1: RPU0 held in reset. RPU Lockstep Mode: 0: reset released to RPU{0, 1}. 1: RPU{0, 1} held in reset.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "ROM_VALIDATION_STATUS"
+  type = "ro"
+  width = 32
+  description = "PMU ROM validation engine status."
+  default = "0x00000000"
+  offset = "0x00000610"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:2"
+    type = "ro"
+  [[register.field]]
+    name = "PASS"
+    bits = "1"
+    type = "ro"
+    shortdesc = '''Validation Cycle Pass indicator.'''
+    longdesc = '''0: failed. 1: passed. This field is only valid after [Done] indicates a completed cycle.'''
+  [[register.field]]
+    name = "DONE"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Validation Cycle Completed indicator.'''
+    longdesc = '''The result is set in the [Pass] bit. 0: not done. 1: done. This bit always gets set after initiating a validation cycle, regardless of result.'''
+[[register]]
+  name = "ROM_VALIDATION_DIGEST_0"
+  type = "ro"
+  width = 32
+  description = "PMU ROM Validation SHA value, Word 0."
+  default = "0xFFFFFFFF"
+  offset = "0x00000614"
+  [[register.field]]
+    name = "WORD"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "ROM_VALIDATION_DIGEST_1"
+  type = "ro"
+  width = 32
+  description = "PMU ROM Validation SHA value, Word 1."
+  default = "0xFFFFFFFF"
+  offset = "0x00000618"
+  [[register.field]]
+    name = "WORD"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "ROM_VALIDATION_DIGEST_2"
+  type = "ro"
+  width = 32
+  description = "PMU ROM Validation SHA value, Word 2."
+  default = "0xFFFFFFFF"
+  offset = "0x0000061C"
+  [[register.field]]
+    name = "WORD"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "ROM_VALIDATION_DIGEST_3"
+  type = "ro"
+  width = 32
+  description = "PMU ROM Validation SHA value, Word 3."
+  default = "0xFFFFFFFF"
+  offset = "0x00000620"
+  [[register.field]]
+    name = "WORD"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "ROM_VALIDATION_DIGEST_4"
+  type = "ro"
+  width = 32
+  description = "PMU ROM Validation SHA value, Word 4."
+  default = "0xFFFFFFFF"
+  offset = "0x00000624"
+  [[register.field]]
+    name = "WORD"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "ROM_VALIDATION_DIGEST_5"
+  type = "ro"
+  width = 32
+  description = "PMU ROM Validation SHA value, Word 5."
+  default = "0xFFFFFFFF"
+  offset = "0x00000628"
+  [[register.field]]
+    name = "WORD"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "ROM_VALIDATION_DIGEST_6"
+  type = "ro"
+  width = 32
+  description = "PMU ROM Validation SHA value, Word 6."
+  default = "0xFFFFFFFF"
+  offset = "0x0000062C"
+  [[register.field]]
+    name = "WORD"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "ROM_VALIDATION_DIGEST_7"
+  type = "ro"
+  width = 32
+  description = "PMU ROM Validation SHA value, Word 7."
+  default = "0xFFFFFFFF"
+  offset = "0x00000630"
+  [[register.field]]
+    name = "WORD"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "ROM_VALIDATION_DIGEST_8"
+  type = "ro"
+  width = 32
+  description = "PMU ROM Validation SHA value, Word 8."
+  default = "0xFFFFFFFF"
+  offset = "0x00000634"
+  [[register.field]]
+    name = "WORD"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "ROM_VALIDATION_DIGEST_9"
+  type = "ro"
+  width = 32
+  description = "PMU ROM Validation SHA value, Word 9."
+  default = "0xFFFFFFFF"
+  offset = "0x00000638"
+  [[register.field]]
+    name = "WORD"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "ROM_VALIDATION_DIGEST_10"
+  type = "ro"
+  width = 32
+  description = "PMU ROM Validation SHA value, Word 10."
+  default = "0xFFFFFFFF"
+  offset = "0x0000063C"
+  [[register.field]]
+    name = "WORD"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "ROM_VALIDATION_DIGEST_11"
+  type = "ro"
+  width = 32
+  description = "PMU ROM Validation SHA value, Word 11."
+  default = "0xFFFFFFFF"
+  offset = "0x00000640"
+  [[register.field]]
+    name = "WORD"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "SAFETY_GATE"
+  type = "mixed"
+  width = 32
+  description = "Safety gates disable hardware functions."
+  default = "0x00000007"
+  offset = "0x00000650"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:3"
+    type = "ro"
+  [[register.field]]
+    name = "PMU_LOGCLR_ENABLE"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "LBIST_ENABLE"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''After a POR reset, the PMU hardware generates a signal to the LBIST controllers.'''
+    longdesc = '''Set [LBIST_Enable] = 0 to help prevent an SEU in the signaling hardware from inadvertently causing LBIST operations to occur during normal operating mode.'''
+  [[register.field]]
+    name = "SCAN_ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Scan Clear Function Enable.'''
+    longdesc = '''Set [Scan_Enable] = 0 to help prevent inadvertent assertion of the scan clear signal by software or an SEU in the hardware.'''
+[[register]]
+  name = "MBIST_RST"
+  type = "rw"
+  width = 32
+  description = "On-demand MBIST Controller Reset, Trigger 0."
+  default = "0x00000000"
+  offset = "0x00000700"
+  [[register.field]]
+    name = "PCIE"
+    bits = "31"
+    type = "rw"
+  [[register.field]]
+    name = "SIOU"
+    bits = "30"
+    type = "rw"
+  [[register.field]]
+    name = "M400_1"
+    bits = "29"
+    type = "rw"
+  [[register.field]]
+    name = "M400_0"
+    bits = "28"
+    type = "rw"
+  [[register.field]]
+    name = "GPU"
+    bits = "27"
+    type = "rw"
+  [[register.field]]
+    name = "DDR"
+    bits = "26"
+    type = "rw"
+  [[register.field]]
+    name = "ACPU_3"
+    bits = "25"
+    type = "rw"
+  [[register.field]]
+    name = "ACPU_2"
+    bits = "24"
+    type = "rw"
+  [[register.field]]
+    name = "ACPU_1"
+    bits = "23"
+    type = "rw"
+  [[register.field]]
+    name = "ACPU_0"
+    bits = "22"
+    type = "rw"
+  [[register.field]]
+    name = "APU"
+    bits = "21"
+    type = "rw"
+  [[register.field]]
+    name = "AFI_5"
+    bits = "20"
+    type = "rw"
+  [[register.field]]
+    name = "AFI_4"
+    bits = "19"
+    type = "rw"
+  [[register.field]]
+    name = "AFI_3"
+    bits = "18"
+    type = "rw"
+  [[register.field]]
+    name = "AFI_2"
+    bits = "17"
+    type = "rw"
+  [[register.field]]
+    name = "AFI_1"
+    bits = "16"
+    type = "rw"
+  [[register.field]]
+    name = "AFI_0"
+    bits = "15"
+    type = "rw"
+  [[register.field]]
+    name = "FPD"
+    bits = "14"
+    type = "rw"
+  [[register.field]]
+    name = "PSS_CORE_TOP"
+    bits = "13"
+    type = "rw"
+  [[register.field]]
+    name = "OCM"
+    bits = "12"
+    type = "rw"
+  [[register.field]]
+    name = "AFI_LPD"
+    bits = "11"
+    type = "rw"
+  [[register.field]]
+    name = "USB1"
+    bits = "10"
+    type = "rw"
+  [[register.field]]
+    name = "USB0"
+    bits = "9"
+    type = "rw"
+  [[register.field]]
+    name = "RPU_TIEOFF_WRAPPER"
+    bits = "8"
+    type = "rw"
+  [[register.field]]
+    name = "RPU"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "IOU"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "GEGM3"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "GEM2"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "GEM1"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "GEM0"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "CAN1"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "CAN0"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "MBIST_PG_EN"
+  type = "rw"
+  width = 32
+  description = "On-demand MBIST, Trigger 1."
+  default = "0x00000000"
+  offset = "0x00000704"
+  [[register.field]]
+    name = "PCIE"
+    bits = "31"
+    type = "rw"
+  [[register.field]]
+    name = "SIOU"
+    bits = "30"
+    type = "rw"
+  [[register.field]]
+    name = "M400_1"
+    bits = "29"
+    type = "rw"
+  [[register.field]]
+    name = "M400_0"
+    bits = "28"
+    type = "rw"
+  [[register.field]]
+    name = "GPU"
+    bits = "27"
+    type = "rw"
+  [[register.field]]
+    name = "DDR"
+    bits = "26"
+    type = "rw"
+  [[register.field]]
+    name = "ACPU_3"
+    bits = "25"
+    type = "rw"
+  [[register.field]]
+    name = "ACPU_2"
+    bits = "24"
+    type = "rw"
+  [[register.field]]
+    name = "ACPU_1"
+    bits = "23"
+    type = "rw"
+  [[register.field]]
+    name = "ACPU_0"
+    bits = "22"
+    type = "rw"
+  [[register.field]]
+    name = "APU"
+    bits = "21"
+    type = "rw"
+  [[register.field]]
+    name = "AFI_5"
+    bits = "20"
+    type = "rw"
+  [[register.field]]
+    name = "AFI_4"
+    bits = "19"
+    type = "rw"
+  [[register.field]]
+    name = "AFI_3"
+    bits = "18"
+    type = "rw"
+  [[register.field]]
+    name = "AFI_2"
+    bits = "17"
+    type = "rw"
+  [[register.field]]
+    name = "AFI_1"
+    bits = "16"
+    type = "rw"
+  [[register.field]]
+    name = "AFI_0"
+    bits = "15"
+    type = "rw"
+  [[register.field]]
+    name = "FPD"
+    bits = "14"
+    type = "rw"
+  [[register.field]]
+    name = "PSS_CORE_TOP"
+    bits = "13"
+    type = "rw"
+  [[register.field]]
+    name = "OCM"
+    bits = "12"
+    type = "rw"
+  [[register.field]]
+    name = "AFI_LPD"
+    bits = "11"
+    type = "rw"
+  [[register.field]]
+    name = "USB1"
+    bits = "10"
+    type = "rw"
+  [[register.field]]
+    name = "USB0"
+    bits = "9"
+    type = "rw"
+  [[register.field]]
+    name = "RPU_TIEOFF_WRAPPER"
+    bits = "8"
+    type = "rw"
+  [[register.field]]
+    name = "RPU"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "IOU"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "GEGM3"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "GEM2"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "GEM1"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "GEM0"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "CAN1"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "CAN0"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "MBIST_SETUP"
+  type = "rw"
+  width = 32
+  description = "On-demand MBIST, Trigger 2."
+  default = "0x00000000"
+  offset = "0x00000708"
+  [[register.field]]
+    name = "PCIE"
+    bits = "31"
+    type = "rw"
+  [[register.field]]
+    name = "SIOU"
+    bits = "30"
+    type = "rw"
+  [[register.field]]
+    name = "M400_1"
+    bits = "29"
+    type = "rw"
+  [[register.field]]
+    name = "M400_0"
+    bits = "28"
+    type = "rw"
+  [[register.field]]
+    name = "GPU"
+    bits = "27"
+    type = "rw"
+  [[register.field]]
+    name = "DDR"
+    bits = "26"
+    type = "rw"
+  [[register.field]]
+    name = "ACPU_3"
+    bits = "25"
+    type = "rw"
+  [[register.field]]
+    name = "ACPU_2"
+    bits = "24"
+    type = "rw"
+  [[register.field]]
+    name = "ACPU_1"
+    bits = "23"
+    type = "rw"
+  [[register.field]]
+    name = "ACPU_0"
+    bits = "22"
+    type = "rw"
+  [[register.field]]
+    name = "APU"
+    bits = "21"
+    type = "rw"
+  [[register.field]]
+    name = "AFI_5"
+    bits = "20"
+    type = "rw"
+  [[register.field]]
+    name = "AFI_4"
+    bits = "19"
+    type = "rw"
+  [[register.field]]
+    name = "AFI_3"
+    bits = "18"
+    type = "rw"
+  [[register.field]]
+    name = "AFI_2"
+    bits = "17"
+    type = "rw"
+  [[register.field]]
+    name = "AFI_1"
+    bits = "16"
+    type = "rw"
+  [[register.field]]
+    name = "AFI_0"
+    bits = "15"
+    type = "rw"
+  [[register.field]]
+    name = "FPD"
+    bits = "14"
+    type = "rw"
+  [[register.field]]
+    name = "PSS_CORE_TOP"
+    bits = "13"
+    type = "rw"
+  [[register.field]]
+    name = "OCM"
+    bits = "12"
+    type = "rw"
+  [[register.field]]
+    name = "AFI_LPD"
+    bits = "11"
+    type = "rw"
+  [[register.field]]
+    name = "USB1"
+    bits = "10"
+    type = "rw"
+  [[register.field]]
+    name = "USB0"
+    bits = "9"
+    type = "rw"
+  [[register.field]]
+    name = "RPU_TIEOFF_WRAPPER"
+    bits = "8"
+    type = "rw"
+  [[register.field]]
+    name = "RPU"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "IOU"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "GEGM3"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "GEM2"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "GEM1"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "GEM0"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "CAN1"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "CAN0"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "MBIST_DONE"
+  type = "ro"
+  width = 32
+  description = "MBIST Done Indicator."
+  default = "0x00000000"
+  offset = "0x00000710"
+  [[register.field]]
+    name = "PCIE"
+    bits = "31"
+    type = "ro"
+  [[register.field]]
+    name = "SIOU"
+    bits = "30"
+    type = "ro"
+  [[register.field]]
+    name = "M400_1"
+    bits = "29"
+    type = "ro"
+  [[register.field]]
+    name = "M400_0"
+    bits = "28"
+    type = "ro"
+  [[register.field]]
+    name = "GPU"
+    bits = "27"
+    type = "ro"
+  [[register.field]]
+    name = "DDR"
+    bits = "26"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU_3"
+    bits = "25"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU_2"
+    bits = "24"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU_1"
+    bits = "23"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU_0"
+    bits = "22"
+    type = "ro"
+  [[register.field]]
+    name = "APU"
+    bits = "21"
+    type = "ro"
+  [[register.field]]
+    name = "AFI_5"
+    bits = "20"
+    type = "ro"
+  [[register.field]]
+    name = "AFI_4"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "AFI_3"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "AFI_2"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "AFI_1"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "AFI_0"
+    bits = "15"
+    type = "ro"
+  [[register.field]]
+    name = "FPD"
+    bits = "14"
+    type = "ro"
+  [[register.field]]
+    name = "PSS_CORE_TOP"
+    bits = "13"
+    type = "ro"
+  [[register.field]]
+    name = "OCM"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "AFI_LPD"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "USB1"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "USB0"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "RPU_TIEOFF_WRAPPER"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "RPU"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "IOU"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "GEGM3"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "GEM2"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "GEM1"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "GEM0"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "CAN1"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "CAN0"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "MBIST_GOOD"
+  type = "ro"
+  width = 32
+  description = "MBIST Result Status."
+  default = "0x00000000"
+  offset = "0x00000714"
+  [[register.field]]
+    name = "PCIE"
+    bits = "31"
+    type = "ro"
+  [[register.field]]
+    name = "SIOU"
+    bits = "30"
+    type = "ro"
+  [[register.field]]
+    name = "M400_1"
+    bits = "29"
+    type = "ro"
+  [[register.field]]
+    name = "M400_0"
+    bits = "28"
+    type = "ro"
+  [[register.field]]
+    name = "GPU"
+    bits = "27"
+    type = "ro"
+  [[register.field]]
+    name = "DDR"
+    bits = "26"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU_3"
+    bits = "25"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU_2"
+    bits = "24"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU_1"
+    bits = "23"
+    type = "ro"
+  [[register.field]]
+    name = "ACPU_0"
+    bits = "22"
+    type = "ro"
+  [[register.field]]
+    name = "APU"
+    bits = "21"
+    type = "ro"
+  [[register.field]]
+    name = "AFI_5"
+    bits = "20"
+    type = "ro"
+  [[register.field]]
+    name = "AFI_4"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "AFI_3"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "AFI_2"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "AFI_1"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "AFI_0"
+    bits = "15"
+    type = "ro"
+  [[register.field]]
+    name = "FPD"
+    bits = "14"
+    type = "ro"
+  [[register.field]]
+    name = "PSS_CORE_TOP"
+    bits = "13"
+    type = "ro"
+  [[register.field]]
+    name = "OCM"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "AFI_LPD"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "USB1"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "USB0"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "RPU_TIEOFF_WRAPPER"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "RPU"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "IOU"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "GEGM3"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "GEM2"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "GEM1"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "GEM0"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "CAN1"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "CAN0"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "SAFETY_CHK"
+  type = "rw"
+  width = 32
+  description = "Test ability to access this register set. Can be used at any time by any master with accessibility."
+  default = "0x00000000"
+  offset = "0x00000800"
+  [[register.field]]
+    name = "REG"
+    bits = "31:0"
+    type = "rw"

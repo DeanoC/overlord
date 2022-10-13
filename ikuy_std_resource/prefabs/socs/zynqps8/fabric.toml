@@ -1,0 +1,69 @@
+[[include]]
+resource = "lpd.toml"
+
+[[include]]
+resource = "fpd.toml"
+
+[[include]]
+resource = "iop.toml"
+
+[[include]]
+resource = "lpdunits.toml"
+
+# DDR domain
+[[instance]]
+name = "DDRController"
+type = "switch.ddrc.zynqps8"
+
+# PL domain
+[[instance]]
+name = "PS8Soc"
+type = "soc.zynqps8.ps8soc"
+
+# FPD <-> LPD connection
+[[connection]]
+type = "bus"
+connection = "FPDMainSwitch -> OCMSwitch"
+bus_name = "fpd_ocm"
+
+[[connection]]
+type = "logical"
+connection = "FPDMainSwitch -> LPDInboundSwitch"
+
+[[connection]]
+type = "logical"
+connection = "LPDMainSwitch -> FPDMainSwitch"
+
+[[connection]]
+type = "bus"
+connection = "LPDMainSwitch -> CCI"
+bus_name = "lpd_cci"
+
+# -> DDR Controller connections
+[[connection]]
+type = "bus"
+connection = "LPDMainSwitch -> DDRController"
+bus_name = "lpd_ddrc"
+[[connection]]
+type = "bus"
+connection = "CCI -> DDRController"
+bus_name = "cci0_ddrc"
+[[connection]]
+type = "bus"
+connection = "CCI -> DDRController"
+bus_name = "cci1_ddrc"
+[[connection]]
+type = "bus"
+connection = "FPD_DDR_SPLITTER0 -> DDRController"
+bus_name = "out1"
+consumer_bus_name = "splitter0_ddrc"
+[[connection]]
+type = "bus"
+connection = "FPD_DDR_SPLITTER1 -> DDRController"
+bus_name = "out1"
+consumer_bus_name = "splitter1_ddrc"
+[[connection]]
+type = "bus"
+connection = "FPD_DDR_SPLITTER2 -> DDRController"
+bus_name = "out1"
+consumer_bus_name = "splitter2_ddrc"

@@ -1,0 +1,25 @@
+[[definition]]
+type = "board.kv260"
+board_type = "Xilinx"
+board_family = "UltraScale+"
+board_device = "xck26-sfvc784-2lv-c"
+defaults = { pullup = true, slew = "Slow", drive = 4, standard = "LVCMOS18" }
+
+clocks = [
+    { name = "clock.ref.33MHz", pin = "M6", standard = "LVCMOS18", frequency = "33Mhz" },
+]
+pingroups = [
+    { name = "BOARD.AP1302_RST", pin = "J11", standard = "LVCMOS33" },
+    { name = "BOARD.AP1302_STANDBY", pin = "J10", standard = "LVCMOS33" },
+    { name = "BOARD.FAN_EN", pin = "A12", standard = "LVCMOS33" },
+    { names = ["BOARD.I2C0.SCL", "BOARD.I2C0.SDA"], pins = ["G11", "F10"], standard = "LVCMOS33" },
+    { names = ["BOARD.PMOD0.0", "BOARD.PMOD0.1", "BOARD.PMOD0.2", "BOARD.PMOD0.3", "BOARD.PMOD0.4", "BOARD.PMOD0.5", "BOARD.PMOD0.6", "BOARD.PMOD0.7"], pins = ["H12", "E10", "D10", "C11", "B10", "E12", "D11", "B11"], standard = "LVCMOS33" },
+]
+
+# SOM I2C Interface Addresses
+# 0x50, 0x58 - SOM EEPROM
+# 0x30, 0x31 - DA9062 PMIC
+# 0x32       - DA9130 PMIC
+# 0x33       - DA9131 PMIC
+# 0x68       - PL power domain monitor
+# 0x70       - PS power domain monitor

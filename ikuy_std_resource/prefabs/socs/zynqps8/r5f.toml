@@ -1,0 +1,34 @@
+path = "prefabs/socs/zynqps8"
+
+[[instance]]
+name = "RPU"
+type = "cpu.r5f.zynqps8"
+
+[[instance]]
+name = "RPUTCM"
+type = "ram.sram.tcm.zynqps8"
+
+[[connection]]
+type = "bus"
+connection = "RPUSwitch -> RPUTCM"
+bus_name = "rputcm"
+
+[[connection]]
+type = "bus"
+connection = "RPU -> RPUSwitch"
+bus_name = "rpu0"
+
+[[connection]]
+type = "bus"
+connection = "RPU -> RPUSwitch"
+bus_name = "rpu1"
+
+[[connection]]
+type = "bus"
+connection = "RPUIOSwitch -> RPUSwitch"
+bus_name = "rpuio_rpuswitch"
+
+[[connection]]
+type = "bus"
+connection = "RPUIOSwitch -> LPDMainSwitch"
+bus_name = "rpuio_lpd"

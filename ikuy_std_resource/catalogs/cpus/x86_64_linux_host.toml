@@ -1,0 +1,6 @@
+[[definition]]
+type = "cpu.x86_64.linux.host"
+triple = "x86_64-pc-linux-gnu"
+width = 64
+max_atomic_width = 128
+max_bitop_type_width = 128

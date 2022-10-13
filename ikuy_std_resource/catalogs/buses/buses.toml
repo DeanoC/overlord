@@ -1,0 +1,5 @@
+resources = [
+    "i2c/i2c.toml",
+    "spi/spi.toml",
+    "axi/axi.toml",
+]

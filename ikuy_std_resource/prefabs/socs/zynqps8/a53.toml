@@ -1,0 +1,8 @@
+[[instance]]
+name = "APU"
+type = "cpu.a53.zynqps8"
+
+[[connection]]
+type = "bus"
+connection = "APU -> CCI"
+bus_name = "apu_cci"
