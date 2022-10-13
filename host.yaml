@@ -1,0 +1,13 @@
+board: host
+triple: ${host_triple}
+libraries:
+  - name: core
+    languages: [cpp]
+    dependencies: []
+  - name: host_os
+    languages: [cpp]
+    dependencies: []
+programs:
+  - name: hello_world
+    languages: [cpp]
+    dependencies: [host_os]
