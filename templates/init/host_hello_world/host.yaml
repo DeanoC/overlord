@@ -1,0 +1,8 @@
+board: host
+triple: ${host_triple}
+libraries:
+  - name: core
+    languages: [cpp]
+programs:
+  - name: hello_world
+    languages: [cpp]
