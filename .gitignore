@@ -12,12 +12,3 @@ null
 .fleet
 .idea
 .scala-build
-
-.idea/misc.xml
-.idea/misc.xml
-.idea/overlord.iml
-.scala-build/project_183d125c5c/classes/main/META-INF/semanticdb/src/Main.scala.semanticdb
-.scala-build/project_183d125c5c/classes/main/Overlord/Config.tasty
-.scala-build/project_183d125c5c/classes/main/Overlord/Main.tasty
-.scala-build/project_183d125c5c/classes/main/Overlord/Main$package.tasty
-.scala-build/project_183d125c5c/classes/main/Overlord/Mode.tasty
