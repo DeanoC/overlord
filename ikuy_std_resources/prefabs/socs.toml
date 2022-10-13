@@ -1,0 +1,7 @@
+resources = [
+    "socs/zynqps8/fabric.toml",
+    "socs/zynqps8/a53.toml",
+    "socs/zynqps8/r5f.toml",
+    "socs/zynqps8/pmu.toml",
+    "socs/zynqps8/all.toml",
+]

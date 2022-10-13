@@ -1,0 +1,39 @@
+actions = [
+    "src",
+    "read_verilog_top"
+]
+
+[parameters]
+ADDR_WIDTH = 32 # Width of address bus in bits
+S_DATA_WIDTH = 32 # Width of input (slave) interface data bus in bits
+M_DATA_WIDTH = 32 # Width of output (master) interface data bus in bits
+ID_WIDTH = 8 # Width of ID signal
+AWUSER_ENABLE = 0 # Propagate awuser signal
+AWUSER_WIDTH = 1 # Width of awuser signal
+WUSER_ENABLE = 0 # Propagate wuser signal
+WUSER_WIDTH = 1 # Width of wuser signal
+BUSER_ENABLE = 0 # Propagate buser signal
+BUSER_WIDTH = 1 # Width of buser signal
+ARUSER_ENABLE = 0 # Propagate aruser signal
+ARUSER_WIDTH = 1 # Width of aruser signal
+RUSER_ENABLE = 0 # Propagate ruser signal
+RUSER_WIDTH = 1 # Width of ruser signal
+CONVERT_BURST = 1 # When adapting to a wider bus, re-pack full-width burst instead of passing through narrow burst if possible
+CONVERT_NARROW_BURST = 0 # When adapting to a wider bus, re-pack all bursts instead of passing through narrow burst if possible
+FORWARD_ID = 0 # Forward ID through adapter
+# S_STRB_WIDTH = (S_DATA_WIDTH/8) # Width of input (slave) interface wstrb (width of data bus in words)
+# M_STRB_WIDTH = (M_DATA_WIDTH/8) # Width of output (master) interface wstrb (width of data bus in words)
+
+[[process]]
+name = 'src'
+processor = 'sources'
+sources = [
+    { file = "rtl/axi_adapter.v", language = "verilog" },
+    { file = "rtl/axi_adapter_rd.v", language = "verilog" },
+    { file = "rtl/axi_adapter_wr.v", language = "verilog" }
+]
+
+[[process]]
+name = 'read_verilog_top'
+processor = 'read_verilog_top'
+source = "rtl/axi_adapter.v"

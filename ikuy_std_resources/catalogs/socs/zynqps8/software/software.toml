@@ -1,0 +1,61 @@
+[[definition]]
+type = "library.zynqps8.display_port"
+software = "libs/display_port/display_port.toml"
+cpus = "a53"
+depends = ["core", "dbg", "osservices", "platform", "utils"]
+
+[[definition]]
+type = "library.zynqps8.dma"
+software = "libs/dma/dma.toml"
+cpus = "a53,pmu,r5f"
+depends = ["core", "dbg", "platform", "osservices", "utils"]
+
+[[definition]]
+type = "library.zynqps8.triple_timer_counter"
+software = "libs/triple_timer_counter/triple_timer_counter.toml"
+cpus = "a53,pmu,r5f"
+depends = ["core", "dbg", "platform", "osservices"]
+
+[[definition]]
+type = "library.zynqps8.gic_v2"
+software = "libs/gic_v2/gic_v2.toml"
+cpus = "a53,r5f"
+depends = ["core", "dbg", "multi_core", "platform", "utils"]
+
+[[definition]]
+type = "library.zynqps8.i2c"
+software = "libs/i2c/i2c.toml"
+cpus = "a53,r5f"
+depends = ["core", "dbg", "multi_core", "platform", "utils"]
+
+[[definition]]
+type = "library.zynqps8.mmu"
+software = "libs/mmu/mmu.toml"
+cpus = "a53,r5f"
+depends = ["core", "dbg", "multi_core", "platform", "utils"]
+
+[[definition]]
+type = "library.zynqps8.xhci"
+software = "libs/xhci/xhci.toml"
+cpus = "a53"
+depends = ["core", "dbg", "multi_core", "platform", "utils", "usb", "zynqps8.gic_v2", "zynqps8.i2c", "zynqps8.mmu"]
+
+[[definition]]
+type = "library.zynqps8.xilinx"
+software = "libs/xilinx/xilinx.toml"
+cpus = "a53,pmu,r5f"
+depends = ["core", "dbg", "utils"]
+
+[[definition]]
+name = "ikuy_boot"
+type = "program.zynqps8.ikuy_boot"
+software = "programs_a53/ikuy_boot/ikuy_boot.toml"
+cpus = "a53"
+depends = ["core", "dbg", "gfxdebug", "osservices", "platform", "utils", "zynqps8.xilinx", "zynqps8.display_port", "zynqps8.mmu"]
+
+[[definition]]
+name = "pmu_monitor"
+type = "program.zynqps8.pmu_monitor"
+software = "programs_pmu/pmu_monitor/pmu_monitor.toml"
+cpus = "pmu"
+depends = ["core", "dbg", "gfxdebug", "osservices", "platform", "utils", "zynqps8.dma"]

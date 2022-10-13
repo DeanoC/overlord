@@ -1,0 +1,190 @@
+description = "PCIe Bridge - Ingress Addr Translation 0"
+[[bank]]
+  name = "AXIPCIE_INGRESS0"
+  address = "0xfd0e0800"
+[[bank]]
+  name = "AXIPCIE_INGRESS1"
+  address = "0xfd0e0820"
+[[bank]]
+  name = "AXIPCIE_INGRESS2"
+  address = "0xfd0e0840"
+[[bank]]
+  name = "AXIPCIE_INGRESS3"
+  address = "0xfd0e0860"
+[[bank]]
+  name = "AXIPCIE_INGRESS4"
+  address = "0xfd0e0880"
+[[bank]]
+  name = "AXIPCIE_INGRESS5"
+  address = "0xfd0e08a0"
+[[bank]]
+  name = "AXIPCIE_INGRESS6"
+  address = "0xfd0e08c0"
+[[bank]]
+  name = "AXIPCIE_INGRESS7"
+  address = "0xfd0e08e0"
+[[register]]
+  name = "TRAN_INGRESS_CAPABILITIES"
+  type = "ro"
+  width = 32
+  description = "Ingress AXI Translation - Capabilities"
+  default = "0x1F0C0001"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "INGRESS_SIZE_MAX"
+    bits = "31:24"
+    type = "ro"
+  [[register.field]]
+    name = "INGRESS_SIZE_OFFSET"
+    bits = "23:16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:1"
+    type = "ro"
+  [[register.field]]
+    name = "INGRESS_PRESENT"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "TRAN_INGRESS_STATUS"
+  type = "ro"
+  width = 32
+  description = "Ingress AXI Translation - Status"
+  default = "0x00000000"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:25"
+    type = "ro"
+  [[register.field]]
+    name = "WR_PENDING_CTR"
+    bits = "24:16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:9"
+    type = "ro"
+  [[register.field]]
+    name = "RD_PENDING_CTR"
+    bits = "8:0"
+    type = "ro"
+[[register]]
+  name = "TRAN_INGRESS_CONTROL"
+  type = "mixed"
+  width = 32
+  description = "Ingress AXI Translation - Control"
+  default = "0x00000000"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "INGRESS_ATTR_W"
+    bits = "31:28"
+    type = "rw"
+    shortdesc = '''Ingress Write Cache Override.'''
+    longdesc = '''When ingress_attr_enable == 1, the AXI transaction m_awcache port is set to this value when forwarding write transactions hitting this translation to AXI. When ingress_attr_enable == 0, the default cache attributes determined by cfg_pcie_rx_awcache are applied.'''
+  [[register.field]]
+    name = "INGRESS_ATTR_R"
+    bits = "27:24"
+    type = "rw"
+    shortdesc = '''Ingress Read Cache Override.'''
+    longdesc = '''When ingress_attr_enable == 1, the AXI transaction m_arcache port is set to this value when forwarding read transactions hitting this translation to AXI. When ingress_attr_enable == 0, the default cache attributes determined by cfg_pcie_rx_arcache are applied.'''
+  [[register.field]]
+    name = "INGRESS_ATTR_ENABLE"
+    bits = "23"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "22:21"
+    type = "ro"
+  [[register.field]]
+    name = "INGRESS_SIZE"
+    bits = "20:16"
+    type = "rw"
+    shortdesc = '''Translation Size.'''
+    longdesc = '''The translation window size in bytes is configured to be 2^(ingress_size_offset+ingress_size). ingress_size must be <= ingress_size_max.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "13:8"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:5"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "INGRESS_INVALID"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "INGRESS_SECURITY_ENABLE"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "INGRESS_ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Translation Enable.'''
+    longdesc = '''The translation is hit when both of the following are true: * ingress_enable == 1 * ingress_src_base[63:(12+ingress_size)] == AXI Address[63:(12+ingress_size)]'''
+[[register]]
+  name = "TRAN_INGRESS_SRC_BASE_LO"
+  type = "mixed"
+  width = 32
+  description = "Ingress AXI Translation - Source Address Low"
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "INGRESS_SRC_BASE_LO"
+    bits = "31:12"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:0"
+    type = "ro"
+[[register]]
+  name = "TRAN_INGRESS_SRC_BASE_HI"
+  type = "rw"
+  width = 32
+  description = "Ingress AXI Translation - Source Address High"
+  default = "0x00000000"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "INGRESS_SRC_BASE_HI"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "TRAN_INGRESS_DST_BASE_LO"
+  type = "mixed"
+  width = 32
+  description = "Ingress AXI Translation - Destination Address Low"
+  default = "0x00000000"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "INGRESS_DST_BASE_LO"
+    bits = "31:12"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:0"
+    type = "ro"
+[[register]]
+  name = "TRAN_INGRESS_DST_BASE_HI"
+  type = "rw"
+  width = 32
+  description = "Ingress AXI Translation - Destination Address High"
+  default = "0x00000000"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "INGRESS_DST_BASE_HI"
+    bits = "31:0"
+    type = "rw"

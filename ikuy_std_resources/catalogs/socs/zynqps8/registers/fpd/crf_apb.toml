@@ -1,0 +1,1233 @@
+description = "Clock and Reset control registers for FPD."
+[[register]]
+  name = "ERR_CTRL"
+  type = "rw"
+  width = 1
+  description = "SLVERR Error Signal Enable."
+  default = "0x00000000"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "SLVERR_ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Accesses to an unimplemented register asserts the SLVERR error signal on the APB bus interface and generates an interrupt.'''
+    longdesc = '''0: disable. 1: enable. Regardless of the setting of the [slverr_enable] bit setting: * The [addr_decode_err] interrupt bit is set in the IR_STATUS register. * APB writes are ignored and reads returns 0.'''
+[[register]]
+  name = "IR_STATUS"
+  type = "wtc"
+  width = 1
+  description = "APB Register Address Decode Error Interrupt Status and Clear."
+  default = "0x00000000"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "IR_MASK"
+  type = "ro"
+  width = 1
+  description = "Interrupt Mask."
+  default = "0x00000001"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "IR_ENABLE"
+  type = "wo"
+  width = 1
+  description = "Interrupt Mask."
+  default = "0x00000000"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "IR_DISABLE"
+  type = "wo"
+  width = 1
+  description = "Interrupt Disable."
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "CRF_WPROT"
+  type = "rw"
+  width = 1
+  description = "CRF_APB SLCR Write Protection."
+  default = "0x00000000"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "ACTIVE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''CRF_APB register set write enable.'''
+    longdesc = '''0: writes enabled. 1: writes disabled.'''
+[[register]]
+  name = "APLL_CTRL"
+  type = "rw"
+width = 32
+description = "APLL Clock Unit Control"
+default = "0x00012C09"
+offset = "0x00000020"
+[[register.field]]
+name = "POST_SRC"
+bits = "26:24"
+type = "rw"
+shortdesc = '''Select the pass-thru clock source for PLL Bypass mode.'''
+longdesc = '''0xx: PS_REF_CLK 100: VIDEO_REF_CLK 101: ALT_REF_CLK 110: AUX_REF_CLK 111: GT_REF_CLK'''
+[[register.field.enum]]
+name = "PS_REF_CLK"
+value = 0
+[[register.field.enum]]
+name = "VIDEO_REF_CLK"
+value = 4
+[[register.field.enum]]
+name = "ALT_REF_CLK"
+value = 5
+[[register.field.enum]]
+name = "AUX_REF_CLK"
+value = 6
+[[register.field.enum]]
+name = "GT_REF_CLK"
+value = 7
+[[register.field]]
+name = "PRE_SRC"
+bits = "22:20"
+type = "rw"
+shortdesc = '''Select the clock source for PLL input.'''
+longdesc = '''0xx: PS_REF_CLK 100: VIDEO_REF_CLK 101: ALT_REF_CLK 110: AUX_REF_CLK 111: GT_REF_CLK'''
+[[register.field.enum]]
+name = "PS_REF_CLK"
+value = 0
+[[register.field.enum]]
+name = "VIDEO_REF_CLK"
+value = 4
+[[register.field.enum]]
+name = "ALT_REF_CLK"
+value = 5
+[[register.field.enum]]
+name = "AUX_REF_CLK"
+value = 6
+[[register.field.enum]]
+name = "GT_REF_CLK"
+value = 7
+[[register.field]]
+name = "DIV2"
+bits = "16"
+type = "rw"
+shortdesc = '''Enable the divide by 2 function inside of the PLL.'''
+longdesc = '''0: no effect. 1: divide clock by 2. Note: this does not change the VCO frequency, just the output frequency.'''
+[[register.field]]
+name = "FBDIV"
+bits = "14:8"
+type = "rw"
+  [[register.field]]
+    name = "BYPASS"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''PLL Clock Bypass Mode.'''
+    longdesc = '''0: normal PLL mode; the source clock is selected using [PRE_SRC]. 1: bypass the PLL; the source clock is selected using [POST_SRC].'''
+  [[register.field]]
+    name = "RESET"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''PLL reset.'''
+    longdesc = '''0: active. 1: reset. Note: Program the PLL into bypass mode before resetting the PLL.'''
+[[register]]
+  name = "APLL_CFG"
+  type = "rw"
+  width = 32
+  description = "APLL Integer Helper Data Configuration."
+  default = "0x00000000"
+  offset = "0x00000024"
+  [[register.field]]
+    name = "LOCK_DLY"
+    bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "LOCK_CNT"
+    bits = "22:13"
+    type = "rw"
+  [[register.field]]
+    name = "LFHF"
+    bits = "11:10"
+    type = "rw"
+  [[register.field]]
+    name = "CP"
+    bits = "8:5"
+    type = "rw"
+  [[register.field]]
+    name = "RES"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "APLL_FRAC_CFG"
+  type = "rw"
+  width = 32
+  description = "Fractional control for the PLL"
+  default = "0x00000000"
+  offset = "0x00000028"
+  [[register.field]]
+    name = "ENABLED"
+    bits = "31"
+    type = "rw"
+    shortdesc = '''Fractional SDM bypass control.'''
+    longdesc = '''0: PLL is in integer mode and it ignores all fractional data. 1: PLL is in fractional mode and uses [DATA] bitfield for the fractional portion of the feedback divider.'''
+  [[register.field]]
+    name = "DATA"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "DPLL_CTRL"
+  type = "rw"
+width = 32
+description = "DPLL Clock Unit Control"
+default = "0x00002C09"
+offset = "0x0000002C"
+[[register.field]]
+name = "POST_SRC"
+bits = "26:24"
+type = "rw"
+shortdesc = '''Select the pass-thru clock source for PLL Bypass mode.'''
+longdesc = '''0xx: PS_REF_CLK 100: VIDEO_REF_CLK 101: ALT_REF_CLK 110: AUX_REF_CLK 111: GT_REF_CLK'''
+[[register.field.enum]]
+name = "PS_REF_CLK"
+value = 0
+[[register.field.enum]]
+name = "VIDEO_REF_CLK"
+value = 4
+[[register.field.enum]]
+name = "ALT_REF_CLK"
+value = 5
+[[register.field.enum]]
+name = "AUX_REF_CLK"
+value = 6
+[[register.field.enum]]
+name = "GT_REF_CLK"
+value = 7
+[[register.field]]
+name = "PRE_SRC"
+bits = "22:20"
+type = "rw"
+shortdesc = '''Select the clock source for PLL input.'''
+longdesc = '''0xx: PS_REF_CLK 100: VIDEO_REF_CLK 101: ALT_REF_CLK 110: AUX_REF_CLK 111: GT_REF_CLK'''
+[[register.field.enum]]
+name = "PS_REF_CLK"
+value = 0
+[[register.field.enum]]
+name = "VIDEO_REF_CLK"
+value = 4
+[[register.field.enum]]
+name = "ALT_REF_CLK"
+value = 5
+[[register.field.enum]]
+name = "AUX_REF_CLK"
+value = 6
+[[register.field.enum]]
+name = "GT_REF_CLK"
+value = 7
+[[register.field]]
+name = "DIV2"
+bits = "16"
+type = "rw"
+shortdesc = '''Enable the divide by 2 function inside of the PLL.'''
+longdesc = '''0: no effect. 1: divide clock by 2. Note: this does not change the VCO frequency, just the output frequency.'''
+[[register.field]]
+name = "FBDIV"
+bits = "14:8"
+type = "rw"
+  [[register.field]]
+    name = "BYPASS"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''PLL Clock Bypass Mode.'''
+    longdesc = '''0: normal PLL mode; the source clock is selected using [PRE_SRC]. 1: bypass the PLL; the source clock is selected using [POST_SRC].'''
+  [[register.field]]
+    name = "RESET"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''PLL reset.'''
+    longdesc = '''0: active. 1: reset. Note: Program the PLL into bypass mode before resetting the PLL.'''
+[[register]]
+  name = "DPLL_CFG"
+  type = "rw"
+  width = 32
+  description = "DPLL Integer Helper Data Configuration."
+  default = "0x00000000"
+  offset = "0x00000030"
+  [[register.field]]
+    name = "LOCK_DLY"
+    bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "LOCK_CNT"
+    bits = "22:13"
+    type = "rw"
+  [[register.field]]
+    name = "LFHF"
+    bits = "11:10"
+    type = "rw"
+  [[register.field]]
+    name = "CP"
+    bits = "8:5"
+    type = "rw"
+  [[register.field]]
+    name = "RES"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "DPLL_FRAC_CFG"
+  type = "rw"
+  width = 32
+  description = "Fractional control for the PLL"
+  default = "0x00000000"
+  offset = "0x00000034"
+  [[register.field]]
+    name = "ENABLED"
+    bits = "31"
+    type = "rw"
+    shortdesc = '''Fractional SDM bypass control.'''
+    longdesc = '''0: PLL is in integer mode and it ignores all fractional data. 1: PLL is in fractional mode and uses [DATA] bitfield for the fractional portion of the feedback divider.'''
+  [[register.field]]
+    name = "DATA"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "VPLL_CTRL"
+  type = "rw"
+width = 32
+description = "VPLL Clock Unit Control."
+default = "0x00012809"
+offset = "0x00000038"
+[[register.field]]
+name = "POST_SRC"
+bits = "26:24"
+type = "rw"
+shortdesc = '''Select the pass-thru clock source for PLL Bypass mode.'''
+longdesc = '''0xx: PS_REF_CLK 100: VIDEO_REF_CLK 101: ALT_REF_CLK 110: AUX_REF_CLK 111: GT_REF_CLK'''
+[[register.field.enum]]
+name = "PS_REF_CLK"
+value = 0
+[[register.field.enum]]
+name = "VIDEO_REF_CLK"
+value = 4
+[[register.field.enum]]
+name = "ALT_REF_CLK"
+value = 5
+[[register.field.enum]]
+name = "AUX_REF_CLK"
+value = 6
+[[register.field.enum]]
+name = "GT_REF_CLK"
+value = 7
+[[register.field]]
+name = "PRE_SRC"
+bits = "22:20"
+type = "rw"
+shortdesc = '''Select the clock source for PLL input.'''
+longdesc = '''0xx: PS_REF_CLK 100: VIDEO_REF_CLK 101: ALT_REF_CLK 110: AUX_REF_CLK 111: GT_REF_CLK'''
+[[register.field.enum]]
+name = "PS_REF_CLK"
+value = 0
+[[register.field.enum]]
+name = "VIDEO_REF_CLK"
+value = 4
+[[register.field.enum]]
+name = "ALT_REF_CLK"
+value = 5
+[[register.field.enum]]
+name = "AUX_REF_CLK"
+value = 6
+[[register.field.enum]]
+name = "GT_REF_CLK"
+value = 7
+[[register.field]]
+name = "CLKOUTDIV"
+bits = "17"
+type = "rw"
+shortdesc = '''test field.'''
+longdesc = '''Used to change the output divider of the PLL. This is for test only.'''
+[[register.field]]
+name = "DIV2"
+bits = "16"
+type = "rw"
+    shortdesc = '''Enable the divide by 2 function inside of the PLL.'''
+    longdesc = '''0: no effect. 1: divide clock by 2. Note: this does not change the VCO frequency, just the output frequency.'''
+  [[register.field]]
+    name = "FBDIV"
+    bits = "14:8"
+    type = "rw"
+  [[register.field]]
+    name = "BYPASS"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''PLL Clock Bypass Mode.'''
+    longdesc = '''0: normal PLL mode; the source clock is selected using [PRE_SRC]. 1: bypass the PLL; the source clock is selected using [POST_SRC].'''
+  [[register.field]]
+    name = "RESET"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''PLL reset.'''
+    longdesc = '''0: active. 1: reset. Note: Program the PLL into bypass mode before resetting the PLL.'''
+[[register]]
+  name = "VPLL_CFG"
+  type = "rw"
+  width = 32
+  description = "VPLL Integer Helper Data Configuration."
+  default = "0x00000000"
+  offset = "0x0000003C"
+  [[register.field]]
+    name = "LOCK_DLY"
+    bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "LOCK_CNT"
+    bits = "22:13"
+    type = "rw"
+  [[register.field]]
+    name = "LFHF"
+    bits = "11:10"
+    type = "rw"
+  [[register.field]]
+    name = "CP"
+    bits = "8:5"
+    type = "rw"
+  [[register.field]]
+    name = "RES"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "VPLL_FRAC_CFG"
+  type = "rw"
+  width = 32
+  description = "Fractional control for the PLL."
+  default = "0x00000000"
+  offset = "0x00000040"
+  [[register.field]]
+    name = "ENABLED"
+    bits = "31"
+    type = "rw"
+    shortdesc = '''Fractional SDM bypass control.'''
+    longdesc = '''0: PLL is in integer mode and it ignores all fractional data. 1: PLL is in fractional mode and uses [DATA] bitfield for the fractional portion of the feedback divider.'''
+  [[register.field]]
+    name = "DATA"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "PLL_STATUS"
+  type = "mixed"
+  width = 8
+  description = "FPD PLL Clocking Status."
+  default = "0x00000038"
+  offset = "0x00000044"
+  [[register.field]]
+    name = "VPLL_STABLE"
+    bits = "5"
+    type = "ro"
+    shortdesc = '''VPLL stability status.'''
+    longdesc = '''0: not locked or bypassed. 1: locked or bypassed.'''
+  [[register.field]]
+    name = "DPLL_STABLE"
+    bits = "4"
+    type = "ro"
+    shortdesc = '''DPLL stability status.'''
+    longdesc = '''0: not locked or bypassed. 1: locked or bypassed.'''
+  [[register.field]]
+    name = "APLL_STABLE"
+    bits = "3"
+    type = "ro"
+    shortdesc = '''APLL stability status.'''
+    longdesc = '''0: not locked or bypassed. 1: locked or bypassed.'''
+  [[register.field]]
+    name = "VPLL_LOCK"
+    bits = "2"
+    type = "ro"
+    shortdesc = '''VPLL lock status.'''
+    longdesc = '''0: not locked. 1: locked.'''
+  [[register.field]]
+    name = "DPLL_LOCK"
+    bits = "1"
+    type = "ro"
+    shortdesc = '''DPLL lock status.'''
+    longdesc = '''0: not locked. 1: locked.'''
+  [[register.field]]
+    name = "APLL_LOCK"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''APLL lock status.'''
+    longdesc = '''0: not locked. 1: locked.'''
+[[register]]
+  name = "APLL_TO_LPD_CTRL"
+  type = "rw"
+  width = 16
+  description = "APLL to LPD Clock Divisor."
+  default = "0x00000400"
+  offset = "0x00000048"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+    type = "rw"
+[[register]]
+  name = "DPLL_TO_LPD_CTRL"
+  type = "rw"
+  width = 16
+  description = "DPLL to LPD Clock Divisor."
+  default = "0x00000400"
+  offset = "0x0000004C"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+    type = "rw"
+[[register]]
+  name = "VPLL_TO_LPD_CTRL"
+  type = "rw"
+  width = 16
+  description = "VPLL to LPD Clock Divisor."
+  default = "0x00000400"
+  offset = "0x00000050"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+    type = "rw"
+[[register]]
+  name = "ACPU_CTRL"
+  type = "rw"
+  width = 32
+  description = "APU MPCore Clock Generator Control."
+  default = "0x03000400"
+  offset = "0x00000060"
+  [[register.field]]
+    name = "CLKACT_HALF"
+    bits = "25"
+    type = "rw"
+    shortdesc = '''Clock active control for half-speed APU Clock.'''
+    longdesc = '''0: disable. Clock stop. 1: enable.'''
+  [[register.field]]
+    name = "CLKACT_FULL"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control for full-speed APU Clock.'''
+    longdesc = '''0: disable. Clock stop. 1: enable.'''
+[[register.field]]
+name = "DIVISOR0"
+bits = "13:8"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: APLL 010: DPLL 011: VPLL'''
+[[register.field.enum]]
+name = "APLL"
+value = 0
+[[register.field.enum]]
+name = "DPLL"
+value = 2
+[[register.field.enum]]
+name = "VPLL"
+value = 3
+
+[[register]]
+name = "DBG_TRACE_CTRL"
+type = "rw"
+width = 32
+description = "Debug Trace Clock Generator Control."
+default = "0x00002500"
+offset = "0x00000064"
+[[register.field]]
+name = "RESERVED"
+    bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. Clock stop. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+    type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL_TO_FPD 010: DPLL 011: APLL'''
+[[register.field.enum]]
+name = "IOPLL_TO_FPD"
+value = 0
+[[register.field.enum]]
+name = "DPLL"
+value = 2
+[[register.field.enum]]
+name = "APLL"
+value = 3
+
+[[register]]
+name = "DBG_FPD_CTRL"
+type = "rw"
+width = 32
+description = "Debug in FPD Clock Generator Control."
+default = "0x01002500"
+offset = "0x00000068"
+[[register.field]]
+name = "RESERVED"
+    bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control for FPD clocking and Time Stamp (see DBG_TSTMP_CTRL register).'''
+    longdesc = '''0: disable. Clock stop. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+    type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL_TO_FPD 010: DPLL 011: APLL'''
+[[register.field.enum]]
+name = "IOPLL_TO_FPD"
+value = 0
+[[register.field.enum]]
+name = "DPLL"
+value = 2
+[[register.field.enum]]
+name = "APLL"
+value = 3
+
+[[register]]
+name = "DP_VIDEO_REF_CTRL"
+type = "rw"
+width = 32
+description = "DisplayPort Video Clock Generator Control."
+default = "0x01002300"
+offset = "0x00000070"
+[[register.field]]
+name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. Clock stop. 1: enable.'''
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+[[register.field]]
+name = "DIVISOR0"
+bits = "13:8"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: VPLL 010: DPLL 011: RPLL_TO_FPD'''
+[[register.field.enum]]
+name = "VPLL"
+value = 0
+[[register.field.enum]]
+name = "DPLL"
+value = 2
+[[register.field.enum]]
+name = "RPLL_TO_FPD"
+value = 3
+[[register]]
+name = "DP_AUDIO_REF_CTRL"
+type = "rw"
+width = 32
+description = "DisplayPort Audio Clock Generator Control."
+default = "0x01032300"
+offset = "0x00000074"
+[[register.field]]
+name = "CLKACT"
+bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. Clock stop. 1: enable.'''
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+[[register.field]]
+name = "DIVISOR0"
+bits = "13:8"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: VPLL 010: DPLL 011: RPLL_TO_FPD'''
+[[register.field.enum]]
+name = "VPLL"
+value = 0
+[[register.field.enum]]
+name = "DPLL"
+value = 2
+[[register.field.enum]]
+name = "RPLL_TO_FPD"
+value = 3
+[[register]]
+name = "DP_STC_REF_CTRL"
+type = "rw"
+width = 32
+description = "DisplayPort System Time Clock Generator Control."
+default = "0x01203200"
+offset = "0x0000007C"
+[[register.field]]
+name = "CLKACT"
+bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. Clock stop. 1: enable.'''
+  [[register.field]]
+    name = "DIVISOR1"
+    bits = "21:16"
+    type = "rw"
+[[register.field]]
+name = "DIVISOR0"
+bits = "13:8"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: VPLL 010: DPLL 011: RPLL_TO_FPD'''
+[[register.field.enum]]
+name = "VPLL"
+value = 0
+[[register.field.enum]]
+name = "DPLL"
+value = 2
+[[register.field.enum]]
+name = "RPLL_TO_FPD"
+value = 3
+[[register]]
+name = "DDR_CTRL"
+type = "rw"
+width = 32
+description = "DDR Memory Controller Clock Generator Control."
+default = "0x01000500"
+offset = "0x00000080"
+[[register.field]]
+name = "DIVISOR0"
+bits = "13:8"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: DPLL 001: VPLL'''
+[[register.field.enum]]
+name = "DPLL"
+value = 0
+[[register.field.enum]]
+name = "VPLL"
+value = 1
+[[register]]
+name = "GPU_REF_CTRL"
+type = "rw"
+width = 32
+description = "GPU Clock Generator Control."
+default = "0x00001500"
+offset = "0x00000084"
+[[register.field]]
+name = "PP1_CLKACT"
+bits = "26"
+    type = "rw"
+    shortdesc = '''Clock active control for Pixel Processor 1.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "PP0_CLKACT"
+    bits = "25"
+    type = "rw"
+    shortdesc = '''Clock active control for Pixel Processor 0.'''
+    longdesc = '''0: disable. 1: enable.'''
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control for GPU and both Pixel Processors.'''
+    longdesc = '''0: disable. 1: enable.'''
+[[register.field]]
+name = "DIVISOR0"
+bits = "13:8"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL_TO_FPD 010: VPLL 011: DPLL'''
+[[register.field.enum]]
+name = "IOPLL_TO_FPD"
+value = 0
+[[register.field.enum]]
+name = "VPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL"
+value = 3
+[[register]]
+name = "SATA_REF_CTRL"
+type = "rw"
+width = 32
+description = "SATA Clock Generator Control."
+default = "0x01001600"
+offset = "0x000000A0"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. Clock stop. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+    type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL_TO_FPD 010: APLL 011: DPLL'''
+[[register.field.enum]]
+name = "IOPLL_TO_FPD"
+value = 0
+[[register.field.enum]]
+name = "APLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL"
+value = 3
+[[register]]
+name = "PCIE_REF_CTRL"
+type = "rw"
+width = 32
+description = "PCIe Clock Generator Control."
+default = "0x00001500"
+offset = "0x000000B4"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. Clock stop. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+    type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL_TO_FPD 010: RPLL_TO_FPD 011: DPLL'''
+[[register.field.enum]]
+name = "IOPLL_TO_FPD"
+value = 0
+[[register.field.enum]]
+name = "RPLL_TO_FPD"
+value = 2
+[[register.field.enum]]
+name = "DPLL"
+value = 3
+
+[[register]]
+name = "FPD_DMA_REF_CTRL"
+type = "rw"
+width = 32
+description = "FPD DMA Clock Generator Control."
+default = "0x01000500"
+offset = "0x000000B8"
+[[register.field]]
+name = "RESERVED"
+    bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. Clock stop. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+    type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: APLL 010: VPLL 011: DPLL'''
+[[register.field.enum]]
+name = "APLL"
+value = 0
+[[register.field.enum]]
+name = "VPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL"
+value = 3
+[[register]]
+name = "DPDMA_REF_CTRL"
+type = "rw"
+width = 32
+description = "DisplayPort DMA Clock Generator Control."
+default = "0x01000500"
+offset = "0x000000BC"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. Clock stop. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+    type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: APLL 010: VPLL 011: DPLL'''
+[[register.field.enum]]
+name = "APLL"
+value = 0
+[[register.field.enum]]
+name = "VPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL"
+value = 3
+[[register]]
+name = "TOPSW_MAIN_CTRL"
+type = "rw"
+width = 32
+description = "FPD AXI Interconnect Clock Generator Control."
+default = "0x01000400"
+offset = "0x000000C0"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. Clock stop. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+    type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: APLL 010: VPLL 011: DPLL'''
+[[register.field.enum]]
+name = "APLL"
+value = 0
+[[register.field.enum]]
+name = "VPLL"
+value = 2
+[[register.field.enum]]
+name = "DPLL"
+value = 3
+[[register]]
+name = "TOPSW_LSBUS_CTRL"
+type = "rw"
+width = 32
+description = "FPD APB Clock Generator Control."
+default = "0x01000800"
+offset = "0x000000C4"
+[[register.field]]
+name = "RESERVED"
+bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "24"
+    type = "rw"
+    shortdesc = '''Clock active control.'''
+    longdesc = '''0: disable. Clock stop. 1: enable.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:14"
+    type = "rw"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "13:8"
+    type = "rw"
+[[register.field]]
+name = "RESERVED"
+bits = "7:3"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: APLL 010: IOPLL_TO_FPD 011: DPLL'''
+[[register.field.enum]]
+name = "APLL"
+value = 0
+[[register.field.enum]]
+name = "IOPLL_TO_FPD"
+value = 2
+[[register.field.enum]]
+name = "DPLL"
+value = 3
+[[register]]
+name = "DBG_TSTMP_CTRL"
+type = "rw"
+width = 32
+description = "Debug Time Stamp Clock Generator Control in FPD."
+default = "0x00000A00"
+offset = "0x000000F8"
+[[register.field]]
+name = "RESERVED"
+bits = "24"
+    type = "rw"
+[[register.field]]
+name = "DIVISOR0"
+bits = "13:8"
+type = "rw"
+[[register.field]]
+name = "SRCSEL"
+bits = "2:0"
+type = "rw"
+shortdesc = '''Clock generator input source.'''
+longdesc = '''000: IOPLL_TO_FPD 010: DPLL 011: APLL'''
+[[register.field.enum]]
+name = "IOPLL_TO_FPD"
+value = 0
+[[register.field.enum]]
+name = "DPLL"
+value = 2
+[[register.field.enum]]
+name = "APLL"
+value = 3
+
+[[register]]
+name = "RST_FPD_TOP"
+type = "rw"
+width = 24
+description = "Software Controlled FPD Resets."
+default = "0x000F9FFE"
+offset = "0x00000100"
+[[register.field]]
+name = "PCIE_CFG_RESET"
+    bits = "19"
+    type = "rw"
+  [[register.field]]
+    name = "PCIE_BRIDGE_RESET"
+    bits = "18"
+    type = "rw"
+  [[register.field]]
+    name = "PCIE_CTRL_RESET"
+    bits = "17"
+    type = "rw"
+  [[register.field]]
+    name = "DP_RESET"
+    bits = "16"
+    type = "rw"
+  [[register.field]]
+    name = "SWDT_RESET"
+    bits = "15"
+    type = "rw"
+  [[register.field]]
+    name = "S_AXI_HPC_3_FPD_RESET"
+    bits = "12"
+    type = "rw"
+  [[register.field]]
+    name = "S_AXI_HPC_2_FPD_RESET"
+    bits = "11"
+    type = "rw"
+  [[register.field]]
+    name = "S_AXI_HP_1_FPD_RESET"
+    bits = "10"
+    type = "rw"
+  [[register.field]]
+    name = "S_AXI_HP_0_FPD_RESET"
+    bits = "9"
+    type = "rw"
+  [[register.field]]
+    name = "S_AXI_HPC_1_FPD_RESET"
+    bits = "8"
+    type = "rw"
+  [[register.field]]
+    name = "S_AXI_HPC_0_FPD_RESET"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "FPD_DMA_RESET"
+    bits = "6"
+    type = "rw"
+    shortdesc = '''FPD_DMA reset.'''
+    longdesc = '''(gdma)'''
+  [[register.field]]
+    name = "GPU_PP1_RESET"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "GPU_PP0_RESET"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "GPU_RESET"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "GT_RESET"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "SATA_RESET"
+    bits = "1"
+    type = "rw"
+[[register]]
+  name = "RST_FPD_APU"
+  type = "rw"
+  width = 24
+  description = "Software Controlled APU MPCore Resets."
+  default = "0x00003D0F"
+  offset = "0x00000104"
+  [[register.field]]
+    name = "ACPU3_PWRON_RESET"
+    bits = "13"
+    type = "rw"
+  [[register.field]]
+    name = "ACPU2_PWRON_RESET"
+    bits = "12"
+    type = "rw"
+  [[register.field]]
+    name = "ACPU1_PWRON_RESET"
+    bits = "11"
+    type = "rw"
+  [[register.field]]
+    name = "ACPU0_PWRON_RESET"
+    bits = "10"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "9"
+    type = "rw"
+  [[register.field]]
+    name = "APU_L2_RESET"
+    bits = "8"
+    type = "rw"
+  [[register.field]]
+    name = "ACPU3_RESET"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "ACPU2_RESET"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "ACPU1_RESET"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "ACPU0_RESET"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "RST_DDR_SS"
+  type = "rw"
+  width = 8
+  description = "Software Controlled DDR Memory Controller Resets."
+  default = "0x0000000F"
+  offset = "0x00000108"
+  [[register.field]]
+    name = "APM_RESET"
+    bits = "2"
+    type = "rw"

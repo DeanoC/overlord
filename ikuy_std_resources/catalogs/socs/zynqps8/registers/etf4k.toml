@@ -1,0 +1,761 @@
+description = "Embedded Trace FIFO"
+[[bank]]
+  name = "CORESIGHT_SOC_ETF_1"
+  address = "0xfe940000"
+[[register]]
+  name = "RSZ"
+  type = "ro"
+  width = 32
+  description = "RAM size Register"
+  default = "0x00000400"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "SIZE"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "STS"
+  type = "ro"
+  width = 32
+  description = "TMC Status register"
+  default = "0x0000000C"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "EMPTY"
+    bits = "4"
+    type = "ro"
+    shortdesc = '''If set, this bit indicates that the TMC does not contain any valid trace data in the trace memory.'''
+    longdesc = '''This does not, however, mean that the pipeline stages within the TMC are empty. To determine whether the pipeline stages within the TMC are empty, read the TMCReady bit.This bit is set on reset.This bit is valid only when TraceCaptEn=1. This bit reads as 0 when TraceCaptEn=0.Note: In Circular-Buffer mode, it is possible that the Empty bit and the Full bit (STS register) are 1 at the same time due to the fact that the Full bit in this mode, once set, does not clear unless TraceCaptEn is set.'''
+  [[register.field]]
+    name = "FTEMPTY"
+    bits = "3"
+    type = "ro"
+    shortdesc = '''This bit is set when trace capture has stopped, and all internal pipelines and buffers have drained.'''
+    longdesc = '''Unlike TMCReady, it is not affected by buffer drains and AXI accesses.The ACQCOMP output reflects the value of this bit unless the TMC is in integration mode.'''
+  [[register.field]]
+    name = "TMCREADY"
+    bits = "2"
+    type = "ro"
+    shortdesc = '''This bit is set when all the following are true:<ul><li>Trace capture has stopped and all internal pipelines and buffers have drained.'''
+    longdesc = '''This is equivalent to being in the Stopped or Disabled state.</li><li>The TMC is not training because of the DrainBuffer bit of the FFCR being set.</li><li>In ETR configuration, the AXI interface is not busy. This case can be used to detect page table reads in scatter-gather mode when in Stopped state.</li></ul>'''
+  [[register.field]]
+    name = "TRIGGERED"
+    bits = "1"
+    type = "ro"
+    shortdesc = '''The Triggered bit is set when trace capture is in progress and the TMC has detected a trigger event.'''
+    longdesc = '''A trigger event is said to have occurred when the TMC has written the set number of datawords (as programmed in the TRG register) into the trace memory after the occurrence of either a rising edge on the TRIGIN input or a trigger packet (ATID = 7'h7D) in the incoming trace stream. This bit is cleared when trace capture is enabled again after having stopped. This bit is operational only in the Circular-buffer mode. In all other modes, this bit is always 0.This bit does not indicate that a trigger has been embedded in the formatted output trace data from the TMC. Trigger indication on the output trace stream is determined by the programming of the Formatter and Flush Control Register, FFCR, 0x304.'''
+  [[register.field]]
+    name = "FULL"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''This bit can be used to help determine how much of the trace buffer contains valid data.'''
+    longdesc = '''Circular-buffer mode: This flag is set when the RAM write pointer wraps around the top of the buffer, and remains set until the TraceCaptEn bit is cleared and set. Software-read-FIFO mode and Hardware-read-FIFO mode: This flag indicates that the current space in the trace memory is less than or equal to the value programmed in the BUFWM register (ie. Fill level >= MEM_SIZE - BUFWM). In the ETR configuration, if the TMC is programmed for Scatter_Gather operation, this bit indicates whether the Trace memory is currently full regardless of the value programmed in the BUFWM register. TMC Disabled (TraceCaptEn=0 and TMCReady=1): The Full bit retains its last value. If TraceCaptEn is 0 and a 1 is written to it, the Full bit is cleared.The FULL output from the TMC reflects the value of this register bit, except when the Integration Mode bit in the ITCTRL register, 0xF00, is set.'''
+[[register]]
+  name = "RRD"
+  type = "ro"
+  width = 32
+  description = "Reading this register enables data to be read from the trace memory. When the memory width given in the DEVID register is greater than 32 bits, multiple reads to this register must be performed together to read a full memory width of data. For example, if the memory width is 128 bits, then reads from this register must be performed four at a time. When a full memory width of data has been read, the RAM Read Pointer is incremented to the next memory word.When no data is available, this register returns 0xFFFFFFFF. This value is chosen because it cannot be generated as part of the trace data when the formatter is enabled.Trace Capture disabled: When in Disabled state (TraceCaptEn=0 and TMCReady=1), the TMC mode is ignored. Reading this register returns the contents of the Local RAM buffer or AXI memory at the location addressed by the RAM Read Pointer Register.Circular Buffer mode: When in Stopped state in Circular Buffer mode and the buffer is not empty, reading this register returns the next word of data from the trace buffer. When all of the trace buffer has been read, the Empty bit in the STS Register is set, and more reads return 0xFFFFFFF. Reading this register when not in Stopped state returns 0xFFFFFFFF.Software FIFO mode: Reading this register returns data from the FIFO. If this register is read when the FIFO is empty, the data returned is 0xFFFFFFFF.Hardware FIFO mode: Reading this register returns 0xFFFFFFFF.Reading this register alters the internal state of the TMC, and can only be performed if the device is unlocked. Reading this register when the device is locked returns 0xFFFFFFFF.In the ETR configuration, when the MemErr bit in the STS Register is set, reading this register returns an error response on the APB slave interface."
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "RRD"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "RRP"
+  type = "rw"
+  width = 32
+  description = "The RAM Read Pointer Register contains the value of the read pointer that is used to read entries from the trace memory over the APB interface.The value written to this register must be a byte-address aligned to the width of the trace memory databus and to a frame boundary. For example, for 64_bit wide trace memory and 128_bit wide trace memory, the four LSBs must be 0s. For 256_bit wide trace memory, the five LSBs must be 0s. The width of the trace memory can be obtained by reading the MEMWIDTH field in the DEVID Register, 0xFC8. When one complete buffer or FIFO entry has been read through the RRD Register, the RAM Read Pointer Register is incremented by the number of bytes per memory width of data. For example, for 64_bit wide memory, it is incremented by eight. For 128_bit wide memory, it is incremented by 16 for every complete memory entry read. When the RAM Read Pointer is incremented after having reached its maximum value, it wraps around. The width of this register in the ETB or ETF configurations is log2(MEM_SIZE*4). In the ETR configuration, this register is 32 bits wide, and the contents of this register represents the lower 32 bits of the 40-bit AXI address used to access trace memory. If scatter-gather operation is enabled, this register represents the next address in trace memory to be read, not the address of a page table entry. When in Disabled state (TraceCaptEn=0 and TMCReady=1), a write to this register sets the value of the trace memory address from which data is fetched on a subsequent RRD read. A write to this register when not in Disabled state results in Unpredictable behavior. This register can be read:<ul><li>when in Disabled state</li><li>when in Stopped state (TraceCaptEn=1 and TMCReady=1), in Circular Buffer mode</li><li>when in Running (TraceCaptEn=1 and TMCReady=0), Stopping or Stopped states, in Software FIFO mode.</li></ul>When entering Disabled state in Circular Buffer mode with scatter-gather mode disabled, this register points to the next location in the trace buffer to be read. This is for backwards compatibility purposes, so that the buffer can be read while in Disabled state. It is recommended that you read the buffer contents while in Stopped state instead, because the pointers are managed automatically."
+  default = "0x00000000"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "RRP"
+    bits = "11:0"
+    type = "rw"
+[[register]]
+  name = "RWP"
+  type = "rw"
+  width = 32
+  description = "The value written to this register must be a byte-address aligned to the width of the trace memory databus and to a frame boundary. For example, for 64_bit wide trace memory and 128_bit wide trace memory, the four LSBs must be 0s. For 256_bit wide trace memory, the five LSBs must be 0s. The width of the trace memory can be obtained by reading the MEMWIDTH field in the DEVID Register, 0xFC8. Reading this register returns the current memory location being referenced, to which the next write would occur. When one complete buffer or FIFO entry has been written to the RWD Register, the RAM Write Pointer Register is incremented by the number of bytes per memory width of data. For example, for 64_bit wide memory, it is incremented by eight. For 128_bit wide memory it is incremented by 16 for every complete memory entry write. When this register wraps around its maximum value, the Full flag in the Status Register, STS, 0x00C, is set. In the ETB or ETF configurations, the width of this register is log2(MEM_SIZE*4). In the ETR configuration, this register is 32 bits wide, and the contents of this register represent the lower 32 bits of the 40-bit AXI address used to access trace memory. In ETB and ETF configurations, when in Circular Buffer mode, this register can be used to set the address to start capturing data from. This is for backwards compatibility purposes, to enable the FULL signal to be generated before the buffer becomes full. In other configurations and modes, the RAM Write Pointer is reset to the start of trace memory when exiting Disabled state (TraceCaptEn=0 and TMCReady=1). This register can be read:<ul><li>when in Disabled state</li><li>when in Stopped state, in Circular Buffer mode</li><li>when in Running, Stopping or Stopped states, in Software FIFO mode.</li></ul>"
+  default = "0x00000000"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "RWP"
+    bits = "11:0"
+    type = "rw"
+[[register]]
+  name = "TRG"
+  type = "rw"
+  width = 32
+  description = "In the Circular-buffer mode, the Trigger Counter Register specifies the number of 32_bit words to capture in the Trace RAM following the detection of either a rising edge on the TRIGIN input or a trigger packet in the incoming trace stream (ATID = 7'h7D). On capturing the specified number of datawords, a Trigger Event is said to have occurred. The effect of a Trigger Event on TMC behavior is controlled by the FFCR register, 0x304.The number of 32_bit words written into the Trace RAM following the trigger is the value stored in this register+1. This counter is disabled when the TMC is in Software-read-FIFO mode or Hardware-read-FIFO mode.Once the trigger counter has started counting, any further triggers, either on TRIGIN or in the incoming trace stream, are ignored till the counter reaches 0. Once the counter has reached 0, it remains at 0 till it is re-programmed with a write to this register. This register is cleared when TMCReady goes HIGH, so that the state of the counter when trace capture has stopped does not affect a subsequent trace capture cycle.Attempting to write to this register while not in Disabled state (TMCReady=0 or TraceCaptEn=1) will result in Unpredictable behavior. A read access to this register is permitted even if trace capture enabled. A read access returns the current value of the Trigger counter. The width of this register and the Trigger counter depends on the size of the trace memory. In ETB and ETF configurations, the width of the counter is log2(MEMSIZE). The width of this register in ETR configuration is 32 bits."
+  default = "0x00000000"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "TRG"
+    bits = "9:0"
+    type = "rw"
+[[register]]
+  name = "CTL"
+  type = "rw"
+  width = 32
+  description = "This register controls trace stream capture.Setting the TraceCaptEn bit to 1 enables the TMC to capture trace data. When trace capture is enabled, Formatter behavior is controlled by the FFCR register.When trace capture is disabled, any remaining data in the formatter is stored to RAM. If the TMC is programmed for Software-read-FIFO mode or hardware-read-FIFO mode and and TraceCaptEn is cleared before TMCReady=1, trace data may get corrupted. In the Hardware-read-FIFO mode, the unformatter drains any trace data in its internal pipelines on to the ATB Master interface, but discards any data that remains in the trace FIFO. Trace capture is fully disabled, or complete, when TMCReady goes HIGH. See Formatter and Flush Status Register, FFSR, 0x300.It is recommended that stopping trace capture be initiated only by programming stop conditions in FFCR register bits. Stopping trace capture by clearing TraceCaptEn is deprecated and is supported only for backwards compatibility with earlier versions of the ETB. Features in the TMC such as the DrainBuffer bit (FFCR register) and the Empty bit (STS register) that are not part of the earlier versions of the ETB do not support stopping trace capture by clearing TraceCaptEn. If trace capture stopping is initiated by clearing this bit, then the DrainBuffer feature (ETF configuration) cannot be invoked. Also, in the ETR configuration, if the TMC is programmed for Scatter_Gather operation and Circular-Buffer mode, clearing TraceCaptEn prevents reading trace data from memory."
+  default = "0x00000000"
+  offset = "0x00000020"
+  [[register.field]]
+    name = "TRACECAPTEN"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "RWD"
+  type = "wo"
+  width = 32
+  description = "Enables testing of Trace RAM connectivity to the TMC. When in Disabled state (TraceCaptEn=0 and TMCReady=1), a write to this register stores data at the location pointed to by the RWP. Writes to this register when not in Disabled state are ignored. When the memory width given in the DEVID register is greater than 32_bit, multiple writes to this register must be performed together to read a full memory width of data. For example, if the memory width is 128 bits, then writes to this register must be performed four at a time. When a full memory width of data has been written, the data is written to memory and the RAM Write Pointer is incremented to the next memory word. In ETR configuration, when the MemErr bit in the STS Register is set, writing to this register returns an error response on the APB slave interface and the write data is discarded. Writing to this register other than when in Disabled state and in integration mode results in Unpredictable behavior."
+  default = "0x00000000"
+  offset = "0x00000024"
+  [[register.field]]
+    name = "RWD"
+    bits = "31:0"
+    type = "wo"
+[[register]]
+  name = "MODE"
+  type = "rw"
+  width = 32
+  description = "Controls TMC operating mode. When configured as an ETB or ETR, the TMC can operate in the following modes:<ul><li>Software FIFO mode</li><li>Circular Buffer mode.</li></ul> When configured as an ETF, the TMC has an additional mode of operation, Hardware FIFO mode. The operating mode can be changed only when the TMC is disabled. Attempting to write to this register while not in Disabled state (TraceCaptEn=0 and TMCReady=1) results in Unpredictable behavior. The operating mode is ignored when in Disabled state."
+  default = "0x00000000"
+  offset = "0x00000028"
+  [[register.field]]
+    name = "MODE"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "LBUFLEVEL"
+  type = "ro"
+  width = 32
+  description = "Reading this register returns the maximum fill level of the trace memory in 32_bit words since this register was last read. Reading this register also results in its contents being updated to the current fill level.This register does not apply when the TMC is programmed for Scatter Gather operation in ETR configuration. In this case, reading this register will return 0x00000000.When the TraceCaptEn bit is cleared, this register retains it last value. If TraceCaptEn is 0 and a 1 is written to it, the LBUFLEVEL register is cleared.The fill level information is mainly useful for performance analysis.Reading this register alters the internal state of the TMC, hence this register can be read only if the device is unlocked. Reading this register when the device is locked will return 0x00000000.The width of this register in the ETB/ETF configurations is 1+log2(MEM_SIZE). In the ETR configuration, the width of this register is 31 bits. Note that an extra bit is needed to return the correct fill level when full."
+  default = "0x00000000"
+  offset = "0x0000002C"
+  [[register.field]]
+    name = "LBUFLEVEL"
+    bits = "10:0"
+    type = "ro"
+[[register]]
+  name = "CBUFLEVEL"
+  type = "ro"
+  width = 32
+  description = "When TraceCaptEn=1, this register indicates the current fill level of the trace memory in 32_bit words. When TraceCaptEn=0, reading this register returns a value of 0x00000000. This register is not available if the TMC is programmed for Scatter_Gather operation in ETR configuration - in this case, reading this register returns a value of 0x00000000. This register is particularly useful in the FIFO modes, in which the pointers change dynamically due to read and write of trace data into trace memory through hardware. It would not be possible for the debugger to deduce the fill level of the trace memory merely by reading the pointer registers. The fill level information is mainly useful for performance analysis."
+  default = "0x00000000"
+  offset = "0x00000030"
+  [[register.field]]
+    name = "CBUFLEVEL"
+    bits = "10:0"
+    type = "ro"
+[[register]]
+  name = "BUFWM"
+  type = "rw"
+  width = 32
+  description = "The value programmed into this register indicates the desired threshold vacancy level in 32_bit words in the trace memory. When the space into FIFO is less than or equal to this value (ie Fill level >= MEM_SIZE - BUFWM), the FULL output is pulled HIGH and the Full bit in the STS register is set. This register is used only in the Software FIFO mode and the Hardware FIFO mode. In the Circular Buffer mode, this functionality can be obtained by programming the RWP to the desired vacancy trigger level, so that when the pointer wraps around, the Full bit is set indicating that the vacancy level has fallen below the desired level. The maximum value that can be written into this register is MEM_SIZE - 1 (in which case the Full bit is set after the first 32_bit word is written to trace memory.).Writing to this register other than when TMCReady=1 and TraceCaptEn=0 will result in Unpredictable behavior.This register is ignored when the TMC is programmed for scatter-gather operation in ETR configuration."
+  default = "0x00000000"
+  offset = "0x00000034"
+  [[register.field]]
+    name = "BUFWM"
+    bits = "9:0"
+    type = "rw"
+[[register]]
+  name = "FFSR"
+  type = "ro"
+  width = 32
+  description = "This register indicates the status of the Formatter and the status of Flush request."
+  default = "0x00000002"
+  offset = "0x00000300"
+  [[register.field]]
+    name = "FTSTOPPED"
+    bits = "1"
+    type = "ro"
+    shortdesc = '''This bit behaves the same way as the FtEmpty bit in the STS register, 0x00C.'''
+    longdesc = '''The FtStopped bit is deprecated and is present in this register to support backwards-compatibility with earlier versions of the ETB.'''
+  [[register.field]]
+    name = "FLINPROG"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''This bit indicates whether the TMC is currently processing a flush on the ATB slave port.'''
+    longdesc = '''This bit reflects the status of the AFVALIDS output. In the ETB or ETR configurations, the flush initiation is controlled by the flush-control bits in the FFCR register. In the ETF configuration, the flush request could additionally be from the ATB Master port.'''
+[[register]]
+  name = "FFCR"
+  type = "rw"
+  width = 32
+  description = "This register allows user control of the stop, trigger, and flush events. When the EnFt bit is 0, no formatting information is inserted into the trace stream and the trace data is stored raw. When tracing is stopped, a byte of value 0x01 is appended to the trace buffer, followed by zero or more bytes of value 0x00 to align to a memory dataword. When data is later decompressed it is then possible to determine that a post-amble is present by back tracking the trailing zero data at the end of the trace stream until the last single bit at logic 1 is detected. All data preceding this first logic 1 is then treated as decompressible data. When all data has been stored in the RAM, FtStopped in the Formatter and Flush Status Register is set HIGH. Note: When the EnFt bit is 0, it is assumed that the source ID is not changing. Multiple flush generating conditions can be enabled together. However, if a second or third flush event is generated then the current flush completes before the next flush is serviced. Only one flush can be outstanding at a time. If two flushes are requested simultaneously, only one will be issued. If two flushes are requested while another is in progress, only one further flush will be issued when the in-progress flush completes.Multiple trigger indication conditions can be enabled simultaneously although this can cause the appearance of multiple triggers if flush using trigger is also enabled. If StopOnTrigEvt and FOnTrigEvt are both set then none of the flushed data is stored. When the system stops, it returns ATREADYS HIGH and does not store the accepted data packets. This is to stop stalling of any other devices connected using a Trace Replicator. StopOnTrigEvt, FOnTrigEvt and TrigOnTrigEvt bits are functional only in Circular Buffer mode. Setting these bits with the TMC enabled in FIFO modes will not have any effect on the TMC.Note: To perform a stop on flush completion through a manually-generated flush request, two write operations to the register are required - one to enable the stop event, if it is not already enabled and one to generate the manual flush."
+  default = "0x00000000"
+  offset = "0x00000304"
+  [[register.field]]
+    name = "DRAINBUFFER"
+    bits = "14"
+    type = "rw"
+    shortdesc = '''This bit is used to enable draining of the trace data through the ATB Master interface after the formatter has stopped.'''
+    longdesc = '''This is useful in Circular buffer mode to capture trace data into trace memory and then drain the captured trace through the ATB Master interface. Writing a '1' to this bit when TMCReady=1 and TraceCaptEn=1 starts the drain of the contents of the trace buffer through the ATB Master interface. This bit always reads as zero. The TMCReady bit (STS register, 0x00C) goes low while the drain is in progress.This bit is functional only when the TMC is in Circular Buffer mode and formatting is enabled (EnFt bit in FFCR register is set). Setting this bit when the TMC is in any other mode or when formatting is disabled will result in Unpredictable behavior.Setting this bit other than when the TMCReady bit (STS Register, 0x00C) is set and TraceCaptEn=1 will result in Unpredictable behavior. Once trace capture is complete in Circular Buffer mode, all of the captured trace must be retrieved from the trace memory through the same mechanism - either read all trace data out through RRD reads or drain all trace data by setting the DrainBuffer bit. Setting the DrainBuffer bit after some of the captured trace has been read out through RRD will result in Unpredictable behavior.'''
+  [[register.field]]
+    name = "STOPONTRIGEVT"
+    bits = "13"
+    type = "rw"
+    shortdesc = '''If this bit is set, the formatter is stopped when a Trigger Event has been observed.'''
+    longdesc = '''A Trigger Event is said to have occurred when the Formatter has written the set number of datawords (as programmed in the TRG register, 0x01C) into the trace memory after the occurrence of either a rising edge on the TRIGIN input or a trigger packet on the incoming trace stream (ATID = 7'h7D). This bit is cleared on reset (disabled). Enabling the TMC in Software-read-FIFO mode or Hardware-read-FIFO mode with this bit set will result in Unpredictable behavior because in FIFO modes, the TMC is a trace link rather than a trace sink and trigger events are related to trace sink functionality.'''
+  [[register.field]]
+    name = "STOPONFL"
+    bits = "12"
+    type = "rw"
+    shortdesc = '''If this bit is set, the formatter is stopped on completion of a flush operation.'''
+    longdesc = '''The initiation of a flush operation is controlled by programming the register bits FlushMan, FOnTrigEvt and FOnFlIn in the FFCR register, 0x304. When a flush-initiation condition occurs, AFVALIDS is pulled HIGH. Once AFREADYS is sampled HIGH, trace capture is stopped. Any remaining data in the formatter is appended with a post-amble and written to trace memory. The flush operation is then said to have completed. This bit is cleared on reset (disabled).In the FIFO modes, if a flush is initiated due to any condition other than a manual flush request, its completion does not lead to a formatter stop regardless of the value programmed in this bit. When the TMC is configured as an ETF, if a flush is initiated by the ATB Master interface, its completion does not lead to a formatter stop regardless of the value programmed in this bit.'''
+  [[register.field]]
+    name = "TRIGONFL"
+    bits = "10"
+    type = "rw"
+    shortdesc = '''If this bit is set, a trigger is indicated on the trace stream on AFREADYS being returned.'''
+    longdesc = '''If the formatter is bypassed (FFCR[0] = '0') or if Trigger Insertion is disabled (FFCR[1] = '0'), then trigger indication on the trace stream is blocked regardless of the value programmed in this bit.When the TMC is configured as an ETF, if a flush is initiated by the ATB Master interface, its completion does not lead to a trigger indication on the trace stream regardless of the value programmed in this bit.'''
+  [[register.field]]
+    name = "TRIGONTRIGEVT"
+    bits = "9"
+    type = "rw"
+    shortdesc = '''If this bit is set, a trigger is indicated on the output trace stream when a Trigger Event occurs.'''
+    longdesc = '''A trigger event is said to have occurred when the Formatter has written the set number of datawords (as programmed in the TRG register) into the trace memory after the occurrence of either a rising edge on the TRIGIN input or a trigger packet in the incoming trace stream (ATID = 7'h7D).If the formatter is bypassed (FFCR[0] = '0') or if Trigger Insertion is disabled (FFCR[1] = '0'), then trigger indication on the trace stream is blocked regardless of the value programmed in this bit. This bit is not supported in Software-read-FIFO mode or Hardware-read-FIFO mode because in FIFO modes, the TMC is a trace link rather than a trace sink and trigger events are related to trace sink functionality.'''
+  [[register.field]]
+    name = "TRIGONTRIGIN"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''If this bit is set, a trigger is indicated on the trace stream when a rising edge is detected on the TRIGIN input.'''
+    longdesc = '''If the formatter is bypassed (FFCR[0] = '0') or if Trigger Insertion is disabled (FFCR[1] = '0'), then trigger indication on the trace stream is blocked regardless of the value programmed in this bit.'''
+  [[register.field]]
+    name = "FLUSHMAN"
+    bits = "6"
+    type = "rw"
+    shortdesc = '''Manually generate a flush of the system.'''
+    longdesc = '''Setting this bit causes a flush to be generated. If TraceCaptEn bit in CTL register is 0, then writes to this bit are ignored. In Circular buffer mode and Hardware-FIFO mode, this bit is cleared automatically when AFREADYS is sampled HIGH. In Software-FIFO mode, this bit is cleared when the flush data is written to trace memory. This bit is clear on reset.'''
+  [[register.field]]
+    name = "FONTRIGEVT"
+    bits = "5"
+    type = "rw"
+    shortdesc = '''Setting this bit generates a flush when a Trigger event occurs.'''
+    longdesc = '''A trigger event is said to have occurred when the Formatter has written the set number of datawords (as programmed in the TRG register) into the trace memory after the occurrence of either a rising edge on the TRIGIN input or a trigger packet in the incoming trace stream (ATID = 7'h7D). This bit is clear on reset. This bit is not supported in Software-read-FIFO mode or Hardware-read-FIFO mode because in FIFO mode, the TMC is a trace link rather than a trace sink and trigger events are related to trace sink functionality.'''
+  [[register.field]]
+    name = "FONFLIN"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''Setting this bit enables the detection of transitions on the FLUSHIN input by the TMC.'''
+    longdesc = '''If this bit is set and the Formatter has not already stopped, a rising edge on FLUSHIN initiates a flush request. This bit is clear on reset.'''
+  [[register.field]]
+    name = "ENTI"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Setting this bit enables the insertion of triggers in the formatted trace stream.'''
+    longdesc = '''A trigger is indicated by inserting one byte of data 8'h00 with ATID 7'h7D in the trace stream. Trigger indication on the trace stream is additionally controlled by the register bits TrigOnFl, TrigOnTrigEvt and TrigOnTrigIn in the FFCR register, 0x304. This bit can only be changed when TMCReady=1 and TraceCaptEn=0. This bit takes effect only when the EnFt register bit in this register is set. If EnTI bit is set to 1 when EnFt is 0, it results in formatting being enabled. This bit is clear on reset.'''
+  [[register.field]]
+    name = "ENFT"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''If this bit is set, formatting is enabled.'''
+    longdesc = '''This bit is clear on reset. This bit is ignored when in Disabled state (TraceCaptEn=0 and TMCReady=1).If this bit is cleared, formatting is disabled. Incoming trace data is assumed to be from a single trace source. If multiple ATIDs are received by the TMC when trace capture is enabled and the formatter is disabled, it will result in interleaving of trace data. Disabling of formatting is deprecated and is supported in the TMC for backwards-compatibility with earlier versions of the ETB. Hence, disabling of formatting is supported only in Circular Buffer mode. Features in the TMC such as the FIFO modes and the DrainBuffer bit that are not part of the earlier versions of the ETB do not support disabling of formatting. If EnTI bit is set to 1 when EnFt is 0, it results in formatting being enabled. If the TMC is enabled in a mode other than Circular Buffer mode with EnFt 0, it will result in formatting being enabled. Attempting to write to this bit when TMCReady=0 or TraceCaptEn=1 will result in Unpredictable behavior.'''
+[[register]]
+  name = "PSCR"
+  type = "rw"
+  width = 32
+  description = "This register determines the reload value of the Periodic Synchronization Counter. This counter enables the frequency of synchronization information to be optimized to the trace capture buffer size.When the TMC is enabled, the Periodic Synchronization counter counts the number of bytes of trace data stored into the trace memory (regardless of whether the trace data has been formatted by the TMC or not) since the occurrence of the last synchronization request on the ATB slave interface. The value programmed into this register determines the reload value of the Periodic Synchronization counter.This counter is enabled only when the TraceCaptEn bit in the Control Register, CTL, 0x020, is set. Writing to this register other than when TraceCaptEn=0 and TMCReady=1 will result in Unpredictable behavior."
+  default = "0x00000000"
+  offset = "0x00000308"
+  [[register.field]]
+    name = "PSCOUNT"
+    bits = "4:0"
+    type = "rw"
+    shortdesc = '''Determines the reload value of the Synchronization Counter.'''
+    longdesc = '''The reload value takes effect the next time the counter reaches 0. Reads from this register return the reload value programmed into this register. This register is set to 0xA on reset, corresponding to a synchronization period of 1024 bytes.0x0: Synchronization disabled. 0x1-0x6: Reserved/UNP.0x7-0x1B: Synchronisation period is 2**PSCount bytes. For example, a value of 0x7 gives a synchronization period of 128 bytes.0x1C-0x1F: Reserved/UNP.'''
+[[register]]
+  name = "ITATBMDATA0"
+  type = "wo"
+  width = 32
+  description = "The Integration Test ATB Master Data Register 0 enables control of the ATDATAM output of the TMC. Writing to this register other than when in Disabled state (TraceCaptEn=0 and TMCReady=1) and in integration mode results in Unpredictable behavior."
+  default = "0x00000000"
+  offset = "0x00000ED0"
+  [[register.field]]
+    name = "ATDATAMBIT31"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "ATDATAMBIT23"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "ATDATAMBIT15"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "ATDATAMBIT7"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "ATDATAMBIT0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "ITATBMCTR2"
+  type = "ro"
+  width = 32
+  description = "The Integration Test ATB Master Interface Control Register 2 captures the values of the SYNCREQM, AFVALIDM and ATREADYM inputs to the TMC."
+  default = "0x00000001"
+  offset = "0x00000ED4"
+  [[register.field]]
+    name = "SYNCREQM"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "AFVALIDM"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ATREADYM"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ITATBMCTR1"
+  type = "wo"
+  width = 32
+  description = "The Integration Test ATB Master Control Register 1 enables control of the ATIDM outputs of the TMC. Writing to this register other than when in Disabled state (TraceCaptEn=0 and TMCReady=1) and in integration mode results in Unpredictable behavior."
+  default = "0x00000000"
+  offset = "0x00000ED8"
+  [[register.field]]
+    name = "ATIDM"
+    bits = "6:0"
+    type = "wo"
+    shortdesc = '''Control the value of ATIDM output from TMC.'''
+    longdesc = '''The value written to this field is driven on the ATIDM output of the TMC.'''
+[[register]]
+  name = "ITATBMCTR0"
+  type = "wo"
+  width = 32
+  description = "The Integration Test ATB Master Interface Control Register 0 enables control of the ATBYTESM, AFREADYM and ATVALIDM outputs of the TMC. Writing to this register other than when in Disabled state (TraceCaptEn=0 and TMCReady=1) and in integration mode results in Unpredictable behavior."
+  default = "0x00000000"
+  offset = "0x00000EDC"
+  [[register.field]]
+    name = "ATBYTESM"
+    bits = "9:8"
+    type = "wo"
+    shortdesc = '''Control the value of ATBYTESM output from TMC.'''
+    longdesc = '''The value written to this field is driven on the ATBYTESM output of the TMC.'''
+  [[register.field]]
+    name = "AFREADYM"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "ATVALIDM"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "ITMISCOP0"
+  type = "wo"
+  width = 32
+  description = "The Integration Test Miscellaneous Output Register 0 controls the values of some outputs from the TMC. Writing to this register other than when in Disabled state (TraceCaptEn=0 and TMCReady=1) and in integration mode results in Unpredictable behavior."
+  default = "0x00000000"
+  offset = "0x00000EE0"
+  [[register.field]]
+    name = "FULL"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "ACQCOMP"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "ITTRFLIN"
+  type = "ro"
+  width = 32
+  description = "This register returns the values of the FLUSHIN and TRIGIN inputs to the TMC. Writing to this register other than when in Disabled state (TraceCaptEn=0 and TMCReady=1) and in integration mode results in Unpredictable behavior."
+  default = "0x00000000"
+  offset = "0x00000EE8"
+  [[register.field]]
+    name = "FLUSHIN"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "TRIGIN"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ITATBDATA0"
+  type = "ro"
+  width = 32
+  description = "The Integration Test ATB Data Register 0 returns the values on the ATDATAS input to the TMC."
+  default = "0x00000000"
+  offset = "0x00000EEC"
+  [[register.field]]
+    name = "ATDATASBIT31"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "ATDATASBIT23"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "ATDATASBIT15"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "ATDATASBIT7"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ATDATASBIT0"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ITATBCTR2"
+  type = "wo"
+  width = 32
+  description = "The Integration Test ATB Control Register 2 enables control of the ATREADYS and AFVALIDS outputs of the TMC. Writing to this register other than when in Disabled state (TraceCaptEn=0 and TMCReady=1) and in integration mode results in Unpredictable behavior."
+  default = "0x00000000"
+  offset = "0x00000EF0"
+  [[register.field]]
+    name = "SYNCREQS"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "AFVALIDS"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "ATREADYS"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "ITATBCTR1"
+  type = "ro"
+  width = 32
+  description = "The Integration Test ATB Control Register 1 captures the value of the ATIDS input to the TMC."
+  default = "0x00000000"
+  offset = "0x00000EF4"
+  [[register.field]]
+    name = "ATIDS"
+    bits = "6:0"
+    type = "ro"
+[[register]]
+  name = "ITATBCTR0"
+  type = "ro"
+  width = 32
+  description = "The Integration Test ATB Control Register 0 captures the values of the ATVALIDS, AFREADYS and ATBYTESS inputs to the TMC."
+  default = "0x00000000"
+  offset = "0x00000EF8"
+  [[register.field]]
+    name = "ATBYTESS"
+    bits = "9:8"
+    type = "ro"
+  [[register.field]]
+    name = "AFREADYS"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ATVALIDS"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ITCTRL"
+  type = "rw"
+  width = 32
+  description = "This register is used to enable topology detection. For more information see the CoreSight Architecture Specification. This register enables the component to switch from a functional mode, the default behavior, to integration mode where the inputs and outputs of the component can be directly controlled for the purpose of integration testing and topology solving. Note: When a device has been in integration mode, it might not function with the original behavior. After performing integration or topology detection, you must reset the system to ensure correct behavior of CoreSight and other connected system components that are affected by the integration or topology detection.Writing to this register other than when in Disabled state (TMCReady=1 and TraceCaptEn=0) results in Unpredictable behavior."
+  default = "0x00000000"
+  offset = "0x00000F00"
+  [[register.field]]
+    name = "INTEGRATION_MODE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "CLAIMSET"
+  type = "rw"
+  width = 32
+  description = "This is used in conjunction with Claim Tag Clear Register, CLAIMCLR. This register forms one half of the Claim Tag value. This location allows individual bits to be set, write, and returns the number of bits that can be set, read."
+  default = "0x0000000F"
+  offset = "0x00000FA0"
+  [[register.field]]
+    name = "CLAIMSET"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "CLAIMCLR"
+  type = "rw"
+  width = 32
+  description = "This register is used in conjunction with Claim Tag Set Register, CLAIMSET. This register forms one half of the Claim Tag value. This location enables individual bits to be cleared, write, and returns the current Claim Tag value, read."
+  default = "0x00000000"
+  offset = "0x00000FA4"
+  [[register.field]]
+    name = "CLAIMCLR"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "LAR"
+  type = "wo"
+  width = 32
+  description = "This is used to enable write access to device registers. External accesses from a debugger (PADDRDBG31 = 1) are not subject to the Lock Registers. A debugger does not have to unlock the component in order to write and modify the registers in the component."
+  default = "0x00000000"
+  offset = "0x00000FB0"
+  [[register.field]]
+    name = "ACCESS_W"
+    bits = "31:0"
+    type = "wo"
+    shortdesc = '''A write of 0xC5ACCE55 enables further write access to this device.'''
+    longdesc = '''A write of any value other than 0xC5ACCE55 will have the affect of removing write access.'''
+[[register]]
+  name = "LSR"
+  type = "ro"
+  width = 32
+  description = "This indicates the status of the Lock control mechanism. This lock prevents accidental writes by code under debug. When locked, write access is blocked to all registers, except the Lock Access Register.External accesses from a debugger (PADDRDBG31 = 1) are not subject to the Lock Registers. This register reads as 0 when read from an external debugger (PADDRDBG31 = 1)."
+  default = "0x00000003"
+  offset = "0x00000FB4"
+  [[register.field]]
+    name = "LOCKTYPE"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "LOCKGRANT"
+    bits = "1"
+    type = "ro"
+    shortdesc = '''Returns the current status of the Lock.'''
+    longdesc = '''This bit reads as 0 when read from an external debugger (PADDRDBG31 = 1) since external debugger accesses are not subject to Lock Registers.'''
+  [[register.field]]
+    name = "LOCKEXIST"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Indicates that a lock control mechanism exists for this device.'''
+    longdesc = '''This bit reads as 0 when read from an external debugger (PADDRDBG31 = 1) since external debugger accesses are not subject to Lock Registers.'''
+[[register]]
+  name = "AUTHSTATUS"
+  type = "ro"
+  width = 32
+  description = "Reports what functionality is currently permitted by the authentication interface."
+  default = "0x00000000"
+  offset = "0x00000FB8"
+  [[register.field]]
+    name = "SNID"
+    bits = "7:6"
+    type = "ro"
+  [[register.field]]
+    name = "SID"
+    bits = "5:4"
+    type = "ro"
+  [[register.field]]
+    name = "NSNID"
+    bits = "3:2"
+    type = "ro"
+  [[register.field]]
+    name = "NSID"
+    bits = "1:0"
+    type = "ro"
+[[register]]
+  name = "DEVID"
+  type = "ro"
+  width = 32
+  description = "This register indicates the capabilities of the CoreSight TMC."
+  default = "0x00000380"
+  offset = "0x00000FC8"
+  [[register.field]]
+    name = "MEMWIDTH"
+    bits = "10:8"
+    type = "ro"
+    shortdesc = '''This value indicates the width of the Memory interface databus.'''
+    longdesc = '''For the ETB and ETF configurations, this value is twice the ATB datawidth. In these configurations, the default value of MEMWIDTH is 64_bits corresponding to the default ATB datawidth of 32_bits. For the ETR configuration, the MEMWIDTH is the same as the ATB datawidth, the default value being 32_bits.'''
+  [[register.field]]
+    name = "CONFIGTYPE"
+    bits = "7:6"
+    type = "ro"
+  [[register.field]]
+    name = "CLKSCHEME"
+    bits = "5"
+    type = "ro"
+    shortdesc = '''This value indicates the TMC RAM clocking scheme used ie.'''
+    longdesc = '''whether the TMC RAM operates synchronously or asynchronously to CLK.'''
+  [[register.field]]
+    name = "ATBINPORTCOUNT"
+    bits = "4:0"
+    type = "ro"
+    shortdesc = '''This value indicates the type/number of ATB multiplexing present on the input ATB.'''
+    longdesc = '''Currently only 0x00 is supported (no multiplexing present). This value is used to assist topology detection of the ATB structure.'''
+[[register]]
+  name = "DEVTYPE"
+  type = "ro"
+  width = 32
+  description = "It provides a debugger with information about the component when the Part Number field is not recognized. The debugger can then report this information."
+  default = "0x00000032"
+  offset = "0x00000FCC"
+  [[register.field]]
+    name = "SUB_TYPE"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "MAJOR_TYPE"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "PIDR4"
+  type = "ro"
+  width = 32
+  description = "Part of the set of Peripheral Identification registers. Contains part of the designer identity and the memory footprint indicator."
+  default = "0x00000004"
+  offset = "0x00000FD0"
+  [[register.field]]
+    name = "FOURKB_COUNT"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''This is a 4-bit value that indicates the total contiguous size of the memory window used by this component in powers of 2 from the standard 4KB.'''
+    longdesc = '''If a component only requires the standard 4KB then this should read as 0x0, 4KB only, for 8KB set to 0x1, 16KB == 0x2, 32KB == 0x3, and so on.'''
+  [[register.field]]
+    name = "JEP106_CONT"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "PIDR5"
+  type = "ro"
+  width = 32
+  description = "Reserved"
+  default = "0x00000000"
+  offset = "0x00000FD4"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "PIDR6"
+  type = "ro"
+  width = 32
+  description = "Reserved"
+  default = "0x00000000"
+  offset = "0x00000FD8"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "PIDR7"
+  type = "ro"
+  width = 32
+  description = "Reserved"
+  default = "0x00000000"
+  offset = "0x00000FDC"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "PIDR0"
+  type = "ro"
+  width = 32
+  description = "Part of the set of Peripheral Identification registers. Contains part of the designer specific part number."
+  default = "0x00000061"
+  offset = "0x00000FE0"
+  [[register.field]]
+    name = "PART_NUMBER_BITS7TO0"
+    bits = "7:0"
+    type = "ro"
+    shortdesc = '''Bits [7:0] of the component's part number.'''
+    longdesc = '''This is selected by the designer of the component.'''
+[[register]]
+  name = "PIDR1"
+  type = "ro"
+  width = 32
+  description = "Part of the set of Peripheral Identification registers. Contains part of the designer specific part number and part of the designer identity."
+  default = "0x000000B9"
+  offset = "0x00000FE4"
+  [[register.field]]
+    name = "JEP106_BITS3TO0"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "PART_NUMBER_BITS11TO8"
+    bits = "3:0"
+    type = "ro"
+    shortdesc = '''Bits [11:8] of the component's part number.'''
+    longdesc = '''This is selected by the designer of the component.'''
+[[register]]
+  name = "PIDR2"
+  type = "ro"
+  width = 32
+  description = "Part of the set of Peripheral Identification registers. Contains part of the designer identity and the product revision."
+  default = "0x0000001B"
+  offset = "0x00000FE8"
+  [[register.field]]
+    name = "REVISION"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''The Revision field is an incremental value starting at 0x0 for the first design of this component.'''
+    longdesc = '''This only increases by 1 for both major and minor revisions and is simply used as a look-up to establish the exact major/minor revision.'''
+  [[register.field]]
+    name = "JEDEC"
+    bits = "3"
+    type = "ro"
+    shortdesc = '''Always set.'''
+    longdesc = '''Indicates that a JEDEC assigned value is used'''
+  [[register.field]]
+    name = "JEP106_BITS6TO4"
+    bits = "2:0"
+    type = "ro"
+[[register]]
+  name = "PIDR3"
+  type = "ro"
+  width = 32
+  description = "Part of the set of Peripheral Identification registers. Contains the RevAnd and Customer Modified fields."
+  default = "0x00000000"
+  offset = "0x00000FEC"
+  [[register.field]]
+    name = "REVAND"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''This field indicates minor errata fixes specific to this design, for example metal fixes after implementation.'''
+    longdesc = '''In most cases this field is zero. It is recommended that component designers ensure this field can be changed by a metal fix if required, for example by driving it from registers that reset to zero.'''
+  [[register.field]]
+    name = "CUSTOMER_MODIFIED"
+    bits = "3:0"
+    type = "ro"
+    shortdesc = '''Where the component is reusable IP, this value indicates if the customer has modified the behavior of the component.'''
+    longdesc = '''In most cases this field is zero.'''
+[[register]]
+  name = "CIDR0"
+  type = "ro"
+  width = 32
+  description = "A component identification register, that indicates that the identification registers are present."
+  default = "0x0000000D"
+  offset = "0x00000FF0"
+  [[register.field]]
+    name = "PREAMBLE"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "CIDR1"
+  type = "ro"
+  width = 32
+  description = "A component identification register, that indicates that the identification registers are present. This register also indicates the component class."
+  default = "0x00000090"
+  offset = "0x00000FF4"
+  [[register.field]]
+    name = "CLASS"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''Class of the component.'''
+    longdesc = '''E.g. ROM table, CoreSight component etc. Constitutes bits [15:12] of the component identification.'''
+  [[register.field]]
+    name = "PREAMBLE"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "CIDR2"
+  type = "ro"
+  width = 32
+  description = "A component identification register, that indicates that the identification registers are present."
+  default = "0x00000005"
+  offset = "0x00000FF8"
+  [[register.field]]
+    name = "PREAMBLE"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "CIDR3"
+  type = "ro"
+  width = 32
+  description = "A component identification register, that indicates that the identification registers are present."
+  default = "0x000000B1"
+  offset = "0x00000FFC"
+  [[register.field]]
+    name = "PREAMBLE"
+    bits = "7:0"
+    type = "ro"

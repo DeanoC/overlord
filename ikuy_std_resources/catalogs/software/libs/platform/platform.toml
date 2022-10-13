@@ -1,0 +1,44 @@
+actions = [
+    "templates",
+    "soft_src"
+]
+
+[[process]]
+name = 'templates'
+processor = 'templates'
+sources = [
+    { in = "CMakeLists.txt", out = "CMakeLists.txt" },
+    { in = "include/platform/cpu_percpu.h", out = "include/platform/${cpuName}/cpu.h", cpus = "_" },
+    { in = "include/platform/memory_map_percpu.h", out = "include/platform/${cpuName}/memory_map.h", cpus = "_" },
+]
+
+[[process]]
+name = 'soft_src'
+processor = 'software_sources'
+sources = [
+    { in = "include/platform/reg_access.h", out = "include/platform/reg_access.h" },
+    { in = "include/platform/cache.h", out = "include/platform/cache.h" },
+    { in = "include/platform/memory_map.h", out = "include/platform/memory_map.h" },
+    { in = "include/platform/cpu.h", out = "include/platform/cpu.h" },
+    { in = "include/platform/host/platform.h", out = "include/platform/host/platform.h" },
+    { in = "include/platform/aarch64/intrinsics_gcc.h", out = "include/platform/aarch64/intrinsics_gcc.h" },
+    { in = "include/platform/microblaze/intrinsics_gcc.h", out = "include/platform/microblaze/intrinsics_gcc.h" },
+    { in = "include/platform/zynqmp/pll_helper.h", out = "include/platform/zynqmp/pll_helper.h" },
+    { in = "include/platform/zynqmp/interrupts.h", out = "include/platform/zynqmp/interrupts.h" },
+    { in = "include/platform/host/backward.hpp", out = "include/platform/host/backward.hpp" },
+    { in = "include/platform/host/compiler_gcc.h", out = "include/platform/host/compiler_gcc.h" },
+    { in = "include/platform/host/compiler_msvc.h", out = "include/platform/host/compiler_msvc.h" },
+    { in = "include/platform/host/host_platform_linux.h", out = "include/platform/host/host_platform_linux.h" },
+    { in = "include/platform/host/host_platform_osx.h", out = "include/platform/host/host_platform_osx.h" },
+    { in = "include/platform/host/host_platform_posix.h", out = "include/platform/host/host_platform_posix.h" },
+    { in = "include/platform/host/host_platform_win.h", out = "include/platform/host/host_platform_win.h" },
+    { in = "src/aarch64/cache.c", out = "src/aarch64/cache.c" },
+    { in = "src/pmu/cache.c", out = "src/pmu/cache.c" },
+    { in = "src/host/backward.cpp", out = "src/host/backward.cpp" },
+    { in = "src/host/compat.c", out = "src/host/compat.c" },
+    { in = "src/microblaze/disable_exceptions.S", out = "src/microblaze/disable_exceptions.S" },
+    { in = "src/microblaze/enable_exceptions.S", out = "src/microblaze/enable_exceptions.S" },
+    { in = "src/microblaze/disable_interrupts.S", out = "src/microblaze/disable_interrupts.S" },
+    { in = "src/microblaze/enable_interrupts.S", out = "src/microblaze/enable_interrupts.S" },
+    { in = "src/zynqmp/pll_helper.c", out = "src/zynqmp/pll_helper.c" },
+]

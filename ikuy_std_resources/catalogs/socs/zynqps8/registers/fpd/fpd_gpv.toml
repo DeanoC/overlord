@@ -1,0 +1,3107 @@
+description = "FPD GPV"
+[[register]]
+  name = "PERIPH_ID_4"
+  type = "ro"
+  width = 32
+  description = "4KB count, JEP106 continuation code"
+  default = "0x00000004"
+  offset = "0x00001FD0"
+  [[register.field]]
+    name = "PERIPH_ID_4"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "PERIPH_ID_5"
+  type = "ro"
+  width = 32
+  description = "Reserved"
+  default = "0x00000000"
+  offset = "0x00001FD4"
+  [[register.field]]
+    name = "PERIPH_ID_5"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "PERIPH_ID_6"
+  type = "ro"
+  width = 32
+  description = "Reserved"
+  default = "0x00000000"
+  offset = "0x00001FD8"
+  [[register.field]]
+    name = "PERIPH_ID_6"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "PERIPH_ID_7"
+  type = "ro"
+  width = 32
+  description = "Reserved"
+  default = "0x00000000"
+  offset = "0x00001FDC"
+  [[register.field]]
+    name = "PERIPH_ID_7"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "PERIPH_ID_0"
+  type = "ro"
+  width = 32
+  description = "Part Number [7:0]"
+  default = "0x00000000"
+  offset = "0x00001FE0"
+  [[register.field]]
+    name = "PERIPH_ID_0"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "PERIPH_ID_1"
+  type = "ro"
+  width = 32
+  description = "JEP106[3:0], part number [11:8]"
+  default = "0x000000B4"
+  offset = "0x00001FE4"
+  [[register.field]]
+    name = "PERIPH_ID_1"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "PERIPH_ID_2"
+  type = "ro"
+  width = 32
+  description = "Revision, JEP106 code flag, JEP106[6:4]"
+  default = "0x0000002B"
+  offset = "0x00001FE8"
+  [[register.field]]
+    name = "PERIPH_ID_2"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "PERIPH_ID_3"
+  type = "ro"
+  width = 32
+  description = "You can set this using the AMBA Designer Graphical User Interface (GUI)"
+  default = "0x00000000"
+  offset = "0x00001FEC"
+  [[register.field]]
+    name = "REV_AND"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "CUST_MOD_NUM"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "COMP_ID_0"
+  type = "ro"
+  width = 32
+  description = "Preamble"
+  default = "0x0000000D"
+  offset = "0x00001FF0"
+  [[register.field]]
+    name = "COMP_ID_0"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "COMP_ID_1"
+  type = "ro"
+  width = 32
+  description = "Generic IP component class, preamble"
+  default = "0x000000F0"
+  offset = "0x00001FF4"
+  [[register.field]]
+    name = "COMP_ID_1"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "COMP_ID_2"
+  type = "ro"
+  width = 32
+  description = "Preamble"
+  default = "0x00000005"
+  offset = "0x00001FF8"
+  [[register.field]]
+    name = "COMP_ID_2"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "COMP_ID_3"
+  type = "ro"
+  width = 32
+  description = "Preamble"
+  default = "0x000000B1"
+  offset = "0x00001FFC"
+  [[register.field]]
+    name = "COMP_ID_3"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "INTFPD_INTLPD_IB_FN_MOD_ISS_BM"
+  type = "rw"
+  width = 32
+  description = "Bus matrix issuing functionality modification register"
+  default = "0x00000000"
+  offset = "0x00002008"
+  [[register.field]]
+    name = "FN_MOD_ISS_BM"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "INTFPD_INTLPD_IB_FN_MOD2"
+  type = "rw"
+  width = 32
+  description = "This register is only present if upsizing or downsizing happens"
+  default = "0x00000000"
+  offset = "0x00002024"
+  [[register.field]]
+    name = "BYPASS_MERGE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "INTFPD_INTLPD_IB_FN_MOD"
+  type = "rw"
+  width = 32
+  description = "Issuing functionality modification register"
+  default = "0x00000000"
+  offset = "0x00002108"
+  [[register.field]]
+    name = "FN_MOD"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "INTFPDCCI_INTFPDMAIN_IB_FN_MOD"
+  type = "rw"
+  width = 32
+  description = "Issuing functionality modification register"
+  default = "0x00000000"
+  offset = "0x00042108"
+  [[register.field]]
+    name = "FN_MOD"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "INTFPDCCI_INTFPDMAIN_IB_QOS_CNTL"
+  type = "rw"
+  width = 32
+  description = "The QoS control register contains the enable bits for all the regulators."
+  default = "0x00000000"
+  offset = "0x0004210C"
+  [[register.field]]
+    name = "EN_AWAR_OT"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_OT"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_OT"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AWAR_RATE"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_RATE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_RATE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "INTFPDCCI_INTFPDMAIN_IB_MAX_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of outstanding transactions"
+  default = "0x00000000"
+  offset = "0x00042110"
+  [[register.field]]
+    name = "AR_MAX_OTI"
+    bits = "29:24"
+    type = "rw"
+  [[register.field]]
+    name = "AR_MAX_OTF"
+    bits = "23:16"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTI"
+    bits = "13:8"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "INTFPDCCI_INTFPDMAIN_IB_MAX_COMB_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of combined outstanding transactions"
+  default = "0x00000000"
+  offset = "0x00042114"
+  [[register.field]]
+    name = "AWAR_MAX_OTI"
+    bits = "14:8"
+    type = "rw"
+  [[register.field]]
+    name = "AWAR_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "INTFPDCCI_INTFPDMAIN_IB_AW_P"
+  type = "rw"
+  width = 32
+  description = "AW channel peak rate"
+  default = "0x00000000"
+  offset = "0x00042118"
+  [[register.field]]
+    name = "AW_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "INTFPDCCI_INTFPDMAIN_IB_AW_B"
+  type = "rw"
+  width = 32
+  description = "AW channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x0004211C"
+  [[register.field]]
+    name = "AW_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "INTFPDCCI_INTFPDMAIN_IB_AW_R"
+  type = "rw"
+  width = 32
+  description = "AW channel average rate"
+  default = "0x00000000"
+  offset = "0x00042120"
+  [[register.field]]
+    name = "AW_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "INTFPDCCI_INTFPDMAIN_IB_AR_P"
+  type = "rw"
+  width = 32
+  description = "AR channel peak rate"
+  default = "0x00000000"
+  offset = "0x00042124"
+  [[register.field]]
+    name = "AR_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "INTFPDCCI_INTFPDMAIN_IB_AR_B"
+  type = "rw"
+  width = 32
+  description = "AR channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x00042128"
+  [[register.field]]
+    name = "AR_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "INTFPDCCI_INTFPDMAIN_IB_AR_R"
+  type = "rw"
+  width = 32
+  description = "AR channel average rate"
+  default = "0x00000000"
+  offset = "0x0004212C"
+  [[register.field]]
+    name = "AR_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "INTFPDSMMUTBU3_INTFPDMAIN_FN_MOD"
+  type = "rw"
+  width = 32
+  description = "Issuing functionality modification register"
+  default = "0x00000000"
+  offset = "0x00043108"
+  [[register.field]]
+    name = "FN_MOD"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "INTFPDSMMUTBU3_INTFPDMAIN_QOS_CNTL"
+  type = "rw"
+  width = 32
+  description = "The QoS control register contains the enable bits for all the regulators."
+  default = "0x00000000"
+  offset = "0x0004310C"
+  [[register.field]]
+    name = "EN_AWAR_OT"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_OT"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_OT"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AWAR_RATE"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_RATE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_RATE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "INTFPDSMMUTBU3_INTFPDMAIN_MAX_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of outstanding transactions"
+  default = "0x00000000"
+  offset = "0x00043110"
+  [[register.field]]
+    name = "AR_MAX_OTI"
+    bits = "29:24"
+    type = "rw"
+  [[register.field]]
+    name = "AR_MAX_OTF"
+    bits = "23:16"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTI"
+    bits = "13:8"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "INTFPDSMMUTBU3_INTFPDMAIN_MAX_COMB_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of combined outstanding transactions"
+  default = "0x00000000"
+  offset = "0x00043114"
+  [[register.field]]
+    name = "AWAR_MAX_OTI"
+    bits = "14:8"
+    type = "rw"
+  [[register.field]]
+    name = "AWAR_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "INTFPDSMMUTBU3_INTFPDMAIN_AW_P"
+  type = "rw"
+  width = 32
+  description = "AW channel peak rate"
+  default = "0x00000000"
+  offset = "0x00043118"
+  [[register.field]]
+    name = "AW_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "INTFPDSMMUTBU3_INTFPDMAIN_AW_B"
+  type = "rw"
+  width = 32
+  description = "AW channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x0004311C"
+  [[register.field]]
+    name = "AW_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "INTFPDSMMUTBU3_INTFPDMAIN_AW_R"
+  type = "rw"
+  width = 32
+  description = "AW channel average rate"
+  default = "0x00000000"
+  offset = "0x00043120"
+  [[register.field]]
+    name = "AW_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "INTFPDSMMUTBU3_INTFPDMAIN_AR_P"
+  type = "rw"
+  width = 32
+  description = "AR channel peak rate"
+  default = "0x00000000"
+  offset = "0x00043124"
+  [[register.field]]
+    name = "AR_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "INTFPDSMMUTBU3_INTFPDMAIN_AR_B"
+  type = "rw"
+  width = 32
+  description = "AR channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x00043128"
+  [[register.field]]
+    name = "AR_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "INTFPDSMMUTBU3_INTFPDMAIN_AR_R"
+  type = "rw"
+  width = 32
+  description = "AR channel average rate"
+  default = "0x00000000"
+  offset = "0x0004312C"
+  [[register.field]]
+    name = "AR_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "INTFPDSMMUTBU4_INTFPDMAIN_FN_MOD"
+  type = "rw"
+  width = 32
+  description = "Issuing functionality modification register"
+  default = "0x00000000"
+  offset = "0x00044108"
+  [[register.field]]
+    name = "FN_MOD"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "INTFPDSMMUTBU4_INTFPDMAIN_QOS_CNTL"
+  type = "rw"
+  width = 32
+  description = "The QoS control register contains the enable bits for all the regulators."
+  default = "0x00000000"
+  offset = "0x0004410C"
+  [[register.field]]
+    name = "EN_AWAR_OT"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_OT"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_OT"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AWAR_RATE"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_RATE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_RATE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "INTFPDSMMUTBU4_INTFPDMAIN_MAX_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of outstanding transactions"
+  default = "0x00000000"
+  offset = "0x00044110"
+  [[register.field]]
+    name = "AR_MAX_OTI"
+    bits = "29:24"
+    type = "rw"
+  [[register.field]]
+    name = "AR_MAX_OTF"
+    bits = "23:16"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTI"
+    bits = "13:8"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "INTFPDSMMUTBU4_INTFPDMAIN_MAX_COMB_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of combined outstanding transactions"
+  default = "0x00000000"
+  offset = "0x00044114"
+  [[register.field]]
+    name = "AWAR_MAX_OTI"
+    bits = "14:8"
+    type = "rw"
+  [[register.field]]
+    name = "AWAR_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "INTFPDSMMUTBU4_INTFPDMAIN_AW_P"
+  type = "rw"
+  width = 32
+  description = "AW channel peak rate"
+  default = "0x00000000"
+  offset = "0x00044118"
+  [[register.field]]
+    name = "AW_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "INTFPDSMMUTBU4_INTFPDMAIN_AW_B"
+  type = "rw"
+  width = 32
+  description = "AW channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x0004411C"
+  [[register.field]]
+    name = "AW_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "INTFPDSMMUTBU4_INTFPDMAIN_AW_R"
+  type = "rw"
+  width = 32
+  description = "AW channel average rate"
+  default = "0x00000000"
+  offset = "0x00044120"
+  [[register.field]]
+    name = "AW_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "INTFPDSMMUTBU4_INTFPDMAIN_AR_P"
+  type = "rw"
+  width = 32
+  description = "AR channel peak rate"
+  default = "0x00000000"
+  offset = "0x00044124"
+  [[register.field]]
+    name = "AR_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "INTFPDSMMUTBU4_INTFPDMAIN_AR_B"
+  type = "rw"
+  width = 32
+  description = "AR channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x00044128"
+  [[register.field]]
+    name = "AR_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "INTFPDSMMUTBU4_INTFPDMAIN_AR_R"
+  type = "rw"
+  width = 32
+  description = "AR channel average rate"
+  default = "0x00000000"
+  offset = "0x0004412C"
+  [[register.field]]
+    name = "AR_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "AFIFM0M_INTFPD_FN_MOD"
+  type = "rw"
+  width = 32
+  description = "Issuing functionality modification register"
+  default = "0x00000000"
+  offset = "0x00045108"
+  [[register.field]]
+    name = "FN_MOD"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM0M_INTFPD_QOS_CNTL"
+  type = "rw"
+  width = 32
+  description = "The QoS control register contains the enable bits for all the regulators."
+  default = "0x00000000"
+  offset = "0x0004510C"
+  [[register.field]]
+    name = "EN_AWAR_OT"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_OT"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_OT"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AWAR_RATE"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_RATE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_RATE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "AFIFM0M_INTFPD_MAX_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of outstanding transactions"
+  default = "0x00000000"
+  offset = "0x00045110"
+  [[register.field]]
+    name = "AR_MAX_OTI"
+    bits = "29:24"
+    type = "rw"
+  [[register.field]]
+    name = "AR_MAX_OTF"
+    bits = "23:16"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTI"
+    bits = "13:8"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM0M_INTFPD_MAX_COMB_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of combined outstanding transactions"
+  default = "0x00000000"
+  offset = "0x00045114"
+  [[register.field]]
+    name = "AWAR_MAX_OTI"
+    bits = "14:8"
+    type = "rw"
+  [[register.field]]
+    name = "AWAR_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM0M_INTFPD_AW_P"
+  type = "rw"
+  width = 32
+  description = "AW channel peak rate"
+  default = "0x00000000"
+  offset = "0x00045118"
+  [[register.field]]
+    name = "AW_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "AFIFM0M_INTFPD_AW_B"
+  type = "rw"
+  width = 32
+  description = "AW channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x0004511C"
+  [[register.field]]
+    name = "AW_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM0M_INTFPD_AW_R"
+  type = "rw"
+  width = 32
+  description = "AW channel average rate"
+  default = "0x00000000"
+  offset = "0x00045120"
+  [[register.field]]
+    name = "AW_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "AFIFM0M_INTFPD_AR_P"
+  type = "rw"
+  width = 32
+  description = "AR channel peak rate"
+  default = "0x00000000"
+  offset = "0x00045124"
+  [[register.field]]
+    name = "AR_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "AFIFM0M_INTFPD_AR_B"
+  type = "rw"
+  width = 32
+  description = "AR channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x00045128"
+  [[register.field]]
+    name = "AR_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM0M_INTFPD_AR_R"
+  type = "rw"
+  width = 32
+  description = "AR channel average rate"
+  default = "0x00000000"
+  offset = "0x0004512C"
+  [[register.field]]
+    name = "AR_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "AFIFM1M_INTFPD_FN_MOD"
+  type = "rw"
+  width = 32
+  description = "Issuing functionality modification register"
+  default = "0x00000000"
+  offset = "0x00046108"
+  [[register.field]]
+    name = "FN_MOD"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM1M_INTFPD_QOS_CNTL"
+  type = "rw"
+  width = 32
+  description = "The QoS control register contains the enable bits for all the regulators."
+  default = "0x00000000"
+  offset = "0x0004610C"
+  [[register.field]]
+    name = "EN_AWAR_OT"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_OT"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_OT"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AWAR_RATE"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_RATE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_RATE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "AFIFM1M_INTFPD_MAX_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of outstanding transactions"
+  default = "0x00000000"
+  offset = "0x00046110"
+  [[register.field]]
+    name = "AR_MAX_OTI"
+    bits = "29:24"
+    type = "rw"
+  [[register.field]]
+    name = "AR_MAX_OTF"
+    bits = "23:16"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTI"
+    bits = "13:8"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM1M_INTFPD_MAX_COMB_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of combined outstanding transactions"
+  default = "0x00000000"
+  offset = "0x00046114"
+  [[register.field]]
+    name = "AWAR_MAX_OTI"
+    bits = "14:8"
+    type = "rw"
+  [[register.field]]
+    name = "AWAR_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM1M_INTFPD_AW_P"
+  type = "rw"
+  width = 32
+  description = "AW channel peak rate"
+  default = "0x00000000"
+  offset = "0x00046118"
+  [[register.field]]
+    name = "AW_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "AFIFM1M_INTFPD_AW_B"
+  type = "rw"
+  width = 32
+  description = "AW channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x0004611C"
+  [[register.field]]
+    name = "AW_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM1M_INTFPD_AW_R"
+  type = "rw"
+  width = 32
+  description = "AW channel average rate"
+  default = "0x00000000"
+  offset = "0x00046120"
+  [[register.field]]
+    name = "AW_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "AFIFM1M_INTFPD_AR_P"
+  type = "rw"
+  width = 32
+  description = "AR channel peak rate"
+  default = "0x00000000"
+  offset = "0x00046124"
+  [[register.field]]
+    name = "AR_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "AFIFM1M_INTFPD_AR_B"
+  type = "rw"
+  width = 32
+  description = "AR channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x00046128"
+  [[register.field]]
+    name = "AR_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM1M_INTFPD_AR_R"
+  type = "rw"
+  width = 32
+  description = "AR channel average rate"
+  default = "0x00000000"
+  offset = "0x0004612C"
+  [[register.field]]
+    name = "AR_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "AFIFM2M_INTFPD_FN_MOD"
+  type = "rw"
+  width = 32
+  description = "Issuing functionality modification register"
+  default = "0x00000000"
+  offset = "0x00047108"
+  [[register.field]]
+    name = "FN_MOD"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM2M_INTFPD_QOS_CNTL"
+  type = "rw"
+  width = 32
+  description = "The QoS control register contains the enable bits for all the regulators."
+  default = "0x00000000"
+  offset = "0x0004710C"
+  [[register.field]]
+    name = "EN_AWAR_OT"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_OT"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_OT"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AWAR_RATE"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_RATE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_RATE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "AFIFM2M_INTFPD_MAX_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of outstanding transactions"
+  default = "0x00000000"
+  offset = "0x00047110"
+  [[register.field]]
+    name = "AR_MAX_OTI"
+    bits = "29:24"
+    type = "rw"
+  [[register.field]]
+    name = "AR_MAX_OTF"
+    bits = "23:16"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTI"
+    bits = "13:8"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM2M_INTFPD_MAX_COMB_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of combined outstanding transactions"
+  default = "0x00000000"
+  offset = "0x00047114"
+  [[register.field]]
+    name = "AWAR_MAX_OTI"
+    bits = "14:8"
+    type = "rw"
+  [[register.field]]
+    name = "AWAR_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM2M_INTFPD_AW_P"
+  type = "rw"
+  width = 32
+  description = "AW channel peak rate"
+  default = "0x00000000"
+  offset = "0x00047118"
+  [[register.field]]
+    name = "AW_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "AFIFM2M_INTFPD_AW_B"
+  type = "rw"
+  width = 32
+  description = "AW channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x0004711C"
+  [[register.field]]
+    name = "AW_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM2M_INTFPD_AW_R"
+  type = "rw"
+  width = 32
+  description = "AW channel average rate"
+  default = "0x00000000"
+  offset = "0x00047120"
+  [[register.field]]
+    name = "AW_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "AFIFM2M_INTFPD_AR_P"
+  type = "rw"
+  width = 32
+  description = "AR channel peak rate"
+  default = "0x00000000"
+  offset = "0x00047124"
+  [[register.field]]
+    name = "AR_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "AFIFM2M_INTFPD_AR_B"
+  type = "rw"
+  width = 32
+  description = "AR channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x00047128"
+  [[register.field]]
+    name = "AR_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM2M_INTFPD_AR_R"
+  type = "rw"
+  width = 32
+  description = "AR channel average rate"
+  default = "0x00000000"
+  offset = "0x0004712C"
+  [[register.field]]
+    name = "AR_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "INTFPDSMMUTBU5_INTFPDMAIN_FN_MOD"
+  type = "rw"
+  width = 32
+  description = "Issuing functionality modification register"
+  default = "0x00000000"
+  offset = "0x00048108"
+  [[register.field]]
+    name = "FN_MOD"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "INTFPDSMMUTBU5_INTFPDMAIN_QOS_CNTL"
+  type = "rw"
+  width = 32
+  description = "The QoS control register contains the enable bits for all the regulators."
+  default = "0x00000000"
+  offset = "0x0004810C"
+  [[register.field]]
+    name = "EN_AWAR_OT"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_OT"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_OT"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AWAR_RATE"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_RATE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_RATE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "INTFPDSMMUTBU5_INTFPDMAIN_MAX_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of outstanding transactions"
+  default = "0x00000000"
+  offset = "0x00048110"
+  [[register.field]]
+    name = "AR_MAX_OTI"
+    bits = "29:24"
+    type = "rw"
+  [[register.field]]
+    name = "AR_MAX_OTF"
+    bits = "23:16"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTI"
+    bits = "13:8"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "INTFPDSMMUTBU5_INTFPDMAIN_MAX_COMB_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of combined outstanding transactions"
+  default = "0x00000000"
+  offset = "0x00048114"
+  [[register.field]]
+    name = "AWAR_MAX_OTI"
+    bits = "14:8"
+    type = "rw"
+  [[register.field]]
+    name = "AWAR_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "INTFPDSMMUTBU5_INTFPDMAIN_AW_P"
+  type = "rw"
+  width = 32
+  description = "AW channel peak rate"
+  default = "0x00000000"
+  offset = "0x00048118"
+  [[register.field]]
+    name = "AW_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "INTFPDSMMUTBU5_INTFPDMAIN_AW_B"
+  type = "rw"
+  width = 32
+  description = "AW channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x0004811C"
+  [[register.field]]
+    name = "AW_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "INTFPDSMMUTBU5_INTFPDMAIN_AW_R"
+  type = "rw"
+  width = 32
+  description = "AW channel average rate"
+  default = "0x00000000"
+  offset = "0x00048120"
+  [[register.field]]
+    name = "AW_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "INTFPDSMMUTBU5_INTFPDMAIN_AR_P"
+  type = "rw"
+  width = 32
+  description = "AR channel peak rate"
+  default = "0x00000000"
+  offset = "0x00048124"
+  [[register.field]]
+    name = "AR_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "INTFPDSMMUTBU5_INTFPDMAIN_AR_B"
+  type = "rw"
+  width = 32
+  description = "AR channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x00048128"
+  [[register.field]]
+    name = "AR_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "INTFPDSMMUTBU5_INTFPDMAIN_AR_R"
+  type = "rw"
+  width = 32
+  description = "AR channel average rate"
+  default = "0x00000000"
+  offset = "0x0004812C"
+  [[register.field]]
+    name = "AR_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "DP_INTFPD_IB_FN_MOD"
+  type = "rw"
+  width = 32
+  description = "Issuing functionality modification register"
+  default = "0x00000000"
+  offset = "0x00049108"
+  [[register.field]]
+    name = "FN_MOD"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "DP_INTFPD_IB_QOS_CNTL"
+  type = "rw"
+  width = 32
+  description = "The QoS control register contains the enable bits for all the regulators."
+  default = "0x00000000"
+  offset = "0x0004910C"
+  [[register.field]]
+    name = "EN_AWAR_OT"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_OT"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_OT"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AWAR_RATE"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_RATE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_RATE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "DP_INTFPD_IB_MAX_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of outstanding transactions"
+  default = "0x00000000"
+  offset = "0x00049110"
+  [[register.field]]
+    name = "AR_MAX_OTI"
+    bits = "29:24"
+    type = "rw"
+  [[register.field]]
+    name = "AR_MAX_OTF"
+    bits = "23:16"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTI"
+    bits = "13:8"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "DP_INTFPD_IB_MAX_COMB_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of combined outstanding transactions"
+  default = "0x00000000"
+  offset = "0x00049114"
+  [[register.field]]
+    name = "AWAR_MAX_OTI"
+    bits = "14:8"
+    type = "rw"
+  [[register.field]]
+    name = "AWAR_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "DP_INTFPD_IB_AW_P"
+  type = "rw"
+  width = 32
+  description = "AW channel peak rate"
+  default = "0x00000000"
+  offset = "0x00049118"
+  [[register.field]]
+    name = "AW_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "DP_INTFPD_IB_AW_B"
+  type = "rw"
+  width = 32
+  description = "AW channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x0004911C"
+  [[register.field]]
+    name = "AW_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "DP_INTFPD_IB_AW_R"
+  type = "rw"
+  width = 32
+  description = "AW channel average rate"
+  default = "0x00000000"
+  offset = "0x00049120"
+  [[register.field]]
+    name = "AW_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "DP_INTFPD_IB_AR_P"
+  type = "rw"
+  width = 32
+  description = "AR channel peak rate"
+  default = "0x00000000"
+  offset = "0x00049124"
+  [[register.field]]
+    name = "AR_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "DP_INTFPD_IB_AR_B"
+  type = "rw"
+  width = 32
+  description = "AR channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x00049128"
+  [[register.field]]
+    name = "AR_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "DP_INTFPD_IB_AR_R"
+  type = "rw"
+  width = 32
+  description = "AR channel average rate"
+  default = "0x00000000"
+  offset = "0x0004912C"
+  [[register.field]]
+    name = "AR_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "AFIFM3M_INTFPD_FN_MOD"
+  type = "rw"
+  width = 32
+  description = "Issuing functionality modification register"
+  default = "0x00000000"
+  offset = "0x0004A108"
+  [[register.field]]
+    name = "FN_MOD"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM3M_INTFPD_QOS_CNTL"
+  type = "rw"
+  width = 32
+  description = "The QoS control register contains the enable bits for all the regulators."
+  default = "0x00000000"
+  offset = "0x0004A10C"
+  [[register.field]]
+    name = "EN_AWAR_OT"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_OT"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_OT"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AWAR_RATE"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_RATE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_RATE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "AFIFM3M_INTFPD_MAX_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of outstanding transactions"
+  default = "0x00000000"
+  offset = "0x0004A110"
+  [[register.field]]
+    name = "AR_MAX_OTI"
+    bits = "29:24"
+    type = "rw"
+  [[register.field]]
+    name = "AR_MAX_OTF"
+    bits = "23:16"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTI"
+    bits = "13:8"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM3M_INTFPD_MAX_COMB_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of combined outstanding transactions"
+  default = "0x00000000"
+  offset = "0x0004A114"
+  [[register.field]]
+    name = "AWAR_MAX_OTI"
+    bits = "14:8"
+    type = "rw"
+  [[register.field]]
+    name = "AWAR_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM3M_INTFPD_AW_P"
+  type = "rw"
+  width = 32
+  description = "AW channel peak rate"
+  default = "0x00000000"
+  offset = "0x0004A118"
+  [[register.field]]
+    name = "AW_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "AFIFM3M_INTFPD_AW_B"
+  type = "rw"
+  width = 32
+  description = "AW channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x0004A11C"
+  [[register.field]]
+    name = "AW_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM3M_INTFPD_AW_R"
+  type = "rw"
+  width = 32
+  description = "AW channel average rate"
+  default = "0x00000000"
+  offset = "0x0004A120"
+  [[register.field]]
+    name = "AW_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "AFIFM3M_INTFPD_AR_P"
+  type = "rw"
+  width = 32
+  description = "AR channel peak rate"
+  default = "0x00000000"
+  offset = "0x0004A124"
+  [[register.field]]
+    name = "AR_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "AFIFM3M_INTFPD_AR_B"
+  type = "rw"
+  width = 32
+  description = "AR channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x0004A128"
+  [[register.field]]
+    name = "AR_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM3M_INTFPD_AR_R"
+  type = "rw"
+  width = 32
+  description = "AR channel average rate"
+  default = "0x00000000"
+  offset = "0x0004A12C"
+  [[register.field]]
+    name = "AR_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "AFIFM4M_INTFPD_FN_MOD"
+  type = "rw"
+  width = 32
+  description = "Issuing functionality modification register"
+  default = "0x00000000"
+  offset = "0x0004B108"
+  [[register.field]]
+    name = "FN_MOD"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM4M_INTFPD_QOS_CNTL"
+  type = "rw"
+  width = 32
+  description = "The QoS control register contains the enable bits for all the regulators."
+  default = "0x00000000"
+  offset = "0x0004B10C"
+  [[register.field]]
+    name = "EN_AWAR_OT"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_OT"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_OT"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AWAR_RATE"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_RATE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_RATE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "AFIFM4M_INTFPD_MAX_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of outstanding transactions"
+  default = "0x00000000"
+  offset = "0x0004B110"
+  [[register.field]]
+    name = "AR_MAX_OTI"
+    bits = "29:24"
+    type = "rw"
+  [[register.field]]
+    name = "AR_MAX_OTF"
+    bits = "23:16"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTI"
+    bits = "13:8"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM4M_INTFPD_MAX_COMB_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of combined outstanding transactions"
+  default = "0x00000000"
+  offset = "0x0004B114"
+  [[register.field]]
+    name = "AWAR_MAX_OTI"
+    bits = "14:8"
+    type = "rw"
+  [[register.field]]
+    name = "AWAR_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM4M_INTFPD_AW_P"
+  type = "rw"
+  width = 32
+  description = "AW channel peak rate"
+  default = "0x00000000"
+  offset = "0x0004B118"
+  [[register.field]]
+    name = "AW_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "AFIFM4M_INTFPD_AW_B"
+  type = "rw"
+  width = 32
+  description = "AW channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x0004B11C"
+  [[register.field]]
+    name = "AW_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM4M_INTFPD_AW_R"
+  type = "rw"
+  width = 32
+  description = "AW channel average rate"
+  default = "0x00000000"
+  offset = "0x0004B120"
+  [[register.field]]
+    name = "AW_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "AFIFM4M_INTFPD_AR_P"
+  type = "rw"
+  width = 32
+  description = "AR channel peak rate"
+  default = "0x00000000"
+  offset = "0x0004B124"
+  [[register.field]]
+    name = "AR_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "AFIFM4M_INTFPD_AR_B"
+  type = "rw"
+  width = 32
+  description = "AR channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x0004B128"
+  [[register.field]]
+    name = "AR_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM4M_INTFPD_AR_R"
+  type = "rw"
+  width = 32
+  description = "AR channel average rate"
+  default = "0x00000000"
+  offset = "0x0004B12C"
+  [[register.field]]
+    name = "AR_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "AFIFM5M_INTFPD_FN_MOD"
+  type = "rw"
+  width = 32
+  description = "Issuing functionality modification register"
+  default = "0x00000000"
+  offset = "0x0004C108"
+  [[register.field]]
+    name = "FN_MOD"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM5M_INTFPD_QOS_CNTL"
+  type = "rw"
+  width = 32
+  description = "The QoS control register contains the enable bits for all the regulators."
+  default = "0x00000000"
+  offset = "0x0004C10C"
+  [[register.field]]
+    name = "EN_AWAR_OT"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_OT"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_OT"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AWAR_RATE"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_RATE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_RATE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "AFIFM5M_INTFPD_MAX_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of outstanding transactions"
+  default = "0x00000000"
+  offset = "0x0004C110"
+  [[register.field]]
+    name = "AR_MAX_OTI"
+    bits = "29:24"
+    type = "rw"
+  [[register.field]]
+    name = "AR_MAX_OTF"
+    bits = "23:16"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTI"
+    bits = "13:8"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM5M_INTFPD_MAX_COMB_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of combined outstanding transactions"
+  default = "0x00000000"
+  offset = "0x0004C114"
+  [[register.field]]
+    name = "AWAR_MAX_OTI"
+    bits = "14:8"
+    type = "rw"
+  [[register.field]]
+    name = "AWAR_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM5M_INTFPD_AW_P"
+  type = "rw"
+  width = 32
+  description = "AW channel peak rate"
+  default = "0x00000000"
+  offset = "0x0004C118"
+  [[register.field]]
+    name = "AW_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "AFIFM5M_INTFPD_AW_B"
+  type = "rw"
+  width = 32
+  description = "AW channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x0004C11C"
+  [[register.field]]
+    name = "AW_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM5M_INTFPD_AW_R"
+  type = "rw"
+  width = 32
+  description = "AW channel average rate"
+  default = "0x00000000"
+  offset = "0x0004C120"
+  [[register.field]]
+    name = "AW_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "AFIFM5M_INTFPD_AR_P"
+  type = "rw"
+  width = 32
+  description = "AR channel peak rate"
+  default = "0x00000000"
+  offset = "0x0004C124"
+  [[register.field]]
+    name = "AR_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "AFIFM5M_INTFPD_AR_B"
+  type = "rw"
+  width = 32
+  description = "AR channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x0004C128"
+  [[register.field]]
+    name = "AR_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "AFIFM5M_INTFPD_AR_R"
+  type = "rw"
+  width = 32
+  description = "AR channel average rate"
+  default = "0x00000000"
+  offset = "0x0004C12C"
+  [[register.field]]
+    name = "AR_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "GPU_INTFPD_IB_READ_QOS"
+  type = "rw"
+  width = 32
+  description = "Read channel QoS value"
+  default = "0x00000000"
+  offset = "0x0004D100"
+  [[register.field]]
+    name = "AR_QOS"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "GPU_INTFPD_IB_WRITE_QOS"
+  type = "rw"
+  width = 32
+  description = "Write channel QoS value"
+  default = "0x00000000"
+  offset = "0x0004D104"
+  [[register.field]]
+    name = "AW_QOS"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "GPU_INTFPD_IB_FN_MOD"
+  type = "rw"
+  width = 32
+  description = "Issuing functionality modification register"
+  default = "0x00000000"
+  offset = "0x0004D108"
+  [[register.field]]
+    name = "FN_MOD"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "GPU_INTFPD_IB_QOS_CNTL"
+  type = "rw"
+  width = 32
+  description = "The QoS control register contains the enable bits for all the regulators."
+  default = "0x00000000"
+  offset = "0x0004D10C"
+  [[register.field]]
+    name = "EN_AWAR_OT"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_OT"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_OT"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AWAR_RATE"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_RATE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_RATE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "GPU_INTFPD_IB_MAX_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of outstanding transactions"
+  default = "0x00000000"
+  offset = "0x0004D110"
+  [[register.field]]
+    name = "AR_MAX_OTI"
+    bits = "29:24"
+    type = "rw"
+  [[register.field]]
+    name = "AR_MAX_OTF"
+    bits = "23:16"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTI"
+    bits = "13:8"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "GPU_INTFPD_IB_MAX_COMB_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of combined outstanding transactions"
+  default = "0x00000000"
+  offset = "0x0004D114"
+  [[register.field]]
+    name = "AWAR_MAX_OTI"
+    bits = "14:8"
+    type = "rw"
+  [[register.field]]
+    name = "AWAR_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "GPU_INTFPD_IB_AW_P"
+  type = "rw"
+  width = 32
+  description = "AW channel peak rate"
+  default = "0x00000000"
+  offset = "0x0004D118"
+  [[register.field]]
+    name = "AW_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "GPU_INTFPD_IB_AW_B"
+  type = "rw"
+  width = 32
+  description = "AW channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x0004D11C"
+  [[register.field]]
+    name = "AW_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "GPU_INTFPD_IB_AW_R"
+  type = "rw"
+  width = 32
+  description = "AW channel average rate"
+  default = "0x00000000"
+  offset = "0x0004D120"
+  [[register.field]]
+    name = "AW_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "GPU_INTFPD_IB_AR_P"
+  type = "rw"
+  width = 32
+  description = "AR channel peak rate"
+  default = "0x00000000"
+  offset = "0x0004D124"
+  [[register.field]]
+    name = "AR_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "GPU_INTFPD_IB_AR_B"
+  type = "rw"
+  width = 32
+  description = "AR channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x0004D128"
+  [[register.field]]
+    name = "AR_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "GPU_INTFPD_IB_AR_R"
+  type = "rw"
+  width = 32
+  description = "AR channel average rate"
+  default = "0x00000000"
+  offset = "0x0004D12C"
+  [[register.field]]
+    name = "AR_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "PCIEM_INTFPD_IB_FN_MOD2"
+  type = "rw"
+  width = 32
+  description = "This register is only present if upsizing or downsizing happens"
+  default = "0x00000000"
+  offset = "0x0004E024"
+  [[register.field]]
+    name = "BYPASS_MERGE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "PCIEM_INTFPD_IB_READ_QOS"
+  type = "rw"
+  width = 32
+  description = "Read channel QoS value"
+  default = "0x00000000"
+  offset = "0x0004E100"
+  [[register.field]]
+    name = "AR_QOS"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "PCIEM_INTFPD_IB_WRITE_QOS"
+  type = "rw"
+  width = 32
+  description = "Write channel QoS value"
+  default = "0x00000000"
+  offset = "0x0004E104"
+  [[register.field]]
+    name = "AW_QOS"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "PCIEM_INTFPD_IB_FN_MOD"
+  type = "rw"
+  width = 32
+  description = "Issuing functionality modification register"
+  default = "0x00000000"
+  offset = "0x0004E108"
+  [[register.field]]
+    name = "FN_MOD"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "PCIEM_INTFPD_IB_QOS_CNTL"
+  type = "rw"
+  width = 32
+  description = "The QoS control register contains the enable bits for all the regulators."
+  default = "0x00000000"
+  offset = "0x0004E10C"
+  [[register.field]]
+    name = "EN_AWAR_OT"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_OT"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_OT"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AWAR_RATE"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_RATE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_RATE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "PCIEM_INTFPD_IB_MAX_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of outstanding transactions"
+  default = "0x00000000"
+  offset = "0x0004E110"
+  [[register.field]]
+    name = "AR_MAX_OTI"
+    bits = "29:24"
+    type = "rw"
+  [[register.field]]
+    name = "AR_MAX_OTF"
+    bits = "23:16"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTI"
+    bits = "13:8"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "PCIEM_INTFPD_IB_MAX_COMB_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of combined outstanding transactions"
+  default = "0x00000000"
+  offset = "0x0004E114"
+  [[register.field]]
+    name = "AWAR_MAX_OTI"
+    bits = "14:8"
+    type = "rw"
+  [[register.field]]
+    name = "AWAR_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "PCIEM_INTFPD_IB_AW_P"
+  type = "rw"
+  width = 32
+  description = "AW channel peak rate"
+  default = "0x00000000"
+  offset = "0x0004E118"
+  [[register.field]]
+    name = "AW_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "PCIEM_INTFPD_IB_AW_B"
+  type = "rw"
+  width = 32
+  description = "AW channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x0004E11C"
+  [[register.field]]
+    name = "AW_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "PCIEM_INTFPD_IB_AW_R"
+  type = "rw"
+  width = 32
+  description = "AW channel average rate"
+  default = "0x00000000"
+  offset = "0x0004E120"
+  [[register.field]]
+    name = "AW_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "PCIEM_INTFPD_IB_AR_P"
+  type = "rw"
+  width = 32
+  description = "AR channel peak rate"
+  default = "0x00000000"
+  offset = "0x0004E124"
+  [[register.field]]
+    name = "AR_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "PCIEM_INTFPD_IB_AR_B"
+  type = "rw"
+  width = 32
+  description = "AR channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x0004E128"
+  [[register.field]]
+    name = "AR_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "PCIEM_INTFPD_IB_AR_R"
+  type = "rw"
+  width = 32
+  description = "AR channel average rate"
+  default = "0x00000000"
+  offset = "0x0004E12C"
+  [[register.field]]
+    name = "AR_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "GDMA_INTFPD_IB_FN_MOD2"
+  type = "rw"
+  width = 32
+  description = "This register is only present if upsizing or downsizing happens"
+  default = "0x00000000"
+  offset = "0x0004F024"
+  [[register.field]]
+    name = "BYPASS_MERGE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "GDMA_INTFPD_IB_FN_MOD"
+  type = "rw"
+  width = 32
+  description = "Issuing functionality modification register"
+  default = "0x00000000"
+  offset = "0x0004F108"
+  [[register.field]]
+    name = "FN_MOD"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "GDMA_INTFPD_IB_QOS_CNTL"
+  type = "rw"
+  width = 32
+  description = "The QoS control register contains the enable bits for all the regulators."
+  default = "0x00000000"
+  offset = "0x0004F10C"
+  [[register.field]]
+    name = "EN_AWAR_OT"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_OT"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_OT"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AWAR_RATE"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_RATE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_RATE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "GDMA_INTFPD_IB_MAX_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of outstanding transactions"
+  default = "0x00000000"
+  offset = "0x0004F110"
+  [[register.field]]
+    name = "AR_MAX_OTI"
+    bits = "29:24"
+    type = "rw"
+  [[register.field]]
+    name = "AR_MAX_OTF"
+    bits = "23:16"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTI"
+    bits = "13:8"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "GDMA_INTFPD_IB_MAX_COMB_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of combined outstanding transactions"
+  default = "0x00000000"
+  offset = "0x0004F114"
+  [[register.field]]
+    name = "AWAR_MAX_OTI"
+    bits = "14:8"
+    type = "rw"
+  [[register.field]]
+    name = "AWAR_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "GDMA_INTFPD_IB_AW_P"
+  type = "rw"
+  width = 32
+  description = "AW channel peak rate"
+  default = "0x00000000"
+  offset = "0x0004F118"
+  [[register.field]]
+    name = "AW_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "GDMA_INTFPD_IB_AW_B"
+  type = "rw"
+  width = 32
+  description = "AW channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x0004F11C"
+  [[register.field]]
+    name = "AW_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "GDMA_INTFPD_IB_AW_R"
+  type = "rw"
+  width = 32
+  description = "AW channel average rate"
+  default = "0x00000000"
+  offset = "0x0004F120"
+  [[register.field]]
+    name = "AW_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "GDMA_INTFPD_IB_AR_P"
+  type = "rw"
+  width = 32
+  description = "AR channel peak rate"
+  default = "0x00000000"
+  offset = "0x0004F124"
+  [[register.field]]
+    name = "AR_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "GDMA_INTFPD_IB_AR_B"
+  type = "rw"
+  width = 32
+  description = "AR channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x0004F128"
+  [[register.field]]
+    name = "AR_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "GDMA_INTFPD_IB_AR_R"
+  type = "rw"
+  width = 32
+  description = "AR channel average rate"
+  default = "0x00000000"
+  offset = "0x0004F12C"
+  [[register.field]]
+    name = "AR_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "SATAM_INTFPD_IB_FN_MOD2"
+  type = "rw"
+  width = 32
+  description = "This register is only present if upsizing or downsizing happens"
+  default = "0x00000000"
+  offset = "0x00050024"
+  [[register.field]]
+    name = "BYPASS_MERGE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "SATAM_INTFPD_IB_READ_QOS"
+  type = "rw"
+  width = 32
+  description = "Read channel QoS value"
+  default = "0x00000000"
+  offset = "0x00050100"
+  [[register.field]]
+    name = "AR_QOS"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "SATAM_INTFPD_IB_WRITE_QOS"
+  type = "rw"
+  width = 32
+  description = "Write channel QoS value"
+  default = "0x00000000"
+  offset = "0x00050104"
+  [[register.field]]
+    name = "AW_QOS"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "SATAM_INTFPD_IB_FN_MOD"
+  type = "rw"
+  width = 32
+  description = "Issuing functionality modification register"
+  default = "0x00000000"
+  offset = "0x00050108"
+  [[register.field]]
+    name = "FN_MOD"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "SATAM_INTFPD_IB_QOS_CNTL"
+  type = "rw"
+  width = 32
+  description = "The QoS control register contains the enable bits for all the regulators."
+  default = "0x00000000"
+  offset = "0x0005010C"
+  [[register.field]]
+    name = "EN_AWAR_OT"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_OT"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_OT"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AWAR_RATE"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_RATE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_RATE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "SATAM_INTFPD_IB_MAX_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of outstanding transactions"
+  default = "0x00000000"
+  offset = "0x00050110"
+  [[register.field]]
+    name = "AR_MAX_OTI"
+    bits = "29:24"
+    type = "rw"
+  [[register.field]]
+    name = "AR_MAX_OTF"
+    bits = "23:16"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTI"
+    bits = "13:8"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "SATAM_INTFPD_IB_MAX_COMB_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of combined outstanding transactions"
+  default = "0x00000000"
+  offset = "0x00050114"
+  [[register.field]]
+    name = "AWAR_MAX_OTI"
+    bits = "14:8"
+    type = "rw"
+  [[register.field]]
+    name = "AWAR_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "SATAM_INTFPD_IB_AW_P"
+  type = "rw"
+  width = 32
+  description = "AW channel peak rate"
+  default = "0x00000000"
+  offset = "0x00050118"
+  [[register.field]]
+    name = "AW_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "SATAM_INTFPD_IB_AW_B"
+  type = "rw"
+  width = 32
+  description = "AW channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x0005011C"
+  [[register.field]]
+    name = "AW_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "SATAM_INTFPD_IB_AW_R"
+  type = "rw"
+  width = 32
+  description = "AW channel average rate"
+  default = "0x00000000"
+  offset = "0x00050120"
+  [[register.field]]
+    name = "AW_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "SATAM_INTFPD_IB_AR_P"
+  type = "rw"
+  width = 32
+  description = "AR channel peak rate"
+  default = "0x00000000"
+  offset = "0x00050124"
+  [[register.field]]
+    name = "AR_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "SATAM_INTFPD_IB_AR_B"
+  type = "rw"
+  width = 32
+  description = "AR channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x00050128"
+  [[register.field]]
+    name = "AR_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "SATAM_INTFPD_IB_AR_R"
+  type = "rw"
+  width = 32
+  description = "AR channel average rate"
+  default = "0x00000000"
+  offset = "0x0005012C"
+  [[register.field]]
+    name = "AR_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "CORESIGHTM_INTFPD_IB_FN_MOD2"
+  type = "rw"
+  width = 32
+  description = "This register is only present if upsizing or downsizing happens"
+  default = "0x00000000"
+  offset = "0x00052024"
+  [[register.field]]
+    name = "BYPASS_MERGE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "CORESIGHTM_INTFPD_IB_READ_QOS"
+  type = "rw"
+  width = 32
+  description = "Read channel QoS value"
+  default = "0x00000000"
+  offset = "0x00052100"
+  [[register.field]]
+    name = "AR_QOS"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "CORESIGHTM_INTFPD_IB_WRITE_QOS"
+  type = "rw"
+  width = 32
+  description = "Write channel QoS value"
+  default = "0x00000000"
+  offset = "0x00052104"
+  [[register.field]]
+    name = "AW_QOS"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "CORESIGHTM_INTFPD_IB_FN_MOD"
+  type = "rw"
+  width = 32
+  description = "Issuing functionality modification register"
+  default = "0x00000000"
+  offset = "0x00052108"
+  [[register.field]]
+    name = "FN_MOD"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "CORESIGHTM_INTFPD_IB_QOS_CNTL"
+  type = "rw"
+  width = 32
+  description = "The QoS control register contains the enable bits for all the regulators."
+  default = "0x00000000"
+  offset = "0x0005210C"
+  [[register.field]]
+    name = "EN_AWAR_OT"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_OT"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_OT"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AWAR_RATE"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_RATE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_RATE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "CORESIGHTM_INTFPD_IB_MAX_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of outstanding transactions"
+  default = "0x00000000"
+  offset = "0x00052110"
+  [[register.field]]
+    name = "AR_MAX_OTI"
+    bits = "29:24"
+    type = "rw"
+  [[register.field]]
+    name = "AR_MAX_OTF"
+    bits = "23:16"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTI"
+    bits = "13:8"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "CORESIGHTM_INTFPD_IB_MAX_COMB_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of combined outstanding transactions"
+  default = "0x00000000"
+  offset = "0x00052114"
+  [[register.field]]
+    name = "AWAR_MAX_OTI"
+    bits = "14:8"
+    type = "rw"
+  [[register.field]]
+    name = "AWAR_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "CORESIGHTM_INTFPD_IB_AW_P"
+  type = "rw"
+  width = 32
+  description = "AW channel peak rate"
+  default = "0x00000000"
+  offset = "0x00052118"
+  [[register.field]]
+    name = "AW_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "CORESIGHTM_INTFPD_IB_AW_B"
+  type = "rw"
+  width = 32
+  description = "AW channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x0005211C"
+  [[register.field]]
+    name = "AW_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "CORESIGHTM_INTFPD_IB_AW_R"
+  type = "rw"
+  width = 32
+  description = "AW channel average rate"
+  default = "0x00000000"
+  offset = "0x00052120"
+  [[register.field]]
+    name = "AW_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "CORESIGHTM_INTFPD_IB_AR_P"
+  type = "rw"
+  width = 32
+  description = "AR channel peak rate"
+  default = "0x00000000"
+  offset = "0x00052124"
+  [[register.field]]
+    name = "AR_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "CORESIGHTM_INTFPD_IB_AR_B"
+  type = "rw"
+  width = 32
+  description = "AR channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x00052128"
+  [[register.field]]
+    name = "AR_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "CORESIGHTM_INTFPD_IB_AR_R"
+  type = "rw"
+  width = 32
+  description = "AR channel average rate"
+  default = "0x00000000"
+  offset = "0x0005212C"
+  [[register.field]]
+    name = "AR_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "IB2_FN_MOD_ISS_BM"
+  type = "rw"
+  width = 32
+  description = "Bus matrix issuing functionality modification register"
+  default = "0x00000000"
+  offset = "0x000C2008"
+  [[register.field]]
+    name = "FN_MOD_ISS_BM"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "IB2_FN_MOD"
+  type = "rw"
+  width = 32
+  description = "Issuing functionality modification register"
+  default = "0x00000000"
+  offset = "0x000C2108"
+  [[register.field]]
+    name = "FN_MOD"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "IB2_QOS_CNTL"
+  type = "rw"
+  width = 32
+  description = "The QoS control register contains the enable bits for all the regulators."
+  default = "0x00000000"
+  offset = "0x000C210C"
+  [[register.field]]
+    name = "EN_AWAR_OT"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_OT"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_OT"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AWAR_RATE"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_RATE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_RATE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "IB2_MAX_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of outstanding transactions"
+  default = "0x00000000"
+  offset = "0x000C2110"
+  [[register.field]]
+    name = "AR_MAX_OTI"
+    bits = "29:24"
+    type = "rw"
+  [[register.field]]
+    name = "AR_MAX_OTF"
+    bits = "23:16"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTI"
+    bits = "13:8"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "IB2_MAX_COMB_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of combined outstanding transactions"
+  default = "0x00000000"
+  offset = "0x000C2114"
+  [[register.field]]
+    name = "AWAR_MAX_OTI"
+    bits = "14:8"
+    type = "rw"
+  [[register.field]]
+    name = "AWAR_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "IB2_AW_P"
+  type = "rw"
+  width = 32
+  description = "AW channel peak rate"
+  default = "0x00000000"
+  offset = "0x000C2118"
+  [[register.field]]
+    name = "AW_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "IB2_AW_B"
+  type = "rw"
+  width = 32
+  description = "AW channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x000C211C"
+  [[register.field]]
+    name = "AW_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "IB2_AW_R"
+  type = "rw"
+  width = 32
+  description = "AW channel average rate"
+  default = "0x00000000"
+  offset = "0x000C2120"
+  [[register.field]]
+    name = "AW_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "IB2_AR_P"
+  type = "rw"
+  width = 32
+  description = "AR channel peak rate"
+  default = "0x00000000"
+  offset = "0x000C2124"
+  [[register.field]]
+    name = "AR_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "IB2_AR_B"
+  type = "rw"
+  width = 32
+  description = "AR channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x000C2128"
+  [[register.field]]
+    name = "AR_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "IB2_AR_R"
+  type = "rw"
+  width = 32
+  description = "AR channel average rate"
+  default = "0x00000000"
+  offset = "0x000C212C"
+  [[register.field]]
+    name = "AR_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "IB6_FN_MOD_ISS_BM"
+  type = "rw"
+  width = 32
+  description = "Bus matrix issuing functionality modification register"
+  default = "0x00000000"
+  offset = "0x000C3008"
+  [[register.field]]
+    name = "FN_MOD_ISS_BM"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "IB6_FN_MOD2"
+  type = "rw"
+  width = 32
+  description = "This register is only present if upsizing or downsizing happens"
+  default = "0x00000000"
+  offset = "0x000C3024"
+  [[register.field]]
+    name = "BYPASS_MERGE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "IB6_FN_MOD"
+  type = "rw"
+  width = 32
+  description = "Issuing functionality modification register"
+  default = "0x00000000"
+  offset = "0x000C3108"
+  [[register.field]]
+    name = "FN_MOD"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "IB6_QOS_CNTL"
+  type = "rw"
+  width = 32
+  description = "The QoS control register contains the enable bits for all the regulators."
+  default = "0x00000000"
+  offset = "0x000C310C"
+  [[register.field]]
+    name = "EN_AWAR_OT"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_OT"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_OT"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AWAR_RATE"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AR_RATE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "EN_AW_RATE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "IB6_MAX_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of outstanding transactions"
+  default = "0x00000000"
+  offset = "0x000C3110"
+  [[register.field]]
+    name = "AR_MAX_OTI"
+    bits = "29:24"
+    type = "rw"
+  [[register.field]]
+    name = "AR_MAX_OTF"
+    bits = "23:16"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTI"
+    bits = "13:8"
+    type = "rw"
+  [[register.field]]
+    name = "AW_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "IB6_MAX_COMB_OT"
+  type = "rw"
+  width = 32
+  description = "Maximum number of combined outstanding transactions"
+  default = "0x00000000"
+  offset = "0x000C3114"
+  [[register.field]]
+    name = "AWAR_MAX_OTI"
+    bits = "14:8"
+    type = "rw"
+  [[register.field]]
+    name = "AWAR_MAX_OTF"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "IB6_AW_P"
+  type = "rw"
+  width = 32
+  description = "AW channel peak rate"
+  default = "0x00000000"
+  offset = "0x000C3118"
+  [[register.field]]
+    name = "AW_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "IB6_AW_B"
+  type = "rw"
+  width = 32
+  description = "AW channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x000C311C"
+  [[register.field]]
+    name = "AW_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "IB6_AW_R"
+  type = "rw"
+  width = 32
+  description = "AW channel average rate"
+  default = "0x00000000"
+  offset = "0x000C3120"
+  [[register.field]]
+    name = "AW_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "IB6_AR_P"
+  type = "rw"
+  width = 32
+  description = "AR channel peak rate"
+  default = "0x00000000"
+  offset = "0x000C3124"
+  [[register.field]]
+    name = "AR_P"
+    bits = "31:24"
+    type = "rw"
+    shortdesc = '''channel peak rate.'''
+    longdesc = '''8-bit fraction of the number of transfers per cycle. A value of 0x80 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x40 sets a rate of one transaction every 4 cycles, etc.'''
+[[register]]
+  name = "IB6_AR_B"
+  type = "rw"
+  width = 32
+  description = "AR channel burstiness allowance"
+  default = "0x00000000"
+  offset = "0x000C3128"
+  [[register.field]]
+    name = "AR_B"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "IB6_AR_R"
+  type = "rw"
+  width = 32
+  description = "AR channel average rate"
+  default = "0x00000000"
+  offset = "0x000C312C"
+  [[register.field]]
+    name = "AR_R"
+    bits = "31:20"
+    type = "rw"
+    shortdesc = '''channel average rate.'''
+    longdesc = '''12-bit fraction of the number of transfers per cycle. A value of 0x800 (decimal 0.5) sets a rate of one transaction every 2 cycles. A value of 0x400 sets a rate of one transaction every 4 cycles, etc.'''

@@ -1,0 +1,3 @@
+resources = [
+    "socs/zynqps8/all.toml",
+]

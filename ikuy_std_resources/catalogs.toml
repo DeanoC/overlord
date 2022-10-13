@@ -1,0 +1,13 @@
+resources =[
+    "boards.toml",
+    "buses.toml",
+    "cpus.toml",
+    "ios.toml",
+    "graphics.toml",
+    "nets.toml",
+    "others.toml",
+    "ram.toml",
+    "socs.toml",
+    "storages.toml",
+    "software.toml",
+]

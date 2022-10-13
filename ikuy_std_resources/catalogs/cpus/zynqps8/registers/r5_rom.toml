@@ -1,0 +1,153 @@
+description = "R5 Integration ROM"
+[[register]]
+  name = "ENTRY00"
+  type = "ro"
+  width = 32
+  description = "CPU 0 Debug Component"
+  default = "0x00010003"
+  offset = "0x00000000"
+[[register]]
+  name = "ENTRY01"
+  type = "ro"
+  width = 32
+  description = "CPU 0 CTI Component"
+  default = "0x00012003"
+  offset = "0x00000004"
+[[register]]
+  name = "ENTRY02"
+  type = "ro"
+  width = 32
+  description = "CPU 0 ETM Component"
+  default = "0x00018003"
+  offset = "0x00000008"
+[[register]]
+  name = "ENTRY03"
+  type = "ro"
+  width = 32
+  description = "CPU 1 Debug Component"
+  default = "0x00019003"
+  offset = "0x0000000C"
+[[register]]
+  name = "ENTRY04"
+  type = "ro"
+  width = 32
+  description = "CPU 1 CTI Component"
+  default = "0x0001C003"
+  offset = "0x00000010"
+[[register]]
+  name = "ENTRY05"
+  type = "ro"
+  width = 32
+  description = "CPU 1 ETM Component"
+  default = "0x0001D003"
+  offset = "0x00000014"
+[[register]]
+  name = "DEVID"
+  type = "ro"
+  width = 32
+  description = "This register indicates the capabilities."
+  default = "0x00000000"
+  offset = "0x00000FC8"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "DEVTYPE"
+  type = "ro"
+  width = 32
+  description = "It provides a debugger with information about the component."
+  default = "0x00000000"
+  offset = "0x00000FCC"
+  [[register.field]]
+    name = "SUB_TYPE"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "MAJOR_TYPE"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "PIDR4"
+  type = "ro"
+  width = 32
+  description = "ROM Peripheral ID 4"
+  default = "0x00000004"
+  offset = "0x00000FD0"
+[[register]]
+  name = "PIDR5"
+  type = "ro"
+  width = 32
+  description = "ROM Peripheral ID 5"
+  default = "0x00000000"
+  offset = "0x00000FD4"
+[[register]]
+  name = "PIDR6"
+  type = "ro"
+  width = 32
+  description = "ROM Peripheral ID 6"
+  default = "0x00000000"
+  offset = "0x00000FD8"
+[[register]]
+  name = "PIDR7"
+  type = "ro"
+  width = 32
+  description = "ROM Peripheral ID 7"
+  default = "0x00000000"
+  offset = "0x00000FDC"
+[[register]]
+  name = "PIDR0"
+  type = "ro"
+  width = 32
+  description = "ROM Peripheral ID 0"
+  default = "0x000000B5"
+  offset = "0x00000FE0"
+[[register]]
+  name = "PIDR1"
+  type = "ro"
+  width = 32
+  description = "ROM Peripheral ID 1"
+  default = "0x000000B4"
+  offset = "0x00000FE4"
+[[register]]
+  name = "PIDR2"
+  type = "ro"
+  width = 32
+  description = "ROM Peripheral ID 2"
+  default = "0x0000000B"
+  offset = "0x00000FE8"
+[[register]]
+  name = "PIDR3"
+  type = "ro"
+  width = 32
+  description = "ROM Peripheral ID 3"
+  default = "0x00000000"
+  offset = "0x00000FEC"
+[[register]]
+  name = "CIDR0"
+  type = "ro"
+  width = 32
+  description = "ROM Component ID 0"
+  default = "0x0000000D"
+  offset = "0x00000FF0"
+[[register]]
+  name = "CIDR1"
+  type = "ro"
+  width = 32
+  description = "ROM Component ID 1"
+  default = "0x00000010"
+  offset = "0x00000FF4"
+[[register]]
+  name = "CIDR2"
+  type = "ro"
+  width = 32
+  description = "ROM Component ID 2"
+  default = "0x00000005"
+  offset = "0x00000FF8"
+[[register]]
+  name = "CIDR3"
+  type = "ro"
+  width = 32
+  description = "ROM Component ID 3"
+  default = "0x000000B1"
+  offset = "0x00000FFC"

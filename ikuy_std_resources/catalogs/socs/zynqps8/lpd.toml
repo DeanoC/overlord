@@ -1,0 +1,83 @@
+[[definition]]
+type = "switch.internal.lpd.zynqps8"
+buses = [
+    { name = "rpu_lpd", supplier = false, data_width = 64, address_width = 32 },
+    { name = "lpdoutbound_lpd", supplier = false, data_width = 128, address_width = 40 },
+    { name = "iooutbound_lpd", supplier = false, data_width = 64, address_width = 40 },
+    { name = "rpuio_lpd", supplier = false, data_width = 128, address_width = 40 },
+    { name = "lpd_cci", supplier = true, data_width = 128, address_width = 40 },
+    { name = "lpd_ddrc", supplier = true, data_width = 64, address_width = 40 },
+    { name = "lpd_ocm", supplier = true, base_address = "0x0200_0000", data_width = 64, address_width = 18 },
+    { name = "lpd_lpdinbound", supplier = true, data_width = 128, address_width = 40 },
+]
+registers = [
+    { resource = "registers/lpd/lpd_gpv.toml", name = "LPD_GPV", base_address = "0x110_0000" },
+    { resource = "registers/lpd/lpd_slcr.toml", name = "LPD_SLCR", base_address = "0x241_0000" },
+    { resource = "registers/lpd/lpd_slcr_secure.toml", name = "LPD_SLCR_SECURE", base_address = "0x24b_0000" },
+    { resource = "registers/lpd/crl_apb.toml", name = "CRL_APB", base_address = "0x25e_0000" },
+]
+
+[[definition]]
+type = "switch.internal.lpdunitsswitch.zynqps8"
+buses = [
+    { name = "iopinbound_lpdunitsswitch", supplier = false, data_width = 32 },
+    { name = "lpdunitsswitch_pssysmon", supplier = true, data_width = 32 },
+    { name = "lpdunitsswitch_ipi", supplier = true, data_width = 32 },
+    { name = "lpdunitsswitch_efuse", supplier = true, data_width = 32 },
+    { name = "lpdunitsswitch_spi${index}", supplier = true, data_width = 32 },
+    { protocol = "internal_ttc", supplier = true, data_width = 32 },
+    { protocol = "internal_swdt", supplier = true, data_width = 32 },
+    { name = "lpdunitsswitch_lpdslcr", supplier = true, data_width = 32 },
+    { name = "lpdunitsswitch_gpio", supplier = true, data_width = 32 },
+    { name = "lpdunitsswitch_rtc", supplier = true, data_width = 32 },
+]
+
+
+[[definition]]
+type = "switch.internal.lpdinbound.zynqps8"
+buses = [
+    { name = "lpd_lpdinbound", supplier = false, data_width = 128, address_width = 40 },
+    { name = "fpd_lpdinbound", supplier = false, data_width = 64, address_width = 40 },
+    { name = "lpdinbound_rpuio", supplier = true, data_width = 128, address_width = 40 },
+]
+
+[[definition]]
+type = "switch.internal.lpdoutbound.zynqps8"
+buses = [
+    { name = "usb${index}_lpdoutbound", supplier = false, data_width = 128, address_width = 40 },
+    { name = "lpddma_lpdoutbound", supplier = false, data_width = 128, address_width = 40 },
+    { name = "lpdoutbound_lpd", supplier = true, data_width = 128, address_width = 40 },
+]
+
+[[definition]]
+type = "switch.internal.rpuio.zynqps8"
+buses = [
+    { name = "lpdinbound_rpuio", supplier = false, data_width = 128, address_width = 40 },
+    { name = "rpuio_lpd", supplier = true, data_width = 128, address_width = 40 },
+    { name = "rpuio_rpu", supplier = true, data_width = 64, address_width = 32 },
+    { name = "rpuio_iopinbound", supplier = true, data_width = 64, address_width = 32 },
+    { name = "rpuio_rpuswitch", supplier = true, data_width = 64, address_width = 32 },
+]
+
+[[definition]]
+type = "switch.internal.rpuswitch.zynqps8"
+registers = [
+    #    { resource = "registers/r5_rom.toml", name = "CORESIGHT_R5_ROM", base_address = "0x1BE_0000"},
+    #    { resource = "registers/r5_dbg.toml", name = "CORESIGHT_R5_DBG", base_address = "0x1BF_0000"},
+    #    { resource = "registers/r5_etm.toml", name = "CORESIGHT_R5_ETM", base_address = "0x1BF_C000"},
+]
+buses = [
+    { name = "rpu${index}", supplier = false, data_width = 64, address_width = 32 },
+    { name = "rpuio_rpuswitch", supplier = false, data_width = 64, address_width = 32 },
+    { name = "rputcm", supplier = true, data_width = 64, address_width = 18 },
+    { name = "rpu_ocm", supplier = true, data_width = 128, address_width = 18 },
+    { name = "rpu_lpd", supplier = true, data_width = 64, address_width = 32 },
+]
+
+[[definition]]
+type = "switch.internal.ocm.zynqps8"
+buses = [
+    { name = "rpu_ocm", supplier = false, data_width = 64, address_width = 18 },
+    { name = "lpd_ocm", supplier = false, data_width = 64, address_width = 18 },
+    { name = "fpd_ocm", supplier = false, data_width = 128, address_width = 18 },
+]

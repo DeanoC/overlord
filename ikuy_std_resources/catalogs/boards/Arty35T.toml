@@ -1,0 +1,340 @@
+[defaults]
+pullup = false
+slew = "Slow"
+drive = 8
+standard = "LVCMOS33"
+
+[[instance]]
+name = "Arty35T"
+type = "board.arty35t"
+board_type = "Xilinx"
+board_family = "Artix 7"
+board_device = "xc7a35tcsg324-1"
+
+[[instance]]
+name = "clk.100MHz"
+type = "clock.ref"
+pin = "E3"
+period = 10.0
+waveform = "{0 5}"
+
+# JTAG
+[[instance]]
+prefix = "jtag"
+names = ["tms", "tdo", "tdi", "tck"]
+type = "pin.jtag"
+pins = ["T18", "R18", "P18", "N17"]
+
+## Switches
+[[instance]]
+name = "board.switches"
+type = "pin.switch"
+pins = ["A8", "C11", "C10", "A10"]
+direction = "In"
+
+## Buttons
+[[instance]]
+name = "board.buttons"
+type = "pin.button"
+pins = ["D9", "C9", "B9", "B8"]
+direction = "In"
+
+## RGB LEDs
+[[instance]]
+name = "board.leds.rgb0"
+type = "pin.led"
+pins = ["G6", "F6", "E1"]
+direction = "Out"
+[[instance]]
+name = "board.leds.rgb1"
+type = "pin.led"
+pins = ["G3", "J4", "G4"]
+direction = "Out"
+[[instance]]
+name = "board.leds.rgb2"
+type = "pin.led"
+pins = ["J3", "J2", "H4"]
+direction = "Out"
+[[instance]]
+name = "board.leds.rgb3"
+type = "pin.led"
+pins = ["K1", "H6", "K2"]
+direction = "Out"
+
+## LEDs
+[[instance]]
+name = "board.leds"
+type = "pin.led"
+pins = ["H5", "J5", "T9", "T10"]
+
+## Pmod Header JA
+[[instance]]
+name = "board.pmod.a"
+type = "pin.pmod"
+pins = ["G13", "B11", "A11", "D12", "D13", "B18", "A18", "K16"]
+
+## Pmod Header JB
+[[instance]]
+name = "board.pmod.b"
+type = "pin.pmod"
+pins = ["E13", "E16", "D15", "C15", "J17", "J18", "K15", "J15"]
+
+## Pmod Header JC
+[[instance]]
+name = "board.pmod.c"
+type = "pin.pmod"
+pins = ["U12", "V12", "V10", "V11", "U14", "V14", "T13", "U13"]
+
+## Pmod Header JD
+[[instance]]
+name = "board.pmod.d"
+type = "pin.pmod"
+pins = ["D4", "D3", "F4", "F3", "E2", "D2", "H2", "G2"]
+
+## USB-UART Interface
+[[instance]]
+prefix = "board.uart0"
+names = ["rx", "tx"]
+type = "pin.uart"
+pins = ["D10", "A9"]
+directions = ["In", "Out"]
+pullup = true
+
+## ChipKit outer Headers
+[[instance]]
+name = "chipkit_io.outer"
+type = "pin.chipkit"
+pins = [
+	"V15", "U16", "P14,", "T11", "R12", "T14", "T15", "T16", "N15,", "M16", "V17", "U18", "R17", "P17",
+]
+
+[[instance]]
+name = "chipkit_io.outer.analog"
+type = "pin.chipkit"
+pins = [
+	"C5", "C6", "A5", "A6", "B4", "C4", "A1", "B1", "B2", "B3", "C14", "D14"
+]
+
+[[instance]]
+name = "chipkit_io.outer.analog_as_digital"
+type = "pin.chipkit"
+pins = [
+	"F5", "D8", "C7", "E7", "D7", "D5"
+]
+
+## ChipKit inner Headers
+[[instance]]
+name = "chipkit_io.inner"
+type = "pin.chipkit"
+pins = [
+	"U11", "V16", "M13,", "R10", "R11", "R13", "R15", "P15", "R16", "N16", "N14", "U17", "T18", "R18", "P18", "N17"
+]
+
+[[instance]]
+name = "chipkit_io.inner.diff_analog"
+type = "pin.chipkit"
+pin_ps = [
+	"B7", "E6", "A4",
+]
+pin_ns = [
+	"B6", "E5", "A3",
+]
+
+[[instance]]
+name = "chipkit_io.inner.analog_as_digital"
+type = "pin.chipkit"
+pins = [
+	"B7", "B6", "E6", "E5", "A4", "A3",
+]
+
+[[instance]]
+prefix = "spi0"
+names = ["cipo", "copi", "scl", "cs"]
+type = "pin.spi"
+pins = ["G1", "H1", "F1", "C1"]
+directions = ["In", "Out", "Out", "Out"]
+pullups = [true, false, false, false]
+
+[[instance]]
+prefix = "i2c"
+names = ["scl", "sda", "scl_pullup", "sda_pullup"]
+type = "pin.i2c"
+pins = ["L18", "M18", "A14", "A14"]
+
+[[instance]]
+name = "ck_ioa"
+type = "pin.other"
+pin = "M17"
+
+[[instance]]
+name = "ck_rst"
+type = "pin.async_reset"
+pin = "C2"
+
+[[instance]]
+prefix = "enet0"
+names = ["reset", "tx_clk", "tx_ctrl"]
+type = "pin.net.ether"
+pins = ["C16", "H16", "H15"]
+direction = "Out"
+pullup = true
+#set_property -dict { PACKAGE_PIN C16   IOSTANDARD LVCMOS33 } [get_ports { eth_rstn }]; #IO_L20P_T3_A20_15 Sch=eth_rstn
+#set_property -dict { PACKAGE_PIN H16   IOSTANDARD LVCMOS33 } [get_ports { eth_tx_clk }]; #IO_L13P_T2_MRCC_15 Sch=eth_tx_clk
+#set_property -dict { PACKAGE_PIN H15   IOSTANDARD LVCMOS33 } [get_ports { eth_tx_en }]; #IO_L19N_T3_A21_VREF_15 Sch=eth_tx_en
+
+[[instance]]
+prefix = "enet0"
+names = ["rx_clk", "rx_ctrl"]
+type = "pin.net.ether"
+pins = ["F15", "C17"]
+direction = "In"
+pullup = true
+#set_property -dict { PACKAGE_PIN F15   IOSTANDARD LVCMOS33 } [get_ports { eth_rx_clk }]; #IO_L14P_T2_SRCC_15 Sch=eth_rx_clk
+#set_property -dict { PACKAGE_PIN C17   IOSTANDARD LVCMOS33 } [get_ports { eth_rxerr }]; #IO_L20N_T3_A19_15 Sch=eth_rxerr
+
+[[instance]]
+name = "enet0.txd"
+type = "pin.net.ether"
+pins = ["H14", "J14", "J13", "H17"]
+direction = "Out"
+pullup = true
+#set_property -dict { PACKAGE_PIN H14   IOSTANDARD LVCMOS33 } [get_ports { eth_txd[0] }]; #IO_L15P_T2_DQS_15 Sch=eth_txd[0]
+#set_property -dict { PACKAGE_PIN J14   IOSTANDARD LVCMOS33 } [get_ports { eth_txd[1] }]; #IO_L19P_T3_A22_15 Sch=eth_txd[1]
+#set_property -dict { PACKAGE_PIN J13   IOSTANDARD LVCMOS33 } [get_ports { eth_txd[2] }]; #IO_L17N_T2_A25_15 Sch=eth_txd[2]
+#set_property -dict { PACKAGE_PIN H17   IOSTANDARD LVCMOS33 } [get_ports { eth_txd[3] }]; #IO_L18P_T2_A24_15 Sch=eth_txd[3]
+
+[[instance]]
+name = "enet0.rxd"
+type = "pin.net.ether"
+pins = ["D18", "E17", "E18", "G17"]
+direction = "In"
+pullup = true
+#set_property -dict { PACKAGE_PIN D18   IOSTANDARD LVCMOS33 } [get_ports { eth_rxd[0] }]; #IO_L21N_T3_DQS_A18_15 Sch=eth_rxd[0]
+#set_property -dict { PACKAGE_PIN E17   IOSTANDARD LVCMOS33 } [get_ports { eth_rxd[1] }]; #IO_L16P_T2_A28_15 Sch=eth_rxd[1]
+#set_property -dict { PACKAGE_PIN E18   IOSTANDARD LVCMOS33 } [get_ports { eth_rxd[2] }]; #IO_L21P_T3_DQS_15 Sch=eth_rxd[2]
+#set_property -dict { PACKAGE_PIN G17   IOSTANDARD LVCMOS33 } [get_ports { eth_rxd[3] }]; #IO_L18N_T2_A23_15 Sch=eth_rxd[3]
+
+[[instance]]
+name = "enet0.mdio"
+type = "pin.net.ether"
+pins = ["K13", "F16"]
+direction = "Bi"
+pullup = true
+#set_property -dict { PACKAGE_PIN K13   IOSTANDARD LVCMOS33 } [get_ports { eth_mdio }]; #IO_L17P_T2_A26_15 Sch=eth_mdio
+#set_property -dict { PACKAGE_PIN F16   IOSTANDARD LVCMOS33 } [get_ports { eth_mdc }]; #IO_L14N_T2_SRCC_15 Sch=eth_mdc
+
+## SMSC Ethernet PHY
+#set_property -dict { PACKAGE_PIN D17   IOSTANDARD LVCMOS33 } [get_ports { eth_col }]; #IO_L16N_T2_A27_15 Sch=eth_col
+#set_property -dict { PACKAGE_PIN G14   IOSTANDARD LVCMOS33 } [get_ports { eth_crs }]; #IO_L15N_T2_DQS_ADV_B_15 Sch=eth_crs
+#set_property -dict { PACKAGE_PIN G18   IOSTANDARD LVCMOS33 } [get_ports { eth_ref_clk }]; #IO_L22P_T3_A17_15 Sch=eth_ref_clk
+#set_property -dict { PACKAGE_PIN G16   IOSTANDARD LVCMOS33 } [get_ports { eth_rx_dv }]; #IO_L13N_T2_MRCC_15 Sch=eth_rx_dv
+
+## Quad SPI Flash
+[[instance]]
+prefix = "qspi0"
+names = ["cs", "dq0", "dq1", "dq2", "dq3"]
+type = "pin.qspi"
+pins = ["L13", "K17", "K18", "L14", "M14"]
+directions = ["Out", "Bi", "Bi", "Bi", "Bi"]
+pullups = [true, false, false, false, false]
+#set_property -dict { PACKAGE_PIN L13   IOSTANDARD LVCMOS33 } [get_ports { qspi_cs }]; #IO_L6P_T0_FCS_B_14 Sch=qspi_cs
+#set_property -dict { PACKAGE_PIN K17   IOSTANDARD LVCMOS33 } [get_ports { qspi_dq[0] }]; #IO_L1P_T0_D00_MOSI_14 Sch=qspi_dq[0]
+#set_property -dict { PACKAGE_PIN K18   IOSTANDARD LVCMOS33 } [get_ports { qspi_dq[1] }]; #IO_L1N_T0_D01_DIN_14 Sch=qspi_dq[1]
+#set_property -dict { PACKAGE_PIN L14   IOSTANDARD LVCMOS33 } [get_ports { qspi_dq[2] }]; #IO_L2P_T0_D02_14 Sch=qspi_dq[2]
+#set_property -dict { PACKAGE_PIN M14   IOSTANDARD LVCMOS33 } [get_ports { qspi_dq[3] }]; #IO_L2N_T0_D03_14 Sch=qspi_dq[3]
+
+## Power Measurements
+#set_property -dict { PACKAGE_PIN B17   IOSTANDARD LVCMOS33     } [get_ports { vsnsvu_n }]; #IO_L7N_T1_AD2N_15 Sch=ad_n[2]
+#set_property -dict { PACKAGE_PIN B16   IOSTANDARD LVCMOS33     } [get_ports { vsnsvu_p }]; #IO_L7P_T1_AD2P_15 Sch=ad_p[2]
+#set_property -dict { PACKAGE_PIN B12   IOSTANDARD LVCMOS33     } [get_ports { vsns5v0_n }]; #IO_L3N_T0_DQS_AD1N_15 Sch=ad_n[1]
+#set_property -dict { PACKAGE_PIN C12   IOSTANDARD LVCMOS33     } [get_ports { vsns5v0_p }]; #IO_L3P_T0_DQS_AD1P_15 Sch=ad_p[1]
+#set_property -dict { PACKAGE_PIN F14   IOSTANDARD LVCMOS33     } [get_ports { isns5v0_n }]; #IO_L5N_T0_AD9N_15 Sch=ad_n[9]
+#set_property -dict { PACKAGE_PIN F13   IOSTANDARD LVCMOS33     } [get_ports { isns5v0_p }]; #IO_L5P_T0_AD9P_15 Sch=ad_p[9]
+#set_property -dict { PACKAGE_PIN A16   IOSTANDARD LVCMOS33     } [get_ports { isns0v95_n }]; #IO_L8N_T1_AD10N_15 Sch=ad_n[10]
+#set_property -dict { PACKAGE_PIN A15   IOSTANDARD LVCMOS33     } [get_ports { isns0v95_p }]; #IO_L8P_T1_AD10P_15 Sch=ad_p[10]
+
+[[instance]]
+prefix = "ram.ddr3"
+name = "addr"
+type = "pin.ram.ddr3"
+pins = ["R2", "M6", "N4", "T1", "N6", "R7", "V6", "U7", "R8", "V7", "R6", "U6", "T6", "T8"]
+pullup = true
+slew = "Fast"
+direction = "Out"
+standard = "SSTL135"
+
+[[instance]]
+prefix = "ram.ddr3"
+name = "DQ"
+type = "pin.ram.ddr3"
+pins = ["K5", "L3", "K3", "L6", "M3", "M1", "L4", "M2", "V4", "T5", "U4", "V5", "V1", "T3", "U3", "R3"]
+pullup = true
+slew = "Fast"
+direction = "Bi"
+standard = "SSTL135"
+#  IN_TERM UNTUNED_SPLIT_50
+
+[[instance]]
+prefix = "ram.ddr3"
+name = "DQS"
+type = "pin.ram.ddr3"
+pin_ps = ["N2", "U2"]
+pin_ns = ["N1", "V2"]
+pullup = true
+slew = "Fast"
+direction = "Bi"
+standard = "DIFF_SSTL135"
+#  IN_TERM UNTUNED_SPLIT_50
+#create_clock -period 3.333 -name {sdramDomain_phyA_sdram_DQS[0]} -waveform {0.000 1.667} [get_ports {sdramDomain_phyA_sdram_DQS[0]}]
+#create_clock -period 3.333 -name {sdramDomain_phyA_sdram_DQS[1]} -waveform {0.000 1.667} [get_ports {sdramDomain_phyA_sdram_DQS[1]}]
+
+[[instance]]
+prefix = "ram.ddr3"
+name = "BA"
+type = "pin.ram.ddr3"
+pins = ["R1", "P4", "P2"]
+pullup = true
+slew = "Fast"
+direction = "Bi"
+standard = "SSTL135"
+
+[[instance]]
+prefix = "ram.ddr3"
+name = "DM"
+type = "pin.ram.ddr3"
+pins = ["L1", "U1"]
+pullup = true
+slew = "Fast"
+direction = "Bi"
+standard = "SSTL135"
+
+[[instance]]
+prefix = "ram.ddr3"
+names = ["RASn", "CASn", "WEn", "CSn"]
+type = "pin.ram.ddr3"
+pins = ["P3", "M4", "P5", "U8"]
+pullup = true
+slew = "Fast"
+direction = "Bi"
+standard = "SSTL135"
+
+[[instance]]
+prefix = "ram.ddr3"
+name = "CK"
+type = "pin.ram.ddr3"
+pin_p = "U9"
+pin_n = "V9"
+pullup = true
+slew = "Fast"
+direction = "Bi"
+standard = "DIFF_SSTL135"
+
+[[instance]]
+prefix = "ram.ddr3"
+names = ["CKE", "ODT", "RESETn"]
+type = "pin.ram.ddr3"
+pins = ["N5", "R5", "K6"]
+pullup = true
+slew = "Fast"
+direction = "Bi"
+standard = "SSTL135"

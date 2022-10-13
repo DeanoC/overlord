@@ -1,0 +1,5 @@
+isHard = true
+hasFpga = true
+
+[[definition]]
+  type = "soc.zynqps7"

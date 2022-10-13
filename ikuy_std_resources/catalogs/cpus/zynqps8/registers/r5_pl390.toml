@@ -1,0 +1,3294 @@
+description = "RPU GIC Interrupt Controller; GICv1"
+
+[[register]]
+  name = "ENABLE_ENABLE"
+  type = "rw"
+  width = 32
+  description = "Interrupt Control Register (ICDICR)"
+  default = "0x00000000"
+  offset = "0x00000000"
+[[register]]
+  name = "ENABLE_IC_TYPE"
+  type = "ro"
+  width = 32
+  description = "Provides information about the configuration of the GIC."
+  default = "0x0000FC05"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "LSPI"
+    bits = "15:11"
+    type = "ro"
+    shortdesc = '''Returns the number of Lockable Shared Peripheral Interrupts (LSPIs) that the GIC contains.'''
+    longdesc = '''Read as: b00000 = no LSPIs, b00001 = 1 LSPI. INTID32, b00010 = 2 LSPIs, INTID32 - INTID33, b00011 = 3 LSPIs, INTID32 - INTID34, .., b11110 = 30 LSPIs, INTID32 - INTID61, b11111 = 31 LSPIs, INTID32 - INTID62. When CFGSDISABLE is HIGH then the GIC prevents writes to any register locations that control the operating state of an LSPI that is programmed to be secure.'''
+  [[register.field]]
+    name = "TZ"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "CPU_NUMBER"
+    bits = "7:5"
+    type = "ro"
+  [[register.field]]
+    name = "IT_LINES_NUMBER"
+    bits = "4:0"
+    type = "ro"
+    shortdesc = '''Returns the number of INTIDs, to the nearest 32, that the Distributor provides.'''
+    longdesc = '''Read as: b00000 = the Distributor provides 1-32 INTIDs, b00001 = the Distributor provides 33-64 INTIDs, b00010 = the Distributor provides 63-96 INTIDs, b00011 = the Distributor provides 97-128 INTIDs, .., b11110 = the Distributor provides 961-992 INTIDs, b11111 = the Distributor provides 993-1020 INTIDs.'''
+[[register]]
+  name = "ENABLE_DIST_IDENT"
+  type = "ro"
+  width = 32
+  description = "Provides information about the implementor of the Distributor and the revision of the GIC."
+  default = "0x0000043B"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "IMPL_VER"
+    bits = "31:24"
+    type = "ro"
+    shortdesc = '''Returns the product identifier.'''
+    longdesc = '''For a GIC (PL390) this field reads back as 0x00.'''
+  [[register.field]]
+    name = "REV_NUM"
+    bits = "23:12"
+    type = "ro"
+    shortdesc = '''Returns the revision number of the GIC.'''
+    longdesc = '''For revision r0p0, these bits read back as 0x000.'''
+  [[register.field]]
+    name = "IMPLEMENTOR"
+    bits = "11:0"
+    type = "ro"
+    shortdesc = '''Returns the JEP106 code of the company that implemented the Distributor RTL, that is, ARM.'''
+    longdesc = '''It uses the following bit format: [11:8] = 0x4, that is, the JEP106 continuation code for ARM, [7] = 0, [6:0] = b0111011, that is, the JEP106 code [6:0] for ARM.'''
+[[register]]
+  name = "ENABLE_SGI_SECURITY_IF_N"
+  type = "rw"
+  width = 16
+  description = "Interrupt Security Registers (ICDISR)"
+  default = "0x00000000"
+  offset = "0x00000080"
+[[register]]
+  name = "ENABLE_SPI_SECURITY0"
+  type = "rw"
+  width = 32
+  description = "Interrupt Security Registers (ICDISR)"
+  default = "0x00000000"
+  offset = "0x00000084"
+[[register]]
+  name = "ENABLE_SPI_SECURITY1"
+  type = "rw"
+  width = 32
+  description = "Interrupt Security Registers (ICDISR)"
+  default = "0x00000000"
+  offset = "0x00000088"
+[[register]]
+  name = "ENABLE_SPI_SECURITY2"
+  type = "rw"
+  width = 32
+  description = "Interrupt Security Registers (ICDISR)"
+  default = "0x00000000"
+  offset = "0x0000008C"
+[[register]]
+  name = "ENABLE_SPI_SECURITY3"
+  type = "rw"
+  width = 32
+  description = "Interrupt Security Registers (ICDISR)"
+  default = "0x00000000"
+  offset = "0x00000090"
+[[register]]
+  name = "ENABLE_SPI_SECURITY4"
+  type = "rw"
+  width = 32
+  description = "Interrupt Security Registers (ICDISR)"
+  default = "0x00000000"
+  offset = "0x00000094"
+[[register]]
+  name = "ENABLE_SPI_ENABLE_SET0"
+  type = "rw"
+  width = 32
+  description = "Interrupt Set-Enable Registers (ICDISER)"
+  default = "0x00000000"
+  offset = "0x00000104"
+[[register]]
+  name = "ENABLE_SPI_ENABLE_SET1"
+  type = "rw"
+  width = 32
+  description = "Interrupt Set-Enable Registers (ICDISER)"
+  default = "0x00000000"
+  offset = "0x00000108"
+[[register]]
+  name = "ENABLE_SPI_ENABLE_SET2"
+  type = "rw"
+  width = 32
+  description = "Interrupt Set-Enable Registers (ICDISER)"
+  default = "0x00000000"
+  offset = "0x0000010C"
+[[register]]
+  name = "ENABLE_SPI_ENABLE_SET3"
+  type = "rw"
+  width = 32
+  description = "Interrupt Set-Enable Registers (ICDISER)"
+  default = "0x00000000"
+  offset = "0x00000110"
+[[register]]
+  name = "ENABLE_SPI_ENABLE_SET4"
+  type = "rw"
+  width = 32
+  description = "Interrupt Set-Enable Registers (ICDISER)"
+  default = "0x00000000"
+  offset = "0x00000114"
+[[register]]
+  name = "ENABLE_SPI_ENABLE_CLR0"
+  type = "rw"
+  width = 32
+  description = "Interrupt Clear-Enable Registers (ICDICER)"
+  default = "0x00000000"
+  offset = "0x00000184"
+[[register]]
+  name = "ENABLE_SPI_ENABLE_CLR1"
+  type = "rw"
+  width = 32
+  description = "Interrupt Clear-Enable Registers (ICDICER)"
+  default = "0x00000000"
+  offset = "0x00000188"
+[[register]]
+  name = "ENABLE_SPI_ENABLE_CLR2"
+  type = "rw"
+  width = 32
+  description = "Interrupt Clear-Enable Registers (ICDICER)"
+  default = "0x00000000"
+  offset = "0x0000018C"
+[[register]]
+  name = "ENABLE_SPI_ENABLE_CLR3"
+  type = "rw"
+  width = 32
+  description = "Interrupt Clear-Enable Registers (ICDICER)"
+  default = "0x00000000"
+  offset = "0x00000190"
+[[register]]
+  name = "ENABLE_SPI_ENABLE_CLR4"
+  type = "rw"
+  width = 32
+  description = "Interrupt Clear-Enable Registers (ICDICER)"
+  default = "0x00000000"
+  offset = "0x00000194"
+[[register]]
+  name = "ENABLE_SGI_PENDING_SET_IF_N"
+  type = "ro"
+  width = 16
+  description = "Interrupt Set-Pending Registers (ICDISPR)"
+  default = "0x00000000"
+  offset = "0x00000200"
+[[register]]
+  name = "ENABLE_SPI_PENDING_SET0"
+  type = "rw"
+  width = 32
+  description = "Interrupt Set-Pending Registers (ICDISPR)"
+  default = "0x00000000"
+  offset = "0x00000204"
+[[register]]
+  name = "ENABLE_SPI_PENDING_SET1"
+  type = "rw"
+  width = 32
+  description = "Interrupt Set-Pending Registers (ICDISPR)"
+  default = "0x00000000"
+  offset = "0x00000208"
+[[register]]
+  name = "ENABLE_SPI_PENDING_SET2"
+  type = "rw"
+  width = 32
+  description = "Interrupt Set-Pending Registers (ICDISPR)"
+  default = "0x00000000"
+  offset = "0x0000020C"
+[[register]]
+  name = "ENABLE_SPI_PENDING_SET3"
+  type = "rw"
+  width = 32
+  description = "Interrupt Set-Pending Registers (ICDISPR)"
+  default = "0x00000000"
+  offset = "0x00000210"
+[[register]]
+  name = "ENABLE_SPI_PENDING_SET4"
+  type = "rw"
+  width = 32
+  description = "Interrupt Set-Pending Registers (ICDISPR)"
+  default = "0x00000000"
+  offset = "0x00000214"
+[[register]]
+  name = "ENABLE_SGI_PENDING_CLR_IF_N"
+  type = "ro"
+  width = 16
+  description = "Pending Clear Register (ICDICPR)"
+  default = "0x00000000"
+  offset = "0x00000280"
+[[register]]
+  name = "ENABLE_SPI_PENDING_CLR0"
+  type = "rw"
+  width = 32
+  description = "Pending Clear Register (ICDICPR)"
+  default = "0x00000000"
+  offset = "0x00000284"
+[[register]]
+  name = "ENABLE_SPI_PENDING_CLR1"
+  type = "rw"
+  width = 32
+  description = "Pending Clear Register (ICDICPR)"
+  default = "0x00000000"
+  offset = "0x00000288"
+[[register]]
+  name = "ENABLE_SPI_PENDING_CLR2"
+  type = "rw"
+  width = 32
+  description = "Pending Clear Register (ICDICPR)"
+  default = "0x00000000"
+  offset = "0x0000028C"
+[[register]]
+  name = "ENABLE_SPI_PENDING_CLR3"
+  type = "rw"
+  width = 32
+  description = "Pending Clear Register (ICDICPR)"
+  default = "0x00000000"
+  offset = "0x00000290"
+[[register]]
+  name = "ENABLE_SPI_PENDING_CLR4"
+  type = "rw"
+  width = 32
+  description = "Pending Clear Register (ICDICPR)"
+  default = "0x00000000"
+  offset = "0x00000294"
+[[register]]
+  name = "ENABLE_SGI_ACTIVE_IF_N"
+  type = "ro"
+  width = 16
+  description = "Active Bit Registers (ICDABR)"
+  default = "0x00000000"
+  offset = "0x00000300"
+[[register]]
+  name = "ENABLE_SPI_ACTIVE0"
+  type = "ro"
+  width = 32
+  description = "Active Bit Registers (ICDABR)"
+  default = "0x00000000"
+  offset = "0x00000304"
+[[register]]
+  name = "ENABLE_SPI_ACTIVE1"
+  type = "ro"
+  width = 32
+  description = "Active Bit Registers (ICDABR)"
+  default = "0x00000000"
+  offset = "0x00000308"
+[[register]]
+  name = "ENABLE_SPI_ACTIVE2"
+  type = "ro"
+  width = 32
+  description = "Active Bit Registers (ICDABR)"
+  default = "0x00000000"
+  offset = "0x0000030C"
+[[register]]
+  name = "ENABLE_SPI_ACTIVE3"
+  type = "ro"
+  width = 32
+  description = "Active Bit Registers (ICDABR)"
+  default = "0x00000000"
+  offset = "0x00000310"
+[[register]]
+  name = "ENABLE_SPI_ACTIVE4"
+  type = "ro"
+  width = 32
+  description = "Active Bit Registers (ICDABR)"
+  default = "0x00000000"
+  offset = "0x00000314"
+[[register]]
+  name = "ENABLE_PRIORITY_SGI_INTID_IF_N0"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000400"
+[[register]]
+  name = "ENABLE_PRIORITY_SGI_INTID_IF_N1"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000401"
+[[register]]
+  name = "ENABLE_PRIORITY_SGI_INTID_IF_N2"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000402"
+[[register]]
+  name = "ENABLE_PRIORITY_SGI_INTID_IF_N3"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000403"
+[[register]]
+  name = "ENABLE_PRIORITY_SGI_INTID_IF_N4"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000404"
+[[register]]
+  name = "ENABLE_PRIORITY_SGI_INTID_IF_N5"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000405"
+[[register]]
+  name = "ENABLE_PRIORITY_SGI_INTID_IF_N6"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000406"
+[[register]]
+  name = "ENABLE_PRIORITY_SGI_INTID_IF_N7"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000407"
+[[register]]
+  name = "ENABLE_PRIORITY_SGI_INTID_IF_N8"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000408"
+[[register]]
+  name = "ENABLE_PRIORITY_SGI_INTID_IF_N9"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000409"
+[[register]]
+  name = "ENABLE_PRIORITY_SGI_INTID_IF_N10"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000040A"
+[[register]]
+  name = "ENABLE_PRIORITY_SGI_INTID_IF_N11"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000040B"
+[[register]]
+  name = "ENABLE_PRIORITY_SGI_INTID_IF_N12"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000040C"
+[[register]]
+  name = "ENABLE_PRIORITY_SGI_INTID_IF_N13"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000040D"
+[[register]]
+  name = "ENABLE_PRIORITY_SGI_INTID_IF_N14"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000040E"
+[[register]]
+  name = "ENABLE_PRIORITY_SGI_INTID_IF_N15"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000040F"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID0"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000420"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID1"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000421"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID2"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000422"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID3"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000423"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID4"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000424"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID5"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000425"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID6"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000426"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID7"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000427"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID8"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000428"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID9"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000429"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID10"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000042A"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID11"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000042B"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID12"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000042C"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID13"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000042D"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID14"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000042E"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID15"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000042F"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID16"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000430"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID17"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000431"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID18"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000432"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID19"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000433"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID20"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000434"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID21"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000435"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID22"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000436"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID23"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000437"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID24"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000438"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID25"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000439"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID26"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000043A"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID27"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000043B"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID28"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000043C"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID29"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000043D"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID30"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000043E"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID31"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000043F"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID32"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000440"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID33"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000441"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID34"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000442"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID35"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000443"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID36"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000444"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID37"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000445"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID38"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000446"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID39"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000447"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID40"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000448"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID41"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000449"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID42"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000044A"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID43"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000044B"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID44"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000044C"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID45"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000044D"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID46"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000044E"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID47"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000044F"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID48"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000450"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID49"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000451"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID50"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000452"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID51"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000453"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID52"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000454"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID53"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000455"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID54"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000456"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID55"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000457"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID56"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000458"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID57"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000459"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID58"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000045A"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID59"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000045B"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID60"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000045C"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID61"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000045D"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID62"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000045E"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID63"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000045F"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID64"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000460"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID65"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000461"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID66"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000462"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID67"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000463"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID68"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000464"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID69"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000465"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID70"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000466"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID71"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000467"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID72"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000468"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID73"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000469"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID74"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000046A"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID75"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000046B"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID76"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000046C"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID77"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000046D"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID78"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000046E"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID79"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000046F"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID80"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000470"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID81"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000471"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID82"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000472"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID83"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000473"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID84"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000474"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID85"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000475"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID86"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000476"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID87"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000477"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID88"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000478"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID89"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000479"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID90"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000047A"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID91"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000047B"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID92"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000047C"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID93"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000047D"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID94"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000047E"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID95"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000047F"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID96"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000480"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID97"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000481"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID98"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000482"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID99"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000483"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID100"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000484"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID101"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000485"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID102"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000486"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID103"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000487"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID104"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000488"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID105"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000489"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID106"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000048A"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID107"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000048B"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID108"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000048C"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID109"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000048D"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID110"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000048E"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID111"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000048F"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID112"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000490"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID113"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000491"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID114"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000492"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID115"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000493"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID116"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000494"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID117"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000495"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID118"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000496"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID119"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000497"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID120"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000498"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID121"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x00000499"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID122"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000049A"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID123"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000049B"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID124"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000049C"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID125"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000049D"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID126"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000049E"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID127"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x0000049F"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID128"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004A0"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID129"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004A1"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID130"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004A2"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID131"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004A3"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID132"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004A4"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID133"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004A5"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID134"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004A6"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID135"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004A7"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID136"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004A8"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID137"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004A9"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID138"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004AA"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID139"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004AB"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID140"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004AC"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID141"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004AD"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID142"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004AE"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID143"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004AF"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID144"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004B0"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID145"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004B1"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID146"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004B2"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID147"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004B3"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID148"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004B4"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID149"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004B5"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID150"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004B6"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID151"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004B7"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID152"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004B8"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID153"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004B9"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID154"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004BA"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID155"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004BB"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID156"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004BC"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID157"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004BD"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID158"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004BE"
+[[register]]
+  name = "ENABLE_PRIORITY_SPI_INTID159"
+  type = "rw"
+  width = 8
+  description = "Interrupt Priority Registers (ICDIPR)"
+  default = "0x00000000"
+  offset = "0x000004BF"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID0"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000820"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID1"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000821"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID2"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000822"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID3"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000823"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID4"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000824"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID5"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000825"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID6"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000826"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID7"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000827"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID8"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000828"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID9"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000829"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID10"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000082A"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID11"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000082B"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID12"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000082C"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID13"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000082D"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID14"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000082E"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID15"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000082F"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID16"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000830"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID17"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000831"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID18"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000832"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID19"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000833"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID20"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000834"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID21"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000835"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID22"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000836"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID23"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000837"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID24"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000838"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID25"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000839"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID26"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000083A"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID27"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000083B"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID28"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000083C"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID29"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000083D"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID30"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000083E"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID31"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000083F"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID32"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000840"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID33"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000841"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID34"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000842"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID35"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000843"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID36"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000844"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID37"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000845"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID38"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000846"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID39"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000847"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID40"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000848"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID41"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000849"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID42"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000084A"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID43"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000084B"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID44"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000084C"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID45"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000084D"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID46"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000084E"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID47"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000084F"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID48"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000850"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID49"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000851"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID50"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000852"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID51"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000853"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID52"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000854"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID53"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000855"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID54"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000856"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID55"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000857"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID56"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000858"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID57"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000859"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID58"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000085A"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID59"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000085B"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID60"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000085C"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID61"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000085D"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID62"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000085E"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID63"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000085F"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID64"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000860"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID65"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000861"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID66"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000862"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID67"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000863"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID68"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000864"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID69"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000865"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID70"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000866"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID71"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000867"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID72"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000868"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID73"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000869"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID74"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000086A"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID75"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000086B"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID76"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000086C"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID77"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000086D"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID78"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000086E"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID79"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000086F"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID80"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000870"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID81"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000871"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID82"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000872"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID83"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000873"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID84"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000874"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID85"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000875"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID86"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000876"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID87"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000877"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID88"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000878"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID89"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000879"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID90"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000087A"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID91"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000087B"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID92"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000087C"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID93"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000087D"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID94"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000087E"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID95"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000087F"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID96"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000880"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID97"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000881"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID98"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000882"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID99"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000883"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID100"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000884"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID101"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000885"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID102"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000886"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID103"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000887"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID104"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000888"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID105"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000889"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID106"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000088A"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID107"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000088B"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID108"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000088C"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID109"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000088D"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID110"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000088E"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID111"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000088F"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID112"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000890"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID113"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000891"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID114"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000892"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID115"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000893"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID116"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000894"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID117"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000895"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID118"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000896"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID119"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000897"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID120"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000898"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID121"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x00000899"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID122"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000089A"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID123"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000089B"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID124"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000089C"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID125"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000089D"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID126"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000089E"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID127"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x0000089F"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID128"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008A0"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID129"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008A1"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID130"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008A2"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID131"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008A3"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID132"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008A4"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID133"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008A5"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID134"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008A6"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID135"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008A7"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID136"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008A8"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID137"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008A9"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID138"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008AA"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID139"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008AB"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID140"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008AC"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID141"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008AD"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID142"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008AE"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID143"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008AF"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID144"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008B0"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID145"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008B1"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID146"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008B2"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID147"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008B3"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID148"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008B4"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID149"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008B5"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID150"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008B6"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID151"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008B7"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID152"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008B8"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID153"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008B9"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID154"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008BA"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID155"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008BB"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID156"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008BC"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID157"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008BD"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID158"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008BE"
+[[register]]
+  name = "ENABLE_TARGETS_SPI_INTID159"
+  type = "rw"
+  width = 8
+  description = "Interrupt Processor Targets Registers (ICDIPTR)"
+  default = "0x00000000"
+  offset = "0x000008BF"
+[[register]]
+  name = "ENABLE_SPI_CONFIG0"
+  type = "rw"
+  width = 32
+  description = "Interrupt Configuration Register (ICDICR)"
+  default = "0x00000000"
+  offset = "0x00000C08"
+[[register]]
+  name = "ENABLE_SPI_CONFIG1"
+  type = "rw"
+  width = 32
+  description = "Interrupt Configuration Register (ICDICR)"
+  default = "0x00000000"
+  offset = "0x00000C0C"
+[[register]]
+  name = "ENABLE_SPI_CONFIG2"
+  type = "rw"
+  width = 32
+  description = "Interrupt Configuration Register (ICDICR)"
+  default = "0x00000000"
+  offset = "0x00000C10"
+[[register]]
+  name = "ENABLE_SPI_CONFIG3"
+  type = "rw"
+  width = 32
+  description = "Interrupt Configuration Register (ICDICR)"
+  default = "0x00000000"
+  offset = "0x00000C14"
+[[register]]
+  name = "ENABLE_SPI_CONFIG4"
+  type = "rw"
+  width = 32
+  description = "Interrupt Configuration Register (ICDICR)"
+  default = "0x00000000"
+  offset = "0x00000C18"
+[[register]]
+  name = "ENABLE_SPI"
+  type = "ro"
+  width = 32
+  description = "Each bit provides the status of the SPI[987:0] inputs."
+  default = "0x00000000"
+  offset = "0x00000D04"
+  [[register.field]]
+    name = "SPI_STATUS"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "ENABLE_LEGACY_INT_N"
+  type = "ro"
+  width = 32
+  description = "Enables an external AMBA master to access the status of the: legacy_nirq_c<n> and legacy_nfiq_c<n> inputs for CPU Interface <n>, cfgsdisable tie-off signal."
+  default = "0x00000000"
+  offset = "0x00000DD4"
+  [[register.field]]
+    name = "CFGSDISABLE"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "LEGACY_NFIQ_IF_N"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "LEGACY_NIRQ_IF_N"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ENABLE_MATCH_D_N"
+  type = "ro"
+  width = 32
+  description = "Returns the status of the match_d<n> tie-off signals for CPU Interface <n>."
+  default = "0x00000000"
+  offset = "0x00000DE0"
+  [[register.field]]
+    name = "MATCH_D"
+    bits = "31:0"
+    type = "ro"
+    shortdesc = '''Returns the status of the match_d<n>[31:0] inputs on the Distributor: Bit [X] = 0 match_d<n>[X] is LOW, Bit [X] = 1 match_d<n>[X] is HIGH.'''
+    longdesc = '''Where <n> is a number, from 0 to 7, that identifies one of the CPU Interfaces.'''
+[[register]]
+  name = "ENABLE_ENABLE_D_N"
+  type = "ro"
+  width = 32
+  description = "Returns the status of the enable_d<n> tie-off signals for CPU Interface <n>."
+  default = "0x00000000"
+  offset = "0x00000DE4"
+  [[register.field]]
+    name = "ENABLE_D"
+    bits = "31:0"
+    type = "ro"
+    shortdesc = '''Returns the status of the enable_d<n>[31:0] inputs on the Distributor: Bit [X] = 0 enable_d<n>[X] is LOW, Bit [X] = 1 enable_d<n>[X] is HIGH.'''
+    longdesc = '''Where <n> is a number, from 0 to 7. that identifies one of the CPU Interfaces.'''
+[[register]]
+  name = "ENABLE_SGI_CONTROL"
+  type = "wo"
+  width = 32
+  description = "Software Generated Interrupt Register (ICDSGIR)"
+  default = "0x00000000"
+  offset = "0x00000F00"
+[[register]]
+  name = "ENABLE_PERIPH_ID_8"
+  type = "ro"
+  width = 8
+  description = "The periph_id_[8:0] Registers provide information about the configuration of the peripheral. Note some fields span across adjacent registers."
+  default = "0x00000087"
+  offset = "0x00000FC0"
+  [[register.field]]
+    name = "IDENTIFIER"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "IF_TYPE"
+    bits = "6:5"
+    type = "ro"
+  [[register.field]]
+    name = "CPU_IF"
+    bits = "4:2"
+    type = "ro"
+  [[register.field]]
+    name = "FIQ_LEGACY"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "IRQ_LEGACY"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ENABLE_PERIPH_ID_0"
+  type = "ro"
+  width = 8
+  description = "The periph_id_[8:0] Registers provide information about the configuration of the peripheral. Note some fields span across adjacent registers."
+  default = "0x00000090"
+  offset = "0x00000FD0"
+  [[register.field]]
+    name = "PART_NUMBER_0"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "ENABLE_PERIPH_ID_1"
+  type = "ro"
+  width = 8
+  description = "The periph_id_[8:0] Registers provide information about the configuration of the peripheral. Note some fields span across adjacent registers."
+  default = "0x000000B3"
+  offset = "0x00000FD4"
+  [[register.field]]
+    name = "JEP106_ID_3_0"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "PART_NUMBER_1"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "ENABLE_PERIPH_ID_2"
+  type = "ro"
+  width = 8
+  description = "The periph_id_[8:0] Registers provide information about the configuration of the peripheral. Note some fields span across adjacent registers."
+  default = "0x0000001B"
+  offset = "0x00000FD8"
+  [[register.field]]
+    name = "REVISION"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''Identifies the architecture version of the GIC.'''
+    longdesc = '''This field is set to 0x1.'''
+  [[register.field]]
+    name = "JEDEC_USED"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "JEP106_ID_6_4"
+    bits = "2:0"
+    type = "ro"
+[[register]]
+  name = "ENABLE_PERIPH_ID_3"
+  type = "ro"
+  width = 8
+  description = "The periph_id_[8:0] Registers provide information about the configuration of the peripheral. Note some fields span across adjacent registers."
+  default = "0x00000000"
+  offset = "0x00000FDC"
+  [[register.field]]
+    name = "REVAND"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''The top-level RTL provides four AND gates that are tied-off to provide an output value of 0x0.'''
+    longdesc = '''Once silicon is available, if metal fixes are necessary then the manufacturer can modify the tie-offs to indicate that a revision of the silicon has occurred.'''
+  [[register.field]]
+    name = "MOD_NUMBER"
+    bits = "3:0"
+    type = "ro"
+    shortdesc = '''The customer can update this field if they modify the RTL of the GIC.'''
+    longdesc = '''ARM set this to 0x0.'''
+[[register]]
+  name = "ENABLE_PERIPH_ID_4"
+  type = "ro"
+  width = 8
+  description = "The periph_id_[8:0] Registers provide information about the configuration of the peripheral. Note some fields span across adjacent registers."
+  default = "0x00000004"
+  offset = "0x00000FE0"
+  [[register.field]]
+    name = "FOURKB_COUNT"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "JEP106_C_CODE"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "ENABLE_PERIPH_ID_5"
+  type = "ro"
+  width = 8
+  description = "The periph_id_[8:0] Registers provide information about the configuration of the peripheral. Note some fields span across adjacent registers."
+  default = "0x00000010"
+  offset = "0x00000FE4"
+  [[register.field]]
+    name = "PPI_NUMBER_0"
+    bits = "7:5"
+    type = "ro"
+  [[register.field]]
+    name = "SGI_NUMBER"
+    bits = "4:0"
+    type = "ro"
+    shortdesc = '''The number of SGIs that the GIC provides.'''
+    longdesc = '''b00000 = no SGIs, b00001 = one SGI, INTID0, b00010 = two SGIs, INTID[1:0], .., b10000 = 16 SGIs, INTID[15:0], b10001-b11111 = reserved.'''
+[[register]]
+  name = "ENABLE_PERIPH_ID_6"
+  type = "ro"
+  width = 8
+  description = "The periph_id_[8:0] Registers provide information about the configuration of the peripheral. Note some fields span across adjacent registers."
+  default = "0x00000000"
+  offset = "0x00000FE8"
+  [[register.field]]
+    name = "SPI_NUMBER_0"
+    bits = "7:2"
+    type = "ro"
+  [[register.field]]
+    name = "PPI_NUMBER_1"
+    bits = "1:0"
+    type = "ro"
+[[register]]
+  name = "ENABLE_PERIPH_ID_7"
+  type = "ro"
+  width = 8
+  description = "The periph_id_[8:0] Registers provide information about the configuration of the peripheral. Note some fields span across adjacent registers."
+  default = "0x00000092"
+  offset = "0x00000FEC"
+  [[register.field]]
+    name = "TZ"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "PRIORITY"
+    bits = "6:4"
+    type = "ro"
+  [[register.field]]
+    name = "SPI_NUMBER_1"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "ENABLE_COMPONENT_ID_0"
+  type = "ro"
+  width = 8
+  description = "The component_id_[3:0] Registers are four eight-bit wide registers, that can conceptually be treated as a single register that holds a 32-bit PrimeCell ID value."
+  default = "0x0000000D"
+  offset = "0x00000FF0"
+  [[register.field]]
+    name = "COMPONENT_ID_0"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "ENABLE_COMPONENT_ID_1"
+  type = "ro"
+  width = 8
+  description = "The component_id_[3:0] Registers are four eight-bit wide registers, that can conceptually be treated as a single register that holds a 32-bit PrimeCell ID value."
+  default = "0x000000F0"
+  offset = "0x00000FF4"
+  [[register.field]]
+    name = "COMPONENT_ID_1"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "ENABLE_COMPONENT_ID_2"
+  type = "ro"
+  width = 8
+  description = "The component_id_[3:0] Registers are four eight-bit wide registers, that can conceptually be treated as a single register that holds a 32-bit PrimeCell ID value."
+  default = "0x00000005"
+  offset = "0x00000FF8"
+  [[register.field]]
+    name = "COMPONENT_ID_2"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "ENABLE_COMPONENT_ID_3"
+  type = "ro"
+  width = 8
+  description = "The component_id_[3:0] Registers are four eight-bit wide registers, that can conceptually be treated as a single register that holds a 32-bit PrimeCell ID value."
+  default = "0x000000B1"
+  offset = "0x00000FFC"
+  [[register.field]]
+    name = "COMPONENT_ID_3"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "CONTROL_N_CONTROL_N"
+  type = "rw"
+  width = 32
+  description = "CPU Interface Control Register (ICCICR)"
+  default = "0x00000000"
+  offset = "0x00001000"
+[[register]]
+  name = "CONTROL_N_PRI_MSK_C_N"
+  type = "rw"
+  width = 32
+  description = "Priority Mask Register (ICCIPMR)"
+  default = "0x00000000"
+  offset = "0x00001004"
+[[register]]
+  name = "CONTROL_N_BP_C_N"
+  type = "rw"
+  width = 32
+  description = "Binary Point Register (ICCBPR)"
+  default = "0x00000000"
+  offset = "0x00001008"
+[[register]]
+  name = "CONTROL_N_INT_ACK_N"
+  type = "ro"
+  width = 32
+  description = "Interrupt Acknowledge Register (ICCIAR)"
+  default = "0x000003FF"
+  offset = "0x0000100C"
+[[register]]
+  name = "CONTROL_N_EOI_N"
+  type = "wo"
+  width = 32
+  description = "End of Interrupt Register (ICCEOIR)"
+  default = "0x00000000"
+  offset = "0x00001010"
+[[register]]
+  name = "CONTROL_N_RUN_PRIORITY_N"
+  type = "ro"
+  width = 32
+  description = "Running Priority Register (ICCRPR)"
+  default = "0x000000FF"
+  offset = "0x00001014"
+[[register]]
+  name = "CONTROL_N_HI_PEND_N"
+  type = "ro"
+  width = 32
+  description = "Highest Pending Interrupt Register (ICCHPIR)"
+  default = "0x000003FF"
+  offset = "0x00001018"
+[[register]]
+  name = "CONTROL_N_ALIAS_NSBP_C_N"
+  type = "rw"
+  width = 32
+  description = "Aliased Binary Point Register (ICCABPR)"
+  default = "0x00000000"
+  offset = "0x0000101C"
+[[register]]
+  name = "CONTROL_N_INTEG_EN_C_N"
+  type = "rw"
+  width = 32
+  description = "Enables the integration test logic to modify the status of the nfiq_c<n> and nirq_c<n> signals."
+  default = "0x00000000"
+  offset = "0x00001040"
+  [[register.field]]
+    name = "INTEG_EN"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "CONTROL_N_INTERRUPT_OUT_N"
+  type = "rw"
+  width = 32
+  description = "Enables the integration test logic to modify the status of the nfiq_c<n> and nirq_c<n> signals."
+  default = "0x00000000"
+  offset = "0x00001044"
+  [[register.field]]
+    name = "SET_NFIQ_C"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "SET_NIRQ_C"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "CONTROL_N_MATCH_C_N"
+  type = "ro"
+  width = 32
+  description = "Returns the status of the match_c<n> tie-off signals for CPU Interface <n>."
+  default = "0x00000000"
+  offset = "0x00001050"
+  [[register.field]]
+    name = "MATCH_C"
+    bits = "31:0"
+    type = "ro"
+    shortdesc = '''Returns the status of the match_c<n>[31:0] inputs for CPU Interface <n>: Bit [X] = 0 match_c<n>[x] is LOW Bit [X] = 1 match_c<n>[x] is HIGH.'''
+    longdesc = '''Where <n> is a number, from 0 to 7. that identifies one of the CPU Interfaces.'''
+[[register]]
+  name = "CONTROL_N_ENABLE_C_N"
+  type = "ro"
+  width = 32
+  description = "Returns the status of the enable_c<n> tie-off signals for CPU Interface <n>."
+  default = "0x00000000"
+  offset = "0x00001054"
+  [[register.field]]
+    name = "ENABLE_C"
+    bits = "31:0"
+    type = "ro"
+    shortdesc = '''Returns the status of the enable_c<n>[31:0] inputs for CPU Interface <n>: Bit [X] = 0 enable_c<n>[x] is LOW Bit [X] = 1 enable_c<n>[x] is HIGH.'''
+    longdesc = '''Where <n> is a number, from 0 to 7. that identifies one of the CPU Interfaces.'''
+[[register]]
+  name = "CONTROL_N_CPU_IF_IDENT"
+  type = "ro"
+  width = 32
+  description = "Returns the status of the enable_c<n> tie-off signals for CPU Interface <n>."
+  default = "0x3901043B"
+  offset = "0x000010FC"
+  [[register.field]]
+    name = "PART_NUM"
+    bits = "31:20"
+    type = "ro"
+    shortdesc = '''Identifies the peripheral.'''
+    longdesc = '''The part number of the GIC is 0x390.'''
+  [[register.field]]
+    name = "ARCH_NUM"
+    bits = "19:16"
+    type = "ro"
+    shortdesc = '''Identifies the version of the ARM Generic Interrupt Controller Architecture Specification that the GIC implements.'''
+    longdesc = '''For version 1.0, this field reads back as 0x1.'''
+  [[register.field]]
+    name = "REV_NUM"
+    bits = "15:12"
+    type = "ro"
+    shortdesc = '''Returns the revision number of the GIC.'''
+    longdesc = '''For revision r0p0, these bits read back as 0x0.'''
+  [[register.field]]
+    name = "IMPLEMENTOR"
+    bits = "11:0"
+    type = "ro"
+    shortdesc = '''Returns the JEP106 code of the company that implemented the Distributor RTL, that is, ARM.'''
+    longdesc = '''It uses the following bit format: [11:8] = 0x4, that is, the JEP106 continuation code for ARM, [7] = 0, [6:0] = b0111011, that is, the JEP106 code [6:0] for ARM.'''
+[[register]]
+  name = "CONTROL_N_PERIPH_ID_8"
+  type = "ro"
+  width = 8
+  description = "The periph_id_[8:0] Registers provide information about the configuration of the peripheral. Note some fields span across adjacent registers."
+  default = "0x00000087"
+  offset = "0x00001FC0"
+  [[register.field]]
+    name = "IDENTIFIER"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "IF_TYPE"
+    bits = "6:5"
+    type = "ro"
+  [[register.field]]
+    name = "CPU_IF"
+    bits = "4:2"
+    type = "ro"
+  [[register.field]]
+    name = "FIQ_LEGACY"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "IRQ_LEGACY"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "CONTROL_N_PERIPH_ID_0"
+  type = "ro"
+  width = 8
+  description = "The periph_id_[8:0] Registers provide information about the configuration of the peripheral. Note some fields span across adjacent registers."
+  default = "0x00000090"
+  offset = "0x00001FD0"
+  [[register.field]]
+    name = "PART_NUMBER_0"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "CONTROL_N_PERIPH_ID_1"
+  type = "ro"
+  width = 8
+  description = "The periph_id_[8:0] Registers provide information about the configuration of the peripheral. Note some fields span across adjacent registers."
+  default = "0x000000B3"
+  offset = "0x00001FD4"
+  [[register.field]]
+    name = "JEP106_ID_3_0"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "PART_NUMBER_1"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "CONTROL_N_PERIPH_ID_2"
+  type = "ro"
+  width = 8
+  description = "The periph_id_[8:0] Registers provide information about the configuration of the peripheral. Note some fields span across adjacent registers."
+  default = "0x0000001B"
+  offset = "0x00001FD8"
+  [[register.field]]
+    name = "REVISION"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''Identifies the architecture version of the GIC.'''
+    longdesc = '''This field is set to 0x1.'''
+  [[register.field]]
+    name = "JEDEC_USED"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "JEP106_ID_6_4"
+    bits = "2:0"
+    type = "ro"
+[[register]]
+  name = "CONTROL_N_PERIPH_ID_3"
+  type = "ro"
+  width = 8
+  description = "The periph_id_[8:0] Registers provide information about the configuration of the peripheral. Note some fields span across adjacent registers."
+  default = "0x00000000"
+  offset = "0x00001FDC"
+  [[register.field]]
+    name = "REVAND"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''The top-level RTL provides four AND gates that are tied-off to provide an output value of 0x0.'''
+    longdesc = '''Once silicon is available, if metal fixes are necessary then the manufacturer can modify the tie-offs to indicate that a revision of the silicon has occurred.'''
+  [[register.field]]
+    name = "MOD_NUMBER"
+    bits = "3:0"
+    type = "ro"
+    shortdesc = '''The customer can update this field if they modify the RTL of the GIC.'''
+    longdesc = '''ARM set this to 0x0.'''
+[[register]]
+  name = "CONTROL_N_PERIPH_ID_4"
+  type = "ro"
+  width = 8
+  description = "The periph_id_[8:0] Registers provide information about the configuration of the peripheral. Note some fields span across adjacent registers."
+  default = "0x00000004"
+  offset = "0x00001FE0"
+  [[register.field]]
+    name = "FOURKB_COUNT"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "JEP106_C_CODE"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "CONTROL_N_PERIPH_ID_5"
+  type = "ro"
+  width = 8
+  description = "The periph_id_[8:0] Registers provide information about the configuration of the peripheral. Note some fields span across adjacent registers."
+  default = "0x00000010"
+  offset = "0x00001FE4"
+  [[register.field]]
+    name = "PPI_NUMBER_0"
+    bits = "7:5"
+    type = "ro"
+  [[register.field]]
+    name = "SGI_NUMBER"
+    bits = "4:0"
+    type = "ro"
+    shortdesc = '''The number of SGIs that the GIC provides.'''
+    longdesc = '''b00000 = no SGIs, b00001 = one SGI, INTID0, b00010 = two SGIs, INTID[1:0], .., b10000 = 16 SGIs, INTID[15:0], b10001-b11111 = reserved.'''
+[[register]]
+  name = "CONTROL_N_PERIPH_ID_6"
+  type = "ro"
+  width = 8
+  description = "The periph_id_[8:0] Registers provide information about the configuration of the peripheral. Note some fields span across adjacent registers."
+  default = "0x00000000"
+  offset = "0x00001FE8"
+  [[register.field]]
+    name = "SPI_NUMBER_0"
+    bits = "7:2"
+    type = "ro"
+  [[register.field]]
+    name = "PPI_NUMBER_1"
+    bits = "1:0"
+    type = "ro"
+[[register]]
+  name = "CONTROL_N_PERIPH_ID_7"
+  type = "ro"
+  width = 8
+  description = "The periph_id_[8:0] Registers provide information about the configuration of the peripheral. Note some fields span across adjacent registers."
+  default = "0x00000092"
+  offset = "0x00001FEC"
+  [[register.field]]
+    name = "TZ"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "PRIORITY"
+    bits = "6:4"
+    type = "ro"
+  [[register.field]]
+    name = "SPI_NUMBER_1"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "CONTROL_N_COMPONENT_ID_0"
+  type = "ro"
+  width = 8
+  description = "The component_id_[3:0] Registers are four eight-bit wide registers, that can conceptually be treated as a single register that holds a 32-bit PrimeCell ID value."
+  default = "0x0000000D"
+  offset = "0x00001FF0"
+  [[register.field]]
+    name = "COMPONENT_ID_0"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "CONTROL_N_COMPONENT_ID_1"
+  type = "ro"
+  width = 8
+  description = "The component_id_[3:0] Registers are four eight-bit wide registers, that can conceptually be treated as a single register that holds a 32-bit PrimeCell ID value."
+  default = "0x000000F0"
+  offset = "0x00001FF4"
+  [[register.field]]
+    name = "COMPONENT_ID_1"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "CONTROL_N_COMPONENT_ID_2"
+  type = "ro"
+  width = 8
+  description = "The component_id_[3:0] Registers are four eight-bit wide registers, that can conceptually be treated as a single register that holds a 32-bit PrimeCell ID value."
+  default = "0x00000005"
+  offset = "0x00001FF8"
+  [[register.field]]
+    name = "COMPONENT_ID_2"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "CONTROL_N_COMPONENT_ID_3"
+  type = "ro"
+  width = 8
+  description = "The component_id_[3:0] Registers are four eight-bit wide registers, that can conceptually be treated as a single register that holds a 32-bit PrimeCell ID value."
+  default = "0x000000B1"
+  offset = "0x00001FFC"
+  [[register.field]]
+    name = "COMPONENT_ID_3"
+    bits = "7:0"
+    type = "ro"

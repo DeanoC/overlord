@@ -1,0 +1,24 @@
+[[include]]
+resource = "lpd.toml"
+
+[[include]]
+resource = "fpd.toml"
+
+[[include]]
+resource = "iop.toml"
+
+[[definition]]
+type = "switch.ddrc.zynqps8"
+registers = [
+    { resource = "registers/ddrc.toml", name = "DDRC", base_address = "0x0007_0000" } #FD
+]
+buses = [
+    { name = "lpd_ddrc", supplier = false, data_width = 64, address_width = 32 }, # S0
+    { name = "cci0_ddrc", supplier = false, data_width = 128, address_width = 40 }, # S1
+    { name = "cci1_ddrc", supplier = false, data_width = 128, address_width = 40 }, # S2
+    { name = "splitter0_ddrc", supplier = false, data_width = 128, address_width = 40 }, # S3
+    { name = "splitter1_ddrc", supplier = false, data_width = 128, address_width = 40 }, # S4
+    { name = "splitter2_ddrc", supplier = false, data_width = 128, address_width = 40 }, # S5
+
+    { protocol = "internal_ddr", supplier = false, data_width = 128, address_width = 40 },
+]

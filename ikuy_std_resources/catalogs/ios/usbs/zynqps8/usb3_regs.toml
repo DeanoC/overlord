@@ -1,0 +1,327 @@
+description = "USB Core 0 Controller"
+[[bank]]
+  name = "USB3"
+  address = "0xff9d0000"
+[[bank]]
+  name = "USB3_1"
+  address = "0xff9e0000"
+[[register]]
+  name = "CUR_PWR_ST"
+  type = "mixed"
+  width = 32
+  description = "Indicates current power state of the core"
+  default = "0x00000000"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "raz"
+  [[register.field]]
+    name = "U2PMU"
+    bits = "3:2"
+    type = "ro"
+  [[register.field]]
+    name = "U3PMU"
+    bits = "1:0"
+    type = "ro"
+[[register]]
+  name = "CONNECT_ST"
+  type = "mixed"
+  width = 32
+  description = "Indicates if USB3 Always ON block has connection to at least 1 host or device during Hibernation state"
+  default = "0x00000000"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:2"
+    type = "raz"
+  [[register.field]]
+    name = "U2PMU"
+    bits = "1"
+    type = "ro"
+    shortdesc = '''1' indicates USB2 Always ON block has at least one connection to host or device.'''
+    longdesc = ''''0' indicates no connection to host or device.'''
+  [[register.field]]
+    name = "U3PMU"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''1' indicates USB3 Always ON block has at least one connection to host or device.'''
+    longdesc = ''''0' indicates no connection to host or device.'''
+[[register]]
+  name = "BUS_FILTER"
+  type = "mixed"
+  width = 32
+  description = "Disables internal bus filters that are enabled by DWC_USB3_EN_BUS_FILTERS"
+  default = "0x00000000"
+  offset = "0x00000030"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "raz"
+  [[register.field]]
+    name = "BYPASS"
+    bits = "3:0"
+    type = "rw"
+    shortdesc = '''This signal must be set or reset at power-on reset and is not changed during normal operation of core.'''
+    longdesc = '''1'b1 means Bus filters disabled. 1'b0 means otherwise'''
+[[register]]
+  name = "PME_EN"
+  type = "mixed"
+  width = 32
+  description = "Enable signal for pme_generation"
+  default = "0x00000000"
+  offset = "0x00000034"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "raz"
+  [[register.field]]
+    name = "BIT"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Its only for legacy purpose.'''
+    longdesc = '''We can keep this bit always at '0'''
+[[register]]
+  name = "PORT"
+  type = "mixed"
+  width = 32
+  description = "Device characteristics"
+  default = "0x00000000"
+  offset = "0x00000038"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:3"
+    type = "raz"
+  [[register.field]]
+    name = "PWR_CTRL_PRSNT"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''1' Indicates that the port has port power switches.'''
+    longdesc = ''''0' indicates otherwise'''
+  [[register.field]]
+    name = "PERM_ATTACH"
+    bits = "1:0"
+    type = "rw"
+    shortdesc = '''1' Device permanetly attached to port.'''
+    longdesc = ''''0' Device not permanently attached'''
+[[register]]
+  name = "PMU_USB"
+  type = "mixed"
+  width = 32
+  description = "Power state transition request by PMU to USB"
+  default = "0x00000000"
+  offset = "0x0000003C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:2"
+    type = "raz"
+  [[register.field]]
+    name = "PWR_ST_REQ"
+    bits = "1:0"
+    type = "rw"
+    shortdesc = '''Power State requested by Software.'''
+    longdesc = '''00 represents D0 11 represents D3'''
+[[register]]
+  name = "JITTER_ADJUST"
+  type = "mixed"
+  width = 32
+  description = "High Speed Jitter Adjustment"
+  default = "0x00000020"
+  offset = "0x00000040"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:6"
+    type = "raz"
+  [[register.field]]
+    name = "FLADJ"
+    bits = "5:0"
+    type = "rw"
+    shortdesc = '''Frame length adjustment register.'''
+    longdesc = '''Default value is 125 us'''
+[[register]]
+  name = "PWR_CONFIG_USB3"
+  type = "mixed"
+  width = 32
+  description = "USB3 PHY power config"
+  default = "0x00000000"
+  offset = "0x00000048"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:30"
+    type = "raz"
+  [[register.field]]
+    name = "STRAP"
+    bits = "29:0"
+    type = "rw"
+[[register]]
+  name = "PWR_CONFIG_USB2"
+  type = "mixed"
+  width = 32
+  description = "USB2 PHY power config"
+  default = "0x00000000"
+  offset = "0x0000004C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:30"
+    type = "raz"
+  [[register.field]]
+    name = "STRAP"
+    bits = "29:0"
+    type = "rw"
+[[register]]
+  name = "HOST"
+  type = "mixed"
+  width = 32
+  description = "Current BELT value"
+  default = "0x000007E8"
+  offset = "0x00000050"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:12"
+    type = "raz"
+  [[register.field]]
+    name = "CUR_BELT"
+    bits = "11:0"
+    type = "ro"
+    shortdesc = '''This signal indicates minimum value if all received Tolerance values.'''
+    longdesc = '''This is valid only in Host mode'''
+[[register]]
+  name = "COHERENCY"
+  type = "mixed"
+  width = 32
+  description = "Coherency Mode"
+  default = "0x00000000"
+  offset = "0x0000005C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "raz"
+  [[register.field]]
+    name = "USB"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''1: Route transactions through CCI for Coherency even if the target of transaction is in LPD.'''
+    longdesc = '''0: Do not route transactions through CCI if target of transaction is in LPD'''
+[[register]]
+  name = "REG_CTRL"
+  type = "mixed"
+  width = 32
+  description = "reg_ctrl"
+  default = "0x00000000"
+  offset = "0x00000060"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "raz"
+  [[register.field]]
+    name = "SLVERR_ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''By default, invalid address requests are ignored.'''
+    longdesc = '''However, a maskable interrupt exsists. By enabling this slverr_enable invalid address requests cause a slverr to occur. Enable/Disable SLVERR during address decode failure. 0: SLVERR is disabled. For request address: Writes are ignored. Read returns 0. 1: SLVERR is enabled. For requestes address, SLVERR is asserted. Writes are ignored. Read returns 0.'''
+[[register]]
+  name = "IR_STATUS"
+  type = "mixed"
+  width = 32
+  description = "ir_status"
+  default = "0x00000000"
+  offset = "0x00000064"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:2"
+    type = "raz"
+  [[register.field]]
+    name = "HOST_SYS_ERR"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "ADDR_DEC_ERR"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "IR_MASK"
+  type = "mixed"
+  width = 32
+  description = "ir_mask"
+  default = "0x00000003"
+  offset = "0x00000068"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:2"
+    type = "raz"
+  [[register.field]]
+    name = "HOST_SYS_ERR"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR_DEC_ERR"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "IR_ENABLE"
+  type = "mixed"
+  width = 32
+  description = "ir_enable"
+  default = "0x00000000"
+  offset = "0x0000006C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:2"
+    type = "raz"
+  [[register.field]]
+    name = "HOST_SYS_ERR"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "ADDR_DEC_ERR"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "IR_DISABLE"
+  type = "mixed"
+  width = 32
+  description = "ir_disable"
+  default = "0x00000000"
+  offset = "0x00000070"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:2"
+    type = "raz"
+  [[register.field]]
+    name = "HOST_SYS_ERR"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "ADDR_DEC_ERR"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "FPD_PIPE_CLK"
+  type = "mixed"
+  width = 32
+  description = "fpd_pipe_clk"
+  default = "0x00000000"
+  offset = "0x0000007C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "raz"
+  [[register.field]]
+    name = "OPTION"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "FPD_POWER_PRSNT"
+  type = "mixed"
+  width = 32
+  description = "fpd_power_prsnt"
+  default = "0x00000000"
+  offset = "0x00000080"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "raz"
+  [[register.field]]
+    name = "OPTION"
+    bits = "0"
+    type = "rw"

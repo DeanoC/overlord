@@ -1,0 +1,2419 @@
+description = "PCIe Controller Attributes"
+[[bank]]
+  name = "PCIE_ATTRIB"
+  address = "0xfd480000"
+[[register]]
+  name = "ATTR_0"
+  type = "rw"
+  width = 32
+  description = "ATTR_0"
+  default = "0x00000003"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "ATTR_AER_CAP_ECRC_GEN_CAPABLE"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Indicates that the core is capable of generating ECRC.'''
+    longdesc = '''Value transferred to bit 5 of the AER Capabilities and Control Register.; EP=0x0001; RP=0x0001'''
+  [[register.field]]
+    name = "ATTR_AER_CAP_ECRC_CHECK_CAPABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Indicates that the core is capable of checking ECRC.'''
+    longdesc = '''Value transferred to bit 7 of the AER Capabilities and Control Register.; EP=0x0001; RP=0x0001'''
+[[register]]
+  name = "ATTR_1"
+  type = "rw"
+  width = 32
+  description = "ATTR_1"
+  default = "0x00000001"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "ATTR_AER_CAP_ID"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''The capability identifier of AER capability.'''
+    longdesc = '''The value is transferred to the AER Capabilities Register[15:0].; EP=0x0001; RP=0x0001'''
+[[register]]
+  name = "ATTR_2"
+  type = "rw"
+  width = 32
+  description = "ATTR_2"
+  default = "0x00000002"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "ATTR_AER_CAP_VERSION"
+    bits = "4:1"
+    type = "rw"
+    shortdesc = '''The version of AER Capability followed.'''
+    longdesc = '''The value is transferred to the VC Capabilities Register[19:16].; EP=0x0001; RP=0x0001'''
+  [[register.field]]
+    name = "ATTR_AER_CAP_PERMIT_ROOTERR_UPDATE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''If TRUE, permits the AER Root Status and Error Source ID reg to be updated.'''
+    longdesc = '''If FALSE, these registers are forced to 0.; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_3"
+  type = "rw"
+  width = 32
+  description = "ATTR_3"
+  default = "0x00000140"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "ATTR_AER_BASE_PTR"
+    bits = "11:0"
+    type = "rw"
+    shortdesc = '''Byte address of the base of the AER Capability Structure.'''
+    longdesc = '''Any access to this structure (via either the link or the management port) is relative to this address.; EP=0x0140; RP=0x0140'''
+[[register]]
+  name = "ATTR_4"
+  type = "rw"
+  width = 32
+  description = "ATTR_4"
+  default = "0x00001000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "ATTR_AER_CAP_ON"
+    bits = "12"
+    type = "rw"
+    shortdesc = '''Indicates that the AER structures exists.'''
+    longdesc = '''If this is FALSE, then the AER structure cannot be accessed via either the link or the management port, and AER will be considered to not be present for error management tasks (such as what types of error messages are sent if an error is detected).; EP=0x0001; RP=0x0001'''
+  [[register.field]]
+    name = "ATTR_AER_CAP_NEXTPTR"
+    bits = "11:0"
+    type = "rw"
+    shortdesc = '''AER's Next Capability Offset pointer to the next item in the capabilities list, or 000h if this is the final capability.'''
+    longdesc = '''; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_5"
+  type = "rw"
+  width = 32
+  description = "ATTR_5"
+  default = "0x0000FF07"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "ATTR_AER_CAP_OPTIONAL_ERR_SUPPORT"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''Indicates which optional error conditions in the Uncorrectable and Correctable Error Mask/Severity registers are supported.'''
+    longdesc = '''If an error is unsupported, then the corresponding bit in the Mask/Severity register is hardwired to 0. Encoding ("1" indicates support): [0] : Corrected Internal Error [1] : Header Log Overflow [2] : Receiver Error [3:7] : undefined [8] : Surprise Down [9] : Flow Control Protocol Error [10] : Completion Timeout [11] : Completer Abort [12] : Receiver Overflow [13] : ECRC Error [14] : ACS Violation [15] : Uncorrectable Internal Error ; EP=0xFF07; RP=0xFF07'''
+[[register]]
+  name = "ATTR_6"
+  type = "rw"
+  width = 32
+  description = "ATTR_6"
+  default = "0x00000007"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "ATTR_AER_CAP_MULTIHEADER"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''Drives value on AER Capabilities[9].'''
+    longdesc = '''Will cause core to buffer several headers for AER header log field.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_AER_CAP_OPTIONAL_ERR_SUPPORT"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''Indicates which optional error conditions in the Uncorrectable and Correctable Error Mask/Severity registers are supported.'''
+    longdesc = '''If an error is unsupported, then the corresponding bit in the Mask/Severity register is hardwired to 0. Encoding ("1" indicates support): [0] : MC Blocked TLP [1] : AtomicOp Egress Blocked [2] : TLP Prefix Blocked [7:3] : undefined; EP=0x0007; RP=0x0007'''
+[[register]]
+  name = "ATTR_7"
+  type = "rw"
+  width = 32
+  description = "ATTR_7"
+  default = "0x00000004"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "ATTR_BAR0"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''Specifies mask/settings for Base Address Register (BAR) 0.'''
+    longdesc = '''If BAR is not to be implemented, set to 32'h00000000. Bits are defined as follows: Memory Space BAR [0] = Mem Space Indicator (set to 0) [2:1] = Type field (10 for 64-bit, 00 for 32-bit) [3] = Prefetchable (0 or 1) [31:4] = Mask for writable bits of BAR; if 32-bit BAR, set uppermost 31:n bits to 1, where 2^n=memory aperture size in bytes. If 64-bit BAR, set uppermost 63:n bits of {BAR1,BAR0} to 1. IO Space BAR 0] = IO Space Indicator (set to 1) [1] = Reserved (set to 0) [31:2] = Mask for writable bits of BAR; set uppermost 31:n bits to 1, where 2^n=i/o aperture size in bytes.; EP=0x0004; RP=0x0000'''
+[[register]]
+  name = "ATTR_8"
+  type = "rw"
+  width = 32
+  description = "ATTR_8"
+  default = "0x0000FFF0"
+  offset = "0x00000020"
+  [[register.field]]
+    name = "ATTR_BAR0"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''Specifies mask/settings for Base Address Register (BAR) 0.'''
+    longdesc = '''If BAR is not to be implemented, set to 32'h00000000. Bits are defined as follows: Memory Space BAR [0] = Mem Space Indicator (set to 0) [2:1] = Type field (10 for 64-bit, 00 for 32-bit) [3] = Prefetchable (0 or 1) [31:4] = Mask for writable bits of BAR; if 32-bit BAR, set uppermost 31:n bits to 1, where 2^n=memory aperture size in bytes. If 64-bit BAR, set uppermost 63:n bits of {BAR1,BAR0} to 1. IO Space BAR 0] = IO Space Indicator (set to 1) [1] = Reserved (set to 0) [31:2] = Mask for writable bits of BAR; set uppermost 31:n bits to 1, where 2^n=i/o aperture size in bytes.; EP=0xFFF0; RP=0x0000'''
+[[register]]
+  name = "ATTR_9"
+  type = "rw"
+  width = 32
+  description = "ATTR_9"
+  default = "0x0000FFFF"
+  offset = "0x00000024"
+  [[register.field]]
+    name = "ATTR_BAR1"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''Specifies mask/settings for Base Address Register (BAR) 1 if BAR0 is a 32-bit BAR, or the upper bits of {BAR1,BAR0} if BAR0 is a 64-bit BAR.'''
+    longdesc = '''If BAR is not to be implemented, set to 32'h00000000. See BAR0 description if this functions as the upper bits of a 64-bit BAR. Bits are defined as follows: Memory Space BAR (not upper bits of BAR0) [0] = Mem Space Indicator (set to 0) [2:1] = Type field (10 for 64-bit, 00 for 32-bit) [3] = Prefetchable (0 or 1) [31:4] = Mask for writable bits of BAR; if 32-bit BAR, set uppermost 31:n bits to 1, where 2^n=memory aperture size in bytes. If 64-bit BAR, set uppermost 63:n bits of {BAR2,BAR1} to 1. IO Space BAR 0] = IO Space Indicator (set to 1) [1] = Reserved (set to 0) [31:2] = Mask for writable bits of BAR; set uppermost 31:n bits to 1, where 2^n=i/o aperture size in bytes.; EP=0xFFFF; RP=0x0000'''
+[[register]]
+  name = "ATTR_10"
+  type = "rw"
+  width = 32
+  description = "ATTR_10"
+  default = "0x0000FFFF"
+  offset = "0x00000028"
+  [[register.field]]
+    name = "ATTR_BAR1"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''Specifies mask/settings for Base Address Register (BAR) 1 if BAR0 is a 32-bit BAR, or the upper bits of {BAR1,BAR0} if BAR0 is a 64-bit BAR.'''
+    longdesc = '''If BAR is not to be implemented, set to 32'h00000000. See BAR0 description if this functions as the upper bits of a 64-bit BAR. Bits are defined as follows: Memory Space BAR (not upper bits of BAR0) [0] = Mem Space Indicator (set to 0) [2:1] = Type field (10 for 64-bit, 00 for 32-bit) [3] = Prefetchable (0 or 1) [31:4] = Mask for writable bits of BAR; if 32-bit BAR, set uppermost 31:n bits to 1, where 2^n=memory aperture size in bytes. If 64-bit BAR, set uppermost 63:n bits of {BAR2,BAR1} to 1. IO Space BAR 0] = IO Space Indicator (set to 1) [1] = Reserved (set to 0) [31:2] = Mask for writable bits of BAR; set uppermost 31:n bits to 1, where 2^n=i/o aperture size in bytes.; EP=0xFFFF; RP=0x0000'''
+[[register]]
+  name = "ATTR_11"
+  type = "rw"
+  width = 32
+  description = "ATTR_11"
+  default = "0x00000004"
+  offset = "0x0000002C"
+  [[register.field]]
+    name = "ATTR_BAR2"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''For an endpoint, specifies mask/settings for Base Address Register (BAR) 2 if BAR1 is a 32-bit BAR, or the upper bits of {BAR2,BAR1} if BAR1 is the lower part of a 64-bit BAR.'''
+    longdesc = '''If BAR is not to be implemented, set to 32'h00000000. See BAR1 description if this functions as the upper bits of a 64-bit BAR. For a switch or root: This must be set to 00FF_FFFF. For an endpoint, bits are defined as follows: Memory Space BAR (not upper bits of BAR1) [0] = Mem Space Indicator (set to 0) [2:1] = Type field (10 for 64-bit, 00 for 32-bit) [3] = Prefetchable (0 or 1) [31:4] = Mask for writable bits of BAR; if 32-bit BAR, set uppermost 31:n bits to 1, where 2^n=memory aperture size in bytes. If 64-bit BAR, set uppermost 63:n bits of {BAR3,BAR2} to 1. IO Space BAR 0] = IO Space Indicator (set to 1) [1] = Reserved (set to 0) [31:2] = Mask for writable bits of BAR; set uppermost 31:n bits to 1, where 2^n=i/o aperture size in bytes.; EP=0x0004; RP=0xFFFF'''
+[[register]]
+  name = "ATTR_12"
+  type = "rw"
+  width = 32
+  description = "ATTR_12"
+  default = "0x0000FFF0"
+  offset = "0x00000030"
+  [[register.field]]
+    name = "ATTR_BAR2"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''For an endpoint, specifies mask/settings for Base Address Register (BAR) 2 if BAR1 is a 32-bit BAR, or the upper bits of {BAR2,BAR1} if BAR1 is the lower part of a 64-bit BAR.'''
+    longdesc = '''If BAR is not to be implemented, set to 32'h00000000. See BAR1 description if this functions as the upper bits of a 64-bit BAR. For a switch or root: This must be set to 00FF_FFFF. For an endpoint, bits are defined as follows: Memory Space BAR (not upper bits of BAR1) [0] = Mem Space Indicator (set to 0) [2:1] = Type field (10 for 64-bit, 00 for 32-bit) [3] = Prefetchable (0 or 1) [31:4] = Mask for writable bits of BAR; if 32-bit BAR, set uppermost 31:n bits to 1, where 2^n=memory aperture size in bytes. If 64-bit BAR, set uppermost 63:n bits of {BAR3,BAR2} to 1. IO Space BAR 0] = IO Space Indicator (set to 1) [1] = Reserved (set to 0) [31:2] = Mask for writable bits of BAR; set uppermost 31:n bits to 1, where 2^n=i/o aperture size in bytes.; EP=0xFFF0; RP=0x00FF'''
+[[register]]
+  name = "ATTR_13"
+  type = "rw"
+  width = 32
+  description = "ATTR_13"
+  default = "0x0000FFFF"
+  offset = "0x00000034"
+  [[register.field]]
+    name = "ATTR_BAR3"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''For an endpoint, specifies mask/settings for Base Address Register (BAR) 3 if BAR2 is a 32-bit BAR, or the upper bits of {BAR3,BAR2} if BAR2 is the lower part of a 64-bit BAR.'''
+    longdesc = '''If BAR is not to be implemented, set to 32'h00000000. See BAR2 description if this functions as the upper bits of a 64-bit BAR. For a switch or root, this must be set to: FFFF_0000 = IO Limit/Base Registers not implemented FFFF_F0F0 = IO Limit/Base Registers use 16-bit decode FFFF_F1F1 = IO Limit/Base Registers use 32-bit decode For an endpoint, bits are defined as follows: Memory Space BAR (not upper bits of BAR2) [0] = Mem Space Indicator (set to 0) [2:1] = Type field (10 for 64-bit, 00 for 32-bit) [3] = Prefetchable (0 or 1) [31:4] = Mask for writable bits of BAR; if 32-bit BAR, set uppermost 31:n bits to 1, where 2^n=memory aperture size in bytes. If 64-bit BAR, set uppermost 63:n bits of {BAR4,BAR3} to 1. IO Space BAR 0] = IO Space Indicator (set to 1) [1] = Reserved (set to 0) [31:2] = Mask for writable bits of BAR; set uppermost 31:n bits to 1, where 2^n=i/o aperture size in bytes.; EP=0xFFFF; RP=0x0000'''
+[[register]]
+  name = "ATTR_14"
+  type = "rw"
+  width = 32
+  description = "ATTR_14"
+  default = "0x0000FFFF"
+  offset = "0x00000038"
+  [[register.field]]
+    name = "ATTR_BAR3"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''For an endpoint, specifies mask/settings for Base Address Register (BAR) 3 if BAR2 is a 32-bit BAR, or the upper bits of {BAR3,BAR2} if BAR2 is the lower part of a 64-bit BAR.'''
+    longdesc = '''If BAR is not to be implemented, set to 32'h00000000. See BAR2 description if this functions as the upper bits of a 64-bit BAR. For a switch or root, this must be set to: FFFF_0000 = IO Limit/Base Registers not implemented FFFF_F0F0 = IO Limit/Base Registers use 16-bit decode FFFF_F1F1 = IO Limit/Base Registers use 32-bit decode For an endpoint, bits are defined as follows: Memory Space BAR (not upper bits of BAR2) [0] = Mem Space Indicator (set to 0) [2:1] = Type field (10 for 64-bit, 00 for 32-bit) [3] = Prefetchable (0 or 1) [31:4] = Mask for writable bits of BAR; if 32-bit BAR, set uppermost 31:n bits to 1, where 2^n=memory aperture size in bytes. If 64-bit BAR, set uppermost 63:n bits of {BAR4,BAR3} to 1. IO Space BAR 0] = IO Space Indicator (set to 1) [1] = Reserved (set to 0) [31:2] = Mask for writable bits of BAR; set uppermost 31:n bits to 1, where 2^n=i/o aperture size in bytes.; EP=0xFFFF; RP=0xFFFF'''
+[[register]]
+  name = "ATTR_15"
+  type = "rw"
+  width = 32
+  description = "ATTR_15"
+  default = "0x00000004"
+  offset = "0x0000003C"
+  [[register.field]]
+    name = "ATTR_BAR4"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''For an endpoint, specifies mask/settings for Base Address Register (BAR) 4 if BAR3 is a 32-bit BAR, or the upper bits of {BAR4,BAR3} if BAR3 is the lower part of a 64-bit BAR.'''
+    longdesc = '''If BAR is not to be implemented, set to 32'h00000000. See BAR3 description if this functions as the upper bits of a 64-bit BAR. For a switch or root: This must be set to FFF0_FFF0. For an endpoint, bits are defined as follows: Memory Space BAR (not upper bits of BAR3) [0] = Mem Space Indicator (set to 0) [2:1] = Type field (10 for 64-bit, 00 for 32-bit) [3] = Prefetchable (0 or 1) [31:4] = Mask for writable bits of BAR; if 32-bit BAR, set uppermost 31:n bits to 1, where 2^n=memory aperture size in bytes. If 64-bit BAR, set uppermost 63:n bits of {BAR5,BAR4} to 1. IO Space BAR 0] = IO Space Indicator (set to 1) [1] = Reserved (set to 0) [31:2] = Mask for writable bits of BAR; set uppermost 31:n bits to 1, where 2^n=i/o aperture size in bytes.; EP=0x0004; RP=0xFFF0'''
+[[register]]
+  name = "ATTR_16"
+  type = "rw"
+  width = 32
+  description = "ATTR_16"
+  default = "0x0000FFF0"
+  offset = "0x00000040"
+  [[register.field]]
+    name = "ATTR_BAR4"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''For an endpoint, specifies mask/settings for Base Address Register (BAR) 4 if BAR3 is a 32-bit BAR, or the upper bits of {BAR4,BAR3} if BAR3 is the lower part of a 64-bit BAR.'''
+    longdesc = '''If BAR is not to be implemented, set to 32'h00000000. See BAR3 description if this functions as the upper bits of a 64-bit BAR. For a switch or root: This must be set to FFF0_FFF0. For an endpoint, bits are defined as follows: Memory Space BAR (not upper bits of BAR3) [0] = Mem Space Indicator (set to 0) [2:1] = Type field (10 for 64-bit, 00 for 32-bit) [3] = Prefetchable (0 or 1) [31:4] = Mask for writable bits of BAR; if 32-bit BAR, set uppermost 31:n bits to 1, where 2^n=memory aperture size in bytes. If 64-bit BAR, set uppermost 63:n bits of {BAR5,BAR4} to 1. IO Space BAR 0] = IO Space Indicator (set to 1) [1] = Reserved (set to 0) [31:2] = Mask for writable bits of BAR; set uppermost 31:n bits to 1, where 2^n=i/o aperture size in bytes.; EP=0xFFF0; RP=0xFFF0'''
+[[register]]
+  name = "ATTR_17"
+  type = "rw"
+  width = 32
+  description = "ATTR_17"
+  default = "0x0000FFFF"
+  offset = "0x00000044"
+  [[register.field]]
+    name = "ATTR_BAR5"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''For an endpoint, specifies mask/settings for Base Address Register (BAR) 5 if BAR4 is a 32-bit BAR, or the upper bits of {BAR5,BAR4} if BAR4 is the lower part of a 64-bit BAR.'''
+    longdesc = '''If BAR is not to be implemented, set to 32'h00000000. See BAR4 description if this functions as the upper bits of a 64-bit BAR. For a switch or root, this must be set to: 0000_0000 = Prefetchable Memory Limit/Base Registers not implemented FFF0_FFF0 = 32-bit Prefetchable Memory Limit/Base implemented FFF1_FFF1 = 64-bit Prefetchable Memory Limit/Base implemented For an endpoint, bits are defined as follows: Memory Space BAR (not upper bits of BAR4) [0] = Mem Space Indicator (set to 0) [2:1] = Type field (00 for 32-bit; BAR5 cannot be lower part of a 64-bit BAR) [3] = Prefetchable (0 or 1) [31:4] = Mask for writable bits of BAR; set uppermost 31:n bits to 1, where 2^n=memory aperture size in bytes. IO Space BAR 0] = IO Space Indicator (set to 1) [1] = Reserved (set to 0) [31:2] = Mask for writable bits of BAR; set uppermost 31:n bits to 1, where 2^n=i/o aperture size in bytes.; EP=0xFFFF; RP=0xFFF1'''
+[[register]]
+  name = "ATTR_18"
+  type = "rw"
+  width = 32
+  description = "ATTR_18"
+  default = "0x0000FFFF"
+  offset = "0x00000048"
+  [[register.field]]
+    name = "ATTR_BAR5"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''For an endpoint, specifies mask/settings for Base Address Register (BAR) 5 if BAR4 is a 32-bit BAR, or the upper bits of {BAR5,BAR4} if BAR4 is the lower part of a 64-bit BAR.'''
+    longdesc = '''If BAR is not to be implemented, set to 32'h00000000. See BAR4 description if this functions as the upper bits of a 64-bit BAR. For a switch or root, this must be set to: 0000_0000 = Prefetchable Memory Limit/Base Registers not implemented FFF0_FFF0 = 32-bit Prefetchable Memory Limit/Base implemented FFF1_FFF1 = 64-bit Prefetchable Memory Limit/Base implemented For an endpoint, bits are defined as follows: Memory Space BAR (not upper bits of BAR4) [0] = Mem Space Indicator (set to 0) [2:1] = Type field (00 for 32-bit; BAR5 cannot be lower part of a 64-bit BAR) [3] = Prefetchable (0 or 1) [31:4] = Mask for writable bits of BAR; set uppermost 31:n bits to 1, where 2^n=memory aperture size in bytes. IO Space BAR 0] = IO Space Indicator (set to 1) [1] = Reserved (set to 0) [31:2] = Mask for writable bits of BAR; set uppermost 31:n bits to 1, where 2^n=i/o aperture size in bytes.; EP=0xFFFF; RP=0xFFF1'''
+[[register]]
+  name = "ATTR_19"
+  type = "rw"
+  width = 32
+  description = "ATTR_19"
+  default = "0x00000000"
+  offset = "0x0000004C"
+  [[register.field]]
+    name = "ATTR_EXPANSION_ROM"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''Specifies mask/settings for the Expansion ROM Base Address Register (BAR).'''
+    longdesc = '''If the BAR is not to be implemented, set to 32'h00000000. Bits are defined as follows: [0] = Expansion ROM implemented (set to 1 to implement ROM) [10:1] = Reserved (set to 0) [31:11] = Mask for writable bits of BAR; set uppermost 31:(2^n) bits to 1, where 2^n=rom aperture size in bytes.; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_20"
+  type = "rw"
+  width = 32
+  description = "ATTR_20"
+  default = "0x00000000"
+  offset = "0x00000050"
+  [[register.field]]
+    name = "ATTR_EXPANSION_ROM"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''Specifies mask/settings for the Expansion ROM Base Address Register (BAR).'''
+    longdesc = '''If the BAR is not to be implemented, set to 32'h00000000. Bits are defined as follows: [0] = Expansion ROM implemented (set to 1 to implement ROM) [10:1] = Reserved (set to 0) [31:11] = Mask for writable bits of BAR; set uppermost 31:(2^n) bits to 1, where 2^n=rom aperture size in bytes.; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_21"
+  type = "rw"
+  width = 32
+  description = "ATTR_21"
+  default = "0x00000040"
+  offset = "0x00000054"
+  [[register.field]]
+    name = "ATTR_CAPABILITIES_PTR"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''Pointer to the first capabilities structure location.'''
+    longdesc = '''The value is transferred to the Capabilities Pointer Register at offset 0x34.; EP=0x0040; RP=0x0040'''
+[[register]]
+  name = "ATTR_22"
+  type = "rw"
+  width = 32
+  description = "ATTR_22"
+  default = "0x00000000"
+  offset = "0x00000058"
+  [[register.field]]
+    name = "ATTR_CARDBUS_CIS_POINTER"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''Pointer to Cardbus data structure.'''
+    longdesc = '''Transferred to the Cardbus CIS Pointer register. Set to 0 if the Cardbus pointer is not implemented.; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_23"
+  type = "rw"
+  width = 32
+  description = "ATTR_23"
+  default = "0x00000000"
+  offset = "0x0000005C"
+  [[register.field]]
+    name = "ATTR_CARDBUS_CIS_POINTER"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''Pointer to Cardbus data structure.'''
+    longdesc = '''Transferred to the Cardbus CIS Pointer register. Set to 0 if the Cardbus pointer is not implemented.; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_24"
+  type = "rw"
+  width = 32
+  description = "ATTR_24"
+  default = "0x00008000"
+  offset = "0x00000060"
+  [[register.field]]
+    name = "ATTR_CLASS_CODE"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''Code identifying basic function, subclass and applicable programming interface.'''
+    longdesc = '''Transferred to the Class Code register.; EP=0x8000; RP=0x0400'''
+[[register]]
+  name = "ATTR_25"
+  type = "rw"
+  width = 32
+  description = "ATTR_25"
+  default = "0x00000905"
+  offset = "0x00000064"
+  [[register.field]]
+    name = "ATTR_DEV_CAP2_ATOMICOP_ROUTING_SUPPORTED"
+    bits = "15"
+    type = "rw"
+    shortdesc = '''Drives value on Device Capabilities2[6].'''
+    longdesc = '''Not supported for EP.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_DEV_CAP2_ARI_FORWARDING_SUPPORTED"
+    bits = "14"
+    type = "rw"
+    shortdesc = '''Drives value on Device Capabilities2[5].'''
+    longdesc = '''Not supported for EP.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_CPL_TIMEOUT_RANGES_SUPPORTED"
+    bits = "13:10"
+    type = "rw"
+    shortdesc = '''Supported range of completion timeouts.'''
+    longdesc = '''Drives Device Capability 2 [3:0]; EP=0x0002; RP=0x0002'''
+  [[register.field]]
+    name = "ATTR_CPL_TIMEOUT_DISABLE_SUPPORTED"
+    bits = "9"
+    type = "rw"
+    shortdesc = '''If TRUE Completion Timeout Disable is supported.'''
+    longdesc = '''This is required to be TRUE for Endpoint and either setting allowed for Root ports. Drives Device Capability 2 [4]; EP=0x0001; RP=0x0001'''
+  [[register.field]]
+    name = "ATTR_CMD_INTX_IMPLEMENTED"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''INTX Interrupt Generation Capable.'''
+    longdesc = '''If FALSE, this will cause Command[10] to be hardwired to 0.; EP=0x0001; RP=0x0001'''
+  [[register.field]]
+    name = "ATTR_CLASS_CODE"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''Code identifying basic function, subclass and applicable programming interface.'''
+    longdesc = '''Transferred to the Class Code register.; EP=0x0005; RP=0x0006'''
+[[register]]
+  name = "ATTR_26"
+  type = "rw"
+  width = 32
+  description = "ATTR_26"
+  default = "0x00003000"
+  offset = "0x00000068"
+  [[register.field]]
+    name = "ATTR_DEV_CAP_ENABLE_SLOT_PWR_LIMIT_VALUE"
+    bits = "13"
+    type = "rw"
+    shortdesc = '''Permits captured Slot Power Limit Scale Messages to program corresponding Device Capabilities Value field (Upstream Ports only).'''
+    longdesc = '''If set to 0, this field will be hardwired to 0.; EP=0x0001; RP=0x0001'''
+  [[register.field]]
+    name = "ATTR_DEV_CAP_ENABLE_SLOT_PWR_LIMIT_SCALE"
+    bits = "12"
+    type = "rw"
+    shortdesc = '''Permits captured Slot Power Limit Scale Messages to program corresponding Device Capabilities Scale field (Upstream Ports only).'''
+    longdesc = '''If set to 0, this field will be hardwired to 0.; EP=0x0001; RP=0x0001'''
+[[register]]
+  name = "ATTR_27"
+  type = "rw"
+  width = 32
+  description = "ATTR_27"
+  default = "0x00002138"
+  offset = "0x0000006C"
+  [[register.field]]
+    name = "ATTR_DEV_CAP_ROLE_BASED_ERROR"
+    bits = "13"
+    type = "rw"
+  [[register.field]]
+    name = "ATTR_DEV_CAP_PHANTOM_FUNCTIONS_SUPPORT"
+    bits = "12:11"
+    type = "rw"
+    shortdesc = '''Phantom Function Support.'''
+    longdesc = '''Indicates number of Function Number that are reallocated to be Tag bits.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_DEV_CAP_MAX_PAYLOAD_SUPPORTED"
+    bits = "10:8"
+    type = "rw"
+    shortdesc = '''Specifies maximum payload supported.'''
+    longdesc = '''Valid settings are: 0- 128 bytes, 1- 256 bytes, 2- 512 bytes, 3- 1024 bytes. Transferred to the Device Capabilities register. The values: 4-2048 bytes, 5- 4096 bytes are not supported; EP=0x0001; RP=0x0001'''
+  [[register.field]]
+    name = "ATTR_DEV_CAP_FUNCTION_LEVEL_RESET_CAPABLE"
+    bits = "7"
+    type = "rw"
+    shortdesc = '''Function Level Reset Capability.'''
+    longdesc = '''Indicates support for option FLR is allowed. Only applies to endpoints.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_DEV_CAP_ENDPOINT_L1_LATENCY"
+    bits = "5:3"
+    type = "rw"
+    shortdesc = '''Endpoint L1 Acceptable Latency.'''
+    longdesc = '''Records the latency that the endpoint can withstand on transitions from L1 state to L0 (if L1 state supported). Valid settings are: 0h less than 1us, 1h 1 to 2us, 2h 2 to 4us, 3h 4 to 8us, 4h 8 to 16us, 5h 16 to 32us, 6h 32 to 64us, 7h more than 64us. For Endpoints only. Must be 0h for other devices.; EP=0x0007; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_DEV_CAP_ENDPOINT_L0S_LATENCY"
+    bits = "2:0"
+    type = "rw"
+    shortdesc = '''Endpoint L0s Acceptable Latency.'''
+    longdesc = '''Records the latency the endpoint can withstand on transitions from L0s state to L0. Valid settings are: 0h less than 64ns, 1h 64 to 128ns, 2h 128 to 256ns, 3h 256 to 512ns, 4h 512ns to 1us, 5h 1 to 2us, 6h 2 to 4 us, 7h more than 4us. For Endpoints only. Must be 0h for other devices.; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_28"
+  type = "rw"
+  width = 32
+  description = "ATTR_28"
+  default = "0x00000000"
+  offset = "0x00000070"
+  [[register.field]]
+    name = "ATTR_DEV_CONTROL_AUX_POWER_SUPPORTED"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''Determines if Device Control[10] is writable.'''
+    longdesc = '''; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_DEV_CAP_RSVD_31_29"
+    bits = "7:5"
+    type = "rw"
+  [[register.field]]
+    name = "ATTR_DEV_CAP_RSVD_17_16"
+    bits = "4:3"
+    type = "rw"
+    shortdesc = '''Reserved bits [17:16] in Device Capability register.'''
+    longdesc = '''; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_DEV_CAP_RSVD_14_12"
+    bits = "2:0"
+    type = "rw"
+    shortdesc = '''Reserved bits [14:12] in Device Capability register.'''
+    longdesc = '''Were previously power indicator, attention indicator and attention button; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_29"
+  type = "rw"
+  width = 32
+  description = "ATTR_29"
+  default = "0x00000100"
+  offset = "0x00000074"
+  [[register.field]]
+    name = "ATTR_DSN_BASE_PTR"
+    bits = "11:0"
+    type = "rw"
+    shortdesc = '''Byte address of the base of the Device Serial Number (DSN) Capability Structure.'''
+    longdesc = '''Any access to this structure (via either the link or the management port) is relative to this address.; EP=0x0100; RP=0x0100'''
+[[register]]
+  name = "ATTR_30"
+  type = "rw"
+  width = 32
+  description = "ATTR_30"
+  default = "0x00000003"
+  offset = "0x00000078"
+  [[register.field]]
+    name = "ATTR_DSN_CAP_ID"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''Capability ID for DSN capability.'''
+    longdesc = '''Must be set to 0003h.; EP=0x0003; RP=0x0003'''
+[[register]]
+  name = "ATTR_31"
+  type = "rw"
+  width = 32
+  description = "ATTR_31"
+  default = "0x0000110C"
+  offset = "0x0000007C"
+  [[register.field]]
+    name = "ATTR_DSN_CAP_ON"
+    bits = "12"
+    type = "rw"
+    shortdesc = '''Indicates that the DSN structures exists.'''
+    longdesc = '''If this is FALSE, then the DSN structure cannot be accessed via either the link or the management port.; EP=0x0001; RP=0x0001'''
+  [[register.field]]
+    name = "ATTR_DSN_CAP_NEXTPTR"
+    bits = "11:0"
+    type = "rw"
+    shortdesc = '''Device Serial Number's Capability's Next Capability Offset pointer to the next item in the capabilities list, or 000h if this is the final capability.'''
+    longdesc = '''; EP=0x010C; RP=0x010C'''
+[[register]]
+  name = "ATTR_32"
+  type = "rw"
+  width = 32
+  description = "ATTR_32"
+  default = "0x000003F1"
+  offset = "0x00000080"
+  [[register.field]]
+    name = "ATTR_DSN_CAP_VERSION"
+    bits = "3:0"
+    type = "rw"
+    shortdesc = '''Indicates the Device Serial Number structure version number.'''
+    longdesc = '''; EP=0x0001; RP=0x0001'''
+[[register]]
+  name = "ATTR_34"
+  type = "rw"
+  width = 32
+  description = "ATTR_34"
+  default = "0x00000100"
+  offset = "0x00000088"
+  [[register.field]]
+    name = "ATTR_INTERRUPT_PIN"
+    bits = "15:8"
+    type = "rw"
+    shortdesc = '''Indicates mapping for legacy interrupt messages.'''
+    longdesc = '''Valid values are 1 INTA, 2 INTB, 3 INTC, 4 INTD. Zero indicates no legacy interrupt messages used.; EP=0x0001; RP=0x0001'''
+  [[register.field]]
+    name = "ATTR_HEADER_TYPE"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''Specifies values to be transferred to Header Type register.'''
+    longdesc = '''Bit 7 should be set to '0' indicating single-function device. Bit 0 identifies header as Type 0 or Type 1, with '0' indicating a Type 0 header.; EP=0x0000; RP=0x0001'''
+[[register]]
+  name = "ATTR_35"
+  type = "rw"
+  width = 32
+  description = "ATTR_35"
+  default = "0x00000FFD"
+  offset = "0x0000008C"
+  [[register.field]]
+    name = "ATTR_LINK_CAP_DLL_LINK_ACTIVE_REPORTING_CAP"
+    bits = "15"
+    type = "rw"
+    shortdesc = '''Data Link Layer Link Active status notification is supported.'''
+    longdesc = '''This is optional for Upstream ports.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_LINK_CAP_CLOCK_POWER_MANAGEMENT"
+    bits = "14"
+    type = "rw"
+  [[register.field]]
+    name = "ATTR_LINK_CAP_ASPM_SUPPORT"
+    bits = "13:12"
+    type = "rw"
+    shortdesc = '''Active State PM Support.'''
+    longdesc = '''Indicates the level of active state power management supported by the selected PCI Express Link, encoded as follows: 0 No ASPM supported, 1 L0s entry supported, 2 Reserved, 3 L0s and L1 entry supported.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_INTERRUPT_STAT_AUTO"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Causes Interrupt Status to be set if a INTA Assert message is sent via cfg_interrupt*, and to be cleared if a INTA Deassert message is sent.'''
+    longdesc = '''; EP=0x0001; RP=0x0001'''
+[[register]]
+  name = "ATTR_36"
+  type = "rw"
+  width = 32
+  description = "ATTR_36"
+  default = "0x00007FFF"
+  offset = "0x00000090"
+  [[register.field]]
+    name = "ATTR_LINK_CAP_L1_EXIT_LATENCY_COMCLK_GEN1"
+    bits = "14:12"
+    type = "rw"
+    shortdesc = '''Sets the exit latency from L1 state to be applied (at 2.'''
+    longdesc = '''5G) where a common clock is used. Transferred to the Link Capabilities register.; EP=0x0007; RP=0x0007'''
+  [[register.field]]
+    name = "ATTR_LINK_CAP_L0S_EXIT_LATENCY_GEN2"
+    bits = "11:9"
+    type = "rw"
+    shortdesc = '''Sets the exit latency from L0s state to be applied (at 5G) where separate clocks are used.'''
+    longdesc = '''Transferred to the Link Capabilities register.; EP=0x0007; RP=0x0007'''
+  [[register.field]]
+    name = "ATTR_LINK_CAP_L0S_EXIT_LATENCY_GEN1"
+    bits = "8:6"
+    type = "rw"
+    shortdesc = '''Sets the exit latency from L0s state to be applied (at 2.'''
+    longdesc = '''5G) where separate clocks are used. Transferred to the Link Capabilities register.; EP=0x0007; RP=0x0007'''
+  [[register.field]]
+    name = "ATTR_LINK_CAP_L0S_EXIT_LATENCY_COMCLK_GEN2"
+    bits = "5:3"
+    type = "rw"
+    shortdesc = '''Sets the exit latency from L0s state to be applied (at 5G) where a common clock is used.'''
+    longdesc = '''Transferred to the Link Capabilities register.; EP=0x0007; RP=0x0007'''
+  [[register.field]]
+    name = "ATTR_LINK_CAP_L0S_EXIT_LATENCY_COMCLK_GEN1"
+    bits = "2:0"
+    type = "rw"
+    shortdesc = '''Sets the exit latency from L0s state to be applied (at 2.'''
+    longdesc = '''5G) where a common clock is used. Transferred to the Link Capabilities register.; EP=0x0007; RP=0x0007'''
+[[register]]
+  name = "ATTR_37"
+  type = "rw"
+  width = 32
+  description = "ATTR_37"
+  default = "0x000049FF"
+  offset = "0x00000094"
+  [[register.field]]
+    name = "ATTR_LINK_CAP_RSVD_23"
+    bits = "15"
+    type = "rw"
+  [[register.field]]
+    name = "ATTR_LINK_CAP_ASPM_OPTIONALITY"
+    bits = "14"
+    type = "rw"
+    shortdesc = '''Sets the ASPM Optionality Compliance bit, to comply with the 2.'''
+    longdesc = '''1 ASPM Optionality ECN. Transferred to the Link Capabilities register.; EP=0x0001; RP=0x0001'''
+  [[register.field]]
+    name = "ATTR_LINK_CAP_MAX_LINK_SPEED"
+    bits = "13:10"
+    type = "rw"
+    shortdesc = '''Maximum Link Speed.'''
+    longdesc = '''Valid settings are: 0001b [2.5 GT/s], 0010b [5.0 GT/s and 2.5 GT/s].; EP=0x0002; RP=0x0002'''
+  [[register.field]]
+    name = "ATTR_LINK_CAP_LINK_BANDWIDTH_NOTIFICATION_CAP"
+    bits = "9"
+    type = "rw"
+    shortdesc = '''Link Bandwidth notification capability.'''
+    longdesc = '''Indicates support for the link bandwidth notification status and interrupt mechanism. Required for Root.; EP=0x0000; RP=0x0001'''
+  [[register.field]]
+    name = "ATTR_LINK_CAP_L1_EXIT_LATENCY_GEN2"
+    bits = "8:6"
+    type = "rw"
+    shortdesc = '''Sets the exit latency from L1 state to be applied (at 5G) where separate clocks are used.'''
+    longdesc = '''Transferred to the Link Capabilities register.; EP=0x0007; RP=0x0007'''
+  [[register.field]]
+    name = "ATTR_LINK_CAP_L1_EXIT_LATENCY_GEN1"
+    bits = "5:3"
+    type = "rw"
+    shortdesc = '''Sets the exit latency from L1 state to be applied (at 2.'''
+    longdesc = '''5G) where separate clocks are used. Transferred to the Link Capabilities register.; EP=0x0007; RP=0x0007'''
+  [[register.field]]
+    name = "ATTR_LINK_CAP_L1_EXIT_LATENCY_COMCLK_GEN2"
+    bits = "2:0"
+    type = "rw"
+    shortdesc = '''Sets the exit latency from L1 state to be applied (at 5G) where a common clock is used.'''
+    longdesc = '''Transferred to the Link Capabilities register.; EP=0x0007; RP=0x0007'''
+[[register]]
+  name = "ATTR_38"
+  type = "rw"
+  width = 32
+  description = "ATTR_38"
+  default = "0x00000120"
+  offset = "0x00000098"
+  [[register.field]]
+    name = "ATTR_MPS_FORCE"
+    bits = "9"
+    type = "rw"
+    shortdesc = '''If set, causes the core to use the MPS value on cfg_force_mps for checking the payload size of received TLPs and for replay/acknak timeouts, instead of using Device Ctrl[7:5].'''
+    longdesc = '''It does not change Device Ctrl[7:5].; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_LINK_STATUS_SLOT_CLOCK_CONFIG"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''Slot Clock Configuration.'''
+    longdesc = '''Indicates where the component uses the same physical reference clock that the platform provides on the connector. For a port that connects to the slot, indicates that it uses a clock with a common source to that used by the slot. For an adaptor inserted in the slot, indicates that it uses the same clock source as the slot, not a locally-derived clock source. Transferred to the Link Status register.; EP=0x0001; RP=0x0001'''
+  [[register.field]]
+    name = "ATTR_LINK_CTRL2_TARGET_LINK_SPEED"
+    bits = "7:4"
+    type = "rw"
+    shortdesc = '''Set an upper limit on the speed advertised by the Upstream component (Root).'''
+    longdesc = '''The value is transferred to the Link Control2[3:0] Register.; EP=0x0002; RP=0x0002'''
+  [[register.field]]
+    name = "ATTR_LINK_CTRL2_HW_AUTONOMOUS_SPEED_DISABLE"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''When TRUE disables hardware from changing the link speed for reasons other than reliability.'''
+    longdesc = '''The value is transferred to the Link Control2 Register[5].; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_LINK_CTRL2_DEEMPHASIS"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Sets the de-emphasis level used by upstream component in 5.'''
+    longdesc = '''0 GT/s mode. The value is transferred to the Link Control2 Register[12]. 0b = -6db 1b = -3.5db.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_LINK_CONTROL_RCB"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''1' implies read completion boundary is 128 bits; '0' implies 64 bits.'''
+    longdesc = '''Transferred to the Link Control register. Only non-zero for a downstream-facing port.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_LINK_CAP_SURPRISE_DOWN_ERROR_CAPABLE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "ATTR_39"
+  type = "rw"
+  width = 32
+  description = "ATTR_39"
+  default = "0x00000148"
+  offset = "0x0000009C"
+  [[register.field]]
+    name = "ATTR_MSI_CAP_64_BIT_ADDR_CAPABLE"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''MSI 64-bit Addressing Capable.'''
+    longdesc = '''The value is transferred to the MSI Control Register[7].; EP=0x0001; RP=0x0001'''
+  [[register.field]]
+    name = "ATTR_MSI_BASE_PTR"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''Byte address of the base of the Message Signaled Interrupt (MSI) Capability Structure.'''
+    longdesc = '''Any access to this structure (via either the link or the management port) is relative to this address.; EP=0x0048; RP=0x0048'''
+[[register]]
+  name = "ATTR_40"
+  type = "rw"
+  width = 32
+  description = "ATTR_40"
+  default = "0x00000405"
+  offset = "0x000000A0"
+  [[register.field]]
+    name = "ATTR_MSI_CAP_MULTIMSGCAP"
+    bits = "11:9"
+    type = "rw"
+    shortdesc = '''Multiple Message Capable.'''
+    longdesc = '''Each MSI function may request up to 32 unique messages. System software may read this field to determine the number of messages requested. Number of messages requested are encoded as follows: 0h = 1 vector 1h= 2 vectors 2h= 4.vectors 3h= 8 vectors 4h= 16 vectors ,5h= 32 vectors 6h, 7h= Rsvd; EP=0x2; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_MSI_CAP_MULTIMSG_EXTENSION"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''Multiple Message Capable Extension - When set this allows 256 unique messages to be sent by the user (regardless of what MSI_CAP_MULTIMSGCAP is set to).'''
+    longdesc = '''; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_MSI_CAP_ID"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''The capability identifier of MSI capability.'''
+    longdesc = '''The value is transferred to the MSI Capabilities Register[7:0].; EP=0x0005; RP=0x0005'''
+[[register]]
+  name = "ATTR_41"
+  type = "rw"
+  width = 32
+  description = "ATTR_41"
+  default = "0x00000160"
+  offset = "0x000000A4"
+  [[register.field]]
+    name = "ATTR_MSI_CAP_PER_VECTOR_MASKING_CAPABLE"
+    bits = "9"
+    type = "rw"
+    shortdesc = '''MSI Per-Vector Masking Capable.'''
+    longdesc = '''The value is transferred to the MSI Control Register[8]. When set, adds Mask and Pending Dword to Cap structure; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_MSI_CAP_ON"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''Indicates that the MSI structures exists.'''
+    longdesc = '''If this is FALSE, then the MSI structure cannot be accessed via either the link or the management port.; EP=0x0001; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_MSI_CAP_NEXTPTR"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''MSI Capability's Next Capability Offset pointer to the next item in the capabilities list, or 00h if this is the final capability.'''
+    longdesc = '''; EP=0x0060; RP=0x0000'''
+[[register]]
+  name = "ATTR_42"
+  type = "rw"
+  width = 32
+  description = "ATTR_42"
+  default = "0x0000119C"
+  offset = "0x000000A8"
+  [[register.field]]
+    name = "ATTR_MSIX_CAP_ID"
+    bits = "15:8"
+    type = "rw"
+    shortdesc = '''The capability identifier of MSI capability.'''
+    longdesc = '''The value is transferred to the MSIX Capabilities Register.; EP=0x0011; RP=0x0011'''
+  [[register.field]]
+    name = "ATTR_MSIX_BASE_PTR"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''Byte address of the base of the MSI-X Capability Structure.'''
+    longdesc = '''Any access to this structure (via either the link or the management port) is relative to this address.; EP=0x009C; RP=0x009C'''
+[[register]]
+  name = "ATTR_43"
+  type = "rw"
+  width = 32
+  description = "ATTR_43"
+  default = "0x00000100"
+  offset = "0x000000AC"
+  [[register.field]]
+    name = "ATTR_MSIX_CAP_PBA_BIR"
+    bits = "11:9"
+    type = "rw"
+    shortdesc = '''MSI-X Pending Bit Array BIR.'''
+    longdesc = '''This value is transferred to the MSI-X PBA BIR field. Set to 0 if MSI-X is not enabled.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_MSIX_CAP_ON"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''Indicates that the MSIX structures exists.'''
+    longdesc = '''If this is FALSE, then the MSIX structure cannot be accessed via either the link or the management port.; EP=0x0001; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_MSIX_CAP_NEXTPTR"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''MSI-X Capability's Next Capability Offset pointer to the next item in the capabilities list, or 00h if this is the final capability.'''
+    longdesc = '''; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_44"
+  type = "rw"
+  width = 32
+  description = "ATTR_44"
+  default = "0x00000001"
+  offset = "0x000000B0"
+  [[register.field]]
+    name = "ATTR_MSIX_CAP_PBA_OFFSET"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''MSI-X Pending Bit Array Offset bits 31:16.'''
+    longdesc = '''This value is transferred to the MSI-X PBA Offset field. Set to 0 if MSI-X is not enabled.; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_45"
+  type = "rw"
+  width = 32
+  description = "ATTR_45"
+  default = "0x00008000"
+  offset = "0x000000B4"
+  [[register.field]]
+    name = "ATTR_MSIX_CAP_PBA_OFFSET"
+    bits = "15:3"
+    type = "rw"
+    shortdesc = '''MSI-X Pending Bit Array Offset bits 15:3.'''
+    longdesc = '''This value is transferred to the MSI-X PBA Offset field. Set to 0 if MSI-X is not enabled.; EP=0x0600; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_MSIX_CAP_TABLE_BIR"
+    bits = "2:0"
+    type = "rw"
+    shortdesc = '''MSI-X Table BIR.'''
+    longdesc = '''This value is transferred to the MSI-X Table BIR field. Set to 0 if MSI-X is not enabled.; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_46"
+  type = "rw"
+  width = 32
+  description = "ATTR_46"
+  default = "0x00000001"
+  offset = "0x000000B8"
+  [[register.field]]
+    name = "ATTR_MSIX_CAP_TABLE_OFFSET"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''MSI-X Table Offset bits 31:16.'''
+    longdesc = '''This value is transferred to the MSI-X Table Offset field. Set to 0 if MSI-X is not enabled.; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_47"
+  type = "rw"
+  width = 32
+  description = "ATTR_47"
+  default = "0x00000000"
+  offset = "0x000000BC"
+  [[register.field]]
+    name = "ATTR_MSIX_CAP_TABLE_OFFSET"
+    bits = "12:0"
+    type = "rw"
+    shortdesc = '''MSI-X Table Offset bits 15:3.'''
+    longdesc = '''This value is transferred to the MSI-X Table Offset field. Set to 0 if MSI-X is not enabled.; EP=0x0400; RP=0x0000'''
+[[register]]
+  name = "ATTR_48"
+  type = "rw"
+  width = 32
+  description = "ATTR_48"
+  default = "0x00000003"
+  offset = "0x000000C0"
+  [[register.field]]
+    name = "ATTR_MSIX_CAP_TABLE_SIZE"
+    bits = "10:0"
+    type = "rw"
+    shortdesc = '''MSI-X Table Size.'''
+    longdesc = '''This value is transferred to the MSI-X Message Control[10:0] field. Set to 0 if MSI-X is not enabled. Note that the core does not implement the table; that must be implemented in user logic.; EP=0x0003; RP=0x0000'''
+[[register]]
+  name = "ATTR_49"
+  type = "rw"
+  width = 32
+  description = "ATTR_49"
+  default = "0x00001060"
+  offset = "0x000000C4"
+  [[register.field]]
+    name = "ATTR_PCIE_CAP_CAPABILITY_ID"
+    bits = "15:8"
+    type = "rw"
+    shortdesc = '''Capability ID for Express capability.'''
+    longdesc = '''Must be set to 10h; EP=0x0010; RP=0x0010'''
+  [[register.field]]
+    name = "ATTR_PCIE_BASE_PTR"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''Byte address of the base of the PCI Express (PCIE) Capability Structure.'''
+    longdesc = '''Any access to this structure (via either the link or the management port) is relative to this address; EP=0x0060; RP=0x0060'''
+[[register]]
+  name = "ATTR_50"
+  type = "rw"
+  width = 32
+  description = "ATTR_50"
+  default = "0x00009C02"
+  offset = "0x000000C8"
+  [[register.field]]
+    name = "ATTR_PCIE_CAP_NEXTPTR"
+    bits = "15:8"
+    type = "rw"
+    shortdesc = '''PCIe Capability's Next Capability Offset pointer to the next item in the capabilities list, or 00h if this is the final capability.'''
+    longdesc = '''; EP=0x009C; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_PCIE_CAP_DEVICE_PORT_TYPE"
+    bits = "7:4"
+    type = "rw"
+    shortdesc = '''Identifies the type of device/port as follows: 0000b PCI Express Endpoint device, 0001b Legacy PCI Express Endpoint device, 0100b Root Port of PCI Express Root Complex, 0101b Upstream Port of PCI Express Switch, 0110b Downstream Port of PCI Express Switch, 0111b PCIE Express to PCI/PCI-X Bridge, 1000b PCI/PCI-X to PCI Express Bridge.'''
+    longdesc = '''Transferred to PCI Express Capabilities register. Must be consistent with IS_SWITCH and UPSTREAM_FACING settings.; EP=0x0000; RP=0x0004'''
+  [[register.field]]
+    name = "ATTR_PCIE_CAP_CAPABILITY_VERSION"
+    bits = "3:0"
+    type = "rw"
+    shortdesc = '''Indicates PCI-SIG defined PCI Express capability structure version number.'''
+    longdesc = '''; EP=0x0002; RP=0x0002'''
+[[register]]
+  name = "ATTR_51"
+  type = "rw"
+  width = 32
+  description = "ATTR_51"
+  default = "0x00004021"
+  offset = "0x000000CC"
+  [[register.field]]
+    name = "ATTR_PM_BASE_PTR"
+    bits = "15:8"
+    type = "rw"
+    shortdesc = '''Byte address of the base of the Power Management (PM) Capability Structure.'''
+    longdesc = '''Any access to this structure (via either the link or the management port) is relative to this address. ; EP=0x0040; RP=0x0040'''
+  [[register.field]]
+    name = "ATTR_PCIE_REVISION"
+    bits = "7:4"
+    type = "rw"
+    shortdesc = '''Not currently in use.'''
+    longdesc = '''Need to correct this definition: '2' specifies PCI Express v2.0 compliance. '1' specifies PCI Express v1.1 compliance. '0' specifies PCI Express v1.0a compliance. '1' should be used. Not acted upon.; EP=0x0002; RP=0x0002'''
+  [[register.field]]
+    name = "ATTR_PCIE_CAP_SLOT_IMPLEMENTED"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''Slot Implemented.'''
+    longdesc = '''When TRUE, indicates that the PCI Express Link associated with this Port is connected to a slot (rather than to an integrated component). Valid only for Root Port of Root Complex and Downstream Port of Switch. Transferred to the PCI Express Capabilities register.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_PCIE_CAP_RSVD_15_14"
+    bits = "2:1"
+    type = "rw"
+    shortdesc = '''This sets the Reserved bits [15:14] of the PCIE Capability register.'''
+    longdesc = '''These should only be set to 0.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_PCIE_CAP_ON"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Indicates that the PCIE structures exists.'''
+    longdesc = '''If this is FALSE, then the PCIE structure cannot be accessed via either the link or the management port.; EP=0x0001; RP=0x0001'''
+[[register]]
+  name = "ATTR_52"
+  type = "rw"
+  width = 32
+  description = "ATTR_52"
+  default = "0x00000040"
+  offset = "0x000000D0"
+  [[register.field]]
+    name = "ATTR_PM_CAP_ID"
+    bits = "13:6"
+    type = "rw"
+    shortdesc = '''The capability identifier of power management capability.'''
+    longdesc = '''The value is transferred to the PM Capabilities Register[7:0].; EP=0x0001; RP=0x0001'''
+  [[register.field]]
+    name = "ATTR_PM_CAP_DSI"
+    bits = "5"
+    type = "rw"
+    shortdesc = '''Device Specific Initialization (DSI).'''
+    longdesc = '''Transferred to the PM Capabilities register[21].; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_PM_CAP_D2SUPPORT"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''D2 Support.'''
+    longdesc = '''Transferred to the PM Capabilities register[26].; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_PM_CAP_D1SUPPORT"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''D1 Support.'''
+    longdesc = '''Transferred to the PM Capabilities register[25].; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_PM_CAP_AUXCURRENT"
+    bits = "2:0"
+    type = "rw"
+    shortdesc = '''AUX Current.'''
+    longdesc = '''Requested aux current allocation. Transferred to the PM Capabilities register[24:22].; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_53"
+  type = "rw"
+  width = 32
+  description = "ATTR_53"
+  default = "0x00003D48"
+  offset = "0x000000D4"
+  [[register.field]]
+    name = "ATTR_PM_CAP_RSVD_04"
+    bits = "15"
+    type = "rw"
+    shortdesc = '''Reserved bit 20 of the PM Capabilities Register.'''
+    longdesc = '''This is expected to be tied to 0.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_PM_CAP_PMESUPPORT"
+    bits = "14:10"
+    type = "rw"
+    shortdesc = '''PME Support.'''
+    longdesc = '''These five bits indicate support for D3cold, D3hot, D2, D1 and D0 respectively. Transferred to the PM Capabilities register[31:27].; EP=0x000F; RP=0x000F'''
+  [[register.field]]
+    name = "ATTR_PM_CAP_PME_CLOCK"
+    bits = "9"
+    type = "rw"
+    shortdesc = '''When set indicates that a PCI clock is required for PME generation.'''
+    longdesc = '''This must be set to 0, [per the specification. The value is transferred to the PM Capabilities Register[19].; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_PM_CAP_ON"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''Indicates that the PM structures exists.'''
+    longdesc = '''If this is FALSE, then the PM structure cannot be accessed via either the link or the management port.; EP=0x0001; RP=0x0001'''
+  [[register.field]]
+    name = "ATTR_PM_CAP_NEXTPTR"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''PM Capability's Next Capability Offset pointer to the next item in the capabilities list, or 00h if this is the final capability.'''
+    longdesc = '''; EP=0x0048; RP=0x0060'''
+[[register]]
+  name = "ATTR_54"
+  type = "rw"
+  width = 32
+  description = "ATTR_54"
+  default = "0x00000023"
+  offset = "0x000000D8"
+  [[register.field]]
+    name = "ATTR_PM_DATA_SCALE4"
+    bits = "15:14"
+    type = "rw"
+    shortdesc = '''Power Management Data Scale register 4.'''
+    longdesc = '''Specifies the scale applied to PM_DATA4. The power consumption of the device is determined by multiplying the contents of the Base Power Data register field with the value corresponding to the encoding returned by this field. Defined encodings are: 0h 1.0x, 1h 0.1x, 2h 0.01x, 3h 0.001x; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_PM_DATA_SCALE3"
+    bits = "13:12"
+    type = "rw"
+    shortdesc = '''Power Management Data Scale register 3.'''
+    longdesc = '''Specifies the scale applied to PM_DATA3. The power consumption of the device is determined by multiplying the contents of the Base Power Data register field with the value corresponding to the encoding returned by this field. Defined encodings are: 0h 1.0x, 1h 0.1x, 2h 0.01x, 3h 0.001x; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_PM_DATA_SCALE2"
+    bits = "11:10"
+    type = "rw"
+    shortdesc = '''Power Management Data Scale register 2.'''
+    longdesc = '''Specifies the scale applied to PM_DATA2. The power consumption of the device is determined by multiplying the contents of the Base Power Data register field with the value corresponding to the encoding returned by this field. Defined encodings are: 0h 1.0x, 1h 0.1x, 2h 0.01x, 3h 0.001x; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_PM_DATA_SCALE1"
+    bits = "9:8"
+    type = "rw"
+    shortdesc = '''Power Management Data Scale register 1.'''
+    longdesc = '''Specifies the scale applied to PM_DATA1. The power consumption of the device is determined by multiplying the contents of the Base Power Data register field with the value corresponding to the encoding returned by this field. Defined encodings are: 0h 1.0x, 1h 0.1x, 2h 0.01x, 3h 0.001x; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_PM_DATA_SCALE0"
+    bits = "7:6"
+    type = "rw"
+    shortdesc = '''Power Management Data Scale register 0.'''
+    longdesc = '''Specifies the scale applied to PM_DATA0. The power consumption of the device is determined by multiplying the contents of the Base Power Data register field with the value corresponding to the encoding returned by this field. Defined encodings are: 0h 1.0x, 1h 0.1x, 2h 0.01x, 3h 0.001x; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_PM_CSR_NOSOFTRST"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "ATTR_PM_CSR_BPCCEN"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "ATTR_PM_CSR_B2B3"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "ATTR_PM_CAP_VERSION"
+    bits = "2:0"
+    type = "rw"
+    shortdesc = '''The version of power management spec followed.'''
+    longdesc = '''The value is transferred to the PM Capabilities Register[18:16].; EP=0x0003; RP=0x0003'''
+[[register]]
+  name = "ATTR_55"
+  type = "rw"
+  width = 32
+  description = "ATTR_55"
+  default = "0x00000000"
+  offset = "0x000000DC"
+  [[register.field]]
+    name = "ATTR_PM_DATA0"
+    bits = "13:6"
+    type = "rw"
+    shortdesc = '''Power Management Data register 0 (D0 Power Consumed).'''
+    longdesc = '''This value will appear in the Data field of the PM Status Register if the value 0000b is written by the host to the Data Select field of the PM Control Register. ; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_PM_DATA_SCALE7"
+    bits = "5:4"
+    type = "rw"
+    shortdesc = '''Power Management Data Scale register 7.'''
+    longdesc = '''Specifies the scale applied to PM_DATA7. The power consumption of the device is determined by multiplying the contents of the Base Power Data register field with the value corresponding to the encoding returned by this field. Defined encodings are: 0h 1.0x, 1h 0.1x, 2h 0.01x, 3h 0.001x; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_PM_DATA_SCALE6"
+    bits = "3:2"
+    type = "rw"
+    shortdesc = '''Power Management Data Scale register 6.'''
+    longdesc = '''Specifies the scale applied to PM_DATA6. The power consumption of the device is determined by multiplying the contents of the Base Power Data register field with the value corresponding to the encoding returned by this field. Defined encodings are: 0h 1.0x, 1h 0.1x, 2h 0.01x, 3h 0.001x; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_PM_DATA_SCALE5"
+    bits = "1:0"
+    type = "rw"
+    shortdesc = '''Power Management Data Scale register 5.'''
+    longdesc = '''Specifies the scale applied to PM_DATA5. The power consumption of the device is determined by multiplying the contents of the Base Power Data register field with the value corresponding to the encoding returned by this field. Defined encodings are: 0h 1.0x, 1h 0.1x, 2h 0.01x, 3h 0.001x; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_56"
+  type = "rw"
+  width = 32
+  description = "ATTR_56"
+  default = "0x00000000"
+  offset = "0x000000E0"
+  [[register.field]]
+    name = "ATTR_PM_DATA2"
+    bits = "15:8"
+    type = "rw"
+    shortdesc = '''Power Management Data register 2 (D2 Power Consumed).'''
+    longdesc = '''This value will appear in the Data field of the PM Status Register if the value 0010b is written by the host to the Data Select field of the PM Control Register. ; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_PM_DATA1"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''Power Management Data register 1 (D1 Power Consumed).'''
+    longdesc = '''This value will appear in the Data field of the PM Status Register if the value 0001b is written by the host to the Data Select field of the PM Control Register. ; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_57"
+  type = "rw"
+  width = 32
+  description = "ATTR_57"
+  default = "0x00000000"
+  offset = "0x000000E4"
+  [[register.field]]
+    name = "ATTR_PM_DATA4"
+    bits = "15:8"
+    type = "rw"
+    shortdesc = '''Power Management Data register 4 (D0 Power Dissipated).'''
+    longdesc = '''This value will appear in the Data field of the PM Status Register if the value 0100b is written by the host to the Data Select field of the PM Control Register. ; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_PM_DATA3"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''Power Management Data register 3 (D3 Power Consumed).'''
+    longdesc = '''This value will appear in the Data field of the PM Status Register if the value 0011b is written by the host to the Data Select field of the PM Control Register. ; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_58"
+  type = "rw"
+  width = 32
+  description = "ATTR_58"
+  default = "0x00000000"
+  offset = "0x000000E8"
+  [[register.field]]
+    name = "ATTR_PM_DATA6"
+    bits = "15:8"
+    type = "rw"
+    shortdesc = '''Power Management Data register 6 (D2 Power Dissipated).'''
+    longdesc = '''This value will appear in the Data field of the PM Status Register if the value 0110b is written by the host to the Data Select field of the PM Control Register. ; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_PM_DATA5"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''Power Management Data register 5 (D1 Power Dissipated).'''
+    longdesc = '''This value will appear in the Data field of the PM Status Register if the value 0101b is written by the host to the Data Select field of the PM Control Register. ; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_59"
+  type = "rw"
+  width = 32
+  description = "ATTR_59"
+  default = "0x00000000"
+  offset = "0x000000EC"
+  [[register.field]]
+    name = "ATTR_PM_DATA7"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''Power Management Data register 7 (D3 Power Dissipated).'''
+    longdesc = '''This value will appear in the Data field of the PM Status Register if the value 0111b is written by the host to the Data Select field of the PM Control Register. ; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_60"
+  type = "rw"
+  width = 32
+  description = "ATTR_60"
+  default = "0x00000178"
+  offset = "0x000000F0"
+  [[register.field]]
+    name = "ATTR_RBAR_BASE_PTR"
+    bits = "11:0"
+    type = "rw"
+    shortdesc = '''Byte address of the base of the Resizable BAR (RBAR) Capability Structure.'''
+    longdesc = '''Any access to this structure (via either the link or the management port) is relative to this address.; EP=0x0178; RP=0x0178'''
+[[register]]
+  name = "ATTR_61"
+  type = "rw"
+  width = 32
+  description = "ATTR_61"
+  default = "0x00000000"
+  offset = "0x000000F4"
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_ON"
+    bits = "12"
+    type = "rw"
+    shortdesc = '''Indicates that the RBAR structures exists.'''
+    longdesc = '''If this is FALSE, then the RBAR structure cannot be accessed via either the link or the management port. In Fuji, RBAR cannot be turned on in RC mode due to lack of testing.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_NEXTPTR"
+    bits = "11:0"
+    type = "rw"
+    shortdesc = '''Resizable BAR Capability's Next Capability Offset pointer to the next item in the capabilities list, or 000h if this is the final capability.'''
+    longdesc = '''; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_62"
+  type = "rw"
+  width = 32
+  description = "ATTR_62"
+  default = "0x00000015"
+  offset = "0x000000F8"
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_ID"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''The capability identifier of Resizable BAR capability.'''
+    longdesc = '''The value is transferred to the Resizable BAR Capabilities Register[15:0].; EP=0x0015; RP=0x0015'''
+[[register]]
+  name = "ATTR_63"
+  type = "rw"
+  width = 32
+  description = "ATTR_63"
+  default = "0x00000001"
+  offset = "0x000000FC"
+  [[register.field]]
+    name = "ATTR_RBAR_NUM"
+    bits = "6:4"
+    type = "rw"
+    shortdesc = '''The number of Resizable BARs in the cap structure.'''
+    longdesc = '''The value is transferred to the Resizable BAR Control Register(0) [7:5].; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_VERSION"
+    bits = "3:0"
+    type = "rw"
+    shortdesc = '''The version of Resizable BAR Capability followed.'''
+    longdesc = '''The value is transferred to the Resizable BAR Capabilities Register[19:16].; EP=0x0001; RP=0x0001'''
+[[register]]
+  name = "ATTR_64"
+  type = "rw"
+  width = 32
+  description = "ATTR_64"
+  default = "0x00000001"
+  offset = "0x00000100"
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_SUP0"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''BAR Size Supported vector for Resizable BAR Capability Register(0).'''
+    longdesc = '''Bits[3:0] and [31:24] sould always be driven to 0.; EP=0x0001; RP=0x0001'''
+[[register]]
+  name = "ATTR_65"
+  type = "rw"
+  width = 32
+  description = "ATTR_65"
+  default = "0x00000000"
+  offset = "0x00000104"
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_SUP0"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''BAR Size Supported vector for Resizable BAR Capability Register(0).'''
+    longdesc = '''Bits[3:0] and [31:24] sould always be driven to 0.; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_66"
+  type = "rw"
+  width = 32
+  description = "ATTR_66"
+  default = "0x00000001"
+  offset = "0x00000108"
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_SUP1"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''BAR Size Supported vector for Resizable BAR Capability Register(1).'''
+    longdesc = '''Bits[3:0] and [31:24] sould always be driven to 0.; EP=0x0001; RP=0x0001'''
+[[register]]
+  name = "ATTR_67"
+  type = "rw"
+  width = 32
+  description = "ATTR_67"
+  default = "0x00000000"
+  offset = "0x0000010C"
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_SUP1"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''BAR Size Supported vector for Resizable BAR Capability Register(1).'''
+    longdesc = '''Bits[3:0] and [31:24] sould always be driven to 0.; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_68"
+  type = "rw"
+  width = 32
+  description = "ATTR_68"
+  default = "0x00000001"
+  offset = "0x00000110"
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_SUP2"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''BAR Size Supported vector for Resizable BAR Capability Register(2).'''
+    longdesc = '''Bits[3:0] and [31:24] sould always be driven to 0.; EP=0x0001; RP=0x0001'''
+[[register]]
+  name = "ATTR_69"
+  type = "rw"
+  width = 32
+  description = "ATTR_69"
+  default = "0x00000000"
+  offset = "0x00000114"
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_SUP2"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''BAR Size Supported vector for Resizable BAR Capability Register(2).'''
+    longdesc = '''Bits[3:0] and [31:24] sould always be driven to 0.; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_70"
+  type = "rw"
+  width = 32
+  description = "ATTR_70"
+  default = "0x00000001"
+  offset = "0x00000118"
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_SUP3"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''BAR Size Supported vector for Resizable BAR Capability Register(3).'''
+    longdesc = '''Bits[3:0] and [31:24] sould always be driven to 0.; EP=0x0001; RP=0x0001'''
+[[register]]
+  name = "ATTR_71"
+  type = "rw"
+  width = 32
+  description = "ATTR_71"
+  default = "0x00000000"
+  offset = "0x0000011C"
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_SUP3"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''BAR Size Supported vector for Resizable BAR Capability Register(3).'''
+    longdesc = '''Bits[3:0] and [31:24] sould always be driven to 0.; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_72"
+  type = "rw"
+  width = 32
+  description = "ATTR_72"
+  default = "0x00000001"
+  offset = "0x00000120"
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_SUP4"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''BAR Size Supported vector for Resizable BAR Capability Register(4).'''
+    longdesc = '''Bits[3:0] and [31:24] sould always be driven to 0.; EP=0x0001; RP=0x0001'''
+[[register]]
+  name = "ATTR_73"
+  type = "rw"
+  width = 32
+  description = "ATTR_73"
+  default = "0x00000000"
+  offset = "0x00000124"
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_SUP4"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''BAR Size Supported vector for Resizable BAR Capability Register(4).'''
+    longdesc = '''Bits[3:0] and [31:24] sould always be driven to 0.; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_74"
+  type = "rw"
+  width = 32
+  description = "ATTR_74"
+  default = "0x00000001"
+  offset = "0x00000128"
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_SUP5"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''BAR Size Supported vector for Resizable BAR Capability Register(5).'''
+    longdesc = '''Bits[3:0] and [31:24] sould always be driven to 0.; EP=0x0001; RP=0x0001'''
+[[register]]
+  name = "ATTR_75"
+  type = "rw"
+  width = 32
+  description = "ATTR_75"
+  default = "0x00000000"
+  offset = "0x0000012C"
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_SUP5"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''BAR Size Supported vector for Resizable BAR Capability Register(5).'''
+    longdesc = '''Bits[3:0] and [31:24] sould always be driven to 0.; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_76"
+  type = "rw"
+  width = 32
+  description = "ATTR_76"
+  default = "0x00000000"
+  offset = "0x00000130"
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_INDEX4"
+    bits = "14:12"
+    type = "rw"
+    shortdesc = '''BAR Index value for Resizable BAR Control Register(4).'''
+    longdesc = '''Set to 0 if 4 or fewer BARs can be resized. This value should not be lower than the value on RBAR_CAP_INDEX0,1,2,3. ; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_INDEX3"
+    bits = "11:9"
+    type = "rw"
+    shortdesc = '''BAR Index value for Resizable BAR Control Register(3).'''
+    longdesc = '''Set to 0 if 3 or fewer BARs can be resized. This value should not be lower than the value on RBAR_CAP_INDEX0,1,2. ; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_INDEX2"
+    bits = "8:6"
+    type = "rw"
+    shortdesc = '''BAR Index value for Resizable BAR Control Register(2).'''
+    longdesc = '''Set to 0 if 2 or fewer BARs can be resized. This value should not be lower than the value on RBAR_CAP_INDEX0,1. ; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_INDEX1"
+    bits = "5:3"
+    type = "rw"
+    shortdesc = '''BAR Index value for Resizable BAR Control Register(1).'''
+    longdesc = '''Set to 0 if 1 or fewer BARs can be resized. This value should not be lower than the value on RBAR_CAP_INDEX0. ; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_INDEX0"
+    bits = "2:0"
+    type = "rw"
+    shortdesc = '''BAR Index value for Resizable BAR Control Register(0).'''
+    longdesc = '''This value must be the lowest BAR Index of the resizable BARs.; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_77"
+  type = "rw"
+  width = 32
+  description = "ATTR_77"
+  default = "0x00000000"
+  offset = "0x00000134"
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_CONTROL_ENCODEDBAR1"
+    bits = "12:8"
+    type = "rw"
+    shortdesc = '''Initial value for the 2nd RBAR Control "BAR Size" field (if any).'''
+    longdesc = '''Encoding is 0=1MB, 1=2MB,2=4MB,etc. This value must correspond to the size requested in the attribute BARx (where x is the value of RBAR_CAP_INDEX1). For instance, if RBAR_CAP_INDEX1=3, and BAR3 requests a 16MB aperture, then this attribute must be set to 4 (meaning 16MB).; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_CONTROL_ENCODEDBAR0"
+    bits = "7:3"
+    type = "rw"
+    shortdesc = '''Initial value for the 1st RBAR Control "BAR Size" field (if any).'''
+    longdesc = '''Encoding is 0=1MB, 1=2MB,2=4MB,etc. This value must correspond to the size requested in the attribute BARx (where x is the value of RBAR_CAP_INDEX0). For instance, if RBAR_CAP_INDEX0=3, and BAR3 requests a 16MB aperture, then this attribute must be set to 4 (meaning 16MB).; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_INDEX5"
+    bits = "2:0"
+    type = "rw"
+    shortdesc = '''BAR Index value for Resizable BAR Control Register(5).'''
+    longdesc = '''Set to 0 if 5 or fewer BARs can be resized. This value should not be lower than the value on RBAR_CAP_INDEX0,1,2,3,4. ; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_78"
+  type = "rw"
+  width = 32
+  description = "ATTR_78"
+  default = "0x00000000"
+  offset = "0x00000138"
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_CONTROL_ENCODEDBAR4"
+    bits = "14:10"
+    type = "rw"
+    shortdesc = '''Initial value for the 5th RBAR Control "BAR Size" field (if any).'''
+    longdesc = '''Encoding is 0=1MB, 1=2MB,2=4MB,etc. This value must correspond to the size requested in the attribute BARx (where x is the value of RBAR_CAP_INDEX4). For instance, if RBAR_CAP_INDEX4=3, and BAR3 requests a 16MB aperture, then this attribute must be set to 4 (meaning 16MB).; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_CONTROL_ENCODEDBAR3"
+    bits = "9:5"
+    type = "rw"
+    shortdesc = '''Initial value for the 4th RBAR Control "BAR Size" field (if any).'''
+    longdesc = '''Encoding is 0=1MB, 1=2MB,2=4MB,etc. This value must correspond to the size requested in the attribute BARx (where x is the value of RBAR_CAP_INDEX3). For instance, if RBAR_CAP_INDEX3=3, and BAR3 requests a 16MB aperture, then this attribute must be set to 4 (meaning 16MB).; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_CONTROL_ENCODEDBAR2"
+    bits = "4:0"
+    type = "rw"
+    shortdesc = '''Initial value for the 3rd RBAR Control "BAR Size" field (if any).'''
+    longdesc = '''Encoding is 0=1MB, 1=2MB,2=4MB,etc. This value must correspond to the size requested in the attribute BARx (where x is the value of RBAR_CAP_INDEX2). For instance, if RBAR_CAP_INDEX2=3, and BAR3 requests a 16MB aperture, then this attribute must be set to 4 (meaning 16MB).; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_79"
+  type = "rw"
+  width = 32
+  description = "ATTR_79"
+  default = "0x00000000"
+  offset = "0x0000013C"
+  [[register.field]]
+    name = "ATTR_SLOT_CAP_NO_CMD_COMPLETED_SUPPORT"
+    bits = "13"
+    type = "rw"
+    shortdesc = '''No Command Completed Support.'''
+    longdesc = '''When TRUE, indicates that Slot doesn't issue SW notification when HotPlug Controller completes command. Transferred to the Slot Capabilities register.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_SLOT_CAP_MRL_SENSOR_PRESENT"
+    bits = "12"
+    type = "rw"
+    shortdesc = '''MRL Sensor Present.'''
+    longdesc = '''When TRUE, indicates that a MRL (Manually-operated Retention Latch) sensor is implemented on the chassis for this slot. Transferred to the Slot Capabilities register.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_SLOT_CAP_HOTPLUG_SURPRISE"
+    bits = "11"
+    type = "rw"
+    shortdesc = '''Hot-Plug Surprise.'''
+    longdesc = '''When TRUE, indicates that a device present in this slot might be removed from the system without any prior notification. Transferred to the Slot Capabilities register.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_SLOT_CAP_HOTPLUG_CAPABLE"
+    bits = "10"
+    type = "rw"
+    shortdesc = '''Hot-Plug Capable.'''
+    longdesc = '''When TRUE, indicates that this slot is capable of supporting Hot-Plug operations. Transferred to the Slot Capabilities register.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_SLOT_CAP_ELEC_INTERLOCK_PRESENT"
+    bits = "9"
+    type = "rw"
+    shortdesc = '''Electromechanical Interlock Present.'''
+    longdesc = '''When TRUE, indicates that an Electromechanical Interlock is implemented on the chassis for this slot. Transferred to the Slot Capabilities register.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_SLOT_CAP_ATT_INDICATOR_PRESENT"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''Attention Indicator Present.'''
+    longdesc = '''When TRUE, indicates that an Attention Indicator is implemented on the chassis for this slot. Transferred to the Slot Capabilities register.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_SLOT_CAP_ATT_BUTTON_PRESENT"
+    bits = "7"
+    type = "rw"
+    shortdesc = '''Attention Button Present.'''
+    longdesc = '''When TRUE, indicates that an Attention Button is implemented on the chassis for this slot. Transferred to the Slot Capabilities register.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_ROOT_CAP_CRS_SW_VISIBILITY"
+    bits = "5"
+    type = "rw"
+    shortdesc = '''CRS SW Visibility.'''
+    longdesc = '''Indicates RC can return CRS to SW. Transferred to the Root Capabilities register.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_RBAR_CAP_CONTROL_ENCODEDBAR5"
+    bits = "4:0"
+    type = "rw"
+    shortdesc = '''Initial value for the 6th RBAR Control "BAR Size" field (if any).'''
+    longdesc = '''Encoding is 0=1MB, 1=2MB,2=4MB,etc. This value must correspond to the size requested in the attribute BARx (where x is the value of RBAR_CAP_INDEX5). For instance, if RBAR_CAP_INDEX5=3, and BAR3 requests a 16MB aperture, then this attribute must be set to 4 (meaning 16MB).; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_80"
+  type = "rw"
+  width = 32
+  description = "ATTR_80"
+  default = "0x00000000"
+  offset = "0x00000140"
+  [[register.field]]
+    name = "ATTR_SLOT_CAP_POWER_INDICATOR_PRESENT"
+    bits = "14"
+    type = "rw"
+    shortdesc = '''Power Indicator Present.'''
+    longdesc = '''When TRUE, indicates that a Power Indicator is implemented on the chassis for this slot. Transferred to the Slot Capabilities register.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_SLOT_CAP_POWER_CONTROLLER_PRESENT"
+    bits = "13"
+    type = "rw"
+    shortdesc = '''Power Controller Present.'''
+    longdesc = '''When TRUE, indicates that a Power Controller is implemented for this slot. Transferred to the Slot Capabilities register.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_SLOT_CAP_PHYSICAL_SLOT_NUM"
+    bits = "12:0"
+    type = "rw"
+    shortdesc = '''Physical Slot Number.'''
+    longdesc = '''The physical slot number attached to this Port. Required to be globally unique within the chassis. Where the port is connected to devices that are either integrated on the system board or integrated within the same silicon as the Switch device or the Root port, this field should be set to 0. Transferred to the Slot Capabilities register.; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_81"
+  type = "rw"
+  width = 32
+  description = "ATTR_81"
+  default = "0x00000000"
+  offset = "0x00000144"
+  [[register.field]]
+    name = "ATTR_SLOT_CAP_SLOT_POWER_LIMIT_VALUE"
+    bits = "9:2"
+    type = "rw"
+    shortdesc = '''Slot Power Limit Value.'''
+    longdesc = '''Upper limit on the power supplied to the slot (in watts) is given by multiplying this value by the value in the Slot Power Limit Scale field. Transferred to the Slot Capabilities register.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_SLOT_CAP_SLOT_POWER_LIMIT_SCALE"
+    bits = "1:0"
+    type = "rw"
+    shortdesc = '''Slot Power Limit Scale.'''
+    longdesc = '''Specifies the scale used for the Slot Power Limit Value. Valid settings are: 0h 1.0x, 1h 0.1x, 2h 0.01x, 3h 0.001x Transferred to the Slot Capabilities register.; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_82"
+  type = "rw"
+  width = 32
+  description = "ATTR_82"
+  default = "0x0000010C"
+  offset = "0x00000148"
+  [[register.field]]
+    name = "ATTR_VC_BASE_PTR"
+    bits = "11:0"
+    type = "rw"
+    shortdesc = '''Byte address of the base of the Virtual Channel (VC) Capability Structure.'''
+    longdesc = '''Any access to this structure (via either the link or the management port) is relative to this address.; EP=0x010C; RP=0x010C'''
+[[register]]
+  name = "ATTR_83"
+  type = "rw"
+  width = 32
+  description = "ATTR_83"
+  default = "0x00001128"
+  offset = "0x0000014C"
+  [[register.field]]
+    name = "ATTR_VC_CAP_ON"
+    bits = "12"
+    type = "rw"
+    shortdesc = '''Indicates that the VC structures exists.'''
+    longdesc = '''If this is FALSE, then the VC structure cannot be accessed via either the link or the management port.; EP=0x0001; RP=0x0001'''
+  [[register.field]]
+    name = "ATTR_VC_CAP_NEXTPTR"
+    bits = "11:0"
+    type = "rw"
+    shortdesc = '''Virtual Channel Capability's Next Capability Offset pointer to the next item in the capabilities list, or 000h if this is the final capability.'''
+    longdesc = '''; EP=0x0128; RP=0x0128'''
+[[register]]
+  name = "ATTR_84"
+  type = "rw"
+  width = 32
+  description = "ATTR_84"
+  default = "0x00000002"
+  offset = "0x00000150"
+  [[register.field]]
+    name = "ATTR_VC_CAP_ID"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''The capability identifier of Virtual Channel capability.'''
+    longdesc = '''The value is transferred to the VC Capabilities Register[15:0].; EP=0x0002; RP=0x0002'''
+[[register]]
+  name = "ATTR_85"
+  type = "rw"
+  width = 32
+  description = "ATTR_85"
+  default = "0x00000250"
+  offset = "0x00000154"
+  [[register.field]]
+    name = "ATTR_VSEC_BASE_PTR"
+    bits = "12:1"
+    type = "rw"
+    shortdesc = '''Byte address of the base of the Vendor-Specific Capability Structure.'''
+    longdesc = '''Any access to this structure (via either the link or the management port) is relative to this address. ; EP=0x0128; RP=0x0128'''
+  [[register.field]]
+    name = "ATTR_VC_CAP_REJECT_SNOOP_TRANSACTIONS"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Reject Snoop Transaction.'''
+    longdesc = '''When TRUE, indicates any TLP with "No Snoop" bit set can be rejected as UR. Transferred to VC Resource Capability Register.; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_86"
+  type = "rw"
+  width = 32
+  description = "ATTR_86"
+  default = "0x00001234"
+  offset = "0x00000158"
+  [[register.field]]
+    name = "ATTR_VSEC_CAP_HDR_ID"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''The vendor-defined ID number of the Vendor-Specific Capability.'''
+    longdesc = '''The value is transferred to the VSEC Header Register[15:0].; EP=0x1234; RP=0x1234'''
+[[register]]
+  name = "ATTR_87"
+  type = "rw"
+  width = 32
+  description = "ATTR_87"
+  default = "0x00001018"
+  offset = "0x0000015C"
+  [[register.field]]
+    name = "ATTR_VSEC_CAP_HDR_REVISION"
+    bits = "15:12"
+    type = "rw"
+    shortdesc = '''The revision of the Vendor-Specific Capability followed.'''
+    longdesc = '''The value is transferred to the VSEC Header Register[19:16].; EP=0x0001; RP=0x0001'''
+  [[register.field]]
+    name = "ATTR_VSEC_CAP_HDR_LENGTH"
+    bits = "11:0"
+    type = "rw"
+    shortdesc = '''The length of the Vendor-Specific Capability in bytes, including the Cap header itself.'''
+    longdesc = '''The value is transferred to the VSEC Header Register[31:20].; EP=0x0018; RP=0x0018'''
+[[register]]
+  name = "ATTR_88"
+  type = "rw"
+  width = 32
+  description = "ATTR_88"
+  default = "0x0000000B"
+  offset = "0x00000160"
+  [[register.field]]
+    name = "ATTR_VSEC_CAP_ID"
+    bits = "15:0"
+    type = "rw"
+    shortdesc = '''The capability identifier of the Vendor-Specific Capability.'''
+    longdesc = '''The value is transferred to the VSEC Capabilities Register[15:0]. This structure is used to implement the Xilinx-specific loopback control registers.; EP=0x000B; RP=0x000B'''
+[[register]]
+  name = "ATTR_89"
+  type = "rw"
+  width = 32
+  description = "ATTR_89"
+  default = "0x00002281"
+  offset = "0x00000164"
+  [[register.field]]
+    name = "ATTR_VSEC_CAP_ON"
+    bits = "13"
+    type = "rw"
+    shortdesc = '''Indicates that the VSEC structures exists.'''
+    longdesc = '''If this is FALSE, then the VSEC structure cannot be accessed via either the link or the management port.; EP=0x0001; RP=0x0001'''
+  [[register.field]]
+    name = "ATTR_VSEC_CAP_NEXTPTR"
+    bits = "12:1"
+    type = "rw"
+    shortdesc = '''VSEC's Next Capability Offset pointer to the next item in the capabilities list, or 000h if this is the final capability.'''
+    longdesc = '''; EP=0x0140; RP=0x0140'''
+  [[register.field]]
+    name = "ATTR_VSEC_CAP_IS_LINK_VISIBLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''The VSEC structure can be detected by link-side config accesses if TRUE.'''
+    longdesc = '''Otherwise, it is only user-side visible.; EP=0x0001; RP=0x0001'''
+[[register]]
+  name = "ATTR_90"
+  type = "rw"
+  width = 32
+  description = "ATTR_90"
+  default = "0x00000031"
+  offset = "0x00000168"
+  [[register.field]]
+    name = "ATTR_VSEC_CAP_VERSION"
+    bits = "3:0"
+    type = "rw"
+    shortdesc = '''The version of the Vendor-Specific Capability followed.'''
+    longdesc = '''The value is transferred to the VSEC Capabilities Register[19:16].; EP=0x0001; RP=0x0001'''
+[[register]]
+  name = "ATTR_91"
+  type = "rw"
+  width = 32
+  description = "ATTR_91"
+  default = "0x00000000"
+  offset = "0x0000016C"
+  [[register.field]]
+    name = "ATTR_LL_ACK_TIMEOUT_EN"
+    bits = "15"
+    type = "rw"
+    shortdesc = '''Enables the Ack/Nak Latency Timer to use the user-defined LL_ACK_TIMEOUT value (or combined with the built-in value, depending on LL_ACK_TIMEOUT_FUNC).'''
+    longdesc = '''If FALSE, the built-in value is used.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_LL_ACK_TIMEOUT"
+    bits = "14:0"
+    type = "rw"
+    shortdesc = '''Sets a user-defined timeout for the Ack/Nak Latency Timer to force any pending ACK or NAK DLLPs to be transmitted; refer to LL_ACK_TIMEOUT_EN and LL_ACK_TIMEOUT_FUNC to see how this value is used.'''
+    longdesc = '''The unit for this attribute is in symbol times, which is 4ns at GEN1 speeds and 2ns at GEN2.; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_92"
+  type = "rw"
+  width = 32
+  description = "ATTR_92"
+  default = "0x00000000"
+  offset = "0x00000170"
+  [[register.field]]
+    name = "ATTR_LL_ACK_TIMEOUT_FUNC"
+    bits = "1:0"
+    type = "rw"
+    shortdesc = '''Defines how LL_ACK_TIMEOUT is to be used, if enabled with LL_ACK_TIMEOUT_EN (otherwise, this is not used).'''
+    longdesc = '''0 = Absolute Value on LL_ACK_TIMEOUT 1 = Add LL_ACK_TIMEOUT to the built-in table value 2 = Subtract LL_ACK_TIMEOUT from the built-in table value It is the user's responsibility to ensure that if "1" is chosen, the timeout value does not overflow the 15-bit field. The core will prevent underflows if option "2" is chosen (final value will be 0 for that case).; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_93"
+  type = "rw"
+  width = 32
+  description = "ATTR_93"
+  default = "0x00000000"
+  offset = "0x00000174"
+  [[register.field]]
+    name = "ATTR_LL_REPLAY_TIMEOUT_EN"
+    bits = "15"
+    type = "rw"
+    shortdesc = '''Enables the Replay Timer to use the user-defined LL_REPLAY_TIMEOUT value (or combined with the built-in value, depending on LL_REPLAY_TIMEOUT_FUNC).'''
+    longdesc = '''If FALSE, the built-in value is used.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_LL_REPLAY_TIMEOUT"
+    bits = "14:0"
+    type = "rw"
+    shortdesc = '''Sets a user-defined timeout for the Replay Timer to force cause the retransmission of unacknowledged TLPs; refer to LL_REPLAY_TIMEOUT_EN and LL_REPLAY_TIMEOUT_FUNC to see how this value is used.'''
+    longdesc = '''The unit for this attribute is in symbol times, which is 4ns at GEN1 speeds and 2ns at GEN2.; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_94"
+  type = "rw"
+  width = 32
+  description = "ATTR_94"
+  default = "0x00000001"
+  offset = "0x00000178"
+  [[register.field]]
+    name = "ATTR_LL_REPLAY_TIMEOUT_FUNC"
+    bits = "1:0"
+    type = "rw"
+    shortdesc = '''Defines how LL_REPLAY_TIMEOUT is to be used, if enabled with LL_REPLAY_TIMEOUT_EN (otherwise, this is not used).'''
+    longdesc = '''0 = Absolute Value on LL_REPLAY_TIMEOUT 1 = Add to the built-in table value 2 = Subtract from the built-in table value It is the user's responsibility to ensure that if "1" is chosen, the timeout value does not overflow the 15-bit field. The core will prevent underflows if option "2" is chosen (final value will be 0 for that case).; EP=0x0001; RP=0x0001'''
+[[register]]
+  name = "ATTR_95"
+  type = "rw"
+  width = 32
+  description = "ATTR_95"
+  default = "0x00000000"
+  offset = "0x0000017C"
+  [[register.field]]
+    name = "ATTR_PM_ASPML0S_TIMEOUT_EN"
+    bits = "15"
+    type = "rw"
+    shortdesc = '''Enables the ASPM L0S Timer to use the user-defined PM_ASPML0S_TIMEOUT value (or combined with the built-in value, depending on PM_ASPML0S_TIMEOUT_FUNC).'''
+    longdesc = '''If FALSE, the built-in value is used.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_PM_ASPML0S_TIMEOUT"
+    bits = "14:0"
+    type = "rw"
+    shortdesc = '''Sets a user-defined timeout for the ASPM L0s Timer; refer to PM_ASPML0S_TIMEOUT_EN and PM_ASPML0S_TIMEOUT_FUNC to see how this value is used.'''
+    longdesc = '''The unit for this attribute is in symbol times, which is 4ns at GEN1 speeds and 2ns at GEN2.; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_96"
+  type = "rw"
+  width = 32
+  description = "ATTR_96"
+  default = "0x00000028"
+  offset = "0x00000180"
+  [[register.field]]
+    name = "ATTR_INFER_EI"
+    bits = "10:6"
+    type = "rw"
+    shortdesc = '''Directs the Physical Layer to add the inferred electrical idle behavior to the specified LTSSM state when the respective bit is set to 1b.'''
+    longdesc = '''Bit 0 for L0, bit 1 for Recovery.RcvrCfg, bit 2 for Recovery.Speed when successful_speed_negotiation = 1b, bit 3 for Recovery.Speed when successful_speed_negotiation = 0b, bit 4 for Loopback.Active (as slave); EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_ENTER_RVRY_EI_L0"
+    bits = "5"
+    type = "rw"
+    shortdesc = '''TRUE is the only allowed setting for this attribute.'''
+    longdesc = '''When set to TRUE the device enters recovery from the L0 state on one of the two conditions, EI inference (if INFER_EI[0] is set to 1b) or analog electrical idle [if INFER_EI[0] is set to 0b) without receiving EIOS.; EP=0x0001; RP=0x0001'''
+  [[register.field]]
+    name = "ATTR_DISABLE_SCRAMBLING"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "ATTR_PM_ASPM_FASTEXIT"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Not currently in use.'''
+    longdesc = '''; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_PM_ASPML0S_TIMEOUT_FUNC"
+    bits = "1:0"
+    type = "rw"
+    shortdesc = '''Defines how PM_ASPML0S_TIMEOUT is to be used, if enabled with PM_ASPML0S_TIMEOUT_EN (otherwise, this is not used).'''
+    longdesc = '''0 = Absolute Value on PM_ASPML0S_TIMEOUT 1 = Add PM_ASPML0S_TIMEOUT to the built-in table value 2 = Subtract PM_ASPML0S_TIMEOUT from the built-in table value 3 = 7us - PM_ASPML0S_TIMEOUT It is the user's responsibility to ensure that if "1" is chosen, the timeout value does not overflow the 15-bit field. The core will prevent underflows if option "2" is chosen (final value will be 0 for that case).; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_97"
+  type = "rw"
+  width = 32
+  description = "ATTR_97"
+  default = "0x00000104"
+  offset = "0x00000184"
+  [[register.field]]
+    name = "ATTR_LTSSM_MAX_LINK_WIDTH"
+    bits = "11:6"
+    type = "rw"
+    shortdesc = '''Used by LTSSM to set Maximum Link Width.'''
+    longdesc = '''Valid settings are: 000001b [x1], 000010b [x2], 000100b [x4], 001000b [x8].; EP=0x0004; RP=0x0004'''
+  [[register.field]]
+    name = "ATTR_LINK_CAP_MAX_LINK_WIDTH"
+    bits = "5:0"
+    type = "rw"
+    shortdesc = '''Maximum Link Width.'''
+    longdesc = '''Valid settings are: 000001b x1, 000010b x2, 000100b x4, 001000b x8.; EP=0x0004; RP=0x0004'''
+[[register]]
+  name = "ATTR_98"
+  type = "rw"
+  width = 32
+  description = "ATTR_98"
+  default = "0x0000FFFF"
+  offset = "0x00000188"
+  [[register.field]]
+    name = "ATTR_N_FTS_COMCLK_GEN2"
+    bits = "15:8"
+    type = "rw"
+    shortdesc = '''Sets the number of FTS sequences advertised in the TS1 Ordered Sets when the Link Configuration register shows that a common clock source is selected (used for all lanes when operating at 5.'''
+    longdesc = '''0 GT/s); EP=0x00FF; RP=0x00FF'''
+  [[register.field]]
+    name = "ATTR_N_FTS_COMCLK_GEN1"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''Sets the number of FTS sequences advertised in the TS1 Ordered Sets when the Link Configuration register shows that a common clock source is selected (used for all lanes when operating at 2.'''
+    longdesc = '''5 GT/s); EP=0x00FF; RP=0x00FF'''
+[[register]]
+  name = "ATTR_99"
+  type = "rw"
+  width = 32
+  description = "ATTR_99"
+  default = "0x0000FFFF"
+  offset = "0x0000018C"
+  [[register.field]]
+    name = "ATTR_N_FTS_GEN2"
+    bits = "15:8"
+    type = "rw"
+    shortdesc = '''Sets the number of FTS sequences advertised in the TS1 Ordered Sets when the Link Configuration register shows that a common clock source is not selected (used for all lanes when operating at 5.'''
+    longdesc = '''0 GT/s); EP=0x00FF; RP=0x00FF'''
+  [[register.field]]
+    name = "ATTR_N_FTS_GEN1"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''Sets the number of FTS sequences advertised in the TS1 Ordered Sets when the Link Configuration register shows that a common clock source is not selected (used for all lanes when operating at 2.'''
+    longdesc = '''5 GT/s); EP=0x00FF; RP=0x00FF'''
+[[register]]
+  name = "ATTR_100"
+  type = "rw"
+  width = 32
+  description = "ATTR_100"
+  default = "0x000000F0"
+  offset = "0x00000190"
+  [[register.field]]
+    name = "ATTR_DNSTREAM_LINK_NUM"
+    bits = "15:8"
+    type = "rw"
+    shortdesc = '''Used in downstream facing mode only.'''
+    longdesc = '''Specified the link number that this device will advertise in TS1 and TS2 during link training.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_EXIT_LOOPBACK_ON_EI"
+    bits = "7"
+    type = "rw"
+    shortdesc = '''When TRUE allows LTSSM (loopback slave at 2.'''
+    longdesc = '''5GT/s) to exit from Loopback.Active on RX Electrical Idle. When FALSE this optional arc is disabled; EP=0x0001; RP=0x0001'''
+  [[register.field]]
+    name = "ATTR_UPSTREAM_FACING"
+    bits = "6"
+    type = "rw"
+    shortdesc = '''TRUE specifies upstream-facing port.'''
+    longdesc = '''FALSE specifies downstream-facing port.; EP=0x0001; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_UPCONFIG_CAPABLE"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "ATTR_PL_AUTO_CONFIG"
+    bits = "3:1"
+    type = "rw"
+    shortdesc = '''Bypass link width negotiation in LTSSM Configuration states.'''
+    longdesc = '''Link will configure to x1, x2, x4 or x8 when the value of this attribute is 100, 101, 110 or 111 respectively. When this attribute is 0xx, link width negotiation will not be bypassed; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_101"
+  type = "rw"
+  width = 32
+  description = "ATTR_101"
+  default = "0x00000000"
+  offset = "0x00000194"
+  [[register.field]]
+    name = "ATTR_ENABLE_MSG_ROUTE"
+    bits = "15:5"
+    type = "rw"
+    shortdesc = '''Enable the routing of message TLPs to the user through the TRN RX interface.'''
+    longdesc = '''A bit value of 1 enables routing of the message TLP to the user. Messages are always decoded by the message decoder. Bit 0 - ERR COR, Bit 1 - ERR NONFATAL, Bit 2 - ERR FATAL, Bit 3 - INTA Bit 4 - INTB, Bit 5 - INTC, Bit 6 - INTD, Bit 7 PM_PME, Bit 8 - PME_TO_ACK, Bit 9 - unlock, Bit 10 PME_Turn_Off; EP=0x0000; RP=0x07FF'''
+  [[register.field]]
+    name = "ATTR_DISABLE_RX_POISONED_RESP"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''Disable error message and status bit response due to receiving a Poisoned TLP.'''
+    longdesc = '''; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_DISABLE_RX_TC_FILTER"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "ATTR_DISABLE_ID_CHECK"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "ATTR_DISABLE_BAR_FILTERING"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Disable BAR filtering.'''
+    longdesc = '''Does not change the behavior of the bar hit outputs; EP=0x0000; RP=0x0001'''
+  [[register.field]]
+    name = "ATTR_DISABLE_ASPM_L1_TIMER"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Disables the internal timer that causes an Upstream Port enter into ASPM L1.'''
+    longdesc = '''; EP=0x0000; RP=0x0000'''
+[[register]]
+  name = "ATTR_102"
+  type = "rw"
+  width = 32
+  description = "ATTR_102"
+  default = "0x00008008"
+  offset = "0x00000198"
+  [[register.field]]
+    name = "ATTR_ENABLE_RX_TD_ECRC_TRIM"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "ATTR_103"
+  type = "rw"
+  width = 32
+  description = "ATTR_103"
+  default = "0x00000022"
+  offset = "0x0000019C"
+  [[register.field]]
+    name = "ATTR_VC0_CPL_INFINITE"
+    bits = "5"
+    type = "rw"
+    shortdesc = '''The block will advertise infinite completions.'''
+    longdesc = '''This must be set to 1. Setting this field to 0 (finite completion credits) is not supported for EP and Root configurations; EP=0x0001; RP=0x0001'''
+  [[register.field]]
+    name = "ATTR_VC_CAP_VERSION"
+    bits = "4:1"
+    type = "rw"
+    shortdesc = '''The version of Virtual Channel Capability followed.'''
+    longdesc = '''The value is transferred to the VC Capabilities Register[19:16]; EP=0x0001; RP=0x0001'''
+  [[register.field]]
+    name = "ATTR_TL_TX_RAM_WRITE_LATENCY"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "ATTR_104"
+  type = "rw"
+  width = 32
+  description = "ATTR_104"
+  default = "0x000003FF"
+  offset = "0x000001A0"
+  [[register.field]]
+    name = "ATTR_VC0_RX_RAM_LIMIT"
+    bits = "12:0"
+    type = "rw"
+[[register]]
+  name = "ATTR_105"
+  type = "rw"
+  width = 32
+  description = "ATTR_105"
+  default = "0x00000172"
+  offset = "0x000001A4"
+  [[register.field]]
+    name = "ATTR_VC0_TOTAL_CREDITS_CD"
+    bits = "10:0"
+    type = "rw"
+    shortdesc = '''Number of credits that should be advertised for Completion data received on Virtual Channel 0.'''
+    longdesc = '''The bytes advertised must be less than or equal to the bram bytes available. See VC0_RX_RAM_LIMIT; EP=0x0172; RP=0x00CD'''
+[[register]]
+  name = "ATTR_106"
+  type = "rw"
+  width = 32
+  description = "ATTR_106"
+  default = "0x00000248"
+  offset = "0x000001A8"
+  [[register.field]]
+    name = "ATTR_VC0_TOTAL_CREDITS_NPH"
+    bits = "13:7"
+    type = "rw"
+    shortdesc = '''Number of credits that should be advertised for Non-Posted headers received on Virtual Channel 0.'''
+    longdesc = '''The number of non posted data credits advertised by the block is equal to the number of non posted header credits. The sum of the posted, non posted, and completion header credits must be <= 80; EP=0x0004; RP=0x000C'''
+  [[register.field]]
+    name = "ATTR_VC0_TOTAL_CREDITS_CH"
+    bits = "6:0"
+    type = "rw"
+    shortdesc = '''Number of credits that should be advertised for Completion headers received on Virtual Channel 0.'''
+    longdesc = '''The sum of the posted, non posted, and completion header credits must be <= 80; EP=0x0048; RP=0x0024'''
+[[register]]
+  name = "ATTR_107"
+  type = "rw"
+  width = 32
+  description = "ATTR_107"
+  default = "0x00000008"
+  offset = "0x000001AC"
+  [[register.field]]
+    name = "ATTR_VC0_TOTAL_CREDITS_NPD"
+    bits = "10:0"
+    type = "rw"
+    shortdesc = '''Number of credits that should be advertised for Non-Posted data received on Virtual Channel 0.'''
+    longdesc = '''The number of non posted data credits advertised by the block is equal to two times the number of non posted header credits if atomic operations are supported or is equal to the number of non posted header credits if atomic operations are not supported. The bytes advertised must be less than or equal to the bram bytes available. See VC0_RX_RAM_LIMIT; EP=0x0008; RP=0x0018'''
+[[register]]
+  name = "ATTR_108"
+  type = "rw"
+  width = 32
+  description = "ATTR_108"
+  default = "0x00000020"
+  offset = "0x000001B0"
+  [[register.field]]
+    name = "ATTR_VC0_TOTAL_CREDITS_PD"
+    bits = "10:0"
+    type = "rw"
+    shortdesc = '''Number of credits that should be advertised for Posted data received on Virtual Channel 0.'''
+    longdesc = '''The bytes advertised must be less than or equal to the bram bytes available. See VC0_RX_RAM_LIMIT; EP=0x0020; RP=0x00B5'''
+[[register]]
+  name = "ATTR_109"
+  type = "rw"
+  width = 32
+  description = "ATTR_109"
+  default = "0x00007E04"
+  offset = "0x000001B4"
+  [[register.field]]
+    name = "ATTR_TECRC_EP_INV"
+    bits = "15"
+    type = "rw"
+    shortdesc = '''Not currently in use.'''
+    longdesc = '''Invert ECRC generated by block when trn_tecrc_gen_n and trn_terrfwd_n are asserted.; EP=0x0000; RP=0x0000'''
+  [[register.field]]
+    name = "ATTR_RECRC_CHK_TRIM"
+    bits = "14"
+    type = "rw"
+    shortdesc = '''Enables td bit clear and ECRC trim on received TLP's FALSE == don't trim TRUE == trim.'''
+    longdesc = '''; EP=0x0001; RP=0x0001'''
+  [[register.field]]
+    name = "ATTR_RECRC_CHK"
+    bits = "13:12"
+    type = "rw"
+  [[register.field]]
+    name = "ATTR_VC0_TX_LASTPACKET"
+    bits = "11:7"
+    type = "rw"
+    shortdesc = '''Index of last packet buffer used by TX TLM (i.'''
+    longdesc = '''e. number of buffers - 1). Calculated from max payload size supported and the number of brams configured for transmit; EP=0x001C; RP=0x001C'''
+  [[register.field]]
+    name = "ATTR_VC0_TOTAL_CREDITS_PH"
+    bits = "6:0"
+    type = "rw"
+    shortdesc = '''Number of credits that should be advertised for Posted headers received on Virtual Channel 0.'''
+    longdesc = '''The sum of the posted, non posted, and completion header credits must be <= 80; EP=0x0004; RP=0x0020'''
+[[register]]
+  name = "ATTR_110"
+  type = "rw"
+  width = 32
+  description = "ATTR_110"
+  default = "0x0000FABC"
+  offset = "0x000001B8"
+  [[register.field]]
+    name = "ATTR_RP_AUTO_SPD_LOOPCNT"
+    bits = "15:11"
+    type = "rw"
+  [[register.field]]
+    name = "ATTR_RP_AUTO_SPD"
+    bits = "10:9"
+    type = "rw"
+  [[register.field]]
+    name = "ATTR_TRN_NP_FC"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "ATTR_UR_INV_REQ"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''When TRUE handle received ATS Invalidate request messages as unsupported request.'''
+    longdesc = '''When FALSE pass received ATS Invalidate request messages to the user; EP=0x0001; RP=0x0001'''
+  [[register.field]]
+    name = "ATTR_CFG_ECRC_ERR_CPLSTAT"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "ID"
+  type = "rw"
+  width = 32
+  description = "ID"
+  default = "0x10EE7024"
+  offset = "0x00000200"
+  [[register.field]]
+    name = "CFG_VEND_ID"
+    bits = "31:16"
+    type = "rw"
+  [[register.field]]
+    name = "CFG_DEV_ID"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "SUBSYS_ID"
+  type = "rw"
+  width = 32
+  description = "SUBSYS_ID"
+  default = "0x10EE0007"
+  offset = "0x00000204"
+  [[register.field]]
+    name = "CFG_SUBSYS_VEND_ID"
+    bits = "31:16"
+    type = "rw"
+  [[register.field]]
+    name = "CFG_SUBSYS_ID"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "REV_ID"
+  type = "rw"
+  width = 32
+  description = "REV_ID"
+  default = "0x00000000"
+  offset = "0x00000208"
+  [[register.field]]
+    name = "CFG_REV_ID"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "DSN_0"
+  type = "rw"
+  width = 32
+  description = "DSN_0"
+  default = "0x00000000"
+  offset = "0x0000020C"
+  [[register.field]]
+    name = "CFG_DSN_DW0"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "DSN_1"
+  type = "rw"
+  width = 32
+  description = "DSN_1"
+  default = "0x00000000"
+  offset = "0x00000210"
+  [[register.field]]
+    name = "CFG_DSN_DW1"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "PM_CTRL"
+  type = "mixed"
+  width = 32
+  description = "PM_CTRL"
+  default = "0x00000007"
+  offset = "0x00000218"
+  [[register.field]]
+    name = "CFG_TRN_PENDING"
+    bits = "3"
+    type = "ro"
+    shortdesc = '''If asserted, sets the Transactions Pending bit in the Device Status Register (Device_Status[5]).'''
+    longdesc = '''Note: The user is required to assert this input if the User Application has not received a completion to a request.'''
+  [[register.field]]
+    name = "CFG_PM_SEND_PME_TO"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Active-low signal causes core to to send Turn Off Message.'''
+    longdesc = '''When the link responds with a Turn Off Ack, this will be reported on cfg_msg_received_pme_to_ack, and the final transition to L3 Ready will be reported on cfg_pcie_link_state.'''
+  [[register.field]]
+    name = "CFG_PM_TURNOFF_OK"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Active low power turn-off ready signal to notify the endpoint that it is safe for power to be turned off.'''
+    longdesc = '''This input will be sampled during or after the cycle in which cfg_msg_received_pme_to pulses.'''
+  [[register.field]]
+    name = "CFG_PM_WAKE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "EP_CTRL"
+  type = "mixed"
+  width = 32
+  description = "EP_CTRL"
+  default = "0x00000000"
+  offset = "0x00000230"
+  [[register.field]]
+    name = "PL_UPSTREAM_DEEMPH_SOURCE"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Enables the Endpoint to control de-emphasis used on the link at 5.'''
+    longdesc = '''0 Gb/s speeds. 0b - -6 dB de-emphasis recommended for short, reflection dominated channels. 1b - -3.5 dB de-emphasis recommended for long, loss dominated channels.'''
+  [[register.field]]
+    name = "PL_RECEIVED_HOT_RST"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "RP_CTRL"
+  type = "rw"
+  width = 32
+  description = "RP_CTRL"
+  default = "0x00000000"
+  offset = "0x00000234"
+  [[register.field]]
+    name = "PL_DOWNSTREAM_DEEMPH_SOURCE"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Enables the Root Port to control de-emphasis used on the link at 5.'''
+    longdesc = '''0 Gb/s speeds. 0b - Use Upstream link partner preferred de-emphasis. 1b - Use Selectable de-emphasis value from Link Control 2 register.'''
+  [[register.field]]
+    name = "PL_TRANSMIT_HOT_RST"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "PCIE_STATUS"
+  type = "ro"
+  width = 32
+  description = "PCIE_STATUS"
+  default = "0x00000000"
+  offset = "0x00000238"
+  [[register.field]]
+    name = "PHY_RDY"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "PCIE_LINK_UP"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "MISC_CTRL"
+  type = "rw"
+  width = 1
+  description = "MISC_CTRL"
+  default = "0x00000000"
+  offset = "0x00000300"
+  [[register.field]]
+    name = "SLVERR_ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''By default, invalid address requests are ignored.'''
+    longdesc = '''However, a maskable interrupt exsists. By enabling this slverr_enable invalid address requests cause a slverr to occur. Enable/Disable SLVERR during address decode failure. 0: SLVERR is disabled. For request address: Writes are ignored. Read returns 0. 1: SLVERR is enabled. For requestes address, SLVERR is asserted. Writes are ignored. Read returns 0.'''
+[[register]]
+  name = "ISR"
+  type = "wtc"
+  width = 32
+  description = "Interrupt Status Register. This is a sticky register that holds the value of the interrupt until cleared by a value of 1."
+  default = "0x00000000"
+  offset = "0x00000304"
+  [[register.field]]
+    name = "PCIE_RESET"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "IMR"
+  type = "ro"
+  width = 32
+  description = "Interrupt Mask Register. This is a read-only location and can be atomically altered by either the IDR or the IER."
+  default = "0x00000003"
+  offset = "0x00000308"
+  [[register.field]]
+    name = "PCIE_RESET"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "IER"
+  type = "wo"
+  width = 32
+  description = "Interrupt Enable Register. A write of to this location will unmask the interrupt. (IMR: 0)"
+  default = "0x00000000"
+  offset = "0x0000030C"
+  [[register.field]]
+    name = "PCIE_RESET"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "IDR"
+  type = "wo"
+  width = 32
+  description = "Interrupt Disable Register. A write of one to this location will mask the interrupt. (IMR: 1)"
+  default = "0x00000000"
+  offset = "0x00000310"
+  [[register.field]]
+    name = "PCIE_RESET"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "CB"
+  type = "rw"
+  width = 32
+  description = "ECO Register 1"
+  default = "0x00000001"
+  offset = "0x0000031C"
+  [[register.field]]
+    name = "CB1"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''RX Valid Filter Enable.'''
+    longdesc = '''This bit should be kept 0 unless advised by Xilinx'''
