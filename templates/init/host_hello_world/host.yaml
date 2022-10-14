@@ -1,6 +1,6 @@
 board: host
 triple: ${host_triple}
-libraries:
+libs:
   - name: core
     languages: [cpp]
     dependencies: []
