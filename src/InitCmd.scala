@@ -8,12 +8,6 @@ import java.net.URL
 import java.io.File
 import java.nio.file.NoSuchFileException
 
-case class InitPaths(
-    targetPath: os.Path,
-    tempPath: os.Path,
-    binPath: os.Path
-)
-
 def initCmd(config: Config): Unit =
   val targetPath = os.pwd / os.RelPath(config.workspace.get.getPath())
   println(s"initialising workspace $targetPath")
@@ -32,77 +26,49 @@ def initCmd(config: Config): Unit =
     os.makeDir.all(tempPath)
     val binPath = targetPath / "bin"
     os.makeDir.all(binPath)
-    InitPaths(targetPath, tempPath, binPath)
+    Paths(targetPath, tempPath, binPath)
   }
 
   if !config.nogit then
-    setupGit(paths)
-    initialGitCommit(paths)
+    gitInit(paths, "main")
+    gitCommit(paths, "Initial Empty Commit")
 
   if !config.nostdresources then
-    installStdResources(paths)
+    gitAddLibrary(paths, "git@github.com:DeanoC/ikuy_std_resources.git", "ikuy_std_resources", "main")
     setupFromTemplate(paths, config.template)
+
+  // we always need zig as we use it to work out host tripple
+  installZig(paths)
 
   println(s"Overload workspace ${targetPath} initialised")
 
   updateCmd(config)
 
-private def setupGit(paths: InitPaths): Unit =
-  // setup git
-  val initReturn = os
-    .proc(
-      "git",
-      "init"
-// need newer git      "--initial-branch=main"
-    )
-    .call(
-      cwd = paths.targetPath,
-      check = false,
-      stdout = os.Inherit,
-      mergeErrIntoOut = true
-    )
-  assert(initReturn.exitCode == 0)
-  val oldSkoolInitialBranchReturn = os
-    .proc(
-      "git",
-      "checkout",
-      "-b",
-      "main"
-    )
-    .call(
-      cwd = paths.targetPath,
-      check = false,
-      stdout = os.Inherit,
-      mergeErrIntoOut = true
-    )
-  assert(initReturn.exitCode == 0)
+private def installZig(paths: Paths): Unit =
+  // download zig for linux
+  val zigEntry: Map[String, String] =
+    Source.fromURL("https://ziglang.org/download/index.json").mkString.as[Map[String, Any]] match
+      case Left(value) =>
+        println(value.msg)
+        println("Unable to find zig toolchain")
+        return
+      case Right(value) =>
+        value
+          .asInstanceOf[Map[String, Any]]("master")
+          .asInstanceOf[Map[String, Map[String, String]]]("x86_64-linux")
 
-  os.write(paths.targetPath / ".gitignore", "")
-  val addReturn = os
-    .proc(
-      "git",
-      "add",
-      ".gitignore"
-    )
-    .call(
-      cwd = paths.targetPath,
-      check = false,
-      stdout = os.Inherit,
-      mergeErrIntoOut = true
-    )
-  assert(addReturn.exitCode == 0)
+  val tarballNameWithExt = zigEntry("tarball").split('/').last
+  val tarballName = tarballNameWithExt.replaceAllLiterally(".tar.xz", "")
 
-private def installStdResources(paths: InitPaths): Unit =
-  // add std resource subtree
-  if !os.exists(paths.targetPath / "ikuy_std_resource") then
-    val remoteResult = os
+  if !os.exists(paths.tempPath / tarballNameWithExt) then
+    println(s"Fetching ${zigEntry("tarball")}")
+    val zigFetchResult = os
       .proc(
-        "git",
-        "remote",
-        "add",
-        "-f",
-        "ikuy_std_resources",
-        "git@github.com:DeanoC/ikuy_std_resources.git"
+        "curl",
+        "--url",
+        zigEntry("tarball"),
+        "--output",
+        (paths.tempPath / tarballNameWithExt).toString()
       )
       .call(
         cwd = paths.targetPath,
@@ -110,68 +76,23 @@ private def installStdResources(paths: InitPaths): Unit =
         stdout = os.Inherit,
         mergeErrIntoOut = true
       )
-    assert(remoteResult.exitCode == 0)
-    val mergeResult = os
+    assert(zigFetchResult.exitCode == 0)
+
+  if !os.exists(paths.tempPath / tarballName) then
+    val tarResult = os
       .proc(
-        "git",
-        "merge",
-        "-s",
-        "ours",
-        "--no-commit",
-        "--allow-unrelated-histories",
-        "ikuy_std_resources/main"
+        "tar",
+        "xvf",
+        tarballNameWithExt.toString()
       )
       .call(
-        cwd = paths.targetPath,
+        cwd = paths.tempPath,
         check = false,
         stdout = os.Inherit,
         mergeErrIntoOut = true
       )
-    assert(mergeResult.exitCode == 0)
+    assert(tarResult.exitCode == 0)
 
-    val subtreeResult = os
-      .proc(
-        "git",
-        "read-tree",
-        "--prefix",
-        "ikuy_std_resources/",
-        "-u",
-        "ikuy_std_resources/main"
-      )
-      .call(
-        cwd = paths.targetPath,
-        check = false,
-        stdout = os.Inherit,
-        mergeErrIntoOut = true
-      )
-    assert(subtreeResult.exitCode == 0)
-  val commitReturn = os
-    .proc(
-      "git",
-      "commit",
-      "-m",
-      """"Subtree merged in ikuy_std_resources""""
-    )
-    .call(
-      cwd = paths.targetPath,
-      check = false,
-      stdout = os.Inherit,
-      mergeErrIntoOut = true
-    )
-  assert(commitReturn.exitCode == 0)
+  os.copy(paths.tempPath / tarballName, paths.binPath, replaceExisting = true, mergeFolders = true)
 
-private def initialGitCommit(paths: InitPaths): Unit =
-  val commitReturn = os
-    .proc(
-      "git",
-      "commit",
-      "-m",
-      """"Initial Empty Commit""""
-    )
-    .call(
-      cwd = paths.targetPath,
-      check = false,
-      stdout = os.Inherit,
-      mergeErrIntoOut = true
-    )
-  assert(commitReturn.exitCode == 0)
+  println("Zig installed to bin")

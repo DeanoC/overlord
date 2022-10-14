@@ -9,12 +9,6 @@ import java.io.File
 import java.nio.file.NoSuchFileException
 import scala.collection.mutable
 
-case class UpdatePaths(
-    targetPath: os.Path,
-    tempPath: os.Path,
-    binPath: os.Path
-)
-
 private case class TemplateHeader(name: String, root: String) derives YamlDecoder
 private case class RootHeader(targets: List[String]) derives YamlDecoder
 
@@ -33,24 +27,24 @@ private case class Program(
 private case class Target(
     board: String,
     triple: String,
-    libraries: List[Library],
+    libs: List[Library],
     programs: List[Program]
 ) derives YamlDecoder
 
-private def getZigTargets(binPath: os.Path): String = {
+private def getZigTargets(paths: Paths): String = {
   val zigTargetsReturn = os
     .proc(
-      "zig",
+      "./zig",
       "targets"
     )
     .call(
-      cwd = binPath
+      cwd = paths.binPath
     )
   assert(zigTargetsReturn.exitCode == 0)
   zigTargetsReturn.out.string()
 }
 
-private def readTarget(target: String, paths: UpdatePaths): Option[Target] = {
+private def readTarget(target: String, paths: Paths): Option[Target] = {
   val targetTxt = os.read(paths.targetPath / (target + ".yaml"))
   val targetHeader = targetTxt.as[Target] match
     case Left(value) =>
@@ -66,28 +60,13 @@ def updateCmd(config: Config): Unit =
   println(s"updating workspace $targetPath")
 
   if !os.exists(targetPath) then
-    println(s"Workspace not found, Exiting")
+    println(s"Workspace $targetPath not found, Exiting")
     System.exit(1)
 
-  val paths = UpdatePaths(targetPath, targetPath / "tmp", targetPath / "bin")
+  val paths = Paths(targetPath, targetPath / "tmp", targetPath / "bin")
 
   if (os.exists(targetPath / "ikuy_std_resources"))
-    val updateStdResources = os
-      .proc(
-        "git",
-        "pull",
-        "-s",
-        "subtree",
-        "ikuy_std_resources",
-        "main"
-      )
-      .call(
-        cwd = paths.targetPath,
-        check = false,
-        stdout = os.Inherit,
-        mergeErrIntoOut = true
-      )
-    assert(updateStdResources.exitCode == 0)
+    gitUpdateLibrary(paths, "ikuy_std_resources", "main")
 
   // read the root.yaml
   val rootTxt = os.read(paths.targetPath / "root.yaml")
@@ -100,7 +79,7 @@ def updateCmd(config: Config): Unit =
   val targets = rootHeader.targets.flatMap(readTarget(_, paths))
   // if Gcc is required (non supported LLVM target usually)
   val requiresGccCpp = targets.flatMap(target =>
-    if target.libraries.forall(_.languages.contains("gcc-cpp")) ||
+    if target.libs.forall(_.languages.contains("gcc-cpp")) ||
       target.programs.forall(_.languages.contains("gcc-cpp"))
     then Some(target.triple)
     else None
@@ -108,8 +87,8 @@ def updateCmd(config: Config): Unit =
   // we use zig as our LLVM C++ compiler
   val requiresZig = targets
     .flatMap(target =>
-      if target.libraries.forall(_.languages.contains("zig")) ||
-        target.libraries.forall(_.languages.contains("cpp")) ||
+      if target.libs.forall(_.languages.contains("zig")) ||
+        target.libs.forall(_.languages.contains("cpp")) ||
         target.programs.forall(_.languages.contains("zig")) ||
         target.programs.forall(_.languages.contains("cpp"))
       then Some(target.triple)
@@ -117,7 +96,7 @@ def updateCmd(config: Config): Unit =
     )
 
   // get zig targets data
-  val zigTargets = getZigTargets(paths.binPath)
+  val zigTargets = getZigTargets(paths)
   val zigTargetsJson = zigTargets.as[Map[String, Any]] match
     case Left(value)  => println(s"Error $value in zig targets"); return
     case Right(value) => value
@@ -128,6 +107,9 @@ def updateCmd(config: Config): Unit =
     // remove versions from the triple provided by zig
     zigHost("triple").split("-").map(_.split('.').head).mkString(sep = "-")
   }
+
+  val definitions = Catalog(paths.targetPath / "ikuy_std_resources" / "definitions")
+  val prefabs = Catalog(paths.targetPath / "ikuy_std_resources" / "prefabs")
 
   val dictionary = Map(
     "${host_triple}" -> zigHostTriple,

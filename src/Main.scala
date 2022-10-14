@@ -25,6 +25,12 @@ case class Config(
     nogit: Boolean = false
 )
 
+case class Paths(
+    targetPath: os.Path,
+    tempPath: os.Path,
+    binPath: os.Path
+)
+
 val builder = OParser.builder[Config]
 val argParser = {
   import builder._
