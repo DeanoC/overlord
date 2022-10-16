@@ -1,0 +1,1727 @@
+description = "DisplayPort DPCD registers"
+[[register]]
+name = "REV"
+width = 8
+description = "DPCD revision."
+offset = "0x0"
+[[register.field]]
+name = "MIN"
+bits = "3:0"
+type = "rw"
+[[register.field]]
+name = "MJR"
+bits = "7:4"
+type = "raz"
+[[register.field.enum]]
+name = "DP_REV_1_0"
+value = "0x10"
+[[register.field.enum]]
+name = "DP_REV_1_1"
+value = "0x11"
+[[register.field.enum]]
+name = "DP_REV_1_2"
+value = "0x12"
+
+[[register]]
+name = "MAX_LINK_RATE"
+width = 8
+offset = "0x1"
+[[register.field]]
+name = "RATE"
+bits = "7:0"
+description = "value * 0.27Gps per line"
+[[register.field.enum]]
+name = "1_62GBPS"
+value = "0x06"
+[[register.field.enum]]
+name = "2_70GBPS"
+value = "0x0A"
+[[register.field.enum]]
+name = "5_40GBPS"
+value = "0x14"
+
+[[register]]
+name = "MAX_LANE_COUNT"
+width = 8
+offset = "0x2"
+[[register.field]]
+name = "MAX_LANE_COUNT"
+bits = "4:0"
+[[register.field.enum]]
+name = "LANE_COUNT_1"
+value = "0x1"
+[[register.field.enum]]
+name = "LANE_COUNT_2"
+value = "0x2"
+[[register.field.enum]]
+name = "LANE_COUNT_4"
+value = "0x4"
+[[register.field]]
+name = "TPS3_SUPPORT"
+bits = 6
+description = "Training Pattern Sequence 3 is supported"
+[[register.field]]
+name = "ENHANCED_FRAME_SUPPORT"
+bits = 7
+description = "Enhanced Frame supported is supported (required for dp1.2)"
+
+[[register]]
+name = "MAX_DOWNSPREAD"
+width = 8
+offset = "0x3"
+[[register.field]]
+name = "MAX_DOWNSPREAD"
+bits = 0
+description = "0 = no down spread, 1 = upto 0.5% down spread"
+[[register.field]]
+name = "NO_AUX_HANDSHAKE_LINK_TRAINING"
+bits = 6
+description = "1 does not require AUX CH handshake if main link is known good"
+
+[[register]]
+name = "NORP"
+width = 8
+offset = "0x4"
+description = "Number of reciever ports = value + 1"
+
+[[register]]
+name = "DOWNSP_PRESENT"
+width = 8
+offset = "0x5"
+[[register.field]]
+name = "DOWNSTREAMPORT_PRESENT"
+bits = 0
+description = "set to 1 when device has downstream ports"
+[[register.field]]
+name = "DWN_STRM_PORT_TYPE"
+bits = "2:1"
+description = "Indiacates the downstream port type of port 0"
+[[register.field.enum]]
+name = "DISPLAY_PORT"
+value = 0
+[[register.field.enum]]
+name = "ANALOG_VGA"
+value = 1
+[[register.field.enum]]
+name = "DVI_OR_HDMI"
+value = 2
+[[register.field.enum]]
+name = "OTHER"
+value = 3
+[[register.field]]
+name = "FORMAT_CONVERSION"
+bits = 3
+description = "0 branch device doesn't have a format conversion, 1 it does"
+[[register.field]]
+name = "DETAILED_CAP_INFO_AVAILABLE"
+bits = 4
+description = "0 = 1 byte per port starting at 0x80, 1 4 bytes per port from 0x80"
+
+[[register]]
+name = "MAIN_LINK_CHANNEL_CODING"
+width = 8
+offset = "0x6"
+[[register.field]]
+name = "ANSI_8B_10B"
+bits = 1
+description = "set to 1 if supports ANSI X3/230-1994 clause 11"
+[[register]]
+name = "DOWNSTEAM_PORT_COUNT"
+width = 8
+offset = "0x7"
+[[register.field]]
+name = "DWN_STRM_PORT_COUNT"
+bits = "3:0"
+description = "Downstream port count"
+[[register.field]]
+name = "MSA_TIMING_PAR_IGNORED"
+bits = 6
+descriptions = "Embedded Display Port only, 1 = doesn't need MSA timing parameters"
+[[register.field]]
+name = "OUI_SUPPORTED"
+bits = 8
+description = "1 = UI Supported 0x400-40B and 0x500-502 address supported"
+
+[[register]]
+name = "RX_PORT0_CAP_0"
+width = 8
+offset = "0x8"
+[[register.field]]
+name = "LOCAL_EDID_PRESENT"
+bits = 1
+description = "1 = reciever port has a local EDID"
+[[register.field]]
+name = "ASSOCIATED_TO_PRECEDING_PORT"
+bits = 2
+description = "0 = main stream, 1 = this port is secondary isochronous stream"
+
+[[register]]
+name = "RX_PORT0_CAP_1"
+width = 8
+offset = "0x9"
+[[register.field]]
+name = "BUFFER_SIZE"
+bits = "7:0"
+description = "Buffer Size = value+1 * 32 bytes per lane. Max 8KB"
+
+[[register]]
+name = "RX_PORT1_CAP_0"
+width = 8
+offset = "0xA"
+[[register.field]]
+name = "LOCAL_EDID_PRESENT"
+bits = 1
+description = "1 = reciever port has a local EDID"
+[[register.field]]
+name = "ASSOCIATED_TO_PRECEDING_PORT"
+bits = 2
+description = "0 = main stream, 1 = this port is secondary isochronous stream"
+
+[[register]]
+name = "RX_PORT1_CAP_1"
+width = 8
+offset = "0xB"
+[[register.field]]
+name = "BUFFER_SIZE"
+bits = "7:0"
+description = "Buffer Size = value+1 * 32 bytes per lane. Max 8KB"
+
+[[register]]
+name = "I2C_SPEED_CTL_CAP"
+width = 8
+offset = "0xC"
+[[register.field]]
+name = "I2C_SPEED"
+bits = "7:0"
+description = "Bitfield of speads supported with I2C over Aux"
+[[register.field.enum]]
+name = "NOT_SUPPORTED"
+value = 0
+[[register.field.enum]]
+name = "1KBPS"
+value = "0x1"
+[[register.field.enum]]
+name = "5KBPS"
+value = "0x2"
+[[register.field.enum]]
+name = "10KBPS"
+value = "0x4"
+[[register.field.enum]]
+name = "100KBPS"
+value = "0x8"
+[[register.field.enum]]
+name = "400KBPS"
+value = "0x10"
+[[register.field.enum]]
+name = "1MBPS"
+value = "0x20"
+
+[[register]]
+name = "EDP_CFG_CAP"
+width = 8
+offset = "0xD"
+[[register.field]]
+name = "ALTERNATE_SCRAMBLER_RESET_CAPABLE"
+bits = 0
+[[register.field]]
+name = "FRAMING_CHANGE_CAPABLE"
+bits = 1
+
+[[register]]
+name = "TRAIN_AUX_RD_INTERVAL"
+width = 8
+offset = "0xE"
+[[register.field]]
+name = "INTERVAL"
+bits = "7:0"
+description = "Link Status/Adjust Request read interval during training"
+[[register.field.enum]]
+name = "4MS"
+value = 1
+[[register.field.enum]]
+name = "8MS"
+value = 2
+[[register.field.enum]]
+name = "12MS"
+value = 3
+[[register.field.enum]]
+name = "16MS"
+value = 4
+
+[[register]]
+name = "ADAPTER_CAP"
+width = 8
+offset = "0xF"
+[[register.field]]
+name = "FORCE_LOAD_SENSE_CAP"
+bits = 0
+description = "1 supports VGA force load adapter sense, 0 doesn't"
+
+[[register]]
+name = "FAUX_CAP"
+width = 8
+offset = "0x20"
+[[register.field]]
+name = "FAUX_CAP"
+bits = 0
+[[register]]
+name = "MSTM_CAP"
+width = 8
+offset = "0x21"
+[[register.field]]
+name = "FAUX_CAP"
+bits = 0
+description = "1 supports MST transport and has a branching unit"
+[[register]]
+name = "NUM_AUDIO_ENDPOINTS"
+width = 8
+offset = "0x22"
+
+[[register]]
+name = "AV_SYNC_DATA_BLOCK"
+width = 8
+offset = "0x23"
+[[register.field]]
+name = "AG_FACTOR"
+bits = "3:0"
+description = "Audio Granularity Factor"
+[[register.field.enum]]
+name = "3MS"
+value = 0
+[[register.field.enum]]
+name = "2MS"
+value = 1
+[[register.field.enum]]
+name = "1MS"
+value = 2
+[[register.field.enum]]
+name = "500us"
+value = 3
+[[register.field.enum]]
+name = "200us"
+value = 4
+[[register.field.enum]]
+name = "100us"
+value = 5
+[[register.field.enum]]
+name = "10us"
+value = 6
+[[register.field.enum]]
+name = "1us"
+value = 7
+[[register.field]]
+name = "VG_FACTOR"
+bits = "7:0"
+[[register.field.enum]]
+name = "3ms"
+value = 0
+[[register.field.enum]]
+name = "2ms"
+value = 1
+[[register.field.enum]]
+name = "1ms"
+value = 2
+[[register.field.enum]]
+name = "500us"
+value = 3
+[[register.field.enum]]
+name = "200us"
+value = 4
+[[register.field.enum]]
+name = "100us"
+value = 5
+
+[[register]]
+name = "AUD_DEC_LAT_7_0"
+width = 8
+offset = "0x24"
+[[register]]
+name = "AUD_DEC_LAT_15_8"
+width = 8
+offset = "0x25"
+[[register]]
+name = "AUD_PP_LAT_7_0"
+width = 8
+offset = "0x26"
+[[register]]
+name = "AUD_PP_LAT_15_8"
+width = 8
+offset = "0x27"
+[[register]]
+name = "VID_INTER_LAT"
+width = 8
+offset = "0x28"
+[[register]]
+name = "VID_PROG_LAT"
+width = 8
+offset = "0x29"
+[[register]]
+name = "REP_LAT"
+width = 8
+offset = "0x2A"
+[[register]]
+name = "AUD_DEL_INS_7_0"
+width = 8
+offset = "0x2B"
+[[register]]
+name = "AUD_DEL_INS_15_8"
+width = 8
+offset = "0x2C"
+[[register]]
+name = "AUD_DEL_INS_23_16"
+width = 8
+offset = "0x2D"
+[[register]]
+name = "GUID"
+width = 8
+offset = "0x30"
+[[register]]
+name = "RX_GTC_VALUE_7_0"
+width = 8
+offset = "0x54"
+[[register]]
+name = "RX_GTC_VALUE_15_8"
+width = 8
+offset = "0x55"
+[[register]]
+name = "RX_GTC_VALUE_23_16"
+width = 8
+offset = "0x56"
+[[register]]
+name = "RX_GTC_VALUE_31_24"
+width = 8
+offset = "0x57"
+[[register]]
+name = "RX_GTC_MSTR_REG"
+width = 8
+offset = "0x58"
+[[register]]
+name = "RX_GTC_FREQ_LOCK_DONE"
+width = 8
+offset = "0x59"
+
+[[register]]
+name = "CAP_INFO"
+width = 8
+offset = "0x80"
+longdesc = "if DETAILED CAP INFO == 0 this is start of 16 1 byte registers, if 1 4 4 byte registers"
+[[register.field]]
+name = "DWN_STRM_PORT_TYPE"
+bits = "2:0"
+[[register.field.enum]]
+name = "DISPLAY_PORT"
+value = "0"
+[[register.field.enum]]
+name = "ANALOG_VGA"
+value = "1"
+[[register.field.enum]]
+name = "DVI"
+value = "2"
+[[register.field.enum]]
+name = "HDMI"
+value = "3"
+[[register.field.enum]]
+name = "OTHER_NO_EDID"
+value = "4"
+[[register.field]]
+name = "DCIA0_DNW_STREAM_PORT_HPD"
+bits = 3
+[[register.field]]
+name = "DCIA0_NON_EDID_DWN_STRM_PORT_ATTRIBUTE"
+bits = "7:4"
+[[register.field.enum]]
+name = "720_480I_60HZ"
+value = 1
+[[register.field.enum]]
+name = "720_480I_50HZ"
+value = 2
+[[register.field.enum]]
+name = "1920_1080I_60HZ"
+value = 3
+[[register.field.enum]]
+name = "1920_1080I_50HZ"
+value = 4
+[[register.field.enum]]
+name = "1280_720P_60HZ"
+value = 5
+[[register.field.enum]]
+name = "1280_720P_50HZ"
+value = 7
+[[register]]
+name = "VGA_CAP_INFO_MAX_PIXELRATE"
+width = 8
+offset = "0x81"
+longdesc = "If downstream port is VGA and DETAILED_CAP_INFO_AVAILABLE == 1"
+[[register]]
+name = "VGA_INFO_MAX_BITS_PER_COMPONENT"
+width = 8
+offset = "0x82"
+longdesc = "If downstream port is VGA and DETAILED_CAP_INFO_AVAILABLE == 1"
+[[register.field]]
+name = "MAX_BPC"
+bits = "2:0"
+[[register.field.enum]]
+name = "8BPC"
+value = 0
+[[register.field.enum]]
+name = "10BPC"
+value = 1
+[[register.field.enum]]
+name = "12BPC"
+value = 2
+[[register.field.enum]]
+name = "16BPC"
+value = 3
+
+[[register]]
+name = "LINK_BW_SET"
+width = 8
+offset = "0x100"
+longdesc = "Main Link Bankwidth = value * 0.27 per lane"
+[[register.field]]
+name = "BANDWIDTH"
+bits = "7:0"
+[[register.field.enum]]
+name = "1_62GBPS"
+value = "0x06"
+[[register.field.enum]]
+name = "2_70GBPS"
+value = "0x0A"
+[[register.field.enum]]
+name = "5_40GBPS"
+value = "0x14"
+
+[[register]]
+name = "LANE_COUNT_SET"
+width = 8
+offset = "0x101"
+longdesc = "Main Link Bankwidth = value * 0.27 per lane"
+[[register.field]]
+name = "LANE_COUNT"
+bits = "4:0"
+[[register.field.enum]]
+name = "1_LINE"
+value = 1
+[[register.field.enum]]
+name = "2_LINE"
+value = 2
+[[register.field.enum]]
+name = "4_LINE"
+value = 4
+[[register.field]]
+name = "ENHANCED_FRAME_EN"
+bits = 7
+
+[[register]]
+name = "TRAINING_PATTERN_SET"
+width = 8
+offset = "0x102"
+longdesc = "Link Training patterns"
+[[register.field]]
+name = "PATTERN_SELECT"
+bits = "1:0"
+[[register.field.enum]]
+name = "DISABLED"
+value = 0
+[[register.field.enum]]
+name = "PATTERN_1"
+value = 1
+[[register.field.enum]]
+name = "PATTERN_2"
+value = 2
+[[register.field.enum]]
+name = "PATTERN_3"
+value = 3
+[[register.field]]
+name = "LINK_QUAL_PATTERN"
+bits = "3:2"
+[[register.field.enum]]
+name = "NOT_TRANSMITTED"
+value = 0
+[[register.field.enum]]
+name = "D10_2_PATTERN"
+value = 1
+[[register.field.enum]]
+name = "SYMBOL_ERROR_RATE_PATTERN"
+value = 2
+[[register.field.enum]]
+name = "PRBS7_PATTERN"
+value = 3
+[[register.field]]
+name = "RECOVERED_CLOCK_OUT_EN"
+bits = 4
+[[register.field]]
+name = "SCRAMBLING_DISABLED"
+bits = 5
+[[register.field]]
+name = "SYMBOL_ERROR_COUNT"
+bits = "7:6"
+[[register.field.enum]]
+name = "DISPARITY_AND_ILLEGAL_SYMBOL_ERROR"
+value = 0
+[[register.field.enum]]
+name = "DISPARITY_ERROR"
+value = 1
+[[register.field.enum]]
+name = "ILLEGAL_SYMBOL_ERROR"
+value = 2
+
+[[register]]
+name = "TRAINING_LANE0_SET"
+width = 8
+offset = "0x103"
+longdesc = "Link Training Control for Lane 0"
+[[register.field]]
+name = "VOLTAGE_SWING"
+bits = "1:0"
+[[register.field]]
+name = "MAX_SWING_REACHED"
+bits = 2
+[[register.field]]
+name = "PRE_EMPHASIS"
+bits = "4:3"
+[[register.field]]
+name = "MAX_PRE_EMPHASIS_REACHED"
+bits = 5
+
+[[register]]
+name = "TRAINING_LANE1_SET"
+width = 8
+offset = "0x104"
+longdesc = "Link Training Control for Lane 0"
+[[register.field]]
+name = "VOLTAGE_SWING"
+bits = "1:0"
+[[register.field]]
+name = "MAX_SWING_REACHED"
+bits = 2
+[[register.field]]
+name = "PRE_EMPHASIS"
+bits = "4:3"
+[[register.field]]
+name = "MAX_PRE_EMPHASIS_REACHED"
+bits = 5
+
+[[register]]
+name = "TRAINING_LANE2_SET"
+width = 8
+offset = "0x105"
+longdesc = "Link Training Control for Lane 0"
+[[register.field]]
+name = "VOLTAGE_SWING"
+bits = "1:0"
+[[register.field]]
+name = "MAX_SWING_REACHED"
+bits = 2
+[[register.field]]
+name = "PRE_EMPHASIS"
+bits = "4:3"
+[[register.field]]
+name = "MAX_PRE_EMPHASIS_REACHED"
+bits = 5
+
+[[register]]
+name = "TRAINING_LANE3_SET"
+width = 8
+offset = "0x106"
+longdesc = "Link Training Control for Lane 0"
+[[register.field]]
+name = "VOLTAGE_SWING"
+bits = "1:0"
+[[register.field]]
+name = "MAX_SWING_REACHED"
+bits = 2
+[[register.field]]
+name = "PRE_EMPHASIS"
+bits = "4:3"
+[[register.field]]
+name = "MAX_PRE_EMPHASIS_REACHED"
+bits = 5
+
+[[register]]
+name = "DOWNSPREAD_CTRL"
+width = 8
+offset = "0x107"
+longdesc = "Down-spreading control"
+[[register.field]]
+name = "SPREAD_AMP"
+bits = 4
+[[register.field]]
+name = "MSA_TIMING_PAR_IGNORED"
+bits = 7
+
+[[register]]
+name = "MAIN_LINK_CODING_SET"
+width = 8
+offset = "0x108"
+longdesc = "Coding set for main link"
+[[register.field]]
+name = "SET_ANSI_8B10B"
+bits = 0
+
+[[register]]
+name = "I2C_SPEED_CTRL"
+width = 8
+offset = "0x109"
+longdesc = "I2C speed control status bit map"
+[[register.field]]
+name = "BITMAP"
+bits = "7:0"
+[[register.field.enum]]
+name = "NOT_SUPPORTED"
+value = 0
+[[register.field.enum]]
+name = "1KBPS"
+value = "0x1"
+[[register.field.enum]]
+name = "5KBPS"
+value = "0x2"
+[[register.field.enum]]
+name = "10KBPS"
+value = "0x3"
+[[register.field.enum]]
+name = "100KBPS"
+value = "0x4"
+[[register.field.enum]]
+name = "400KBPS"
+value = "0x5"
+[[register.field.enum]]
+name = "1MBPS"
+value = "0x6"
+
+[[register]]
+name = "EDP_CONFIGURATION_SET"
+width = 8
+offset = "0x10A"
+longdesc = "eDP only configuration"
+
+[[register]]
+name = "LINK_QUAL_LANE0_SET"
+width = 8
+offset = "0x10B"
+longdesc = "Supersides the controls in TRAINING_PATTERN_SET lane X"
+[[register.field]]
+name = "LINK_QUAL_PATTERN"
+bits = "2:0"
+[[register.field.enum]]
+name = "NOT_TRANSMITTED"
+value = 0
+[[register.field.enum]]
+name = "D10_2_PATTERN"
+value = 1
+[[register.field.enum]]
+name = "SYMBOL_ERROR_RATE_PATTERN"
+value = 2
+[[register.field.enum]]
+name = "PRBS7_PATTERN"
+value = 3
+[[register.field.enum]]
+name = "80_BIT_CUSTOM_PATTERN"
+value = 4
+[[register.field.enum]]
+name = "HBR2_PATTERN"
+value = 5
+
+[[register]]
+name = "LINK_QUAL_LANE1_SET"
+width = 8
+offset = "0x10C"
+longdesc = "Supersides the controls in TRAINING_PATTERN_SET lane X"
+[[register.field]]
+name = "LINK_QUAL_PATTERN"
+bits = "2:0"
+[[register.field.enum]]
+name = "NOT_TRANSMITTED"
+value = 0
+[[register.field.enum]]
+name = "D10_2_PATTERN"
+value = 1
+[[register.field.enum]]
+name = "SYMBOL_ERROR_RATE_PATTERN"
+value = 2
+[[register.field.enum]]
+name = "PRBS7_PATTERN"
+value = 3
+[[register.field.enum]]
+name = "80_BIT_CUSTOM_PATTERN"
+value = 4
+[[register.field.enum]]
+name = "HBR2_PATTERN"
+value = 5
+
+[[register]]
+name = "LINK_QUAL_LANE2_SET"
+width = 8
+offset = "0x10D"
+longdesc = "Supersides the controls in TRAINING_PATTERN_SET lane X"
+[[register.field]]
+name = "LINK_QUAL_PATTERN"
+bits = "2:0"
+[[register.field.enum]]
+name = "NOT_TRANSMITTED"
+value = 0
+[[register.field.enum]]
+name = "D10_2_PATTERN"
+value = 1
+[[register.field.enum]]
+name = "SYMBOL_ERROR_RATE_PATTERN"
+value = 2
+[[register.field.enum]]
+name = "PRBS7_PATTERN"
+value = 3
+[[register.field.enum]]
+name = "80_BIT_CUSTOM_PATTERN"
+value = 4
+[[register.field.enum]]
+name = "HBR2_PATTERN"
+value = 5
+
+[[register]]
+name = "LINK_QUAL_LANE3_SET"
+width = 8
+offset = "0x10E"
+longdesc = "Supersides the controls in TRAINING_PATTERN_SET lane X"
+[[register.field]]
+name = "LINK_QUAL_PATTERN"
+bits = "2:0"
+[[register.field.enum]]
+name = "NOT_TRANSMITTED"
+value = 0
+[[register.field.enum]]
+name = "D10_2_PATTERN"
+value = 1
+[[register.field.enum]]
+name = "SYMBOL_ERROR_RATE_PATTERN"
+value = 2
+[[register.field.enum]]
+name = "PRBS7_PATTERN"
+value = 3
+[[register.field.enum]]
+name = "80_BIT_CUSTOM_PATTERN"
+value = 4
+[[register.field.enum]]
+name = "HBR2_PATTERN"
+value = 5
+
+[[register]]
+name = "TRAINING_LANE0_1_SET2"
+width = 8
+offset = "0x10F"
+longdesc = "Link Training Control Lane 0 and 1"
+[[register.field]]
+name = "LANE0_POST_CURSOR2"
+bits = "1:0"
+[[register.field]]
+name = "MAX_LANE0_POST_CURSOR2_REACHED"
+bits = 2
+[[register.field]]
+name = "LANE1_POST_CURSOR2"
+bits = "5:4"
+[[register.field]]
+name = "MAX_LANE1_POST_CURSOR2_REACHED"
+bits = 6
+
+[[register]]
+name = "TRAINING_LANE2_3_SET2"
+width = 8
+offset = "0x110"
+longdesc = "Link Training Control Lane 2 and 3"
+[[register.field]]
+name = "LANE2_POST_CURSOR2"
+bits = "1:0"
+[[register.field]]
+name = "MAX_LANE2_POST_CURSOR2_REACHED"
+bits = 2
+[[register.field]]
+name = "LANE3_POST_CURSOR2"
+bits = "5:4"
+[[register.field]]
+name = "MAX_LANE3_POST_CURSOR2_REACHED"
+bits = 6
+
+[[register]]
+name = "MSTM_CTRL"
+width = 8
+offset = "0x111"
+longdesc = "Multi stream control"
+[[register.field]]
+name = "MST_EN"
+bits = 0
+[[register.field]]
+name = "UP_REQ_EN"
+bits = 1
+
+[[register]]
+name = "AUDIO_DELAY_7_0"
+width = 8
+offset = "0x112"
+[[register]]
+name = "AUDIO_DELAY_15_8"
+width = 8
+offset = "0x112"
+[[register]]
+name = "AUDIO_DELAY_23_6"
+width = 8
+offset = "0x114"
+
+[[register]]
+name = "UPSTREAM_DEVICE_DP_PWR_NEEDED"
+width = 8
+offset = "0x118"
+[[register.field]]
+name = "DP_PWR_NO_NEEDED_BY_UPSTREAM_DEVICE"
+bits = 0
+
+[[register]]
+name = "FAUX_MODE_CTRL"
+width = 8
+offset = "0x120"
+[[register.field]]
+name = "FAUX_EN"
+bits = 0
+[[register.field]]
+name = "FAUX_FORWARD_CHANNEL_TRAINING_PATTERN_EN"
+bits = 1
+[[register.field]]
+name = "FAUX_BACK_CHANNEL_TRAINING_PATTERN_EN"
+bits = 2
+[[register.field]]
+name = "FAUX_SCRAMBLER_DIS"
+bits = 3
+[[register.field]]
+name = "FAUX_FORWARD_CHANNEL_SQUELCH_TRAINING_EN"
+bits = 4
+[[register.field]]
+name = "FAUX_FORWARD_CHANNEL_SYMBOL_ERROR_COUNT_SEL"
+bits = "7:6"
+[[register.field.enum]]
+name = "DISPARITY_AND_ILLEGAL_SYMBOL_ERROR"
+value = 0
+[[register.field.enum]]
+name = "DISPARITY_ERROR"
+value = 1
+[[register.field.enum]]
+name = "ILLEGAL_SYMBOL_ERROR"
+value = 2
+
+[[register]]
+name = "FAUX_FORWARD_CHANNEL_DRIVE_SET"
+width = 8
+offset = "0x121"
+[[register.field]]
+name = "VOLTAGE_SWING"
+bits = "1:0"
+[[register.field]]
+name = "MAX_SWING_REACHED"
+bits = 2
+[[register.field]]
+name = "PRE_EMPHASIS"
+bits = "4:3"
+[[register.field]]
+name = "MAX_PRE_EMPHASIS_REACHED"
+bits = 5
+
+[[register]]
+name = "FAUX_BACK_CHANNEL_STATUS"
+width = 8
+offset = "0x122"
+[[register.field]]
+name = "SYMBOL_LOCK_DONE"
+bits = 0
+[[register.field]]
+name = "VOLTAGE_SWING_ADJ_REQ"
+bits = "2:1"
+[[register.field]]
+name = "PRE_EMPHASIS_ADJ_REQ"
+bits = "4:3"
+
+[[register]]
+name = "FAUX_BACK_CHANNEL_SYMBOL_ERROR_COUNT_7_0"
+width = 8
+offset = "0x123"
+[[register]]
+name = "FAUX_BACK_CHANNEL_SYMBOL_ERROR_COUNT_14_8"
+width = 8
+offset = "0x124"
+
+[[register]]
+name = "FAUX_BACK_CHANNEL_TRAINING_PATTERN_TIME"
+width = 8
+offset = "0x125"
+[[register.field]]
+name = "TRAINING_PATTERN_TIME"
+bits = "3:0"
+[[register.field.enum]]
+name = "400US"
+value = 0
+[[register.field.enum]]
+name = "4MS"
+value = 1
+[[register.field.enum]]
+name = "8MS"
+value = 2
+[[register.field.enum]]
+name = "12MS"
+value = 3
+[[register.field.enum]]
+name = "16MS"
+value = 8
+
+[[register]]
+name = "TX_GTC_VALUE_7_0"
+width = 8
+offset = "0x154"
+[[register]]
+name = "TX_GTC_VALUE_15_8"
+width = 8
+offset = "0x155"
+[[register]]
+name = "TX_GTC_VALUE_23_16"
+width = 8
+offset = "0x156"
+[[register]]
+name = "TX_GTC_VALUE_31_24"
+width = 8
+offset = "0x157"
+
+[[register]]
+name = "RX_GTC_VALUE_PHASE_SKEW_EN"
+width = 8
+offset = "0x158"
+[[register.field]]
+name = "EN"
+bits = 0
+
+[[register]]
+name = "TX_GTC_FREQ_LOCK_DONE"
+width = 8
+offset = "0x159"
+[[register.field]]
+name = "DONE"
+bits = 0
+
+[[register]]
+name = "ADAPTER_CTRL"
+width = 8
+offset = "0x1A0"
+[[register.field]]
+name = "FORCE_SENSE_LOAD"
+bits = 0
+[[register]]
+name = "BRANCH_DEVICE_CTRL"
+width = 8
+offset = "0x1A1"
+[[register.field]]
+name = "HPD_LONG_PULSE_FOR_UPSTREAM"
+bits = 0
+
+[[register]]
+name = "PAYLOAD_ALLOCATE_SET"
+width = 8
+offset = "0x1C0"
+[[register.field]]
+name = "ID"
+bits = "6:0"
+[[register]]
+name = "PAYLOAD_ALLOCATE_START_TIME_SLOT"
+width = 8
+offset = "0x1C1"
+[[register.field]]
+name = "TIME_SLOT"
+bits = "5:0"
+[[register]]
+name = "PAYLOAD_ALLOCATE_TIME_SLOT_COUNT"
+width = 8
+offset = "0x1C2"
+[[register.field]]
+name = "COUNT"
+bits = "5:0"
+
+[[register]]
+name = "SINK_COUNT"
+width = 8
+offset = "0x200"
+[[register.field]]
+name = "COUNT_5_0"
+bits = "5:0"
+[[register.field]]
+name = "CP_READY"
+bits = 6
+[[register.field]]
+name = "COUNT_7"
+bits = 7
+
+[[register]]
+name = "DEVICE_SERVICE_IRQ_VECTOR"
+width = 8
+offset = "0x201"
+[[register.field]]
+name = "REMOTE_CONTROL_COMMAND_PENDING"
+bits = 0
+[[register.field]]
+name = "AUTOMATED_TEST_REQUEST"
+bits = 1
+[[register.field]]
+name = "CP_IRQ"
+bits = 2
+[[register.field]]
+name = "MCCS_IRQ"
+bits = 3
+[[register.field]]
+name = "DOWN_REP_MSG_RDY"
+bits = 4
+[[register.field]]
+name = "UP_REQ_MSG_RDY"
+bits = 5
+[[register.field]]
+name = "SINK_SPECIFIC_IRQ"
+bits = 6
+
+[[register]]
+name = "LANE_0_1_STATUS"
+width = 8
+offset = "0x202"
+longdesc = "Lane 0 and 1 status"
+[[register.field]]
+name = "LANE0_CR_DONE"
+bits = 0
+[[register.field]]
+name = "LANE0_CHANNEL_EQ_DONE"
+bits = 1
+[[register.field]]
+name = "LANE0_SYMBOL_LOCKED"
+bits = 2
+[[register.field]]
+name = "LANE1_CR_DONE"
+bits = 4
+[[register.field]]
+name = "LANE1_CHANNEL_EQ_DONE"
+bits = 5
+[[register.field]]
+name = "LANE1_SYMBOL_LOCKED"
+bits = 6
+
+[[register]]
+name = "LANE_2_3_STATUS"
+width = 8
+offset = "0x203"
+longdesc = "Lane 2 and 3 status"
+[[register.field]]
+name = "LANE2_CR_DONE"
+bits = 0
+[[register.field]]
+name = "LANE2_CHANNEL_EQ_DONE"
+bits = 1
+[[register.field]]
+name = "LANE2_SYMBOL_LOCKED"
+bits = 2
+[[register.field]]
+name = "LANE3_CR_DONE"
+bits = 4
+[[register.field]]
+name = "LANE3_CHANNEL_EQ_DONE"
+bits = 5
+[[register.field]]
+name = "LANE3_SYMBOL_LOCKED"
+bits = 6
+
+[[register]]
+name = "LANE_ALIGN_STATUS_UPDATED"
+width = 8
+offset = "0x204"
+[[register.field]]
+name = "INTERLANE_ALIGN_DONE"
+bits = 0
+[[register.field]]
+name = "DOWNSTREAM_PORT_STATUS_CHANGED"
+bits = 6
+[[register.field]]
+name = "LINK_STATUS_UPDATED"
+bits = 7
+
+[[register]]
+name = "SINK_STATUS"
+width = 8
+offset = "0x205"
+[[register.field]]
+name = "RECEIVE_PORT_0_STATUS"
+bits = 0
+[[register.field]]
+name = "RECEIVE_PORT_1_STATUS"
+bits = 1
+
+[[register]]
+name = "ADJUST_REQUEST_LANE0_1"
+width = 8
+offset = "0x206"
+[[register.field]]
+name = "VOLTAGE_SWING_LANE0"
+bits = "1:0"
+[[register.field]]
+name = "PRE_EMPHASIS_LANE0"
+bits = "3:2"
+[[register.field]]
+name = "VOLTAGE_SWING_LANE1"
+bits = "5:4"
+[[register.field]]
+name = "PRE_EMPHASIS_LANE1"
+bits = "7:6"
+[[register]]
+name = "ADJUST_REQUEST_LANE2_3"
+width = 8
+offset = "0x207"
+[[register.field]]
+name = "VOLTAGE_SWING_LANE2"
+bits = "1:0"
+[[register.field]]
+name = "PRE_EMPHASIS_LANE2"
+bits = "3:2"
+[[register.field]]
+name = "VOLTAGE_SWING_LANE3"
+bits = "5:4"
+[[register.field]]
+name = "PRE_EMPHASIS_LANE3"
+bits = "7:6"
+
+[[register]]
+name = "TRAINING_SCORE_LANE0"
+width = 8
+offset = "0x208"
+[[register]]
+name = "TRAINING_SCORE_LANE1"
+width = 8
+offset = "0x209"
+[[register]]
+name = "TRAINING_SCORE_LANE2"
+width = 8
+offset = "0x20A"
+[[register]]
+name = "TRAINING_SCORE_LANE3"
+width = 8
+offset = "0x20B"
+
+[[register]]
+name = "ADJUST_REQUEST_POST_CURSOR2"
+width = 8
+offset = "0x20C"
+[[register.field]]
+name = "POST_CURSOR2_LANE0"
+bits = "1:0"
+[[register.field]]
+name = "POST_CURSOR2_LANE1"
+bits = "3:2"
+[[register.field]]
+name = "POST_CURSOR2_LANE2"
+bits = "5:4"
+[[register.field]]
+name = "POST_CURSOR2_LANE3"
+bits = "7:6"
+
+[[register]]
+name = "FAUX_FORWARD_CHANNEL_SYMBOL_ERROR_COUNT_7_0"
+width = 8
+offset = "0x20D"
+[[register]]
+name = "FAUX_FORWARD_CHANNEL_SYMBOL_ERROR_COUNT_14_8"
+width = 8
+offset = "0x20E"
+
+[[register]]
+name = "SYMBOL_ERROR_COUNT_LANE0_7_0"
+width = 8
+offset = "0x210"
+[[register]]
+name = "SYMBOL_ERROR_COUNT_LANE0_14_8"
+width = 8
+offset = "0x211"
+[[register]]
+name = "SYMBOL_ERROR_COUNT_LANE1_7_0"
+width = 8
+offset = "0x212"
+[[register]]
+name = "SYMBOL_ERROR_COUNT_LANE1_14_8"
+width = 8
+offset = "0x213"
+[[register]]
+name = "SYMBOL_ERROR_COUNT_LANE2_7_0"
+width = 8
+offset = "0x214"
+[[register]]
+name = "SYMBOL_ERROR_COUNT_LANE2_14_8"
+width = 8
+offset = "0x215"
+[[register]]
+name = "SYMBOL_ERROR_COUNT_LANE3_7_0"
+width = 8
+offset = "0x216"
+[[register]]
+name = "SYMBOL_ERROR_COUNT_LANE3_14_8"
+width = 8
+offset = "0x217"
+
+[[register]]
+name = "TEST_REQUEST"
+width = 8
+offset = "0x218"
+[[register.field]]
+name = "TEST_LINK_TRAINING"
+bits = 0
+[[register.field]]
+name = "TEST_PATTERN"
+bits = 1
+[[register.field]]
+name = "TEST_EDID_READ"
+bits = 2
+[[register.field]]
+name = "PHY_TEST_PATTERN"
+bits = 3
+[[register.field]]
+name = "FAUX_TEST_PATTERN"
+bits = 4
+
+[[register]]
+name = "TEST_LINK_RATE"
+width = 8
+offset = "0x219"
+[[register.field]]
+name = "RATE"
+bits = "7:0"
+[[register.field.enum]]
+name = "1_62GBPS"
+value = "0x06"
+[[register.field.enum]]
+name = "2_70GBPS"
+value = "0x0A"
+[[register.field.enum]]
+name = "5_40GBPS"
+value = "0x14"
+
+[[register]]
+name = "TEST_LINK_COUNT"
+width = 8
+offset = "0x220"
+[[register.field]]
+name = "COUNT"
+bits = "4:0"
+
+[[register]]
+name = "TEST_PATTERN"
+width = 8
+offset = "0x221"
+[[register.field]]
+name = "PATTERN"
+bits = "7:0"
+[[register.field.enum]]
+name = "NO_TEST_PATTERN"
+value = 0
+[[register.field.enum]]
+name = "NO_TEST_PATTERN"
+value = 0
+[[register.field.enum]]
+name = "COLOUR_RAMPS"
+value = 1
+[[register.field.enum]]
+name = "BLACK_AND_WHITE_VERTICAL_LINES"
+value = 2
+[[register.field.enum]]
+name = "COLOUR_SQUARE"
+value = 3
+
+[[register]]
+name = "TEST_H_TOTAL_15_8"
+width = 8
+offset = "0x222"
+[[register]]
+name = "TEST_H_TOTAL_7_0"
+width = 8
+offset = "0x223"
+[[register]]
+name = "TEST_V_TOTAL_15_8"
+width = 8
+offset = "0x224"
+[[register]]
+name = "TEST_V_TOTAL_7_0"
+width = 8
+offset = "0x225"
+[[register]]
+name = "TEST_H_START_15_8"
+width = 8
+offset = "0x226"
+[[register]]
+name = "TEST_H_START_7_0"
+width = 8
+offset = "0x227"
+[[register]]
+name = "TEST_V_START_15_8"
+width = 8
+offset = "0x228"
+[[register]]
+name = "TEST_V_START_7_0"
+width = 8
+offset = "0x229"
+[[register]]
+name = "TEST_HSYNC_14_8"
+width = 8
+offset = "0x22A"
+[[register]]
+name = "TEST_HSYNC_7_0"
+width = 8
+offset = "0x22B"
+[[register]]
+name = "TEST_VSYNC_14_8"
+width = 8
+offset = "0x22C"
+[[register]]
+name = "TEST_VSYNC_7_0"
+width = 8
+offset = "0x22D"
+[[register]]
+name = "TEST_H_WIDTH_15_8"
+width = 8
+offset = "0x22E"
+[[register]]
+name = "TEST_H_WIDTH_7_0"
+width = 8
+offset = "0x22F"
+[[register]]
+name = "TEST_V_HEIGHT_15_8"
+width = 8
+offset = "0x230"
+[[register]]
+name = "TEST_V_HEIGHT_7_0"
+width = 8
+offset = "0x231"
+
+[[register]]
+name = "TEST_MISC_0"
+width = 8
+offset = "0x232"
+[[register.field]]
+name = "TEST_SYNCHRONOUS_CLOCK"
+bits = 0
+[[register.field]]
+name = "TEST_COLOUR_FORMAT"
+bits = "2:1"
+[[register.field.enum]]
+name = "RGB"
+value = 0
+[[register.field.enum]]
+name = "YCBCR_422"
+value = 1
+[[register.field.enum]]
+name = "YCBCR_444"
+value = 2
+[[register.field]]
+name = "TEST_DYNAMIC_RANGE"
+bits = 3
+[[register.field.enum]]
+name = "VESA"
+value = 0
+[[register.field.enum]]
+name = "CEA"
+value = 1
+[[register.field]]
+name = "TEST_YCBCR_COEFFICIENTS"
+bits = 4
+[[register.field.enum]]
+name = "ITU601"
+value = 0
+[[register.field.enum]]
+name = "ITU709"
+value = 1
+[[register.field]]
+name = "TEST_BIT_DEPTH"
+bits = "7:5"
+[[register.field.enum]]
+name = "6BPC"
+value = 0
+[[register.field.enum]]
+name = "8BPC"
+value = 1
+[[register.field.enum]]
+name = "10BPC"
+value = 2
+[[register.field.enum]]
+name = "12BPC"
+value = 3
+[[register.field.enum]]
+name = "16BPC"
+value = 4
+
+[[register]]
+name = "TEST_MISC_1"
+width = 8
+offset = "0x233"
+[[register.field]]
+name = "TEST_REFRESH_DENOMINATOR"
+bits = 0
+[[register.field.enum]]
+name = "1"
+value = 0
+[[register.field.enum]]
+name = "1_001"
+value = 1
+[[register.field]]
+name = "TEST_INTERLACED"
+bits = 1
+
+[[register]]
+name = "TEST_REFRESH_RATE_NUMERATOR"
+width = 8
+offset = "0x234"
+
+[[register]]
+name = "TEST_CRC_R_CR_7_0"
+width = 8
+offset = "0x240"
+[[register]]
+name = "TEST_CRC_R_CR_15_8"
+width = 8
+offset = "0x241"
+[[register]]
+name = "TEST_CRC_G_Y_7_0"
+width = 8
+offset = "0x242"
+[[register]]
+name = "TEST_CRC_G_Y_15_8"
+width = 8
+offset = "0x243"
+[[register]]
+name = "TEST_CRC_B_CB_7_0"
+width = 8
+offset = "0x244"
+[[register]]
+name = "TEST_CRC_B_CB_15_8"
+width = 8
+offset = "0x245"
+
+[[register]]
+name = "TEST_SINK_MISC"
+width = 8
+offset = "0x246"
+[[register.field]]
+name = "TEST_CRC_COUNT"
+bits = "3:0"
+[[register.field]]
+name = "TEST_CRC_SUPPORTED"
+bits = 5
+
+[[register]]
+name = "PHY_TEST_PATTERN"
+width = 8
+offset = "0x248"
+[[register.field]]
+name = "PATTERN"
+bits = "2:0"
+[[register.field.enum]]
+name = "NO_PATTERN"
+value = 0
+[[register.field.enum]]
+name = "D10_2_PATTERN"
+value = 1
+[[register.field.enum]]
+name = "SYMBOL_ERROR_RATE_PATTERN"
+value = 2
+[[register.field.enum]]
+name = "PRBS7_PATTERN"
+value = 3
+[[register.field.enum]]
+name = "80_BIT_CUSTOM_PATTERN"
+value = 4
+[[register.field.enum]]
+name = "HBR2_PATTERN"
+value = 5
+
+[[register]]
+name = "TEST_FAUX"
+width = 8
+offset = "0x249"
+[[register.field]]
+name = "FORWARD_CHANNEL_TEST_PATTERN"
+bits = "2:0"
+[[register.field.enum]]
+name = "NO_PATTERN"
+value = 0
+[[register.field.enum]]
+name = "D10_2_PATTERN"
+value = 1
+[[register.field.enum]]
+name = "SYMBOL_ERROR_RATE_PATTERN"
+value = 2
+[[register.field.enum]]
+name = "PRBS7_PATTERN"
+value = 3
+[[register.field]]
+name = "BACK_CHANNEL_ERROR_COUNT_REQUEST"
+bits = "3"
+
+[[register]]
+name = "HBR2_COMPLIANCE_SCRAMBLER_RESET_7_0"
+width = 8
+offset = "0x24A"
+[[register]]
+name = "HBR2_COMPLIANCE_SCRAMBLER_RESET_15_8"
+width = 8
+offset = "0x24B"
+
+[[register]]
+name = "TEST_80BIT_CUSTOM_PATTERN_7_0"
+width = 8
+offset = "0x250"
+[[register]]
+name = "TEST_80BIT_CUSTOM_PATTERN_15_8"
+width = 8
+offset = "0x251"
+[[register]]
+name = "TEST_80BIT_CUSTOM_PATTERN_23_16"
+width = 8
+offset = "0x252"
+[[register]]
+name = "TEST_80BIT_CUSTOM_PATTERN_31_24"
+width = 8
+offset = "0x253"
+[[register]]
+name = "TEST_80BIT_CUSTOM_PATTERN_39_24"
+width = 8
+offset = "0x254"
+[[register]]
+name = "TEST_80BIT_CUSTOM_PATTERN_47_40"
+width = 8
+offset = "0x255"
+[[register]]
+name = "TEST_80BIT_CUSTOM_PATTERN_55_48"
+width = 8
+offset = "0x256"
+[[register]]
+name = "TEST_80BIT_CUSTOM_PATTERN_63_56"
+width = 8
+offset = "0x257"
+[[register]]
+name = "TEST_80BIT_CUSTOM_PATTERN_71_64"
+width = 8
+offset = "0x258"
+[[register]]
+name = "TEST_80BIT_CUSTOM_PATTERN_79_72"
+width = 8
+offset = "0x259"
+
+[[register]]
+name = "TEST_RESPONSE"
+width = 8
+offset = "0x260"
+[[register.field]]
+name = "TEST_ACK"
+bits = 0
+[[register.field]]
+name = "TEST_NACK"
+bits = 1
+[[register.field]]
+name = "TEST_EDID_CHECKSUM_READ"
+bits = 2
+
+[[register]]
+name = "TEST_EDID_CHECKSUM"
+width = 8
+offset = "0x261"
+
+[[register]]
+name = "TEST_FAUX_BACK_CHANNEL_TEST_PATTERN"
+width = 8
+offset = "0x266"
+[[register.field]]
+name = "BACK_CHANNEL_TEST_PATTERN"
+bits = "2:0"
+[[register.field.enum]]
+name = "NO_PATTERN"
+value = 0
+[[register.field.enum]]
+name = "D10_2_PATTERN"
+value = 1
+[[register.field.enum]]
+name = "SYMBOL_ERROR_RATE_PATTERN"
+value = 2
+[[register.field.enum]]
+name = "PRBS7_PATTERN"
+value = 3
+
+[[register]]
+name = "TEST_SINK"
+width = 8
+offset = "0x270"
+[[register.field]]
+name = "START"
+bits = 0
+[[register.field]]
+name = "PHY_SINK_TEST_LANE"
+bits = "5:4"
+[[register.field]]
+name = "PHY_SINK_TEST_LANE_EN"
+bits = 7
+
+[[register]]
+name = "FAUX_FORWARD_CHANNEL_STATUS"
+width = 8
+offset = "0x280"
+[[register.field]]
+name = "LOCK_DOWN"
+bits = 0
+[[register.field]]
+name = "VOLTAGE_SWING_ADJ_REG"
+bits = "2:1"
+[[register.field]]
+name = "PRE_EMPHASIS_ADJ_REQ"
+bits = "4:3"
+[[register.field]]
+name = "SQUELCH_THRESHOLD_DONE"
+bits = 7
+
+[[register]]
+name = "FAUX_BACK_CHANNEL_DRIVE_SET"
+width = 8
+offset = "0x281"
+[[register.field]]
+name = "VOLTAGE_SWING_SET"
+bits = "1:0"
+[[registe.field]]
+name = "MAX_SWING_REACHED"
+bits = 2
+[[register.field]]
+name = "PRE_EMPHASIS_SET"
+bits = "4:3"
+[[registe.field]]
+name = "MAX_PRE_EMPHASIS_REACHED"
+bits = 5
+
+[[register]]
+name = "FAUX_BACK_SYMBOL_ERROR_COUNT_CONTROL"
+width = 8
+offset = "0x282"
+[[register.field]]
+name = "SYMBOL_ERROR_COUNT"
+bits = "7:6"
+[[register.field.enum]]
+name = "DISPARITY_AND_ILLEGAL_SYMBOL_ERROR"
+value = 0
+[[register.field.enum]]
+name = "DISPARITY_ERROR"
+value = 1
+[[register.field.enum]]
+name = "ILLEGAL_SYMBOL_ERROR"
+value = 2
+
+[[register]]
+name = "PAYLOAD_TABLE_UPDATE_STATUS"
+width = 8
+offset = "0x2C0"
+[[register.field]]
+name = "VC_TABLE_UPDATED"
+bits = 0
+[[register.field]]
+name = "ACT_HANDLED"
+bits = 1
+
+[[register]]
+name = "VC_PAYLOAD_SLOT_1"
+width = 8
+offset = "0x2C1"
+longdesc = "1 to 63 table slots"

@@ -1,0 +1,25 @@
+# boards are possible board targets for this project
+# boards can be defined in the catalogs or local project
+boards:
+ - host
+ - x86_64-linux
+
+# cpu in use for this project
+# set of cpus in use can be a sub-set of all the cpus available on the boards
+# and any addition softcores
+cpus:
+ - host
+ - x86_64
+
+# software defined by this project
+# these are the locally defined, these can then depend on catalog software
+software:
+ - program.hello_world
+
+# gateware (FPGA) defined by this project
+gateware:
+
+# by default each board uses its own built in toplevel definition
+# However when using gateware or more complex topologies local
+# toplevel file should be used
+toplevel:

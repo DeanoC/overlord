@@ -1,0 +1,232 @@
+description = "Real Time Clock Control and Configuration"
+[[bank]]
+  name = "RTC"
+  address = "0xffa60000"
+[[register]]
+  name = "SET_TIME_WRITE"
+  type = "wo"
+  width = 32
+  description = "Set the Current Time."
+  default = "0x00000000"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "wo"
+[[register]]
+  name = "SET_TIME_READ"
+  type = "ro"
+  width = 32
+  description = "Last Current-time Value Programmed."
+  default = "0x00000000"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "CALIB_WRITE"
+  type = "wo"
+  width = 21
+  description = "One Second Time Based."
+  default = "0x00000000"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "FRACTION_EN"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "FRACTION_DATA"
+    bits = "19:16"
+    type = "wo"
+  [[register.field]]
+    name = "MAX_TICK"
+    bits = "15:0"
+    type = "wo"
+[[register]]
+  name = "CALIB_READ"
+  type = "ro"
+  width = 21
+  description = "Read-back Calibration Value."
+  default = "0x00000000"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "FRACTION_EN"
+    bits = "20"
+    type = "ro"
+  [[register.field]]
+    name = "FRACTION_DATA"
+    bits = "19:16"
+    type = "ro"
+  [[register.field]]
+    name = "MAX_TICK"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "CURRENT_TIME"
+  type = "ro"
+  width = 32
+  description = "Current time in seconds."
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "ALARM"
+  type = "rw"
+  width = 32
+  description = "Alarm Value."
+  default = "0x00000000"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "VALUE"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "RTC_INT_STATUS"
+  type = "wtc"
+  width = 2
+  description = "Interrupt Status."
+  default = "0x00000000"
+  offset = "0x00000020"
+  [[register.field]]
+    name = "ALARM"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "SECONDS"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "RTC_INT_MASK"
+  type = "ro"
+  width = 2
+  description = "Interrupt Mask."
+  default = "0x00000003"
+  offset = "0x00000024"
+  [[register.field]]
+    name = "ALARM"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "SECONDS"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "RTC_INT_EN"
+  type = "wo"
+  width = 2
+  description = "Interrupt Enable."
+  default = "0x00000000"
+  offset = "0x00000028"
+  [[register.field]]
+    name = "ALARM"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "SECONDS"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "RTC_INT_DIS"
+  type = "wo"
+  width = 2
+  description = "Interrupt Disable."
+  default = "0x00000000"
+  offset = "0x0000002C"
+  [[register.field]]
+    name = "ALARM"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "SECONDS"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "ADDR_ERROR"
+  type = "wtc"
+  width = 1
+  description = "Address Decode Error Status."
+  default = "0x00000000"
+  offset = "0x00000030"
+  [[register.field]]
+    name = "STATUS"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "ADDR_ERROR_INT_MASK"
+  type = "ro"
+  width = 1
+  description = "Address Decode Error Interrupt Mask."
+  default = "0x00000001"
+  offset = "0x00000034"
+  [[register.field]]
+    name = "MASK"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ADDR_ERROR_INT_EN"
+  type = "wo"
+  width = 1
+  description = "Address Decode Error Interrupt Enable."
+  default = "0x00000000"
+  offset = "0x00000038"
+  [[register.field]]
+    name = "MASK"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "ADDR_ERROR_INT_DIS"
+  type = "wo"
+  width = 1
+  description = "Address Decode Error Interrupt Disable."
+  default = "0x00000000"
+  offset = "0x0000003C"
+  [[register.field]]
+    name = "MASK"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "CONTROL"
+  type = "mixed"
+  width = 32
+  description = "Control."
+  default = "0x01000000"
+  offset = "0x00000040"
+  [[register.field]]
+    name = "BATTERY_ENABLE"
+    bits = "31"
+    type = "wo"
+    shortdesc = '''Enables the RTC.'''
+    longdesc = '''By writing a 0 to this bit, RTC will be powered off and the only module that potentially draws current from the battery will be BBRAM. The value read through this bit does not necessarily reflect whether RTC is enabled or not. It is expected that RTC is enabled every time it is being configured. If RTC is not used in the design, FSBL will disable it by writing a 0 to this bit. 0: RTC power off. 1: RTC power on. Read-only.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:28"
+    type = "rw"
+  [[register.field]]
+    name = "OSC_CNTRL"
+    bits = "27:24"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:1"
+    type = "rw"
+  [[register.field]]
+    name = "SLVERR_ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Enables SLVERR (Slave Error) if there is an access to an invalid register address.'''
+    longdesc = '''By default, this feature is disabled. 0: SLVERR is disabled. Writes are ignored and Reads return 0. 1: SLVERR is enabled. SLVERR is asserted. Writes are ignored and Reads return 0.'''
+[[register]]
+  name = "SAFETY_CHK"
+  type = "rw"
+  width = 32
+  description = "Safety Check."
+  default = "0x00000000"
+  offset = "0x00000050"
+  [[register.field]]
+    name = "REG"
+    bits = "31:0"
+    type = "rw"

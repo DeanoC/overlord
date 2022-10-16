@@ -1,0 +1,2437 @@
+description = "Cortex-R5 built-in debug logic, R5 Debug Logic"
+[[register]]
+  name = "DIDR"
+  type = "ro"
+  width = 32
+  description = "Debug ID register"
+  default = "0x77140013"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "WRP"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "BRP"
+    bits = "27:24"
+    type = "ro"
+  [[register.field]]
+    name = "CONTEXT"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "ARCH_VER"
+    bits = "19:16"
+    type = "ro"
+  [[register.field]]
+    name = "DEVID_IMP"
+    bits = "15"
+    type = "ro"
+    shortdesc = '''Indicates whether DEVID is implemented.'''
+    longdesc = '''0x0 = not implemented'''
+  [[register.field]]
+    name = "VARIANT"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''Implementation-defined variant number.'''
+    longdesc = '''This is the major revision number n in the rn part of the rnpn description of the product revision status.'''
+  [[register.field]]
+    name = "REVISION"
+    bits = "3:0"
+    type = "ro"
+    shortdesc = '''Implementation-defined revisionnumber.'''
+    longdesc = '''This is the minor revision number n in the pn part of the rnpn description of the product revision status.'''
+[[register]]
+  name = "WFAR"
+  type = "rw"
+  width = 32
+  description = "The Watchpoint Fault Address Register"
+  default = "0x00000000"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "ADDRESS"
+    bits = "31:1"
+    type = "rw"
+    shortdesc = '''This is the address of the watchpointed instruction.'''
+    longdesc = '''When a watchpoint occurs in ARM state, the WFAR contains the address of the instruction causing it plus an offset of 0x8. When a watchpoint occurs in Thumb state, the offset is plus 0x4.'''
+[[register]]
+  name = "VCR"
+  type = "rw"
+  width = 32
+  description = "Vector Catch Register"
+  default = "0x00000000"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "FIQ"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "IRQ"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "DATA_ABORT"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "PREFETCH_ABORT"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "SVC"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "UNDEFINED"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "RESET"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "DSCCR"
+  type = "rw"
+  width = 32
+  description = "Debug State Cache Control Register"
+  default = "0x00000000"
+  offset = "0x00000028"
+  [[register.field]]
+    name = "NWT"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "NIL"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "NDL"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "DTRRXEXT"
+  type = "ro"
+  width = 32
+  description = "Read Data Transfer Register"
+  default = "0x00000000"
+  offset = "0x00000080"
+  [[register.field]]
+    name = "DATA"
+    bits = "31:0"
+    type = "ro"
+    shortdesc = '''Reads the Data Transfer Register.'''
+    longdesc = '''Note: Reads of the DTRRXint through the coprocessor interface cause the TXfull flag to be cleared. However, reads of the DTRRXext through the APB port do not affect this flag.'''
+[[register]]
+  name = "ITR"
+  type = "wo"
+  width = 32
+  description = "Instruction Transfer Register"
+  default = "0x00000000"
+  offset = "0x00000084"
+  [[register.field]]
+    name = "INSTRUCTION"
+    bits = "31:0"
+    type = "wo"
+    shortdesc = '''The Instruction Transfer Register, bits [31:0] contain the ARM instruction for the processor to execute while in debug state.'''
+    longdesc = '''Note: Writes to the ITR when the processor is not in debug state or the DSCR[13] execute instruction enable bit is clearedare Unpredictable. When an instruction is issued to the processor, the debug unit prevents the next instruction from being issued until the DSCR[25] instruction complete bit is set.'''
+[[register]]
+  name = "DSCREXT"
+  type = "mixed"
+  width = 32
+  description = "Debug Status and Control Register"
+  default = "0x00000002"
+  offset = "0x00000088"
+  [[register.field]]
+    name = "RXFULL"
+    bits = "30"
+    type = "ro"
+    shortdesc = '''The RXfull flag: 0 = Read-DTR, DTRRX, empty.'''
+    longdesc = '''1 = Read-DTR, DTRRX, full. When set, this flag indicates to the processor that there is data available to read at the DTRRXint. It is automatically set on writes to the DTRRXext by the debugger, and is cleared when the processor reads the CP14 DTR. If the flag is not set, the DTRRXint returns an Unpredictable value.'''
+  [[register.field]]
+    name = "TXFULL"
+    bits = "29"
+    type = "ro"
+    shortdesc = '''The TXfull flag: 0 = Write-DTR, DTRTX, empty.'''
+    longdesc = '''1 = Write-DTR, DTRTX, full. When clear, this flag indicates to the processor that the DTRTXint is ready to receive data. It is automatically cleared on reads ofthe DTRTXext by the debugger, and is set when the processor writes to the CP14 DTR. If this bit is set and the processor attempts to write to the DTRTXint, the register contents are overwritten and the TXfull flag remains set.'''
+  [[register.field]]
+    name = "PIPEADV"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''Sticky pipeline advance read-only bit.'''
+    longdesc = '''This bit enables the debugger to detectwhether the processor is idle. In some situations, this might mean that the system bus port is deadlocked. This bit is set to 1 when the processor pipeline retires one instruction. It is cleared by a write to DRCR[3]. 0 = no instruction has completed execution since the last time this bit was cleared 1 = an instruction has completed execution since the last time this bit was cleared'''
+  [[register.field]]
+    name = "INSTRCOMPL_L"
+    bits = "24"
+    type = "ro"
+    shortdesc = '''Instruction complete read-only bit.'''
+    longdesc = '''Thisflag determines whether the processor has completed execution of an instruction issued through the APB port. 0 = processor is executing an instruction fetched from the ITR Register 1 = processor is not executing an instruction fetched from the ITR Register. When the APB port reads the DSCR and this bit is clear, then a subsequent write to the ITR Register is ignored unless DSCR[21:20] is not equal to 0. If DSCR[21:20] is not equal to 0, the ITR write stalls until the processor completes execution of the current instruction. If the processor is not in debug state, then the value read for this flag is Unpredictable. The flag is set to 1 on entry to debug state.'''
+  [[register.field]]
+    name = "EXTDCCMODE"
+    bits = "21:20"
+    type = "rw"
+    shortdesc = '''DTR access mode.'''
+    longdesc = '''You can use this field to optimize DTR traffic between a debugger and the processor. b00 = Non-blocking mode b01 = Stall mode b10 = Fast mode b11 = Reserved. Note . This field only affects the behavior ofDSCRext, DTRRXext, DTRTXext, and ITR accesses through the APB port, and not through CP14 debug instructions. . Non-blocking mode is the default setting. Improper use of the other modes might result in the debug access bus becoming deadlocked.'''
+  [[register.field]]
+    name = "ADADISCARD"
+    bits = "19"
+    type = "ro"
+    shortdesc = '''The Asynchronous Aborts Discarded bit is set when the processor is in debug state and is cleared on exit from debug state.'''
+    longdesc = '''While this bit is set, the processor does not take asynchronous Data Aborts, instead, the sticky asynchronous Data Abort bit is set to 1. 0 = do not discard asynchronous Data Aborts 1 = discard asynchronous Data Aborts and set ADABORT_I.'''
+  [[register.field]]
+    name = "NS"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "SPNIDDIS"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "SPIDDIS"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "MDBGEN"
+    bits = "15"
+    type = "rw"
+    shortdesc = '''The Monitor debug-mode enable bit: 0 = Monitor debug-mode disabled 1 = Monitor debug-mode enabled.'''
+    longdesc = '''If Halting debug-mode is enabled through bit [14], then the processor is in Halting debug-mode regardless of the value of bit [15]. If the external interface input DBGENm is LOW, this bit reads as 0. The programmed value is masked until DBGENm is HIGH, and at that time the read value reverts to the programmed value.'''
+  [[register.field]]
+    name = "HDBGEN"
+    bits = "14"
+    type = "rw"
+    shortdesc = '''The Halting debug-mode enable bit: 0 = Halting debug-mode disabled 1 = Halting debug-mode enabled.'''
+    longdesc = '''If the external interface input DBGENm is LOW, this bit reads as 0. The programmed value is masked until DBGENm is HIGH, and at that time the read value reverts to the programmed value.'''
+  [[register.field]]
+    name = "ITREN"
+    bits = "13"
+    type = "rw"
+    shortdesc = '''Execute ARM instruction enable bit: 0 = disabled 1 = enabled.'''
+    longdesc = '''If this bit is set and an ITR write succeeds, the processor fetches an instruction from the ITR for execution. If this bit is set to 1 when the processor is not in debug state, the behavior of the processor is Unpredictable.'''
+  [[register.field]]
+    name = "UDCCDIS"
+    bits = "12"
+    type = "rw"
+    shortdesc = '''CP14 debug user access disable control bit: 0 = CP14 debug user access enable 1 = CP14 debug user access disable.'''
+    longdesc = '''If this bit is set and a User mode process attemptsto access any CP14 debug registers, an Undefined Instruction exception is taken.'''
+  [[register.field]]
+    name = "INTDIS"
+    bits = "11"
+    type = "rw"
+    shortdesc = '''Interrupts disable bit: 0 = interrupts enabled 1 = interrupts disabled.'''
+    longdesc = '''If this bit is set, the nIRQmand nFIQminput signals are inhibited. The external debugger can optionally use this bit to execute pieces of code in normal state aspart of the debugging process and avoid having an interrupt taking control of the program flow.'''
+  [[register.field]]
+    name = "DBGACK"
+    bits = "10"
+    type = "rw"
+    shortdesc = '''Force Debug Acknowledge bit.'''
+    longdesc = '''If this bit is set to 1, the DBGACKm output signal is forced HIGH, regardless of the processor state. The external debugger can optionally use this bit to execute pieces of code in normal state as part of the debugging process for the system to behave as if the processor is in debug state. Some systems rely on DBGACKm to determine whether data accesses are application or debugger generated.'''
+  [[register.field]]
+    name = "UND_I"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Sticky Undefined bit: 0 = no Undefined Instruction exception occurred in debug state since the last time this bit was cleared 1 = an Undefined Instruction exception occurred while in debug state since the last time this bit was cleared.'''
+    longdesc = '''This flag detects Undefined Instruction exceptions generated by instructions issued to the processor through the ITR. This bit is set to 1 when anUndefined Instruction exception occurs while the processor is in debug state and is cleared by writing a 1 to DRCR[2].'''
+  [[register.field]]
+    name = "ADABORT_I"
+    bits = "7"
+    type = "ro"
+    shortdesc = '''Sticky asynchronous Data Abort bit: 0 = no asynchronous Data Aborts occurred since the last time this bit was cleared 1 = an asynchronous Data Abort occurred since the last time this bit was cleared.'''
+    longdesc = '''This flag detects asynchronous DataAborts triggered by instructions issued to the processor through the ITR. This bit is set to 1 when an asynchronous Data Abort occurs while the processor is in debug state and is cleared by writing a 1 to DRCR[2].'''
+  [[register.field]]
+    name = "SDABORT_I"
+    bits = "6"
+    type = "ro"
+    shortdesc = '''Sticky synchronous Data Abort bit: 0 = no synchronous Data Abort occurred since the last time this bit was cleared 1 = a synchronous Data Abort occurred since the last time this bit was cleared.'''
+    longdesc = '''This flag detects synchronous DataAborts generated by instructionsissued to the processor through the ITR. This bit is set to 1 when a synchronous Data Abort occurs while the processor is in debug state and is cleared by writing to the DRCR[2].'''
+  [[register.field]]
+    name = "MOE"
+    bits = "5:2"
+    type = "rw"
+    shortdesc = '''Method of entry bits: 0000 = a DRCR[0] halting debug event occurred 0001 = a breakpoint occurred 0100 = an EDBGRQm halting debug event occurred 0011 = a BKPT instruction occurred 1010 = a synchronous watchpoint occurred others = reserved.'''
+    longdesc = '''These bits are set toindicate any of: . the cause of a debug exception . the cause for entering debug state. A Prefetch Abort or Data Abort handler must check the value of the CP15 Fault Status Register to determine whether a debug exception occurred and then use these bits to determine the specific debug event.'''
+  [[register.field]]
+    name = "RESTARTED"
+    bits = "1"
+    type = "ro"
+    shortdesc = '''CPU restarted bit: 0 = The processor is exiting debug state.'''
+    longdesc = '''1 = The processor has exited debug state. The debugger can poll this bit to determine when the processor responds to a request to leave debug state.'''
+  [[register.field]]
+    name = "HALTED"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''CPU halted bit: 0 = The processor is in normal state.'''
+    longdesc = '''1 = The processor is in debug state. The debugger can poll this bit to determine when the processor has entered debug state.'''
+[[register]]
+  name = "DTRTXEXT"
+  type = "rw"
+  width = 32
+  description = "Write Data Transfer Register"
+  default = "0x00000000"
+  offset = "0x0000008C"
+  [[register.field]]
+    name = "DATA"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Writes the Data Transfer Register.'''
+    longdesc = '''This is write-only for the CP14 interface. Note: Writes to the DTRTXint through the coprocessor interface cause the RXfull flag to be set. However, writes to the DTRTXext through the APB port do not affect this flag.'''
+[[register]]
+  name = "DRCR"
+  type = "wo"
+  width = 32
+  description = "Debug Run Control Register"
+  default = "0x00000000"
+  offset = "0x00000090"
+  [[register.field]]
+    name = "CANCEL_MEMORY_REQUESTS"
+    bits = "4"
+    type = "wo"
+    shortdesc = '''If 1 is written to this bit, the processor abandons any pending memorytransactions until it can enter debug state.'''
+    longdesc = '''Debug state entry is the acknowledge event that clears this request. Abandoned transactions have the following behavior: . abandoned stores might write an Unpredictable value to the target address . abandoned loads return an Unpredictable value to the register bank. An abandoned transaction does not cause any exception. Additional instruction fetches or data accesses after the processor entered debug state have an Unpredictable behavior. This bit enables the debugger to progress on a deadlock so the processor can enter debug state. For a debug state entry to occur, a halting debug event must be requested before this bit is set. If you write a 1 to this bit when DBGENm is LOW, the write has no effect.'''
+  [[register.field]]
+    name = "CLEAR_STICKY_PIPELINE_ADVANCE"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "CLEAR_STICKY_EXCEPTIONS"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "RESTART_REQUEST"
+    bits = "1"
+    type = "wo"
+    shortdesc = '''Writing a 1 to this bit requests that the processor leaves debug state.'''
+    longdesc = '''This request is held until the processor exits debug state. When the debugger makes this request, it polls DSCR[1] until it reads 1. This bit always reads as zero. Writes are ignored when the processor is not in debug state.'''
+  [[register.field]]
+    name = "HALT_REQUEST"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Writing a 1 to this bit triggers a halting debug event, that is, a request that the processor enters debug state.'''
+    longdesc = '''This request is held until the debug state entry occurs. When the debugger makes this request, it must poll DSCR[0] until it reads 1. This bit always reads as zero. Writes are ignored when the processor is already in debug state.'''
+[[register]]
+  name = "BVR0"
+  type = "rw"
+  width = 32
+  description = "Breakpoint Value Register 0"
+  default = "0x00000000"
+  offset = "0x00000100"
+  [[register.field]]
+    name = "BREAKPOINT_VALUE"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Each BVR is associated with a Breakpoint Control Register(BCR).'''
+    longdesc = '''BCRy is the corresponding control register for BVRy. A pair of breakpoint registers, BVRy/BCRy, is called a Breakpoint Register Pair (BRP). BVR0-7 are paired with BCR0-7 to make BRP0-7. The breakpoint value contained in this register corresponds to either an instruction address or a context ID. Breakpoints can be set on: . an instruction address . a context ID value . an instruction address and context ID pair. For an instruction address and context ID pair, two BRPs must be linked. A debug event is generated when both the instruction address and the context ID pair match at the same time. Note . Only BRPn supports context ID comparison, where n+1 is the number of breakpoint register pairs implemented in the processor. . Bits [1:0] of Registers BVR0 to BVR(n-1) are Do Not Modify on writes and Read-As-Zero because these registers do not support context ID comparisons. . The contents of the CP15 Context ID Register give the context ID value for a BVR to match. For information on the Context ID Register, see Chapter 4 System Control.'''
+[[register]]
+  name = "BVR1"
+  type = "rw"
+  width = 32
+  description = "Breakpoint Value Register 1"
+  default = "0x00000000"
+  offset = "0x00000104"
+  [[register.field]]
+    name = "BREAKPOINT_VALUE"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Each BVR is associated with a Breakpoint Control Register(BCR).'''
+    longdesc = '''BCRy is the corresponding control register for BVRy. A pair of breakpoint registers, BVRy/BCRy, is called a Breakpoint Register Pair (BRP). BVR0-7 are paired with BCR0-7 to make BRP0-7. The breakpoint value contained in this register corresponds to either an instruction address or a context ID. Breakpoints can be set on: . an instruction address . a context ID value . an instruction address and context ID pair. For an instruction address and context ID pair, two BRPs must be linked. A debug event is generated when both the instruction address and the context ID pair match at the same time. Note . Only BRPn supports context ID comparison, where n+1 is the number of breakpoint register pairs implemented in the processor. . Bits [1:0] of Registers BVR0 to BVR(n-1) are Do Not Modify on writes and Read-As-Zero because these registers do not support context ID comparisons. . The contents of the CP15 Context ID Register give the context ID value for a BVR to match. For information on the Context ID Register, see Chapter 4 System Control.'''
+[[register]]
+  name = "BVR2"
+  type = "rw"
+  width = 32
+  description = "Breakpoint Value Register 2"
+  default = "0x00000000"
+  offset = "0x00000108"
+  [[register.field]]
+    name = "BREAKPOINT_VALUE"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Each BVR is associated with a Breakpoint Control Register(BCR).'''
+    longdesc = '''BCRy is the corresponding control register for BVRy. A pair of breakpoint registers, BVRy/BCRy, is called a Breakpoint Register Pair (BRP). BVR0-7 are paired with BCR0-7 to make BRP0-7. The breakpoint value contained in this register corresponds to either an instruction address or a context ID. Breakpoints can be set on: . an instruction address . a context ID value . an instruction address and context ID pair. For an instruction address and context ID pair, two BRPs must be linked. A debug event is generated when both the instruction address and the context ID pair match at the same time. Note . Only BRPn supports context ID comparison, where n+1 is the number of breakpoint register pairs implemented in the processor. . Bits [1:0] of Registers BVR0 to BVR(n-1) are Do Not Modify on writes and Read-As-Zero because these registers do not support context ID comparisons. . The contents of the CP15 Context ID Register give the context ID value for a BVR to match. For information on the Context ID Register, see Chapter 4 System Control.'''
+[[register]]
+  name = "BVR3"
+  type = "rw"
+  width = 32
+  description = "Breakpoint Value Register 3"
+  default = "0x00000000"
+  offset = "0x0000010C"
+  [[register.field]]
+    name = "BREAKPOINT_VALUE"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Each BVR is associated with a Breakpoint Control Register(BCR).'''
+    longdesc = '''BCRy is the corresponding control register for BVRy. A pair of breakpoint registers, BVRy/BCRy, is called a Breakpoint Register Pair (BRP). BVR0-7 are paired with BCR0-7 to make BRP0-7. The breakpoint value contained in this register corresponds to either an instruction address or a context ID. Breakpoints can be set on: . an instruction address . a context ID value . an instruction address and context ID pair. For an instruction address and context ID pair, two BRPs must be linked. A debug event is generated when both the instruction address and the context ID pair match at the same time. Note . Only BRPn supports context ID comparison, where n+1 is the number of breakpoint register pairs implemented in the processor. . Bits [1:0] of Registers BVR0 to BVR(n-1) are Do Not Modify on writes and Read-As-Zero because these registers do not support context ID comparisons. . The contents of the CP15 Context ID Register give the context ID value for a BVR to match. For information on the Context ID Register, see Chapter 4 System Control.'''
+[[register]]
+  name = "BVR4"
+  type = "rw"
+  width = 32
+  description = "Breakpoint Value Register 4"
+  default = "0x00000000"
+  offset = "0x00000110"
+  [[register.field]]
+    name = "BREAKPOINT_VALUE"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Each BVR is associated with a Breakpoint Control Register(BCR).'''
+    longdesc = '''BCRy is the corresponding control register for BVRy. A pair of breakpoint registers, BVRy/BCRy, is called a Breakpoint Register Pair (BRP). BVR0-7 are paired with BCR0-7 to make BRP0-7. The breakpoint value contained in this register corresponds to either an instruction address or a context ID. Breakpoints can be set on: . an instruction address . a context ID value . an instruction address and context ID pair. For an instruction address and context ID pair, two BRPs must be linked. A debug event is generated when both the instruction address and the context ID pair match at the same time. Note . Only BRPn supports context ID comparison, where n+1 is the number of breakpoint register pairs implemented in the processor. . Bits [1:0] of Registers BVR0 to BVR(n-1) are Do Not Modify on writes and Read-As-Zero because these registers do not support context ID comparisons. . The contents of the CP15 Context ID Register give the context ID value for a BVR to match. For information on the Context ID Register, see Chapter 4 System Control.'''
+[[register]]
+  name = "BVR5"
+  type = "rw"
+  width = 32
+  description = "Breakpoint Value Register 5"
+  default = "0x00000000"
+  offset = "0x00000114"
+  [[register.field]]
+    name = "BREAKPOINT_VALUE"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Each BVR is associated with a Breakpoint Control Register(BCR).'''
+    longdesc = '''BCRy is the corresponding control register for BVRy. A pair of breakpoint registers, BVRy/BCRy, is called a Breakpoint Register Pair (BRP). BVR0-7 are paired with BCR0-7 to make BRP0-7. The breakpoint value contained in this register corresponds to either an instruction address or a context ID. Breakpoints can be set on: . an instruction address . a context ID value . an instruction address and context ID pair. For an instruction address and context ID pair, two BRPs must be linked. A debug event is generated when both the instruction address and the context ID pair match at the same time. Note . Only BRPn supports context ID comparison, where n+1 is the number of breakpoint register pairs implemented in the processor. . Bits [1:0] of Registers BVR0 to BVR(n-1) are Do Not Modify on writes and Read-As-Zero because these registers do not support context ID comparisons. . The contents of the CP15 Context ID Register give the context ID value for a BVR to match. For information on the Context ID Register, see Chapter 4 System Control.'''
+[[register]]
+  name = "BVR6"
+  type = "rw"
+  width = 32
+  description = "Breakpoint Value Register 6"
+  default = "0x00000000"
+  offset = "0x00000118"
+  [[register.field]]
+    name = "BREAKPOINT_VALUE"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Each BVR is associated with a Breakpoint Control Register(BCR).'''
+    longdesc = '''BCRy is the corresponding control register for BVRy. A pair of breakpoint registers, BVRy/BCRy, is called a Breakpoint Register Pair (BRP). BVR0-7 are paired with BCR0-7 to make BRP0-7. The breakpoint value contained in this register corresponds to either an instruction address or a context ID. Breakpoints can be set on: . an instruction address . a context ID value . an instruction address and context ID pair. For an instruction address and context ID pair, two BRPs must be linked. A debug event is generated when both the instruction address and the context ID pair match at the same time. Note . Only BRPn supports context ID comparison, where n+1 is the number of breakpoint register pairs implemented in the processor. . Bits [1:0] of Registers BVR0 to BVR(n-1) are Do Not Modify on writes and Read-As-Zero because these registers do not support context ID comparisons. . The contents of the CP15 Context ID Register give the context ID value for a BVR to match. For information on the Context ID Register, see Chapter 4 System Control.'''
+[[register]]
+  name = "BVR7"
+  type = "rw"
+  width = 32
+  description = "Breakpoint Value Register 7"
+  default = "0x00000000"
+  offset = "0x0000011C"
+  [[register.field]]
+    name = "BREAKPOINT_VALUE"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Each BVR is associated with a Breakpoint Control Register(BCR).'''
+    longdesc = '''BCRy is the corresponding control register for BVRy. A pair of breakpoint registers, BVRy/BCRy, is called a Breakpoint Register Pair (BRP). BVR0-7 are paired with BCR0-7 to make BRP0-7. The breakpoint value contained in this register corresponds to either an instruction address or a context ID. Breakpoints can be set on: . an instruction address . a context ID value . an instruction address and context ID pair. For an instruction address and context ID pair, two BRPs must be linked. A debug event is generated when both the instruction address and the context ID pair match at the same time. Note . Only BRPn supports context ID comparison, where n+1 is the number of breakpoint register pairs implemented in the processor. . Bits [1:0] of Registers BVR0 to BVR(n-1) are Do Not Modify on writes and Read-As-Zero because these registers do not support context ID comparisons. . The contents of the CP15 Context ID Register give the context ID value for a BVR to match. For information on the Context ID Register, see Chapter 4 System Control.'''
+[[register]]
+  name = "BCR0"
+  type = "rw"
+  width = 32
+  description = "Breakpoint Control Register 0"
+  default = "0x00000000"
+  offset = "0x00000140"
+  [[register.field]]
+    name = "BREAKPOINT_ADDRESS_MASK"
+    bits = "28:24"
+    type = "rw"
+    shortdesc = '''This field sets a breakpoint on a range of addresses by masking lower order address bits out of the breakpoint comparison.'''
+    longdesc = '''b00000 = no mask b00001 = Reserved b00010 = Reserved b00011 = 0x00000007 mask for instruction address b00100 = 0x0000000F mask for instruction address b00101 = 0x0000001F mask for instruction address .. b11111 = 0x7FFFFFFF mask for instruction address. If BCR[28:24] is not set to b00000, thenBCR[8:5] must be set to b1111. Otherwise the behavior is Unpredictable. In addition, if BCR[28:24] is not set to b00000, then the corresponding BVR bits that are not being included in the comparison Should Be Zero. Otherwise the behavior is Unpredictable. Ifthis BRP is programmed for context ID comparison, this field must be set to b00000.Otherwise the behavior is Unpredictable. There is no encoding for a full 32-bit mask but the same effect of a break anywherebreakpoint can be achieved by setting BCR[22] to 1 and BCR[8:5] to b0000.'''
+  [[register.field]]
+    name = "M"
+    bits = "22:20"
+    type = "rw"
+  [[register.field]]
+    name = "LINKED_BRP_NUMBER"
+    bits = "19:16"
+    type = "rw"
+    shortdesc = '''The binary number encoded here indicates another BRPto link this one with.'''
+    longdesc = '''Note . if a BRP is linked with itself,it is Unpredictable whether a breakpoint debug event is generated . if this BRP is linked to another BRP that is not configured for linked context ID matching, it is Unpredictable whether a breakpoint debug event is generated.'''
+  [[register.field]]
+    name = "BYTE_ADDRESS_SELECT"
+    bits = "8:5"
+    type = "rw"
+    shortdesc = '''For breakpoints programmed to match an instruction address, the debugger must write a word-aligned address to the BVR.'''
+    longdesc = '''You can then use this field toprogram the breakpoint soit hits only if certain byte addresses are accessed. If the BRP is programmed for instruction address match: b0000 = the breakpoint never hits bxxx1 = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +0 is accessed bxx1x = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +1 is accessed bx1xx = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +2 is accessed b1xxx = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +3 is accessed b1111 = the breakpoint hits if any of the four bytes starting at address (BVR & 0xFFFFFFFC) +0 is accessed. If the BRP is programmed for instruction address mismatch, the breakpoint hits where the corresponding instruction address breakpoint does not hit, that is, the range of addresses covered by an instruction address mismatch breakpoint is the negative image of the corresponding instruction address breakpoint. If the BRP is programmed for context ID comparison, this field must be set to b1111. Otherwise, breakpoint and watchpoint debug events might not be generated as expected. Writing a value to BCR[8:5] so that BCR[8] is not equal to BCR[7] or BCR[6] isnot equal to BCR[5] has Unpredictable results.'''
+  [[register.field]]
+    name = "S"
+    bits = "2:1"
+    type = "rw"
+    shortdesc = '''Supervisor access control.'''
+    longdesc = '''The breakpoint can be conditioned on the mode of the processor: b00 = User, System, or Supervisor b01 = Privileged b10 = User b11 = any'''
+  [[register.field]]
+    name = "B"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Breakpoint enable: 0 = Breakpoint disabled.'''
+    longdesc = '''1 = Breakpoint enabled'''
+[[register]]
+  name = "BCR1"
+  type = "rw"
+  width = 32
+  description = "Breakpoint Control Register 1"
+  default = "0x00000000"
+  offset = "0x00000144"
+  [[register.field]]
+    name = "BREAKPOINT_ADDRESS_MASK"
+    bits = "28:24"
+    type = "rw"
+    shortdesc = '''This field sets a breakpoint on a range of addresses by masking lower order address bits out of the breakpoint comparison.'''
+    longdesc = '''b00000 = no mask b00001 = Reserved b00010 = Reserved b00011 = 0x00000007 mask for instruction address b00100 = 0x0000000F mask for instruction address b00101 = 0x0000001F mask for instruction address .. b11111 = 0x7FFFFFFF mask for instruction address. If BCR[28:24] is not set to b00000, thenBCR[8:5] must be set to b1111. Otherwise the behavior is Unpredictable. In addition, if BCR[28:24] is not set to b00000, then the corresponding BVR bits that are not being included in the comparison Should Be Zero. Otherwise the behavior is Unpredictable. Ifthis BRP is programmed for context ID comparison, this field must be set to b00000.Otherwise the behavior is Unpredictable. There is no encoding for a full 32-bit mask but the same effect of a break anywherebreakpoint can be achieved by setting BCR[22] to 1 and BCR[8:5] to b0000.'''
+  [[register.field]]
+    name = "M"
+    bits = "22:20"
+    type = "rw"
+  [[register.field]]
+    name = "LINKED_BRP_NUMBER"
+    bits = "19:16"
+    type = "rw"
+    shortdesc = '''The binary number encoded here indicates another BRPto link this one with.'''
+    longdesc = '''Note . if a BRP is linked with itself,it is Unpredictable whether a breakpoint debug event is generated . if this BRP is linked to another BRP that is not configured for linked context ID matching, it is Unpredictable whether a breakpoint debug event is generated.'''
+  [[register.field]]
+    name = "BYTE_ADDRESS_SELECT"
+    bits = "8:5"
+    type = "rw"
+    shortdesc = '''For breakpoints programmed to match an instruction address, the debugger must write a word-aligned address to the BVR.'''
+    longdesc = '''You can then use this field toprogram the breakpoint soit hits only if certain byte addresses are accessed. If the BRP is programmed for instruction address match: b0000 = the breakpoint never hits bxxx1 = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +0 is accessed bxx1x = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +1 is accessed bx1xx = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +2 is accessed b1xxx = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +3 is accessed b1111 = the breakpoint hits if any of the four bytes starting at address (BVR & 0xFFFFFFFC) +0 is accessed. If the BRP is programmed for instruction address mismatch, the breakpoint hits where the corresponding instruction address breakpoint does not hit, that is, the range of addresses covered by an instruction address mismatch breakpoint is the negative image of the corresponding instruction address breakpoint. If the BRP is programmed for context ID comparison, this field must be set to b1111. Otherwise, breakpoint and watchpoint debug events might not be generated as expected. Writing a value to BCR[8:5] so that BCR[8] is not equal to BCR[7] or BCR[6] isnot equal to BCR[5] has Unpredictable results.'''
+  [[register.field]]
+    name = "S"
+    bits = "2:1"
+    type = "rw"
+    shortdesc = '''Supervisor access control.'''
+    longdesc = '''The breakpoint can be conditioned on the mode of the processor: b00 = User, System, or Supervisor b01 = Privileged b10 = User b11 = any'''
+  [[register.field]]
+    name = "B"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Breakpoint enable: 0 = Breakpoint disabled.'''
+    longdesc = '''1 = Breakpoint enabled'''
+[[register]]
+  name = "BCR2"
+  type = "rw"
+  width = 32
+  description = "Breakpoint Control Register 2"
+  default = "0x00000000"
+  offset = "0x00000148"
+  [[register.field]]
+    name = "BREAKPOINT_ADDRESS_MASK"
+    bits = "28:24"
+    type = "rw"
+    shortdesc = '''This field sets a breakpoint on a range of addresses by masking lower order address bits out of the breakpoint comparison.'''
+    longdesc = '''b00000 = no mask b00001 = Reserved b00010 = Reserved b00011 = 0x00000007 mask for instruction address b00100 = 0x0000000F mask for instruction address b00101 = 0x0000001F mask for instruction address .. b11111 = 0x7FFFFFFF mask for instruction address. If BCR[28:24] is not set to b00000, thenBCR[8:5] must be set to b1111. Otherwise the behavior is Unpredictable. In addition, if BCR[28:24] is not set to b00000, then the corresponding BVR bits that are not being included in the comparison Should Be Zero. Otherwise the behavior is Unpredictable. Ifthis BRP is programmed for context ID comparison, this field must be set to b00000.Otherwise the behavior is Unpredictable. There is no encoding for a full 32-bit mask but the same effect of a break anywherebreakpoint can be achieved by setting BCR[22] to 1 and BCR[8:5] to b0000.'''
+  [[register.field]]
+    name = "M"
+    bits = "22:20"
+    type = "rw"
+  [[register.field]]
+    name = "LINKED_BRP_NUMBER"
+    bits = "19:16"
+    type = "rw"
+    shortdesc = '''The binary number encoded here indicates another BRPto link this one with.'''
+    longdesc = '''Note . if a BRP is linked with itself,it is Unpredictable whether a breakpoint debug event is generated . if this BRP is linked to another BRP that is not configured for linked context ID matching, it is Unpredictable whether a breakpoint debug event is generated.'''
+  [[register.field]]
+    name = "BYTE_ADDRESS_SELECT"
+    bits = "8:5"
+    type = "rw"
+    shortdesc = '''For breakpoints programmed to match an instruction address, the debugger must write a word-aligned address to the BVR.'''
+    longdesc = '''You can then use this field toprogram the breakpoint soit hits only if certain byte addresses are accessed. If the BRP is programmed for instruction address match: b0000 = the breakpoint never hits bxxx1 = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +0 is accessed bxx1x = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +1 is accessed bx1xx = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +2 is accessed b1xxx = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +3 is accessed b1111 = the breakpoint hits if any of the four bytes starting at address (BVR & 0xFFFFFFFC) +0 is accessed. If the BRP is programmed for instruction address mismatch, the breakpoint hits where the corresponding instruction address breakpoint does not hit, that is, the range of addresses covered by an instruction address mismatch breakpoint is the negative image of the corresponding instruction address breakpoint. If the BRP is programmed for context ID comparison, this field must be set to b1111. Otherwise, breakpoint and watchpoint debug events might not be generated as expected. Writing a value to BCR[8:5] so that BCR[8] is not equal to BCR[7] or BCR[6] isnot equal to BCR[5] has Unpredictable results.'''
+  [[register.field]]
+    name = "S"
+    bits = "2:1"
+    type = "rw"
+    shortdesc = '''Supervisor access control.'''
+    longdesc = '''The breakpoint can be conditioned on the mode of the processor: b00 = User, System, or Supervisor b01 = Privileged b10 = User b11 = any'''
+  [[register.field]]
+    name = "B"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Breakpoint enable: 0 = Breakpoint disabled.'''
+    longdesc = '''1 = Breakpoint enabled'''
+[[register]]
+  name = "BCR3"
+  type = "rw"
+  width = 32
+  description = "Breakpoint Control Register 3"
+  default = "0x00000000"
+  offset = "0x0000014C"
+  [[register.field]]
+    name = "BREAKPOINT_ADDRESS_MASK"
+    bits = "28:24"
+    type = "rw"
+    shortdesc = '''This field sets a breakpoint on a range of addresses by masking lower order address bits out of the breakpoint comparison.'''
+    longdesc = '''b00000 = no mask b00001 = Reserved b00010 = Reserved b00011 = 0x00000007 mask for instruction address b00100 = 0x0000000F mask for instruction address b00101 = 0x0000001F mask for instruction address .. b11111 = 0x7FFFFFFF mask for instruction address. If BCR[28:24] is not set to b00000, thenBCR[8:5] must be set to b1111. Otherwise the behavior is Unpredictable. In addition, if BCR[28:24] is not set to b00000, then the corresponding BVR bits that are not being included in the comparison Should Be Zero. Otherwise the behavior is Unpredictable. Ifthis BRP is programmed for context ID comparison, this field must be set to b00000.Otherwise the behavior is Unpredictable. There is no encoding for a full 32-bit mask but the same effect of a break anywherebreakpoint can be achieved by setting BCR[22] to 1 and BCR[8:5] to b0000.'''
+  [[register.field]]
+    name = "M"
+    bits = "22:20"
+    type = "rw"
+  [[register.field]]
+    name = "LINKED_BRP_NUMBER"
+    bits = "19:16"
+    type = "rw"
+    shortdesc = '''The binary number encoded here indicates another BRPto link this one with.'''
+    longdesc = '''Note . if a BRP is linked with itself,it is Unpredictable whether a breakpoint debug event is generated . if this BRP is linked to another BRP that is not configured for linked context ID matching, it is Unpredictable whether a breakpoint debug event is generated.'''
+  [[register.field]]
+    name = "BYTE_ADDRESS_SELECT"
+    bits = "8:5"
+    type = "rw"
+    shortdesc = '''For breakpoints programmed to match an instruction address, the debugger must write a word-aligned address to the BVR.'''
+    longdesc = '''You can then use this field toprogram the breakpoint soit hits only if certain byte addresses are accessed. If the BRP is programmed for instruction address match: b0000 = the breakpoint never hits bxxx1 = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +0 is accessed bxx1x = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +1 is accessed bx1xx = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +2 is accessed b1xxx = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +3 is accessed b1111 = the breakpoint hits if any of the four bytes starting at address (BVR & 0xFFFFFFFC) +0 is accessed. If the BRP is programmed for instruction address mismatch, the breakpoint hits where the corresponding instruction address breakpoint does not hit, that is, the range of addresses covered by an instruction address mismatch breakpoint is the negative image of the corresponding instruction address breakpoint. If the BRP is programmed for context ID comparison, this field must be set to b1111. Otherwise, breakpoint and watchpoint debug events might not be generated as expected. Writing a value to BCR[8:5] so that BCR[8] is not equal to BCR[7] or BCR[6] isnot equal to BCR[5] has Unpredictable results.'''
+  [[register.field]]
+    name = "S"
+    bits = "2:1"
+    type = "rw"
+    shortdesc = '''Supervisor access control.'''
+    longdesc = '''The breakpoint can be conditioned on the mode of the processor: b00 = User, System, or Supervisor b01 = Privileged b10 = User b11 = any'''
+  [[register.field]]
+    name = "B"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Breakpoint enable: 0 = Breakpoint disabled.'''
+    longdesc = '''1 = Breakpoint enabled'''
+[[register]]
+  name = "BCR4"
+  type = "rw"
+  width = 32
+  description = "Breakpoint Control Register 4"
+  default = "0x00000000"
+  offset = "0x00000150"
+  [[register.field]]
+    name = "BREAKPOINT_ADDRESS_MASK"
+    bits = "28:24"
+    type = "rw"
+    shortdesc = '''This field sets a breakpoint on a range of addresses by masking lower order address bits out of the breakpoint comparison.'''
+    longdesc = '''b00000 = no mask b00001 = Reserved b00010 = Reserved b00011 = 0x00000007 mask for instruction address b00100 = 0x0000000F mask for instruction address b00101 = 0x0000001F mask for instruction address .. b11111 = 0x7FFFFFFF mask for instruction address. If BCR[28:24] is not set to b00000, thenBCR[8:5] must be set to b1111. Otherwise the behavior is Unpredictable. In addition, if BCR[28:24] is not set to b00000, then the corresponding BVR bits that are not being included in the comparison Should Be Zero. Otherwise the behavior is Unpredictable. Ifthis BRP is programmed for context ID comparison, this field must be set to b00000.Otherwise the behavior is Unpredictable. There is no encoding for a full 32-bit mask but the same effect of a break anywherebreakpoint can be achieved by setting BCR[22] to 1 and BCR[8:5] to b0000.'''
+  [[register.field]]
+    name = "M"
+    bits = "22:20"
+    type = "rw"
+  [[register.field]]
+    name = "LINKED_BRP_NUMBER"
+    bits = "19:16"
+    type = "rw"
+    shortdesc = '''The binary number encoded here indicates another BRPto link this one with.'''
+    longdesc = '''Note . if a BRP is linked with itself,it is Unpredictable whether a breakpoint debug event is generated . if this BRP is linked to another BRP that is not configured for linked context ID matching, it is Unpredictable whether a breakpoint debug event is generated.'''
+  [[register.field]]
+    name = "BYTE_ADDRESS_SELECT"
+    bits = "8:5"
+    type = "rw"
+    shortdesc = '''For breakpoints programmed to match an instruction address, the debugger must write a word-aligned address to the BVR.'''
+    longdesc = '''You can then use this field toprogram the breakpoint soit hits only if certain byte addresses are accessed. If the BRP is programmed for instruction address match: b0000 = the breakpoint never hits bxxx1 = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +0 is accessed bxx1x = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +1 is accessed bx1xx = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +2 is accessed b1xxx = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +3 is accessed b1111 = the breakpoint hits if any of the four bytes starting at address (BVR & 0xFFFFFFFC) +0 is accessed. If the BRP is programmed for instruction address mismatch, the breakpoint hits where the corresponding instruction address breakpoint does not hit, that is, the range of addresses covered by an instruction address mismatch breakpoint is the negative image of the corresponding instruction address breakpoint. If the BRP is programmed for context ID comparison, this field must be set to b1111. Otherwise, breakpoint and watchpoint debug events might not be generated as expected. Writing a value to BCR[8:5] so that BCR[8] is not equal to BCR[7] or BCR[6] isnot equal to BCR[5] has Unpredictable results.'''
+  [[register.field]]
+    name = "S"
+    bits = "2:1"
+    type = "rw"
+    shortdesc = '''Supervisor access control.'''
+    longdesc = '''The breakpoint can be conditioned on the mode of the processor: b00 = User, System, or Supervisor b01 = Privileged b10 = User b11 = any'''
+  [[register.field]]
+    name = "B"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Breakpoint enable: 0 = Breakpoint disabled.'''
+    longdesc = '''1 = Breakpoint enabled'''
+[[register]]
+  name = "BCR5"
+  type = "rw"
+  width = 32
+  description = "Breakpoint Control Register 5"
+  default = "0x00000000"
+  offset = "0x00000154"
+  [[register.field]]
+    name = "BREAKPOINT_ADDRESS_MASK"
+    bits = "28:24"
+    type = "rw"
+    shortdesc = '''This field sets a breakpoint on a range of addresses by masking lower order address bits out of the breakpoint comparison.'''
+    longdesc = '''b00000 = no mask b00001 = Reserved b00010 = Reserved b00011 = 0x00000007 mask for instruction address b00100 = 0x0000000F mask for instruction address b00101 = 0x0000001F mask for instruction address .. b11111 = 0x7FFFFFFF mask for instruction address. If BCR[28:24] is not set to b00000, thenBCR[8:5] must be set to b1111. Otherwise the behavior is Unpredictable. In addition, if BCR[28:24] is not set to b00000, then the corresponding BVR bits that are not being included in the comparison Should Be Zero. Otherwise the behavior is Unpredictable. Ifthis BRP is programmed for context ID comparison, this field must be set to b00000.Otherwise the behavior is Unpredictable. There is no encoding for a full 32-bit mask but the same effect of a break anywherebreakpoint can be achieved by setting BCR[22] to 1 and BCR[8:5] to b0000.'''
+  [[register.field]]
+    name = "M"
+    bits = "22:20"
+    type = "rw"
+  [[register.field]]
+    name = "LINKED_BRP_NUMBER"
+    bits = "19:16"
+    type = "rw"
+    shortdesc = '''The binary number encoded here indicates another BRPto link this one with.'''
+    longdesc = '''Note . if a BRP is linked with itself,it is Unpredictable whether a breakpoint debug event is generated . if this BRP is linked to another BRP that is not configured for linked context ID matching, it is Unpredictable whether a breakpoint debug event is generated.'''
+  [[register.field]]
+    name = "BYTE_ADDRESS_SELECT"
+    bits = "8:5"
+    type = "rw"
+    shortdesc = '''For breakpoints programmed to match an instruction address, the debugger must write a word-aligned address to the BVR.'''
+    longdesc = '''You can then use this field toprogram the breakpoint soit hits only if certain byte addresses are accessed. If the BRP is programmed for instruction address match: b0000 = the breakpoint never hits bxxx1 = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +0 is accessed bxx1x = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +1 is accessed bx1xx = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +2 is accessed b1xxx = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +3 is accessed b1111 = the breakpoint hits if any of the four bytes starting at address (BVR & 0xFFFFFFFC) +0 is accessed. If the BRP is programmed for instruction address mismatch, the breakpoint hits where the corresponding instruction address breakpoint does not hit, that is, the range of addresses covered by an instruction address mismatch breakpoint is the negative image of the corresponding instruction address breakpoint. If the BRP is programmed for context ID comparison, this field must be set to b1111. Otherwise, breakpoint and watchpoint debug events might not be generated as expected. Writing a value to BCR[8:5] so that BCR[8] is not equal to BCR[7] or BCR[6] isnot equal to BCR[5] has Unpredictable results.'''
+  [[register.field]]
+    name = "S"
+    bits = "2:1"
+    type = "rw"
+    shortdesc = '''Supervisor access control.'''
+    longdesc = '''The breakpoint can be conditioned on the mode of the processor: b00 = User, System, or Supervisor b01 = Privileged b10 = User b11 = any'''
+  [[register.field]]
+    name = "B"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Breakpoint enable: 0 = Breakpoint disabled.'''
+    longdesc = '''1 = Breakpoint enabled'''
+[[register]]
+  name = "BCR6"
+  type = "rw"
+  width = 32
+  description = "Breakpoint Control Register 6"
+  default = "0x00000000"
+  offset = "0x00000158"
+  [[register.field]]
+    name = "BREAKPOINT_ADDRESS_MASK"
+    bits = "28:24"
+    type = "rw"
+    shortdesc = '''This field sets a breakpoint on a range of addresses by masking lower order address bits out of the breakpoint comparison.'''
+    longdesc = '''b00000 = no mask b00001 = Reserved b00010 = Reserved b00011 = 0x00000007 mask for instruction address b00100 = 0x0000000F mask for instruction address b00101 = 0x0000001F mask for instruction address .. b11111 = 0x7FFFFFFF mask for instruction address. If BCR[28:24] is not set to b00000, thenBCR[8:5] must be set to b1111. Otherwise the behavior is Unpredictable. In addition, if BCR[28:24] is not set to b00000, then the corresponding BVR bits that are not being included in the comparison Should Be Zero. Otherwise the behavior is Unpredictable. Ifthis BRP is programmed for context ID comparison, this field must be set to b00000.Otherwise the behavior is Unpredictable. There is no encoding for a full 32-bit mask but the same effect of a break anywherebreakpoint can be achieved by setting BCR[22] to 1 and BCR[8:5] to b0000.'''
+  [[register.field]]
+    name = "M"
+    bits = "22:20"
+    type = "rw"
+  [[register.field]]
+    name = "LINKED_BRP_NUMBER"
+    bits = "19:16"
+    type = "rw"
+    shortdesc = '''The binary number encoded here indicates another BRPto link this one with.'''
+    longdesc = '''Note . if a BRP is linked with itself,it is Unpredictable whether a breakpoint debug event is generated . if this BRP is linked to another BRP that is not configured for linked context ID matching, it is Unpredictable whether a breakpoint debug event is generated.'''
+  [[register.field]]
+    name = "BYTE_ADDRESS_SELECT"
+    bits = "8:5"
+    type = "rw"
+    shortdesc = '''For breakpoints programmed to match an instruction address, the debugger must write a word-aligned address to the BVR.'''
+    longdesc = '''You can then use this field toprogram the breakpoint soit hits only if certain byte addresses are accessed. If the BRP is programmed for instruction address match: b0000 = the breakpoint never hits bxxx1 = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +0 is accessed bxx1x = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +1 is accessed bx1xx = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +2 is accessed b1xxx = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +3 is accessed b1111 = the breakpoint hits if any of the four bytes starting at address (BVR & 0xFFFFFFFC) +0 is accessed. If the BRP is programmed for instruction address mismatch, the breakpoint hits where the corresponding instruction address breakpoint does not hit, that is, the range of addresses covered by an instruction address mismatch breakpoint is the negative image of the corresponding instruction address breakpoint. If the BRP is programmed for context ID comparison, this field must be set to b1111. Otherwise, breakpoint and watchpoint debug events might not be generated as expected. Writing a value to BCR[8:5] so that BCR[8] is not equal to BCR[7] or BCR[6] isnot equal to BCR[5] has Unpredictable results.'''
+  [[register.field]]
+    name = "S"
+    bits = "2:1"
+    type = "rw"
+    shortdesc = '''Supervisor access control.'''
+    longdesc = '''The breakpoint can be conditioned on the mode of the processor: b00 = User, System, or Supervisor b01 = Privileged b10 = User b11 = any'''
+  [[register.field]]
+    name = "B"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Breakpoint enable: 0 = Breakpoint disabled.'''
+    longdesc = '''1 = Breakpoint enabled'''
+[[register]]
+  name = "BCR7"
+  type = "rw"
+  width = 32
+  description = "Breakpoint Control Register 7"
+  default = "0x00000000"
+  offset = "0x0000015C"
+  [[register.field]]
+    name = "BREAKPOINT_ADDRESS_MASK"
+    bits = "28:24"
+    type = "rw"
+    shortdesc = '''This field sets a breakpoint on a range of addresses by masking lower order address bits out of the breakpoint comparison.'''
+    longdesc = '''b00000 = no mask b00001 = Reserved b00010 = Reserved b00011 = 0x00000007 mask for instruction address b00100 = 0x0000000F mask for instruction address b00101 = 0x0000001F mask for instruction address .. b11111 = 0x7FFFFFFF mask for instruction address. If BCR[28:24] is not set to b00000, thenBCR[8:5] must be set to b1111. Otherwise the behavior is Unpredictable. In addition, if BCR[28:24] is not set to b00000, then the corresponding BVR bits that are not being included in the comparison Should Be Zero. Otherwise the behavior is Unpredictable. Ifthis BRP is programmed for context ID comparison, this field must be set to b00000.Otherwise the behavior is Unpredictable. There is no encoding for a full 32-bit mask but the same effect of a break anywherebreakpoint can be achieved by setting BCR[22] to 1 and BCR[8:5] to b0000.'''
+  [[register.field]]
+    name = "M"
+    bits = "22:20"
+    type = "rw"
+  [[register.field]]
+    name = "LINKED_BRP_NUMBER"
+    bits = "19:16"
+    type = "rw"
+    shortdesc = '''The binary number encoded here indicates another BRPto link this one with.'''
+    longdesc = '''Note . if a BRP is linked with itself,it is Unpredictable whether a breakpoint debug event is generated . if this BRP is linked to another BRP that is not configured for linked context ID matching, it is Unpredictable whether a breakpoint debug event is generated.'''
+  [[register.field]]
+    name = "BYTE_ADDRESS_SELECT"
+    bits = "8:5"
+    type = "rw"
+    shortdesc = '''For breakpoints programmed to match an instruction address, the debugger must write a word-aligned address to the BVR.'''
+    longdesc = '''You can then use this field toprogram the breakpoint soit hits only if certain byte addresses are accessed. If the BRP is programmed for instruction address match: b0000 = the breakpoint never hits bxxx1 = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +0 is accessed bxx1x = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +1 is accessed bx1xx = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +2 is accessed b1xxx = the breakpoint hits if the byte at address (BVR & 0xFFFFFFFC) +3 is accessed b1111 = the breakpoint hits if any of the four bytes starting at address (BVR & 0xFFFFFFFC) +0 is accessed. If the BRP is programmed for instruction address mismatch, the breakpoint hits where the corresponding instruction address breakpoint does not hit, that is, the range of addresses covered by an instruction address mismatch breakpoint is the negative image of the corresponding instruction address breakpoint. If the BRP is programmed for context ID comparison, this field must be set to b1111. Otherwise, breakpoint and watchpoint debug events might not be generated as expected. Writing a value to BCR[8:5] so that BCR[8] is not equal to BCR[7] or BCR[6] isnot equal to BCR[5] has Unpredictable results.'''
+  [[register.field]]
+    name = "S"
+    bits = "2:1"
+    type = "rw"
+    shortdesc = '''Supervisor access control.'''
+    longdesc = '''The breakpoint can be conditioned on the mode of the processor: b00 = User, System, or Supervisor b01 = Privileged b10 = User b11 = any'''
+  [[register.field]]
+    name = "B"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Breakpoint enable: 0 = Breakpoint disabled.'''
+    longdesc = '''1 = Breakpoint enabled'''
+[[register]]
+  name = "WVR0"
+  type = "rw"
+  width = 32
+  description = "Watchpoint Value Register 0"
+  default = "0x00000000"
+  offset = "0x00000180"
+  [[register.field]]
+    name = "WATCHPOINT_ADDRESS"
+    bits = "31:2"
+    type = "rw"
+    shortdesc = '''Each WVR is associated with a Watchpoint Control Register(WCR).'''
+    longdesc = '''WCRy is the corresponding register for WVRy. A pair of watchpoint registers, WVRy and WCRy, is called a Watchpoint Register Pair(WRP). WVR0-7 are paired with WCR0-7 to make WRP0-7. The watchpoint value contained in the WVR always corresponds to a data address and can be set either on: . a data address . a data address and context ID pair. For a data address and context ID pair, a WRP and the BRP with context ID comparison capability must be linked. A debug event is generated when both the data address and the context ID pair match simultaneously.'''
+[[register]]
+  name = "WVR1"
+  type = "rw"
+  width = 32
+  description = "Watchpoint Value Register 1"
+  default = "0x00000000"
+  offset = "0x00000184"
+  [[register.field]]
+    name = "WATCHPOINT_ADDRESS"
+    bits = "31:2"
+    type = "rw"
+    shortdesc = '''Each WVR is associated with a Watchpoint Control Register(WCR).'''
+    longdesc = '''WCRy is the corresponding register for WVRy. A pair of watchpoint registers, WVRy and WCRy, is called a Watchpoint Register Pair(WRP). WVR0-7 are paired with WCR0-7 to make WRP0-7. The watchpoint value contained in the WVR always corresponds to a data address and can be set either on: . a data address . a data address and context ID pair. For a data address and context ID pair, a WRP and the BRP with context ID comparison capability must be linked. A debug event is generated when both the data address and the context ID pair match simultaneously.'''
+[[register]]
+  name = "WVR2"
+  type = "rw"
+  width = 32
+  description = "Watchpoint Value Register 2"
+  default = "0x00000000"
+  offset = "0x00000188"
+  [[register.field]]
+    name = "WATCHPOINT_ADDRESS"
+    bits = "31:2"
+    type = "rw"
+    shortdesc = '''Each WVR is associated with a Watchpoint Control Register(WCR).'''
+    longdesc = '''WCRy is the corresponding register for WVRy. A pair of watchpoint registers, WVRy and WCRy, is called a Watchpoint Register Pair(WRP). WVR0-7 are paired with WCR0-7 to make WRP0-7. The watchpoint value contained in the WVR always corresponds to a data address and can be set either on: . a data address . a data address and context ID pair. For a data address and context ID pair, a WRP and the BRP with context ID comparison capability must be linked. A debug event is generated when both the data address and the context ID pair match simultaneously.'''
+[[register]]
+  name = "WVR3"
+  type = "rw"
+  width = 32
+  description = "Watchpoint Value Register 3"
+  default = "0x00000000"
+  offset = "0x0000018C"
+  [[register.field]]
+    name = "WATCHPOINT_ADDRESS"
+    bits = "31:2"
+    type = "rw"
+    shortdesc = '''Each WVR is associated with a Watchpoint Control Register(WCR).'''
+    longdesc = '''WCRy is the corresponding register for WVRy. A pair of watchpoint registers, WVRy and WCRy, is called a Watchpoint Register Pair(WRP). WVR0-7 are paired with WCR0-7 to make WRP0-7. The watchpoint value contained in the WVR always corresponds to a data address and can be set either on: . a data address . a data address and context ID pair. For a data address and context ID pair, a WRP and the BRP with context ID comparison capability must be linked. A debug event is generated when both the data address and the context ID pair match simultaneously.'''
+[[register]]
+  name = "WVR4"
+  type = "rw"
+  width = 32
+  description = "Watchpoint Value Register 4"
+  default = "0x00000000"
+  offset = "0x00000190"
+  [[register.field]]
+    name = "WATCHPOINT_ADDRESS"
+    bits = "31:2"
+    type = "rw"
+    shortdesc = '''Each WVR is associated with a Watchpoint Control Register(WCR).'''
+    longdesc = '''WCRy is the corresponding register for WVRy. A pair of watchpoint registers, WVRy and WCRy, is called a Watchpoint Register Pair(WRP). WVR0-7 are paired with WCR0-7 to make WRP0-7. The watchpoint value contained in the WVR always corresponds to a data address and can be set either on: . a data address . a data address and context ID pair. For a data address and context ID pair, a WRP and the BRP with context ID comparison capability must be linked. A debug event is generated when both the data address and the context ID pair match simultaneously.'''
+[[register]]
+  name = "WVR5"
+  type = "rw"
+  width = 32
+  description = "Watchpoint Value Register 5"
+  default = "0x00000000"
+  offset = "0x00000194"
+  [[register.field]]
+    name = "WATCHPOINT_ADDRESS"
+    bits = "31:2"
+    type = "rw"
+    shortdesc = '''Each WVR is associated with a Watchpoint Control Register(WCR).'''
+    longdesc = '''WCRy is the corresponding register for WVRy. A pair of watchpoint registers, WVRy and WCRy, is called a Watchpoint Register Pair(WRP). WVR0-7 are paired with WCR0-7 to make WRP0-7. The watchpoint value contained in the WVR always corresponds to a data address and can be set either on: . a data address . a data address and context ID pair. For a data address and context ID pair, a WRP and the BRP with context ID comparison capability must be linked. A debug event is generated when both the data address and the context ID pair match simultaneously.'''
+[[register]]
+  name = "WVR6"
+  type = "rw"
+  width = 32
+  description = "Watchpoint Value Register 6"
+  default = "0x00000000"
+  offset = "0x00000198"
+  [[register.field]]
+    name = "WATCHPOINT_ADDRESS"
+    bits = "31:2"
+    type = "rw"
+    shortdesc = '''Each WVR is associated with a Watchpoint Control Register(WCR).'''
+    longdesc = '''WCRy is the corresponding register for WVRy. A pair of watchpoint registers, WVRy and WCRy, is called a Watchpoint Register Pair(WRP). WVR0-7 are paired with WCR0-7 to make WRP0-7. The watchpoint value contained in the WVR always corresponds to a data address and can be set either on: . a data address . a data address and context ID pair. For a data address and context ID pair, a WRP and the BRP with context ID comparison capability must be linked. A debug event is generated when both the data address and the context ID pair match simultaneously.'''
+[[register]]
+  name = "WVR7"
+  type = "rw"
+  width = 32
+  description = "Watchpoint Value Register 7"
+  default = "0x00000000"
+  offset = "0x0000019C"
+  [[register.field]]
+    name = "WATCHPOINT_ADDRESS"
+    bits = "31:2"
+    type = "rw"
+    shortdesc = '''Each WVR is associated with a Watchpoint Control Register(WCR).'''
+    longdesc = '''WCRy is the corresponding register for WVRy. A pair of watchpoint registers, WVRy and WCRy, is called a Watchpoint Register Pair(WRP). WVR0-7 are paired with WCR0-7 to make WRP0-7. The watchpoint value contained in the WVR always corresponds to a data address and can be set either on: . a data address . a data address and context ID pair. For a data address and context ID pair, a WRP and the BRP with context ID comparison capability must be linked. A debug event is generated when both the data address and the context ID pair match simultaneously.'''
+[[register]]
+  name = "WCR0"
+  type = "rw"
+  width = 32
+  description = "Watchpoint Control Register 0"
+  default = "0x00000000"
+  offset = "0x000001C0"
+  [[register.field]]
+    name = "WATCHPOINT_ADDRESS_MASK"
+    bits = "28:24"
+    type = "rw"
+    shortdesc = '''This field watches a range of addresses by masking lower order address bits out ofthe watchpoint comparison.'''
+    longdesc = '''b00000 = no mask b00001 = Reserved b00010 = Reserved b00011 = 0x00000007mask for data address b00100 = 0x0000000Fmask for data address b00101 = 0x0000001Fmask for data address .. b11111 = 0x7FFFFFFFmask for data address. Note . If WCR[28:24] is not set to b00000, then WCR[12:5] must be set to b11111111. Otherwise the behavior is Unpredictable. . If WCR[28:24] is not set to b00000, then the corresponding WVR bits that are not being included in the comparison Should Be Zero. Otherwise the behavioris Unpredictable. . To watch for a write to any byte in an 8-byte aligned object of size8 bytes, ARM recommends that a debugger sets WCR[28:24] tob00111, and WCR[12:5] to b11111111. This is compatible with both ARMv7 debug compliant implementationsthat have an 8-bit WCR[12:5] and with those that have a 4-bit WCR[8:5] byte address select field.'''
+  [[register.field]]
+    name = "E"
+    bits = "20"
+    type = "rw"
+    shortdesc = '''Enable linking bit: 0 = linking disabled 1 = linking enabled.'''
+    longdesc = '''When this bit is set, this watchpoint is linked with the context ID holding BRP selected by the linked BRP field.'''
+  [[register.field]]
+    name = "LINKED_BRP"
+    bits = "19:16"
+    type = "rw"
+    shortdesc = '''Linked BRP number.'''
+    longdesc = '''The binary number encoded here indicates a context ID holding BRP to link this WRP with. If this WRP is linked to a BRP that is not configured for linked context ID matching, it is Unpredictable whether a watchpoint debug event is generated.'''
+  [[register.field]]
+    name = "BYTE_ADDRESS_SELECT"
+    bits = "12:5"
+    type = "rw"
+    shortdesc = '''The WVR is programmed with word-aligned address.'''
+    longdesc = '''You can use this field to program the watchpoint so it only hits if certain byte addresses are accessed: b00000000 The watchpoint never hits. bxxxxxxx1 The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +0 is accessed. bxxxxxx1x The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +1 is accessed. bxxxxx1xx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +2 is accessed. bxxxx1xxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +3 is accessed. bxxx1xxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +4 is accessed. bxx1xxxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +5 is accessed. bx1xxxxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +6 is accessed. b1xxxxxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +7 is accessed.'''
+  [[register.field]]
+    name = "LS"
+    bits = "4:3"
+    type = "rw"
+    shortdesc = '''Load/store access.'''
+    longdesc = '''The watchpoint can be conditioned to the type of access: b00 = Reserved b01 = load, load exclusive, or swap b10 = store, store exclusive or swap b11 = either. A SWPor SWPBtriggers on load, store, or either. A load exclusive instruction triggers on load or either. A store exclusive instruction triggers on store oreither, whether it succeeds or not.'''
+  [[register.field]]
+    name = "S"
+    bits = "2:1"
+    type = "rw"
+    shortdesc = '''Privileged access control.'''
+    longdesc = '''The watchpoint can be conditioned to the privilege of the access: b00 = reserved b01 = Privileged, match if the processor does a privileged access to memory b10 = User, match only on non-privileged accesses b11 = either, match all accesses. Note For all cases, the match refers to the privilege of the access, not the mode of the processor.'''
+  [[register.field]]
+    name = "W"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Watchpoint enable: 0 = Watchpoint disabled.'''
+    longdesc = '''1 = Watchpoint enabled.'''
+[[register]]
+  name = "WCR1"
+  type = "rw"
+  width = 32
+  description = "Watchpoint Control Register 1"
+  default = "0x00000000"
+  offset = "0x000001C4"
+  [[register.field]]
+    name = "WATCHPOINT_ADDRESS_MASK"
+    bits = "28:24"
+    type = "rw"
+    shortdesc = '''This field watches a range of addresses by masking lower order address bits out ofthe watchpoint comparison.'''
+    longdesc = '''b00000 = no mask b00001 = Reserved b00010 = Reserved b00011 = 0x00000007mask for data address b00100 = 0x0000000Fmask for data address b00101 = 0x0000001Fmask for data address .. b11111 = 0x7FFFFFFFmask for data address. Note . If WCR[28:24] is not set to b00000, then WCR[12:5] must be set to b11111111. Otherwise the behavior is Unpredictable. . If WCR[28:24] is not set to b00000, then the corresponding WVR bits that are not being included in the comparison Should Be Zero. Otherwise the behavioris Unpredictable. . To watch for a write to any byte in an 8-byte aligned object of size8 bytes, ARM recommends that a debugger sets WCR[28:24] tob00111, and WCR[12:5] to b11111111. This is compatible with both ARMv7 debug compliant implementationsthat have an 8-bit WCR[12:5] and with those that have a 4-bit WCR[8:5] byte address select field.'''
+  [[register.field]]
+    name = "E"
+    bits = "20"
+    type = "rw"
+    shortdesc = '''Enable linking bit: 0 = linking disabled 1 = linking enabled.'''
+    longdesc = '''When this bit is set, this watchpoint is linked with the context ID holding BRP selected by the linked BRP field.'''
+  [[register.field]]
+    name = "LINKED_BRP"
+    bits = "19:16"
+    type = "rw"
+    shortdesc = '''Linked BRP number.'''
+    longdesc = '''The binary number encoded here indicates a context ID holding BRP to link this WRP with. If this WRP is linked to a BRP that is not configured for linked context ID matching, it is Unpredictable whether a watchpoint debug event is generated.'''
+  [[register.field]]
+    name = "BYTE_ADDRESS_SELECT"
+    bits = "12:5"
+    type = "rw"
+    shortdesc = '''The WVR is programmed with word-aligned address.'''
+    longdesc = '''You can use this field to program the watchpoint so it only hits if certain byte addresses are accessed: b00000000 The watchpoint never hits. bxxxxxxx1 The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +0 is accessed. bxxxxxx1x The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +1 is accessed. bxxxxx1xx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +2 is accessed. bxxxx1xxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +3 is accessed. bxxx1xxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +4 is accessed. bxx1xxxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +5 is accessed. bx1xxxxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +6 is accessed. b1xxxxxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +7 is accessed.'''
+  [[register.field]]
+    name = "LS"
+    bits = "4:3"
+    type = "rw"
+    shortdesc = '''Load/store access.'''
+    longdesc = '''The watchpoint can be conditioned to the type of access: b00 = Reserved b01 = load, load exclusive, or swap b10 = store, store exclusive or swap b11 = either. A SWPor SWPBtriggers on load, store, or either. A load exclusive instruction triggers on load or either. A store exclusive instruction triggers on store oreither, whether it succeeds or not.'''
+  [[register.field]]
+    name = "S"
+    bits = "2:1"
+    type = "rw"
+    shortdesc = '''Privileged access control.'''
+    longdesc = '''The watchpoint can be conditioned to the privilege of the access: b00 = reserved b01 = Privileged, match if the processor does a privileged access to memory b10 = User, match only on non-privileged accesses b11 = either, match all accesses. Note For all cases, the match refers to the privilege of the access, not the mode of the processor.'''
+  [[register.field]]
+    name = "W"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Watchpoint enable: 0 = Watchpoint disabled.'''
+    longdesc = '''1 = Watchpoint enabled.'''
+[[register]]
+  name = "WCR2"
+  type = "rw"
+  width = 32
+  description = "Watchpoint Control Register 2"
+  default = "0x00000000"
+  offset = "0x000001C8"
+  [[register.field]]
+    name = "WATCHPOINT_ADDRESS_MASK"
+    bits = "28:24"
+    type = "rw"
+    shortdesc = '''This field watches a range of addresses by masking lower order address bits out ofthe watchpoint comparison.'''
+    longdesc = '''b00000 = no mask b00001 = Reserved b00010 = Reserved b00011 = 0x00000007mask for data address b00100 = 0x0000000Fmask for data address b00101 = 0x0000001Fmask for data address .. b11111 = 0x7FFFFFFFmask for data address. Note . If WCR[28:24] is not set to b00000, then WCR[12:5] must be set to b11111111. Otherwise the behavior is Unpredictable. . If WCR[28:24] is not set to b00000, then the corresponding WVR bits that are not being included in the comparison Should Be Zero. Otherwise the behavioris Unpredictable. . To watch for a write to any byte in an 8-byte aligned object of size8 bytes, ARM recommends that a debugger sets WCR[28:24] tob00111, and WCR[12:5] to b11111111. This is compatible with both ARMv7 debug compliant implementationsthat have an 8-bit WCR[12:5] and with those that have a 4-bit WCR[8:5] byte address select field.'''
+  [[register.field]]
+    name = "E"
+    bits = "20"
+    type = "rw"
+    shortdesc = '''Enable linking bit: 0 = linking disabled 1 = linking enabled.'''
+    longdesc = '''When this bit is set, this watchpoint is linked with the context ID holding BRP selected by the linked BRP field.'''
+  [[register.field]]
+    name = "LINKED_BRP"
+    bits = "19:16"
+    type = "rw"
+    shortdesc = '''Linked BRP number.'''
+    longdesc = '''The binary number encoded here indicates a context ID holding BRP to link this WRP with. If this WRP is linked to a BRP that is not configured for linked context ID matching, it is Unpredictable whether a watchpoint debug event is generated.'''
+  [[register.field]]
+    name = "BYTE_ADDRESS_SELECT"
+    bits = "12:5"
+    type = "rw"
+    shortdesc = '''The WVR is programmed with word-aligned address.'''
+    longdesc = '''You can use this field to program the watchpoint so it only hits if certain byte addresses are accessed: b00000000 The watchpoint never hits. bxxxxxxx1 The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +0 is accessed. bxxxxxx1x The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +1 is accessed. bxxxxx1xx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +2 is accessed. bxxxx1xxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +3 is accessed. bxxx1xxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +4 is accessed. bxx1xxxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +5 is accessed. bx1xxxxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +6 is accessed. b1xxxxxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +7 is accessed.'''
+  [[register.field]]
+    name = "LS"
+    bits = "4:3"
+    type = "rw"
+    shortdesc = '''Load/store access.'''
+    longdesc = '''The watchpoint can be conditioned to the type of access: b00 = Reserved b01 = load, load exclusive, or swap b10 = store, store exclusive or swap b11 = either. A SWPor SWPBtriggers on load, store, or either. A load exclusive instruction triggers on load or either. A store exclusive instruction triggers on store oreither, whether it succeeds or not.'''
+  [[register.field]]
+    name = "S"
+    bits = "2:1"
+    type = "rw"
+    shortdesc = '''Privileged access control.'''
+    longdesc = '''The watchpoint can be conditioned to the privilege of the access: b00 = reserved b01 = Privileged, match if the processor does a privileged access to memory b10 = User, match only on non-privileged accesses b11 = either, match all accesses. Note For all cases, the match refers to the privilege of the access, not the mode of the processor.'''
+  [[register.field]]
+    name = "W"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Watchpoint enable: 0 = Watchpoint disabled.'''
+    longdesc = '''1 = Watchpoint enabled.'''
+[[register]]
+  name = "WCR3"
+  type = "rw"
+  width = 32
+  description = "Watchpoint Control Register 3"
+  default = "0x00000000"
+  offset = "0x000001CC"
+  [[register.field]]
+    name = "WATCHPOINT_ADDRESS_MASK"
+    bits = "28:24"
+    type = "rw"
+    shortdesc = '''This field watches a range of addresses by masking lower order address bits out ofthe watchpoint comparison.'''
+    longdesc = '''b00000 = no mask b00001 = Reserved b00010 = Reserved b00011 = 0x00000007mask for data address b00100 = 0x0000000Fmask for data address b00101 = 0x0000001Fmask for data address .. b11111 = 0x7FFFFFFFmask for data address. Note . If WCR[28:24] is not set to b00000, then WCR[12:5] must be set to b11111111. Otherwise the behavior is Unpredictable. . If WCR[28:24] is not set to b00000, then the corresponding WVR bits that are not being included in the comparison Should Be Zero. Otherwise the behavioris Unpredictable. . To watch for a write to any byte in an 8-byte aligned object of size8 bytes, ARM recommends that a debugger sets WCR[28:24] tob00111, and WCR[12:5] to b11111111. This is compatible with both ARMv7 debug compliant implementationsthat have an 8-bit WCR[12:5] and with those that have a 4-bit WCR[8:5] byte address select field.'''
+  [[register.field]]
+    name = "E"
+    bits = "20"
+    type = "rw"
+    shortdesc = '''Enable linking bit: 0 = linking disabled 1 = linking enabled.'''
+    longdesc = '''When this bit is set, this watchpoint is linked with the context ID holding BRP selected by the linked BRP field.'''
+  [[register.field]]
+    name = "LINKED_BRP"
+    bits = "19:16"
+    type = "rw"
+    shortdesc = '''Linked BRP number.'''
+    longdesc = '''The binary number encoded here indicates a context ID holding BRP to link this WRP with. If this WRP is linked to a BRP that is not configured for linked context ID matching, it is Unpredictable whether a watchpoint debug event is generated.'''
+  [[register.field]]
+    name = "BYTE_ADDRESS_SELECT"
+    bits = "12:5"
+    type = "rw"
+    shortdesc = '''The WVR is programmed with word-aligned address.'''
+    longdesc = '''You can use this field to program the watchpoint so it only hits if certain byte addresses are accessed: b00000000 The watchpoint never hits. bxxxxxxx1 The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +0 is accessed. bxxxxxx1x The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +1 is accessed. bxxxxx1xx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +2 is accessed. bxxxx1xxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +3 is accessed. bxxx1xxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +4 is accessed. bxx1xxxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +5 is accessed. bx1xxxxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +6 is accessed. b1xxxxxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +7 is accessed.'''
+  [[register.field]]
+    name = "LS"
+    bits = "4:3"
+    type = "rw"
+    shortdesc = '''Load/store access.'''
+    longdesc = '''The watchpoint can be conditioned to the type of access: b00 = Reserved b01 = load, load exclusive, or swap b10 = store, store exclusive or swap b11 = either. A SWPor SWPBtriggers on load, store, or either. A load exclusive instruction triggers on load or either. A store exclusive instruction triggers on store oreither, whether it succeeds or not.'''
+  [[register.field]]
+    name = "S"
+    bits = "2:1"
+    type = "rw"
+    shortdesc = '''Privileged access control.'''
+    longdesc = '''The watchpoint can be conditioned to the privilege of the access: b00 = reserved b01 = Privileged, match if the processor does a privileged access to memory b10 = User, match only on non-privileged accesses b11 = either, match all accesses. Note For all cases, the match refers to the privilege of the access, not the mode of the processor.'''
+  [[register.field]]
+    name = "W"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Watchpoint enable: 0 = Watchpoint disabled.'''
+    longdesc = '''1 = Watchpoint enabled.'''
+[[register]]
+  name = "WCR4"
+  type = "rw"
+  width = 32
+  description = "Watchpoint Control Register 4"
+  default = "0x00000000"
+  offset = "0x000001D0"
+  [[register.field]]
+    name = "WATCHPOINT_ADDRESS_MASK"
+    bits = "28:24"
+    type = "rw"
+    shortdesc = '''This field watches a range of addresses by masking lower order address bits out ofthe watchpoint comparison.'''
+    longdesc = '''b00000 = no mask b00001 = Reserved b00010 = Reserved b00011 = 0x00000007mask for data address b00100 = 0x0000000Fmask for data address b00101 = 0x0000001Fmask for data address .. b11111 = 0x7FFFFFFFmask for data address. Note . If WCR[28:24] is not set to b00000, then WCR[12:5] must be set to b11111111. Otherwise the behavior is Unpredictable. . If WCR[28:24] is not set to b00000, then the corresponding WVR bits that are not being included in the comparison Should Be Zero. Otherwise the behavioris Unpredictable. . To watch for a write to any byte in an 8-byte aligned object of size8 bytes, ARM recommends that a debugger sets WCR[28:24] tob00111, and WCR[12:5] to b11111111. This is compatible with both ARMv7 debug compliant implementationsthat have an 8-bit WCR[12:5] and with those that have a 4-bit WCR[8:5] byte address select field.'''
+  [[register.field]]
+    name = "E"
+    bits = "20"
+    type = "rw"
+    shortdesc = '''Enable linking bit: 0 = linking disabled 1 = linking enabled.'''
+    longdesc = '''When this bit is set, this watchpoint is linked with the context ID holding BRP selected by the linked BRP field.'''
+  [[register.field]]
+    name = "LINKED_BRP"
+    bits = "19:16"
+    type = "rw"
+    shortdesc = '''Linked BRP number.'''
+    longdesc = '''The binary number encoded here indicates a context ID holding BRP to link this WRP with. If this WRP is linked to a BRP that is not configured for linked context ID matching, it is Unpredictable whether a watchpoint debug event is generated.'''
+  [[register.field]]
+    name = "BYTE_ADDRESS_SELECT"
+    bits = "12:5"
+    type = "rw"
+    shortdesc = '''The WVR is programmed with word-aligned address.'''
+    longdesc = '''You can use this field to program the watchpoint so it only hits if certain byte addresses are accessed: b00000000 The watchpoint never hits. bxxxxxxx1 The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +0 is accessed. bxxxxxx1x The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +1 is accessed. bxxxxx1xx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +2 is accessed. bxxxx1xxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +3 is accessed. bxxx1xxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +4 is accessed. bxx1xxxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +5 is accessed. bx1xxxxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +6 is accessed. b1xxxxxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +7 is accessed.'''
+  [[register.field]]
+    name = "LS"
+    bits = "4:3"
+    type = "rw"
+    shortdesc = '''Load/store access.'''
+    longdesc = '''The watchpoint can be conditioned to the type of access: b00 = Reserved b01 = load, load exclusive, or swap b10 = store, store exclusive or swap b11 = either. A SWPor SWPBtriggers on load, store, or either. A load exclusive instruction triggers on load or either. A store exclusive instruction triggers on store oreither, whether it succeeds or not.'''
+  [[register.field]]
+    name = "S"
+    bits = "2:1"
+    type = "rw"
+    shortdesc = '''Privileged access control.'''
+    longdesc = '''The watchpoint can be conditioned to the privilege of the access: b00 = reserved b01 = Privileged, match if the processor does a privileged access to memory b10 = User, match only on non-privileged accesses b11 = either, match all accesses. Note For all cases, the match refers to the privilege of the access, not the mode of the processor.'''
+  [[register.field]]
+    name = "W"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Watchpoint enable: 0 = Watchpoint disabled.'''
+    longdesc = '''1 = Watchpoint enabled.'''
+[[register]]
+  name = "WCR5"
+  type = "rw"
+  width = 32
+  description = "Watchpoint Control Register 5"
+  default = "0x00000000"
+  offset = "0x000001D4"
+  [[register.field]]
+    name = "WATCHPOINT_ADDRESS_MASK"
+    bits = "28:24"
+    type = "rw"
+    shortdesc = '''This field watches a range of addresses by masking lower order address bits out ofthe watchpoint comparison.'''
+    longdesc = '''b00000 = no mask b00001 = Reserved b00010 = Reserved b00011 = 0x00000007mask for data address b00100 = 0x0000000Fmask for data address b00101 = 0x0000001Fmask for data address .. b11111 = 0x7FFFFFFFmask for data address. Note . If WCR[28:24] is not set to b00000, then WCR[12:5] must be set to b11111111. Otherwise the behavior is Unpredictable. . If WCR[28:24] is not set to b00000, then the corresponding WVR bits that are not being included in the comparison Should Be Zero. Otherwise the behavioris Unpredictable. . To watch for a write to any byte in an 8-byte aligned object of size8 bytes, ARM recommends that a debugger sets WCR[28:24] tob00111, and WCR[12:5] to b11111111. This is compatible with both ARMv7 debug compliant implementationsthat have an 8-bit WCR[12:5] and with those that have a 4-bit WCR[8:5] byte address select field.'''
+  [[register.field]]
+    name = "E"
+    bits = "20"
+    type = "rw"
+    shortdesc = '''Enable linking bit: 0 = linking disabled 1 = linking enabled.'''
+    longdesc = '''When this bit is set, this watchpoint is linked with the context ID holding BRP selected by the linked BRP field.'''
+  [[register.field]]
+    name = "LINKED_BRP"
+    bits = "19:16"
+    type = "rw"
+    shortdesc = '''Linked BRP number.'''
+    longdesc = '''The binary number encoded here indicates a context ID holding BRP to link this WRP with. If this WRP is linked to a BRP that is not configured for linked context ID matching, it is Unpredictable whether a watchpoint debug event is generated.'''
+  [[register.field]]
+    name = "BYTE_ADDRESS_SELECT"
+    bits = "12:5"
+    type = "rw"
+    shortdesc = '''The WVR is programmed with word-aligned address.'''
+    longdesc = '''You can use this field to program the watchpoint so it only hits if certain byte addresses are accessed: b00000000 The watchpoint never hits. bxxxxxxx1 The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +0 is accessed. bxxxxxx1x The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +1 is accessed. bxxxxx1xx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +2 is accessed. bxxxx1xxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +3 is accessed. bxxx1xxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +4 is accessed. bxx1xxxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +5 is accessed. bx1xxxxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +6 is accessed. b1xxxxxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +7 is accessed.'''
+  [[register.field]]
+    name = "LS"
+    bits = "4:3"
+    type = "rw"
+    shortdesc = '''Load/store access.'''
+    longdesc = '''The watchpoint can be conditioned to the type of access: b00 = Reserved b01 = load, load exclusive, or swap b10 = store, store exclusive or swap b11 = either. A SWPor SWPBtriggers on load, store, or either. A load exclusive instruction triggers on load or either. A store exclusive instruction triggers on store oreither, whether it succeeds or not.'''
+  [[register.field]]
+    name = "S"
+    bits = "2:1"
+    type = "rw"
+    shortdesc = '''Privileged access control.'''
+    longdesc = '''The watchpoint can be conditioned to the privilege of the access: b00 = reserved b01 = Privileged, match if the processor does a privileged access to memory b10 = User, match only on non-privileged accesses b11 = either, match all accesses. Note For all cases, the match refers to the privilege of the access, not the mode of the processor.'''
+  [[register.field]]
+    name = "W"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Watchpoint enable: 0 = Watchpoint disabled.'''
+    longdesc = '''1 = Watchpoint enabled.'''
+[[register]]
+  name = "WCR6"
+  type = "rw"
+  width = 32
+  description = "Watchpoint Control Register 6"
+  default = "0x00000000"
+  offset = "0x000001D8"
+  [[register.field]]
+    name = "WATCHPOINT_ADDRESS_MASK"
+    bits = "28:24"
+    type = "rw"
+    shortdesc = '''This field watches a range of addresses by masking lower order address bits out ofthe watchpoint comparison.'''
+    longdesc = '''b00000 = no mask b00001 = Reserved b00010 = Reserved b00011 = 0x00000007mask for data address b00100 = 0x0000000Fmask for data address b00101 = 0x0000001Fmask for data address .. b11111 = 0x7FFFFFFFmask for data address. Note . If WCR[28:24] is not set to b00000, then WCR[12:5] must be set to b11111111. Otherwise the behavior is Unpredictable. . If WCR[28:24] is not set to b00000, then the corresponding WVR bits that are not being included in the comparison Should Be Zero. Otherwise the behavioris Unpredictable. . To watch for a write to any byte in an 8-byte aligned object of size8 bytes, ARM recommends that a debugger sets WCR[28:24] tob00111, and WCR[12:5] to b11111111. This is compatible with both ARMv7 debug compliant implementationsthat have an 8-bit WCR[12:5] and with those that have a 4-bit WCR[8:5] byte address select field.'''
+  [[register.field]]
+    name = "E"
+    bits = "20"
+    type = "rw"
+    shortdesc = '''Enable linking bit: 0 = linking disabled 1 = linking enabled.'''
+    longdesc = '''When this bit is set, this watchpoint is linked with the context ID holding BRP selected by the linked BRP field.'''
+  [[register.field]]
+    name = "LINKED_BRP"
+    bits = "19:16"
+    type = "rw"
+    shortdesc = '''Linked BRP number.'''
+    longdesc = '''The binary number encoded here indicates a context ID holding BRP to link this WRP with. If this WRP is linked to a BRP that is not configured for linked context ID matching, it is Unpredictable whether a watchpoint debug event is generated.'''
+  [[register.field]]
+    name = "BYTE_ADDRESS_SELECT"
+    bits = "12:5"
+    type = "rw"
+    shortdesc = '''The WVR is programmed with word-aligned address.'''
+    longdesc = '''You can use this field to program the watchpoint so it only hits if certain byte addresses are accessed: b00000000 The watchpoint never hits. bxxxxxxx1 The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +0 is accessed. bxxxxxx1x The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +1 is accessed. bxxxxx1xx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +2 is accessed. bxxxx1xxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +3 is accessed. bxxx1xxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +4 is accessed. bxx1xxxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +5 is accessed. bx1xxxxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +6 is accessed. b1xxxxxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +7 is accessed.'''
+  [[register.field]]
+    name = "LS"
+    bits = "4:3"
+    type = "rw"
+    shortdesc = '''Load/store access.'''
+    longdesc = '''The watchpoint can be conditioned to the type of access: b00 = Reserved b01 = load, load exclusive, or swap b10 = store, store exclusive or swap b11 = either. A SWPor SWPBtriggers on load, store, or either. A load exclusive instruction triggers on load or either. A store exclusive instruction triggers on store oreither, whether it succeeds or not.'''
+  [[register.field]]
+    name = "S"
+    bits = "2:1"
+    type = "rw"
+    shortdesc = '''Privileged access control.'''
+    longdesc = '''The watchpoint can be conditioned to the privilege of the access: b00 = reserved b01 = Privileged, match if the processor does a privileged access to memory b10 = User, match only on non-privileged accesses b11 = either, match all accesses. Note For all cases, the match refers to the privilege of the access, not the mode of the processor.'''
+  [[register.field]]
+    name = "W"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Watchpoint enable: 0 = Watchpoint disabled.'''
+    longdesc = '''1 = Watchpoint enabled.'''
+[[register]]
+  name = "WCR7"
+  type = "rw"
+  width = 32
+  description = "Watchpoint Control Register 7"
+  default = "0x00000000"
+  offset = "0x000001DC"
+  [[register.field]]
+    name = "WATCHPOINT_ADDRESS_MASK"
+    bits = "28:24"
+    type = "rw"
+    shortdesc = '''This field watches a range of addresses by masking lower order address bits out ofthe watchpoint comparison.'''
+    longdesc = '''b00000 = no mask b00001 = Reserved b00010 = Reserved b00011 = 0x00000007mask for data address b00100 = 0x0000000Fmask for data address b00101 = 0x0000001Fmask for data address .. b11111 = 0x7FFFFFFFmask for data address. Note . If WCR[28:24] is not set to b00000, then WCR[12:5] must be set to b11111111. Otherwise the behavior is Unpredictable. . If WCR[28:24] is not set to b00000, then the corresponding WVR bits that are not being included in the comparison Should Be Zero. Otherwise the behavioris Unpredictable. . To watch for a write to any byte in an 8-byte aligned object of size8 bytes, ARM recommends that a debugger sets WCR[28:24] tob00111, and WCR[12:5] to b11111111. This is compatible with both ARMv7 debug compliant implementationsthat have an 8-bit WCR[12:5] and with those that have a 4-bit WCR[8:5] byte address select field.'''
+  [[register.field]]
+    name = "E"
+    bits = "20"
+    type = "rw"
+    shortdesc = '''Enable linking bit: 0 = linking disabled 1 = linking enabled.'''
+    longdesc = '''When this bit is set, this watchpoint is linked with the context ID holding BRP selected by the linked BRP field.'''
+  [[register.field]]
+    name = "LINKED_BRP"
+    bits = "19:16"
+    type = "rw"
+    shortdesc = '''Linked BRP number.'''
+    longdesc = '''The binary number encoded here indicates a context ID holding BRP to link this WRP with. If this WRP is linked to a BRP that is not configured for linked context ID matching, it is Unpredictable whether a watchpoint debug event is generated.'''
+  [[register.field]]
+    name = "BYTE_ADDRESS_SELECT"
+    bits = "12:5"
+    type = "rw"
+    shortdesc = '''The WVR is programmed with word-aligned address.'''
+    longdesc = '''You can use this field to program the watchpoint so it only hits if certain byte addresses are accessed: b00000000 The watchpoint never hits. bxxxxxxx1 The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +0 is accessed. bxxxxxx1x The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +1 is accessed. bxxxxx1xx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +2 is accessed. bxxxx1xxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFFC) +3 is accessed. bxxx1xxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +4 is accessed. bxx1xxxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +5 is accessed. bx1xxxxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +6 is accessed. b1xxxxxxx The watchpoint hits if the byte at address (WVR[31:0] & 0xFFFFFFF8) +7 is accessed.'''
+  [[register.field]]
+    name = "LS"
+    bits = "4:3"
+    type = "rw"
+    shortdesc = '''Load/store access.'''
+    longdesc = '''The watchpoint can be conditioned to the type of access: b00 = Reserved b01 = load, load exclusive, or swap b10 = store, store exclusive or swap b11 = either. A SWPor SWPBtriggers on load, store, or either. A load exclusive instruction triggers on load or either. A store exclusive instruction triggers on store oreither, whether it succeeds or not.'''
+  [[register.field]]
+    name = "S"
+    bits = "2:1"
+    type = "rw"
+    shortdesc = '''Privileged access control.'''
+    longdesc = '''The watchpoint can be conditioned to the privilege of the access: b00 = reserved b01 = Privileged, match if the processor does a privileged access to memory b10 = User, match only on non-privileged accesses b11 = either, match all accesses. Note For all cases, the match refers to the privilege of the access, not the mode of the processor.'''
+  [[register.field]]
+    name = "W"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Watchpoint enable: 0 = Watchpoint disabled.'''
+    longdesc = '''1 = Watchpoint enabled.'''
+[[register]]
+  name = "OSLSR"
+  type = "ro"
+  width = 32
+  description = "Operating System Lock Status Register"
+  default = "0x00000000"
+  offset = "0x00000304"
+[[register]]
+  name = "PRCR"
+  type = "rw"
+  width = 32
+  description = "Device Powerdown and Reset Control Register"
+  default = "0x00000000"
+  offset = "0x00000310"
+  [[register.field]]
+    name = "HOLD_INTERNAL_RESET"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Hold internal reset bit.'''
+    longdesc = '''This bit can be used to prevent the processor from running again before the debugger detects a power-down event and restoresthe state of the debug registers in the processor. This bit does not have any effect on initial system power-up, because nSYSPORESETclears it. 0 = Do not hold internal reset on power-up or warm reset. 1 = Hold the processor non-debug logic in reset on warm reset until this flag is cleared.'''
+  [[register.field]]
+    name = "FORCE_INTERNAL_RESET"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''When a 1 is written to this bit, the processor asserts the DBGRSTREQm output for four cycles.'''
+    longdesc = '''You can connect this output to an external reset controller that, in turn, resets the processor.'''
+  [[register.field]]
+    name = "NO_POWER_DOWN"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''When set to 1, the DBGNOPWRDWN output signal is HIGH.'''
+    longdesc = '''This outputconnects to the system power controller and is interpreted as a request to operate in emulate mode, if the system supports this functionality. In this mode, the processor is not actually powered down when requested by software or hardware handshakes. This mode is useful when debugging applications on top of working operating systems. 0 = DBGNOPWRDWN is LOW. 1 = DBGNOPWRDWN is HIGH.'''
+[[register]]
+  name = "PRSR"
+  type = "rw"
+  width = 32
+  description = "Device Powerdown and Reset Status Register"
+  default = "0x00000000"
+  offset = "0x00000314"
+  [[register.field]]
+    name = "STICKY_RESET_STATUS"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''Sticky reset status bit.'''
+    longdesc = '''Thisbit is cleared on read. 0 = the processor has not been reset since the last time this register was read. 1 = the processor has been reset since the last time this register was read. This sticky bit is set to 1 when nRESETm is asserted. This bit is reset to 0 by PRESETDBGmn.'''
+  [[register.field]]
+    name = "RESET_STATUS"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Reset status bit: 0 = the processor is not held in reset 1 = the processor isheld in reset.'''
+    longdesc = '''This bit reads 1 when nRESETm is asserted.'''
+  [[register.field]]
+    name = "STICKY_POWER_DOWN_STATUS"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Indicates if the core power domain has been powered down since the PRCR was last read.'''
+    longdesc = '''0 = the CPU has not been powered down since the last read. 1 = the CPU has been powered down since the last read. If this bit is 1: . The contents of the core domain debug registers have been lost and must be reprogrammed. . Debug-APB transactions that access core domain debug registers receive an error response. This bit is cleared to 0 on a read.'''
+  [[register.field]]
+    name = "POWER_DOWN_STATUS"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Indicates the status of the core power domain: 0 = the CPU is powered-down, that is, it is in Dormant or Shutdown mode.'''
+    longdesc = '''Core-domain debug registers cannot be accessed. 1 = the CPU is powered-up, that is, it is in Run or Standby mode. All debug registers can be accessed.'''
+[[register]]
+  name = "MIDR"
+  type = "ro"
+  width = 32
+  description = "Main ID Register"
+  default = "0x411FC153"
+  offset = "0x00000D00"
+  [[register.field]]
+    name = "IMPLEMENTER"
+    bits = "31:24"
+    type = "ro"
+    shortdesc = '''Implementer Indicates implementer.'''
+    longdesc = '''0x41= ARM Limited.'''
+  [[register.field]]
+    name = "VARIANT"
+    bits = "23:20"
+    type = "ro"
+    shortdesc = '''Variant Identifies the major revision of the processor.'''
+    longdesc = '''This is the major revision number nin the rnpart of the rnpndescription of the product revision status.'''
+  [[register.field]]
+    name = "ARCHITECTUR"
+    bits = "19:16"
+    type = "ro"
+    shortdesc = '''Architecture Indicates the architecture version.'''
+    longdesc = '''0xF = see feature registers.'''
+  [[register.field]]
+    name = "PRIMARY_PART_NUMBER"
+    bits = "15:4"
+    type = "ro"
+    shortdesc = '''Primary part number Indicates processor part number.'''
+    longdesc = '''0xC15= Cortex-R5.'''
+  [[register.field]]
+    name = "REVISION"
+    bits = "3:0"
+    type = "ro"
+    shortdesc = '''Revision Identifies the minor revision of the processor.'''
+    longdesc = '''This is the minor revision number nin the pnpart of the rnpndescription of the product revision status.'''
+[[register]]
+  name = "CTR"
+  type = "ro"
+  width = 32
+  description = "Cache Type Register"
+  default = "0x8003C003"
+  offset = "0x00000D04"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CWG"
+    bits = "27:24"
+    type = "ro"
+    shortdesc = '''CWG Cache Write-back Granule.'''
+    longdesc = '''0x0= No information provided. See maximum cache line size in c0, Cache Size ID Registeron page 4-34.'''
+  [[register.field]]
+    name = "ERG"
+    bits = "23:20"
+    type = "ro"
+    shortdesc = '''ERG Exclusives Reservation Granule.'''
+    longdesc = '''0x0= No information provided.'''
+  [[register.field]]
+    name = "DMINLINE"
+    bits = "19:16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:14"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "13:4"
+    type = "ro"
+  [[register.field]]
+    name = "IMINLINE"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "TCMTR"
+  type = "ro"
+  width = 32
+  description = "TCM Type Register"
+  default = "0x00010001"
+  offset = "0x00000D08"
+  [[register.field]]
+    name = "FORMAT"
+    bits = "31:29"
+    type = "ro"
+  [[register.field]]
+    name = "BTCM"
+    bits = "18:16"
+    type = "ro"
+    shortdesc = '''Specifies the number of BTCMs implemented.'''
+    longdesc = '''This is always set to 001 because the processor has one BTCM.'''
+  [[register.field]]
+    name = "ATCM"
+    bits = "2:0"
+    type = "ro"
+    shortdesc = '''Specifies the number of ATCMs implemented.'''
+    longdesc = '''Always set to 001. The processor has one ATCM'''
+[[register]]
+  name = "MPUIR"
+  type = "ro"
+  width = 32
+  description = "MPU Type Register"
+  default = "0x00000C00"
+  offset = "0x00000D10"
+  [[register.field]]
+    name = "DREGION"
+    bits = "15:8"
+    type = "ro"
+    shortdesc = '''Specifies the number of unified MPU regions.'''
+    longdesc = '''Set to 0, 12, or 16 data MPU regions.'''
+  [[register.field]]
+    name = "S"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Specifies the type of MPU regions, unified or separate, in the processor.'''
+    longdesc = '''Always set to 0, the processor has unified memory regions'''
+[[register]]
+  name = "MPIDR"
+  type = "ro"
+  width = 32
+  description = "Multiprocessor Affinity Register"
+  default = "0xC0000000"
+  offset = "0x00000D14"
+  [[register.field]]
+    name = "EXTENSION"
+    bits = "31:30"
+    type = "ro"
+  [[register.field]]
+    name = "AFF2"
+    bits = "23:16"
+    type = "ro"
+  [[register.field]]
+    name = "AFF1"
+    bits = "15:8"
+    type = "ro"
+    shortdesc = '''Processor groups within a system.'''
+    longdesc = '''Read GROUPID input.'''
+  [[register.field]]
+    name = "AFF0"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "ID_PFR0"
+  type = "ro"
+  width = 32
+  description = "Processor Feature Register 0"
+  default = "0x00000131"
+  offset = "0x00000D20"
+  [[register.field]]
+    name = "STATE3"
+    bits = "15:12"
+    type = "ro"
+    shortdesc = '''Indicates support for Thumb Execution Environment (ThumbEE).'''
+    longdesc = '''0x0= no support.'''
+  [[register.field]]
+    name = "STATE2"
+    bits = "11:8"
+    type = "ro"
+    shortdesc = '''Indicates support for acceleration of execution environments in hardware or software.'''
+    longdesc = '''0x1= the processor supports acceleration ofexecution environments in software.'''
+  [[register.field]]
+    name = "STATE1"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''Indicates type of Thumb encoding that the processor supports.'''
+    longdesc = '''0x3= the processor supports Thumb encoding with all Thumb instructions.'''
+  [[register.field]]
+    name = "STATE0"
+    bits = "3:0"
+    type = "ro"
+    shortdesc = '''Indicates support for ARM instruction set.'''
+    longdesc = '''0x1= the processor supports ARM instructions.'''
+[[register]]
+  name = "ID_PFR1"
+  type = "ro"
+  width = 32
+  description = "Processor Feature Register 1"
+  default = "0x00000001"
+  offset = "0x00000D24"
+  [[register.field]]
+    name = "UCTLR_PROG_MODEL"
+    bits = "11:8"
+    type = "ro"
+  [[register.field]]
+    name = "SECURITY_EXTENSION"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "ARMV4_PROG_MODEL"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "ID_DFR0"
+  type = "ro"
+  width = 32
+  description = "Debug Feature Register 0"
+  default = "0x00010400"
+  offset = "0x00000D28"
+  [[register.field]]
+    name = "UCTLR_DEBUG_MODEL_MMAP"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "TRACE_DEBUG_MODEL_MMAP"
+    bits = "19:16"
+    type = "ro"
+  [[register.field]]
+    name = "TRACE_DEBUG_MODEL_CP"
+    bits = "15:12"
+    type = "ro"
+  [[register.field]]
+    name = "CORE_DEBUG_MODEL_MMAP"
+    bits = "11:8"
+    type = "ro"
+  [[register.field]]
+    name = "SECURE_DEBUG_MODEL"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "CORE_DEBUG_MODEL_CP"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "ID_AFR0"
+  type = "ro"
+  width = 32
+  description = "Auxiliary Feature Register 0"
+  default = "0x00000000"
+  offset = "0x00000D2C"
+  [[register.field]]
+    name = "INFO"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "ID_MMFR0"
+  type = "ro"
+  width = 32
+  description = "Memory Model Feature Register 0"
+  default = "0x00210030"
+  offset = "0x00000D30"
+  [[register.field]]
+    name = "INNERMOST_SHAREABILITY"
+    bits = "31:28"
+    type = "ro"
+    shortdesc = '''Indicates the innermost shareability domain implemented.'''
+    longdesc = '''RAZ/Unknown because only oneshareability domain is implemented, see [15:12].'''
+  [[register.field]]
+    name = "FCSE"
+    bits = "27:24"
+    type = "ro"
+    shortdesc = '''Indicates support for Fast Context Switch Extension(FCSE).'''
+    longdesc = '''0x0= no support.'''
+  [[register.field]]
+    name = "AUXILIARY_REGISTERS"
+    bits = "23:20"
+    type = "ro"
+    shortdesc = '''Indicates support for the auxiliary registers.'''
+    longdesc = '''0x2= the processor supports the Auxiliary Instruction and Data Fault Status Registers (AIFSR and ADFSR) and the Auxiliary Control Register.'''
+  [[register.field]]
+    name = "TCM_SUPPORT"
+    bits = "19:16"
+    type = "ro"
+    shortdesc = '''Indicates support for TCM and associated DMA.'''
+    longdesc = '''0x1= implementation defined.'''
+  [[register.field]]
+    name = "SHAREABILITY_LEVELS"
+    bits = "15:12"
+    type = "ro"
+    shortdesc = '''Indicates the number of shareability levels implemented.'''
+    longdesc = '''0x0= one level of shareability implemented'''
+  [[register.field]]
+    name = "OUTERMOST_SHAREABILITY"
+    bits = "11:8"
+    type = "ro"
+    shortdesc = '''Indicates the outermost shareability domain implemented.'''
+    longdesc = '''0x0= implemented as non-cacheable'''
+  [[register.field]]
+    name = "PMSA"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''Indicates support for Physical Memory System Architecture(PMSA).'''
+    longdesc = '''0x3= the processor supports PMSAv7 (subsection support).'''
+  [[register.field]]
+    name = "VMSA"
+    bits = "3:0"
+    type = "ro"
+    shortdesc = '''Indicates support for Virtual Memory System Architecture(VMSA).'''
+    longdesc = '''0x0= no support.'''
+[[register]]
+  name = "ID_MMFR1"
+  type = "ro"
+  width = 32
+  description = "Memory Model Feature Register 1"
+  default = "0x00000000"
+  offset = "0x00000D34"
+  [[register.field]]
+    name = "BRANCH_PREDICTOR"
+    bits = "31:28"
+    type = "ro"
+    shortdesc = '''Indicates BranchPredictor management requirements.'''
+    longdesc = '''0x0= no MMU present.'''
+  [[register.field]]
+    name = "L1_TEST_CLEAN_OP"
+    bits = "27:24"
+    type = "ro"
+    shortdesc = '''Indicates support for test and clean op on data cache, Harvard or unified architecture.'''
+    longdesc = '''0x0= no support.'''
+  [[register.field]]
+    name = "L1_CACHE_MAINT_OP_UNI"
+    bits = "23:20"
+    type = "ro"
+    shortdesc = '''Indicates support for L1 cache, entire cache maint op, uni architecture.'''
+    longdesc = '''0x0= no support.'''
+  [[register.field]]
+    name = "L1_CACHE_MAINT_OP_HAR"
+    bits = "19:16"
+    type = "ro"
+    shortdesc = '''Indicates support for L1 cache, entire cache maint op, Harvard architecture.'''
+    longdesc = '''0x0= no support.'''
+  [[register.field]]
+    name = "L1_CACHE_LINE_MAINT_OP_SNW_UNI"
+    bits = "15:12"
+    type = "ro"
+    shortdesc = '''Indicates support for L1 cache line maint op by Set and Way, uni architecture.'''
+    longdesc = '''0x0= no support.'''
+  [[register.field]]
+    name = "L1_CACHE_LINE_MAINT_OP_SNW_HAR"
+    bits = "11:8"
+    type = "ro"
+    shortdesc = '''Indicates support for L1 cache line maint op by Set and Way, Harvard architecture.'''
+    longdesc = '''0x0= no support.'''
+  [[register.field]]
+    name = "L1_CACHE_LINE_MAINT_OP_MVA_UNI"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''Indicates support for L1 cache line maint op by address,uni architecture.'''
+    longdesc = '''0x0= no support.'''
+  [[register.field]]
+    name = "L1_CACHE_LINE_MAINT_OP_MVA_HAR"
+    bits = "3:0"
+    type = "ro"
+    shortdesc = '''Indicates support for L1 cache line maint op by address, Harvard architecture.'''
+    longdesc = '''0x0= no support.'''
+[[register]]
+  name = "ID_MMFR2"
+  type = "ro"
+  width = 32
+  description = "Memory Model Feature Register 2"
+  default = "0x01200000"
+  offset = "0x00000D38"
+  [[register.field]]
+    name = "HW_ACCESS_FLAG"
+    bits = "31:28"
+    type = "ro"
+    shortdesc = '''Indicates support for Hardware Access Flag.'''
+    longdesc = '''0x0= no support.'''
+  [[register.field]]
+    name = "WFI"
+    bits = "27:24"
+    type = "ro"
+    shortdesc = '''Indicates support for Wait-For-Interrupt stalling.'''
+    longdesc = '''0x1= the processor supports Wait-For-Interrupt.'''
+  [[register.field]]
+    name = "MEMORY_BARRIER"
+    bits = "23:20"
+    type = "ro"
+    shortdesc = '''Indicates support for memory barrier op.'''
+    longdesc = '''0x2= the processor supports: . DSB (formerly DWB) . ISB (formerly Prefetch Flush) . DMB'''
+  [[register.field]]
+    name = "TLB_MAINT_OP_UNI"
+    bits = "19:16"
+    type = "ro"
+    shortdesc = '''Indicates support for TLB maintenance operations, unified architecture.'''
+    longdesc = '''0x0= no support.'''
+  [[register.field]]
+    name = "TLB_MAINT_OP_HAR"
+    bits = "15:12"
+    type = "ro"
+    shortdesc = '''Indicates support for TLB maintenance operations, Harvard architecture.'''
+    longdesc = '''0x0= no support.'''
+  [[register.field]]
+    name = "L1_CACHE_MAINT_RANGE_OP_HAR"
+    bits = "11:8"
+    type = "ro"
+    shortdesc = '''Indicates support for cache maintenance range operations, Harvard architecture.'''
+    longdesc = '''0x0= no support.'''
+  [[register.field]]
+    name = "L1_BGND_PREFETCH_CACHE_OP"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''Indicates support for background prefetch cache range operations, Harvard architecture.'''
+    longdesc = '''0x0= no support.'''
+  [[register.field]]
+    name = "L1_FGND_PREFETCH_CACHE_OP"
+    bits = "3:0"
+    type = "ro"
+    shortdesc = '''Indicates support for foreground prefetch cache range operations, Harvard architecture.'''
+    longdesc = '''0x0= no support.'''
+[[register]]
+  name = "ID_MMFR3"
+  type = "ro"
+  width = 32
+  description = "Memory Model Feature Register 3"
+  default = "0x00000211"
+  offset = "0x00000D3C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:20"
+    type = "ro"
+  [[register.field]]
+    name = "MAINT_BROADCAST"
+    bits = "15:12"
+    type = "ro"
+    shortdesc = '''Indicates whether cache maint op are broadcast.'''
+    longdesc = '''0x0= cache maintenance operations only affect local structures.'''
+  [[register.field]]
+    name = "BRANCH_PREDICTOR_MAINT_OP"
+    bits = "11:8"
+    type = "ro"
+    shortdesc = '''Indicates support for branch predictor maintenance operations in systems with hierarchical cache maintenance operations.'''
+    longdesc = '''0x2= supports invalidate entire branch predictor array and invalidate branch predictor by MVA'''
+  [[register.field]]
+    name = "HIER_CACHE_MAINT_BY_SNW"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''Indicates support for hierarchical cache maintenance operations by Set and Way.'''
+    longdesc = '''0x1= the processor supports invalidate cache,clean and invalidate, and clean by Set and Way.'''
+  [[register.field]]
+    name = "HIER_CACHE_MAINT_BY_MVA"
+    bits = "3:0"
+    type = "ro"
+    shortdesc = '''Indicates support for hierarchical cache maintenance operations by address.'''
+    longdesc = '''0x1= the processor supports: . Invalidate data cache by address . Clean data cache by address . Clean and invalidate data cache by address . Invalidate instruction cache by address . Invalidate all instruction cache entries'''
+[[register]]
+  name = "ID_ISAR0"
+  type = "ro"
+  width = 32
+  description = "ISA Feature Register 0"
+  default = "0x02101111"
+  offset = "0x00000D40"
+  [[register.field]]
+    name = "DIVIDE"
+    bits = "27:24"
+    type = "ro"
+    shortdesc = '''Indicates support for divide instr.'''
+    longdesc = '''0x2= Support for UDIV and SDIV in the ARM and Thumb ISA. Applies from Cortex-R5, r1p0.'''
+  [[register.field]]
+    name = "DEBUG"
+    bits = "23:20"
+    type = "ro"
+    shortdesc = '''Indicates support for debug instructions.'''
+    longdesc = '''0x1= the processor supports BKPT.'''
+  [[register.field]]
+    name = "COPROCESSOR"
+    bits = "19:16"
+    type = "ro"
+    shortdesc = '''Indicates support for coprocessor instructions other than separately attributed feature registers, such as CP15 registers and VFP.'''
+    longdesc = '''0x0= no support.'''
+  [[register.field]]
+    name = "COMPARE_AND_BRANCH"
+    bits = "15:12"
+    type = "ro"
+    shortdesc = '''Indicates support for combined compare and branch instructions.'''
+    longdesc = '''0x1= the processor supports combinedcompare and branch instructions, CBNZand CBZ.'''
+  [[register.field]]
+    name = "BITFIELD"
+    bits = "11:8"
+    type = "ro"
+    shortdesc = '''Indicates support for bitfield instructions.'''
+    longdesc = '''0x1= the processor supportsbitfield instructions, BFC, BFI, SBFX, and UBFX.'''
+  [[register.field]]
+    name = "BIT_COUNTING"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''Indicates support for bit counting instructions.'''
+    longdesc = '''0x1= the processor supports CLZ.'''
+  [[register.field]]
+    name = "ATOMIC"
+    bits = "3:0"
+    type = "ro"
+    shortdesc = '''Indicates support for atomic loadand store instructions.'''
+    longdesc = '''0x1= the processor supports SWPand SWPB.'''
+[[register]]
+  name = "ID_ISAR1"
+  type = "ro"
+  width = 32
+  description = "ISA Feature Register 1"
+  default = "0x13112111"
+  offset = "0x00000D44"
+  [[register.field]]
+    name = "JAZELLE"
+    bits = "31:28"
+    type = "ro"
+    shortdesc = '''Indicates support for Jazelle instructions.'''
+    longdesc = '''0x1= the processor supports: . BXJ instruction . J bit in PSRs'''
+  [[register.field]]
+    name = "INTERWORKING"
+    bits = "27:24"
+    type = "ro"
+    shortdesc = '''Indicates support for interworking instructions.'''
+    longdesc = '''0x3= the processor supports: . BX, and T bit in PSRs . BLX, and PC loads have BX behavior . Data-processing instr in the ARM instruction set with the PC as the destination and the S bit clear have BX-like behavior'''
+  [[register.field]]
+    name = "IMMEDIATE"
+    bits = "23:20"
+    type = "ro"
+    shortdesc = '''Indicates support for immediate instructions.'''
+    longdesc = '''0x1= the processor supports: . the MOVT instruction . MOV instruction encodings with 16-bit immediates . Thumb ADD and SUB instr with 12-bit immediates'''
+  [[register.field]]
+    name = "ITE"
+    bits = "19:16"
+    type = "ro"
+    shortdesc = '''Indicates support for if then instructions.'''
+    longdesc = '''0x1= the processor supports ITinstructions'''
+  [[register.field]]
+    name = "EXTEND"
+    bits = "15:12"
+    type = "ro"
+    shortdesc = '''Indicates support for sign or zero extend instructions.'''
+    longdesc = '''0x2= the processor supports: . SXTB, SXTB16, SXTH, UXTB, UXTB16, and UXTH . SXTAB, SXTAB16, SXTAH, UXTAB, UXTAB16, and UXTAH'''
+  [[register.field]]
+    name = "EXCEPTION_2"
+    bits = "11:8"
+    type = "ro"
+    shortdesc = '''Indicates support for exception 2 instructions.'''
+    longdesc = '''0x1= the processor supports: RFE, SRS, and CPS'''
+  [[register.field]]
+    name = "EXCEPTION_1"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''Indicates support for exception 1 instructions.'''
+    longdesc = '''0x1= the processor supports: LDM(exception return), LDM(user registers), and STM(user registers).'''
+  [[register.field]]
+    name = "ENDIAN"
+    bits = "3:0"
+    type = "ro"
+    shortdesc = '''Indicates support for endianness control instructions.'''
+    longdesc = '''0x1= the processor supports: SETENDand E bit in PSRs'''
+[[register]]
+  name = "ID_ISAR2"
+  type = "ro"
+  width = 32
+  description = "ISA Feature Register 2"
+  default = "0x21232141"
+  offset = "0x00000D48"
+  [[register.field]]
+    name = "REVERSAL"
+    bits = "31:28"
+    type = "ro"
+    shortdesc = '''Indicates support for reversal instructions.'''
+    longdesc = '''0x2= the processor supports REV, REV16, REVSH, and RBIT.'''
+  [[register.field]]
+    name = "PSR"
+    bits = "27:24"
+    type = "ro"
+    shortdesc = '''Indicates support for PSRinstructions.'''
+    longdesc = '''0x1= the processor supports MRSand MSR, and the exception return forms of data-processing instructions.'''
+  [[register.field]]
+    name = "UNSIGNED_MULTIPLY"
+    bits = "23:20"
+    type = "ro"
+    shortdesc = '''Indicates support for advanced unsigned multiply instructions.'''
+    longdesc = '''0x2= the processor supports: . UMULL and UMLAL . UMAAL'''
+  [[register.field]]
+    name = "SIGNED_MULTIPLY"
+    bits = "19:16"
+    type = "ro"
+    shortdesc = '''Indicates support for advancedsigned multiply instructions.'''
+    longdesc = '''0x3= the processor supports: . SMULL and SMLAL . SMLABB, SMLABT, SMLALBB,SMLALBT, SMLALTB, SMLALTT, SMLATB, SMLATT, SMLAWB, SMLAWT, SMULBB, SMULBT, SMULTB, SMULTT, SMULWB, SMULWT, and Q flag in PSRs . SMLAD, SMLADX, SMLALD, SMLALDX, SMLSD, SMLSDX, SMLSLD, SMLSLDX, SMMLA, SMMLAR, SMMLS, SMMLSR, SMPUL, SMPULR, SMUAD, SMUADX, SMUSD, and SMUSDX'''
+  [[register.field]]
+    name = "MULTIPLY"
+    bits = "15:12"
+    type = "ro"
+    shortdesc = '''Indicates support for multiply instructions.'''
+    longdesc = '''0x2= the processor supports MUL, MLA, and MLS.'''
+  [[register.field]]
+    name = "INTERRUPTIBLE"
+    bits = "11:8"
+    type = "ro"
+    shortdesc = '''Indicates support for multi-access interruptible instructions.'''
+    longdesc = '''0x1= the processor supports restartable LDMand STM.'''
+  [[register.field]]
+    name = "MEMORY_HINT"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''Indicates support for memory hint instructions.'''
+    longdesc = '''0x4= the processor supports PLD, PLIand PLDW. Applies from Cortex-R5, r1p0'''
+  [[register.field]]
+    name = "LOAD_STORE"
+    bits = "3:0"
+    type = "ro"
+    shortdesc = '''Indicates support for additional load and store instructions.'''
+    longdesc = '''0x1= the processor supports LDRDand STRD.'''
+[[register]]
+  name = "ID_ISAR3"
+  type = "ro"
+  width = 32
+  description = "ISA Feature Register 3"
+  default = "0x01112131"
+  offset = "0x00000D4C"
+  [[register.field]]
+    name = "THUMB_EE_EXTENSION"
+    bits = "31:28"
+    type = "ro"
+    shortdesc = '''Indicates support for ThumbEE Execution Environment extension.'''
+    longdesc = '''0x0= no support.'''
+  [[register.field]]
+    name = "TRUE_NOP"
+    bits = "27:24"
+    type = "ro"
+    shortdesc = '''Indicates support for true NOPinstructions.'''
+    longdesc = '''0x1= the processor supports NOP16, NOP32and various NOPcompatible hints in both the ARM and Thumb instruction sets.'''
+  [[register.field]]
+    name = "THUMB_COPY"
+    bits = "23:20"
+    type = "ro"
+    shortdesc = '''Indicates support for Thumb copy instructions.'''
+    longdesc = '''0x1= the processor supports Thumb MOV(3) low register ?low register.'''
+  [[register.field]]
+    name = "TABLE_BRANCH"
+    bits = "19:16"
+    type = "ro"
+    shortdesc = '''Indicates support for table branch instructions.'''
+    longdesc = '''0x1= the processor supports table branch instructions, TBB and TBH.'''
+  [[register.field]]
+    name = "SYNC_PRIMITIVE"
+    bits = "15:12"
+    type = "ro"
+    shortdesc = '''Indicates support for synchronization primitive instructions.'''
+    longdesc = '''0x2= the processor supports: . LDREX and STREX . LDREXB, LDREXH, LDREXD, STREXB, STREXH, STREXD, and CLREX'''
+  [[register.field]]
+    name = "SVC"
+    bits = "11:8"
+    type = "ro"
+    shortdesc = '''Indicates support for SVC(formerly SWI) instructions.'''
+    longdesc = '''0x1= the processor supports SVC.'''
+  [[register.field]]
+    name = "SIMD"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''Indicates support for Single Instruction Multiple Data(SIMD) instructions.'''
+    longdesc = '''0x3= the processor supports: PKHBT, PKHTB, QADD16, QADD8, QASX, QSUB16, QSUB8, QSAX, SADD16, SADD8, SASX, SEL, SHADD16, SHADD8, SHASX, SHSUB16, SHSUB8, SHSAX, SSAT, SSAT16, SSUB16, SSUB8, SSAX, SXTAB16, SXTB16, UADD16, UADD8, UASX, UHADD16, UHADD8, UASX, UHSUB16, UHSUB8, USAX, UQADD16, UQADD8, UQASX, UQSUB16, UQSUB8, UQSAX, USAD8, USADA8, USAT, USAT16, USUB16, USUB8, USAX, UXTAB16, UXTB16, and the GE[3:0] bits in the PSRs.'''
+  [[register.field]]
+    name = "SATURATE"
+    bits = "3:0"
+    type = "ro"
+    shortdesc = '''Indicates support for saturate instructions.'''
+    longdesc = '''0x1= the processor supports QADD, QDADD, QDSUB, QSUBand Q flag in PSRs.'''
+[[register]]
+  name = "ID_ISAR4"
+  type = "ro"
+  width = 32
+  description = "ISA Feature Register 4"
+  default = "0x00010142"
+  offset = "0x00000D50"
+  [[register.field]]
+    name = "SWP_FRAC"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "PSR_M"
+    bits = "27:24"
+    type = "ro"
+    shortdesc = '''Indicates support for M-profile instr for modifying the PSRs.'''
+    longdesc = '''0x0= no support.'''
+  [[register.field]]
+    name = "EXCLUSIVE"
+    bits = "23:20"
+    type = "ro"
+    shortdesc = '''Indicates support for Exclusive instructions.'''
+    longdesc = '''0x0= Only supports synchronization primitive instructionsas indicated by bits [15:12] in the ISAR3 register.'''
+  [[register.field]]
+    name = "BARRIER"
+    bits = "19:16"
+    type = "ro"
+    shortdesc = '''Indicates support for Barrier instructions.'''
+    longdesc = '''0x1= the processor supports DMB, DSB, and ISBinstructions.'''
+  [[register.field]]
+    name = "SMC"
+    bits = "15:12"
+    type = "ro"
+    shortdesc = '''Indicates support for Secure Monitor Call(SMC) (formerly SMI) instructions.'''
+    longdesc = '''0x0= no support.'''
+  [[register.field]]
+    name = "WRITE_BACK"
+    bits = "11:8"
+    type = "ro"
+    shortdesc = '''Indicates support for write-back instructions.'''
+    longdesc = '''0x1= supports all the writeback addressing modes defined in ARMv7.'''
+  [[register.field]]
+    name = "WITH_SHIFT"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''Indicates support for with-shift instructions.'''
+    longdesc = '''0x4= the processor supports: . the full range of constant shift options, on load/store and other instr . register-controlled shift options'''
+  [[register.field]]
+    name = "UNPRIVILEGED"
+    bits = "3:0"
+    type = "ro"
+    shortdesc = '''Indicates support for Unprivileged instructions.'''
+    longdesc = '''0x2= the processor supports LDR{SB|B|SH|H}Tand STR{B|H}T.'''
+[[register]]
+  name = "ID_ISAR5"
+  type = "ro"
+  width = 32
+  description = "ISA Feature Register 5"
+  default = "0x00000000"
+  offset = "0x00000D54"
+  [[register.field]]
+    name = "INFO"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "ETMIF"
+  type = "wo"
+  width = 32
+  description = "ETM Interface Integration Register"
+  default = "0x00000000"
+  offset = "0x00000ED8"
+  [[register.field]]
+    name = "EVNTBUSM_54"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "EVNTBUSM_0"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "ETMCIDM_31"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "ETMCIDM_0"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "ETMDDM_63"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "ETMDDM_0"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "ETMDAM_31"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "ETMDAM_0"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "ETMDCTLM_11"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "ETMDCTLM_0"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "ETMIAM_31"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "ETMIAM_1"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "ETMICTLM_13"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "ETMICTLM_0"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "MISCOUT"
+  type = "wo"
+  width = 32
+  description = "Miscellaneous Outputs Integration Register"
+  default = "0x00000000"
+  offset = "0x00000EF8"
+  [[register.field]]
+    name = "DBGRESTARTEDM"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "DBGTRIGGERM"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "ETMWFIPENDINGM"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "NPMUIRQM"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "COMMTXM"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "COMMRXM"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "DBGACKM"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "MISCIN"
+  type = "ro"
+  width = 32
+  description = "Miscellaneous Inputs Integration Register"
+  default = "0x00000000"
+  offset = "0x00000EFC"
+  [[register.field]]
+    name = "DBGRESTARTM"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "ETMEXTOUTM"
+    bits = "9:8"
+    type = "ro"
+  [[register.field]]
+    name = "NETMWFIREADYM"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "NFIQM"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "NIRQM"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "EDBGRQM"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "ITCTRL"
+  type = "rw"
+  width = 32
+  description = "Integration Mode Control Register"
+  default = "0x00000000"
+  offset = "0x00000F00"
+  [[register.field]]
+    name = "IME"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Integration mode enable.'''
+    longdesc = '''When IME == 1, the device reverts to an integration mode to enable integration testing or topology detection. The integration mode behavior is IMPLEMENTATION DEFINED.'''
+[[register]]
+  name = "CLAIMSET"
+  type = "rw"
+  width = 32
+  description = "Claim Tag Set Register"
+  default = "0x00000000"
+  offset = "0x00000FA0"
+  [[register.field]]
+    name = "CLAIM"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''Claim set bits.'''
+    longdesc = '''RAO. Writing a 1 to one of these bits sets the corresponding CLAIM bit to 1. This is an indirect write to the CLAIM bits.A single write operation can set multiple bits to 1. Writing 0 to one of these bits has no effect.'''
+[[register]]
+  name = "CLAIMCLR"
+  type = "rw"
+  width = 32
+  description = "Claim Tag Clear Register"
+  default = "0x00000000"
+  offset = "0x00000FA4"
+  [[register.field]]
+    name = "CLAIM"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''Claim clear bits.'''
+    longdesc = '''Reading this field returns the current value of the CLAIM bits.Writing a 1 to one of these bits clears the corresponding CLAIM bit to 0. This is an indirect write to the CLAIM bits.A single write operation can clear multiple bits to 0. Writing 0 to one of these bits has no effect.'''
+[[register]]
+  name = "LAR"
+  type = "wo"
+  width = 32
+  description = "Lock Access Register"
+  default = "0x00000000"
+  offset = "0x00000FB0"
+  [[register.field]]
+    name = "KEY"
+    bits = "31:0"
+    type = "wo"
+    shortdesc = '''Lock Access control.'''
+    longdesc = '''Writing the key value 0xC5ACCE55 to this field unlocks the lock, enabling write accesses to this component's registers through a memory-mapped interface.Writing any other value to this register locks the lock, disabling write accesses to this component's registers through a memory mapped interface.'''
+[[register]]
+  name = "LSR"
+  type = "ro"
+  width = 32
+  description = "Lock Status Register"
+  default = "0x00000007"
+  offset = "0x00000FB4"
+  [[register.field]]
+    name = "TT"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "SLK"
+    bits = "1"
+    type = "ro"
+    shortdesc = '''Locked bit: 0 = Writes are permitted.'''
+    longdesc = '''1 = Writes are ignored.'''
+  [[register.field]]
+    name = "SLI"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "AUTHSTATUS"
+  type = "ro"
+  width = 32
+  description = "Authentication Status Register"
+  default = "0x000000A0"
+  offset = "0x00000FB8"
+  [[register.field]]
+    name = "SNID_IMP"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "SNID_EN"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "SID_IMP"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "SID_EN"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "NSNID_IMP"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "NSNID_EN"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "NSID_IMP"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "NSID_EN"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "DEVID"
+  type = "ro"
+  width = 32
+  description = "Device Indentifier"
+  default = "0x00000000"
+  offset = "0x00000FC8"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "DEVTYPE"
+  type = "ro"
+  width = 32
+  description = "Device Type Register"
+  default = "0x00000015"
+  offset = "0x00000FCC"
+  [[register.field]]
+    name = "SUBTYPE"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "MAIN_CLASS"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "PIDR4"
+  type = "ro"
+  width = 32
+  description = "Peripheral ID Register 4"
+  default = "0x00000004"
+  offset = "0x00000FD0"
+  [[register.field]]
+    name = "SIZE"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "DES_2"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "PIDR5"
+  type = "ro"
+  width = 32
+  description = "Peripheral ID Register 5"
+  default = "0x00000000"
+  offset = "0x00000FD4"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "PIDR6"
+  type = "ro"
+  width = 32
+  description = "Peripheral ID Register 6"
+  default = "0x00000000"
+  offset = "0x00000FD8"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "PIDR7"
+  type = "ro"
+  width = 32
+  description = "Peripheral ID Register 7"
+  default = "0x00000000"
+  offset = "0x00000FDC"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "PIDR0"
+  type = "ro"
+  width = 32
+  description = "Peripheral ID Register 0"
+  default = "0x00000015"
+  offset = "0x00000FE0"
+  [[register.field]]
+    name = "PART_0"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "PIDR1"
+  type = "ro"
+  width = 32
+  description = "Peripheral ID Register 1"
+  default = "0x000000BC"
+  offset = "0x00000FE4"
+  [[register.field]]
+    name = "DES_0"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "PART_1"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "PIDR2"
+  type = "ro"
+  width = 32
+  description = "Peripheral ID Register 2"
+  default = "0x0000004B"
+  offset = "0x00000FE8"
+  [[register.field]]
+    name = "REVISION"
+    bits = "7:4"
+    type = "ro"
+    shortdesc = '''Indicates the revision number for the Cortex-R5 processor.'''
+    longdesc = '''This is the major revision number nin the rn part of the rnpn description of the product revision status.'''
+  [[register.field]]
+    name = "JEDEC"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "DES_1"
+    bits = "2:0"
+    type = "ro"
+[[register]]
+  name = "PIDR3"
+  type = "ro"
+  width = 32
+  description = "Peripheral ID Register 3"
+  default = "0x00000000"
+  offset = "0x00000FEC"
+  [[register.field]]
+    name = "REVAND"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "CMOD"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "CIDR0"
+  type = "ro"
+  width = 32
+  description = "Component ID Register 0"
+  default = "0x0000000D"
+  offset = "0x00000FF0"
+  [[register.field]]
+    name = "PRMBL_0"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "CIDR1"
+  type = "ro"
+  width = 32
+  description = "Component ID Register 1"
+  default = "0x00000090"
+  offset = "0x00000FF4"
+  [[register.field]]
+    name = "CLASS"
+    bits = "7:4"
+    type = "ro"
+  [[register.field]]
+    name = "PRMBL_1"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+  name = "CIDR2"
+  type = "ro"
+  width = 32
+  description = "Component ID Register 2"
+  default = "0x00000005"
+  offset = "0x00000FF8"
+  [[register.field]]
+    name = "PRMBL_2"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "CIDR3"
+  type = "ro"
+  width = 32
+  description = "Component ID Register 3"
+  default = "0x000000B1"
+  offset = "0x00000FFC"
+  [[register.field]]
+    name = "PRMBL_3"
+    bits = "7:0"
+    type = "ro"

@@ -1,0 +1,791 @@
+description = "DDR QoS Control"
+[[bank]]
+  name = "DDR_QOS_CTRL"
+  address = "0xfd090000"
+[[register]]
+  name = "PORT_TYPE"
+  type = "mixed"
+  width = 32
+  description = "Set Port Type Register"
+  default = "0x0000A845"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+  [[register.field]]
+    name = "PORT5_TYPE"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "PORT4_TYPE"
+    bits = "13:12"
+    type = "rw"
+  [[register.field]]
+    name = "PORT3_TYPE"
+    bits = "11:10"
+    type = "rw"
+  [[register.field]]
+    name = "PORT2B_TYPE"
+    bits = "9:8"
+    type = "rw"
+  [[register.field]]
+    name = "PORT2R_TYPE"
+    bits = "7:6"
+    type = "rw"
+  [[register.field]]
+    name = "PORT1B_TYPE"
+    bits = "5:4"
+    type = "rw"
+  [[register.field]]
+    name = "PORT1R_TYPE"
+    bits = "3:2"
+    type = "rw"
+  [[register.field]]
+    name = "PORT0_TYPE"
+    bits = "1:0"
+    type = "rw"
+[[register]]
+  name = "QOS_CTRL"
+  type = "mixed"
+  width = 32
+  description = "Set Port Type Register"
+  default = "0x00400000"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:23"
+    type = "raz"
+  [[register.field]]
+    name = "APB_ERR_RES"
+    bits = "22"
+    type = "rw"
+  [[register.field]]
+    name = "PORT5_WR_CTRL"
+    bits = "21"
+    type = "rw"
+  [[register.field]]
+    name = "PORT5_HPR_CTRL"
+    bits = "20"
+    type = "rw"
+  [[register.field]]
+    name = "PORT5_LPR_CTRL"
+    bits = "19"
+    type = "rw"
+  [[register.field]]
+    name = "PORT4_WR_CTRL"
+    bits = "18"
+    type = "rw"
+  [[register.field]]
+    name = "PORT4_HPR_CTRL"
+    bits = "17"
+    type = "rw"
+  [[register.field]]
+    name = "PORT4_LPR_CTRL"
+    bits = "16"
+    type = "rw"
+  [[register.field]]
+    name = "PORT3_WR_CTRL"
+    bits = "15"
+    type = "rw"
+  [[register.field]]
+    name = "PORT3_HPR_CTRL"
+    bits = "14"
+    type = "rw"
+  [[register.field]]
+    name = "PORT3_LPR_CTRL"
+    bits = "13"
+    type = "rw"
+  [[register.field]]
+    name = "PORT2_WR_CTRL"
+    bits = "12"
+    type = "rw"
+  [[register.field]]
+    name = "PORT2B_HPR_CTRL"
+    bits = "11"
+    type = "rw"
+  [[register.field]]
+    name = "PORT2B_LPR_CTRL"
+    bits = "10"
+    type = "rw"
+  [[register.field]]
+    name = "PORT2R_HPR_CTRL"
+    bits = "9"
+    type = "rw"
+  [[register.field]]
+    name = "PORT2R_LPR_CTRL"
+    bits = "8"
+    type = "rw"
+  [[register.field]]
+    name = "PORT1_WR_CTRL"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "PORT1B_HPR_CTRL"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "PORT1B_LPR_CTRL"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "PORT1R_HPR_CTRL"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "PORT1R_LPR_CTRL"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "PORT0_WR_CTRL"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "PORT0_HPR_CTRL"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "PORT0_LPR_CTRL"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "RD_HPR_THRSLD"
+  type = "mixed"
+  width = 32
+  description = "Set Value for Read HPR (High Priority Read) CAM Threshold"
+  default = "0x00000000"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:7"
+    type = "raz"
+  [[register.field]]
+    name = "VALUE"
+    bits = "6:0"
+    type = "rw"
+[[register]]
+  name = "RD_LPR_THRSLD"
+  type = "mixed"
+  width = 32
+  description = "Set Value for Read LPR (Low Priority Read) CAM Threshold"
+  default = "0x00000000"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:7"
+    type = "raz"
+  [[register.field]]
+    name = "VALUE"
+    bits = "6:0"
+    type = "rw"
+[[register]]
+  name = "WR_THRSLD"
+  type = "mixed"
+  width = 32
+  description = "Set Value for Write CAM Threshold"
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:7"
+    type = "raz"
+  [[register.field]]
+    name = "VALUE"
+    bits = "6:0"
+    type = "rw"
+[[register]]
+  name = "ZQCS_CTRL0"
+  type = "mixed"
+  width = 32
+  description = "ZQCS Control Register 0"
+  default = "0x00000000"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "raz"
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "ZQCS_CTRL1"
+  type = "mixed"
+  width = 32
+  description = "ZQCS Control Register 2"
+  default = "0x00000000"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "raz"
+  [[register.field]]
+    name = "VSYNC_CNT"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "ZQCS_STATUS"
+  type = "mixed"
+  width = 32
+  description = "ZQCS Status Register"
+  default = "0x00000000"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "raz"
+  [[register.field]]
+    name = "BUSY"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''QoS Controller may initiate a ZQCS (ZQ calibration short) operation only if this signal is low.'''
+    longdesc = '''This signal goes high in the clock after the uMCTL2 accepts the ZQCS request. It goes low when the ZQCS operation is initiated in the uMCTL2. It is recommended not to perform ZQCS operations when this signal is high. 0 - Indicates that the QoS Controller can initiate a ZQCS operation 1 - Indicates that ZQCS operation has not been initiated yet in the uMCTL2'''
+[[register]]
+  name = "DDRC_EXT_REFRESH"
+  type = "mixed"
+  width = 32
+  description = "DDRC External Refresh Control Register"
+  default = "0x00000000"
+  offset = "0x00000020"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "raz"
+  [[register.field]]
+    name = "ENABLE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "QOS_IRQ_STATUS"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Status Register for intrN. This is a sticky register that holds the value of the interrupt until cleared by a value of 1."
+  default = "0x00000000"
+  offset = "0x00000200"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:11"
+    type = "raz"
+  [[register.field]]
+    name = "DDRC_WR_POISON"
+    bits = "10"
+    type = "wtc"
+    shortdesc = '''Write poison interrupt status from DDRC.'''
+    longdesc = '''OR'd of Write poison interrupt from all XPIs. Program DDRC.POISONCFG.wr_poison_intr_en to enables/disables interrupts for write transaction poisoning. Use DDRC.POISONSTAT status register to find which XPI cause transaction poisoning.'''
+  [[register.field]]
+    name = "DDRC_RD_POISON"
+    bits = "9"
+    type = "wtc"
+    shortdesc = '''Read poison interrupt status from DDRC.'''
+    longdesc = '''OR'd of Read poison from all XPIs. Program DDRC.POISONCFG.rd_poison_intr_en to enables/disables interrupts for read transaction poisoning. Use DDRC.POISONSTAT status register to find which XPI cause transaction poisoning.'''
+  [[register.field]]
+    name = "MRR_DATA_VALID"
+    bits = "8"
+    type = "wtc"
+    shortdesc = '''When asserted high, indicates that data on DDR_QOS_CTRL.'''
+    longdesc = '''DDRC_MRR_DATA* is valid.'''
+  [[register.field]]
+    name = "PC_COPY_DONE"
+    bits = "7"
+    type = "wtc"
+  [[register.field]]
+    name = "DFI_ALT_ERR"
+    bits = "6"
+    type = "wtc"
+  [[register.field]]
+    name = "DFI_ALT_ERR_MAX"
+    bits = "5"
+    type = "wtc"
+    shortdesc = '''This interrupt is asserted when the DDRC.'''
+    longdesc = '''CRCPARSTAT.dfi_alert_err_cnt reaches it maximum value, and the interrupt is enabled by DDRC.CRCPARCTL0.dfi_alert_err_int_en.'''
+  [[register.field]]
+    name = "DFI_ALT_ERR_FTL"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "DFI_INIT_COMP"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "DDRECC_UNCRERR"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "DDRECC_CORERR"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "INV_APB"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "QOS_IRQ_MASK"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Mask Register for intrN. This is a read-only location and can be atomically altered by either the IDR or the IER."
+  default = "0x000007FF"
+  offset = "0x00000204"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:11"
+    type = "raz"
+  [[register.field]]
+    name = "DDRC_WR_POISON"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "DDRC_RD_POISON"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "MRR_DATA_VALID"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "PC_COPY_DONE"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "DFI_ALT_ERR"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "DFI_ALT_ERR_MAX"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "DFI_ALT_ERR_FTL"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "DFI_INIT_COMP"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "DDRECC_UNCRERR"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "DDRECC_CORERR"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "INV_APB"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "QOS_IRQ_ENABLE"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Enable Register. A write of to this location will unmask the interrupt. (IMR: 0)"
+  default = "0x00000000"
+  offset = "0x00000208"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:11"
+    type = "raz"
+  [[register.field]]
+    name = "DDRC_WR_POISON"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "DDRC_RD_POISON"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "MRR_DATA_VALID"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "PC_COPY_DONE"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "DFI_ALT_ERR"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "DFI_ALT_ERR_MAX"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "DFI_ALT_ERR_FTL"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "DFI_INIT_COMP"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "DDRECC_UNCRERR"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "DDRECC_CORERR"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "INV_APB"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "QOS_IRQ_DISABLE"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Disable Register. A write of one to this location will mask the interrupt. (IMR: 1)"
+  default = "0x00000000"
+  offset = "0x0000020C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:11"
+    type = "raz"
+  [[register.field]]
+    name = "DDRC_WR_POISON"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "DDRC_RD_POISON"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "MRR_DATA_VALID"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "PC_COPY_DONE"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "DFI_ALT_ERR"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "DFI_ALT_ERR_MAX"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "DFI_ALT_ERR_FTL"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "DFI_INIT_COMP"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "DDRECC_UNCRERR"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "DDRECC_CORERR"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "INV_APB"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "DDRC_URGENT"
+  type = "mixed"
+  width = 32
+  description = "DDRC URGENT Sideband signal control register"
+  default = "0x00000000"
+  offset = "0x00000510"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:14"
+    type = "raz"
+  [[register.field]]
+    name = "ARURGENT_5"
+    bits = "13"
+    type = "rw"
+    shortdesc = '''Sideband signal to indicate a DDRC Port 5 read queue urgent transaction.'''
+    longdesc = '''When asserted, if DDRC.rd_port_urgent_en register is set, causes the port arbiter to switch immediately to read.'''
+  [[register.field]]
+    name = "AWURGENT_5"
+    bits = "12"
+    type = "rw"
+    shortdesc = '''Sideband signal to indicate a DDRC Port 5 write urgent transaction.'''
+    longdesc = '''When asserted, if DDRC.wr_port_urgent_en register is set, causes the port arbiter to switch immediately to write.'''
+  [[register.field]]
+    name = "ARURGENT_4"
+    bits = "11"
+    type = "rw"
+    shortdesc = '''Sideband signal to indicate a DDRC Port 4 read queue urgent transaction.'''
+    longdesc = '''When asserted, if DDRC.rd_port_urgent_en register is set, causes the port arbiter to switch immediately to read.'''
+  [[register.field]]
+    name = "AWURGENT_4"
+    bits = "10"
+    type = "rw"
+    shortdesc = '''Sideband signal to indicate a DDRC Port 4 write urgent transaction.'''
+    longdesc = '''When asserted, if wr_port_urgent_en register is set, causes the port arbiter to switch immediately to write.'''
+  [[register.field]]
+    name = "ARURGENT_3"
+    bits = "9"
+    type = "rw"
+    shortdesc = '''Sideband signal to indicate a DDRC Port 3 read queue urgent transaction.'''
+    longdesc = '''When asserted, if DDRC.rd_port_urgent_en register is set, causes the port arbiter to switch immediately to read.'''
+  [[register.field]]
+    name = "AWURGENT_3"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''Sideband signal to indicate a DDRC Port 3 write urgent transaction.'''
+    longdesc = '''When asserted, if DDRC.wr_port_urgent_en register is set, causes the port arbiter to switch immediately to write.'''
+  [[register.field]]
+    name = "ARURGENTR_2"
+    bits = "7"
+    type = "rw"
+    shortdesc = '''Sideband signal to indicate a DDRC Port 2 read red queue urgent transaction.'''
+    longdesc = '''When asserted, if DDRC.rd_port_urgent_en register is set, causes the port arbiter to switch immediately to read.'''
+  [[register.field]]
+    name = "ARURGENTB_2"
+    bits = "6"
+    type = "rw"
+    shortdesc = '''Sideband signal to indicate a DDRC Port 2 read blue queue urgent transaction.'''
+    longdesc = '''When asserted, if DDRC.rd_port_urgent_en register is set, causes the port arbiter to switch immediately to read.'''
+  [[register.field]]
+    name = "AWURGENT_2"
+    bits = "5"
+    type = "rw"
+    shortdesc = '''Sideband signal to indicate a DDRC Port 2 write urgent transaction.'''
+    longdesc = '''When asserted, if DDRC.wr_port_urgent_en register is set, causes the port arbiter to switch immediately to write.'''
+  [[register.field]]
+    name = "ARURGENTR_1"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''Sideband signal to indicate a DDRC Port 1 read red queue urgent transaction.'''
+    longdesc = '''When asserted, if DDRC.rd_port_urgent_en register is set, causes the port arbiter to switch immediately to read.'''
+  [[register.field]]
+    name = "ARURGENTB_1"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''Sideband signal to indicate a DDRC Port 1 read blue queue urgent transaction.'''
+    longdesc = '''When asserted, if DDRC.rd_port_urgent_en register is set, causes the port arbiter to switch immediately to read.'''
+  [[register.field]]
+    name = "AWURGENT_1"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Sideband signal to indicate a DDRC Port 1 write urgent transaction.'''
+    longdesc = '''When asserted, if DDRC.wr_port_urgent_en register is set, causes the port arbiter to switch immediately to write.'''
+  [[register.field]]
+    name = "ARURGENT_0"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Sideband signal to indicate a DDRC Port 0 read queue urgent transaction.'''
+    longdesc = '''When asserted, if DDRC.rd_port_urgent_en register is set, causes the port arbiter to switch immediately to read.'''
+  [[register.field]]
+    name = "AWURGENT_0"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Sideband signal to indicate a DDRC Port 0 write urgent transaction.'''
+    longdesc = '''When asserted, if DDRC.wr_port_urgent_en register is set, causes the port arbiter to switch immediately to write.'''
+[[register]]
+  name = "DDRC_QVN_CTRL"
+  type = "mixed"
+  width = 32
+  description = "DDRC QVN Control register"
+  default = "0x0000003C"
+  offset = "0x00000514"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:6"
+    type = "raz"
+  [[register.field]]
+    name = "PREALLOC_P2"
+    bits = "5:4"
+    type = "rw"
+  [[register.field]]
+    name = "PREALLOC_P1"
+    bits = "3:2"
+    type = "rw"
+  [[register.field]]
+    name = "EN_P2"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "EN_P1"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "DDRC_MRR_STATUS"
+  type = "mixed"
+  width = 32
+  description = "DDRC MRR Register Status"
+  default = "0x00000000"
+  offset = "0x00000518"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "raz"
+  [[register.field]]
+    name = "VALID_CNT"
+    bits = "3:1"
+    type = "ro"
+  [[register.field]]
+    name = "VALID"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "DDRC_MRR_DATA0"
+  type = "ro"
+  width = 32
+  description = "DDRC MRR Register Data"
+  default = "0x00000000"
+  offset = "0x0000051C"
+  [[register.field]]
+    name = "LSB"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "DDRC_MRR_DATA1"
+  type = "ro"
+  width = 32
+  description = "DDRC MRR Register Data"
+  default = "0x00000000"
+  offset = "0x00000520"
+  [[register.field]]
+    name = "MSB"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "DDRC_MRR_DATA2"
+  type = "mixed"
+  width = 32
+  description = "DDRC MRR Register Data"
+  default = "0x00000000"
+  offset = "0x00000524"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "raz"
+  [[register.field]]
+    name = "ECC"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "DDRC_MRR_DATA3"
+  type = "ro"
+  width = 32
+  description = "DDRC MRR Register Data"
+  default = "0x00000000"
+  offset = "0x00000528"
+  [[register.field]]
+    name = "LSB"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "DDRC_MRR_DATA4"
+  type = "ro"
+  width = 32
+  description = "DDRC MRR Register Data"
+  default = "0x00000000"
+  offset = "0x0000052C"
+  [[register.field]]
+    name = "MSB"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "DDRC_MRR_DATA5"
+  type = "mixed"
+  width = 32
+  description = "DDRC MRR Register Data"
+  default = "0x00000000"
+  offset = "0x00000530"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "raz"
+  [[register.field]]
+    name = "ECC"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "DDRC_MRR_DATA6"
+  type = "ro"
+  width = 32
+  description = "DDRC MRR Register Data"
+  default = "0x00000000"
+  offset = "0x00000534"
+  [[register.field]]
+    name = "LSB"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "DDRC_MRR_DATA7"
+  type = "ro"
+  width = 32
+  description = "DDRC MRR Register Data"
+  default = "0x00000000"
+  offset = "0x00000538"
+  [[register.field]]
+    name = "MSB"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "DDRC_MRR_DATA8"
+  type = "mixed"
+  width = 32
+  description = "DDRC MRR Register Data"
+  default = "0x00000000"
+  offset = "0x0000053C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "raz"
+  [[register.field]]
+    name = "ECC"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "DDRC_MRR_DATA9"
+  type = "ro"
+  width = 32
+  description = "DDRC MRR Register Data"
+  default = "0x00000000"
+  offset = "0x00000540"
+  [[register.field]]
+    name = "LSB"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "DDRC_MRR_DATA10"
+  type = "ro"
+  width = 32
+  description = "DDRC MRR Register Data"
+  default = "0x00000000"
+  offset = "0x00000544"
+  [[register.field]]
+    name = "MSB"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "DDRC_MRR_DATA11"
+  type = "mixed"
+  width = 32
+  description = "DDRC MRR Register Data"
+  default = "0x00000000"
+  offset = "0x00000548"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "raz"
+  [[register.field]]
+    name = "ECC"
+    bits = "7:0"
+    type = "ro"
+[[register]]
+  name = "DDR_CLK_CTRL"
+  type = "mixed"
+  width = 32
+  description = "DDR Sub system clock control"
+  default = "0x00000001"
+  offset = "0x00000700"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:2"
+    type = "raz"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Clock active signal.'''
+    longdesc = '''Switch to 0 to disable the clock'''

@@ -1,0 +1,284 @@
+description = "APU settings, APU Configuration"
+[[register]]
+  name = "ERR_CTRL"
+  type = "rw"
+  width = 32
+  description = "Control register"
+  default = "0x00000000"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "PSLVERR"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "ISR"
+  type = "wtc"
+  width = 32
+  description = "Interrupt Status Register"
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "INV_APB"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "IMR"
+  type = "ro"
+  width = 32
+  description = "Interrupt Mask Register"
+  default = "0x00000001"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "INV_APB"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "IEN"
+  type = "wo"
+  width = 32
+  description = "Interrupt Enable Register"
+  default = "0x00000000"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "INV_APB"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "IDS"
+  type = "wo"
+  width = 32
+  description = "Interrupt Disable Register"
+  default = "0x00000000"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "INV_APB"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "CONFIG_0"
+  type = "rw"
+  width = 32
+  description = "CPU Core Configuration"
+  default = "0x00000F0F"
+  offset = "0x00000020"
+  [[register.field]]
+    name = "CFGTE"
+    bits = "27:24"
+    type = "rw"
+    shortdesc = '''Set instruction set for exception handling.'''
+    longdesc = '''Only change this signal when the core is in the reset state.'''
+  [[register.field]]
+    name = "CFGEND"
+    bits = "19:16"
+    type = "rw"
+    shortdesc = '''Set data endiannes during exception handling.'''
+    longdesc = '''Only change this signal when the core is in the reset state.'''
+  [[register.field]]
+    name = "VINITHI"
+    bits = "11:8"
+    type = "rw"
+    shortdesc = '''Set exception vector locations.'''
+    longdesc = '''Only change this signal when the core is in the reset state.'''
+  [[register.field]]
+    name = "AA64NAA32"
+    bits = "3:0"
+    type = "rw"
+    shortdesc = '''Set register width state (1=64bit, 0=32bit) at cold reset.'''
+    longdesc = '''Only change when the core is in the reset state.'''
+[[register]]
+  name = "CONFIG_1"
+  type = "rw"
+  width = 32
+  description = "L2 Configuration"
+  default = "0x00000000"
+  offset = "0x00000024"
+  [[register.field]]
+    name = "L2RSTDISABLE"
+    bits = "29"
+    type = "rw"
+    shortdesc = '''Set whether to disable L2 cache invalidation at reset.'''
+    longdesc = '''Only change this signal when the MP is in the reset state.'''
+  [[register.field]]
+    name = "L1RSTDISABLE"
+    bits = "28"
+    type = "rw"
+    shortdesc = '''Set whether to disable L1 cache invalidation at reset.'''
+    longdesc = '''Only change this signal when the MP is in the reset state.'''
+  [[register.field]]
+    name = "CP15DISABLE"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "RVBARADDR0L"
+  type = "rw"
+  width = 32
+  description = "Reset Vector Base Address"
+  default = "0xFFFF0000"
+  offset = "0x00000040"
+  [[register.field]]
+    name = "ADDR"
+    bits = "31:2"
+    type = "rw"
+    shortdesc = '''Determine the reset value for A53 Core 0 RVBAR_EL3[31:2].'''
+    longdesc = '''Only change this signal when the core in reset state.'''
+[[register]]
+  name = "RVBARADDR0H"
+  type = "rw"
+  width = 32
+  description = "Reset Vector Base Address"
+  default = "0x00000000"
+  offset = "0x00000044"
+  [[register.field]]
+    name = "ADDR"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''Determine the reset value for A53 Core 0 RVBAR_EL3[39:32].'''
+    longdesc = '''Only change this signal when the core in reset state.'''
+[[register]]
+  name = "RVBARADDR1L"
+  type = "rw"
+  width = 32
+  description = "Reset Vector Base Address"
+  default = "0xFFFF0000"
+  offset = "0x00000048"
+  [[register.field]]
+    name = "ADDR"
+    bits = "31:2"
+    type = "rw"
+    shortdesc = '''Determine the reset value for A53 Core 1 RVBAR_EL3[31:2].'''
+    longdesc = '''Only change this signal when the core in reset state.'''
+[[register]]
+  name = "RVBARADDR1H"
+  type = "rw"
+  width = 32
+  description = "Reset Vector Base Address"
+  default = "0x00000000"
+  offset = "0x0000004C"
+  [[register.field]]
+    name = "ADDR"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''Determine the reset value for A53 Core 1 RVBAR_EL3[39:32].'''
+    longdesc = '''Only change this signal when the core in reset state.'''
+[[register]]
+  name = "RVBARADDR2L"
+  type = "rw"
+  width = 32
+  description = "Reset Vector Base Address"
+  default = "0xFFFF0000"
+  offset = "0x00000050"
+  [[register.field]]
+    name = "ADDR"
+    bits = "31:2"
+    type = "rw"
+    shortdesc = '''Determine the reset value for A53 Core 2 RVBAR_EL3[31:2].'''
+    longdesc = '''Only change this signal when the core in reset state.'''
+[[register]]
+  name = "RVBARADDR2H"
+  type = "rw"
+  width = 32
+  description = "Reset Vector Base Address"
+  default = "0x00000000"
+  offset = "0x00000054"
+  [[register.field]]
+    name = "ADDR"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''Determine the reset value for A53 Core 2 RVBAR_EL3[39:32].'''
+    longdesc = '''Only change this signal when the core in reset state.'''
+[[register]]
+  name = "RVBARADDR3L"
+  type = "rw"
+  width = 32
+  description = "Reset Vector Base Address"
+  default = "0xFFFF0000"
+  offset = "0x00000058"
+  [[register.field]]
+    name = "ADDR"
+    bits = "31:2"
+    type = "rw"
+    shortdesc = '''Determine the reset value for A53 Core 3 RVBAR_EL3[31:2].'''
+    longdesc = '''Only change this signal when the core in reset state.'''
+[[register]]
+  name = "RVBARADDR3H"
+  type = "rw"
+  width = 32
+  description = "Reset Vector Base Address"
+  default = "0x00000000"
+  offset = "0x0000005C"
+  [[register.field]]
+    name = "ADDR"
+    bits = "7:0"
+    type = "rw"
+    shortdesc = '''Determine the reset value for A53 Core 3 RVBAR_EL3[39:32].'''
+    longdesc = '''Only change this signal when the core in reset state.'''
+[[register]]
+  name = "ACE_CTRL"
+  type = "rw"
+  width = 32
+  description = "ACE Control Register"
+  default = "0x000F000F"
+  offset = "0x00000060"
+  [[register.field]]
+    name = "AWQOS"
+    bits = "19:16"
+    type = "rw"
+  [[register.field]]
+    name = "ARQOS"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "SNOOP_CTRL"
+  type = "rw"
+  width = 32
+  description = "Snoop Control Register"
+  default = "0x00000000"
+  offset = "0x00000080"
+  [[register.field]]
+    name = "ACE_INACT"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "ACP_INACT"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Set this bit to idle the ACP interface.'''
+    longdesc = '''This indicates that PL sends no more transaction on ACP.'''
+[[register]]
+  name = "PWRCTL"
+  type = "rw"
+  width = 32
+  description = "Power Control Register"
+  default = "0x00000000"
+  offset = "0x00000090"
+  [[register.field]]
+    name = "CLREXMONREQ"
+    bits = "17"
+    type = "rw"
+  [[register.field]]
+    name = "L2FLUSHREQ"
+    bits = "16"
+    type = "rw"
+  [[register.field]]
+    name = "CPUPWRDWNREQ"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "PWRSTAT"
+  type = "ro"
+  width = 32
+  description = "Power Status Register"
+  default = "0x00000000"
+  offset = "0x00000094"
+  [[register.field]]
+    name = "CLREXMONACK"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "L2FLUSHDONE"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "DBGNOPWRDWN"
+    bits = "3:0"
+    type = "ro"

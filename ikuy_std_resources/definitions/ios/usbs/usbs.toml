@@ -1,0 +1,13 @@
+path = "usbs"
+
+[[definition]]
+type = "io.internal.usb.zynqps8"
+registers = [
+    { resource = "zynqps8/usb3_xhci.toml", name = "USB3${index}_XHCI", base_address = "0x120_0000", address_increment = "0x10_0000" },
+    { resource = "zynqps8/usb3_regs.toml", name = "USB3${index}_REGS", base_address = "0x29d_0000", address_increment = "0x1_0000" },
+]
+buses = [
+    { name = "iopinbound_usb${index}", supplier = false },
+    { name = "usb${index}_lpdoutbound", supplier = true },
+]
+max_instances = 2

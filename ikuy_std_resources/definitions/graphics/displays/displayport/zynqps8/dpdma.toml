@@ -1,0 +1,2402 @@
+description = "DisplayPort DMA"
+[[register]]
+  name = "ERR_CTRL"
+type = "mixed"
+  width = 32
+  description = "Enable/Disable a error response"
+  default = "0x00000000"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "raz"
+  [[register.field]]
+    name = "APB_ERR_RES"
+    bits = "0"
+    type = "rw"
+[[register]]
+name = "ISR"
+type = "wtc"
+  width = 32
+  description = "Interrupt Status Register for intrN. This is a sticky register that holds the value of the interrupt until cleared by a value of 1."
+  default = "0x00000000"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "VSYNC_INT"
+    bits = "27"
+    type = "wtc"
+  [[register.field]]
+    name = "AXI_RD_4K_CROSS"
+    bits = "26"
+    type = "wtc"
+  [[register.field]]
+    name = "WR_DATA_FIFO_FULL"
+    bits = "25"
+    type = "wtc"
+  [[register.field]]
+    name = "WR_CMD_FIFO_FULL"
+    bits = "24"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_ERR5"
+    bits = "23"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_ERR4"
+    bits = "22"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_ERR3"
+    bits = "21"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_ERR2"
+    bits = "20"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_ERR1"
+    bits = "19"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_ERR0"
+    bits = "18"
+    type = "wtc"
+  [[register.field]]
+    name = "DATA_AXI_ERR5"
+    bits = "17"
+    type = "wtc"
+  [[register.field]]
+    name = "DATA_AXI_ERR4"
+    bits = "16"
+    type = "wtc"
+  [[register.field]]
+    name = "DATA_AXI_ERR3"
+    bits = "15"
+    type = "wtc"
+  [[register.field]]
+    name = "DATA_AXI_ERR2"
+    bits = "14"
+    type = "wtc"
+  [[register.field]]
+    name = "DATA_AXI_ERR1"
+    bits = "13"
+    type = "wtc"
+  [[register.field]]
+    name = "DATA_AXI_ERR0"
+    bits = "12"
+    type = "wtc"
+  [[register.field]]
+    name = "NO_OSTAND_TRAN5"
+    bits = "11"
+    type = "wtc"
+  [[register.field]]
+    name = "NO_OSTAND_TRAN4"
+    bits = "10"
+    type = "wtc"
+  [[register.field]]
+    name = "NO_OSTAND_TRAN3"
+    bits = "9"
+    type = "wtc"
+  [[register.field]]
+    name = "NO_OSTAND_TRAN2"
+    bits = "8"
+    type = "wtc"
+  [[register.field]]
+    name = "NO_OSTAND_TRAN1"
+    bits = "7"
+    type = "wtc"
+  [[register.field]]
+    name = "NO_OSTAND_TRAN0"
+    bits = "6"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_DONE5"
+    bits = "5"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_DONE4"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_DONE3"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_DONE2"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_DONE1"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_DONE0"
+    bits = "0"
+    type = "wtc"
+[[register]]
+name = "IMR"
+type = "ro"
+  width = 32
+  description = "Interrupt Mask Register for intrN. This is a read-only location and can be atomically altered by either the IDR or the IER."
+  default = "0x0FFFFFFF"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "VSYNC_INT"
+    bits = "27"
+    type = "ro"
+  [[register.field]]
+    name = "AXI_RD_4K_CROSS"
+    bits = "26"
+    type = "ro"
+  [[register.field]]
+    name = "WR_DATA_FIFO_FULL"
+    bits = "25"
+    type = "ro"
+  [[register.field]]
+    name = "WR_CMD_FIFO_FULL"
+    bits = "24"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_ERR5"
+    bits = "23"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_ERR4"
+    bits = "22"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_ERR3"
+    bits = "21"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_ERR2"
+    bits = "20"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_ERR1"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_ERR0"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "DATA_AXI_ERR5"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "DATA_AXI_ERR4"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "DATA_AXI_ERR3"
+    bits = "15"
+    type = "ro"
+  [[register.field]]
+    name = "DATA_AXI_ERR2"
+    bits = "14"
+    type = "ro"
+  [[register.field]]
+    name = "DATA_AXI_ERR1"
+    bits = "13"
+    type = "ro"
+  [[register.field]]
+    name = "DATA_AXI_ERR0"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "NO_OSTAND_TRAN5"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "NO_OSTAND_TRAN4"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "NO_OSTAND_TRAN3"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "NO_OSTAND_TRAN2"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "NO_OSTAND_TRAN1"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "NO_OSTAND_TRAN0"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_DONE5"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_DONE4"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_DONE3"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_DONE2"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_DONE1"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_DONE0"
+    bits = "0"
+    type = "ro"
+[[register]]
+name = "IEN"
+type = "wo"
+  width = 32
+  description = "Interrupt Enable Register. A write of 1 to this location will unmask the interrupt. (IMR: 0)"
+  default = "0x00000000"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "VSYNC_INT"
+    bits = "27"
+    type = "wo"
+  [[register.field]]
+    name = "AXI_RD_4K_CROSS"
+    bits = "26"
+    type = "wo"
+  [[register.field]]
+    name = "WR_DATA_FIFO_FULL"
+    bits = "25"
+    type = "wo"
+  [[register.field]]
+    name = "WR_CMD_FIFO_FULL"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_ERR5"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_ERR4"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_ERR3"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_ERR2"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_ERR1"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_ERR0"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "DATA_AXI_ERR5"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "DATA_AXI_ERR4"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "DATA_AXI_ERR3"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "DATA_AXI_ERR2"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "DATA_AXI_ERR1"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "DATA_AXI_ERR0"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "NO_OSTAND_TRAN5"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "NO_OSTAND_TRAN4"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "NO_OSTAND_TRAN3"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "NO_OSTAND_TRAN2"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "NO_OSTAND_TRAN1"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "NO_OSTAND_TRAN0"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_DONE5"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_DONE4"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_DONE3"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_DONE2"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_DONE1"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_DONE0"
+    bits = "0"
+    type = "wo"
+[[register]]
+name = "IDS"
+type = "wo"
+  width = 32
+  description = "Interrupt Disable Register. A write of 1 one to this location will mask the interrupt. (IMR: 1)"
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "VSYNC_INT"
+    bits = "27"
+    type = "wo"
+  [[register.field]]
+    name = "AXI_RD_4K_CROSS"
+    bits = "26"
+    type = "wo"
+  [[register.field]]
+    name = "WR_DATA_FIFO_FULL"
+    bits = "25"
+    type = "wo"
+  [[register.field]]
+    name = "WR_CMD_FIFO_FULL"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_ERR5"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_ERR4"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_ERR3"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_ERR2"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_ERR1"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_ERR0"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "DATA_AXI_ERR5"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "DATA_AXI_ERR4"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "DATA_AXI_ERR3"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "DATA_AXI_ERR2"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "DATA_AXI_ERR1"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "DATA_AXI_ERR0"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "NO_OSTAND_TRAN5"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "NO_OSTAND_TRAN4"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "NO_OSTAND_TRAN3"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "NO_OSTAND_TRAN2"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "NO_OSTAND_TRAN1"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "NO_OSTAND_TRAN0"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_DONE5"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_DONE4"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_DONE3"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_DONE2"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_DONE1"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_DONE0"
+    bits = "0"
+    type = "wo"
+[[register]]
+name = "EISR"
+type = "wtc"
+  width = 32
+  description = "Interrupt Status Register for intrN. This is a sticky register that holds the value of the interrupt until cleared by a value of 1."
+  default = "0x00000000"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "RD_CMD_FIFO_FULL"
+    bits = "31"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_DONE_ERR5"
+    bits = "30"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_DONE_ERR4"
+    bits = "29"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_DONE_ERR3"
+    bits = "28"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_DONE_ERR2"
+    bits = "27"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_DONE_ERR1"
+    bits = "26"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_DONE_ERR0"
+    bits = "25"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_WR_AXI_ERR5"
+    bits = "24"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_WR_AXI_ERR4"
+    bits = "23"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_WR_AXI_ERR3"
+    bits = "22"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_WR_AXI_ERR2"
+    bits = "21"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_WR_AXI_ERR1"
+    bits = "20"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_WR_AXI_ERR0"
+    bits = "19"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_CRC_ERR5"
+    bits = "18"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_CRC_ERR4"
+    bits = "17"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_CRC_ERR3"
+    bits = "16"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_CRC_ERR2"
+    bits = "15"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_CRC_ERR1"
+    bits = "14"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_CRC_ERR0"
+    bits = "13"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_PRE_ERR5"
+    bits = "12"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_PRE_ERR4"
+    bits = "11"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_PRE_ERR3"
+    bits = "10"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_PRE_ERR2"
+    bits = "9"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_PRE_ERR1"
+    bits = "8"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_PRE_ERR0"
+    bits = "7"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_RD_AXI_ERR5"
+    bits = "6"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_RD_AXI_ERR4"
+    bits = "5"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_RD_AXI_ERR3"
+    bits = "4"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_RD_AXI_ERR2"
+    bits = "3"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_RD_AXI_ERR1"
+    bits = "2"
+    type = "wtc"
+  [[register.field]]
+    name = "DSCR_RD_AXI_ERR0"
+    bits = "1"
+    type = "wtc"
+  [[register.field]]
+    name = "INV_APB"
+    bits = "0"
+    type = "wtc"
+[[register]]
+name = "EIMR"
+type = "ro"
+  width = 32
+  description = "Interrupt Mask Register for intrN. This is a read-only location and can be atomically altered by either the IDR or the IER."
+  default = "0xFFFFFFFF"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "RD_CMD_FIFO_FULL"
+    bits = "31"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_DONE_ERR5"
+    bits = "30"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_DONE_ERR4"
+    bits = "29"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_DONE_ERR3"
+    bits = "28"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_DONE_ERR2"
+    bits = "27"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_DONE_ERR1"
+    bits = "26"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_DONE_ERR0"
+    bits = "25"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_WR_AXI_ERR5"
+    bits = "24"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_WR_AXI_ERR4"
+    bits = "23"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_WR_AXI_ERR3"
+    bits = "22"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_WR_AXI_ERR2"
+    bits = "21"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_WR_AXI_ERR1"
+    bits = "20"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_WR_AXI_ERR0"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_CRC_ERR5"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_CRC_ERR4"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_CRC_ERR3"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_CRC_ERR2"
+    bits = "15"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_CRC_ERR1"
+    bits = "14"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_CRC_ERR0"
+    bits = "13"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_PRE_ERR5"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_PRE_ERR4"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_PRE_ERR3"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_PRE_ERR2"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_PRE_ERR1"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_PRE_ERR0"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_RD_AXI_ERR5"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_RD_AXI_ERR4"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_RD_AXI_ERR3"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_RD_AXI_ERR2"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_RD_AXI_ERR1"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_RD_AXI_ERR0"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "INV_APB"
+    bits = "0"
+    type = "ro"
+[[register]]
+name = "EIEN"
+type = "wo"
+  width = 32
+  description = "Interrupt Enable Register. A write of 1 to this location will unmask the interrupt. (IMR: 0)"
+  default = "0x00000000"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "RD_CMD_FIFO_FULL"
+    bits = "31"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_DONE_ERR5"
+    bits = "30"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_DONE_ERR4"
+    bits = "29"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_DONE_ERR3"
+    bits = "28"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_DONE_ERR2"
+    bits = "27"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_DONE_ERR1"
+    bits = "26"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_DONE_ERR0"
+    bits = "25"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_WR_AXI_ERR5"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_WR_AXI_ERR4"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_WR_AXI_ERR3"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_WR_AXI_ERR2"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_WR_AXI_ERR1"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_WR_AXI_ERR0"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_CRC_ERR5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_CRC_ERR4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_CRC_ERR3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_CRC_ERR2"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_CRC_ERR1"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_CRC_ERR0"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_PRE_ERR5"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_PRE_ERR4"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_PRE_ERR3"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_PRE_ERR2"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_PRE_ERR1"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_PRE_ERR0"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_RD_AXI_ERR5"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_RD_AXI_ERR4"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_RD_AXI_ERR3"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_RD_AXI_ERR2"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_RD_AXI_ERR1"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_RD_AXI_ERR0"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "INV_APB"
+    bits = "0"
+    type = "wo"
+[[register]]
+name = "EIDS"
+type = "wo"
+  width = 32
+  description = "Interrupt Disable Register. A write of one to this location will mask the interrupt. (IMR: 1)"
+  default = "0x00000000"
+  offset = "0x00000020"
+  [[register.field]]
+    name = "RD_CMD_FIFO_FULL"
+    bits = "31"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_DONE_ERR5"
+    bits = "30"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_DONE_ERR4"
+    bits = "29"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_DONE_ERR3"
+    bits = "28"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_DONE_ERR2"
+    bits = "27"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_DONE_ERR1"
+    bits = "26"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_DONE_ERR0"
+    bits = "25"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_WR_AXI_ERR5"
+    bits = "24"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_WR_AXI_ERR4"
+    bits = "23"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_WR_AXI_ERR3"
+    bits = "22"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_WR_AXI_ERR2"
+    bits = "21"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_WR_AXI_ERR1"
+    bits = "20"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_WR_AXI_ERR0"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_CRC_ERR5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_CRC_ERR4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_CRC_ERR3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_CRC_ERR2"
+    bits = "15"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_CRC_ERR1"
+    bits = "14"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_CRC_ERR0"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_PRE_ERR5"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_PRE_ERR4"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_PRE_ERR3"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_PRE_ERR2"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_PRE_ERR1"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_PRE_ERR0"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_RD_AXI_ERR5"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_RD_AXI_ERR4"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_RD_AXI_ERR3"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_RD_AXI_ERR2"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_RD_AXI_ERR1"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "DSCR_RD_AXI_ERR0"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "INV_APB"
+    bits = "0"
+    type = "wo"
+[[register]]
+name = "CNTL"
+type = "raz"
+  width = 32
+  description = "DPDMA Global control register, holds fields which control all 6 channels"
+  default = "0x00000000"
+  offset = "0x00000100"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:0"
+    type = "raz"
+[[register]]
+name = "GBL"
+type = "mixed"
+  width = 32
+  description = "Global control register provides control to start or redirect any channel"
+  default = "0x00000000"
+  offset = "0x00000104"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:12"
+    type = "raz"
+  [[register.field]]
+    name = "RTRG_CH5"
+    bits = "11"
+    type = "wo"
+    shortdesc = '''Software can redirect channel 5 by writing 1 to this bit.'''
+    longdesc = '''Instead of using NEXT ADDRESS at the end of FRAME, DPDMA uses start address to fetch the next descriptor if this bit is written (hardware has a internal sticky copy). This is self clearing bit.'''
+  [[register.field]]
+    name = "RTRG_CH4"
+    bits = "10"
+    type = "wo"
+    shortdesc = '''Software can redirect channel 4 by writing 1 to this bit.'''
+    longdesc = '''Instead of using NEXT ADDRESS at the end of FRAME, DPDMA uses start address to fetch the next descriptor if this bit is written (hardware has a internal sticky copy). This is self clearing bit.'''
+  [[register.field]]
+    name = "RTRG_CH3"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Software can redirect channel 3 by writing 1 to this bit.'''
+    longdesc = '''Instead of using NEXT ADDRESS at the end of FRAME, DPDMA uses start address to fetch the next descriptor if this bit is written (hardware has a internal sticky copy). This is self clearing bit.'''
+  [[register.field]]
+    name = "RTRG_CH2"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Software can redirect channel 2 by writing 1 to this bit.'''
+    longdesc = '''Instead of using NEXT ADDRESS at the end of FRAME, DPDMA uses start address to fetch the next descriptor if this bit is written (hardware has a internal sticky copy). This is self clearing bit.'''
+  [[register.field]]
+    name = "RTRG_CH1"
+    bits = "7"
+    type = "wo"
+    shortdesc = '''Software can redirect channel 1 by writing 1 to this bit.'''
+    longdesc = '''Instead of using NEXT ADDRESS at the end of FRAME, DPDMA uses start address to fetch the next descriptor if this bit is written (hardware has a internal sticky copy). This is self clearing bit.'''
+  [[register.field]]
+    name = "RTRG_CH0"
+    bits = "6"
+    type = "wo"
+    shortdesc = '''Software can redirect channel 0 by writing 1 to this bit.'''
+    longdesc = '''Instead of using NEXT ADDRESS at the end of FRAME, DPDMA uses start address to fetch the next descriptor if this bit is written (hardware has a internal sticky copy). This is self clearing bit.'''
+  [[register.field]]
+    name = "TRG_CH5"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "TRG_CH4"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "TRG_CH3"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "TRG_CH2"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "TRG_CH1"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "TRG_CH0"
+    bits = "0"
+    type = "wo"
+[[register]]
+name = "ALC0_CNTL"
+type = "mixed"
+  width = 32
+  description = "Global control register provides control to start or redirect any channel"
+  default = "0x00000000"
+  offset = "0x00000108"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:6"
+    type = "raz"
+  [[register.field]]
+    name = "MON_ID"
+    bits = "5:2"
+    type = "rw"
+  [[register.field]]
+    name = "CLEAR"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "EN"
+    bits = "0"
+    type = "rw"
+[[register]]
+name = "ALC0_STATUS"
+type = "mixed"
+  width = 32
+  description = "Status Register"
+  default = "0x00000000"
+  offset = "0x0000010C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "raz"
+  [[register.field]]
+    name = "OFLOW"
+    bits = "0"
+    type = "ro"
+[[register]]
+name = "ALC0_MAX"
+type = "mixed"
+  width = 32
+  description = "ALC0 Max latency Register"
+  default = "0x00000000"
+  offset = "0x00000110"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+  [[register.field]]
+    name = "LATENCY"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+name = "ALC0_MIN"
+type = "mixed"
+  width = 32
+  description = "ALC0 Min Latency Register"
+  default = "0x0000FFFF"
+  offset = "0x00000114"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+  [[register.field]]
+    name = "LATENCY"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+name = "ALC0_ACC"
+type = "ro"
+  width = 32
+  description = "ALC0 Accumulated Transaction Latency Register"
+  default = "0x00000000"
+  offset = "0x00000118"
+  [[register.field]]
+    name = "LATENCY"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+name = "ALC0_ACC_TRAN"
+type = "ro"
+  width = 32
+  description = "ALC1 Accumulated Transaction Count Register"
+  default = "0x00000000"
+  offset = "0x0000011C"
+  [[register.field]]
+    name = "COUNT"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+name = "ALC1_CNTL"
+type = "mixed"
+  width = 32
+  description = "Global control register provides control to start or redirect any channel"
+  default = "0x00000000"
+  offset = "0x00000120"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:6"
+    type = "raz"
+  [[register.field]]
+    name = "MON_ID"
+    bits = "5:2"
+    type = "rw"
+  [[register.field]]
+    name = "CLEAR"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "EN"
+    bits = "0"
+    type = "rw"
+[[register]]
+name = "ALC1_STATUS"
+type = "mixed"
+  width = 32
+  description = "Status Register"
+  default = "0x00000000"
+  offset = "0x00000124"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "raz"
+  [[register.field]]
+    name = "OFLOW"
+    bits = "0"
+    type = "ro"
+[[register]]
+name = "ALC1_MAX"
+type = "mixed"
+  width = 32
+  description = "ALC1 Max latency Register"
+  default = "0x00000000"
+  offset = "0x00000128"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+  [[register.field]]
+    name = "LATENCY"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+name = "ALC1_MIN"
+type = "mixed"
+  width = 32
+  description = "ALC1 Min Latency Register"
+  default = "0x0000FFFF"
+  offset = "0x0000012C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+  [[register.field]]
+    name = "LATENCY"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+name = "ALC1_ACC"
+type = "ro"
+  width = 32
+  description = "ALC1 Accumulated Transaction Latency Register"
+  default = "0x00000000"
+  offset = "0x00000130"
+  [[register.field]]
+    name = "LATENCY"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+name = "ALC1_ACC_TRAN"
+type = "ro"
+  width = 32
+  description = "ALC1 Accumulated Transaction Count Register"
+  default = "0x00000000"
+  offset = "0x00000134"
+  [[register.field]]
+    name = "COUNT"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+name = "CH0_DSCR_STRT_ADDRE"
+type = "mixed"
+  width = 32
+  description = "Descriptor Start Address Extension Register"
+  default = "0x00000000"
+  offset = "0x00000200"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+  [[register.field]]
+    name = "MSB"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+name = "CH0_DSCR_STRT_ADDR"
+type = "rw"
+  width = 32
+  description = "Descriptor Start Address Register"
+  default = "0x00000000"
+  offset = "0x00000204"
+  [[register.field]]
+    name = "LSB"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+name = "CH0_DSCR_NEXT_ADDRE"
+type = "mixed"
+  width = 32
+  description = "Next Descriptor Address Extention Register"
+  default = "0x00000000"
+  offset = "0x00000208"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+  [[register.field]]
+    name = "MSB"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+name = "CH0_DSCR_NEXT_ADDR"
+type = "ro"
+  width = 32
+  description = "Next Descriptor Address Register"
+  default = "0x00000000"
+  offset = "0x0000020C"
+  [[register.field]]
+    name = "LSB"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+name = "CH0_PYLD_CUR_ADDRE"
+type = "mixed"
+  width = 32
+  description = "Current Payload Address Extension Register"
+  default = "0x00000000"
+  offset = "0x00000210"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+  [[register.field]]
+    name = "MSB"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+name = "CH0_PYLD_CUR_ADDR"
+type = "ro"
+  width = 32
+  description = "Current Payload Address Register"
+  default = "0x00000000"
+  offset = "0x00000214"
+  [[register.field]]
+    name = "LSB"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+name = "CH0_CNTL"
+type = "mixed"
+  width = 32
+  description = "Channel 0 Control Register"
+  default = "0x00000000"
+  offset = "0x00000218"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:30"
+    type = "raz"
+  [[register.field]]
+    name = "DSCR_DLY_CNT"
+    bits = "29:20"
+    type = "rw"
+  [[register.field]]
+    name = "DSCR_AXCACHE"
+    bits = "19:16"
+    type = "rw"
+  [[register.field]]
+    name = "DSCR_AXPROT"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "QOS_DATA_RD"
+    bits = "13:10"
+    type = "rw"
+  [[register.field]]
+    name = "QOS_DSCR_RD"
+    bits = "9:6"
+    type = "rw"
+  [[register.field]]
+    name = "QOS_DSCR_WR"
+    bits = "5:2"
+    type = "rw"
+  [[register.field]]
+    name = "PAUSE"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Pause for DMA channel, pause preserves the DMA state.'''
+    longdesc = '''It stopes generating new fetch request untill Pause is High. 1: DMA Channel is paused 0: Normar operation'''
+  [[register.field]]
+    name = "EN"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Enable/Disable for DMA Channel, Trigger generated by start trigger register is only respected if DMA channel is enabled.'''
+    longdesc = '''Once DMA channel is disable, it goes to idle and can be restarted using trigger after enableing the channel 1: DMA Channel is enable 0: DMA Channel is desable'''
+[[register]]
+name = "CH0_STATUS"
+type = "mixed"
+  width = 32
+  description = "Channel 0 Status Register"
+  default = "0x00000000"
+  offset = "0x0000021C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:25"
+    type = "raz"
+  [[register.field]]
+    name = "OTRAN_CNT"
+    bits = "24:21"
+    type = "ro"
+  [[register.field]]
+    name = "PREAMBLE"
+    bits = "20:13"
+    type = "ro"
+  [[register.field]]
+    name = "EN_DSCR_INTR"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "EN_DSCR_UP"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_DONE"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "IGNR_DONE"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "LDSCR_FRAME"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Current descriptor is last descriptor of the Frame.'''
+    longdesc = '''Next descriptor it the first descriptor of next frame 1 = This is last descriptor of Frame 0 = Intermediate descriptor'''
+  [[register.field]]
+    name = "LAST_DSCR"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "EN_CRC"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "MODE"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "BURST_TYPE"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "BURST_LEN"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+name = "CH1_DSCR_STRT_ADDRE"
+type = "mixed"
+  width = 32
+  description = "Descriptor Start Address Extension Register"
+  default = "0x00000000"
+  offset = "0x00000300"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+  [[register.field]]
+    name = "MSB"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+name = "CH1_DSCR_STRT_ADDR"
+type = "rw"
+  width = 32
+  description = "Descriptor Start Address Register"
+  default = "0x00000000"
+  offset = "0x00000304"
+  [[register.field]]
+    name = "LSB"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+name = "CH1_DSCR_NEXT_ADDRE"
+type = "mixed"
+  width = 32
+  description = "Next Descriptor Address Extension Register"
+  default = "0x00000000"
+  offset = "0x00000308"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+  [[register.field]]
+    name = "MSB"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+name = "CH1_DSCR_NEXT_ADDR"
+type = "ro"
+  width = 32
+  description = "Next Descriptor Address Register"
+  default = "0x00000000"
+  offset = "0x0000030C"
+  [[register.field]]
+    name = "LSB"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+name = "CH1_PYLD_CUR_ADDRE"
+type = "mixed"
+  width = 32
+  description = "Current Payload Address Extension Register"
+  default = "0x00000000"
+  offset = "0x00000310"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+  [[register.field]]
+    name = "MSB"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+name = "CH1_PYLD_CUR_ADDR"
+type = "ro"
+  width = 32
+  description = "Current Payload Address Register"
+  default = "0x00000000"
+  offset = "0x00000314"
+  [[register.field]]
+    name = "LSB"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+name = "CH1_CNTL"
+type = "mixed"
+  width = 32
+  description = "Channel 1 Control Register"
+  default = "0x00000000"
+  offset = "0x00000318"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:30"
+    type = "raz"
+  [[register.field]]
+    name = "DSCR_DLY_CNT"
+    bits = "29:20"
+    type = "rw"
+  [[register.field]]
+    name = "DSCR_AXCACHE"
+    bits = "19:16"
+    type = "rw"
+  [[register.field]]
+    name = "DSCR_AXPROT"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "QOS_DATA_RD"
+    bits = "13:10"
+    type = "rw"
+  [[register.field]]
+    name = "QOS_DSCR_RD"
+    bits = "9:6"
+    type = "rw"
+  [[register.field]]
+    name = "QOS_DSCR_WR"
+    bits = "5:2"
+    type = "rw"
+  [[register.field]]
+    name = "PAUSE"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Pause for DMA channel, pause preserves the DMA state.'''
+    longdesc = '''It stops generating new fetch request until Pause is High. 1: DMA Channel is paused 0: Normar operation'''
+  [[register.field]]
+    name = "EN"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Enable/Disable for DMA Channel, Trigger generated by start trigger register is only respected if DMA channel is enabled.'''
+    longdesc = '''Once DMA channel is disable, it goes to idle and can be restarted using trigger after enabling the channel 1: DMA Channel is enable 0: DMA Channel is disable'''
+[[register]]
+name = "CH1_STATUS"
+type = "mixed"
+  width = 32
+  description = "Channel 1 Status Register"
+  default = "0x00000000"
+  offset = "0x0000031C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:25"
+    type = "raz"
+  [[register.field]]
+    name = "OTRAN_CNT"
+    bits = "24:21"
+    type = "ro"
+  [[register.field]]
+    name = "PREAMBLE"
+    bits = "20:13"
+    type = "ro"
+  [[register.field]]
+    name = "EN_DSCR_INTR"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "EN_DSCR_UP"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_DONE"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "IGNR_DONE"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "LDSCR_FRAME"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Current descriptor is last descriptor of the Frame.'''
+    longdesc = '''Next descriptor it the first descriptor of next frame 1 = This is last descriptor of Frame 0 = Intermediate descriptor'''
+  [[register.field]]
+    name = "LAST_DSCR"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "EN_CRC"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "MODE"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "BURST_TYPE"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "BURST_LEN"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+name = "CH2_DSCR_STRT_ADDRE"
+type = "mixed"
+  width = 32
+  description = "Descriptor Start Address Extension Register"
+  default = "0x00000000"
+  offset = "0x00000400"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+  [[register.field]]
+    name = "MSB"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+name = "CH2_DSCR_STRT_ADDR"
+type = "rw"
+  width = 32
+  description = "Descriptor Start Address Register"
+  default = "0x00000000"
+  offset = "0x00000404"
+  [[register.field]]
+    name = "LSB"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+name = "CH2_DSCR_NEXT_ADDRE"
+type = "mixed"
+  width = 32
+  description = "Next Descriptor Address Extension Register"
+  default = "0x00000000"
+  offset = "0x00000408"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+  [[register.field]]
+    name = "MSB"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+name = "CH2_DSCR_NEXT_ADDR"
+type = "ro"
+  width = 32
+  description = "Next Descriptor Address Register"
+  default = "0x00000000"
+  offset = "0x0000040C"
+  [[register.field]]
+    name = "LSB"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+name = "CH2_PYLD_CUR_ADDRE"
+type = "mixed"
+  width = 32
+  description = "Current Payload Address Extension Register"
+  default = "0x00000000"
+  offset = "0x00000410"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+  [[register.field]]
+    name = "MSB"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+name = "CH2_PYLD_CUR_ADDR"
+type = "ro"
+  width = 32
+  description = "Current Payload Address Register"
+  default = "0x00000000"
+  offset = "0x00000414"
+  [[register.field]]
+    name = "LSB"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+name = "CH2_CNTL"
+type = "mixed"
+  width = 32
+  description = "Channel 2 Control Register"
+  default = "0x00000000"
+  offset = "0x00000418"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:30"
+    type = "raz"
+  [[register.field]]
+    name = "DSCR_DLY_CNT"
+    bits = "29:20"
+    type = "rw"
+  [[register.field]]
+    name = "DSCR_AXCACHE"
+    bits = "19:16"
+    type = "rw"
+  [[register.field]]
+    name = "DSCR_AXPROT"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "QOS_DATA_RD"
+    bits = "13:10"
+    type = "rw"
+  [[register.field]]
+    name = "QOS_DSCR_RD"
+    bits = "9:6"
+    type = "rw"
+  [[register.field]]
+    name = "QOS_DSCR_WR"
+    bits = "5:2"
+    type = "rw"
+  [[register.field]]
+    name = "PAUSE"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Pause for DMA channel, pause preserves the DMA state.'''
+    longdesc = '''It stops generating new fetch request until Pause is High. 1: DMA Channel is paused 0: Normar operation'''
+  [[register.field]]
+    name = "EN"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Enable/Disable for DMA Channel, Trigger generated by start trigger register is only respected if DMA channel is enabled.'''
+    longdesc = '''Once DMA channel is disable, it goes to idle and can be restarted using trigger after enabling the channel 1: DMA Channel is enable 0: DMA Channel is disable'''
+[[register]]
+name = "CH2_STATUS"
+type = "mixed"
+  width = 32
+  description = "Channel 2 Status Register"
+  default = "0x00000000"
+  offset = "0x0000041C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:25"
+    type = "raz"
+  [[register.field]]
+    name = "OTRAN_CNT"
+    bits = "24:21"
+    type = "ro"
+  [[register.field]]
+    name = "PREAMBLE"
+    bits = "20:13"
+    type = "ro"
+  [[register.field]]
+    name = "EN_DSCR_INTR"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "EN_DSCR_UP"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_DONE"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "IGNR_DONE"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "LDSCR_FRAME"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Current descriptor is last descriptor of the Frame.'''
+    longdesc = '''Next descriptor it the first descriptor of next frame 1 = This is last descriptor of Frame 0 = Intermediate descriptor'''
+  [[register.field]]
+    name = "LAST_DSCR"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "EN_CRC"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "MODE"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "BURST_TYPE"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "BURST_LEN"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+name = "CH3_DSCR_STRT_ADDRE"
+type = "mixed"
+  width = 32
+  description = "Descriptor Start Address Extension Register"
+  default = "0x00000000"
+  offset = "0x00000500"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+  [[register.field]]
+    name = "MSB"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+name = "CH3_DSCR_STRT_ADDR"
+type = "rw"
+  width = 32
+  description = "Descriptor Start Address Register"
+  default = "0x00000000"
+  offset = "0x00000504"
+  [[register.field]]
+    name = "LSB"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+name = "CH3_DSCR_NEXT_ADDRE"
+type = "mixed"
+  width = 32
+  description = "Next Descriptor Address Extension Register"
+  default = "0x00000000"
+  offset = "0x00000508"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+  [[register.field]]
+    name = "MSB"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+name = "CH3_DSCR_NEXT_ADDR"
+type = "ro"
+  width = 32
+  description = "Next Descriptor Address Register"
+  default = "0x00000000"
+  offset = "0x0000050C"
+  [[register.field]]
+    name = "LSB"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+name = "CH3_PYLD_CUR_ADDRE"
+type = "mixed"
+  width = 32
+  description = "Current Payload Address Extension Register"
+  default = "0x00000000"
+  offset = "0x00000510"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+  [[register.field]]
+    name = "MSB"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+name = "CH3_PYLD_CUR_ADDR"
+type = "ro"
+  width = 32
+  description = "Current Payload Address Register"
+  default = "0x00000000"
+  offset = "0x00000514"
+  [[register.field]]
+    name = "LSB"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+name = "CH3_CNTL"
+type = "mixed"
+  width = 32
+  description = "Channel 3 Control Register"
+  default = "0x00000000"
+  offset = "0x00000518"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:30"
+    type = "raz"
+  [[register.field]]
+    name = "DSCR_DLY_CNT"
+    bits = "29:20"
+    type = "rw"
+  [[register.field]]
+    name = "DSCR_AXCACHE"
+    bits = "19:16"
+    type = "rw"
+  [[register.field]]
+    name = "DSCR_AXPROT"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "QOS_DATA_RD"
+    bits = "13:10"
+    type = "rw"
+  [[register.field]]
+    name = "QOS_DSCR_RD"
+    bits = "9:6"
+    type = "rw"
+  [[register.field]]
+    name = "QOS_DSCR_WR"
+    bits = "5:2"
+    type = "rw"
+  [[register.field]]
+    name = "PAUSE"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Pause for DMA channel, pause preserves the DMA state.'''
+    longdesc = '''It stops generating new fetch request until Pause is High. 1: DMA Channel is paused 0: Normar operation'''
+  [[register.field]]
+    name = "EN"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Enable/Disable for DMA Channel, Trigger generated by start trigger register is only respected if DMA channel is enabled.'''
+    longdesc = '''Once DMA channel is disable, it goes to idle and can be restarted using trigger after enabling the channel 1: DMA Channel is enable 0: DMA Channel is disable'''
+[[register]]
+name = "CH3_STATUS"
+type = "mixed"
+  width = 32
+  description = "Channel 3 Status Register"
+  default = "0x00000000"
+  offset = "0x0000051C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:25"
+    type = "raz"
+  [[register.field]]
+    name = "OTRAN_CNT"
+    bits = "24:21"
+    type = "ro"
+  [[register.field]]
+    name = "PREAMBLE"
+    bits = "20:13"
+    type = "ro"
+  [[register.field]]
+    name = "EN_DSCR_INTR"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "EN_DSCR_UP"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_DONE"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "IGNR_DONE"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "LDSCR_FRAME"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Current descriptor is last descriptor of the Frame.'''
+    longdesc = '''Next descriptor it the first descriptor of next frame 1 = This is last descriptor of Frame 0 = Intermediate descriptor'''
+  [[register.field]]
+    name = "LAST_DSCR"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "EN_CRC"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "MODE"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "BURST_TYPE"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "BURST_LEN"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+name = "CH4_DSCR_STRT_ADDRE"
+type = "mixed"
+  width = 32
+  description = "Descriptor Start Address Extension Register"
+  default = "0x00000000"
+  offset = "0x00000600"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+  [[register.field]]
+    name = "MSB"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+name = "CH4_DSCR_STRT_ADDR"
+type = "rw"
+  width = 32
+  description = "Descriptor Start Address Register"
+  default = "0x00000000"
+  offset = "0x00000604"
+  [[register.field]]
+    name = "LSB"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+name = "CH4_DSCR_NEXT_ADDRE"
+type = "mixed"
+  width = 32
+  description = "Next Descriptor Address Extension Register"
+  default = "0x00000000"
+  offset = "0x00000608"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+  [[register.field]]
+    name = "MSB"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+name = "CH4_DSCR_NEXT_ADDR"
+type = "ro"
+  width = 32
+  description = "Next Descriptor Address Register"
+  default = "0x00000000"
+  offset = "0x0000060C"
+  [[register.field]]
+    name = "LSB"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+name = "CH4_PYLD_CUR_ADDRE"
+type = "mixed"
+  width = 32
+  description = "Current Payload Address Extension Register"
+  default = "0x00000000"
+  offset = "0x00000610"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+  [[register.field]]
+    name = "MSB"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+name = "CH4_PYLD_CUR_ADDR"
+type = "ro"
+  width = 32
+  description = "Current Payload Address Register"
+  default = "0x00000000"
+  offset = "0x00000614"
+  [[register.field]]
+    name = "LSB"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+name = "CH4_CNTL"
+type = "mixed"
+  width = 32
+  description = "Channel 4 Control Register"
+  default = "0x00000000"
+  offset = "0x00000618"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:20"
+    type = "raz"
+  [[register.field]]
+    name = "DSCR_AXCACHE"
+    bits = "19:16"
+    type = "rw"
+  [[register.field]]
+    name = "DSCR_AXPROT"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "QOS_DATA_RD"
+    bits = "13:10"
+    type = "rw"
+  [[register.field]]
+    name = "QOS_DSCR_RD"
+    bits = "9:6"
+    type = "rw"
+  [[register.field]]
+    name = "QOS_DSCR_WR"
+    bits = "5:2"
+    type = "rw"
+  [[register.field]]
+    name = "PAUSE"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Pause for DMA channel, pause preserves the DMA state.'''
+    longdesc = '''It stops generating new fetch request until Pause is High. 1: DMA Channel is paused 0: Normar operation'''
+  [[register.field]]
+    name = "EN"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Enable/Disable for DMA Channel, Trigger generated by start trigger register is only respected if DMA channel is enabled.'''
+    longdesc = '''Once DMA channel is disable, it goes to idle and can be restarted using trigger after enabling the channel 1: DMA Channel is enable 0: DMA Channel is disable'''
+[[register]]
+name = "CH4_STATUS"
+type = "mixed"
+  width = 32
+  description = "Channel 4 Status Register"
+  default = "0x00000000"
+  offset = "0x0000061C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:25"
+    type = "raz"
+  [[register.field]]
+    name = "OTRAN_CNT"
+    bits = "24:21"
+    type = "ro"
+  [[register.field]]
+    name = "PREAMBLE"
+    bits = "20:13"
+    type = "ro"
+  [[register.field]]
+    name = "EN_DSCR_INTR"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "EN_DSCR_UP"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_DONE"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "IGNR_DONE"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "LDSCR_FRAME"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Current descriptor is last descriptor of the Frame.'''
+    longdesc = '''Next descriptor it the first descriptor of next frame 1 = This is last descriptor of Frame 0 = Intermediate descriptor'''
+  [[register.field]]
+    name = "LAST_DSCR"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "EN_CRC"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "MODE"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "BURST_TYPE"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "BURST_LEN"
+    bits = "3:0"
+    type = "ro"
+[[register]]
+name = "CH5_DSCR_STRT_ADDRE"
+type = "mixed"
+  width = 32
+  description = "Descriptor Start Address Extension Register"
+  default = "0x00000000"
+  offset = "0x00000700"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+  [[register.field]]
+    name = "MSB"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+name = "CH5_DSCR_STRT_ADDR"
+type = "rw"
+  width = 32
+  description = "Descriptor Start Address Register"
+  default = "0x00000000"
+  offset = "0x00000704"
+  [[register.field]]
+    name = "LSB"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+name = "CH5_DSCR_NEXT_ADDRE"
+type = "mixed"
+  width = 32
+  description = "Next Descriptor Address Extension Register"
+  default = "0x00000000"
+  offset = "0x00000708"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+  [[register.field]]
+    name = "MSB"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+name = "CH5_DSCR_NEXT_ADDR"
+type = "ro"
+  width = 32
+  description = "Next Descriptor Address Register"
+  default = "0x00000000"
+  offset = "0x0000070C"
+  [[register.field]]
+    name = "LSB"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+name = "CH5_PYLD_CUR_ADDRE"
+type = "mixed"
+  width = 32
+  description = "Current Payload Address Extension Register"
+  default = "0x00000000"
+  offset = "0x00000710"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "raz"
+  [[register.field]]
+    name = "MSB"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+name = "CH5_PYLD_CUR_ADDR"
+type = "ro"
+  width = 32
+  description = "Current Payload Address Register"
+  default = "0x00000000"
+  offset = "0x00000714"
+  [[register.field]]
+    name = "LSB"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+name = "CH5_CNTL"
+type = "mixed"
+  width = 32
+  description = "Channel 4 Control Register"
+  default = "0x00000000"
+  offset = "0x00000718"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:20"
+    type = "raz"
+  [[register.field]]
+    name = "DSCR_AXCACHE"
+    bits = "19:16"
+    type = "rw"
+  [[register.field]]
+    name = "DSCR_AXPROT"
+    bits = "15:14"
+    type = "rw"
+  [[register.field]]
+    name = "QOS_DATA_RD"
+    bits = "13:10"
+    type = "rw"
+  [[register.field]]
+    name = "QOS_DSCR_RD"
+    bits = "9:6"
+    type = "rw"
+  [[register.field]]
+    name = "QOS_DSCR_WR"
+    bits = "5:2"
+    type = "rw"
+  [[register.field]]
+    name = "PAUSE"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Pause for DMA channel, pause preserves the DMA state.'''
+    longdesc = '''It stops generating new fetch request until Pause is High. 1: DMA Channel is paused 0: Normar operation'''
+  [[register.field]]
+    name = "EN"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Enable/Disable for DMA Channel, Trigger generated by start trigger register is only respected if DMA channel is enabled.'''
+    longdesc = '''Once DMA channel is disable, it goes to idle and can be restarted using trigger after enabling the channel 1: DMA Channel is enable 0: DMA Channel is disable'''
+[[register]]
+name = "CH5_STATUS"
+type = "mixed"
+  width = 32
+  description = "Channel 4 Status Register"
+  default = "0x00000000"
+  offset = "0x0000071C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:25"
+    type = "raz"
+  [[register.field]]
+    name = "OTRAN_CNT"
+    bits = "24:21"
+    type = "ro"
+  [[register.field]]
+    name = "PREAMBLE"
+    bits = "20:13"
+    type = "ro"
+  [[register.field]]
+    name = "EN_DSCR_INTR"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "EN_DSCR_UP"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "DSCR_DONE"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "IGNR_DONE"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "LDSCR_FRAME"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Current descriptor is last descriptor of the Frame.'''
+    longdesc = '''Next descriptor it the first descriptor of next frame 1 = This is last descriptor of Frame 0 = Intermediate descriptor'''
+  [[register.field]]
+    name = "LAST_DSCR"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "EN_CRC"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "MODE"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "BURST_TYPE"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "BURST_LEN"
+    bits = "3:0"
+    type = "ro"

@@ -1,0 +1,5 @@
+arch: ${host_cpu}
+features: [${host_features}]
+width: 64
+max_atomic_width: 128
+max_bitop_type_width: 128

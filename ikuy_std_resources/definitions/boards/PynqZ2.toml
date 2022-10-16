@@ -1,0 +1,197 @@
+type = "Xilinx"
+family = "Artix 7"
+device = "xc7z020clg400-1"
+
+
+[defaults]
+pullup = false
+slew = "Slow"
+drive = 8
+standard = "LVCMOS33"
+
+[[instance]]
+  type = "soc.zynqps7"
+
+[[instance]]
+  type = "ram.ddr.ddr3.MT41K512M16HA"
+  size = "512 MiB"
+
+[[constraint]]
+  prefix =      "qspi0"
+  names =       ["ss", "io0", "io1", "io2", "io3", "sclk", "fbclk"]
+  pins =        ["A7",   "B8",  "D6",  "B7",  "A6",  "A5",   "D5"]
+  directions =  ["Out",  "Bi",  "Bi",  "Bi",  "Bi",  "Out",  "Bi"]
+  pullups =     [true,   false, false, false, false, false,  false]
+
+[[constraint]]
+  prefix =      "uart0"
+  names =       ["rx", "tx"]
+  pins =        ["C5", "C8"]
+  directions =  ["In", "Out"]
+  pullup =      true
+
+[[constraint]]
+  prefix =      "enet0"
+  names =       ["reset", "tx_clk", "tx_ctrl"]
+  pins =        ["B5",    "A19",    "F14"]
+  direction =   "Out"
+  pullup =      true
+[[constraint]]
+  prefix =      "enet0"
+  names =       ["rx_clk", "rx_ctrl"]
+  pins =        ["B17",    "D13"]
+  direction =   "In"
+  pullup =      true
+[[constraint]]
+  name =        "enet0.txd"
+  pins =        ["E14", "B18", "D10", "A17"]
+  direction =   "Out"
+  pullup =      true
+[[constraint]]
+  name =        "enet0.rxd"
+  pins =        ["D11", "A16", "F15", "A15"]
+  direction =   "In"
+  pullup =      true
+[[constraint]]
+  name =        "enet0.mdio"
+  pins =        ["C10", "C11"]
+  direction =   "Bi"
+  pullup =      true
+
+[[constraint]]
+  prefix =      "usb0"
+  names =       ["dir", "nxt", "stp", "reset", "Clk"]
+  pins =        ["C13", "C15", "E16", "A11",   "D16"]
+  directions =  ["In",  "In",  "Out", "Out",   "Bi"]
+
+[[constraint]]
+  name =        "usb0.data"
+  pins =        ["A14", "D15", "A12", "F12", "C16", "A10", "E13", "C18"]
+  direction =   "Bi"
+  pullup =      true
+
+[[constraint]]
+  prefix =      "sd0"
+  names =       ["clk", "cmd", "cd"]
+  pins =        ["D14", "C17", "B14"]
+  pullup =      true
+  standard =    "LVCMOS18"
+[[constraint]]
+  name =        "sd0.data"
+  pins =        ["E12", "A9", "F13", "B15"]
+  pullup =      true
+  standard =    "LVCMOS18"
+
+[[constraint]]
+  name =        "clk.125MhZ"
+  pin =         "H16"
+
+[[constraint]]
+  name =        "board.switches"
+  pins =        ["M20", "M19"]
+  direction =   "In"
+
+[[constraint]]
+  name =        "board.leds.rgb0"
+  pins =        ["N15", "G17", "L15"]
+  direction =   "Out"
+[[constraint]]
+  name =        "board.leds.rgb1"
+  pins =        ["M15", "L14", "G14"]
+  direction =   "Out"
+
+[[constraint]]
+  name =        "board.leds"
+  pins =        ["R14", "P14", "N16", "M14"]
+  direction =   "Out"
+
+[[constraint]]
+  name =        "board.btns"
+  pins =        ["D19", "D20", "L20", "L19"]
+  direction =   "In"
+
+[[constraint]]
+  name =        "board.pmod.a"
+  pins =        ["Y18", "Y19", "Y16", "Y17", "U18", "U19", "W18", "W19"]
+[[constraint]]
+  name =        "board.pmod.b"
+  pins =        ["W14", "Y14", "T11", "T10", "V16", "W16", "V12", "W13"]
+
+[[constraint]]
+  name =        "board.adr"
+  pins =        ["M17", "M18"]
+
+[[constraint]]
+  prefix =      "audio"
+  names =       ["mclk", "sda", "scl", "dout", "din", "wclk", "bclk"]
+  pins =        ["U5",   "T9",  "U9",  "F17",  "G18", "T17",  "R18"]
+
+[[constraint]]
+  name =        "board.ar.an"
+  pin_ps =      ["E17", "E18", "K14", "K16", "J20", "G19"]
+  pin_ns =      ["D18", "E19", "J14", "J16", "H20", "G20"]
+
+[[constraint]]
+  name =        "board.ar.digital"
+  pins =        ["T14", "U12", "U13", "V13", "V15", "T15", "R16", "U17", "V17", "V18", "T16", "R17", "P18", "N17"]
+
+[[constraint]]
+  name =        "board.a"
+  pins =        ["Y11", "Y12", "W11", "V11", "T5", "U10"]
+
+[[constraint]]
+  prefix =      "ck"
+  names =       ["miso", "mosi", "sck", "ss"]
+  pins =        ["W15",  "T12",  "H15", "F16"]
+
+[[constraint]]
+  name =        "board.rpio"
+  pins =        ["Y16", "Y17", "W18", "W19", "Y18", "Y19", "U18", 
+                 "U19", "F19", "V10", "V8", "W10", "B20", 
+                 "B20","W8", "V6", "Y6", "B19","U7","C20", "Y8",
+                 "A20","Y9","U8", "W6", "Y7", "F20", "W9"]
+
+[[constraint]]
+  prefix =      "hdmi_tx"
+  names =       ["cec", "hpdn"]
+  pins =        ["G15", "R19"]
+[[constraint]]
+  prefix =      "hdmi_tx"
+  names =       ["clk", "d0",  "d1",  "d2"]
+  pin_ps =      ["L16", "K17", "K19", "J18"]
+  pin_ns =      ["L17", "K18", "J19", "H18"]
+  standard =    "TDMS_33"
+
+[[constraint]]
+  prefix =      "hdmi_rx"
+  names =       ["cec", "hpdn", "scl", "sda"]
+  pins =        ["H17", "T19", "U14", "U15"]
+[[constraint]]
+  prefix =      "hdmi_rx"
+  names =       ["clk", "d0", "d1", "d2"]
+  pin_ps =      ["N18", "V20", "T20", "N20"]
+  pin_ns =      ["P18", "W20", "U20", "P20"]
+  standard =    "TDMS_33"
+
+[[constraint]]
+  name =        "mio"
+  pins =        ["E6", "D8", "E9", "C6", "D9", "E8"]
+  direction =   "Bi"
+  pullup =      true
+[[constraint]]
+  name =        "mio18"
+  pins =        ["B12", "C12", "B13", "B9"]
+  direction =   "Bi"
+  pullup =      true
+  standard =    "LVCMOS18"
+
+[[constraint]]
+  name =        "DDR_DQ"
+  pins =        ["C3", "B3", "A2", "A4", "D3", "D1", "C1", "E1", "E3", "E3",
+                 "G3", "H3", "J3", "H2", "H1", "J1", "P1", "P3", "R3", "R1",
+                 "T4", "U4", "U2", "U3", "V1", "Y3", "W1", "Y4", "Y2", "W3",
+                 "V2", "V3"]
+  pullup =      true
+  slew =        "Fast"
+  direction =   "Bi"
+  standard =    "SSTL15_T_DCI"

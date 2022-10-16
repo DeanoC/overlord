@@ -1,0 +1,3383 @@
+description = "VCU System-Level Control"
+[[bank]]
+  name = "VCU_PL_SLCR"
+  address = "0xa0040000"
+[[register]]
+  name = "VCU_ERR_CTRL"
+  type = "mixed"
+  width = 32
+  description = "Enable/Disable a error response"
+  default = "0x00000000"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "raz"
+  [[register.field]]
+    name = "APB_ERR_RES"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "VCU_VERSION"
+  type = "mixed"
+  width = 32
+  description = "VCU Version Control Register"
+  default = "0x00000002"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "raz"
+  [[register.field]]
+    name = "CTRL"
+    bits = "3:0"
+    type = "ro"
+    shortdesc = '''1: 1.'''
+    longdesc = '''0 silicon has this register reset value. 2: 2.0 silicon has this register reset value.'''
+[[register]]
+  name = "CRL_WPROT"
+  type = "rw"
+  width = 1
+  description = "CRL SLCR Write protection register"
+  default = "0x00000000"
+  offset = "0x00000020"
+  [[register.field]]
+    name = "ACTIVE"
+    bits = "0"
+    type = "rw"
+[[register]]
+  name = "VCU_PLL_CTRL"
+  type = "mixed"
+  width = 32
+  description = "PLL Basic Control"
+  default = "0x0001510F"
+  offset = "0x00000024"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:27"
+    type = "raz"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "26:18"
+    type = "raz"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15"
+    type = "raz"
+  [[register.field]]
+    name = "FBDIV"
+    bits = "14:8"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:4"
+    type = "raz"
+  [[register.field]]
+    name = "BYPASS"
+    bits = "3"
+    type = "rw"
+    shortdesc = '''Bypasses the PLL clock.'''
+    longdesc = '''The usable clock will be determined from the POST_SRC field. (This signal may only be toggled after 4 cycles of the old clock and 4 cycles of the new clock. This is not usually an issue, but designers must be aware.)'''
+  [[register.field]]
+    name = "PCTRL_POR_IN"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''Drives pctrl_por_b_in pin of PLL.'''
+    longdesc = '''An invertor is there before PLL on this bit. 1will keep in reset mode.'''
+  [[register.field]]
+    name = "PSS_PWR_POR"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Drives pss_pwr_por_b pin of PLL.'''
+    longdesc = '''An invertor is there before PLL on this bit.1will keep in reset mode.'''
+  [[register.field]]
+    name = "RESET"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Asserts Reset to the PLL.'''
+    longdesc = '''1will keep PLL in reset mode.'''
+[[register]]
+  name = "VCU_PLL_CFG"
+  type = "mixed"
+  width = 32
+  description = "Helper data. Values are to be looked up in a table from Data Sheet"
+  default = "0x00000000"
+  offset = "0x00000028"
+  [[register.field]]
+    name = "LOCK_DLY"
+    bits = "31:25"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "24:23"
+    type = "raz"
+  [[register.field]]
+    name = "LOCK_CNT"
+    bits = "22:13"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "12"
+    type = "raz"
+  [[register.field]]
+    name = "LFHF"
+    bits = "11:10"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "9"
+    type = "raz"
+  [[register.field]]
+    name = "CP"
+    bits = "8:5"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4"
+    type = "raz"
+  [[register.field]]
+    name = "RES"
+    bits = "3:0"
+    type = "rw"
+[[register]]
+  name = "ENC_CORE_CTRL"
+  type = "mixed"
+  width = 32
+  description = "Reference clock control."
+  default = "0x00001000"
+  offset = "0x00000030"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "12"
+    type = "rw"
+    shortdesc = '''Clock active signal.'''
+    longdesc = '''Switch to 0 to disable the clock'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:10"
+    type = "raz"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "9:4"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "3:1"
+    type = "raz"
+  [[register.field]]
+    name = "SRCSEL"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''0: clock input from PL to be used as encoder core clock.'''
+    longdesc = '''1: clock derived from VCU PLL to be used as encoder core clock'''
+[[register]]
+  name = "ENC_MCU_CTRL"
+  type = "mixed"
+  width = 32
+  description = "This register controls this reference clock"
+  default = "0x00001000"
+  offset = "0x00000034"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "12"
+    type = "rw"
+    shortdesc = '''Clock active signal.'''
+    longdesc = '''Switch to 0 to disable the clock'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:10"
+    type = "raz"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "9:4"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "3:1"
+    type = "raz"
+  [[register.field]]
+    name = "SRCSEL"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''0: clock input from PL to be used as encoder mcu clock.'''
+    longdesc = '''1: clock derived from VCU PLL to be used as encoder mcu clock'''
+[[register]]
+  name = "DEC_CORE_CTRL"
+  type = "mixed"
+  width = 32
+  description = "This register controls this reference clock"
+  default = "0x00001000"
+  offset = "0x00000038"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "12"
+    type = "rw"
+    shortdesc = '''Clock active signal.'''
+    longdesc = '''Switch to 0 to disable the clock'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:10"
+    type = "raz"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "9:4"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "3:1"
+    type = "raz"
+  [[register.field]]
+    name = "SRCSEL"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''0: clock input from PL to be used as decoder core clock.'''
+    longdesc = '''1: clock derived from VCU PLL to be used as decoder core clock'''
+[[register]]
+  name = "DEC_MCU_CTRL"
+  type = "mixed"
+  width = 32
+  description = "This register controls this reference clock"
+  default = "0x00001000"
+  offset = "0x0000003C"
+  [[register.field]]
+    name = "CLKACT"
+    bits = "12"
+    type = "rw"
+    shortdesc = '''Clock active signal.'''
+    longdesc = '''Switch to 0 to disable the clock'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:10"
+    type = "raz"
+  [[register.field]]
+    name = "DIVISOR0"
+    bits = "9:4"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "3:1"
+    type = "raz"
+  [[register.field]]
+    name = "SRCSEL"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''0: clock input from PL to be used as decoder mcu clock.'''
+    longdesc = '''1: clock derived from VCU PLL to be used as decoder mcu clock'''
+[[register]]
+  name = "VCU_AXI_CTRL"
+  type = "mixed"
+  width = 32
+  description = "This register controls this reference clock"
+  default = "0x0000F000"
+  offset = "0x00000040"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "18"
+    type = "raz"
+  [[register.field]]
+    name = "MCU_CLK_SEL"
+    bits = "17"
+    type = "rw"
+    shortdesc = '''0: Encoder MCU clock selected on output port for monitoring purpose.'''
+    longdesc = '''1: Decoder MCU clock selected on output port for monitoring purpose.'''
+  [[register.field]]
+    name = "CORE_CLK_SEL"
+    bits = "16"
+    type = "rw"
+    shortdesc = '''0: Encoder core clock selected on output port for monitoring purpose.'''
+    longdesc = '''1: Decoder core clock selected on output port for monitoring purpose.'''
+  [[register.field]]
+    name = "MCU_CLKACT"
+    bits = "15"
+    type = "rw"
+    shortdesc = '''Clock active signal.'''
+    longdesc = '''Switch to 0 to disable the clock'''
+  [[register.field]]
+    name = "DEC_CLKACT"
+    bits = "14"
+    type = "rw"
+    shortdesc = '''Clock active signal.'''
+    longdesc = '''Switch to 0 to disable the clock'''
+  [[register.field]]
+    name = "ENC_CACHE_CLKACT"
+    bits = "13"
+    type = "rw"
+    shortdesc = '''Clock active signal.'''
+    longdesc = '''Switch to 0 to disable the clock'''
+  [[register.field]]
+    name = "ENC_CLKACT"
+    bits = "12"
+    type = "rw"
+    shortdesc = '''Clock active signal.'''
+    longdesc = '''Switch to 0 to disable the clock'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "11:0"
+    type = "raz"
+[[register]]
+  name = "PLL_STATUS"
+  type = "mixed"
+  width = 32
+  description = "Tells the status of the PLLs"
+  default = "0x00000008"
+  offset = "0x00000060"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:4"
+    type = "raz"
+  [[register.field]]
+    name = "PLL_STABLE"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "2:1"
+    type = "raz"
+  [[register.field]]
+    name = "PLL_LOCK"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "VCU_ISR"
+  type = "wtc"
+  width = 32
+  description = "Interrupt Status Register for intrN. This is a sticky register that holds the value of the interrupt until cleared by a value of 1."
+  default = "0x00000000"
+  offset = "0x00000070"
+  [[register.field]]
+    name = "APM3_FIFO3_OVFL"
+    bits = "19"
+    type = "wtc"
+    shortdesc = '''Overflow occured on 2nd read latency measurement FIFO.'''
+    longdesc = '''This is for second Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM3_FIFO2_OVFL"
+    bits = "18"
+    type = "wtc"
+    shortdesc = '''Overflow occured on 1st read latency measurement FIFO.'''
+    longdesc = '''This is for second Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM3_FIFO1_OVFL"
+    bits = "17"
+    type = "wtc"
+    shortdesc = '''Overflow occured on 2nd write latency measurement FIFO.'''
+    longdesc = '''This is for second Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM3_FIFO0_OVFL"
+    bits = "16"
+    type = "wtc"
+    shortdesc = '''Overflow occured on 1st write latency measurement FIFO.'''
+    longdesc = '''This is for second Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM3_RESULT_VALID"
+    bits = "15"
+    type = "wtc"
+    shortdesc = '''Timing window completion interrupt.'''
+    longdesc = '''This indicates that performance measurement results are available for read. This is for second Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM2_FIFO3_OVFL"
+    bits = "14"
+    type = "wtc"
+    shortdesc = '''Overflow occured on 2nd read latency measurement FIFO.'''
+    longdesc = '''This is for first Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM2_FIFO2_OVFL"
+    bits = "13"
+    type = "wtc"
+    shortdesc = '''Overflow occured on 1st read latency measurement FIFO.'''
+    longdesc = '''This is for first Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM2_FIFO1_OVFL"
+    bits = "12"
+    type = "wtc"
+    shortdesc = '''Overflow occured on 2nd write latency measurement FIFO.'''
+    longdesc = '''This is for first Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM2_FIFO0_OVFL"
+    bits = "11"
+    type = "wtc"
+    shortdesc = '''Overflow occured on 1st write latency measurement FIFO.'''
+    longdesc = '''This is for first Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM2_RESULT_VALID"
+    bits = "10"
+    type = "wtc"
+    shortdesc = '''Timing window completion interrupt.'''
+    longdesc = '''This indicates that performance measurement results are available for read. This is for first Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM1_FIFO3_OVFL"
+    bits = "9"
+    type = "wtc"
+    shortdesc = '''Overflow occured on 2nd read latency measurement FIFO.'''
+    longdesc = '''This for is second Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM1_FIFO2_OVFL"
+    bits = "8"
+    type = "wtc"
+    shortdesc = '''Overflow occured on 1st read latency measurement FIFO.'''
+    longdesc = '''This is for second Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM1_FIFO1_OVFL"
+    bits = "7"
+    type = "wtc"
+    shortdesc = '''Overflow occured on 2nd write latency measurement FIFO.'''
+    longdesc = '''This is for second Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM1_FIFO0_OVFL"
+    bits = "6"
+    type = "wtc"
+    shortdesc = '''Overflow occured on 1st write latency measurement FIFO.'''
+    longdesc = '''This is for second Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM1_RESULT_VALID"
+    bits = "5"
+    type = "wtc"
+    shortdesc = '''Timing window completion interrupt.'''
+    longdesc = '''This indicates that performance measurement results are available for read. This is for second Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM0_FIFO3_OVFL"
+    bits = "4"
+    type = "wtc"
+    shortdesc = '''Overflow occured on 2nd read latency measurement FIFO.'''
+    longdesc = '''This is for first Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM0_FIFO2_OVFL"
+    bits = "3"
+    type = "wtc"
+    shortdesc = '''Overflow occured on 1st read latency measurement FIFO.'''
+    longdesc = '''This is for first Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM0_FIFO1_OVFL"
+    bits = "2"
+    type = "wtc"
+    shortdesc = '''Overflow occured on 2nd write latency measurement FIFO.'''
+    longdesc = '''This is for first Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM0_FIFO0_OVFL"
+    bits = "1"
+    type = "wtc"
+    shortdesc = '''Overflow occured on 1st write latency measurement FIFO.'''
+    longdesc = '''This is for first Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM0_RESULT_VALID"
+    bits = "0"
+    type = "wtc"
+    shortdesc = '''Timing window completion interrupt.'''
+    longdesc = '''This indicates that performance measurement results are available for read. This is first Encoder AXI4 Bus.'''
+[[register]]
+  name = "VCU_IMR"
+  type = "ro"
+  width = 32
+  description = "Interrupt Mask Register for intrN. This is a read-only location and can be atomically altered by either the IDR or the IER."
+  default = "0x000FFFFF"
+  offset = "0x00000074"
+  [[register.field]]
+    name = "APM3_FIFO3_OVFL"
+    bits = "19"
+    type = "ro"
+    shortdesc = '''Overflow occured on 2nd read latency measurement FIFO.'''
+    longdesc = '''This is for 2nd Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM3_FIFO2_OVFL"
+    bits = "18"
+    type = "ro"
+    shortdesc = '''Overflow occured on 1st read latency measurement FIFO.'''
+    longdesc = '''This is for 2nd Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM3_FIFO1_OVFL"
+    bits = "17"
+    type = "ro"
+    shortdesc = '''Overflow occured on 2nd write latency measurement FIFO.'''
+    longdesc = '''This is for 2nd Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM3_FIFO0_OVFL"
+    bits = "16"
+    type = "ro"
+    shortdesc = '''Overflow occured on 1st write latency measurement FIFO.'''
+    longdesc = '''This is for 2nd Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM3_RESULT_VALID"
+    bits = "15"
+    type = "ro"
+    shortdesc = '''Timing window completion interrupt.'''
+    longdesc = '''This indicates that performance measurement results are available for read. This is for 2nd Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM2_FIFO3_OVFL"
+    bits = "14"
+    type = "ro"
+    shortdesc = '''Overflow occured on 2nd read latency measurement FIFO.'''
+    longdesc = '''This is for 1st Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM2_FIFO2_OVFL"
+    bits = "13"
+    type = "ro"
+    shortdesc = '''Overflow occured on 1st read latency measurement FIFO.'''
+    longdesc = '''This is for 1st Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM2_FIFO1_OVFL"
+    bits = "12"
+    type = "ro"
+    shortdesc = '''Overflow occured on 2nd write latency measurement FIFO.'''
+    longdesc = '''This is for 1st Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM2_FIFO0_OVFL"
+    bits = "11"
+    type = "ro"
+    shortdesc = '''Overflow occured on 1st write latency measurement FIFO.'''
+    longdesc = '''This is for 1st Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM2_RESULT_VALID"
+    bits = "10"
+    type = "ro"
+    shortdesc = '''Timing window completion interrupt.'''
+    longdesc = '''This indicates that performance measurement results are available for read. This is for 1st Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM1_FIFO3_OVFL"
+    bits = "9"
+    type = "ro"
+    shortdesc = '''Overflow occured on 2nd read latency measurement FIFO.'''
+    longdesc = '''This for is 2nd Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM1_FIFO2_OVFL"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Overflow occured on 1st read latency measurement FIFO.'''
+    longdesc = '''This is for 2nd Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM1_FIFO1_OVFL"
+    bits = "7"
+    type = "ro"
+    shortdesc = '''Overflow occured on 2nd write latency measurement FIFO.'''
+    longdesc = '''This is for 2nd Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM1_FIFO0_OVFL"
+    bits = "6"
+    type = "ro"
+    shortdesc = '''Overflow occured on 1st write latency measurement FIFO.'''
+    longdesc = '''This is for 2nd Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM1_RESULT_VALID"
+    bits = "5"
+    type = "ro"
+    shortdesc = '''Timing window completion interrupt.'''
+    longdesc = '''This indicates that performance measurement results are available for read. This is for 2nd Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM0_FIFO3_OVFL"
+    bits = "4"
+    type = "ro"
+    shortdesc = '''Overflow occured on 2nd read latency measurement FIFO.'''
+    longdesc = '''This is for 1st Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM0_FIFO2_OVFL"
+    bits = "3"
+    type = "ro"
+    shortdesc = '''Overflow occured on 1st read latency measurement FIFO.'''
+    longdesc = '''This is for 1st Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM0_FIFO1_OVFL"
+    bits = "2"
+    type = "ro"
+    shortdesc = '''Overflow occured on 2nd write latency measurement FIFO.'''
+    longdesc = '''This is for 1st Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM0_FIFO0_OVFL"
+    bits = "1"
+    type = "ro"
+    shortdesc = '''Overflow occured on 1st write latency measurement FIFO.'''
+    longdesc = '''This is for 1st Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM0_RESULT_VALID"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Timing window completion interrupt.'''
+    longdesc = '''This indicates that performance measurement results are available for read. This is 1st Encoder AXI4 Bus.'''
+[[register]]
+  name = "VCU_IEN"
+  type = "wo"
+  width = 32
+  description = "Interrupt Enable Register. A write of 1 to this location will unmask the interrupt. (IMR: 0)"
+  default = "0x00000000"
+  offset = "0x00000078"
+  [[register.field]]
+    name = "APM3_FIFO3_OVFL"
+    bits = "19"
+    type = "wo"
+    shortdesc = '''Overflow occured on 2nd read latency measurement FIFO.'''
+    longdesc = '''This is for 2nd Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM3_FIFO2_OVFL"
+    bits = "18"
+    type = "wo"
+    shortdesc = '''Overflow occured on 1st read latency measurement FIFO.'''
+    longdesc = '''This is for 2nd Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM3_FIFO1_OVFL"
+    bits = "17"
+    type = "wo"
+    shortdesc = '''Overflow occured on 2nd write latency measurement FIFO.'''
+    longdesc = '''This is for 2nd Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM3_FIFO0_OVFL"
+    bits = "16"
+    type = "wo"
+    shortdesc = '''Overflow occured on 1st write latency measurement FIFO.'''
+    longdesc = '''This is for 2nd Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM3_RESULT_VALID"
+    bits = "15"
+    type = "wo"
+    shortdesc = '''Timing window completion interrupt.'''
+    longdesc = '''This indicates that performance measurement results are available for read. This is for 2nd Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM2_FIFO3_OVFL"
+    bits = "14"
+    type = "wo"
+    shortdesc = '''Overflow occured on 2nd read latency measurement FIFO.'''
+    longdesc = '''This is for 1st Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM2_FIFO2_OVFL"
+    bits = "13"
+    type = "wo"
+    shortdesc = '''Overflow occured on 1st read latency measurement FIFO.'''
+    longdesc = '''This is for 1st Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM2_FIFO1_OVFL"
+    bits = "12"
+    type = "wo"
+    shortdesc = '''Overflow occured on 2nd write latency measurement FIFO.'''
+    longdesc = '''This is for 1st Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM2_FIFO0_OVFL"
+    bits = "11"
+    type = "wo"
+    shortdesc = '''Overflow occured on 1st write latency measurement FIFO.'''
+    longdesc = '''This is for 1st Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM2_RESULT_VALID"
+    bits = "10"
+    type = "wo"
+    shortdesc = '''Timing window completion interrupt.'''
+    longdesc = '''This indicates that performance measurement results are available for read. This is for 1st Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM1_FIFO3_OVFL"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Overflow occured on 2nd read latency measurement FIFO.'''
+    longdesc = '''This for is 2nd Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM1_FIFO2_OVFL"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Overflow occured on 1st read latency measurement FIFO.'''
+    longdesc = '''This is for 2nd Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM1_FIFO1_OVFL"
+    bits = "7"
+    type = "wo"
+    shortdesc = '''Overflow occured on 2nd write latency measurement FIFO.'''
+    longdesc = '''This is for 2nd Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM1_FIFO0_OVFL"
+    bits = "6"
+    type = "wo"
+    shortdesc = '''Overflow occured on 1st write latency measurement FIFO.'''
+    longdesc = '''This is for 2nd Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM1_RESULT_VALID"
+    bits = "5"
+    type = "wo"
+    shortdesc = '''Timing window completion interrupt.'''
+    longdesc = '''This indicates that performance measurement results are available for read. This is for 2nd Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM0_FIFO3_OVFL"
+    bits = "4"
+    type = "wo"
+    shortdesc = '''Overflow occured on 2nd read latency measurement FIFO.'''
+    longdesc = '''This is for 1st Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM0_FIFO2_OVFL"
+    bits = "3"
+    type = "wo"
+    shortdesc = '''Overflow occured on 1st read latency measurement FIFO.'''
+    longdesc = '''This is for 1st Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM0_FIFO1_OVFL"
+    bits = "2"
+    type = "wo"
+    shortdesc = '''Overflow occured on 2nd write latency measurement FIFO.'''
+    longdesc = '''This is for 1st Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM0_FIFO0_OVFL"
+    bits = "1"
+    type = "wo"
+    shortdesc = '''Overflow occured on 1st write latency measurement FIFO.'''
+    longdesc = '''This is for 1st Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM0_RESULT_VALID"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Timing window completion interrupt.'''
+    longdesc = '''This indicates that performance measurement results are available for read. This is 1st Encoder AXI4 Bus.'''
+[[register]]
+  name = "VCU_IDS"
+  type = "wo"
+  width = 32
+  description = "Interrupt Disable Register. A write of 1 one to this location will mask the interrupt. (IMR: 1)"
+  default = "0x00000000"
+  offset = "0x0000007C"
+  [[register.field]]
+    name = "APM3_FIFO3_OVFL"
+    bits = "19"
+    type = "wo"
+    shortdesc = '''Overflow occured on 2nd read latency measurement FIFO.'''
+    longdesc = '''This is for 2nd Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM3_FIFO2_OVFL"
+    bits = "18"
+    type = "wo"
+    shortdesc = '''Overflow occured on 1st read latency measurement FIFO.'''
+    longdesc = '''This is for 2nd Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM3_FIFO1_OVFL"
+    bits = "17"
+    type = "wo"
+    shortdesc = '''Overflow occured on 2nd write latency measurement FIFO.'''
+    longdesc = '''This is for 2nd Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM3_FIFO0_OVFL"
+    bits = "16"
+    type = "wo"
+    shortdesc = '''Overflow occured on 1st write latency measurement FIFO.'''
+    longdesc = '''This is for 2nd Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM3_RESULT_VALID"
+    bits = "15"
+    type = "wo"
+    shortdesc = '''Timing window completion interrupt.'''
+    longdesc = '''This indicates that performance measurement results are available for read. This is for 2nd Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM2_FIFO3_OVFL"
+    bits = "14"
+    type = "wo"
+    shortdesc = '''Overflow occured on 2nd read latency measurement FIFO.'''
+    longdesc = '''This is for 1st Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM2_FIFO2_OVFL"
+    bits = "13"
+    type = "wo"
+    shortdesc = '''Overflow occured on 1st read latency measurement FIFO.'''
+    longdesc = '''This is for 1st Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM2_FIFO1_OVFL"
+    bits = "12"
+    type = "wo"
+    shortdesc = '''Overflow occured on 2nd write latency measurement FIFO.'''
+    longdesc = '''This is for 1st Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM2_FIFO0_OVFL"
+    bits = "11"
+    type = "wo"
+    shortdesc = '''Overflow occured on 1st write latency measurement FIFO.'''
+    longdesc = '''This is for 1st Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM2_RESULT_VALID"
+    bits = "10"
+    type = "wo"
+    shortdesc = '''Timing window completion interrupt.'''
+    longdesc = '''This indicates that performance measurement results are available for read. This is for 1st Decoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM1_FIFO3_OVFL"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Overflow occured on 2nd read latency measurement FIFO.'''
+    longdesc = '''This for is 2nd Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM1_FIFO2_OVFL"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Overflow occured on 1st read latency measurement FIFO.'''
+    longdesc = '''This is for 2nd Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM1_FIFO1_OVFL"
+    bits = "7"
+    type = "wo"
+    shortdesc = '''Overflow occured on 2nd write latency measurement FIFO.'''
+    longdesc = '''This is for 2nd Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM1_FIFO0_OVFL"
+    bits = "6"
+    type = "wo"
+    shortdesc = '''Overflow occured on 1st write latency measurement FIFO.'''
+    longdesc = '''This is for 2nd Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM1_RESULT_VALID"
+    bits = "5"
+    type = "wo"
+    shortdesc = '''Timing window completion interrupt.'''
+    longdesc = '''This indicates that performance measurement results are available for read. This is for 2nd Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM0_FIFO3_OVFL"
+    bits = "4"
+    type = "wo"
+    shortdesc = '''Overflow occured on 2nd read latency measurement FIFO.'''
+    longdesc = '''This is for 1st Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM0_FIFO2_OVFL"
+    bits = "3"
+    type = "wo"
+    shortdesc = '''Overflow occured on 1st read latency measurement FIFO.'''
+    longdesc = '''This is for 1st Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM0_FIFO1_OVFL"
+    bits = "2"
+    type = "wo"
+    shortdesc = '''Overflow occured on 2nd write latency measurement FIFO.'''
+    longdesc = '''This is for 1st Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM0_FIFO0_OVFL"
+    bits = "1"
+    type = "wo"
+    shortdesc = '''Overflow occured on 1st write latency measurement FIFO.'''
+    longdesc = '''This is for 1st Encoder AXI4 Bus.'''
+  [[register.field]]
+    name = "APM0_RESULT_VALID"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Timing window completion interrupt.'''
+    longdesc = '''This indicates that performance measurement results are available for read. This is 1st Encoder AXI4 Bus.'''
+[[register]]
+  name = "APM0_CFG"
+  type = "mixed"
+  width = 32
+  description = "APM0_CFG"
+  default = "0x00000002"
+  offset = "0x00000100"
+  [[register.field]]
+    name = "RD_ID_LAT_FF1"
+    bits = "31:28"
+    type = "rw"
+  [[register.field]]
+    name = "WR_ID_LAT_FF1"
+    bits = "27:24"
+    type = "rw"
+  [[register.field]]
+    name = "RD_ID_LAT_FF0"
+    bits = "23:20"
+    type = "rw"
+  [[register.field]]
+    name = "WR_ID_LAT_FF0"
+    bits = "19:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:8"
+    type = "raz"
+  [[register.field]]
+    name = "SEL_RD_ID_LAT_FF1"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "SEL_WR_ID_LAT_FF1"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "SEL_RD_ID_LAT_FF0"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "SEL_WR_ID_LAT_FF0"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "3"
+    type = "raz"
+  [[register.field]]
+    name = "MODE"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''0: Contineous Timing Mode.'''
+    longdesc = '''Mode 1 in the APM specification 1: Burst Timing Mode. Mode 2 in the APM specification'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "0"
+    type = "raz"
+[[register]]
+  name = "APM0_TIMER"
+  type = "rw"
+  width = 32
+  description = "APM0_TIMER"
+  default = "0x00000000"
+  offset = "0x00000104"
+  [[register.field]]
+    name = "BURST_MAX_VAL"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Maximum value of clock ticks in timing mode window in case of Mode 2.'''
+    longdesc = '''This is number of AXI clock cycles. Timing window counter will restart once it attains the maximum value. A new timing window start after that.'''
+[[register]]
+  name = "APM0_TRG"
+  type = "mixed"
+  width = 32
+  description = "APM0_TRG"
+  default = "0x00000000"
+  offset = "0x00000108"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "raz"
+  [[register.field]]
+    name = "START_STOP"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''1: on this register will define the active operating window in case of Mode 1.'''
+    longdesc = '''Rising edge (Updating this register from 0 to 1) and falling edge (Updating this register from 1 to 0) will be used as start and stop trigger for operating timing mode 2.'''
+[[register]]
+  name = "APM0_RESULT0"
+  type = "ro"
+  width = 32
+  description = "APM0_RESULT0"
+  default = "0x00000000"
+  offset = "0x0000010C"
+  [[register.field]]
+    name = "WR_TRANSAC_COUNT"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "APM0_RESULT1"
+  type = "ro"
+  width = 32
+  description = "APM0_RESULT1"
+  default = "0x00000000"
+  offset = "0x00000110"
+  [[register.field]]
+    name = "RD_TRANSAC_COUNT"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "APM0_RESULT2"
+  type = "ro"
+  width = 32
+  description = "APM0_RESULT2"
+  default = "0x00000000"
+  offset = "0x00000114"
+  [[register.field]]
+    name = "WRDATABEAT_COUNT"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "APM0_RESULT3"
+  type = "ro"
+  width = 32
+  description = "APM0_RESULT3"
+  default = "0x00000000"
+  offset = "0x00000118"
+  [[register.field]]
+    name = "RDDATABEAT_COUNT"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "APM0_RESULT4"
+  type = "mixed"
+  width = 32
+  description = "APM0_RESULT4"
+  default = "0x00000000"
+  offset = "0x0000011C"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:28"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_WR_LAT0"
+    bits = "27:0"
+    type = "ro"
+[[register]]
+  name = "APM0_RESULT5"
+  type = "mixed"
+  width = 32
+  description = "APM0_RESULT5"
+  default = "0x00000000"
+  offset = "0x00000120"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:17"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_WR_LAT0"
+    bits = "16:0"
+    type = "ro"
+[[register]]
+  name = "APM0_RESULT6"
+  type = "mixed"
+  width = 32
+  description = "APM0_RESULT6"
+  default = "0x00000000"
+  offset = "0x00000124"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_WR_LAT0"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM0_RESULT7"
+  type = "mixed"
+  width = 32
+  description = "APM0_RESULT7"
+  default = "0x00000000"
+  offset = "0x00000128"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_WR_LAT0"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM0_RESULT8"
+  type = "mixed"
+  width = 32
+  description = "APM0_RESULT8"
+  default = "0x00000000"
+  offset = "0x0000012C"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:28"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_RD_LAT0"
+    bits = "27:0"
+    type = "ro"
+[[register]]
+  name = "APM0_RESULT9"
+  type = "mixed"
+  width = 32
+  description = "APM0_RESULT9"
+  default = "0x00000000"
+  offset = "0x00000130"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:17"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_RD_LAT0"
+    bits = "16:0"
+    type = "ro"
+[[register]]
+  name = "APM0_RESULT10"
+  type = "mixed"
+  width = 32
+  description = "APM0_RESULT10"
+  default = "0x00000000"
+  offset = "0x00000134"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_RD_LAT0"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM0_RESULT11"
+  type = "mixed"
+  width = 32
+  description = "APM0_RESULT11"
+  default = "0x00000000"
+  offset = "0x00000138"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_RD_LAT0"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM0_RESULT12"
+  type = "mixed"
+  width = 32
+  description = "APM0_RESULT12"
+  default = "0x00000000"
+  offset = "0x0000013C"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:28"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_WR_LAT1"
+    bits = "27:0"
+    type = "ro"
+[[register]]
+  name = "APM0_RESULT13"
+  type = "mixed"
+  width = 32
+  description = "APM0_RESULT13"
+  default = "0x00000000"
+  offset = "0x00000140"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:17"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_WR_LAT1"
+    bits = "16:0"
+    type = "ro"
+[[register]]
+  name = "APM0_RESULT14"
+  type = "mixed"
+  width = 32
+  description = "APM0_RESULT14"
+  default = "0x00000000"
+  offset = "0x00000144"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_WR_LAT1"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM0_RESULT15"
+  type = "mixed"
+  width = 32
+  description = "APM0_RESULT15"
+  default = "0x00000000"
+  offset = "0x00000148"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_WR_LAT1"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM0_RESULT16"
+  type = "mixed"
+  width = 32
+  description = "APM0_RESULT16"
+  default = "0x00000000"
+  offset = "0x0000014C"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:28"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_RD_LAT1"
+    bits = "27:0"
+    type = "ro"
+[[register]]
+  name = "APM0_RESULT17"
+  type = "mixed"
+  width = 32
+  description = "APM0_RESULT17"
+  default = "0x00000000"
+  offset = "0x00000150"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:17"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_RD_LAT1"
+    bits = "16:0"
+    type = "ro"
+[[register]]
+  name = "APM0_RESULT18"
+  type = "mixed"
+  width = 32
+  description = "APM0_RESULT18"
+  default = "0x00000000"
+  offset = "0x00000154"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_RD_LAT1"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM0_RESULT19"
+  type = "mixed"
+  width = 32
+  description = "APM0_RESULT19"
+  default = "0x00000000"
+  offset = "0x00000158"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_RD_LAT1"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM0_RESULT20"
+  type = "mixed"
+  width = 32
+  description = "APM0_RESULT20"
+  default = "0x1FFF0000"
+  offset = "0x0000015C"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:29"
+    type = "raz"
+  [[register.field]]
+    name = "MIN_WR_LAT0"
+    bits = "28:16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "raz"
+  [[register.field]]
+    name = "MAX_WR_LAT0"
+    bits = "12:0"
+    type = "ro"
+[[register]]
+  name = "APM0_RESULT21"
+  type = "mixed"
+  width = 32
+  description = "APM0_RESULT21"
+  default = "0x1FFF0000"
+  offset = "0x00000160"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:29"
+    type = "raz"
+  [[register.field]]
+    name = "MIN_RD_LAT0"
+    bits = "28:16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "raz"
+  [[register.field]]
+    name = "MAX_RD_LAT0"
+    bits = "12:0"
+    type = "ro"
+[[register]]
+  name = "APM0_RESULT22"
+  type = "mixed"
+  width = 32
+  description = "APM0_RESULT22"
+  default = "0x1FFF0000"
+  offset = "0x00000164"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:29"
+    type = "raz"
+  [[register.field]]
+    name = "MIN_WR_LAT1"
+    bits = "28:16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "raz"
+  [[register.field]]
+    name = "MAX_WR_LAT1"
+    bits = "12:0"
+    type = "ro"
+[[register]]
+  name = "APM0_RESULT23"
+  type = "mixed"
+  width = 32
+  description = "APM0_RESULT23"
+  default = "0x1FFF0000"
+  offset = "0x00000168"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:29"
+    type = "raz"
+  [[register.field]]
+    name = "MIN_RD_LAT1"
+    bits = "28:16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "raz"
+  [[register.field]]
+    name = "MAX_RD_LAT1"
+    bits = "12:0"
+    type = "ro"
+[[register]]
+  name = "APM0_RESULT24"
+  type = "mixed"
+  width = 32
+  description = "APM0_RESULT24"
+  default = "0x00000000"
+  offset = "0x0000016C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31"
+    type = "raz"
+  [[register.field]]
+    name = "RD_FIFO1_SAMPLE_PRESENT"
+    bits = "30:24"
+    type = "ro"
+    shortdesc = '''No.'''
+    longdesc = '''of samples present in 2nd read latency measurement FIFO. This represent the no. of outstanding transactions at the end of the configured timing window. This is for debug purpose.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23"
+    type = "raz"
+  [[register.field]]
+    name = "RD_FIFO0_SAMPLE_PRESENT"
+    bits = "22:16"
+    type = "ro"
+    shortdesc = '''No.'''
+    longdesc = '''of samples present in 1st read latency measurement FIFO. This represent the no. of outstanding transactions at the end of the configured timing window. This is for debug purpose.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15"
+    type = "raz"
+  [[register.field]]
+    name = "WR_FIFO1_SAMPLE_PRESENT"
+    bits = "14:8"
+    type = "ro"
+    shortdesc = '''No.'''
+    longdesc = '''of samples present in 2nd write latency measurement FIFO. This represent the no. of outstanding transactions at the end of the configured timing window. This is for debug purpose.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7"
+    type = "raz"
+  [[register.field]]
+    name = "WR_FIFO0_SAMPLE_PRESENT"
+    bits = "6:0"
+    type = "ro"
+    shortdesc = '''No.'''
+    longdesc = '''of samples present in 1st write latency measurement FIFO. This represent the no. of outstanding transactions at the end of the configured timing window. This is for debug purpose.'''
+[[register]]
+  name = "APM1_CFG"
+  type = "mixed"
+  width = 32
+  description = "APM1_CFG"
+  default = "0x00000002"
+  offset = "0x00000200"
+  [[register.field]]
+    name = "RD_ID_LAT_FF1"
+    bits = "31:28"
+    type = "rw"
+  [[register.field]]
+    name = "WR_ID_LAT_FF1"
+    bits = "27:24"
+    type = "rw"
+  [[register.field]]
+    name = "RD_ID_LAT_FF0"
+    bits = "23:20"
+    type = "rw"
+  [[register.field]]
+    name = "WR_ID_LAT_FF0"
+    bits = "19:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:8"
+    type = "raz"
+  [[register.field]]
+    name = "SEL_RD_ID_LAT_FF1"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "SEL_WR_ID_LAT_FF1"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "SEL_RD_ID_LAT_FF0"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "SEL_WR_ID_LAT_FF0"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "3"
+    type = "raz"
+  [[register.field]]
+    name = "MODE"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''0: Contineous Timing Mode.'''
+    longdesc = '''Mode 1 in the APM specification 1: Burst Timing Mode. Mode 2 in the APM specification'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "0"
+    type = "raz"
+[[register]]
+  name = "APM1_TIMER"
+  type = "rw"
+  width = 32
+  description = "APM1_TIMER"
+  default = "0x00000000"
+  offset = "0x00000204"
+  [[register.field]]
+    name = "BURST_MAX_VAL"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Maximum value of clock ticks in timing mode window in case of Mode 2.'''
+    longdesc = '''This is number of AXI clock cycles. Timing window counter will restart once it attains the maximum value. A new timing window start after that.'''
+[[register]]
+  name = "APM1_TRG"
+  type = "mixed"
+  width = 32
+  description = "APM1_TRG"
+  default = "0x00000000"
+  offset = "0x00000208"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "raz"
+  [[register.field]]
+    name = "START_STOP"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''1: defines the active operating window in case of Mode 1.'''
+    longdesc = '''Rising edge(Updating this register from 0 to 1) and falling edge (Updating this register from 1 to 0) will be used as start and stop trigger for operating timing mode 2.'''
+[[register]]
+  name = "APM1_RESULT0"
+  type = "ro"
+  width = 32
+  description = "APM1_RESULT0"
+  default = "0x00000000"
+  offset = "0x0000020C"
+  [[register.field]]
+    name = "WR_TRANSAC_COUNT"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "APM1_RESULT1"
+  type = "ro"
+  width = 32
+  description = "APM1_RESULT1"
+  default = "0x00000000"
+  offset = "0x00000210"
+  [[register.field]]
+    name = "RD_TRANSAC_COUNT"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "APM1_RESULT2"
+  type = "ro"
+  width = 32
+  description = "APM1_RESULT2"
+  default = "0x00000000"
+  offset = "0x00000214"
+  [[register.field]]
+    name = "WRDATABEAT_COUNT"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "APM1_RESULT3"
+  type = "ro"
+  width = 32
+  description = "APM1_RESULT3"
+  default = "0x00000000"
+  offset = "0x00000218"
+  [[register.field]]
+    name = "RDDATABEAT_COUNT"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "APM1_RESULT4"
+  type = "mixed"
+  width = 32
+  description = "APM1_RESULT4"
+  default = "0x00000000"
+  offset = "0x0000021C"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:28"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_WR_LAT0"
+    bits = "27:0"
+    type = "ro"
+[[register]]
+  name = "APM1_RESULT5"
+  type = "mixed"
+  width = 32
+  description = "APM1_RESULT5"
+  default = "0x00000000"
+  offset = "0x00000220"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:17"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_WR_LAT0"
+    bits = "16:0"
+    type = "ro"
+[[register]]
+  name = "APM1_RESULT6"
+  type = "mixed"
+  width = 32
+  description = "APM1_RESULT6"
+  default = "0x00000000"
+  offset = "0x00000224"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_WR_LAT0"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM1_RESULT7"
+  type = "mixed"
+  width = 32
+  description = "APM1_RESULT7"
+  default = "0x00000000"
+  offset = "0x00000228"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_WR_LAT0"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM1_RESULT8"
+  type = "mixed"
+  width = 32
+  description = "APM1_RESULT8"
+  default = "0x00000000"
+  offset = "0x0000022C"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:28"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_RD_LAT0"
+    bits = "27:0"
+    type = "ro"
+[[register]]
+  name = "APM1_RESULT9"
+  type = "mixed"
+  width = 32
+  description = "APM1_RESULT9"
+  default = "0x00000000"
+  offset = "0x00000230"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:17"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_RD_LAT0"
+    bits = "16:0"
+    type = "ro"
+[[register]]
+  name = "APM1_RESULT10"
+  type = "mixed"
+  width = 32
+  description = "APM1_RESULT10"
+  default = "0x00000000"
+  offset = "0x00000234"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_RD_LAT0"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM1_RESULT11"
+  type = "mixed"
+  width = 32
+  description = "APM1_RESULT11"
+  default = "0x00000000"
+  offset = "0x00000238"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_RD_LAT0"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM1_RESULT12"
+  type = "mixed"
+  width = 32
+  description = "APM1_RESULT12"
+  default = "0x00000000"
+  offset = "0x0000023C"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:28"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_WR_LAT1"
+    bits = "27:0"
+    type = "ro"
+[[register]]
+  name = "APM1_RESULT13"
+  type = "mixed"
+  width = 32
+  description = "APM1_RESULT13"
+  default = "0x00000000"
+  offset = "0x00000240"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:17"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_WR_LAT1"
+    bits = "16:0"
+    type = "ro"
+[[register]]
+  name = "APM1_RESULT14"
+  type = "mixed"
+  width = 32
+  description = "APM1_RESULT14"
+  default = "0x00000000"
+  offset = "0x00000244"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_WR_LAT1"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM1_RESULT15"
+  type = "mixed"
+  width = 32
+  description = "APM1_RESULT15"
+  default = "0x00000000"
+  offset = "0x00000248"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_WR_LAT1"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM1_RESULT16"
+  type = "mixed"
+  width = 32
+  description = "APM1_RESULT16"
+  default = "0x00000000"
+  offset = "0x0000024C"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:28"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_RD_LAT1"
+    bits = "27:0"
+    type = "ro"
+[[register]]
+  name = "APM1_RESULT17"
+  type = "mixed"
+  width = 32
+  description = "APM1_RESULT17"
+  default = "0x00000000"
+  offset = "0x00000250"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:17"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_RD_LAT1"
+    bits = "16:0"
+    type = "ro"
+[[register]]
+  name = "APM1_RESULT18"
+  type = "mixed"
+  width = 32
+  description = "APM1_RESULT18"
+  default = "0x00000000"
+  offset = "0x00000254"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_RD_LAT1"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM1_RESULT19"
+  type = "mixed"
+  width = 32
+  description = "APM1_RESULT19"
+  default = "0x00000000"
+  offset = "0x00000258"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_RD_LAT1"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM1_RESULT20"
+  type = "mixed"
+  width = 32
+  description = "APM1_RESULT20"
+  default = "0x1FFF0000"
+  offset = "0x0000025C"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:29"
+    type = "raz"
+  [[register.field]]
+    name = "MIN_WR_LAT0"
+    bits = "28:16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "raz"
+  [[register.field]]
+    name = "MAX_WR_LAT0"
+    bits = "12:0"
+    type = "ro"
+[[register]]
+  name = "APM1_RESULT21"
+  type = "mixed"
+  width = 32
+  description = "APM1_RESULT21"
+  default = "0x1FFF0000"
+  offset = "0x00000260"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:29"
+    type = "raz"
+  [[register.field]]
+    name = "MIN_RD_LAT0"
+    bits = "28:16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "raz"
+  [[register.field]]
+    name = "MAX_RD_LAT0"
+    bits = "12:0"
+    type = "ro"
+[[register]]
+  name = "APM1_RESULT22"
+  type = "mixed"
+  width = 32
+  description = "APM1_RESULT22"
+  default = "0x1FFF0000"
+  offset = "0x00000264"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:29"
+    type = "raz"
+  [[register.field]]
+    name = "MIN_WR_LAT1"
+    bits = "28:16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "raz"
+  [[register.field]]
+    name = "MAX_WR_LAT1"
+    bits = "12:0"
+    type = "ro"
+[[register]]
+  name = "APM1_RESULT23"
+  type = "mixed"
+  width = 32
+  description = "APM1_RESULT23"
+  default = "0x1FFF0000"
+  offset = "0x00000268"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:29"
+    type = "raz"
+  [[register.field]]
+    name = "MIN_RD_LAT1"
+    bits = "28:16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "raz"
+  [[register.field]]
+    name = "MAX_RD_LAT1"
+    bits = "12:0"
+    type = "ro"
+[[register]]
+  name = "APM1_RESULT24"
+  type = "mixed"
+  width = 32
+  description = "APM1_RESULT24"
+  default = "0x00000000"
+  offset = "0x0000026C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31"
+    type = "raz"
+  [[register.field]]
+    name = "RD_FIFO1_SAMPLE_PRESENT"
+    bits = "30:24"
+    type = "ro"
+    shortdesc = '''No.'''
+    longdesc = '''of samples present in 2nd read latency measurement FIFO. This represent the no. of outstanding transactions at the end of the configured timing window. This is for debug purpose.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23"
+    type = "raz"
+  [[register.field]]
+    name = "RD_FIFO0_SAMPLE_PRESENT"
+    bits = "22:16"
+    type = "ro"
+    shortdesc = '''No.'''
+    longdesc = '''of samples present in 1st read latency measurement FIFO. This represent the no. of outstanding transactions at the end of the configured timing window. This is for debug purpose.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15"
+    type = "raz"
+  [[register.field]]
+    name = "WR_FIFO1_SAMPLE_PRESENT"
+    bits = "14:8"
+    type = "ro"
+    shortdesc = '''No.'''
+    longdesc = '''of samples present in 2nd write latency measurement FIFO. This represent the no. of outstanding transactions at the end of the configured timing window. This is for debug purpose.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7"
+    type = "raz"
+  [[register.field]]
+    name = "WR_FIFO0_SAMPLE_PRESENT"
+    bits = "6:0"
+    type = "ro"
+    shortdesc = '''No.'''
+    longdesc = '''of samples present in 1st write latency measurement FIFO. This represent the no. of outstanding transactions at the end of the configured timing window. This is for debug purpose.'''
+[[register]]
+  name = "APM2_CFG"
+  type = "mixed"
+  width = 32
+  description = "APM2_CFG"
+  default = "0x00000002"
+  offset = "0x00000300"
+  [[register.field]]
+    name = "RD_ID_LAT_FF1"
+    bits = "31:28"
+    type = "rw"
+  [[register.field]]
+    name = "WR_ID_LAT_FF1"
+    bits = "27:24"
+    type = "rw"
+  [[register.field]]
+    name = "RD_ID_LAT_FF0"
+    bits = "23:20"
+    type = "rw"
+  [[register.field]]
+    name = "WR_ID_LAT_FF0"
+    bits = "19:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:8"
+    type = "raz"
+  [[register.field]]
+    name = "SEL_RD_ID_LAT_FF1"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "SEL_WR_ID_LAT_FF1"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "SEL_RD_ID_LAT_FF0"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "SEL_WR_ID_LAT_FF0"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "3"
+    type = "raz"
+  [[register.field]]
+    name = "MODE"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''0: Contineous Timing Mode.'''
+    longdesc = '''Mode 1 in the APM specification 1: Burst Timing Mode. Mode 2 in the APM specification'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "0"
+    type = "raz"
+[[register]]
+  name = "APM2_TIMER"
+  type = "rw"
+  width = 32
+  description = "APM2_TIMER"
+  default = "0x00000000"
+  offset = "0x00000304"
+  [[register.field]]
+    name = "BURST_MAX_VAL"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Maximum value of clock ticks in timing mode window in case of Mode 2.'''
+    longdesc = '''This is number of AXI clock cycles. Timing window counter will restart once it attains the maximum value. A new timing window start after that.'''
+[[register]]
+  name = "APM2_TRG"
+  type = "mixed"
+  width = 32
+  description = "APM2_TRG"
+  default = "0x00000000"
+  offset = "0x00000308"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "raz"
+  [[register.field]]
+    name = "START_STOP"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''1: define the active operating window in case of Mode 1.'''
+    longdesc = '''Rising edge(Updating this register from 0 to 1) and falling edge (Updating this register from 1 to 0) will be used as start and stop trigger for operating timing mode 2.'''
+[[register]]
+  name = "APM2_RESULT0"
+  type = "ro"
+  width = 32
+  description = "APM2_RESULT0"
+  default = "0x00000000"
+  offset = "0x0000030C"
+  [[register.field]]
+    name = "WR_TRANSAC_COUNT"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "APM2_RESULT1"
+  type = "ro"
+  width = 32
+  description = "APM2_RESULT1"
+  default = "0x00000000"
+  offset = "0x00000310"
+  [[register.field]]
+    name = "RD_TRANSAC_COUNT"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "APM2_RESULT2"
+  type = "ro"
+  width = 32
+  description = "APM2_RESULT2"
+  default = "0x00000000"
+  offset = "0x00000314"
+  [[register.field]]
+    name = "WRDATABEAT_COUNT"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "APM2_RESULT3"
+  type = "ro"
+  width = 32
+  description = "APM2_RESULT3"
+  default = "0x00000000"
+  offset = "0x00000318"
+  [[register.field]]
+    name = "RDDATABEAT_COUNT"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "APM2_RESULT4"
+  type = "mixed"
+  width = 32
+  description = "APM2_RESULT4"
+  default = "0x00000000"
+  offset = "0x0000031C"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:28"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_WR_LAT0"
+    bits = "27:0"
+    type = "ro"
+[[register]]
+  name = "APM2_RESULT5"
+  type = "mixed"
+  width = 32
+  description = "APM2_RESULT5"
+  default = "0x00000000"
+  offset = "0x00000320"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:17"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_WR_LAT0"
+    bits = "16:0"
+    type = "ro"
+[[register]]
+  name = "APM2_RESULT6"
+  type = "mixed"
+  width = 32
+  description = "APM2_RESULT6"
+  default = "0x00000000"
+  offset = "0x00000324"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_WR_LAT0"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM2_RESULT7"
+  type = "mixed"
+  width = 32
+  description = "APM2_RESULT7"
+  default = "0x00000000"
+  offset = "0x00000328"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_WR_LAT0"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM2_RESULT8"
+  type = "mixed"
+  width = 32
+  description = "APM2_RESULT8"
+  default = "0x00000000"
+  offset = "0x0000032C"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:28"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_RD_LAT0"
+    bits = "27:0"
+    type = "ro"
+[[register]]
+  name = "APM2_RESULT9"
+  type = "mixed"
+  width = 32
+  description = "APM2_RESULT9"
+  default = "0x00000000"
+  offset = "0x00000330"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:17"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_RD_LAT0"
+    bits = "16:0"
+    type = "ro"
+[[register]]
+  name = "APM2_RESULT10"
+  type = "mixed"
+  width = 32
+  description = "APM2_RESULT10"
+  default = "0x00000000"
+  offset = "0x00000334"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_RD_LAT0"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM2_RESULT11"
+  type = "mixed"
+  width = 32
+  description = "APM2_RESULT11"
+  default = "0x00000000"
+  offset = "0x00000338"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_RD_LAT0"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM2_RESULT12"
+  type = "mixed"
+  width = 32
+  description = "APM2_RESULT12"
+  default = "0x00000000"
+  offset = "0x0000033C"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:28"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_WR_LAT1"
+    bits = "27:0"
+    type = "ro"
+[[register]]
+  name = "APM2_RESULT13"
+  type = "mixed"
+  width = 32
+  description = "APM2_RESULT13"
+  default = "0x00000000"
+  offset = "0x00000340"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:17"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_WR_LAT1"
+    bits = "16:0"
+    type = "ro"
+[[register]]
+  name = "APM2_RESULT14"
+  type = "mixed"
+  width = 32
+  description = "APM2_RESULT14"
+  default = "0x00000000"
+  offset = "0x00000344"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_WR_LAT1"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM2_RESULT15"
+  type = "mixed"
+  width = 32
+  description = "APM2_RESULT15"
+  default = "0x00000000"
+  offset = "0x00000348"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_WR_LAT1"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM2_RESULT16"
+  type = "mixed"
+  width = 32
+  description = "APM2_RESULT16"
+  default = "0x00000000"
+  offset = "0x0000034C"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:28"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_RD_LAT1"
+    bits = "27:0"
+    type = "ro"
+[[register]]
+  name = "APM2_RESULT17"
+  type = "mixed"
+  width = 32
+  description = "APM2_RESULT17"
+  default = "0x00000000"
+  offset = "0x00000350"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:17"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_RD_LAT1"
+    bits = "16:0"
+    type = "ro"
+[[register]]
+  name = "APM2_RESULT18"
+  type = "mixed"
+  width = 32
+  description = "APM2_RESULT18"
+  default = "0x00000000"
+  offset = "0x00000354"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_RD_LAT1"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM2_RESULT19"
+  type = "mixed"
+  width = 32
+  description = "APM2_RESULT19"
+  default = "0x00000000"
+  offset = "0x00000358"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_RD_LAT1"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM2_RESULT20"
+  type = "mixed"
+  width = 32
+  description = "APM2_RESULT20"
+  default = "0x1FFF0000"
+  offset = "0x0000035C"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:29"
+    type = "raz"
+  [[register.field]]
+    name = "MIN_WR_LAT0"
+    bits = "28:16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "raz"
+  [[register.field]]
+    name = "MAX_WR_LAT0"
+    bits = "12:0"
+    type = "ro"
+[[register]]
+  name = "APM2_RESULT21"
+  type = "mixed"
+  width = 32
+  description = "APM2_RESULT21"
+  default = "0x1FFF0000"
+  offset = "0x00000360"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:29"
+    type = "raz"
+  [[register.field]]
+    name = "MIN_RD_LAT0"
+    bits = "28:16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "raz"
+  [[register.field]]
+    name = "MAX_RD_LAT0"
+    bits = "12:0"
+    type = "ro"
+[[register]]
+  name = "APM2_RESULT22"
+  type = "mixed"
+  width = 32
+  description = "APM2_RESULT22"
+  default = "0x1FFF0000"
+  offset = "0x00000364"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:29"
+    type = "raz"
+  [[register.field]]
+    name = "MIN_WR_LAT1"
+    bits = "28:16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "raz"
+  [[register.field]]
+    name = "MAX_WR_LAT1"
+    bits = "12:0"
+    type = "ro"
+[[register]]
+  name = "APM2_RESULT23"
+  type = "mixed"
+  width = 32
+  description = "APM2_RESULT23"
+  default = "0x1FFF0000"
+  offset = "0x00000368"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:29"
+    type = "raz"
+  [[register.field]]
+    name = "MIN_RD_LAT1"
+    bits = "28:16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "raz"
+  [[register.field]]
+    name = "MAX_RD_LAT1"
+    bits = "12:0"
+    type = "ro"
+[[register]]
+  name = "APM2_RESULT24"
+  type = "mixed"
+  width = 32
+  description = "APM2_RESULT24"
+  default = "0x00000000"
+  offset = "0x0000036C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31"
+    type = "raz"
+  [[register.field]]
+    name = "RD_FIFO1_SAMPLE_PRESENT"
+    bits = "30:24"
+    type = "ro"
+    shortdesc = '''No.'''
+    longdesc = '''of samples present in 2nd read latency measurement FIFO. This represent the no. of outstanding transactions at the end of the configured timing window. This is for debug purpose.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23"
+    type = "raz"
+  [[register.field]]
+    name = "RD_FIFO0_SAMPLE_PRESENT"
+    bits = "22:16"
+    type = "ro"
+    shortdesc = '''No.'''
+    longdesc = '''of samples present in 1st read latency measurement FIFO. This represent the no. of outstanding transactions at the end of the configured timing window. This is for debug purpose.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15"
+    type = "raz"
+  [[register.field]]
+    name = "WR_FIFO1_SAMPLE_PRESENT"
+    bits = "14:8"
+    type = "ro"
+    shortdesc = '''No.'''
+    longdesc = '''of samples present in 2nd write latency measurement FIFO. This represent the no. of outstanding transactions at the end of the configured timing window. This is for debug purpose.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7"
+    type = "raz"
+  [[register.field]]
+    name = "WR_FIFO0_SAMPLE_PRESENT"
+    bits = "6:0"
+    type = "ro"
+    shortdesc = '''No.'''
+    longdesc = '''of samples present in 1st write latency measurement FIFO. This represent the no. of outstanding transactions at the end of the configured timing window. This is for debug purpose.'''
+[[register]]
+  name = "APM3_CFG"
+  type = "mixed"
+  width = 32
+  description = "APM3_CFG"
+  default = "0x00000002"
+  offset = "0x00000400"
+  [[register.field]]
+    name = "RD_ID_LAT_FF1"
+    bits = "31:28"
+    type = "rw"
+  [[register.field]]
+    name = "WR_ID_LAT_FF1"
+    bits = "27:24"
+    type = "rw"
+  [[register.field]]
+    name = "RD_ID_LAT_FF0"
+    bits = "23:20"
+    type = "rw"
+  [[register.field]]
+    name = "WR_ID_LAT_FF0"
+    bits = "19:16"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:8"
+    type = "raz"
+  [[register.field]]
+    name = "SEL_RD_ID_LAT_FF1"
+    bits = "7"
+    type = "rw"
+  [[register.field]]
+    name = "SEL_WR_ID_LAT_FF1"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "SEL_RD_ID_LAT_FF0"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "SEL_WR_ID_LAT_FF0"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "3"
+    type = "raz"
+  [[register.field]]
+    name = "MODE"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''0: Contineous Timing Mode.'''
+    longdesc = '''Mode 1 in the APM specification 1: Burst Timing Mode. Mode 2 in the APM specification'''
+  [[register.field]]
+    name = "ENABLE"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "0"
+    type = "raz"
+[[register]]
+  name = "APM3_TIMER"
+  type = "rw"
+  width = 32
+  description = "APM3_TIMER"
+  default = "0x00000000"
+  offset = "0x00000404"
+  [[register.field]]
+    name = "BURST_MAX_VAL"
+    bits = "31:0"
+    type = "rw"
+    shortdesc = '''Maximum value of clock ticks in timing mode window in case of Mode 2.'''
+    longdesc = '''This is number of AXI clock cycles. Timing window counter will restart once it attains the maximum value. A new timing window start after that.'''
+[[register]]
+  name = "APM3_TRG"
+  type = "mixed"
+  width = 32
+  description = "APM3_TRG"
+  default = "0x00000000"
+  offset = "0x00000408"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "raz"
+  [[register.field]]
+    name = "START_STOP"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''1: define the active operating window in case of Mode 1.'''
+    longdesc = '''Rising edge(Updating this register from 0 to 1) and falling edge (Updating this register from 1 to 0) will be used as start and stop trigger for operating timing mode 2.'''
+[[register]]
+  name = "APM3_RESULT0"
+  type = "ro"
+  width = 32
+  description = "APM3_RESULT0"
+  default = "0x00000000"
+  offset = "0x0000040C"
+  [[register.field]]
+    name = "WR_TRANSAC_COUNT"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "APM3_RESULT1"
+  type = "ro"
+  width = 32
+  description = "APM3_RESULT1"
+  default = "0x00000000"
+  offset = "0x00000410"
+  [[register.field]]
+    name = "RD_TRANSAC_COUNT"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "APM3_RESULT2"
+  type = "ro"
+  width = 32
+  description = "APM3_RESULT2"
+  default = "0x00000000"
+  offset = "0x00000414"
+  [[register.field]]
+    name = "WRDATABEAT_COUNT"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "APM3_RESULT3"
+  type = "ro"
+  width = 32
+  description = "APM3_RESULT3"
+  default = "0x00000000"
+  offset = "0x00000418"
+  [[register.field]]
+    name = "RDDATABEAT_COUNT"
+    bits = "31:0"
+    type = "ro"
+[[register]]
+  name = "APM3_RESULT4"
+  type = "mixed"
+  width = 32
+  description = "APM3_RESULT4"
+  default = "0x00000000"
+  offset = "0x0000041C"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:28"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_WR_LAT0"
+    bits = "27:0"
+    type = "ro"
+[[register]]
+  name = "APM3_RESULT5"
+  type = "mixed"
+  width = 32
+  description = "APM3_RESULT5"
+  default = "0x00000000"
+  offset = "0x00000420"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:17"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_WR_LAT0"
+    bits = "16:0"
+    type = "ro"
+[[register]]
+  name = "APM3_RESULT6"
+  type = "mixed"
+  width = 32
+  description = "APM3_RESULT6"
+  default = "0x00000000"
+  offset = "0x00000424"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_WR_LAT0"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM3_RESULT7"
+  type = "mixed"
+  width = 32
+  description = "APM3_RESULT7"
+  default = "0x00000000"
+  offset = "0x00000428"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_WR_LAT0"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM3_RESULT8"
+  type = "mixed"
+  width = 32
+  description = "APM3_RESULT8"
+  default = "0x00000000"
+  offset = "0x0000042C"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:28"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_RD_LAT0"
+    bits = "27:0"
+    type = "ro"
+[[register]]
+  name = "APM3_RESULT9"
+  type = "mixed"
+  width = 32
+  description = "APM3_RESULT9"
+  default = "0x00000000"
+  offset = "0x00000430"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:17"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_RD_LAT0"
+    bits = "16:0"
+    type = "ro"
+[[register]]
+  name = "APM3_RESULT10"
+  type = "mixed"
+  width = 32
+  description = "APM3_RESULT10"
+  default = "0x00000000"
+  offset = "0x00000434"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_RD_LAT0"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM3_RESULT11"
+  type = "mixed"
+  width = 32
+  description = "APM3_RESULT11"
+  default = "0x00000000"
+  offset = "0x00000438"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_RD_LAT0"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM3_RESULT12"
+  type = "mixed"
+  width = 32
+  description = "APM3_RESULT12"
+  default = "0x00000000"
+  offset = "0x0000043C"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:28"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_WR_LAT1"
+    bits = "27:0"
+    type = "ro"
+[[register]]
+  name = "APM3_RESULT13"
+  type = "mixed"
+  width = 32
+  description = "APM3_RESULT13"
+  default = "0x00000000"
+  offset = "0x00000440"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:17"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_WR_LAT1"
+    bits = "16:0"
+    type = "ro"
+[[register]]
+  name = "APM3_RESULT14"
+  type = "mixed"
+  width = 32
+  description = "APM3_RESULT14"
+  default = "0x00000000"
+  offset = "0x00000444"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_WR_LAT1"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM3_RESULT15"
+  type = "mixed"
+  width = 32
+  description = "APM3_RESULT15"
+  default = "0x00000000"
+  offset = "0x00000448"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_WR_LAT1"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM3_RESULT16"
+  type = "mixed"
+  width = 32
+  description = "APM3_RESULT16"
+  default = "0x00000000"
+  offset = "0x0000044C"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:28"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_RD_LAT1"
+    bits = "27:0"
+    type = "ro"
+[[register]]
+  name = "APM3_RESULT17"
+  type = "mixed"
+  width = 32
+  description = "APM3_RESULT17"
+  default = "0x00000000"
+  offset = "0x00000450"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:17"
+    type = "raz"
+  [[register.field]]
+    name = "ACCUM_RD_LAT1"
+    bits = "16:0"
+    type = "ro"
+[[register]]
+  name = "APM3_RESULT18"
+  type = "mixed"
+  width = 32
+  description = "APM3_RESULT18"
+  default = "0x00000000"
+  offset = "0x00000454"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_RD_LAT1"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM3_RESULT19"
+  type = "mixed"
+  width = 32
+  description = "APM3_RESULT19"
+  default = "0x00000000"
+  offset = "0x00000458"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:16"
+    type = "raz"
+  [[register.field]]
+    name = "COUNT_RD_LAT1"
+    bits = "15:0"
+    type = "ro"
+[[register]]
+  name = "APM3_RESULT20"
+  type = "mixed"
+  width = 32
+  description = "APM3_RESULT20"
+  default = "0x1FFF0000"
+  offset = "0x0000045C"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:29"
+    type = "raz"
+  [[register.field]]
+    name = "MIN_WR_LAT0"
+    bits = "28:16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "raz"
+  [[register.field]]
+    name = "MAX_WR_LAT0"
+    bits = "12:0"
+    type = "ro"
+[[register]]
+  name = "APM3_RESULT21"
+  type = "mixed"
+  width = 32
+  description = "APM3_RESULT21"
+  default = "0x1FFF0000"
+  offset = "0x00000460"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:29"
+    type = "raz"
+  [[register.field]]
+    name = "MIN_RD_LAT0"
+    bits = "28:16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "raz"
+  [[register.field]]
+    name = "MAX_RD_LAT0"
+    bits = "12:0"
+    type = "ro"
+[[register]]
+  name = "APM3_RESULT22"
+  type = "mixed"
+  width = 32
+  description = "APM3_RESULT22"
+  default = "0x1FFF0000"
+  offset = "0x00000464"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:29"
+    type = "raz"
+  [[register.field]]
+    name = "MIN_WR_LAT1"
+    bits = "28:16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "raz"
+  [[register.field]]
+    name = "MAX_WR_LAT1"
+    bits = "12:0"
+    type = "ro"
+[[register]]
+  name = "APM3_RESULT23"
+  type = "mixed"
+  width = 32
+  description = "APM3_RESULT23"
+  default = "0x1FFF0000"
+  offset = "0x00000468"
+  [[register.field]]
+    name = "VALIDITY_CHECK"
+    bits = "31"
+    type = "ro"
+    shortdesc = '''This signal will toggle in alternate timing window.'''
+    longdesc = '''This is required for safe reading of accumulated read and write latencies parameters which requires more then one APM access. This bit field is read with all the latency related APB registers and this is expected to be same for all those registers.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "30:29"
+    type = "raz"
+  [[register.field]]
+    name = "MIN_RD_LAT1"
+    bits = "28:16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:13"
+    type = "raz"
+  [[register.field]]
+    name = "MAX_RD_LAT1"
+    bits = "12:0"
+    type = "ro"
+[[register]]
+  name = "APM3_RESULT24"
+  type = "mixed"
+  width = 32
+  description = "APM3_RESULT24"
+  default = "0x00000000"
+  offset = "0x0000046C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31"
+    type = "raz"
+  [[register.field]]
+    name = "RD_FIFO1_SAMPLE_PRESENT"
+    bits = "30:24"
+    type = "ro"
+    shortdesc = '''No.'''
+    longdesc = '''of samples present in 2nd read latency measurement FIFO. This represent the no. of outstanding transactions at the end of the configured timing window. This is for debug purpose.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23"
+    type = "raz"
+  [[register.field]]
+    name = "RD_FIFO0_SAMPLE_PRESENT"
+    bits = "22:16"
+    type = "ro"
+    shortdesc = '''No.'''
+    longdesc = '''of samples present in 1st read latency measurement FIFO. This represent the no. of outstanding transactions at the end of the configured timing window. This is for debug purpose.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15"
+    type = "raz"
+  [[register.field]]
+    name = "WR_FIFO1_SAMPLE_PRESENT"
+    bits = "14:8"
+    type = "ro"
+    shortdesc = '''No.'''
+    longdesc = '''of samples present in 2nd write latency measurement FIFO. This represent the no. of outstanding transactions at the end of the configured timing window. This is for debug purpose.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7"
+    type = "raz"
+  [[register.field]]
+    name = "WR_FIFO0_SAMPLE_PRESENT"
+    bits = "6:0"
+    type = "ro"
+    shortdesc = '''No.'''
+    longdesc = '''of samples present in 1st write latency measurement FIFO. This represent the no. of outstanding transactions at the end of the configured timing window. This is for debug purpose.'''

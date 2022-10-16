@@ -1,0 +1,5431 @@
+description = "Inter-Processor Interrupts Control and Status"
+[[register]]
+  name = "CH0_TRIG"
+  type = "mixed"
+  width = 32
+  description = "Ch 0 Interrupt Trigger (sender). Default APU MPCore."
+  default = "0x00000000"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH0_OBS"
+  type = "ro"
+  width = 32
+  description = "Ch 0 Interrupt Observation (sender)."
+  default = "0x00000000"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "ro"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "ro"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH0_ISR"
+  type = "mixed"
+  width = 32
+  description = "Ch 0 Interrupt Status and Clear (receiver). Default APU MPCore."
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wtc"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wtc"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wtc"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wtc"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wtc"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wtc"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wtc"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wtc"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wtc"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wtc"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH0_IMR"
+  type = "ro"
+  width = 32
+  description = "Ch 0 Interrupt Mask (receiver)."
+  default = "0x0F0F0301"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "ro"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "ro"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH0_IER"
+  type = "mixed"
+  width = 32
+  description = "Ch 0 Interrupt Enable (receiver)."
+  default = "0x00000000"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH0_IDR"
+  type = "mixed"
+  width = 32
+  description = "Ch 0 Interrupt Disable (receiver)."
+  default = "0x00000000"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH1_TRIG"
+  type = "mixed"
+  width = 32
+  description = "Ch 1 Interrupt Trigger (sender). Default RPU0."
+  default = "0x00000000"
+  offset = "0x00010000"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH1_OBS"
+  type = "ro"
+  width = 32
+  description = "Ch 1 Interrupt Observation (sender)."
+  default = "0x00000000"
+  offset = "0x00010004"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "ro"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "ro"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH1_ISR"
+  type = "mixed"
+  width = 32
+  description = "Ch 1 Interrupt Status and Clear (receiver). Default RPU0."
+  default = "0x00000000"
+  offset = "0x00010010"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wtc"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wtc"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wtc"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wtc"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wtc"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wtc"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wtc"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wtc"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wtc"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wtc"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH1_IMR"
+  type = "ro"
+  width = 32
+  description = "Ch 1 Interrupt Mask (receiver)."
+  default = "0x0F0F0301"
+  offset = "0x00010014"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "ro"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "ro"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH1_IER"
+  type = "mixed"
+  width = 32
+  description = "Ch 1 Interrupt Enable (receiver)."
+  default = "0x00000000"
+  offset = "0x00010018"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH1_IDR"
+  type = "mixed"
+  width = 32
+  description = "Ch 1 Interrupt Disable (receiver)."
+  default = "0x00000000"
+  offset = "0x0001001C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH2_TRIG"
+  type = "mixed"
+  width = 32
+  description = "Ch 2 Interrupt Trigger (sender). Default RPU1."
+  default = "0x00000000"
+  offset = "0x00020000"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH2_OBS"
+  type = "ro"
+  width = 32
+  description = "Ch 2 Interrupt Observation (sender)."
+  default = "0x00000000"
+  offset = "0x00020004"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "ro"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "ro"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH2_ISR"
+  type = "mixed"
+  width = 32
+  description = "Ch 2 Interrupt Status and Clear (receiver). Default RPU1."
+  default = "0x00000000"
+  offset = "0x00020010"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wtc"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wtc"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wtc"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wtc"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wtc"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wtc"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wtc"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wtc"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wtc"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wtc"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH2_IMR"
+  type = "ro"
+  width = 32
+  description = "Ch 2 Interrupt Mask (receiver)."
+  default = "0x0F0F0301"
+  offset = "0x00020014"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "ro"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "ro"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH2_IER"
+  type = "mixed"
+  width = 32
+  description = "Ch 2 Interrupt Enable (receiver)."
+  default = "0x00000000"
+  offset = "0x00020018"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH2_IDR"
+  type = "mixed"
+  width = 32
+  description = "Ch 1 Interrupt Disable (receiver)."
+  default = "0x00000000"
+  offset = "0x0002001C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "PMU_0_TRIG"
+  type = "mixed"
+  width = 32
+  description = "PMU 0 Interrupt Trigger (sender)."
+  default = "0x00000000"
+  offset = "0x00030000"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "PMU_0_OBS"
+  type = "ro"
+  width = 32
+  description = "PMU 0 Interrupt Observation (sender)."
+  default = "0x00000000"
+  offset = "0x00030004"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "ro"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "ro"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "PMU_0_ISR"
+  type = "mixed"
+  width = 32
+  description = "PMU 0 Interrupt Status and Clear (receiver)."
+  default = "0x00000000"
+  offset = "0x00030010"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wtc"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wtc"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wtc"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wtc"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wtc"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wtc"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wtc"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wtc"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wtc"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wtc"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "PMU_0_IMR"
+  type = "ro"
+  width = 32
+  description = "PMU 0 Interrupt Mask (receiver)."
+  default = "0x0F0F0301"
+  offset = "0x00030014"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "ro"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "ro"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "PMU_0_IER"
+  type = "mixed"
+  width = 32
+  description = "PMU 0 Interrupt Enable (receiver)."
+  default = "0x00000000"
+  offset = "0x00030018"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "PMU_0_IDR"
+  type = "mixed"
+  width = 32
+  description = "PMU 0 Interrupt Disable (receiver)."
+  default = "0x00000000"
+  offset = "0x0003001C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "PMU_1_TRIG"
+  type = "mixed"
+  width = 32
+  description = "PMU 1 Interrupt Trigger (sender)."
+  default = "0x00000000"
+  offset = "0x00031000"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "PMU_1_OBS"
+  type = "ro"
+  width = 32
+  description = "PMU 1 Interrupt Observation (sender)."
+  default = "0x00000000"
+  offset = "0x00031004"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "ro"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "ro"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "PMU_1_ISR"
+  type = "mixed"
+  width = 32
+  description = "PMU 1 Interrupt Status and Clear (receiver)."
+  default = "0x00000000"
+  offset = "0x00031010"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wtc"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wtc"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wtc"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wtc"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wtc"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wtc"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wtc"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wtc"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wtc"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wtc"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "PMU_1_IMR"
+  type = "ro"
+  width = 32
+  description = "PMU 1 Interrupt Mask (receiver)."
+  default = "0x0F0F0301"
+  offset = "0x00031014"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "ro"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "ro"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "PMU_1_IER"
+  type = "mixed"
+  width = 32
+  description = "PMU 1 Interrupt Enable (receiver)."
+  default = "0x00000000"
+  offset = "0x00031018"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "PMU_1_IDR"
+  type = "mixed"
+  width = 32
+  description = "PMU 1 Interrupt Disable (receiver)."
+  default = "0x00000000"
+  offset = "0x0003101C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "PMU_2_TRIG"
+  type = "mixed"
+  width = 32
+  description = "PMU 2 Interrupt Trigger (sender)."
+  default = "0x00000000"
+  offset = "0x00032000"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "PMU_2_OBS"
+  type = "ro"
+  width = 32
+  description = "PMU 2 Interrupt Observation (sender)."
+  default = "0x00000000"
+  offset = "0x00032004"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "ro"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "ro"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "PMU_2_ISR"
+  type = "mixed"
+  width = 32
+  description = "PMU 2 Interrupt Status and Clear (receiver)."
+  default = "0x00000000"
+  offset = "0x00032010"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wtc"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wtc"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wtc"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wtc"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wtc"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wtc"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wtc"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wtc"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wtc"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wtc"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "PMU_2_IMR"
+  type = "ro"
+  width = 32
+  description = "PMU 2 Interrupt Mask (receiver)."
+  default = "0x0F0F0301"
+  offset = "0x00032014"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "ro"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "ro"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "PMU_2_IER"
+  type = "mixed"
+  width = 32
+  description = "PMU 2 Interrupt Enable (receiver)."
+  default = "0x00000000"
+  offset = "0x00032018"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "PMU_2_IDR"
+  type = "mixed"
+  width = 32
+  description = "PMU 2 Interrupt Disable (receiver)."
+  default = "0x00000000"
+  offset = "0x0003201C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "PMU_3_TRIG"
+  type = "mixed"
+  width = 32
+  description = "PMU 3 Interrupt Trigger (sender)."
+  default = "0x00000000"
+  offset = "0x00033000"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "PMU_3_OBS"
+  type = "ro"
+  width = 32
+  description = "PMU 3 Interrupt Observation (sender)."
+  default = "0x00000000"
+  offset = "0x00033004"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "ro"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "ro"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "PMU_3_ISR"
+  type = "mixed"
+  width = 32
+  description = "PMU 3 Interrupt Status and Clear (receiver)."
+  default = "0x00000000"
+  offset = "0x00033010"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wtc"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wtc"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wtc"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wtc"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wtc"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wtc"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wtc"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wtc"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wtc"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wtc"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "PMU_3_IMR"
+  type = "ro"
+  width = 32
+  description = "PMU 3 Interrupt Mask (receiver)."
+  default = "0x0F0F0301"
+  offset = "0x00033014"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "ro"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "ro"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "PMU_3_IER"
+  type = "mixed"
+  width = 32
+  description = "PMU 3 Interrupt Enable (receiver)."
+  default = "0x00000000"
+  offset = "0x00033018"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "PMU_3_IDR"
+  type = "mixed"
+  width = 32
+  description = "PMU 3 Interrupt Disable (receiver)."
+  default = "0x00000000"
+  offset = "0x0003301C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH7_TRIG"
+  type = "mixed"
+  width = 32
+  description = "Ch 7 Interrupt Trigger (sender). Default PL 0."
+  default = "0x00000000"
+  offset = "0x00040000"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH7_OBS"
+  type = "ro"
+  width = 32
+  description = "Ch 7 Interrupt Observation (sender)."
+  default = "0x00000000"
+  offset = "0x00040004"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "ro"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "ro"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH7_ISR"
+  type = "mixed"
+  width = 32
+  description = "Ch 7 Interrupt Status and Clear (receiver). Default PL 0."
+  default = "0x00000000"
+  offset = "0x00040010"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wtc"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wtc"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wtc"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wtc"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wtc"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wtc"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wtc"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wtc"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wtc"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wtc"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH7_IMR"
+  type = "ro"
+  width = 32
+  description = "Ch 7 Interrupt Mask (receiver)."
+  default = "0x0F0F0301"
+  offset = "0x00040014"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "ro"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "ro"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH7_IER"
+  type = "mixed"
+  width = 32
+  description = "Ch 7 Interrupt Enable (receiver)."
+  default = "0x00000000"
+  offset = "0x00040018"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH7_IDR"
+  type = "mixed"
+  width = 32
+  description = "Ch 7 Interrupt Disable (receiver)."
+  default = "0x00000000"
+  offset = "0x0004001C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH8_TRIG"
+  type = "mixed"
+  width = 32
+  description = "Ch 8 Interrupt Trigger (sender). Default PL 1."
+  default = "0x00000000"
+  offset = "0x00050000"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH8_OBS"
+  type = "ro"
+  width = 32
+  description = "Ch 8 Interrupt Observation (sender)."
+  default = "0x00000000"
+  offset = "0x00050004"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "ro"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "ro"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH8_ISR"
+  type = "mixed"
+  width = 32
+  description = "Ch 8 Interrupt Status and Clear (receiver). Default PL 1."
+  default = "0x00000000"
+  offset = "0x00050010"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wtc"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wtc"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wtc"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wtc"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wtc"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wtc"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wtc"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wtc"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wtc"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wtc"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH8_IMR"
+  type = "ro"
+  width = 32
+  description = "Ch 8 Interrupt Mask (receiver)."
+  default = "0x0F0F0301"
+  offset = "0x00050014"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "ro"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "ro"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH8_IER"
+  type = "mixed"
+  width = 32
+  description = "Ch 8 Interrupt Enable (receiver)."
+  default = "0x00000000"
+  offset = "0x00050018"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH8_IDR"
+  type = "mixed"
+  width = 32
+  description = "Ch 8 Interrupt Disable (receiver)."
+  default = "0x00000000"
+  offset = "0x0005001C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH9_TRIG"
+  type = "mixed"
+  width = 32
+  description = "Ch 9 Interrupt Trigger (sender). Default PL 2."
+  default = "0x00000000"
+  offset = "0x00060000"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH9_OBS"
+  type = "ro"
+  width = 32
+  description = "Ch 9 Interrupt Observation (sender)."
+  default = "0x00000000"
+  offset = "0x00060004"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "ro"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "ro"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH9_ISR"
+  type = "mixed"
+  width = 32
+  description = "Ch 9 Interrupt Status and Clear (receiver). Default PL 2."
+  default = "0x00000000"
+  offset = "0x00060010"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wtc"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wtc"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wtc"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wtc"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wtc"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wtc"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wtc"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wtc"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wtc"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wtc"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH9_IMR"
+  type = "ro"
+  width = 32
+  description = "Ch 9 Interrupt Mask (receiver)."
+  default = "0x0F0F0301"
+  offset = "0x00060014"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "ro"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "ro"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH9_IER"
+  type = "mixed"
+  width = 32
+  description = "Ch 9 Interrupt Enable (receiver)."
+  default = "0x00000000"
+  offset = "0x00060018"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH9_IDR"
+  type = "mixed"
+  width = 32
+  description = "Ch 9 Interrupt Disable (receiver)."
+  default = "0x00000000"
+  offset = "0x0006001C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH10_TRIG"
+  type = "mixed"
+  width = 32
+  description = "Ch 10 Interrupt Trigger (sender). Default PL 3."
+  default = "0x00000000"
+  offset = "0x00070000"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH10_OBS"
+  type = "ro"
+  width = 32
+  description = "Ch 10 Interrupt Observation (sender)."
+  default = "0x00000000"
+  offset = "0x00070004"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "ro"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "ro"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH10_ISR"
+  type = "mixed"
+  width = 32
+  description = "Ch 10 Interrupt Status and Clear (receiver). Default PL 3."
+  default = "0x00000000"
+  offset = "0x00070010"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wtc"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wtc"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wtc"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wtc"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wtc"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wtc"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wtc"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wtc"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wtc"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wtc"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wtc"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH10_IMR"
+  type = "ro"
+  width = 32
+  description = "Ch 10 Interrupt Mask (receiver)."
+  default = "0x0F0F0301"
+  offset = "0x00070014"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "ro"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "ro"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "ro"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "ro"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "ro"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "ro"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "ro"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "ro"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "ro"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "ro"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH10_IER"
+  type = "mixed"
+  width = 32
+  description = "Ch 10 Interrupt Enable (receiver)."
+  default = "0x00000000"
+  offset = "0x00070018"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "CH10_IDR"
+  type = "mixed"
+  width = 32
+  description = "Ch 10 Interrupt Disable (receiver)."
+  default = "0x00000000"
+  offset = "0x0007001C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:28"
+    type = "ro"
+  [[register.field]]
+    name = "CH10"
+    bits = "27"
+    type = "wo"
+    shortdesc = '''Ch 10.'''
+    longdesc = '''Default to PL IPI3.'''
+  [[register.field]]
+    name = "CH9"
+    bits = "26"
+    type = "wo"
+    shortdesc = '''Ch 9.'''
+    longdesc = '''Default to PL IPI2.'''
+  [[register.field]]
+    name = "CH8"
+    bits = "25"
+    type = "wo"
+    shortdesc = '''Ch 8.'''
+    longdesc = '''Default to PL IPI1.'''
+  [[register.field]]
+    name = "CH7"
+    bits = "24"
+    type = "wo"
+    shortdesc = '''Ch 7.'''
+    longdesc = '''Default to PL IPI0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "23:20"
+    type = "ro"
+  [[register.field]]
+    name = "CH6"
+    bits = "19"
+    type = "wo"
+  [[register.field]]
+    name = "CH5"
+    bits = "18"
+    type = "wo"
+  [[register.field]]
+    name = "CH4"
+    bits = "17"
+    type = "wo"
+  [[register.field]]
+    name = "CH3"
+    bits = "16"
+    type = "wo"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "15:10"
+    type = "ro"
+  [[register.field]]
+    name = "CH2"
+    bits = "9"
+    type = "wo"
+    shortdesc = '''Ch 2.'''
+    longdesc = '''Default to RPU1.'''
+  [[register.field]]
+    name = "CH1"
+    bits = "8"
+    type = "wo"
+    shortdesc = '''Ch 1.'''
+    longdesc = '''Default to RPU0.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "7:1"
+    type = "ro"
+  [[register.field]]
+    name = "CH0"
+    bits = "0"
+    type = "wo"
+    shortdesc = '''Ch 0.'''
+    longdesc = '''Default to APU MPCore.'''
+[[register]]
+  name = "IPI_CTRL"
+  type = "rw"
+  width = 32
+  description = "IPI Controller Error Signal Control."
+  default = "0x00000000"
+  offset = "0x00080000"
+  [[register.field]]
+    name = "SLVERR_ENABLE"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Unimplemented Register Access.'''
+    longdesc = '''Enable the PSLVERR signal back to APB master when an unimplemented register is accessed. 0: do not send PSLVERR. 1: assert PSLVERR for unimplemented register accesses. Note: The [addr_decode_err] interrupt bit is set in the IPI_ISR regardless of the setting of this bit.'''
+[[register]]
+  name = "IPI_ISR"
+  type = "mixed"
+  width = 32
+  description = "IPI Controller Interrupt Status and Clear."
+  default = "0x00000000"
+  offset = "0x00080010"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "wtc"
+[[register]]
+  name = "IPI_IMR"
+  type = "ro"
+  width = 32
+  description = "IPI Controller Interrupt Mask."
+  default = "0x00000001"
+  offset = "0x00080014"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "IPI_IER"
+  type = "mixed"
+  width = 32
+  description = "IPI Controller Interrupt Enable."
+  default = "0x00000000"
+  offset = "0x00080018"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "SAFETY_CHK"
+  type = "rw"
+  width = 32
+  description = "Scratch register for interconnect data path checking"
+  default = "0x00000000"
+  offset = "0x00080030"
+  [[register.field]]
+    name = "DATA"
+    bits = "31:0"
+    type = "rw"
+[[register]]
+  name = "IPI_IDR"
+  type = "mixed"
+  width = 32
+  description = "IPI Controller Interrupt Disable."
+  default = "0x00000000"
+  offset = "0x000C001C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:1"
+    type = "ro"
+  [[register.field]]
+    name = "ADDR_DECODE_ERR"
+    bits = "0"
+    type = "wo"

@@ -1,0 +1,726 @@
+description = "UART 0 Controller"
+[[register]]
+  name = "CONTROL"
+  type = "mixed"
+  width = 32
+  description = "UART Control Register"
+  default = "0x00000128"
+  offset = "0x00000000"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:9"
+    type = "ro"
+  [[register.field]]
+    name = "STPBRK"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''Stop transmitter break: 0: no affect 1: stop transmission of the break after a minimum of one character length and transmit a high level during 12 bit periods.'''
+    longdesc = '''It can be set regardless of the value of STTBRK.'''
+  [[register.field]]
+    name = "STTBRK"
+    bits = "7"
+    type = "rw"
+    shortdesc = '''Start transmitter break: 0: no affect 1: start to transmit a break after the characters currently present in the FIFO and the transmit shift register have been transmitted.'''
+    longdesc = '''It can only be set if STPBRK (Stop transmitter break) is not high.'''
+  [[register.field]]
+    name = "RSTTO"
+    bits = "6"
+    type = "rw"
+    shortdesc = '''Restart receiver timeout counter: 1: receiver timeout counter is restarted.'''
+    longdesc = '''This bit is self clearing once the restart has completed.'''
+  [[register.field]]
+    name = "TXDIS"
+    bits = "5"
+    type = "rw"
+  [[register.field]]
+    name = "TXEN"
+    bits = "4"
+    type = "rw"
+  [[register.field]]
+    name = "RXDIS"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "RXEN"
+    bits = "2"
+    type = "rw"
+  [[register.field]]
+    name = "TXRES"
+    bits = "1"
+    type = "rw"
+  [[register.field]]
+    name = "RXRES"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Software reset for Rx data path: 0: no affect 1: receiver logic is reset and all pending receiver data is discarded.'''
+    longdesc = '''This bit is self clearing once the reset has completed.'''
+[[register]]
+  name = "MODE"
+  type = "mixed"
+  width = 32
+  description = "UART Mode Register"
+  default = "0x00000000"
+  offset = "0x00000004"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:14"
+    type = "ro"
+  [[register.field]]
+    name = "WSIZE"
+    bits = "13:12"
+    type = "rw"
+    shortdesc = '''Configure the size of FIFO access from the APB 00: One or two bytes written to TX FIFO or read from RX FIFO.'''
+    longdesc = '''If byte_sel is high then one byte is written or read, if byte_sel is low then two bytes are written or read (default legacy mode) 01: One byte is always written or read from FIFOs, regardless of whether byte_sel is active 10: Two bytes are always written or read from FIFOs, regardless of whether byte_sel is active 11: Four bytes are always written or read from FIFOs regardless of byte_sel (assuming configured width of APB supports four bytes)'''
+  [[register.field]]
+    name = "CHMODE"
+    bits = "9:8"
+    type = "rw"
+    shortdesc = '''Channel mode: Defines the mode of operation of the UART.'''
+    longdesc = '''00: normal 01: automatic echo 10: local loopback 11: remote loopback'''
+  [[register.field]]
+    name = "NBSTOP"
+    bits = "7:6"
+    type = "rw"
+    shortdesc = '''Number of stop bits: Defines the number of stop bits to detect on receive and to generate on transmit.'''
+    longdesc = '''00: 1 stop bit 01: 1.5 stop bits 10: 2 stop bits 11: reserved'''
+  [[register.field]]
+    name = "PAR"
+    bits = "5:3"
+    type = "rw"
+    shortdesc = '''Parity type select: Defines the expected parity to check on receive and the parity to generate on transmit.'''
+    longdesc = '''000: even parity 001: odd parity 010: forced to 0 parity (space) 011: forced to 1 parity (mark) 1xx: no parity'''
+  [[register.field]]
+    name = "CHRL"
+    bits = "2:1"
+    type = "rw"
+    shortdesc = '''Character length select: Defines the number of bits in each character.'''
+    longdesc = '''11: 6 bits 10: 7 bits 0x: 8 bits'''
+  [[register.field]]
+    name = "CLKS"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Clock source select: This field defines whether a pre-scalar of 8 is applied to the baud rate generator input clock.'''
+    longdesc = '''0: clock source is uart_ref_clk 1: clock source is uart_ref_clk/8'''
+[[register]]
+  name = "INTRPT_EN"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Enable Register"
+  default = "0x00000000"
+  offset = "0x00000008"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:14"
+    type = "ro"
+  [[register.field]]
+    name = "RBRK"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "TOVR"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "TNFUL"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "TTRIG"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "DMSI"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "TIMEOUT"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "PARE"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "FRAME"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "ROVR"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "TFUL"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "TEMPTY"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "RFUL"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "REMPTY"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "RTRIG"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "INTRPT_DIS"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Disable Register"
+  default = "0x00000000"
+  offset = "0x0000000C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:14"
+    type = "ro"
+  [[register.field]]
+    name = "RBRK"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "TOVR"
+    bits = "12"
+    type = "wo"
+  [[register.field]]
+    name = "TNFUL"
+    bits = "11"
+    type = "wo"
+  [[register.field]]
+    name = "TTRIG"
+    bits = "10"
+    type = "wo"
+  [[register.field]]
+    name = "DMSI"
+    bits = "9"
+    type = "wo"
+  [[register.field]]
+    name = "TIMEOUT"
+    bits = "8"
+    type = "wo"
+  [[register.field]]
+    name = "PARE"
+    bits = "7"
+    type = "wo"
+  [[register.field]]
+    name = "FRAME"
+    bits = "6"
+    type = "wo"
+  [[register.field]]
+    name = "ROVR"
+    bits = "5"
+    type = "wo"
+  [[register.field]]
+    name = "TFUL"
+    bits = "4"
+    type = "wo"
+  [[register.field]]
+    name = "TEMPTY"
+    bits = "3"
+    type = "wo"
+  [[register.field]]
+    name = "RFUL"
+    bits = "2"
+    type = "wo"
+  [[register.field]]
+    name = "REMPTY"
+    bits = "1"
+    type = "wo"
+  [[register.field]]
+    name = "RTRIG"
+    bits = "0"
+    type = "wo"
+[[register]]
+  name = "INTRPT_MASK"
+  type = "mixed"
+  width = 32
+  description = "Interrupt Mask Register"
+  default = "0x00000000"
+  offset = "0x00000010"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:14"
+    type = "ro"
+  [[register.field]]
+    name = "RBRK"
+    bits = "13"
+    type = "wo"
+  [[register.field]]
+    name = "TOVR"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "TNFUL"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "TTRIG"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "DMSI"
+    bits = "9"
+    type = "ro"
+  [[register.field]]
+    name = "TIMEOUT"
+    bits = "8"
+    type = "ro"
+  [[register.field]]
+    name = "PARE"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "FRAME"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "ROVR"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "TFUL"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "TEMPTY"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "RFUL"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "REMPTY"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "RTRIG"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "CHNL_INT_STS"
+  type = "wtc"
+  width = 32
+  description = "Channel Interrupt Status Register"
+  default = "0x00000200"
+  offset = "0x00000014"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:14"
+    type = "wtc"
+  [[register.field]]
+    name = "RBRK"
+    bits = "13"
+    type = "wtc"
+    shortdesc = '''Receiver break detect interrupt status: This event is triggered whenever the receiver detects ua_rxd low for more than a full frame (start + data + parity + stop).'''
+    longdesc = '''0: no interrupt occurred 1: interrupt occurred'''
+  [[register.field]]
+    name = "TOVR"
+    bits = "12"
+    type = "wtc"
+    shortdesc = '''Transmitter FIFO Overflow interrupt mask status: This event is triggered whenever a new word is pushed into the transmit FIFO when there is not enough room for all of the data.'''
+    longdesc = '''This will be set as a result of any write when the TFUL flag in Channel_sts_reg0 is already set, or a double byte write when the TNFUL flag in Channel_sts_reg0 is already set. 0: no interrupt occurred 1: interrupt occurred'''
+  [[register.field]]
+    name = "TNFUL"
+    bits = "11"
+    type = "wtc"
+    shortdesc = '''Transmitter FIFO Nearly Full interrupt mask status: This event is triggered whenever a new word is pushed into the transmit FIFO causing the fill level to be such that there is not enough space for a further write of the number of bytes currently specified in the WSIZE bits in the Mode register.'''
+    longdesc = '''If this further write were currently attempted it would cause an overflow. Note that when WSIZE is 00, this assumes that a two byte write would be attempted and hence a single byte write is still possible without overflow by driving byte_sel low for the write. 0: no interrupt occurred 1: interrupt occurred'''
+  [[register.field]]
+    name = "TTRIG"
+    bits = "10"
+    type = "wtc"
+    shortdesc = '''Transmitter FIFO Trigger interrupt mask status.'''
+    longdesc = '''This event is triggered whenever a new word is pushed into the transmit that causes the event to be triggered when the transmit FIFO level falls below the value defined by TTRIG 0: no interrupt occurred 1: interrupt occurred'''
+  [[register.field]]
+    name = "DMSI"
+    bits = "9"
+    type = "wtc"
+    shortdesc = '''Delta Modem Status Indicator interrupt mask status: This event is triggered whenever the DCTS, DDSR, TERI, or DDCD in the modem status register are being set.'''
+    longdesc = '''0: no interrupt occurred 1: interrupt occurred'''
+  [[register.field]]
+    name = "TIMEOUT"
+    bits = "8"
+    type = "wtc"
+    shortdesc = '''Receiver Timeout Error interrupt mask status: This event is triggered whenever the receiver timeout counter has expired due to a long idle condition.'''
+    longdesc = '''0: no interrupt occurred 1: interrupt occurred'''
+  [[register.field]]
+    name = "PARE"
+    bits = "7"
+    type = "wtc"
+    shortdesc = '''Receiver Parity Error interrupt mask status: This event is triggered whenever the received parity bit does not match the expected value.'''
+    longdesc = '''0: no interrupt occurred 1: interrupt occurred'''
+  [[register.field]]
+    name = "FRAME"
+    bits = "6"
+    type = "wtc"
+    shortdesc = '''Receiver Framing Error interrupt mask status: This event is triggered whenever the receiver fails to detect a valid stop bit.'''
+    longdesc = '''0: no interrupt occurred 1: interrupt occurred'''
+  [[register.field]]
+    name = "ROVR"
+    bits = "5"
+    type = "wtc"
+    shortdesc = '''Receiver Overflow Error interrupt mask status: This event is triggered whenever the contents of the receiver shift register have not yet been transferred to the receiver FIFO and a new start bit is detected.'''
+    longdesc = '''This may be due to the FIFO being full, or due to excessive clock boundary delays. 0: no interrupt occurred 1: interrupt occurred'''
+  [[register.field]]
+    name = "TFUL"
+    bits = "4"
+    type = "wtc"
+    shortdesc = '''Transmitter FIFO Full interrupt mask status: This event is triggered whenever a new word is inserted into the transmit FIFO causing it to go from a non-full condition to a full condition.'''
+    longdesc = '''0: no interrupt occurred 1: interrupt occurred'''
+  [[register.field]]
+    name = "TEMPTY"
+    bits = "3"
+    type = "wtc"
+    shortdesc = '''Transmitter FIFO Empty interrupt mask status: This event is triggered whenever the final word is removed from the transmit FIFO.'''
+    longdesc = '''0: no interrupt occurred 1: interrupt occurred'''
+  [[register.field]]
+    name = "RFUL"
+    bits = "2"
+    type = "wtc"
+    shortdesc = '''Receiver FIFO Full interrupt mask status: This event is triggered whenever a new word is inserted into the receive FIFO causing it to go from a non-full condition to a full condition.'''
+    longdesc = '''0: no interrupt occurred 1: interrupt occurred'''
+  [[register.field]]
+    name = "REMPTY"
+    bits = "1"
+    type = "wtc"
+    shortdesc = '''Receiver FIFO Empty interrupt mask status: This event is triggered upon exit of the final word from the receive FIFO.'''
+    longdesc = '''0: no interrupt occurred 1: interrupt occurred'''
+  [[register.field]]
+    name = "RTRIG"
+    bits = "0"
+    type = "wtc"
+    shortdesc = '''Receiver FIFO Trigger interrupt mask status: This event is triggered whenever a new word is inserted into the receive FIFO.'''
+    longdesc = '''0: no interrupt occurred 1: interrupt occurred'''
+[[register]]
+  name = "BAUD_RATE_GEN"
+  type = "mixed"
+  width = 32
+  description = "Baud Rate Generator Register."
+  default = "0x0000028B"
+  offset = "0x00000018"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:16"
+    type = "ro"
+  [[register.field]]
+    name = "CD"
+    bits = "15:0"
+    type = "rw"
+[[register]]
+  name = "RCVR_TIMEOUT"
+  type = "mixed"
+  width = 32
+  description = "Receiver Timeout Register"
+  default = "0x00000000"
+  offset = "0x0000001C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "ro"
+  [[register.field]]
+    name = "RTO"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "RCVR_FIFO_TRIGGER_LEVEL"
+  type = "mixed"
+  width = 32
+  description = "Receiver FIFO Trigger Level Register"
+  default = "0x00000020"
+  offset = "0x00000020"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:6"
+    type = "ro"
+  [[register.field]]
+    name = "RTRIG"
+    bits = "5:0"
+    type = "rw"
+[[register]]
+  name = "MODEM_CTRL"
+  type = "mixed"
+  width = 32
+  description = "Modem Control Register"
+  default = "0x00000000"
+  offset = "0x00000024"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:6"
+    type = "ro"
+  [[register.field]]
+    name = "FCM"
+    bits = "5"
+    type = "rw"
+    shortdesc = '''Automatic flow control mode: 0: disable Transmission is continuous regardless of the value of the EMIOUARTxCTSN input, and the EMIOUARTxRTSN output is driven completely under software control.'''
+    longdesc = '''1: enable Transmission will only occur when the EMIOUARTxCTSN input is asserted low, and the EMIOUARTxRTSN output is driven using a compare of the RX FIFO fill level to the programmed FDEL value.'''
+  [[register.field]]
+    name = "RESERVED"
+    bits = "4:2"
+    type = "ro"
+  [[register.field]]
+    name = "RTS"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''Request to send output control: This bit is ignored if automatic flow control mode is enabled by FCM being high.'''
+    longdesc = '''If FCM is low, the value of this bit is inverted when applied to the EMIOUARTxRTSN output. 0: EMIOUARTxRTSN output forced to logic 1 1: EMIOUARTxRTSN output forced to logic 0'''
+  [[register.field]]
+    name = "DTR"
+    bits = "0"
+    type = "rw"
+    shortdesc = '''Data Terminal Ready: The value of this bit is inverted when applied to the EMIOUARTxDTRN output.'''
+    longdesc = '''0: EMIOUARTxDTRN output forced to logic 1 1: EMIOUARTxDTRN output forced to logic 0'''
+[[register]]
+  name = "MODEM_STS"
+  type = "mixed"
+  width = 32
+  description = "Modem Status Register"
+  default = "0x00000000"
+  offset = "0x00000028"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:9"
+    type = "ro"
+  [[register.field]]
+    name = "FCMS"
+    bits = "8"
+    type = "rw"
+  [[register.field]]
+    name = "DCD"
+    bits = "7"
+    type = "ro"
+  [[register.field]]
+    name = "RI"
+    bits = "6"
+    type = "ro"
+  [[register.field]]
+    name = "DSR"
+    bits = "5"
+    type = "ro"
+  [[register.field]]
+    name = "CTS"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "DDCD"
+    bits = "3"
+    type = "wtc"
+    shortdesc = '''Delta Data Carrier Detect status: Indicates a change in state of the EMIOUARTxDCDN input since this bit was last cleared.'''
+    longdesc = '''0: No change has occurred 1: Change has occurred'''
+  [[register.field]]
+    name = "TERI"
+    bits = "2"
+    type = "wtc"
+    shortdesc = '''Trailing Edge Ring Indicator status: Indicates that the EMIOUARTxRIN input has change from high to low state since this bit was last cleared.'''
+    longdesc = '''0: No trailing edge has occurred 1: Trailing edge has occurred'''
+  [[register.field]]
+    name = "DDSR"
+    bits = "1"
+    type = "wtc"
+    shortdesc = '''Delta Data Set Ready status: Indicates a change in state of the EMIOUARTxDSRN input since this bit was last cleared.'''
+    longdesc = '''0: No change has occurred 1: Change has occurred'''
+  [[register.field]]
+    name = "DCTS"
+    bits = "0"
+    type = "wtc"
+    shortdesc = '''Delta Clear To Send status: Indicates a change in state of the EMIOUARTxCTSN input since this bit was last cleared.'''
+    longdesc = '''0: No change has occurred 1: Change has occurred'''
+[[register]]
+  name = "CHANNEL_STS"
+  type = "ro"
+  width = 32
+  description = "Channel Status Register"
+  default = "0x00000000"
+  offset = "0x0000002C"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:15"
+    type = "ro"
+  [[register.field]]
+    name = "TNFUL"
+    bits = "14"
+    type = "ro"
+    shortdesc = '''Transmitter FIFO Nearly Full continuous status: This indicates that there is not enough space for the number of bytes currently specified in the WSIZE bits in the Mode register.'''
+    longdesc = '''If a write were currently attempted it would cause an overflow. Note that when WSIZE is 00, this assumes that a two byte write would be attempted and hence a single byte write is still possible without overflow by driving byte_sel low for the write. 0: More than one byte is unused in the Tx FIFO 1: Only one byte is free in the Tx FIFO'''
+  [[register.field]]
+    name = "TTRIG"
+    bits = "13"
+    type = "ro"
+  [[register.field]]
+    name = "FDELT"
+    bits = "12"
+    type = "ro"
+  [[register.field]]
+    name = "TACTIVE"
+    bits = "11"
+    type = "ro"
+  [[register.field]]
+    name = "RACTIVE"
+    bits = "10"
+    type = "ro"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "9:5"
+    type = "ro"
+  [[register.field]]
+    name = "TFUL"
+    bits = "4"
+    type = "ro"
+  [[register.field]]
+    name = "TEMPTY"
+    bits = "3"
+    type = "ro"
+  [[register.field]]
+    name = "RFUL"
+    bits = "2"
+    type = "ro"
+  [[register.field]]
+    name = "REMPTY"
+    bits = "1"
+    type = "ro"
+  [[register.field]]
+    name = "RTRIG"
+    bits = "0"
+    type = "ro"
+[[register]]
+  name = "TX_RX_FIFO"
+  type = "mixed"
+  width = 32
+  description = "Transmit and Receive FIFO"
+  default = "0x00000000"
+  offset = "0x00000030"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "ro"
+  [[register.field]]
+    name = "FIFO"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "BAUD_RATE_DIVIDER"
+  type = "mixed"
+  width = 32
+  description = "Baud Rate Divider Register"
+  default = "0x0000000F"
+  offset = "0x00000034"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:8"
+    type = "ro"
+  [[register.field]]
+    name = "BDIV"
+    bits = "7:0"
+    type = "rw"
+[[register]]
+  name = "FLOW_DELAY"
+  type = "mixed"
+  width = 32
+  description = "Flow Control Delay Register"
+  default = "0x00000000"
+  offset = "0x00000038"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:6"
+    type = "ro"
+  [[register.field]]
+    name = "FDEL"
+    bits = "5:0"
+    type = "rw"
+    shortdesc = '''RxFIFO trigger level for Ready To Send (RTS) output signal (EMIOUARTxRTSN) de-assertion: 0 - 3: Flow delay triggering is disabled, since minimum 4 word hysteresis cannot be satisfied.'''
+    longdesc = '''4 to 65535: EMIOUARTxRTSN is driven high when Rx FIFO fill level equals FDEL'''
+[[register]]
+  name = "TX_FIFO_TRIGGER_LEVEL"
+  type = "mixed"
+  width = 32
+  description = "Transmitter FIFO Trigger Level Register"
+  default = "0x00000020"
+  offset = "0x00000044"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:6"
+    type = "ro"
+  [[register.field]]
+    name = "TTRIG"
+    bits = "5:0"
+    type = "rw"
+[[register]]
+  name = "RX_FIFO_BYTE_STATUS"
+  type = "mixed"
+  width = 32
+  description = "RX FIFO Byte Status Register"
+  default = "0x00000000"
+  offset = "0x00000048"
+  [[register.field]]
+    name = "RESERVED"
+    bits = "31:12"
+    type = "ro"
+  [[register.field]]
+    name = "BYTE3_BREAK"
+    bits = "11"
+    type = "rw"
+    shortdesc = '''The byte in location3 of the RX FIFO has a break condition associated with it.'''
+    longdesc = '''0: No break was detected when byte 3 was received 1: A break was detected when byte 3 was received'''
+  [[register.field]]
+    name = "BYTE3_FRM_ERR"
+    bits = "10"
+    type = "rw"
+    shortdesc = '''The byte in location 3 of the RX FIFO has a frame error associated with it.'''
+    longdesc = '''0: No frame error was detected when byte 3 was received 1: A frame error was detected when byte 3 was received'''
+  [[register.field]]
+    name = "BYTE3_PAR_ERR"
+    bits = "9"
+    type = "rw"
+  [[register.field]]
+    name = "BYTE2_BREAK"
+    bits = "8"
+    type = "rw"
+    shortdesc = '''The byte in location 2 of the RX FIFO has a break condition associated with it.'''
+    longdesc = '''0: No break was detected when byte 2 was received 1: A break was detected when byte 2 was received'''
+  [[register.field]]
+    name = "BYTE2_FRM_ERR"
+    bits = "7"
+    type = "rw"
+    shortdesc = '''The byte in location 2 of the RX FIFO has a frame error associated with it.'''
+    longdesc = '''0: No frame error was detected when byte 0 was received 1: A frame error was detected when byte 2 was received'''
+  [[register.field]]
+    name = "BYTE2_PAR_ERR"
+    bits = "6"
+    type = "rw"
+  [[register.field]]
+    name = "BYTE1_BREAK"
+    bits = "5"
+    type = "rw"
+    shortdesc = '''The byte in location 1 of the RX FIFO has a break condition associated with it.'''
+    longdesc = '''0: No break was detected when byte 1 was received 1: A break was detected when byte 1 was received'''
+  [[register.field]]
+    name = "BYTE1_FRM_ERR"
+    bits = "4"
+    type = "rw"
+    shortdesc = '''The byte in location 1 of the RX FIFO has a frame error associated with it.'''
+    longdesc = '''0: No frame error was detected when byte 1 was received 1: A frame error was detected when byte 1 was received'''
+  [[register.field]]
+    name = "BYTE1_PAR_ERR"
+    bits = "3"
+    type = "rw"
+  [[register.field]]
+    name = "BYTE0_BREAK"
+    bits = "2"
+    type = "rw"
+    shortdesc = '''The byte in location 0 of the RX FIFO has a break condition associated with it.'''
+    longdesc = '''0: No break was detected when byte 0 was received 1: A break was detected when byte 0 was received'''
+  [[register.field]]
+    name = "BYTE0_FRM_ERR"
+    bits = "1"
+    type = "rw"
+    shortdesc = '''The byte in location 0 of the RX FIFO has a frame error associated with it.'''
+    longdesc = '''0: No frame error was detected when byte 0 was received 1: A frame error was detected when byte 0 was received'''
+  [[register.field]]
+    name = "BYTE0_PAR_ERR"
+    bits = "0"
+    type = "rw"

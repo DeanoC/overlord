@@ -1,0 +1,6 @@
+board_type: host
+os: ${host_os}
+abi: ${host_abi}
+cpu_clusters:
+ - cpu: ${host_cpu}
+   count: 0 # 0 means variable

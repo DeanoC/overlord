@@ -1,0 +1,6 @@
+resources = [
+    "uarts/uarts.toml",
+    "usbs/usbs.toml",
+    "cans/cans.toml",
+    "gpios/gpios.toml",
+]

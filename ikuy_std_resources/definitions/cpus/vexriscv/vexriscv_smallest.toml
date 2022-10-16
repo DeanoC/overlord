@@ -1,0 +1,29 @@
+actions = [
+	"make_config",
+	"sbt_run",
+	"src",
+	"read_verilog_top"
+]
+[[process]]
+name = 'make_config'
+processor = 'toml'
+filename = 'config.toml'
+parameters = [
+]
+
+[[process]]
+name = 'sbt_run'
+processor = 'sbt'
+with_build_sbt = true
+main_scala = "VexRiscV_smallest.scala"
+args = '+runMain VexRiscV_smallest config.toml .. ${name}'
+
+[[process]]
+name = 'src'
+processor = 'sources'
+sources = [{ file = "${name}.v", language = "verilog" }]
+
+[[process]]
+name = 'read_verilog_top'
+processor = 'read_verilog_top'
+source = "${name}"
