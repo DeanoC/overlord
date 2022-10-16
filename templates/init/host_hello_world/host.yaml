@@ -1,13 +1,15 @@
-board: host
-triple: ${host_triple}
-libs:
-  - name: core
-    languages: [cpp]
-    dependencies: []
-  - name: host_os
-    languages: [cpp]
-    dependencies: []
-programs:
-  - name: hello_world
-    languages: [cpp]
-    dependencies: [host_os]
+name: hello_world
+
+boards: 
+ - host
+
+cpus:
+ - host
+
+source: 
+# - cpp
+#  - src/*.cpp
+ - zig
+dependencies: 
+ - library.host_os
+

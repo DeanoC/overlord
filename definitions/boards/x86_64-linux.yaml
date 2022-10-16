@@ -1,0 +1,6 @@
+board_type: hardware
+os: linux
+abi: gnu
+cpu_clusters:
+ - cpu: x86_64
+   count: 0 # 0 means variable

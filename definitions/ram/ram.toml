@@ -3,3 +3,11 @@ resources = [
     "ddr/ddr.toml",
     "sram/sram.toml"
 ]
+
+
+[[definition]]
+  type = "ram.ddr.ddr4.MT40A256M16LY"
+
+[[definition]]
+  type = "ram.ddr.ddr3.MT41K512M16HA"
+

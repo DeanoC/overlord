@@ -1,4 +1,0 @@
-resources = [
-    "graphics/gpus/gpus.toml",
-    "graphics/displays/displays.toml",
-]
