@@ -4,6 +4,7 @@ package Overlord
 import org.virtuslab.yaml.*
 import sys.process._
 import scala.io.Source
+private case class TemplateHeader(name: String, root: String) derives YamlDecoder
 
 def setupFromTemplate(paths: Paths, templateName: String): Unit =
   val templatePath = paths.targetPath / "ikuy_std_resources" / "templates" / "init" / templateName

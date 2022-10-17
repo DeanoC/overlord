@@ -1,6 +1,0 @@
-arch: "x86_64"
-cpu: "x64_64_v2"
-features: []
-width: 64
-max_atomic_width: 128
-max_bitop_type_width: 128

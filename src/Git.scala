@@ -144,7 +144,7 @@ private def gitUpdateLibrary(paths: Paths, name: String, optionalBranch: String 
       "-s",
       "subtree",
       name,
-      "main"
+      branch
     )
     .call(
       cwd = paths.targetPath,
@@ -153,3 +153,34 @@ private def gitUpdateLibrary(paths: Paths, name: String, optionalBranch: String 
       mergeErrIntoOut = true
     )
   assert(updateGit.exitCode == 0)
+
+def gitClone(paths: Paths, name: String, optionalDest: String = ""): Unit =
+  if optionalDest.isEmpty then
+    val cloneGit = os
+      .proc(
+        "git",
+        "clone",
+        name
+      )
+      .call(
+        cwd = paths.targetPath,
+        check = false,
+        stdout = os.Inherit,
+        mergeErrIntoOut = true
+      )
+    assert(cloneGit.exitCode == 0)
+  else
+    val cloneGit = os
+      .proc(
+        "git",
+        "clone",
+        name,
+        optionalDest
+      )
+      .call(
+        cwd = paths.targetPath,
+        check = false,
+        stdout = os.Inherit,
+        mergeErrIntoOut = true
+      )
+    assert(cloneGit.exitCode == 0)
