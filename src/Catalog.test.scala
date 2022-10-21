@@ -6,7 +6,6 @@ import utest._
 object CatalogTests extends TestSuite {
   val targetPath = os.temp.dir() / "CatalogTest"
 
-  // if exist, remove
   val paths = if !os.exists(targetPath) then
     // create directories
     os.makeDir.all(targetPath)
