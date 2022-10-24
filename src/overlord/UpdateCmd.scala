@@ -68,7 +68,7 @@ def updateCmd(config: Config): Unit =
   val paths = Paths(targetPath, targetPath / "tmp", targetPath / "bin", targetPath / "libs")
 
   if (os.exists(targetPath / "ikuy_std_resources"))
-    gitUpdateLibrary(paths, "ikuy_std_resources", "main")
+    gitUpdateCatalog(paths, "ikuy_std_resources", "main")
 
   // read the root.yaml
   val rootTxt = os.read(paths.targetPath / "root.yaml")
@@ -80,9 +80,9 @@ def updateCmd(config: Config): Unit =
 
   rootHeader.software match
     case None            =>
-    case Some(softwares) => processSoftware(paths, softwares)
+    case Some(softwares) => processSoftware(paths, softwares, config.pushBeforeFetch)
 
-private def processSoftware(paths: Paths, softwares: Seq[String]): Unit =
+private def processSoftware(paths: Paths, softwares: Seq[String], pushBeforeFetch: Boolean): Unit =
   // TODO generilise this to other catalogs
   val catalog = Catalog(paths.targetPath / "ikuy_std_resources" / "catalog")
 
@@ -185,4 +185,15 @@ private def processSoftware(paths: Paths, softwares: Seq[String]): Unit =
     )
     .toSet
 
-  val sw = Software(paths, zigTargets, catalog, software, dictionary, gccTriples.toSeq, llvmTriples.toSeq, boards, cpus)
+  val sw = Software(
+    paths,
+    zigTargets,
+    catalog,
+    software,
+    dictionary,
+    gccTriples.toSeq,
+    llvmTriples.toSeq,
+    boards,
+    cpus,
+    pushBeforeFetch
+  )

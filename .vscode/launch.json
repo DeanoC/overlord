@@ -16,6 +16,18 @@
             "jvmOptions": []
         },
         {
+            "name": "Scala-cli push and update test",
+            "type": "scala",
+            "request": "launch",
+            "mainClass": "Overlord.Main",
+            "args": [
+                "update",
+                "--push_before_fetch",
+                "../../test_init_workspace",
+            ],
+            "jvmOptions": []
+        },
+        {
             "name": "Scala-cli init",
             "type": "scala",
             "request": "launch",

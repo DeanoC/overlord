@@ -68,6 +68,28 @@ private def gitAddCatalog(
     )
   assert(commitReturn.exitCode == 0)
 
+private def gitUpdateCatalog(paths: Paths, name: String, optionalBranch: String = ""): Unit =
+  val branch =
+    if optionalBranch.isEmpty() then "main"
+    else optionalBranch
+
+  val updateGit = os
+    .proc(
+      "git",
+      "pull",
+      "-s",
+      "subtree",
+      name,
+      branch
+    )
+    .call(
+      cwd = paths.targetPath,
+      check = false,
+      stdout = os.Inherit,
+      mergeErrIntoOut = true
+    )
+  assert(updateGit.exitCode == 0)
+
 private def gitInit(paths: Paths, optionalBranch: String = ""): Unit =
   val branch =
     if optionalBranch.isEmpty() then "main"
@@ -132,28 +154,6 @@ private def gitCommit(paths: Paths, msg: String): Unit =
     )
   assert(commitReturn.exitCode == 0)
 
-private def gitUpdateLibrary(paths: Paths, name: String, optionalBranch: String = ""): Unit =
-  val branch =
-    if optionalBranch.isEmpty() then "main"
-    else optionalBranch
-
-  val updateGit = os
-    .proc(
-      "git",
-      "pull",
-      "-s",
-      "subtree",
-      name,
-      branch
-    )
-    .call(
-      cwd = paths.targetPath,
-      check = false,
-      stdout = os.Inherit,
-      mergeErrIntoOut = true
-    )
-  assert(updateGit.exitCode == 0)
-
 def gitClone(paths: Paths, name: String, optionalDest: String = ""): Unit =
   if optionalDest.isEmpty then
     val cloneGit = os
@@ -203,22 +203,6 @@ private def gitAddLibSubTree(
   val libAndName = (paths.libPath / name).toString()
 
   if !os.exists(paths.libPath / name) then
-    val remoteResult = os
-      .proc(
-        "git",
-        "remote",
-        "add",
-        "-f",
-        s"libs_$name",
-        gitUrl
-      )
-      .call(
-        cwd = paths.targetPath,
-        check = false,
-        stdout = os.Inherit,
-        mergeErrIntoOut = true
-      )
-    assert(remoteResult.exitCode == 0)
     val mergeResult = os
       .proc(
         "git",
@@ -226,7 +210,7 @@ private def gitAddLibSubTree(
         "add",
         "--prefix",
         s"libs/$name",
-        s"libs_$name",
+        gitUrl,
         branch
       )
       .call(
@@ -236,3 +220,71 @@ private def gitAddLibSubTree(
         mergeErrIntoOut = true
       )
     assert(mergeResult.exitCode == 0)
+
+private def gitPushLibSubTree(
+    paths: Paths,
+    gitUrl: String,
+    optionalName: String = "",
+    optionalBranch: String = ""
+): Unit =
+  // if no name provided, extract from gitUrl
+  val name =
+    if optionalName.isEmpty() then gitUrl.split('/').last.replace(".git", "")
+    else optionalName
+  val branch =
+    if optionalBranch.isEmpty() then "main"
+    else optionalBranch
+
+  val nameAndBranch = name + "/" + branch
+  val libAndName = (paths.libPath / name).toString()
+
+  val mergeResult = os
+    .proc(
+      "git",
+      "subtree",
+      "push",
+      "--prefix",
+      s"libs/$name",
+      gitUrl,
+      branch
+    )
+    .call(
+      cwd = paths.targetPath,
+      check = false,
+      stdout = os.Inherit,
+      mergeErrIntoOut = true
+    )
+  assert(mergeResult.exitCode == 0)
+
+private def gitUpdateLibrary(
+    paths: Paths,
+    gitUrl: String,
+    optionalName: String = "",
+    optionalBranch: String = ""
+): Unit =
+  // if no name provided, extract from gitUrl
+  val name =
+    if optionalName.isEmpty() then gitUrl.split('/').last.replace(".git", "")
+    else optionalName
+
+  val branch =
+    if optionalBranch.isEmpty() then "main"
+    else optionalBranch
+
+  val updateGit = os
+    .proc(
+      "git",
+      "subtree",
+      "pull",
+      "--prefix",
+      s"libs/$name",
+      gitUrl,
+      branch
+    )
+    .call(
+      cwd = paths.targetPath,
+      check = false,
+      stdout = os.Inherit,
+      mergeErrIntoOut = true
+    )
+  assert(updateGit.exitCode == 0)

@@ -11,7 +11,8 @@ case class Software(
     gccTriples: Seq[Triple],
     llvmTriples: Seq[Triple],
     board: Seq[Board],
-    cpus: Seq[Cpu]
+    cpus: Seq[Cpu],
+    pushBeforeFetch: Boolean
 ):
   private lazy val baseTemplatePath = paths.targetPath / "ikuy_std_resources" / "templates"
   // produce GCC build files
@@ -70,8 +71,9 @@ case class Software(
       sw.actions.flatMap(a =>
         val action = a.split(" ")
         action(0) match
-          case "fetch" => Some(FetchSoftwareAction(paths, id, sw, action.tail))
-          case _       => println(s"Unknown action ${action(0)}"); None
+          case "fetch" =>
+            Some(FetchSoftwareAction(paths, id, sw, action.tail, pushBeforeFetch))
+          case _ => println(s"Unknown action ${action(0)}"); None
       )
     )
 

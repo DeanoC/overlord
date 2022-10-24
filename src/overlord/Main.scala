@@ -19,6 +19,9 @@ case class Config(
     workspace: Option[File] = None,
     force: Boolean = false,
 
+    // update items
+    pushBeforeFetch: Boolean = false,
+
     // init command config items
     template: String = "host_hello_world",
     nostdresources: Boolean = false,
@@ -54,6 +57,9 @@ val argParser = {
       .action((_, c) => c.copy(mode = Mode.Update))
       .text("update an existing workspace")
       .children(
+        opt[Unit]("push_before_fetch")
+          .text("Try and push any commits before fetching")
+          .action((_, c) => c.copy(pushBeforeFetch = true))
       ),
     cmd("init")
       .action((_, c) => c.copy(mode = Mode.Init))
