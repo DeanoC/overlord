@@ -5,13 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Scala-cli update",
+            "name": "Scala-cli update test",
             "type": "scala",
             "request": "launch",
             "mainClass": "Overlord.Main",
             "args": [
                 "update",
-                "../../wip_test",
+                "../../test_init_workspace",
             ],
             "jvmOptions": []
         },
@@ -23,6 +23,17 @@
             "args": [
                 "init",
                 "../../wip_test",
+            ],
+            "jvmOptions": []
+        },
+        {
+            "name": "Scala-cli init test",
+            "type": "scala",
+            "request": "launch",
+            "mainClass": "Overlord.Main",
+            "args": [
+                "init",
+                "../../test_init_workspace",
             ],
             "jvmOptions": []
         }

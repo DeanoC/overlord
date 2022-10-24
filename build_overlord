@@ -1,0 +1,2 @@
+#!/bin/bash
+scala-cli package --native-image --force src/overlord/*.scala -o overlord
