@@ -4,6 +4,7 @@ import scala.collection.IndexedSeqView.Id
 
 case class Identifier(id: Seq[String]):
   def +:(name: String): Identifier = Identifier(name +: id)
+  def contains(name: String): Boolean = id.contains(name)
   override def toString(): String = id.mkString(".")
 
 case class Catalog(

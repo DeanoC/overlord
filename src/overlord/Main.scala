@@ -21,7 +21,7 @@ case class Config(
 
     // update items
     pushBeforeFetch: Boolean = false,
-
+    skipGit: Boolean = false,
     // init command config items
     template: String = "host_hello_world",
     nostdresources: Boolean = false,
@@ -57,6 +57,9 @@ val argParser = {
       .action((_, c) => c.copy(mode = Mode.Update))
       .text("update an existing workspace")
       .children(
+        opt[Unit]("skip_git")
+          .text("don't do any git updates")
+          .action((_, c) => c.copy(skipGit = true)),
         opt[Unit]("push_before_fetch")
           .text("Try and push any commits before fetching")
           .action((_, c) => c.copy(pushBeforeFetch = true))

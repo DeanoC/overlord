@@ -9,7 +9,7 @@ import java.io.File
 import java.nio.file.NoSuchFileException
 import scala.collection.mutable
 
-private case class Root(
+case class Root(
     boards: List[String],
     cpus: List[String],
     software: Option[List[String]],
@@ -17,15 +17,41 @@ private case class Root(
     toplevel: String
 ) derives YamlDecoder
 
-private case class SoftwareDef(
-    name: String,
-    boards: List[String],
-    cpus: List[String],
-    builder: List[String],
-    libraries: List[String],
-    dependencies: List[String],
-    actions: List[String]
+sealed trait SoftwareDef {
+  def name: String
+  def boards: List[String]
+  def cpus: List[String]
+  def builder: List[String]
+  def libraries: List[String]
+  def dependencies: List[String]
+  def actions: List[String]
+}
+case class ZigLibDef(
+    link: String
 ) derives YamlDecoder
+
+case class LibSoftwareDef(
+    override val name: String,
+    override val boards: List[String],
+    override val cpus: List[String],
+    override val builder: List[String],
+    override val libraries: List[String],
+    override val dependencies: List[String],
+    override val actions: List[String],
+    zig: Option[ZigLibDef]
+) extends SoftwareDef()
+    derives YamlDecoder
+
+case class ProgramSoftwareDef(
+    override val name: String,
+    override val boards: List[String],
+    override val cpus: List[String],
+    override val builder: List[String],
+    override val libraries: List[String],
+    override val dependencies: List[String],
+    override val actions: List[String]
+) extends SoftwareDef()
+    derives YamlDecoder
 
 private case class Cpu(
     arch: String,
@@ -48,10 +74,13 @@ private case class Board(
 
 private def readSoftware(target: String, paths: Paths): Option[SoftwareDef] = {
   val targetTxt = os.read(paths.targetPath / (target + ".yaml"))
-  val targetHeader = targetTxt.as[SoftwareDef] match
+  val targetHeader = targetTxt.as[LibSoftwareDef] match
     case Left(value) =>
-      println(s"$value in $target error")
-      return None
+      targetTxt.as[ProgramSoftwareDef] match
+        case Left(value) =>
+          println(s"$value in $target error")
+          return None
+        case Right(header) => header
     case Right(header) => header
 
   Some(targetHeader)
@@ -80,9 +109,9 @@ def updateCmd(config: Config): Unit =
 
   rootHeader.software match
     case None            =>
-    case Some(softwares) => processSoftware(paths, softwares, config.pushBeforeFetch)
+    case Some(softwares) => processSoftware(paths, softwares, config.pushBeforeFetch, config.skipGit)
 
-private def processSoftware(paths: Paths, softwares: Seq[String], pushBeforeFetch: Boolean): Unit =
+private def processSoftware(paths: Paths, softwares: Seq[String], pushBeforeFetch: Boolean, skipGit: Boolean): Unit =
   // TODO generilise this to other catalogs
   val catalog = Catalog(paths.targetPath / "ikuy_std_resources" / "catalog")
 
@@ -97,9 +126,19 @@ private def processSoftware(paths: Paths, softwares: Seq[String], pushBeforeFetc
   val software = softwares.flatMap(sw =>
     sw.split('.').head match
       case "program" => readSoftware(sw.split('.').last, paths)
-      case "lib"     => readSoftware(sw.split('.').last, paths)
+      case "library" => readSoftware(sw.split('.').last, paths)
       case _         => println(s"ERROR: unknown software type ${sw.split('.').head}"); None
   )
+
+  val localPrograms = softwares.flatMap(sw =>
+    if sw.split('.').head == "program" then Some(Identifier(sw.split('.').toSeq.drop(1)))
+    else None
+  )
+  val localLibraries = softwares.flatMap(sw =>
+    if sw.split('.').head == "library" then Some(Identifier(sw.split('.').toSeq.drop(1)))
+    else None
+  )
+
   val requiresCMake =
     software.flatMap(p => if p.builder.forall(_ == "cmake") then Some((p.boards, p.cpus)) else None)
 
@@ -190,10 +229,13 @@ private def processSoftware(paths: Paths, softwares: Seq[String], pushBeforeFetc
     zigTargets,
     catalog,
     software,
+    localPrograms,
+    localLibraries,
     dictionary,
     gccTriples.toSeq,
     llvmTriples.toSeq,
     boards,
     cpus,
-    pushBeforeFetch
+    pushBeforeFetch,
+    skipGit
   )

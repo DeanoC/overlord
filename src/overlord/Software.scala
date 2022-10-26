@@ -7,13 +7,18 @@ case class Software(
     zigTargets: ZigTargets,
     catalog: Catalog,
     software: Seq[SoftwareDef],
+    localProgramNames: Seq[Identifier],
+    localLibNames: Seq[Identifier],
     dictionary: Map[String, String],
     gccTriples: Seq[Triple],
     llvmTriples: Seq[Triple],
     board: Seq[Board],
     cpus: Seq[Cpu],
-    pushBeforeFetch: Boolean
+    pushBeforeFetch: Boolean,
+    skipGit: Boolean
 ):
+  private def makeLibraryIdentifier(p: String) = Identifier(Seq("software", "libs") ++ p.split('.') ++ Seq("lib"))
+
   private lazy val baseTemplatePath = paths.targetPath / "ikuy_std_resources" / "templates"
   // produce GCC build files
   if gccTriples.nonEmpty then
@@ -31,11 +36,29 @@ case class Software(
     os.write.over(paths.binPath / "make_compilers.sh", builderResult, perms = os.PermSet.fromString("rwxr-xr-x"))
     // TODO CMAKE toolchain files
   end if
-  software.foreach(sw => produceSoftware(sw))
 
-//  private def getAllDependencies(sw: SoftwareDef, currentDeps: List[String]): List[String]
+  val localPrograms = for
+    sw <- software
+    progName <- localProgramNames
+    if progName.contains(sw.name)
+  yield sw
 
-  private def makeIdentifier(p: String) = Identifier(Seq("software", "libs") ++ p.split('.') ++ Seq("lib"))
+  // TODO local libraries?
+
+  // recursive get all libraries needed by all local programs
+  val libsById = {
+    val libsByPath = mutable.HashMap[os.Path, SoftwareDef]()
+    localPrograms.foreach(getAllLibraries(_, libsByPath))
+    libsByPath.map(l => (makeLibraryIdentifier(l._2.name) -> l._2)).toMap
+  }
+  val actions = produceSoftwareActions(libsById)
+  actions.foreach(_.doAction())
+
+  val zigLocalPrograms = localPrograms.filter(sw => sw.builder.contains("zig"))
+  val zigTop = ZigSoftware.programsTop(paths, zigLocalPrograms, libsById)
+  os.write.over(paths.targetPath / "build.zig", zigTop)
+
+  // val cmakeLocalSoftware = localPrograms.filter(sw => sw.builder.contains("cmake"))
 
   private def getAllLibraries(sw: SoftwareDef, libsByPath: mutable.HashMap[os.Path, SoftwareDef]): Unit =
     if sw.libraries.contains(sw.name) then
@@ -44,7 +67,7 @@ case class Software(
 
     sw.libraries
       .flatMap(p =>
-        catalog.fetch(makeIdentifier(p)) match
+        catalog.fetch(makeLibraryIdentifier(p)) match
           case None        => println(s"ERROR: Unknown library ${p}"); None
           case Some(value) => Some(value)
       )
@@ -55,8 +78,8 @@ case class Software(
             println(s"ERROR: library ${c.name} has no body");
             None
           else
-            text.as[SoftwareDef] match
-              case Left(err)    => println(err); None
+            text.as[LibSoftwareDef] match
+              case Left(err)    => println(s"ERROR ${c.filePath} with $err"); None
               case Right(value) => libsByPath(c.filePath) = value; Some(value)
         else None
       )
@@ -64,25 +87,18 @@ case class Software(
       .toSet
       .map(c => getAllLibraries(c, libsByPath))
 
-  private def produceLibs(libs: Map[Identifier, SoftwareDef]): Unit =
-    val actions = libs.flatMap((id, sw) =>
-      println(s"${id.toString()}: ")
-      // lets through each action
-      sw.actions.flatMap(a =>
-        val action = a.split(" ")
-        action(0) match
-          case "fetch" =>
-            Some(FetchSoftwareAction(paths, id, sw, action.tail, pushBeforeFetch))
-          case _ => println(s"Unknown action ${action(0)}"); None
+  private def produceSoftwareActions(libs: Map[Identifier, SoftwareDef]): Seq[FetchSoftwareAction] =
+    libs
+      .flatMap((id, sw) =>
+        println(s"${id.toString()}: ")
+        // lets go through each action
+        sw.actions.flatMap(a =>
+          val action = a.split(" ")
+          action(0) match
+            case "fetch" =>
+              if action(1) == "git" && skipGit then None
+              else Some(FetchSoftwareAction(paths, id, sw, action.tail, pushBeforeFetch))
+            case _ => println(s"Unknown action ${action(0)}"); None
+        )
       )
-    )
-
-  private def produceSoftware(swd: SoftwareDef): Unit =
-    val cpusRequired = swd.cpus.map(_.replace("host", zigTargets.native.cpu.arch))
-    for
-      cpu <- cpusRequired
-      if !cpus.exists(_.arch == cpu)
-    do println(s"$cpu is required for ${swd.name} software")
-    val libsByPath = mutable.HashMap[os.Path, SoftwareDef]()
-    getAllLibraries(swd, libsByPath)
-    produceLibs(libsByPath.map(l => (makeIdentifier(l._2.name) -> l._2)).toMap);
+      .to(Seq)

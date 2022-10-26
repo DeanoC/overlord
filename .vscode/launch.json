@@ -5,6 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Scala-cli update skipGit",
+            "type": "scala",
+            "request": "launch",
+            "mainClass": "Overlord.Main",
+            "args": [
+                "update",
+                "--skip_git",
+                "../../test_init_workspace",
+            ],
+            "jvmOptions": []
+        },
+        {
             "name": "Scala-cli update test",
             "type": "scala",
             "request": "launch",
