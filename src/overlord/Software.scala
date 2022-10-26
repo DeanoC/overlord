@@ -17,7 +17,7 @@ case class Software(
     pushBeforeFetch: Boolean,
     skipGit: Boolean
 ):
-  private def makeLibraryIdentifier(p: String) = Identifier(Seq("software", "libs") ++ p.split('.') ++ Seq("lib"))
+  private def makeLibraryIdentifier(p: String) = Identifier(Seq("software", "libs") ++ p.split('.'))
 
   private lazy val baseTemplatePath = paths.targetPath / "ikuy_std_resources" / "templates"
   // produce GCC build files

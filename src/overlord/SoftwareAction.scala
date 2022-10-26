@@ -27,8 +27,8 @@ case class FetchSoftwareAction(
     assert(id.id(1) == "libs")
     val branch = if args.size == 3 then args(2) else "main"
 
-    // and get the rest minus the end lib
-    val cutId = Identifier(id.id.drop(2).dropRight(1))
+    // and get the rest
+    val cutId = Identifier(id.id.drop(2))
     val folder = paths.libPath / cutId.id.mkString("/")
     if os.exists(folder) then
       println(s"$folder exists, updating")
