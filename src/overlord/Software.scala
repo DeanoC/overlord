@@ -56,7 +56,10 @@ case class Software(
 
   val zigLocalPrograms = localPrograms.filter(sw => sw.builder.contains("zig"))
   val zigTop = ZigSoftware.programsTop(paths, zigLocalPrograms, libsById)
-  os.write.over(paths.targetPath / "build.zig", zigTop)
+  if os.exists(paths.targetPath / "build.zig") then
+    val oldFile = os.read(paths.targetPath / "build.zig")
+    if oldFile != zigTop then os.write.over(paths.targetPath / "build.zig", zigTop)
+  else os.write(paths.targetPath / "build.zig", zigTop)
 
   // val cmakeLocalSoftware = localPrograms.filter(sw => sw.builder.contains("cmake"))
 
