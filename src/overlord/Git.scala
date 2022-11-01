@@ -33,7 +33,7 @@ private def gitAddCatalog(
         stdout = os.Inherit,
         mergeErrIntoOut = true
       )
-    assert(remoteResult.exitCode == 0)
+    // assert(remoteResult.exitCode == 0)
     val mergeResult = os
       .proc("git", "merge", "-s", "ours", "--no-commit", "--allow-unrelated-histories", nameAndBranch)
       .call(
@@ -254,7 +254,8 @@ private def gitPushLibSubTree(
       stdout = os.Inherit,
       mergeErrIntoOut = true
     )
-  assert(mergeResult.exitCode == 0)
+  // allow errors as we might not have rights to push some libraries
+  // assert(mergeResult.exitCode == 0)
 
 private def gitUpdateLibrary(
     paths: Paths,

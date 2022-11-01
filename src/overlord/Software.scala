@@ -17,7 +17,6 @@ case class Software(
     pushBeforeFetch: Boolean,
     skipGit: Boolean
 ):
-  private def makeLibraryIdentifier(p: String) = Identifier(Seq("software", "libs") ++ p.split('.'))
 
   private lazy val baseTemplatePath = paths.targetPath / "ikuy_std_resources" / "templates"
   // produce GCC build files
@@ -49,7 +48,7 @@ case class Software(
   val libsById = {
     val libsByPath = mutable.HashMap[os.Path, SoftwareDef]()
     localPrograms.foreach(getAllLibraries(_, libsByPath))
-    libsByPath.map(l => (makeLibraryIdentifier(l._2.name) -> l._2)).toMap
+    libsByPath.map(l => (Software.makeLibraryIdentifier(l._2.name) -> l._2)).toMap
   }
   val actions = produceSoftwareActions(libsById)
   actions.foreach(_.doAction())
@@ -61,8 +60,6 @@ case class Software(
     if oldFile != zigTop then os.write.over(paths.targetPath / "build.zig", zigTop)
   else os.write(paths.targetPath / "build.zig", zigTop)
 
-  // val cmakeLocalSoftware = localPrograms.filter(sw => sw.builder.contains("cmake"))
-
   private def getAllLibraries(sw: SoftwareDef, libsByPath: mutable.HashMap[os.Path, SoftwareDef]): Unit =
     if sw.libraries.contains(sw.name) then
       println(s"ERROR: ${sw.name} has itself as a library dependency")
@@ -70,20 +67,32 @@ case class Software(
 
     sw.libraries
       .flatMap(p =>
-        catalog.fetch(makeLibraryIdentifier(p)) match
-          case None        => println(s"ERROR: Unknown library ${p}"); None
+        catalog.fetch(Software.makeLibraryIdentifier(p)) match
+          case None =>
+            if sw.builder.contains("zig") then
+              catalog.fetch(Software.makeLibraryIdentifier(p ++ "-zig")) match
+                case None => println(s"ERROR: Unknown library ${p}"); None
+                case Some(value) =>
+                  Some(value)
+            else
+              println(s"ERROR: Unknown library ${p}");
+              None
           case Some(value) => Some(value)
       )
       .map(c =>
         if !libsByPath.contains(c.filePath) then
-          val text = os.read(c.filePath)
-          if text.isEmpty() then
-            println(s"ERROR: library ${c.name} has no body");
+          if os.isDir(c.filePath) then
+            println(s"ERROR: library ${c.name} is a directory");
             None
           else
-            text.as[LibSoftwareDef] match
-              case Left(err)    => println(s"ERROR ${c.filePath} with $err"); None
-              case Right(value) => libsByPath(c.filePath) = value; Some(value)
+            val text = os.read(c.filePath)
+            if text.isEmpty() then
+              println(s"ERROR: library ${c.name} has no body");
+              None
+            else
+              text.as[LibSoftwareDef] match
+                case Left(err)    => println(s"ERROR ${c.filePath} with $err"); None
+                case Right(value) => libsByPath(c.filePath) = value; Some(value)
         else None
       )
       .flatten
@@ -93,7 +102,6 @@ case class Software(
   private def produceSoftwareActions(libs: Map[Identifier, SoftwareDef]): Seq[FetchSoftwareAction] =
     libs
       .flatMap((id, sw) =>
-        println(s"${id.toString()}: ")
         // lets go through each action
         sw.actions.flatMap(a =>
           val action = a.split(" ")
@@ -105,3 +113,6 @@ case class Software(
         )
       )
       .to(Seq)
+
+object Software:
+  def makeLibraryIdentifier(p: String) = Identifier(Seq("software", "libs") ++ p.split('.'))

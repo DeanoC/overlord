@@ -35,6 +35,7 @@ case class FetchSoftwareAction(
       if pullBeforeFetch then
         println("Pulling before fetch (AKA sync)")
         gitPushLibSubTree(paths, args(1), cutId.toString(), branch)
+      println(s"Updating $cutId")
       gitUpdateLibrary(paths, args(1), cutId.toString(), branch)
     else
       println(s"$folder does not exists, git fetching ${args(1)}")
