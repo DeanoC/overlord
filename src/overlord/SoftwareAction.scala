@@ -20,23 +20,25 @@ case class FetchSoftwareAction(
       // check we are a valid software action
       assert(id.id(0) == "software")
       id.id(1) match
-        case "libs" => gitLibraryAction()
-        case _      => println(s"Unknown type of software ${id.id(1)}")
+        case "libraries" => gitLibraryAction()
+        case _           => println(s"Unknown type of software ${id.id(1)}")
 
   private def gitLibraryAction(): Unit =
-    assert(id.id(1) == "libs")
-    val branch = if args.size == 3 then args(2) else "main"
-
-    // and get the rest
+    assert(id.id(1) == "libraries")
+    val branch = if args.size >= 3 then args(2) else "main"
     val cutId = Identifier(id.id.drop(2))
-    val folder = paths.libPath / cutId.id.mkString("/")
+
+    // we use the last part of the id unless optionally specified
+    val dir = if args.size >= 4 then args(3) else cutId.id.mkString("/")
+    val folder = paths.libPath / dir
+    println(folder)
     if os.exists(folder) then
       println(s"$folder exists, updating")
       if pullBeforeFetch then
         println("Pulling before fetch (AKA sync)")
-        gitPushLibSubTree(paths, args(1), cutId.toString(), branch)
+        gitPushLibSubTree(paths, args(1), dir.toString(), branch)
       println(s"Updating $cutId")
-      gitUpdateLibrary(paths, args(1), cutId.toString(), branch)
+      gitUpdateLibrary(paths, args(1), dir.toString(), branch)
     else
       println(s"$folder does not exists, git fetching ${args(1)}")
-      gitAddLibSubTree(paths, args(1), cutId.toString(), branch)
+      gitAddLibSubTree(paths, args(1), dir.toString(), branch)

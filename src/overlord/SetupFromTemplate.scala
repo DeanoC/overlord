@@ -8,7 +8,7 @@ import scala.io.Source
 private case class TemplateHeader(name: String, root: String) derives YamlDecoder
 
 def setupFromTemplate(paths: Paths, templateName: String): Unit =
-  val templatePath = paths.targetPath / "ikuy_std_resources" / "templates" / "init" / templateName
+  val templatePath = paths.libPath / "ltngt.packages" / "templates" / "init" / templateName
   if !os.exists(templatePath) then
     println(s"Unable to find $templateName in std resources")
     return

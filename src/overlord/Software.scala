@@ -115,4 +115,4 @@ case class Software(
       .to(Seq)
 
 object Software:
-  def makeLibraryIdentifier(p: String) = Identifier(Seq("software", "libs") ++ p.split('.'))
+  def makeLibraryIdentifier(p: String) = Identifier(Seq("software", "libraries") ++ p.split('.'))

@@ -26,7 +26,7 @@ def initCmd(config: Config): Unit =
     gitCommit(paths, "Initial Empty Commit")
 
   if !config.nostdresources then
-    gitAddCatalog(paths, "git@github.com:DeanoC/ikuy_std_resources.git", "ikuy_std_resources", "main")
+    gitAddLibSubTree(paths, "git@github.com:DeanoC/ltngt.packages.git", "ltngt", "main")
     setupFromTemplate(paths, config.template)
 
   updateCmd(config)

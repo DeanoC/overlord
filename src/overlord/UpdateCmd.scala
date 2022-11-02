@@ -149,14 +149,14 @@ def updateCmd(config: Config): Unit =
 
   val paths = Paths(targetPath, targetPath / "tmp", targetPath / "bin", targetPath / "libs")
 
-  if !os.exists(targetPath / "ikuy_std_resources") then
-    gitAddCatalog(paths, "git@github.com:DeanoC/ikuy_std_resources.git", "ikuy_std_resources", "main")
+  if !os.exists(paths.libPath / "ltngt.packages") then
+    gitAddLibSubTree(paths, "git@github.com:DeanoC/ltngt.packages.git", "ltngt.packages", "main")
+
+  if (os.exists(paths.libPath / "ltngt.packages"))
+    gitUpdateLibrary(paths, "git@github.com:DeanoC/ltngt.packages.git", "ltngt.packages", "main")
 
   // we always need zig as we use it to work out host tripple
   installZig(paths)
-
-  if (os.exists(targetPath / "ikuy_std_resources"))
-    gitUpdateCatalog(paths, "ikuy_std_resources", "main")
 
   // read the root.yaml
   val rootTxt = os.read(paths.targetPath / "root.yaml")
@@ -172,7 +172,7 @@ def updateCmd(config: Config): Unit =
 
 private def processSoftware(paths: Paths, softwares: Seq[String], pushBeforeFetch: Boolean, skipGit: Boolean): Unit =
   // TODO generilise this to other catalogs
-  val catalog = Catalog(paths.targetPath / "ikuy_std_resources" / "catalog")
+  val catalog = Catalog(paths.libPath / "ltngt.packages")
 
   // use zig to get info on the host and check this version of LLVM supports all the triple we want
   // get zig targets data
