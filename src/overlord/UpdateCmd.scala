@@ -298,3 +298,4 @@ private def processSoftware(paths: Paths, softwares: Seq[String], pushBeforeFetc
     pushBeforeFetch,
     skipGit
   )
+  println("Update finished")

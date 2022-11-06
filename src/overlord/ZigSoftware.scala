@@ -4,9 +4,6 @@ import scala.collection.mutable
 
 object ZigSoftware:
 
-  def addLibrary(exe: String, name: String): String =
-    s"    if(!hasPackageBeenAdded(\"${name}\")) ${exe}.addPackage(${name}Pkg);\n"
-
   private def makeLinkerFunction(
       libsById: Map[Identifier, SoftwareDef],
       name: String,
@@ -16,15 +13,16 @@ object ZigSoftware:
   ): String =
     val sb = mutable.StringBuilder()
     val dictionary = Map("${lib_name}" -> name)
-    val bTxt = if link.contains("builder") || libraries.nonEmpty then "builder" else "_"
+    val bTxt = if link.contains("builder") then "builder" else "_"
     sb ++= s"pub fn ${name}Link(${bTxt}: *std.build.Builder, executable: *std.build.LibExeObjStep) void {\n"
     sb ++= link.replace("\\n", "\n").overlordStringInterpolate(dictionary)
 
     if libraries.nonEmpty then
       libraries.foreach(l =>
         libsById(Software.makeLibraryIdentifier(l)) match
-          case LibSoftwareDef(name, _, _, _, _, _, _, _) => sb ++= addLibrary("executable", name)
-          case _                                         => ""
+          case LibSoftwareDef(lib_name, _, _, _, _, _, _, _) =>
+            sb ++= s"    if(!hasPackageBeenAdded(\"${lib_name}\")) executable.addPackage(${lib_name}Pkg);\n"
+          case _ => ""
       )
 
     sb ++= pkg
@@ -74,13 +72,18 @@ var packageAdded = [_]struct { name: []const u8, added: bool = false } {
     sb ++= "};\n// Package definitions\n"
     libsById.foreach((id, sw) =>
       sw match
-        case LibSoftwareDef(lib_name, _, _, _, _, _, _, zig) =>
+        case LibSoftwareDef(lib_name, _, _, _, libraries, _, _, zig) =>
           val imp =
             if zig.nonEmpty && zig.get.library_import.nonEmpty then
               zig.get.library_import.overlordStringInterpolate(Map("${lib_name}" -> lib_name))
             else s"libs/$lib_name/package.zig"
-          sb ++= s"""const ${lib_name}Pkg = std.build.Pkg{ .name = "$lib_name", .source = .{ .path = sdkPath("$imp") } };"""
-          sb ++= "\n"
+          sb ++= s"const ${lib_name}Pkg = std.build.Pkg{\n    .name = \"$lib_name\",\n    .source = .{ .path = sdkPath(\"$imp\") }"
+          if libraries.nonEmpty then
+            sb ++= ",\n    .dependencies = &.{"
+            libraries.foreach(lib => sb ++= s"\n      ${lib}Pkg, ")
+            sb ++= "\n    },"
+
+          sb ++= "\n};\n"
         case _ => {}
     )
 
@@ -97,12 +100,15 @@ var packageAdded = [_]struct { name: []const u8, added: bool = false } {
     libsById.foreach((id, sw) =>
       sw match
         case LibSoftwareDef(lib_name, _, _, _, libraries, _, _, zig) =>
-          if zig.nonEmpty && zig.get.library_link.nonEmpty then
-            val pkg =
-              if zig.nonEmpty && zig.get.library_package.nonEmpty then "    " ++ zig.get.library_package ++ "\n"
-              else addLibrary("executable", lib_name);
-            sb ++= makeLinkerFunction(libsById, lib_name, libraries, zig.get.library_link, pkg)
-              .overlordStringInterpolate(Map("${lib_name}" -> lib_name))
+          val pkg =
+            if zig.nonEmpty && zig.get.library_package.nonEmpty then zig.get.library_package ++ "\n"
+            else s"    if(!hasPackageBeenAdded(\"${lib_name}\")) executable.addPackage(${lib_name}Pkg);\n"
+
+          val link = if zig.nonEmpty && zig.get.library_link.nonEmpty then zig.get.library_link ++ "\n" else ""
+
+          sb ++= makeLinkerFunction(libsById, lib_name, libraries, link, pkg).overlordStringInterpolate(
+            Map("${lib_name}" -> lib_name)
+          )
         case _ => {}
     )
 
@@ -118,10 +124,7 @@ var packageAdded = [_]struct { name: []const u8, added: bool = false } {
           libsById.foreach((id, sw) =>
             sw match
               case LibSoftwareDef(lib_name, _, _, _, _, _, _, zig) =>
-                val str =
-                  if zig.nonEmpty && zig.get.library_link.nonEmpty then
-                    s"    ${lib_name}Link(builder, ${exe_name}_exe);\n"
-                  else addLibrary(s"${exe_name}_exe", lib_name)
+                val str = s"    ${lib_name}Link(builder, ${exe_name}_exe);\n"
 
                 sb ++= str.overlordStringInterpolate(Map("${lib_name}" -> lib_name))
               case _ => {}
