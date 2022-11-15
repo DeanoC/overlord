@@ -1,2 +1,4 @@
 #!/bin/bash
-scala-cli package --native-image --force src/overlord/*.scala -o overlord
+#scala-cli package --native-image --enable-url-protocols=https --force src/overlord/*.scala -o overlord
+#scala-cli package --native src/overlord/*.scala -o overlord
+scala-cli package --assembly src/overlord/*.scala -o overlord
