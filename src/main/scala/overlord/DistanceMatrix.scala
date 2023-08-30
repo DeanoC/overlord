@@ -155,7 +155,7 @@ object DistanceMatrix {
 		}
 
 		// compute the routes between instances
-		computeRouteBetweens(dm, instancesArray, connected)
+		computeRouteBetweens(dm, instancesArray.toIndexedSeq, connected)
 
 		dm
 	}

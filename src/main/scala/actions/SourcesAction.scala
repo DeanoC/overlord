@@ -34,7 +34,7 @@ object SourcesAction {
 		}
 
 		val srcs = Utils.toArray(process("sources")).map(Utils.toTable)
-		for (entry <- srcs) yield {
+		for (entry <- srcs.toIndexedSeq) yield {
 			val filename = Utils.toString(entry("file"))
 			SourcesAction(filename, Utils.toString(entry("language")))
 		}

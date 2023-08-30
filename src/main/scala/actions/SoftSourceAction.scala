@@ -67,7 +67,7 @@ object SoftSourceAction {
 		} else None
 
 		// pre source cpu target lists
-		for (entry <- srcs) yield {
+		for (entry <- srcs.toIndexedSeq) yield {
 			val (phase, cpus) =
 				if (entry.contains("cpus")) {
 					val cpusString = Utils.toString(entry("cpus"))

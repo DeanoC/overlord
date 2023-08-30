@@ -49,6 +49,6 @@ object UnconnectedParameters {
 			}
 		}
 
-		new UnconnectedParameters(direction, secondFullName, parameters)
+		new UnconnectedParameters(direction, secondFullName, parameters.toIndexedSeq)
 	}
 }

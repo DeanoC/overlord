@@ -61,7 +61,7 @@ case class Port(name: String,
 
 object Ports {
 	def apply(array: Array[Variant]): Seq[Port] =
-		array.flatMap(_ match {
+		array.toIndexedSeq.flatMap(_ match {
 			              case TableV(tbl) => if (tbl.contains("name")) {
 				              val name  = Utils.toString(tbl("name"))
 				              val width = Utils.lookupInt(tbl, "width", 1)

@@ -55,6 +55,6 @@ object YamlAction {
 		val filename   = Utils.toString(process("filename"))
 		val parameters = Utils.toArray(process("parameters")).map(Utils.toString)
 
-		Seq(YamlAction(parameters, filename))
+		Seq(YamlAction(parameters.toIndexedSeq, filename))
 	}
 }

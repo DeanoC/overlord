@@ -1,12 +1,4 @@
-//lazy val ikuy = ProjectRef(uri("git@github.com:DeanoC/ikuy2.git#master"),
-// "root")
-//lazy val ikuy = ProjectRef(file("../ikuy2"), "ikuy")
-lazy val ikuy_utils = ProjectRef(uri(
-	"http://github.com/DeanoC/ikuy_utils.git#master"), "ikuy_utils")
-//lazy val ikuy_utils = ProjectRef(file("../ikuy_utils"), "ikuy_utils")
-
-
-ThisBuild / scalaVersion := "2.13.3"
+ThisBuild / scalaVersion := "2.13.11"
 ThisBuild / organization := "com.deanoc"
 ThisBuild / version := "1.0"
 ThisBuild / scalacOptions += "-deprecation"
@@ -26,4 +18,3 @@ ThisBuild / libraryDependencies := Seq(
 	"ca.mrvisser" %% "sealerate" % "0.0.6",
 	)
 lazy val overlord = (project in file("."))
-	.dependsOn(ikuy_utils)

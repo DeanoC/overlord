@@ -15,7 +15,7 @@ case class RamInstance(name: String,
 
 	private lazy val ranges: Seq[(BigInt, BigInt, Boolean, Seq[String])] = {
 		if (!attributes.contains("ranges")) Seq()
-		else Utils.toArray(attributes("ranges")).map {
+		else Utils.toArray(attributes("ranges")).toIndexedSeq.map {
 			b =>
 				(Utils.lookupBigInt(Utils.toTable(b), "address", 0),
 					Utils.lookupBigInt(Utils.toTable(b), "size", 0),

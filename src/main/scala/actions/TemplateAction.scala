@@ -73,7 +73,7 @@ object TemplateAction {
 			else Some(cpuRegEx.split(cpusString).toSeq)
 		} else None
 
-		for (entry <- srcs) yield {
+		for (entry <- srcs.toIndexedSeq) yield {
 			val (phase, cpus) =
 				if (entry.contains("cpus")) {
 					val cpusString = Utils.toString(entry("cpus"))

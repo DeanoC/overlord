@@ -16,7 +16,7 @@ trait ChipInstance extends InstanceTrait with PortsLike with RegisterBankLike wi
 	lazy         val ports                : mutable.HashMap[String, Port]     = mutable.HashMap[String, Port](definition.ports.toSeq: _*)
 	lazy         val instanceRegisterBanks: mutable.ArrayBuffer[RegisterBank] = {
 		if (attributes.contains("registers")) {
-			Registers(this, Utils.toArray(attributes("registers"))).to(mutable.ArrayBuffer)
+			Registers(this, Utils.toArray(attributes("registers"))).toIndexedSeq.to(mutable.ArrayBuffer)
 		} else mutable.ArrayBuffer()
 	}
 	private lazy val hasRegisters         : Boolean                           = registerBanks.nonEmpty
@@ -30,7 +30,7 @@ trait ChipInstance extends InstanceTrait with PortsLike with RegisterBankLike wi
 	val splitIdent           : Array[String]           = name.split('.')
 	private val busSpecs: Seq[BusSpec] = {
 		if (!attributes.contains("buses")) Seq()
-		else Utils.toArray(attributes("buses")).map(
+		else Utils.toArray(attributes("buses")).toIndexedSeq.map(
 			b => {
 				val table = Utils.toTable(b)
 				BusSpec(name = Utils.lookupString(table, "name", "NO_NAME"),
