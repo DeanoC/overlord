@@ -26,7 +26,7 @@ case class SoftSourceAction(override val phase: Int,
 			ofn = ofn.replace(s"$k", v.toCString)
 		}
 
-		val iPath = catalog_path.resolve(ofn)
+		val iPath = catalog_path.resolve(ifn)
 
 		val oPath = instance match {
 			case si: SoftwareInstance =>
@@ -37,7 +37,7 @@ case class SoftSourceAction(override val phase: Int,
 
 				Game.outPath
 					.resolve(folder)
-					.resolve(si.name)
+					.resolve(si.name.replace('.','/'))
 
 					.resolve(ofn)
 			case _                    =>

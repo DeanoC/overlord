@@ -3,9 +3,11 @@ package actions
 import ikuy_utils.{Utils, Variant}
 import overlord.Game
 import overlord.Instances.{InstanceTrait, ProgramInstance, SoftwareInstance}
+import java.nio.file.{Path, Paths}
 
 case class TemplateAction(override val phase: Int,
                           cpus: Seq[String],
+													catalog_path: Path,
                           in: String,
                           out: String)
 	extends Action() {
@@ -24,11 +26,11 @@ case class TemplateAction(override val phase: Int,
 			ofn = ofn.replace(s"$k", v.toCString)
 		}
 
-		val iPath = Game.tryPaths(instance, ifn)
+		val iPath = catalog_path.resolve(ifn)
 
 		val source = Utils.readFile(iPath)
 		if (source.isEmpty) {
-			println(f"Template source file $ifn not found%n")
+			println(f"Template source file $iPath not found%n")
 			return
 		}
 
@@ -47,7 +49,7 @@ case class TemplateAction(override val phase: Int,
 
 				Game.outPath
 					.resolve(folder)
-					.resolve(si.name)
+					.resolve(si.name.replace('.','/'))
 					.resolve(ofn)
 			case _                    =>
 				Game.outPath.resolve(ofn)
@@ -91,6 +93,7 @@ object TemplateAction {
 
 			TemplateAction(phase,
 			               cpus,
+										 Game.catalogPath,
 			               inFilename,
 			               outFilename)
 		}

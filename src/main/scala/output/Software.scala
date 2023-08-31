@@ -59,8 +59,7 @@ object Software {
 			val df             = sourcePath.toFile
 			if (df.exists()) {
 				df.listFiles.foreach(f => {
-					val alreadyExists = Utils.doesFileOrDirectoryExist(targetPath.resolve(f
-						                                                                      .getName))
+					val alreadyExists = Utils.doesFileOrDirectoryExist(targetPath.resolve(f.getName))
 					if (alreadyExists) {
 						Utils.deleteDirectories(targetPath.resolve(f.getName))
 					}
@@ -83,9 +82,10 @@ object Software {
 
 				if (all_cpus.isEmpty || all_cpus.get.contains(cpuName)) {
 					val sourcePath = libPath.resolve(lib.name)
-					val targetPath = out.resolve(s"libs_$cpuName").resolve(lib.name)
+					val targetPath = out.resolve(s"libs_$cpuName").resolve(lib.name.replace('.', '/'))
 					libraryDefines += lib.name.replace('.', '_')
 
+					Utils.ensureDirectories(targetPath.getParent())
 					Utils.createSymbolicLink(sourcePath, targetPath)
 				}
 			}
