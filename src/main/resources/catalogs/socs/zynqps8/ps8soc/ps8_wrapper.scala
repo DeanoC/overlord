@@ -1416,9 +1416,9 @@ object Ps8Wrapper {
 		val table = if (tomlFile.isEmpty) {
 			println(s"No toml config file provided, defaults will be used")
 			Map[String, Variant]()
-		} else Utils.readToml(Path.of(tomlFile.get))
+		} else Utils.readToml(Paths.get(tomlFile.get))
 
-		println(Path.of(tomlFile.get).toString)
+		println(Paths.get(tomlFile.get).toString)
 
 		val ps8Config = ZynqMpPs8Config.createFromTable(table)
 

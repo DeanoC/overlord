@@ -4,14 +4,14 @@ import ikuy_utils._
 import overlord.Game
 import overlord.Instances.InstanceTrait
 
-import java.nio.file.Path
+import java.nio.file.{Path, Paths}
 
 case class CopyAction(filename: String, language: String, srcPath: String)
 	extends Action {
 
 	override val phase: Int = 1
 
-	private var dstAbsPath: Path = Path.of("")
+	private var dstAbsPath: Path = Paths.get("")
 
 	override def execute(instance: InstanceTrait, parameters: Map[String, Variant]): Unit = {
 

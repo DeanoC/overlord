@@ -2,7 +2,7 @@ package overlord
 
 import ikuy_utils._
 
-import java.nio.file.{Files, Path}
+import java.nio.file.{Files, Path, Paths}
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
@@ -90,7 +90,7 @@ object DefinitionCatalog {
 			val tincs = Utils.toArray(parsed("include"))
 			for (include <- tincs) {
 				val table = Utils.toTable(include)
-				val name  = Path.of(Utils.toString(table("resource")))
+				val name  = Paths.get(Utils.toString(table("resource")))
 				Game.pushCatalogPath(name)
 				val cat = DefinitionCatalog.fromFile(s"${name.getFileName}", defaults)
 				cat match {

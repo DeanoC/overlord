@@ -18,7 +18,7 @@ object Resetti {
 			println(s"No toml config file provided, defaults will be used")
 			Map[String, Variant]()
 		}
-		else Utils.readToml(Path.of(tomlFile.get))
+		else Utils.readToml(Paths.get(tomlFile.get))
 
 
 		val luInt  = new Function2[String, Int, Int] {

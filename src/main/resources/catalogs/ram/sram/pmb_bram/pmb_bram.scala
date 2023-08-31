@@ -19,7 +19,7 @@ object PmbBram {
 			println(s"No toml config file provided, defaults will be used")
 			Map[String, Variant]()
 		}
-		else Utils.readToml(name, Path.of(tomlFile.get), getClass)
+		else Utils.readToml(name, Paths.get(tomlFile.get), getClass)
 
 
 		val luInt  = new Function2[String, Int, Int] {

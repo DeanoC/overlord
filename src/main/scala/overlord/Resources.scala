@@ -3,7 +3,7 @@ package overlord
 import ikuy_utils.{ArrayV, Utils, Variant}
 import overlord.Instances.BoardInstance
 
-import java.nio.file.Path
+import java.nio.file.{Path, Paths}
 import scala.collection.mutable
 import scala.language.postfixOps
 
@@ -13,7 +13,7 @@ object Resources {
 	}
 
 	def overlordRootPath(): Path =
-		Path.of(new java.io.File(classOf[BoardInstance]
+		Paths.get(new java.io.File(classOf[BoardInstance]
 			                         .getProtectionDomain
 			                         .getCodeSource
 			                         .getLocation.toURI).getCanonicalPath)

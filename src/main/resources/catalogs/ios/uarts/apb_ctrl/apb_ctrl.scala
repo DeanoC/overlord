@@ -28,7 +28,7 @@ object UartApbCtrl {
 			println(s"No toml config file provided, defaults will be used")
 			Map[String, Variant]()
 		}
-		else Utils.readToml(name, Path.of(tomlFile.get), getClass)
+		else Utils.readToml(name, Paths.get(tomlFile.get), getClass)
 
 
 		val luInt  = new Function2[String, Int, Int] {
@@ -60,7 +60,7 @@ object UartApbCtrl {
 			)
 
 		val regsToml = writeRegistersToToml
-		Utils.writeFile(Path.of(targetDir).resolve(s"${name}_regs.toml"),
+		Utils.writeFile(Paths.get(targetDir).resolve(s"${name}_regs.toml"),
 		                regsToml)
 
 		config

@@ -5,7 +5,7 @@ import overlord.Chip.{BitsDesc, Register}
 import overlord.Instances.{ChipInstance, CpuInstance}
 import overlord._
 
-import java.nio.file.Path
+import java.nio.file.{Path, Paths}
 import scala.collection.mutable
 import scala.xml.PrettyPrinter
 
@@ -58,7 +58,7 @@ object Svd {
 		// copy etc/CMSIS-SVD.xsd
 		val etc = out.resolve("etc")
 		Utils.ensureDirectories(etc)
-		Utils.copy(Path.of("etc/CMSIS-SVD.xsd"), etc.resolve("CMSIS-SVD.xsd"))
+		Utils.copy(Paths.get("etc/CMSIS-SVD.xsd"), etc.resolve("CMSIS-SVD.xsd"))
 
 		val path = if (out.toFile.isDirectory)
 			out.resolve(s"${game.name}.svd")

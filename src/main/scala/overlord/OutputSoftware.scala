@@ -6,7 +6,7 @@ import overlord.Connections._
 import overlord.Instances._
 import overlord.Interfaces.{RamLike, RegisterBankLike}
 
-import java.nio.file.Path
+import java.nio.file.{Path, Paths}
 import scala.collection.mutable
 
 object OutputSoftware {
@@ -312,7 +312,7 @@ object OutputSoftware {
 
 	private def filePath(out: Path, name: String): Path = {
 		val fn       = s"${name.replace('.', '_')}.h".toLowerCase()
-		val filename = Path.of(fn).getFileName
+		val filename = Paths.get(fn).getFileName
 		out.resolve(filename)
 	}
 

@@ -5,7 +5,7 @@ import ikuy_utils.Utils.VariantTable
 import ikuy_utils.{Utils, Variant}
 import overlord.{DefinitionType, Game, GatewareDefinitionTrait}
 
-import java.nio.file.Path
+import java.nio.file.{Path, Paths}
 
 case class GatewareDefinition(defType: DefinitionType,
                               sourcePath: Path,
@@ -64,8 +64,8 @@ object GatewareDefinition {
 	          registers: Seq[Variant],
 	          parameters: Map[String, Variant],
 	          fileName: String): Option[GatewareDefinition] = {
-		val fileNameAlone = Path.of(fileName).getFileName
-		Game.pushCatalogPath(Path.of(fileName))
+		val fileNameAlone = Paths.get(fileName).getFileName
+		Game.pushCatalogPath(Paths.get(fileName))
 		val result = parse(defType,
 		                   attributes,
 		                   dependencies,

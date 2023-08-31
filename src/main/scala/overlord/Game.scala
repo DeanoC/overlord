@@ -5,7 +5,7 @@ import overlord.Connections._
 import overlord.Instances._
 import overlord.Interfaces.{ChipLike, RegisterBankLike}
 
-import java.nio.file.{Files, Path}
+import java.nio.file.{Files, Path, Paths}
 import scala.collection.mutable
 import scala.reflect.ClassTag
 
@@ -83,7 +83,7 @@ object Game {
 	private val instancePathStack: mutable.Stack[Path] = mutable.Stack[Path]()
 	private val outPathStack     : mutable.Stack[Path] = mutable.Stack[Path]()
 
-	private var baseProjectPath: Path = Path.of("")
+	private var baseProjectPath: Path = Paths.get("")
 
 	def setupPaths(projectPath: Path, catalogPath: Path, prefabsPath: Path, outPath: Path): Unit = {
 		baseProjectPath = projectPath.toAbsolutePath
@@ -103,7 +103,7 @@ object Game {
 
 	def projectPath: Path = baseProjectPath
 
-	def pushCatalogPath(path: String): Unit = pushCatalogPath(Path.of(path))
+	def pushCatalogPath(path: String): Unit = pushCatalogPath(Paths.get(path))
 
 	def pushCatalogPath(path: Path): Unit = {
 		val potDPath = catalogPath.resolve(path);
@@ -113,13 +113,13 @@ object Game {
 
 	def catalogPath: Path = catalogPathStack.top
 
-	def setInstancePath(path: String): Unit = setInstancePath(Path.of(path))
+	def setInstancePath(path: String): Unit = setInstancePath(Paths.get(path))
 
 	def setInstancePath(path: Path): Unit = {
 		instancePathStack.push(path)
 	}
 
-	def pushInstancePath(path: String): Unit = pushInstancePath(Path.of(path))
+	def pushInstancePath(path: String): Unit = pushInstancePath(Paths.get(path))
 
 	def pushInstancePath(path: Path): Unit = {
 		val potIPath = instancePath.resolve(path);
@@ -129,7 +129,7 @@ object Game {
 
 	def instancePath: Path = instancePathStack.top
 
-	def pushOutPath(path: String): Unit = pushOutPath(Path.of(path))
+	def pushOutPath(path: String): Unit = pushOutPath(Paths.get(path))
 
 	def pushOutPath(path: Path): Unit = {
 		val potOPath = outPath.resolve(path);
@@ -186,20 +186,20 @@ object Game {
 	}
 
 	private def tryPaths(instance: InstanceTrait, resource: String, pass: Int): Path = {
-		val givenPath = Path.of(resolvePathMacros(instance, resource))
+		val givenPath = Paths.get(resolvePathMacros(instance, resource))
 		if (!Files.exists(givenPath)) {
-			val instancePath = Path.of(Game.resolvePathMacros(instance, "${instancePath}/" + resource))
+			val instancePath = Paths.get(Game.resolvePathMacros(instance, "${instancePath}/" + resource))
 			if (!Files.exists(instancePath)) {
-				val definitionPath = Path.of(Game.resolvePathMacros(instance, "${definitionPath}/" + resource))
+				val definitionPath = Paths.get(Game.resolvePathMacros(instance, "${definitionPath}/" + resource))
 				if (!Files.exists(definitionPath)) {
-					val outPath = Path.of(Game.resolvePathMacros(instance, "${outPath}/" + resource))
+					val outPath = Paths.get(Game.resolvePathMacros(instance, "${outPath}/" + resource))
 					if (!Files.exists(outPath)) {
 						if (pass == 0 && instance.definition.isInstanceOf[SoftwareDefinitionTrait]) {
 							val softDef = instance.definition.asInstanceOf[SoftwareDefinitionTrait]
 							tryPaths(instance, softDef.actionsFilePath.getParent.toString + "/" + resource, 1)
 						} else {
 							println(s"tryPath: $resource file not found")
-							Path.of("")
+							Paths.get("")
 						}
 					} else outPath
 				} else definitionPath
@@ -349,7 +349,7 @@ object Game {
 				for (include <- tincs) {
 					val table           = Utils.toTable(include)
 					val incResourceName = Utils.toString(table("resource"))
-					val incResourcePath = Path.of(incResourceName)
+					val incResourcePath = Paths.get(incResourceName)
 
 					prefabs.findPrefabInclude(incResourceName) match {
 						case Some(value) =>

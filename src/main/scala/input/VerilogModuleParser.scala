@@ -2,7 +2,7 @@ package input
 
 import overlord.Chip.BitsDesc
 
-import java.nio.file.{Files, Path}
+import java.nio.file.{Files, Path, Paths}
 import scala.collection.mutable
 
 sealed trait VerilogBoundary
@@ -46,13 +46,13 @@ object VerilogModuleParser {
 			moduleName = n
 			for {j <- i + 1 until txt.length} {
 				if (txt(j).nonEmpty &&
-				    !txt(j).strip().startsWith("""//""") &&
+				    !txt(j).trim().startsWith("""//""") &&
 				    !blockCommentRegEx.matches(txt(j))) {
 					val words = {
-						txt(j).strip().split("\\s")
+						txt(j).trim().split("\\s")
 							.filterNot(w => w == "wire" || w == "reg" || w == "integer")
 							.map(_.filter(c => (c.isLetterOrDigit || c == '_')))
-							.filterNot(_.isBlank)
+							.filterNot(_.isEmpty)
 							.filterNot(_ (0).isDigit)
 					}
 					if (words.length == 2 || words.length == 3) {

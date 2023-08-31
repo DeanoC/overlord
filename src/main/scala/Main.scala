@@ -1,7 +1,7 @@
 import ikuy_utils._
 import overlord._
 
-import java.nio.file.{Files, Path}
+import java.nio.file.{Files, Path, Paths}
 import scala.annotation.tailrec
 
 object Main {
@@ -79,13 +79,13 @@ object Main {
 		val board = options(Symbol("board")).asInstanceOf[String]
 
 		val filename = options(Symbol("infile")).asInstanceOf[String]
-		if (!Files.exists(Path.of(filename))) {
+		if (!Files.exists(Paths.get(filename))) {
 			println(usage)
 			println(s"$filename does not exists")
 			sys.exit(1)
 		}
-		val filePath = Path.of(filename)
-		val out      = Path.of(
+		val filePath = Paths.get(filename)
+		val out      = Paths.get(
 			if (!options.contains(Symbol("out"))) "."
 			else options(Symbol("out")).asInstanceOf[String]
 			).toAbsolutePath
@@ -97,7 +97,7 @@ object Main {
 
 		val resources =
 			if (!options.contains(Symbol("resources"))) None
-			else Some(overlord.Resources(Path.of(options(Symbol("resources"))
+			else Some(overlord.Resources(Paths.get(options(Symbol("resources"))
 				                                     .asInstanceOf[String])))
 
 
