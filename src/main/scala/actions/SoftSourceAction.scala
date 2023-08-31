@@ -3,9 +3,11 @@ package actions
 import ikuy_utils.{Utils, Variant}
 import overlord.Game
 import overlord.Instances.{InstanceTrait, ProgramInstance, SoftwareInstance}
+import java.nio.file.{Path, Paths}
 
 case class SoftSourceAction(override val phase: Int,
                             cpus: Seq[String],
+														catalog_path: Path,
                             in: String,
                             out: String)
 	extends Action() {
@@ -24,7 +26,7 @@ case class SoftSourceAction(override val phase: Int,
 			ofn = ofn.replace(s"$k", v.toCString)
 		}
 
-		val iPath = Game.tryPaths(instance, ifn)
+		val iPath = catalog_path.resolve(ofn)
 
 		val oPath = instance match {
 			case si: SoftwareInstance =>
@@ -36,6 +38,7 @@ case class SoftSourceAction(override val phase: Int,
 				Game.outPath
 					.resolve(folder)
 					.resolve(si.name)
+
 					.resolve(ofn)
 			case _                    =>
 				Game.outPath.resolve(ofn)
@@ -85,6 +88,7 @@ object SoftSourceAction {
 
 			SoftSourceAction(phase,
 			                 cpus,
+											 Game.catalogPath,
 			                 inFilename,
 			                 outFilename)
 		}

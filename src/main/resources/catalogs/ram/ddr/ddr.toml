@@ -1,5 +1,0 @@
-path = "ddr"
-
-resources = [
-    "ddr4/ddr4.toml",
-]

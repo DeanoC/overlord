@@ -9,7 +9,7 @@ import scala.language.postfixOps
 
 object Resources {
 	def stdResourcePath(): Path = {
-		overlordRootPath().resolve("src/main/resources/")
+		Paths.get("../ikuy_catalog/").toAbsolutePath.normalize()
 	}
 
 	def overlordRootPath(): Path =

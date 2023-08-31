@@ -1,9 +1,0 @@
-[[definition]]
-type = "other.ipi.zynqps8"
-registers = [
-    { resource = "zynqps8/ipi.toml", name = "IPI", base_address = "0x0230_0000" },
-    { resource = "zynqps8/ipi_buffer.toml", name = "IPI_BUFFER", base_address = "0x0299_0000" },
-]
-buses = [
-    { name = "lpdunitsswitch_ipi", supplier = false, data_width = 32 },
-]

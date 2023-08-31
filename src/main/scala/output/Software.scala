@@ -197,6 +197,7 @@ object Software {
 		           out.resolve("empty-file.ld"))
 
 		Utils.writeFile(out.resolve("make_software.sh"), sb.result())
+		Utils.setFileExecutable(out.resolve(s"make_software.sh"))
 	}
 
 	private def generateSubdirProgramMake(out: Path,

@@ -1,9 +1,0 @@
-[[definition]]
-type = "switch.spi.zynqps8"
-buses = [
-    { name = "lpdunitsswitch_spi${index}", supplier = false, data_width = 32 },
-]
-registers = [
-    { resource = "zynqps8/spi.toml", name = "SPI${index}", base_address = "0x0104_0000", address_increment = "0x1_0000" },
-]
-max_instances = 2

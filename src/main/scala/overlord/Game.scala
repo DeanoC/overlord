@@ -188,17 +188,17 @@ object Game {
 	private def tryPaths(instance: InstanceTrait, resource: String, pass: Int): Path = {
 		val givenPath = Paths.get(resolvePathMacros(instance, resource))
 		if (!Files.exists(givenPath)) {
-			val instancePath = Paths.get(Game.resolvePathMacros(instance, "${instancePath}/" + resource))
+			val instancePath = Paths.get(Game.resolvePathMacros(instance, "${instancePath}/" + resource)).normalize()
 			if (!Files.exists(instancePath)) {
-				val definitionPath = Paths.get(Game.resolvePathMacros(instance, "${definitionPath}/" + resource))
+				val definitionPath = Paths.get(Game.resolvePathMacros(instance, "${definitionPath}/" + resource)).normalize()
 				if (!Files.exists(definitionPath)) {
-					val outPath = Paths.get(Game.resolvePathMacros(instance, "${outPath}/" + resource))
+					val outPath = Paths.get(Game.resolvePathMacros(instance, "${outPath}/" + resource)).normalize()
 					if (!Files.exists(outPath)) {
 						if (pass == 0 && instance.definition.isInstanceOf[SoftwareDefinitionTrait]) {
 							val softDef = instance.definition.asInstanceOf[SoftwareDefinitionTrait]
 							tryPaths(instance, softDef.actionsFilePath.getParent.toString + "/" + resource, 1)
 						} else {
-							println(s"tryPath: $resource file not found")
+							println(s"tryPath: ${Paths.get(resource).normalize()} file not found")
 							Paths.get("")
 						}
 					} else outPath

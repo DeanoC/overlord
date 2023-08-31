@@ -84,11 +84,11 @@ object Main {
 			println(s"$filename does not exists")
 			sys.exit(1)
 		}
-		val filePath = Paths.get(filename)
+		val filePath = Paths.get(filename).toAbsolutePath().normalize()
 		val out      = Paths.get(
 			if (!options.contains(Symbol("out"))) "."
 			else options(Symbol("out")).asInstanceOf[String]
-			).toAbsolutePath
+			).toAbsolutePath.normalize()
 		Utils.ensureDirectories(out)
 
 		Game.setupPaths(filePath.getParent, Resources.stdResourcePath(), Resources.stdResourcePath(), out)
@@ -125,7 +125,10 @@ object Main {
 				sys.exit()
 		}
 
-		if (options.contains(Symbol("create"))) output.Project(game)
+		if (options.contains(Symbol("create"))) {
+			output.Project(game)
+			println(s"** Project created at $out **")
+		}
 		if (options.contains(Symbol("update"))) {
 			val instance = if (!options.contains(Symbol("instance"))) None
 			else Some(options(Symbol("instance")).asInstanceOf[String])
