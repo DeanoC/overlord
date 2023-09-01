@@ -37,7 +37,7 @@ case class SoftSourceAction(override val phase: Int,
 
 				Game.outPath
 					.resolve(folder)
-					.resolve(si.name.replace('.','/'))
+					.resolve(si.name.replace('.','_'))
 
 					.resolve(ofn)
 			case _                    =>

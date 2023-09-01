@@ -81,8 +81,8 @@ object Software {
 				} else None
 
 				if (all_cpus.isEmpty || all_cpus.get.contains(cpuName)) {
-					val sourcePath = libPath.resolve(lib.name)
-					val targetPath = out.resolve(s"libs_$cpuName").resolve(lib.name.replace('.', '/'))
+					val sourcePath = libPath.resolve(lib.name.replace('.', '_'))
+					val targetPath = out.resolve(s"libs_$cpuName").resolve(lib.name.replace('.', '_'))
 					libraryDefines += lib.name.replace('.', '_')
 
 					Utils.ensureDirectories(targetPath.getParent())
