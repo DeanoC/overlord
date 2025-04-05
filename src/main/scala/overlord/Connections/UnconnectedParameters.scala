@@ -1,6 +1,6 @@
 package overlord.Connections
 
-import ikuy_utils.{Utils, Variant}
+import gagameos.{Utils, Variant}
 import overlord.Instances.{ChipInstance, InstanceTrait}
 
 sealed trait ParameterType

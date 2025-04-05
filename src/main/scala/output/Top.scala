@@ -1,6 +1,6 @@
 package output
 
-import ikuy_utils._
+import gagameos._
 import overlord.Connections.{InstanceLoc, WildCardConnectionPriority, Wire}
 import overlord.Instances.{ChipInstance, ClockInstance, PinGroupInstance}
 import overlord._

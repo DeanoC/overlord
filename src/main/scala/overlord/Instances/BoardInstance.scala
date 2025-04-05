@@ -1,6 +1,6 @@
 package overlord.Instances
 
-import ikuy_utils._
+import gagameos._
 import overlord.Interfaces.UnconnectedLike
 import overlord.{ChipDefinitionTrait, Definition}
 import compat.TomlCompat.Value

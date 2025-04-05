@@ -1,6 +1,6 @@
 package output
 
-import ikuy_utils._
+import gagameos._
 import overlord.Connections.{ConstantParameterType, FrequencyParameterType}
 import overlord.{DiffPinConstraint, Game, PinConstraint}
 

@@ -1,6 +1,6 @@
 package overlord.Instances
 
-import ikuy_utils.{Utils, Variant}
+import gagameos.{Utils, Variant}
 import overlord.Chip.{Port, RegisterBank, Registers}
 import overlord.Interfaces._
 import overlord.{ChipDefinitionTrait, GatewareDefinitionTrait, HardwareDefinitionTrait}

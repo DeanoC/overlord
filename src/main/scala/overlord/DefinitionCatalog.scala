@@ -1,6 +1,6 @@
 package overlord
 
-import ikuy_utils._
+import gagameos._
 
 import java.nio.file.{Files, Path, Paths}
 import scala.collection.mutable

@@ -1,6 +1,6 @@
 package overlord
 
-import ikuy_utils.{ArrayV, Utils, Variant}
+import gagameos.{ArrayV, Utils, Variant}
 import overlord.Instances.BoardInstance
 
 import java.nio.file.{Path, Paths}
@@ -9,7 +9,7 @@ import scala.language.postfixOps
 
 object Resources {
 	def stdResourcePath(): Path = {
-		Paths.get("../ikuy_catalog/").toAbsolutePath.normalize()
+		Paths.get("../std_catalog/").toAbsolutePath.normalize()
 	}
 
 	def overlordRootPath(): Path =

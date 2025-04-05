@@ -1,6 +1,6 @@
 package overlord.Chip
+import gagameos._
 
-import ikuy_utils._
 
 sealed trait WireDirection {
 	override def toString: String = {

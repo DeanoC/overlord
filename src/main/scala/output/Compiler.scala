@@ -1,6 +1,6 @@
 package output
 
-import ikuy_utils.Utils
+import gagameos._
 import overlord.Instances.CpuInstance
 import overlord.{Game, Resources}
 

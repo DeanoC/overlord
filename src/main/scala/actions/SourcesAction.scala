@@ -1,6 +1,6 @@
 package actions
 
-import ikuy_utils._
+import gagameos._
 import overlord.Game
 import overlord.Instances.InstanceTrait
 

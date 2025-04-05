@@ -1,6 +1,6 @@
 package output
 
-import ikuy_utils.Utils
+import gagameos.Utils
 import overlord.Chip.{BitsDesc, Register}
 import overlord.Instances.{ChipInstance, CpuInstance}
 import overlord._

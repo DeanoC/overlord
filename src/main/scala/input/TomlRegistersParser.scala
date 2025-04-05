@@ -1,6 +1,6 @@
 package input
 
-import ikuy_utils.{BigIntV, StringV, TableV}
+import gagameos.{BigIntV, StringV, TableV}
 import overlord.Chip.{RegisterBank, Registers}
 import overlord.Instances.InstanceTrait
 

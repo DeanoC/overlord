@@ -1,6 +1,6 @@
 package actions
 
-import ikuy_utils.Variant
+import gagameos.Variant
 import overlord.Instances.InstanceTrait
 
 case class ShellAction(script: String,

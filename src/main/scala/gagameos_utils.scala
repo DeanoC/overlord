@@ -1,4 +1,4 @@
-package ikuy_utils
+package gagameos
 import com.electronwill.nightconfig.core.Config
 import com.electronwill.nightconfig.toml.TomlParser
 import compat.TomlCompat // Correct the import path

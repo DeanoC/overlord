@@ -1,7 +1,7 @@
 package overlord.Software
 
 import actions.ActionsFile
-import ikuy_utils.{StringV, Utils, Variant}
+import gagameos.{StringV, Utils, Variant}
 import overlord.{DefinitionType, Game, SoftwareDefinitionTrait}
 
 import java.nio.file.Path

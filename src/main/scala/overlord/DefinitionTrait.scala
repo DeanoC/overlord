@@ -1,7 +1,7 @@
 package overlord
 
 import actions.ActionsFile
-import ikuy_utils.{Utils, Variant}
+import gagameos.{Utils, Variant}
 import overlord.Chip.{ChipDefinition, Port, RegisterBank, Registers}
 import overlord.Instances._
 import overlord.Software.SoftwareDefinition

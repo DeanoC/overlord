@@ -1,8 +1,8 @@
 package overlord.Chip
 
 import actions.ActionsFile
-import ikuy_utils.Utils.VariantTable
-import ikuy_utils.{Utils, Variant}
+import gagameos.Utils.VariantTable
+import gagameos.{Utils, Variant}
 import overlord.{DefinitionType, Game, GatewareDefinitionTrait}
 
 import java.nio.file.{Path, Paths}

@@ -1,6 +1,6 @@
 package actions
 
-import ikuy_utils._
+import gagameos._
 import input.{VerilogParameterKey, VerilogPort}
 import overlord.Chip.{Port, WireDirection}
 import overlord.Game
@@ -34,8 +34,8 @@ case class ReadVerilogTopAction(filename: String)
 			}
 
 			instance.moduleName = module.name
-			val ports         = module.boundary.collect { case p: VerilogPort => p }
-			val parameterKeys = module.boundary.collect { case p: VerilogParameterKey => p }
+			val ports         = module.module_boundary.collect { case p: VerilogPort => p }
+			val parameterKeys = module.module_boundary.collect { case p: VerilogParameterKey => p }
 			ports.foreach(p => instance.mergePort(p.name, Port(p.name, p.bits, WireDirection(p.direction), p.knownWidth)))
 			parameterKeys.foreach(p => instance.mergeParameterKey(p.parameter))
 		}

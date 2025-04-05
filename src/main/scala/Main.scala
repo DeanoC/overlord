@@ -1,4 +1,4 @@
-import ikuy_utils._
+import gagameos._
 import overlord._
 
 import java.nio.file.{Files, Path, Paths}
@@ -8,17 +8,17 @@ object Main {
 	private val usage =
 		"""|Usage: overlord [create|report|svd] --options path filename
 		   |     : create - generate a compile project with all sub parts at 'out'
-		   |     : report - prints some info about over structure
+		   |     : report - prints some info about the overall structure
 		   |     : svd    - produce a CMSIS-SVD file on its own
 		   |     : --out  - path where generated files should be placed
-		   |     : --board - board defination to use
-		   |     : --nostdresources - don't use any the std catalog
-		   |     : --resources - TODO use specified path a root of resources tomls
-		   |		 : filename should be a .over file to use for the project"""
+		   |     : --board - board definition to use
+		   |     : --nostdresources - don't use the standard catalog
+		   |     : --resources - use the specified path as the root of resources tomls
+		   |     : filename should be a .over file to use for the project"""
 			.stripMargin
 
 	def main(args: Array[String]): Unit = {
-		if (args.length == 0) {
+		if (args.isEmpty) {
 			println(usage)
 			sys.exit(1)
 		}
@@ -26,38 +26,39 @@ object Main {
 
 		@tailrec
 		def nextOption(map: OptionMap, list: List[String]): OptionMap = {
-			def isSwitch(s: String) = s(0) == '-'
+			def isSwitch(s: String) = s.startsWith("-")
 
 			list match {
 				case Nil              => map
 				case "create" :: tail =>
-					nextOption(map ++ Map(Symbol("create") -> true), tail)
+					nextOption(map + (Symbol("create") -> true), tail)
 				case "update" :: tail =>
-					nextOption(map ++ Map(Symbol("update") -> true), tail)
+					nextOption(map + (Symbol("update") -> true), tail)
 				case "report" :: tail =>
-					nextOption(map ++ Map(Symbol("report") -> true), tail)
+					nextOption(map + (Symbol("report") -> true), tail)
 				case "svd" :: tail    =>
-					nextOption(map ++ Map(Symbol("svd") -> true), tail)
+					nextOption(map + (Symbol("svd") -> true), tail)
 
 				case ("--out" | "-o") :: value :: tail =>
-					nextOption(map ++ Map(Symbol("out") -> value), tail)
+					nextOption(map + (Symbol("out") -> value), tail)
 				case "--nostdresources" :: tail        =>
-					nextOption(map ++ Map(Symbol("nostdresources") -> true), tail)
+					nextOption(map + (Symbol("nostdresources") -> true), tail)
 				case "--nostdprefabs" :: tail          =>
-					nextOption(map ++ Map(Symbol("nostdresources") -> true), tail)
+					nextOption(map + (Symbol("nostdprefabs") -> true), tail)
 				case "--board" :: value :: tail        =>
-					nextOption(map ++ Map(Symbol("board") -> value), tail)
+					nextOption(map + (Symbol("board") -> value), tail)
 				case "--resources" :: value :: tail    =>
-					nextOption(map ++ Map(Symbol("resources") -> value), tail)
+					nextOption(map + (Symbol("resources") -> value), tail)
 				case "--instance" :: value :: tail     =>
-					nextOption(map ++ Map(Symbol("instance") -> value), tail)
+					nextOption(map + (Symbol("instance") -> value), tail)
 
 				case string :: opt2 :: tail if isSwitch(opt2) =>
-					nextOption(map ++ Map(Symbol("infile") -> string), list.tail)
+					nextOption(map + (Symbol("infile") -> string), list.tail)
 				case string :: Nil                            =>
-					nextOption(map ++ Map(Symbol("infile") -> string), list.tail)
-				case option :: tail                           =>
-					println("Unknown option " + option)
+					nextOption(map + (Symbol("infile") -> string), list.tail)
+				case option :: _                              =>
+					println(s"Unknown option: $option")
+					println(usage)
 					sys.exit(1)
 			}
 		}
@@ -65,76 +66,68 @@ object Main {
 		val options = nextOption(Map(), args.toList)
 		if (!options.contains(Symbol("infile"))) {
 			println(usage)
-			println("filename is required")
+			println("Error: filename is required")
 			sys.exit(1)
 		}
 
 		if (!options.contains(Symbol("board"))) {
 			println(usage)
-			println("board name is required")
-			println(options)
+			println("Error: board name is required")
 			sys.exit(1)
 		}
-
-		val board = options(Symbol("board")).asInstanceOf[String]
 
 		val filename = options(Symbol("infile")).asInstanceOf[String]
 		if (!Files.exists(Paths.get(filename))) {
 			println(usage)
-			println(s"$filename does not exists")
+			println(s"Error: $filename does not exist")
 			sys.exit(1)
 		}
-		val filePath = Paths.get(filename).toAbsolutePath().normalize()
-		val out      = Paths.get(
-			if (!options.contains(Symbol("out"))) "."
-			else options(Symbol("out")).asInstanceOf[String]
-			).toAbsolutePath.normalize()
+
+		val filePath = Paths.get(filename).toAbsolutePath.normalize()
+		val out = Paths.get(
+			options.getOrElse(Symbol("out"), ".").asInstanceOf[String]
+		).toAbsolutePath.normalize()
 		Utils.ensureDirectories(out)
 
 		Game.setupPaths(filePath.getParent, Resources.stdResourcePath(), Resources.stdResourcePath(), out)
 
 		val stdResources = Resources(Resources.stdResourcePath())
+		val resources = options.get(Symbol("resources")).map { path =>
+			overlord.Resources(Paths.get(path.asInstanceOf[String]))
+		}
 
-		val resources =
-			if (!options.contains(Symbol("resources"))) None
-			else Some(overlord.Resources(Paths.get(options(Symbol("resources"))
-				                                     .asInstanceOf[String])))
-
+		if (!options.contains(Symbol("nostdresources")) && !Files.exists(Resources.stdResourcePath())) {
+			println(s"Warning: Standard resource folder '${Resources.stdResourcePath()}' does not exist.")
+		}
 
 		val chipCatalog = new DefinitionCatalog
-
-		if (!options.contains(Symbol("nostdresources")))
+		if (!options.contains(Symbol("nostdresources"))) {
 			chipCatalog.mergeNewDefinition(stdResources.loadCatalogs())
-		if (resources.isDefined)
-			chipCatalog.mergeNewDefinition(resources.get.loadCatalogs())
+		}
+		resources.foreach(r => chipCatalog.mergeNewDefinition(r.loadCatalogs()))
 
 		val prefabCatalog = new PrefabCatalog
-		if (!options.contains(Symbol("nostdprefabs")))
+		if (!options.contains(Symbol("nostdprefabs"))) {
 			prefabCatalog.prefabs ++= stdResources.loadPrefabs()
-		if (resources.isDefined)
-			prefabCatalog.prefabs ++= resources.get.loadPrefabs()
+		}
+		resources.foreach(r => prefabCatalog.prefabs ++= r.loadPrefabs())
 
 		val gameName = filename.split('/').last.split('.').head
 
-		Game.setupPaths(filePath.getParent, filePath.getParent, filePath.getParent, out)
-
-		val game = Game(gameName, board, filePath, chipCatalog, prefabCatalog) match {
+		val game = Game(gameName, options(Symbol("board")).asInstanceOf[String], filePath, chipCatalog, prefabCatalog) match {
 			case Some(game) => game
 			case None       =>
 				println(s"Error parsing $filename")
-				sys.exit()
+				sys.exit(1)
 		}
 
 		if (options.contains(Symbol("create"))) {
 			output.Project(game)
 			println(s"** Project created at $out **")
-		}
-		if (options.contains(Symbol("update"))) {
-			val instance = if (!options.contains(Symbol("instance"))) None
-			else Some(options(Symbol("instance")).asInstanceOf[String])
+		} else if (options.contains(Symbol("update"))) {
+			val instance = options.get(Symbol("instance")).map(_.asInstanceOf[String])
 			output.UpdateProject(game, instance)
-		}
-		else {
+		} else {
 			if (options.contains(Symbol("report"))) output.Report(game)
 			if (options.contains(Symbol("svd"))) output.Svd(game)
 		}

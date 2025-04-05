@@ -1,6 +1,6 @@
 package overlord.Chip
 
-import ikuy_utils._
+import gagameos._
 import overlord.{ChipDefinitionTrait, DefinitionType, HardwareDefinitionTrait}
 
 import java.nio.file.Path

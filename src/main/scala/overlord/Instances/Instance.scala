@@ -1,6 +1,6 @@
 package overlord.Instances
 
-import ikuy_utils.{Utils, Variant}
+import gagameos.{Utils, Variant}
 import overlord.Chip.{ChipDefinition, Port}
 import overlord.Interfaces.QueryInterface
 import overlord.Software.SoftwareDefinition

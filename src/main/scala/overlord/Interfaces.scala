@@ -1,6 +1,6 @@
 package overlord.Interfaces
 
-import ikuy_utils.Variant
+import gagameos.Variant
 import overlord.Chip.{Port, RegisterBank}
 import overlord.Connections.{Connected, ConnectionDirection, Constant}
 import overlord.Instances.{ChipInstance, InstanceTrait}

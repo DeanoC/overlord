@@ -1,6 +1,6 @@
 package overlord.Instances
 
-import ikuy_utils._
+import gagameos._
 import overlord.ChipDefinitionTrait
 
 case class ClockInstance(name: String,

@@ -1,6 +1,6 @@
 package overlord.Chip
 
-import ikuy_utils.{StringV, Utils, Variant}
+import gagameos.{StringV, Utils, Variant}
 import overlord.Game
 import overlord.Instances.InstanceTrait
 

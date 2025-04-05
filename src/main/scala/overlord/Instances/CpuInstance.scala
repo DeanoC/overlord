@@ -1,6 +1,6 @@
 package overlord.Instances
 
-import ikuy_utils.{Utils, Variant}
+import gagameos.{Utils, Variant}
 import overlord.ChipDefinitionTrait
 import overlord.Interfaces.{BusLike, MultiBusLike, SupplierBusLike}
 

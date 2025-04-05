@@ -1,6 +1,6 @@
 package overlord.Connections
 
-import ikuy_utils.Utils
+import gagameos.Utils
 import overlord.Instances._
 import overlord.Interfaces.{MultiBusLike, PortsLike, RamLike, SupplierBusLike}
 

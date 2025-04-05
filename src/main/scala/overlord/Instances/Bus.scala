@@ -1,7 +1,7 @@
 package overlord.Instances
 
-import ikuy_utils.Utils.VariantTable
-import ikuy_utils.{ArrayV, BigIntV, Utils, Variant}
+import gagameos.Utils.VariantTable
+import gagameos.{ArrayV, BigIntV, Utils, Variant}
 import overlord.Interfaces.SupplierBusLike
 
 import scala.collection.mutable

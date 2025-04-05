@@ -1,6 +1,6 @@
 package actions
 
-import ikuy_utils.{Utils, Variant}
+import gagameos._
 import overlord.Game
 import overlord.Instances.{InstanceTrait, ProgramInstance, SoftwareInstance}
 import java.nio.file.{Path, Paths}

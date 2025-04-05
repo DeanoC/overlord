@@ -1,6 +1,6 @@
 package overlord.Instances
 
-import ikuy_utils.Variant
+import gagameos.Variant
 import overlord.SoftwareDefinitionTrait
 
 case class LibraryInstance(override val name: String,

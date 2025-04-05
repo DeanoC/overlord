@@ -1,6 +1,6 @@
 package overlord
 
-import ikuy_utils._
+import gagameos._
 import overlord.Chip.{BitsDesc, RegisterList, Registers}
 import overlord.Connections._
 import overlord.Instances._

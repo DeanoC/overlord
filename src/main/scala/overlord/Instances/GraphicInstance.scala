@@ -1,6 +1,6 @@
 package overlord.Instances
 
-import ikuy_utils.Variant
+import gagameos.Variant
 import overlord.ChipDefinitionTrait
 
 case class GraphicInstance(name: String,
