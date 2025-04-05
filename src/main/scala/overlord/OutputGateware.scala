@@ -52,7 +52,7 @@ object OutputGateware {
 							).toMap
 					})
 				} else Array[TableV]()
-		}.fold(Array())((o, n) => o ++ n).map(_.asInstanceOf[Variant])))
+		}.fold(Array[Variant]())((o, n) => o ++ n).map(_.asInstanceOf[Variant])))
 
 		val instanceParameters =
 			if (instance.attributes.contains("parameters")) {
@@ -67,7 +67,6 @@ object OutputGateware {
 			c.parameter.parameterType match {
 				case ConstantParameterType(value) => Some(name, value)
 				case FrequencyParameterType(freq) => Some(name, StringV(freq.toString + " Mhz"))
-				case _                            => None
 			}
 		}.toMap
 

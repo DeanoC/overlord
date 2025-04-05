@@ -2,6 +2,7 @@ package actions
 
 import ikuy_utils.{ArrayV, Utils, Variant}
 import overlord.Instances.{ChipInstance, InstanceTrait}
+import scala.util.boundary, boundary.break
 
 trait Action {
 	val phase : Int
@@ -43,26 +44,29 @@ object ActionsFile {
 			(for {taction <- Utils.toArray(parsed("actions"))
 			      action = Utils.toString(taction)} yield {
 
-				if (!processes.contains(action)) {
-					println(s"$action process not found in $name")
-					return None
-				}
-				val process = processes(action)
-				Utils.toString(process("processor")) match {
-					case "copy"                => CopyAction(name, process)
-					case "sources"             => SourcesAction(name, process)
-					case "git"                 => GitCloneAction(name, process)
-					case "python"              => PythonAction(name, process)
-					case "yaml"                => YamlAction(name, process)
-					case "toml"                => TomlAction(name, process)
-					case "sbt"                 => SbtAction(name, process)
-					case "read_verilog_top"    => ReadVerilogTopAction(name, process)
-					case "read_toml_registers" => ReadTomlRegistersAction(name, process)
-					case "templates"           => TemplateAction(name, process)
-					case "software_sources"    => SoftSourceAction(name, process)
-					case _                     =>
-						println(f"Unknown action processor (${Utils.toString(process("processor"))}) in $name")
-						return None
+				boundary {
+					if (!processes.contains(action)) {
+						println(s"$action process not found in $name")
+						break(None)
+					}
+
+					val process = processes(action)
+					Utils.toString(process("processor")) match {
+						case "copy"                => CopyAction(name, process)
+						case "sources"             => SourcesAction(name, process)
+						case "git"                 => GitCloneAction(name, process)
+						case "python"              => PythonAction(name, process)
+						case "yaml"                => YamlAction(name, process)
+						case "toml"                => TomlAction(name, process)
+						case "sbt"                 => SbtAction(name, process)
+						case "read_verilog_top"    => ReadVerilogTopAction(name, process)
+						case "read_toml_registers" => ReadTomlRegistersAction(name, process)
+						case "templates"           => TemplateAction(name, process)
+						case "software_sources"    => SoftSourceAction(name, process)
+						case _                     =>
+							println(f"Unknown action processor (${Utils.toString(process("processor"))}) in $name")
+							break(None)
+					}
 				}
 			}).flatten
 

@@ -1,12 +1,15 @@
 package ikuy_utils
-import toml.Value
+import com.electronwill.nightconfig.core.Config
+import com.electronwill.nightconfig.toml.TomlParser
+import compat.TomlCompat // Correct the import path
+import compat.TomlCompat.Value
 
 import java.io._
 import java.nio.file.{Files, Path}
 import scala.collection.compat.immutable.LazyList
 import scala.collection.mutable
-import scala.reflect.runtime.{universe => ru}
 import scala.util.{Failure, Success, Try}
+import scala.jdk.CollectionConverters.*
 
 sealed trait Variant {
 	def toTomlString: String
@@ -241,11 +244,11 @@ object Utils {
 				return Map[String, Variant]()
 		}
 
-		val tparsed = toml.Toml.parse(source)
-		if (tparsed.isLeft) {
-			println(s"$tomlPath has failed to parse with error ${tparsed.left}")
+		val tparsed = new TomlParser().parse(source)
+		if (tparsed == null) {
+			println(s"$tomlPath has failed to parse")
 			Map[String, Variant]()
-		} else tparsed.toOption.get.values.map(e => e._1 -> toVariant(e._2))
+		} else tparsed.entrySet().asScala.map(e => e.getKey -> toVariant(e.getValue)).toMap
 	}
 
 	def lookupString(tbl: VariantTable, key: String, or: String): String =
@@ -261,7 +264,7 @@ object Utils {
 	}
 
 	def toVariant(t: Value): Variant = t match {
-		case Value.Str(v)  => parseBigInt(v) match {
+		case Value.Str(v) => parseBigInt(v.asInstanceOf[String]) match { // Cast `v` to String
 			case Some(value) => BigIntV(value)
 			case None        => StringV(v)
 		}

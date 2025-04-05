@@ -122,8 +122,8 @@ object Registers {
 					else None
 
 					val enums = if (table.contains("enum")) {
-						for (enum <- Utils.toArray(table("enum"))) yield {
-							val table     = Utils.toTable(enum)
+						for (reg_enum <- Utils.toArray(table("enum"))) yield {
+							val table     = Utils.toTable(reg_enum)
 							val enumName  = Utils.toString(table("name"))
 							val enumValue = Utils.toBigInt(table("value"))
 							val enumDesc  = if (table.contains("description"))

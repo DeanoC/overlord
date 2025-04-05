@@ -61,19 +61,18 @@ case class Port(name: String,
 
 object Ports {
 	def apply(array: Array[Variant]): Seq[Port] =
-		array.toIndexedSeq.flatMap(_ match {
-			              case TableV(tbl) => if (tbl.contains("name")) {
-				              val name  = Utils.toString(tbl("name"))
-				              val width = Utils.lookupInt(tbl, "width", 1)
-				              val dir   = WireDirection(
-					              Utils.lookupString(tbl, "direction", "inout"))
-				              Some(Port(name, BitsDesc(width), dir))
-			              }
-			              else {
-				              println(s"$array is a port inline table without a name")
-				              None
-			              }
-			              case StringV(s)  => Some(Port(s, BitsDesc(1)))
-			              case _           => None
-		              })
+		array.toIndexedSeq.flatMap {
+			case TableV(tbl) =>
+				if (tbl.contains("name")) {
+					val name = Utils.toString(tbl("name"))
+					val width = Utils.lookupInt(tbl, "width", 1)
+					val dir = WireDirection(Utils.lookupString(tbl, "direction", "inout"))
+					Some(Port(name, BitsDesc(width), dir))
+				} else {
+					println(s"$array is a port inline table without a name")
+					None
+				}
+			case StringV(s) => Some(Port(s, BitsDesc(1)))
+			case _ => None
+		}
 }

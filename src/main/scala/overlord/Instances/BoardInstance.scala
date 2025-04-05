@@ -3,42 +3,42 @@ package overlord.Instances
 import ikuy_utils._
 import overlord.Interfaces.UnconnectedLike
 import overlord.{ChipDefinitionTrait, Definition}
-import toml.Value
+import compat.TomlCompat.Value
 
 import scala.collection.immutable
 
 sealed trait BoardType {
-	val defaults: Map[String, toml.Value]
+	val defaults: Map[String, Value]
 }
 
 case class XilinxBoard(family: String, device: String) extends BoardType {
 	override val defaults: Map[String, Value] =
-		immutable.Map[String, toml.Value](
-			("pullup" -> toml.Value.Bool(false)),
-			("slew" -> toml.Value.Str("Slow")),
-			("drive" -> toml.Value.Num(8)),
-			("direction" -> toml.Value.Str("None")),
-			("standard" -> toml.Value.Str("LVCMOS33"))
+		immutable.Map[String, Value](
+			("pullup" -> Value.Bool(false)),
+			("slew" -> Value.Str("Slow")),
+			("drive" -> Value.Num(8)),
+			("direction" -> Value.Str("None")),
+			("standard" -> Value.Str("LVCMOS33"))
 			)
 }
 
 case class AlteraBoard() extends BoardType {
 	override val defaults: Map[String, Value] =
-		immutable.Map[String, toml.Value]()
+		immutable.Map[String, Value]()
 }
 
 case class LatticeBoard() extends BoardType {
 	override val defaults: Map[String, Value] =
-		immutable.Map[String, toml.Value]()
+		immutable.Map[String, Value]()
 }
 
 case class BoardInstance(name: String,
                          boardType: BoardType,
                          override val definition: ChipDefinitionTrait,
-                         override var children: Seq[InstanceTrait] = Seq()
+                         override val children: Seq[InstanceTrait] = Seq()
                         ) extends ChipInstance with Container {
 	override val physical   : Boolean              = true
-	override var unconnected: Seq[UnconnectedLike] = Seq()
+	override val unconnected: Seq[UnconnectedLike] = Seq()
 
 	override def isVisibleToSoftware: Boolean = true
 }

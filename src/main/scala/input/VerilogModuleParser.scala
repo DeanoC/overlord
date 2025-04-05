@@ -41,7 +41,7 @@ object VerilogModuleParser {
 		val boundary   = mutable.ArrayBuffer[VerilogBoundary]()
 		for {i <- txt.indices;
 		     if txt(i).contains("module") && !txt(i).contains("endmodule")
-		     moduleRegEx(n) = txt(i)
+		     moduleRegEx(n) = txt(i): @unchecked
 		     } {
 			moduleName = n
 			for {j <- i + 1 until txt.length} {

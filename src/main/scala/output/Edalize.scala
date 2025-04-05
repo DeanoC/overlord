@@ -26,7 +26,7 @@ object Edalize {
 			 |
 			 |
 			 |""".stripMargin
-/*
+
 		sb ++=
 		s"""def prep_rom(name, in_path, out_path, bits_per_byte, data_width, size_in_bytes):
 			 |    "turns roms into form for bitstream"
@@ -54,6 +54,7 @@ object Edalize {
 			.stripMargin
 		//@formatter:on
 
+		/*
 		for {ram <- game.rams} {
 			ram.fillType match {
 				case PrimaryBootFillType() =>
@@ -71,8 +72,8 @@ object Edalize {
 					val bitsPerByte  = luInt("bits_per_byte", 0)
 					val busDataWidth = luInt("data_width", 0)
 					if (sizeInBytes <= 0 ||
-					    bitsPerByte <= 0 ||
-					    busDataWidth <= 0) {
+						bitsPerByte <= 0 ||
+						busDataWidth <= 0) {
 						println("invalid RAM setup")
 						return
 					}
@@ -86,18 +87,18 @@ object Edalize {
 
 
 					sb ++= s"\n\n" +
-					       s"prep_rom('${ram.ident}', \n" +
-					       s"         r'$inPath', \n" +
-					       s"         r'$outPath', \n" +
-					       s"         $bitsPerByte, \n" +
-					       s"         $busDataWidth, \n" +
-					       s"         $sizeInBytes)\n"
+						   s"prep_rom('${ram.ident}', \n" +
+						   s"         r'$inPath', \n" +
+						   s"         r'$outPath', \n" +
+						   s"         $bitsPerByte, \n" +
+						   s"         $busDataWidth, \n" +
+						   s"         $sizeInBytes)\n"
 
 				case _ | ZeroFillType() =>
+				}
 			}
 
-		}*/
-val buildPath = Game.projectPath.resolve("build")
+		val buildPath = Game.projectPath.resolve("build")
 		Utils.ensureDirectories(buildPath)
 		sb ++= s"work_root = '${buildPath.toString.replace("\\", "\\\\")}'\n"
 		sb ++= s"name = '${game.name}'\n"
@@ -110,18 +111,14 @@ val buildPath = Game.projectPath.resolve("build")
 
 		sb ++= "files = [\n"
 		for {gw <- game.gatewares
-		     defi = gw.definition.asInstanceOf[GatewareDefinitionTrait]} {
+			 defi = gw.definition.asInstanceOf[GatewareDefinitionTrait]} {
 			defi.actionsFile.actions.foreach {
+				// @formatter:off
 				case action: CopyAction =>
-					sb ++=
-					// @formatter:off
-s"""    {'name': '${action.getDestPath}', 'file_type': '${action.language}Source'},\n"""
-						// @formatter:on
+					sb ++= s"""    {'name': '${action.getDestPath}', 'file_type': '${action.language}Source'},\n"""
 				case action: SourcesAction =>
-					sb ++=
-					// @formatter:off
-s"""    {'name': '${action.getSrcPath}', 'file_type': '${action.language}Source'},\n"""
-						// @formatter:on
+					sb ++= s"""    {'name': '${action.getSrcPath}', 'file_type': '${action.language}Source'},\n"""
+				// @formatter:on
 				case _ =>
 			}
 		}
@@ -131,9 +128,9 @@ s"""    {'name': '${action.getSrcPath}', 'file_type': '${action.language}Source'
 
 		sb ++=
 		// @formatter:off
-s"""    {'name': '${absTopFilePath.toString}', 'file_type': 'verilogSource'},\n"""
+s"""    {'name': '${absTopFilePath.toString}', 'file_type': 'verilogSource'},\n""" // Adjust indentation
 		sb ++=
-s"""    {'name': '${absXDCFilePath.toString}', 'file_type': 'xdc'}\n"""
+s"""    {'name': '${absXDCFilePath.toString}', 'file_type': 'xdc'}\n""" // Adjust indentation
 		// @formatter:on
 
 		sb ++= "]\n"
@@ -161,14 +158,15 @@ s"""    {'name': '${absXDCFilePath.toString}', 'file_type': 'xdc'}\n"""
 		sb ++=
 		s"""|
 			  |if not os.path.isdir(work_root):
-		    |  os.makedirs(work_root)
-		    |
-		    |backend.configure()
-		    |backend.build()
-		    |
-		    |""".stripMargin
+			|  os.makedirs(work_root)
+			|
+			|backend.configure()
+			|backend.build()
+			|
+			|""".stripMargin
 
 		Utils.writeFile(Game.outPath.resolve("edalize_build.py"), sb.result())
+		*/
 	}
 
 }

@@ -1,6 +1,6 @@
 package overlord.Instances
 
-import ikuy_utils.Utils
+import ikuy_utils.{Utils, Variant}
 import overlord.Chip.{Port, RegisterBank, Registers}
 import overlord.Interfaces._
 import overlord.{ChipDefinitionTrait, GatewareDefinitionTrait, HardwareDefinitionTrait}
@@ -16,7 +16,18 @@ trait ChipInstance extends InstanceTrait with PortsLike with RegisterBankLike wi
 	lazy         val ports                : mutable.HashMap[String, Port]     = mutable.HashMap[String, Port](definition.ports.toSeq: _*)
 	lazy         val instanceRegisterBanks: mutable.ArrayBuffer[RegisterBank] = {
 		if (attributes.contains("registers")) {
-			Registers(this, Utils.toArray(attributes("registers"))).toIndexedSeq.to(mutable.ArrayBuffer)
+			// Use scala.collection.immutable.ArraySeq to avoid implicit array conversion
+			import scala.collection.immutable.ArraySeq
+			val registersVariant = attributes("registers")
+			val registerArray = 
+				if (registersVariant.isInstanceOf[Array[_]]) {
+					// If it's already an array, use ArraySeq.unsafeWrapArray
+					ArraySeq.unsafeWrapArray(registersVariant.asInstanceOf[Array[Variant]])
+				} else {
+					// Otherwise convert to a Seq and then to an ArrayBuffer
+					Utils.toArray(registersVariant).toIndexedSeq
+				}
+			mutable.ArrayBuffer.from(Registers(this, registerArray))
 		} else mutable.ArrayBuffer()
 	}
 	private lazy val hasRegisters         : Boolean                           = registerBanks.nonEmpty

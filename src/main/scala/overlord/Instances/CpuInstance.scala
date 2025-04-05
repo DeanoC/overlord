@@ -22,18 +22,22 @@ case class CpuInstance(name: String,
 	private val busSpecs         : Seq[BusSpec] = {
 		val attrs = definition.attributes
 		if (!attrs.contains("buses")) Seq()
-		else Utils.toArray(attrs("buses")).map(
-			b => {
-				val table = Utils.toTable(b)
-				BusSpec(name = Utils.lookupString(table, "name", "NO_NAME"),
-				        supplier = Utils.lookupBoolean(table, "supplier", true),
-				        protocol = Utils.lookupString(table, "protocol", "internal"),
-				        prefix = Utils.lookupString(table, "prefix", "internal"),
-				        baseAddr = Utils.lookupBigInt(table, "base_address", 0),
-				        dataWidth = Utils.lookupBigInt(table, "data_width", 32),
-				        addrWidth = Utils.lookupBigInt(table, "address_width", 32),
-				        fixedAddress = Utils.lookupBoolean(table, "fixed_base_address", or = false))
-			})
+		else {
+			// Using explicit toIndexedSeq instead of implicit conversion
+			val busesArray = Utils.toArray(attrs("buses"))
+			busesArray.toIndexedSeq.map(
+				b => {
+					val table = Utils.toTable(b)
+					BusSpec(name = Utils.lookupString(table, "name", "NO_NAME"),
+							supplier = Utils.lookupBoolean(table, "supplier", true),
+							protocol = Utils.lookupString(table, "protocol", "internal"),
+							prefix = Utils.lookupString(table, "prefix", "internal"),
+							baseAddr = Utils.lookupBigInt(table, "base_address", 0),
+							dataWidth = Utils.lookupBigInt(table, "data_width", 32),
+							addrWidth = Utils.lookupBigInt(table, "address_width", 32),
+							fixedAddress = Utils.lookupBoolean(table, "fixed_base_address", or = false))
+				})
+		}
 	}
 	private val buses            : Seq[Bus]     = busSpecs.map(Bus(this, name, definition.attributes, _))
 

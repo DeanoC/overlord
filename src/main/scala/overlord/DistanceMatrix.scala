@@ -165,7 +165,7 @@ object DistanceMatrix {
 			instance match {
 				case container: Container =>
 					flattenInstances(container.chipChildren) ++
-					(if (container.physical) Array(instance) else Array())
+					(if (container.physical) Array(instance) else Array[ChipInstance]())
 				case _                    => Array(instance)
 			}
 			).toArray.flatten

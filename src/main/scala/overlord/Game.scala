@@ -225,7 +225,7 @@ object Game {
 				return None
 			}
 
-			val rootContainer = new RootContainer
+			val rootContainer = new MutableContainer
 			injectBoard(rootContainer)
 			flattenContainers(rootContainer)
 
@@ -252,17 +252,17 @@ object Game {
 			          wires))
 		}
 
-		private def flattenContainers(rootContainer: RootContainer): Unit = {
+		private def flattenContainers(rootContainer: MutableContainer): Unit = {
 			// flatten all containers
 			for (c <- containerStack.popAll()) {
-				rootContainer.children ++= c.children
-				rootContainer.unconnected ++= c.unconnected
+				rootContainer.mutableChildren ++= c.children
+				rootContainer.mutableUnconnected ++= c.unconnected
 			}
 
 			containerStack.clear()
 		}
 
-		private def outputSoftware(rootContainer: RootContainer,
+		private def outputSoftware(rootContainer: Container,
 		                           connected: Seq[Connected],
 		                           distanceMatrix: DistanceMatrix): Unit = {
 			pushOutPath("soft/tmp")
@@ -282,16 +282,17 @@ object Game {
 		}
 
 		private def generateInstances(path: Path): Boolean = {
-			containerStack.push(RootContainer())
+			var newContainer = MutableContainer()
+			containerStack.push(newContainer)
 			val parsed = Utils.readToml(path)
 			if (parsed.contains("defaults")) defaults ++= Utils.toTable(parsed("defaults"))
-			if (!processInstantiations(parsed, containerStack.top)) {
+			if (!processInstantiations(parsed, newContainer)) {
 				println(s"Instantiation failed")
 				false
 			} else true
 		}
 
-		private def injectBoard(rootContainer: RootContainer) = {
+		private def injectBoard(rootContainer: MutableContainer) = {
 			// pass the board as if it had been a prefab in the main project file
 			val boardInsertV = Map[String, Variant](
 				"instance" -> ArrayV(Array(
@@ -307,7 +308,7 @@ object Game {
 			processInstantiations(boardInsertV, rootContainer)
 		}
 
-		private def connectAndOutputChips(rootContainer: RootContainer) = {
+		private def connectAndOutputChips(rootContainer: MutableContainer) = {
 			pushOutPath("gate")
 			Utils.ensureDirectories(outPath)
 
@@ -341,7 +342,7 @@ object Game {
 		}
 
 		private def processInstantiations(parsed: Map[String, Variant],
-		                                  container: Container): Boolean = {
+		                                  container: MutableContainer): Boolean = {
 
 			// includes
 			if (parsed.contains("include")) {
@@ -374,13 +375,13 @@ object Game {
 				val instancesWanted = Utils.toArray(parsed("instance"))
 				val instances       = instancesWanted.flatMap(Instance(_, defaults.toMap, catalogs))
 				// do dependencies later when everything is flattened
-				container.children ++= instances
+				container.mutableChildren ++= instances
 			}
 
 			// extract connections
 			if (parsed.contains("connection")) {
 				val connections = Utils.toArray(parsed("connection"))
-				container.unconnected ++= connections.flatMap(Unconnected(_))
+				container.mutableUnconnected ++= connections.flatMap(Unconnected(_))
 			}
 
 			var okay = true
@@ -403,7 +404,7 @@ object Game {
 			okay
 		}
 
-		private def resolveSoftwareDependencies(rootContainer: RootContainer): Unit = {
+		private def resolveSoftwareDependencies(rootContainer: MutableContainer): Unit = {
 			// add all instances, so we can check for software dependencies (including drivers for hardware)
 			val depSet: mutable.Set[InstanceTrait] = rootContainer.children.to(mutable.Set)
 
@@ -432,7 +433,7 @@ object Game {
 								if (opt.nonEmpty) {
 									val inst = opt.get
 									assert(inst.isInstanceOf[SoftwareInstance])
-									rootContainer.children ++= Seq(inst)
+									rootContainer.mutableChildren ++= Seq(inst)
 									depSet += inst.asInstanceOf[SoftwareInstance]
 									inst.definition.dependencies.filterNot(d => depStack.contains(d)).foreach(depStack.push)
 									found = true;

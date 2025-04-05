@@ -5,6 +5,7 @@ import input.{VerilogParameterKey, VerilogPort}
 import overlord.Chip.{Port, WireDirection}
 import overlord.Game
 import overlord.Instances.{ChipInstance, InstanceTrait}
+import scala.util.boundary, boundary.break
 
 case class ReadVerilogTopAction(filename: String)
 	extends GatewareAction {
@@ -20,20 +21,24 @@ case class ReadVerilogTopAction(filename: String)
 	}
 
 	override def execute(instance: ChipInstance, parameters: Map[String, Variant]): Unit = {
+		import scala.util.boundary, boundary.break
+
 		val expandedName = Game.resolveInstanceMacros(instance, filename)
 		val modules      = input.VerilogModuleParser(Game.tryPaths(instance, expandedName), instance.name)
-		val module       = modules.find(_.name == instance.name).getOrElse {
-			modules.find(_.name == expandedName.split("/").last.replace(".v", "")).getOrElse(
-				return
-				)
+
+		boundary {
+			val module = modules.find(_.name == instance.name).getOrElse {
+				modules.find(_.name == expandedName.split("/").last.replace(".v", "")).getOrElse {
+					break(())
+				}
+			}
+
+			instance.moduleName = module.name
+			val ports         = module.boundary.collect { case p: VerilogPort => p }
+			val parameterKeys = module.boundary.collect { case p: VerilogParameterKey => p }
+			ports.foreach(p => instance.mergePort(p.name, Port(p.name, p.bits, WireDirection(p.direction), p.knownWidth)))
+			parameterKeys.foreach(p => instance.mergeParameterKey(p.parameter))
 		}
-
-		instance.moduleName = module.name
-		val ports         = module.boundary.collect { case p: VerilogPort => p }
-		val parameterKeys = module.boundary.collect { case p: VerilogParameterKey => p }
-		ports.foreach(p => instance.mergePort(p.name, Port(p.name, p.bits, WireDirection(p.direction), p.knownWidth)))
-		parameterKeys.foreach(p => instance.mergeParameterKey(p.parameter))
-
 	}
 }
 
