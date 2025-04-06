@@ -1,8 +1,21 @@
 package overlord.Connections
 
 import overlord.Hardware.Port
-import overlord.{BiDirectionConnection, ConnectionDirection, DefinitionTrait, GatewareDefinitionTrait, HardwareDefinitionTrait, QueryInterface, SoftwareDefinitionTrait}
-import overlord.Instances.{ChipInstance, ClockInstance, InstanceTrait, PinGroupInstance}
+import overlord.{
+  BiDirectionConnection,
+  ConnectionDirection,
+  DefinitionTrait,
+  GatewareDefinitionTrait,
+  HardwareDefinitionTrait,
+  QueryInterface,
+  SoftwareDefinitionTrait
+}
+import overlord.Instances.{
+  ChipInstance,
+  ClockInstance,
+  InstanceTrait,
+  PinGroupInstance
+}
 
 sealed trait ConnectionPriority
 
@@ -14,57 +27,64 @@ case class ExplicitConnectionPriority() extends ConnectionPriority
 
 case class FakeConnectionPriority() extends ConnectionPriority
 
-case class InstanceLoc(instance: InstanceTrait,
-                       port: Option[Port],
-                       fullName: String) {
-	def definition: DefinitionTrait = instance.definition
+case class InstanceLoc(
+    instance: InstanceTrait,
+    port: Option[Port],
+    fullName: String
+) {
+  def definition: DefinitionTrait = instance.definition
 
-	val isHardware: Boolean = definition.isInstanceOf[HardwareDefinitionTrait]
+  val isHardware: Boolean = definition.isInstanceOf[HardwareDefinitionTrait]
 
-	def isGateware: Boolean = definition.isInstanceOf[GatewareDefinitionTrait]
+  def isGateware: Boolean = definition.isInstanceOf[GatewareDefinitionTrait]
 
-	def isSoftware: Boolean = definition.isInstanceOf[SoftwareDefinitionTrait]
+  def isSoftware: Boolean = definition.isInstanceOf[SoftwareDefinitionTrait]
 
-	def isPin: Boolean = instance.isInstanceOf[PinGroupInstance]
+  def isPin: Boolean = instance.isInstanceOf[PinGroupInstance]
 
-	def isClock: Boolean = instance.isInstanceOf[ClockInstance]
+  def isClock: Boolean = instance.isInstanceOf[ClockInstance]
 
-	def isChip: Boolean = !(isPin || isClock)
+  def isChip: Boolean = !(isPin || isClock)
 
 }
 
 trait Connected extends QueryInterface {
-	val connectionPriority: ConnectionPriority
+  val connectionPriority: ConnectionPriority
 
-	def connectedTo(inst: ChipInstance): Boolean
+  def connectedTo(inst: ChipInstance): Boolean
 
-	def connectedBetween(s: ChipInstance, e: ChipInstance): Boolean = connectedBetween(s, e, BiDirectionConnection())
+  def connectedBetween(s: ChipInstance, e: ChipInstance): Boolean =
+    connectedBetween(s, e, BiDirectionConnection())
 
-	def connectedBetween(s: ChipInstance, e: ChipInstance, d: ConnectionDirection): Boolean
+  def connectedBetween(
+      s: ChipInstance,
+      e: ChipInstance,
+      d: ConnectionDirection
+  ): Boolean
 
-	def first: Option[InstanceLoc]
+  def first: Option[InstanceLoc]
 
-	def direction: ConnectionDirection
+  def direction: ConnectionDirection
 
-	def second: Option[InstanceLoc]
+  def second: Option[InstanceLoc]
 
-	def firstFullName: String
+  def firstFullName: String
 
-	def secondFullName: String
+  def secondFullName: String
 
-	def firstLastName: String = firstFullName.split('.').last
+  def firstLastName: String = firstFullName.split('.').last
 
-	def secondLastName: String = secondFullName.split('.').last
+  def secondLastName: String = secondFullName.split('.').last
 
-	def firstHeadName: String = firstFullName.split('.').head
+  def firstHeadName: String = firstFullName.split('.').head
 
-	def secondHeadName: String = secondFullName.split('.').head
+  def secondHeadName: String = secondFullName.split('.').head
 
-	def isPinToChip: Boolean
+  def isPinToChip: Boolean
 
-	def isChipToChip: Boolean
+  def isChipToChip: Boolean
 
-	def isChipToPin: Boolean
+  def isChipToPin: Boolean
 
-	def isClock: Boolean
+  def isClock: Boolean
 }

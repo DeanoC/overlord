@@ -31,32 +31,32 @@ import overlord.Project as OverlordProject
 //
 
 object Project {
-	def apply(game: OverlordProject): Unit = {
-		val out = OverlordProject.outPath
-		println(s"Creating project at ${out.toRealPath()}")
+  def apply(game: OverlordProject): Unit = {
+    val out = OverlordProject.outPath
+    println(s"Creating project at ${out.toRealPath()}")
 
-		output.Report(game)
+    output.Report(game)
 
-		OverlordProject.pushOutPath("gate")
-		output.Xdc(game)
-		output.Top(game)
-		output.Edalize(game)
-		OverlordProject.popOutPath()
+    OverlordProject.pushOutPath("gate")
+    output.Xdc(game)
+    output.Top(game)
+    output.Edalize(game)
+    OverlordProject.popOutPath()
 
-		OverlordProject.pushOutPath("soft")
-		output.Software(game)
-		OverlordProject.popOutPath()
-	}
+    OverlordProject.pushOutPath("soft")
+    output.Software(game)
+    OverlordProject.popOutPath()
+  }
 }
 
 object UpdateProject {
-	def apply(game: OverlordProject, instance: Option[String]): Unit = {
-		instance match {
-			case Some(inst) =>
+  def apply(game: OverlordProject, instance: Option[String]): Unit = {
+    instance match {
+      case Some(inst) =>
 
-			case None =>
-				// TODO for now just call create Project
-				Project(game)
-		}
-	}
+      case None =>
+        // TODO for now just call create Project
+        Project(game)
+    }
+  }
 }

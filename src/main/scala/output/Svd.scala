@@ -13,8 +13,9 @@ import scala.xml.PrettyPrinter
 object Svd {
   def apply(game: Project): Unit = {
 
-    val cpus = for (cpu <- game.cpus) yield 
-      <cpu>
+    val cpus =
+      for (cpu <- game.cpus)
+        yield <cpu>
         {outputCpu(cpu)}
       </cpu>
 
@@ -42,7 +43,7 @@ object Svd {
           <cpus>{cpus}</cpus>
         </vendorExtensions>
       </device>
-    //@formatter:on
+    // @formatter:on
 
     val out = Project.outPath
     Utils.ensureDirectories(out)
@@ -52,9 +53,10 @@ object Svd {
     Utils.ensureDirectories(etc)
     Utils.copy(Paths.get("etc/CMSIS-SVD.xsd"), etc.resolve("CMSIS-SVD.xsd"))
 
-    val path = if (out.toFile.isDirectory)
-      out.resolve(s"${game.name}.svd")
-    else out
+    val path =
+      if (out.toFile.isDirectory)
+        out.resolve(s"${game.name}.svd")
+      else out
 
     Utils.writeFile(path, new PrettyPrinter(Int.MaxValue, 2).format(deviceXml))
   }

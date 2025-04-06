@@ -11,18 +11,18 @@ import scala.collection.mutable
 import scala.reflect.ClassTag
 import scala.util.boundary, boundary.break
 
-/**
- * Represents a project in the Overlord system, containing instances, connections, constants, and more.
- * Provides utility methods for managing and interacting with the project structure.
- */
+/** Represents a project in the Overlord system, containing instances,
+  * connections, constants, and more. Provides utility methods for managing and
+  * interacting with the project structure.
+  */
 case class Project(
-  name: String,
-  children: Seq[InstanceTrait],
-  connected: Seq[Connected],
-  constants: Seq[Constant],
-  distanceMatrix: DistanceMatrix,
-  busDistanceMatrix: DistanceMatrix,
-  wires: Seq[Wire]
+    name: String,
+    children: Seq[InstanceTrait],
+    connected: Seq[Connected],
+    constants: Seq[Constant],
+    distanceMatrix: DistanceMatrix,
+    busDistanceMatrix: DistanceMatrix,
+    wires: Seq[Wire]
 ) {
   // Lazy evaluation of connected gateware instances.
   lazy val setOfConnectedGateware: Set[ChipInstance] = {
@@ -49,64 +49,112 @@ case class Project(
   }
 
   lazy val flatChipChildren: Seq[ChipInstance] =
-    children.filter(_.isInstanceOf[ChipInstance]).map(_.asInstanceOf[ChipInstance]) ++
-    children.filter(_.isInstanceOf[Container]).map(_.asInstanceOf[Container]).flatMap(_.flatChildren.map(_.asInstanceOf[ChipInstance]))
+    children
+      .filter(_.isInstanceOf[ChipInstance])
+      .map(_.asInstanceOf[ChipInstance]) ++
+      children
+        .filter(_.isInstanceOf[Container])
+        .map(_.asInstanceOf[Container])
+        .flatMap(_.flatChildren.map(_.asInstanceOf[ChipInstance]))
 
-  lazy val flatSoftwareChildren: Seq[SoftwareInstance] = children.filter(_.isInstanceOf[SoftwareInstance]).map(_.asInstanceOf[SoftwareInstance])
+  lazy val flatSoftwareChildren: Seq[SoftwareInstance] = children
+    .filter(_.isInstanceOf[SoftwareInstance])
+    .map(_.asInstanceOf[SoftwareInstance])
 
   lazy val allChipInstances: Seq[ChipInstance] = flatChipChildren
 
   lazy val allSoftwareInstances: Seq[SoftwareInstance] = flatSoftwareChildren
 
-  lazy val cpus: Seq[CpuInstance] = flatChipChildren.filter(_.isInstanceOf[CpuInstance]).map(_.asInstanceOf[CpuInstance])
+  lazy val cpus: Seq[CpuInstance] = flatChipChildren
+    .filter(_.isInstanceOf[CpuInstance])
+    .map(_.asInstanceOf[CpuInstance])
 
-  lazy val storages: Seq[StorageInstance] = flatChipChildren.filter(_.isInstanceOf[StorageInstance]).map(_.asInstanceOf[StorageInstance])
+  lazy val storages: Seq[StorageInstance] = flatChipChildren
+    .filter(_.isInstanceOf[StorageInstance])
+    .map(_.asInstanceOf[StorageInstance])
 
-  lazy val nets: Seq[NetInstance] = flatChipChildren.filter(_.isInstanceOf[NetInstance]).map(_.asInstanceOf[NetInstance])
+  lazy val nets: Seq[NetInstance] = flatChipChildren
+    .filter(_.isInstanceOf[NetInstance])
+    .map(_.asInstanceOf[NetInstance])
 
-  lazy val pins: Seq[PinGroupInstance] = flatChipChildren.filter(_.isInstanceOf[PinGroupInstance]).map(_.asInstanceOf[PinGroupInstance])
+  lazy val pins: Seq[PinGroupInstance] = flatChipChildren
+    .filter(_.isInstanceOf[PinGroupInstance])
+    .map(_.asInstanceOf[PinGroupInstance])
 
-  lazy val clocks: Seq[ClockInstance] = flatChipChildren.filter(_.isInstanceOf[ClockInstance]).map(_.asInstanceOf[ClockInstance])
+  lazy val clocks: Seq[ClockInstance] = flatChipChildren
+    .filter(_.isInstanceOf[ClockInstance])
+    .map(_.asInstanceOf[ClockInstance])
 
-  lazy val gatewares: Seq[ChipInstance] = flatChipChildren.filter(_.definition.isInstanceOf[GatewareDefinitionTrait])
+  lazy val gatewares: Seq[ChipInstance] =
+    flatChipChildren.filter(_.definition.isInstanceOf[GatewareDefinitionTrait])
 
-  lazy val libraries: Seq[LibraryInstance] = flatSoftwareChildren.filter(_.isInstanceOf[LibraryInstance]).map(_.asInstanceOf[LibraryInstance])
+  lazy val libraries: Seq[LibraryInstance] = flatSoftwareChildren
+    .filter(_.isInstanceOf[LibraryInstance])
+    .map(_.asInstanceOf[LibraryInstance])
 
-  lazy val programs: Seq[ProgramInstance] = flatSoftwareChildren.filter(_.isInstanceOf[ProgramInstance]).map(_.asInstanceOf[ProgramInstance])
+  lazy val programs: Seq[ProgramInstance] = flatSoftwareChildren
+    .filter(_.isInstanceOf[ProgramInstance])
+    .map(_.asInstanceOf[ProgramInstance])
 
-  lazy val board: Option[BoardInstance] = children.find(_.isInstanceOf[BoardInstance]).asInstanceOf[Option[BoardInstance]]
+  lazy val board: Option[BoardInstance] = children
+    .find(_.isInstanceOf[BoardInstance])
+    .asInstanceOf[Option[BoardInstance]]
 
+  /** Retrieves interfaces of a specific type directly connected to a given chip
+    * instance.
+    *
+    * @param instance
+    *   The chip instance to check connections for.
+    * @tparam T
+    *   The type of interface to retrieve.
+    * @return
+    *   A sequence of interfaces of type T directly connected to the instance.
+    */
+  def getInterfacesDirectlyConnectedTo[T <: ChipLike](
+      instance: ChipInstance
+  )(implicit tag: ClassTag[T]): Seq[T] =
+    flatChipChildren
+      .flatMap(c => c.getInterface[T])
+      .filter(f => distanceMatrix.distanceBetween(instance, f.getOwner) == 1)
 
-  /**
-   * Retrieves interfaces of a specific type directly connected to a given chip instance.
-   *
-   * @param instance The chip instance to check connections for.
-   * @tparam T The type of interface to retrieve.
-   * @return A sequence of interfaces of type T directly connected to the instance.
-   */
-  def getInterfacesDirectlyConnectedTo[T <: ChipLike](instance: ChipInstance)(implicit tag: ClassTag[T]): Seq[T] =
-    flatChipChildren.flatMap(c => c.getInterface[T]).filter(f => distanceMatrix.distanceBetween(instance, f.getOwner) == 1)
+  /** Retrieves instances with a specific type of interface between two chip
+    * instances.
+    *
+    * @param start
+    *   The starting chip instance.
+    * @param end
+    *   The ending chip instance.
+    * @tparam T
+    *   The type of interface to check for.
+    * @return
+    *   A sequence of chip instances with the specified interface type between
+    *   the start and end instances.
+    */
+  def getInstancesWithInterfaceBetween[T <: ChipLike](
+      start: ChipInstance,
+      end: ChipInstance
+  )(implicit tag: ClassTag[T]): Seq[ChipInstance] =
+    getInterfacesConnectedTo[T](start).flatMap(inf =>
+      if (distanceMatrix.isConnectedBetween(inf.getOwner, end)) Some(end)
+      else None
+    )
 
-  /**
-   * Retrieves instances with a specific type of interface between two chip instances.
-   *
-   * @param start The starting chip instance.
-   * @param end The ending chip instance.
-   * @tparam T The type of interface to check for.
-   * @return A sequence of chip instances with the specified interface type between the start and end instances.
-   */
-  def getInstancesWithInterfaceBetween[T <: ChipLike](start: ChipInstance, end: ChipInstance)(implicit tag: ClassTag[T]): Seq[ChipInstance] =
-    getInterfacesConnectedTo[T](start).flatMap(inf => if (distanceMatrix.isConnectedBetween(inf.getOwner, end)) Some(end) else None)
-
-  /**
-   * Retrieves interfaces of a specific type connected to a given chip instance.
-   *
-   * @param instance The chip instance to check connections for.
-   * @tparam T The type of interface to retrieve.
-   * @return A sequence of interfaces of type T connected to the instance.
-   */
-  def getInterfacesConnectedTo[T <: ChipLike](instance: ChipInstance)(implicit tag: ClassTag[T]): Seq[T] =
-    flatChipChildren.flatMap(_.getInterface[T]).filter(f => distanceMatrix.isConnectedBetween(instance, f.getOwner))
+  /** Retrieves interfaces of a specific type connected to a given chip
+    * instance.
+    *
+    * @param instance
+    *   The chip instance to check connections for.
+    * @tparam T
+    *   The type of interface to retrieve.
+    * @return
+    *   A sequence of interfaces of type T connected to the instance.
+    */
+  def getInterfacesConnectedTo[T <: ChipLike](
+      instance: ChipInstance
+  )(implicit tag: ClassTag[T]): Seq[T] =
+    flatChipChildren
+      .flatMap(_.getInterface[T])
+      .filter(f => distanceMatrix.isConnectedBetween(instance, f.getOwner))
 }
 
 object Project {
@@ -117,15 +165,24 @@ object Project {
 
   private var baseProjectPath: Path = Paths.get("")
 
-  /**
-   * Sets up the paths for the project, including catalog, prefab, and output paths.
-   *
-   * @param projectPath The base path of the project.
-   * @param catalogPath The path to the catalog directory.
-   * @param prefabsPath The path to the prefabs directory.
-   * @param outPath The path to the output directory.
-   */
-  def setupPaths(projectPath: Path, catalogPath: Path, prefabsPath: Path, outPath: Path): Unit = {
+  /** Sets up the paths for the project, including catalog, prefab, and output
+    * paths.
+    *
+    * @param projectPath
+    *   The base path of the project.
+    * @param catalogPath
+    *   The path to the catalog directory.
+    * @param prefabsPath
+    *   The path to the prefabs directory.
+    * @param outPath
+    *   The path to the output directory.
+    */
+  def setupPaths(
+      projectPath: Path,
+      catalogPath: Path,
+      prefabsPath: Path,
+      outPath: Path
+  ): Unit = {
     baseProjectPath = projectPath.toAbsolutePath
 
     catalogPathStack.clear()
@@ -141,138 +198,142 @@ object Project {
     outPathStack.push(outPath)
   }
 
-  /**
-   * Retrieves the base project path.
-   *
-   * @return The base project path.
-   */
+  /** Retrieves the base project path.
+    *
+    * @return
+    *   The base project path.
+    */
   def projectPath: Path = baseProjectPath
 
-  /**
-   * Pushes a new catalog path onto the stack.
-   *
-   * @param path The new catalog path to push.
-   */
+  /** Pushes a new catalog path onto the stack.
+    *
+    * @param path
+    *   The new catalog path to push.
+    */
   def pushCatalogPath(path: String): Unit = pushCatalogPath(Paths.get(path))
 
-  /**
-   * Pushes a new catalog path onto the stack.
-   *
-   * @param path The new catalog path to push.
-   */
+  /** Pushes a new catalog path onto the stack.
+    *
+    * @param path
+    *   The new catalog path to push.
+    */
   def pushCatalogPath(path: Path): Unit = {
     val potDPath = catalogPath.resolve(path)
     if (potDPath.toFile.isFile) catalogPathStack.push(potDPath.getParent)
     else catalogPathStack.push(potDPath)
   }
 
-  /**
-   * Retrieves the current catalog path from the stack.
-   *
-   * @return The current catalog path.
-   */
+  /** Retrieves the current catalog path from the stack.
+    *
+    * @return
+    *   The current catalog path.
+    */
   def catalogPath: Path = catalogPathStack.top
 
-  /**
-   * Sets the instance path.
-   *
-   * @param path The new instance path to set.
-   */
+  /** Sets the instance path.
+    *
+    * @param path
+    *   The new instance path to set.
+    */
   def setInstancePath(path: String): Unit = setInstancePath(Paths.get(path))
 
-  /**
-   * Sets the instance path.
-   *
-   * @param path The new instance path to set.
-   */
+  /** Sets the instance path.
+    *
+    * @param path
+    *   The new instance path to set.
+    */
   def setInstancePath(path: Path): Unit = {
     instancePathStack.push(path)
   }
 
-  /**
-   * Pushes a new instance path onto the stack.
-   *
-   * @param path The new instance path to push.
-   */
+  /** Pushes a new instance path onto the stack.
+    *
+    * @param path
+    *   The new instance path to push.
+    */
   def pushInstancePath(path: String): Unit = pushInstancePath(Paths.get(path))
 
-  /**
-   * Pushes a new instance path onto the stack.
-   *
-   * @param path The new instance path to push.
-   */
+  /** Pushes a new instance path onto the stack.
+    *
+    * @param path
+    *   The new instance path to push.
+    */
   def pushInstancePath(path: Path): Unit = {
     val potIPath = instancePath.resolve(path)
     if (potIPath.toFile.isFile) instancePathStack.push(potIPath.getParent)
     else instancePathStack.push(potIPath)
   }
 
-  /**
-   * Retrieves the current instance path from the stack.
-   *
-   * @return The current instance path.
-   */
+  /** Retrieves the current instance path from the stack.
+    *
+    * @return
+    *   The current instance path.
+    */
   def instancePath: Path = instancePathStack.top
 
-  /**
-   * Pushes a new output path onto the stack.
-   *
-   * @param path The new output path to push.
-   */
+  /** Pushes a new output path onto the stack.
+    *
+    * @param path
+    *   The new output path to push.
+    */
   def pushOutPath(path: String): Unit = pushOutPath(Paths.get(path))
 
-  /**
-   * Pushes a new output path onto the stack.
-   *
-   * @param path The new output path to push.
-   */
+  /** Pushes a new output path onto the stack.
+    *
+    * @param path
+    *   The new output path to push.
+    */
   def pushOutPath(path: Path): Unit = {
     val potOPath = outPath.resolve(path)
     if (potOPath.toFile.isFile) outPathStack.push(potOPath.getParent)
     else outPathStack.push(potOPath)
   }
 
-  /**
-   * Retrieves the current output path from the stack.
-   *
-   * @return The current output path.
-   */
+  /** Retrieves the current output path from the stack.
+    *
+    * @return
+    *   The current output path.
+    */
   def outPath: Path = outPathStack.top
 
-  /**
-   * Pops the top catalog path from the stack.
-   */
+  /** Pops the top catalog path from the stack.
+    */
   def popCatalogPath(): Unit = catalogPathStack.pop()
 
-  /**
-   * Pops the top instance path from the stack.
-   */
+  /** Pops the top instance path from the stack.
+    */
   def popInstancePath(): Unit = instancePathStack.pop()
 
-  /**
-   * Pops the top output path from the stack.
-   */
+  /** Pops the top output path from the stack.
+    */
   def popOutPath(): Unit = outPathStack.pop()
 
-  /**
-   * Resolves instance-specific macros in a given string.
-   *
-   * @param instance The instance to use for macro resolution.
-   * @param inString The input string containing macros.
-   * @return The string with resolved macros.
-   */
-  def resolveInstanceMacros(instance: InstanceTrait, inString: String): String = {
+  /** Resolves instance-specific macros in a given string.
+    *
+    * @param instance
+    *   The instance to use for macro resolution.
+    * @param inString
+    *   The input string containing macros.
+    * @return
+    *   The string with resolved macros.
+    */
+  def resolveInstanceMacros(
+      instance: InstanceTrait,
+      inString: String
+  ): String = {
     inString
       .replace("${name}", instance.name)
   }
 
-  /**
-   * Resolves path-related macros in a given string.
-   *
-   * @param instance The instance to use for macro resolution.
-   * @param inString The input string containing macros.
-   * @return The string with resolved macros.
-   */
+  /** Resolves path-related macros in a given string.
+    *
+    * @param instance
+    *   The instance to use for macro resolution.
+    * @param inString
+    *   The input string containing macros.
+    * @return
+    *   The string with resolved macros.
+    */
   def resolvePathMacros(instance: InstanceTrait, inString: String): String = {
     resolveInstanceMacros(instance, inString)
       .replace("${projectPath}", projectPath.toString)
@@ -281,32 +342,41 @@ object Project {
       .replace("${instancePath}", instance.sourcePath.toString)
   }
 
-  /**
-   * Attempts to resolve a resource path for a given instance.
-   *
-   * @param instance The instance to use for path resolution.
-   * @param resource The resource to resolve the path for.
-   * @return The resolved path.
-   */
+  /** Attempts to resolve a resource path for a given instance.
+    *
+    * @param instance
+    *   The instance to use for path resolution.
+    * @param resource
+    *   The resource to resolve the path for.
+    * @return
+    *   The resolved path.
+    */
   def tryPaths(instance: InstanceTrait, resource: String): Path = {
     tryPaths(instance, resource, 0)
   }
 
-  /**
-   * Creates an Project instance from the provided parameters.
-   *
-   * @param gameName The name of the project.
-   * @param board The board name.
-   * @param gamePath The path to the project directory.
-   * @param catalogs The definition catalogs.
-   * @param prefabs The prefab catalogs.
-   * @return An optional Project instance.
-   */
-  def apply(gameName: String,
-            board: String,
-            gamePath: Path,
-            catalogs: DefinitionCatalog,
-            prefabs: PrefabCatalog): Option[Project] = {
+  /** Creates an Project instance from the provided parameters.
+    *
+    * @param gameName
+    *   The name of the project.
+    * @param board
+    *   The board name.
+    * @param gamePath
+    *   The path to the project directory.
+    * @param catalogs
+    *   The definition catalogs.
+    * @param prefabs
+    *   The prefab catalogs.
+    * @return
+    *   An optional Project instance.
+    */
+  def apply(
+      gameName: String,
+      board: String,
+      gamePath: Path,
+      catalogs: DefinitionCatalog,
+      prefabs: PrefabCatalog
+  ): Option[Project] = {
 
     // check for duplicates
     val keyArray = catalogs.catalogs.keys.toArray.sortInPlaceWith {
@@ -316,7 +386,9 @@ object Project {
     for (i <- 0 until catalogs.catalogs.size) {
       for (j <- i + 1 until catalogs.catalogs.size) {
         if ((keyArray(i).ident == keyArray(j).ident)) {
-          println(s"WARN: Duplicate definition name ${keyArray(i).ident} detected")
+          println(
+            s"WARN: Duplicate definition name ${keyArray(i).ident} detected"
+          )
         }
       }
     }
@@ -325,18 +397,38 @@ object Project {
     gb.toGame()
   }
 
-  private def tryPaths(instance: InstanceTrait, resource: String, pass: Int): Path = {
+  private def tryPaths(
+      instance: InstanceTrait,
+      resource: String,
+      pass: Int
+  ): Path = {
     val givenPath = Paths.get(resolvePathMacros(instance, resource))
     if (!Files.exists(givenPath)) {
-      val instancePath = Paths.get(Project.resolvePathMacros(instance, "${instancePath}/" + resource)).normalize()
+      val instancePath = Paths
+        .get(Project.resolvePathMacros(instance, "${instancePath}/" + resource))
+        .normalize()
       if (!Files.exists(instancePath)) {
-        val definitionPath = Paths.get(Project.resolvePathMacros(instance, "${definitionPath}/" + resource)).normalize()
+        val definitionPath = Paths
+          .get(
+            Project.resolvePathMacros(instance, "${definitionPath}/" + resource)
+          )
+          .normalize()
         if (!Files.exists(definitionPath)) {
-          val outPath = Paths.get(Project.resolvePathMacros(instance, "${outPath}/" + resource)).normalize()
+          val outPath = Paths
+            .get(Project.resolvePathMacros(instance, "${outPath}/" + resource))
+            .normalize()
           if (!Files.exists(outPath)) {
-            if (pass == 0 && instance.definition.isInstanceOf[SoftwareDefinitionTrait]) {
-              val softDef = instance.definition.asInstanceOf[SoftwareDefinitionTrait]
-              tryPaths(instance, softDef.actionsFilePath.getParent.toString + "/" + resource, 1)
+            if (
+              pass == 0 && instance.definition
+                .isInstanceOf[SoftwareDefinitionTrait]
+            ) {
+              val softDef =
+                instance.definition.asInstanceOf[SoftwareDefinitionTrait]
+              tryPaths(
+                instance,
+                softDef.actionsFilePath.getParent.toString + "/" + resource,
+                1
+              )
             } else {
               println(s"tryPath: ${givenPath.toAbsolutePath} file not found")
               Paths.get("")
@@ -347,11 +439,13 @@ object Project {
     } else givenPath
   }
 
-  private class GameBuilder(gameName: String,
-                            board: String,
-                            gamePath: Path,
-                            catalogs: DefinitionCatalog,
-                            prefabs: PrefabCatalog) {
+  private class GameBuilder(
+      gameName: String,
+      board: String,
+      gamePath: Path,
+      catalogs: DefinitionCatalog,
+      prefabs: PrefabCatalog
+  ) {
 
     val containerStack: mutable.Stack[Container] = mutable.Stack()
 
@@ -372,7 +466,8 @@ object Project {
       resolveSoftwareDependencies(rootContainer)
 
       // connect everything
-      val (connected, distanceMatrix, busDistanceMatrix, wires) = connectAndOutputChips(rootContainer)
+      val (connected, distanceMatrix, busDistanceMatrix, wires) =
+        connectAndOutputChips(rootContainer)
       outputSoftware(rootContainer, connected, busDistanceMatrix)
 
       // get chips (hardware or gateware)
@@ -381,15 +476,20 @@ object Project {
         case s: SoftwareInstance => s
       }
 
-      val constants = rootContainer.unconnected.flatMap(_.collectConstants(instances))
+      val constants =
+        rootContainer.unconnected.flatMap(_.collectConstants(instances))
 
-      Some(Project(gameName,
-                instances,
-                connected,
-                constants,
-                distanceMatrix,
-                busDistanceMatrix,
-                wires))
+      Some(
+        Project(
+          gameName,
+          instances,
+          connected,
+          constants,
+          distanceMatrix,
+          busDistanceMatrix,
+          wires
+        )
+      )
     }
 
     private def flattenContainers(rootContainer: MutableContainer): Unit = {
@@ -402,21 +502,38 @@ object Project {
       containerStack.clear()
     }
 
-    private def outputSoftware(rootContainer: Container,
-                               connected: Seq[Connected],
-                               distanceMatrix: DistanceMatrix): Unit = {
+    private def outputSoftware(
+        rootContainer: Container,
+        connected: Seq[Connected],
+        distanceMatrix: DistanceMatrix
+    ): Unit = {
       pushOutPath("soft/tmp")
       Utils.ensureDirectories(outPath)
 
       // get software (libraries, boot roms) for all cpus
-      val softInstances = rootContainer.children.collect { case i: SoftwareInstance => i }
-      val cpuInstances  = rootContainer.children.collect { case i: CpuInstance => i }
+      val softInstances = rootContainer.children.collect {
+        case i: SoftwareInstance => i
+      }
+      val cpuInstances = rootContainer.children.collect { case i: CpuInstance =>
+        i
+      }
       // collect constants
-      val constants     = rootContainer.unconnected.flatMap(_.collectConstants(softInstances))
+      val constants =
+        rootContainer.unconnected.flatMap(_.collectConstants(softInstances))
 
       OutputSoftware.cpuInvariantActions(softInstances, constants)
-      OutputSoftware.cpuSpecificActions(board, softInstances, cpuInstances, distanceMatrix, connected)
-      OutputSoftware.hardwareRegistersOutput(cpuInstances, distanceMatrix, connected)
+      OutputSoftware.cpuSpecificActions(
+        board,
+        softInstances,
+        cpuInstances,
+        distanceMatrix,
+        connected
+      )
+      OutputSoftware.hardwareRegistersOutput(
+        cpuInstances,
+        distanceMatrix,
+        connected
+      )
 
       popOutPath()
     }
@@ -425,7 +542,8 @@ object Project {
       var newContainer = MutableContainer()
       containerStack.push(newContainer)
       val parsed = Utils.readYaml(path)
-      if (parsed.contains("defaults")) defaults ++= Utils.toTable(parsed("defaults"))
+      if (parsed.contains("defaults"))
+        defaults ++= Utils.toTable(parsed("defaults"))
       boundary {
         if (!processInstantiations(parsed, newContainer)) {
           println(s"Instantiation failed")
@@ -438,16 +556,24 @@ object Project {
     private def injectBoard(rootContainer: MutableContainer) = {
       // pass the board as if it had been a prefab in the main project file
       val boardInsertV = Map[String, Variant](
-        "instance" -> ArrayV(Array(
-          TableV(
-            Map[String, Variant](
-              "name" -> StringV(s"$board"),
-              "type" -> StringV(s"board.$board"))
-            ))),
-        "prefab" -> ArrayV(Array(
-          TableV(
-            Map[String, Variant]("name" -> StringV(s"boards.$board"))
-            ))))
+        "instance" -> ArrayV(
+          Array(
+            TableV(
+              Map[String, Variant](
+                "name" -> StringV(s"$board"),
+                "type" -> StringV(s"board.$board")
+              )
+            )
+          )
+        ),
+        "prefab" -> ArrayV(
+          Array(
+            TableV(
+              Map[String, Variant]("name" -> StringV(s"boards.$board"))
+            )
+          )
+        )
+      )
       processInstantiations(boardInsertV, rootContainer)
     }
 
@@ -455,10 +581,13 @@ object Project {
       pushOutPath("gate")
       Utils.ensureDirectories(outPath)
 
-      val chipInstances = rootContainer.children.collect { case i: ChipInstance => i }
+      val chipInstances = rootContainer.children.collect {
+        case i: ChipInstance => i
+      }
 
       // collect constants
-      val constants = rootContainer.unconnected.flatMap(_.collectConstants(chipInstances))
+      val constants =
+        rootContainer.unconnected.flatMap(_.collectConstants(chipInstances))
 
       // preconnect for bus address allocations
       rootContainer.unconnected.foreach(_.preConnect(chipInstances))
@@ -470,28 +599,35 @@ object Project {
       rootContainer.unconnected.foreach(_.finaliseBuses(chipInstances))
 
       // connect chips and uniquise the connections
-      val connected = rootContainer.unconnected.flatMap(_.connect(chipInstances)).toSet.toSeq
+      val connected =
+        rootContainer.unconnected.flatMap(_.connect(chipInstances)).toSet.toSeq
 
       // compute the distance matrix
-      val allDistanceMatrix: DistanceMatrix = DistanceMatrix(chipInstances, connected)
-      val busDistanceMatrix: DistanceMatrix = DistanceMatrix(chipInstances, connected.filterNot { i =>
-        i.isInstanceOf[ConnectedPortGroup]
-      })
-      val wires                             = Wires(allDistanceMatrix, connected)
+      val allDistanceMatrix: DistanceMatrix =
+        DistanceMatrix(chipInstances, connected)
+      val busDistanceMatrix: DistanceMatrix = DistanceMatrix(
+        chipInstances,
+        connected.filterNot { i =>
+          i.isInstanceOf[ConnectedPortGroup]
+        }
+      )
+      val wires = Wires(allDistanceMatrix, connected)
       popOutPath()
 
       (connected, allDistanceMatrix, busDistanceMatrix, wires)
 
     }
 
-    private def processInstantiations(parsed: Map[String, Variant],
-                                      container: MutableContainer): Boolean = {
-      boundary { 
+    private def processInstantiations(
+        parsed: Map[String, Variant],
+        container: MutableContainer
+    ): Boolean = {
+      boundary {
         // includes
         if (parsed.contains("include")) {
           val tincs = Utils.toArray(parsed("include"))
           for (include <- tincs) {
-            val table           = Utils.toTable(include)
+            val table = Utils.toTable(include)
             val incResourceName = Utils.toString(table("resource"))
             val incResourcePath = Paths.get(incResourceName)
 
@@ -501,11 +637,11 @@ object Project {
                 val variants = prefabs.flattenIncludesContents(value.name)
                 processInstantiations(variants, container)
                 Project.popInstancePath()
-              case None        =>
+              case None =>
                 Utils.readFile(incResourcePath) match {
                   case Some(d) =>
                     if (!generateInstances(incResourcePath)) break(false)
-                  case _       =>
+                  case _ =>
                     println(s"Include resource file $incResourceName not found")
                     break(false)
                 }
@@ -516,7 +652,8 @@ object Project {
         // extract instances
         if (parsed.contains("instance")) {
           val instancesWanted = Utils.toArray(parsed("instance"))
-          val instances       = instancesWanted.flatMap(Instance(_, defaults.toMap, catalogs))
+          val instances =
+            instancesWanted.flatMap(Instance(_, defaults.toMap, catalogs))
           // do dependencies later when everything is flattened
           container.mutableChildren ++= instances
         }
@@ -538,7 +675,7 @@ object Project {
             prefabs.findPrefab(ident) match {
               case Some(pf) =>
                 okay &= processInstantiations(pf.stuff, container)
-              case None     =>
+              case None =>
                 println(s"Error: prefab $ident not found")
                 break(false)
             }
@@ -548,9 +685,12 @@ object Project {
       }
     }
 
-    private def resolveSoftwareDependencies(rootContainer: MutableContainer): Unit = {
+    private def resolveSoftwareDependencies(
+        rootContainer: MutableContainer
+    ): Unit = {
       // add all instances, so we can check for software dependencies (including drivers for hardware)
-      val depSet: mutable.Set[InstanceTrait] = rootContainer.children.to(mutable.Set)
+      val depSet: mutable.Set[InstanceTrait] =
+        rootContainer.children.to(mutable.Set)
 
       // push all there dependencies onto stack
       val depStack = mutable.Stack[String]()
@@ -558,19 +698,27 @@ object Project {
       while (depStack.nonEmpty) {
         val n = depStack.pop()
         // if already exists ignore (and we can assume all children have already are/been on the stack
-        if (!depSet.exists(_.definition.defType.ident.tail.mkString(".") == n)) {
+        if (
+          !depSet.exists(_.definition.defType.ident.tail.mkString(".") == n)
+        ) {
           val defs = {
             val si = n.split('.')
             if (si.isEmpty) Seq()
             else if (si(0) == "library") Seq(LibraryDefinitionType(si.toSeq))
             else if (si(0) == "program") Seq(ProgramDefinitionType(si.toSeq))
-            else Seq(LibraryDefinitionType(si.prepended("library").toSeq), ProgramDefinitionType(si.prepended("program").toSeq))
+            else
+              Seq(
+                LibraryDefinitionType(si.prepended("library").toSeq),
+                ProgramDefinitionType(si.prepended("program").toSeq)
+              )
           }
 
           var found = false;
 
-          for (d <- defs
-               if !found) {
+          for (
+            d <- defs
+            if !found
+          ) {
             catalogs.findDefinition(d) match {
               case Some(defi) =>
                 val opt = defi.createInstance(n, Map[String, Variant]())
@@ -579,11 +727,15 @@ object Project {
                   assert(inst.isInstanceOf[SoftwareInstance])
                   rootContainer.mutableChildren ++= Seq(inst)
                   depSet += inst.asInstanceOf[SoftwareInstance]
-                  inst.definition.dependencies.filterNot(d => depStack.contains(d)).foreach(depStack.push)
+                  inst.definition.dependencies
+                    .filterNot(d => depStack.contains(d))
+                    .foreach(depStack.push)
                   found = true;
-                }
-                else println(s"ERROR: Software dependency $n ${defi.defType.ident.mkString(".")}")
-              case None       =>
+                } else
+                  println(
+                    s"ERROR: Software dependency $n ${defi.defType.ident.mkString(".")}"
+                  )
+              case None =>
             }
           }
           if (!found) println(s"ERROR: Software dependency $n not found")
@@ -593,4 +745,3 @@ object Project {
   }
 
 }
-

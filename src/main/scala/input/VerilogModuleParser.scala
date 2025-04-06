@@ -14,8 +14,12 @@ sealed trait VerilogBoundary
 case class VerilogParameterKey(parameter: String) extends VerilogBoundary
 
 // Represents a Verilog port with direction, bit width, name, and width knowledge
-case class VerilogPort(direction: String, bits: BitsDesc, name: String, knownWidth: Boolean)
-  extends VerilogBoundary
+case class VerilogPort(
+    direction: String,
+    bits: BitsDesc,
+    name: String,
+    knownWidth: Boolean
+) extends VerilogBoundary
 
 // Represents a Verilog module with a name and its boundaries
 case class VerilogModule(name: String, module_boundary: Seq[VerilogBoundary])
@@ -25,7 +29,8 @@ object VerilogModuleParser {
   private val bitRegEx = "\\[\\d+:\\d+\\]".r
   private val moduleRegEx = "\\s*module\\s+(\\w+)[\\s|#(]*".r
   private val endPortsRegEx = "\\);".r
-  private val blockCommentRegEx = "(/\\*([^*]|[\\r\\n]|(\\*+([^*/]|[\\r\\n])))*\\*+/)|(//.*)".r
+  private val blockCommentRegEx =
+    "(/\\*([^*]|[\\r\\n]|(\\*+([^*/]|[\\r\\n])))*\\*+/)|(//.*)".r
 
   // Parses a Verilog file and extracts modules
   def apply(absolutePath: Path, name: String): Seq[VerilogModule] = {
@@ -45,7 +50,9 @@ object VerilogModuleParser {
   }
 
   // Extracts a single module from the Verilog file
-  private def extractModule(txt: Seq[String]): (Integer, Option[VerilogModule]) = {
+  private def extractModule(
+      txt: Seq[String]
+  ): (Integer, Option[VerilogModule]) = {
     import scala.util.boundary, boundary.break
     boundary {
       var moduleName = ""
@@ -61,17 +68,20 @@ object VerilogModuleParser {
         boundary {
           // Parse the module's ports and parameters
           for (j <- i + 1 until txt.length) {
-            if (txt(j).nonEmpty &&
+            if (
+              txt(j).nonEmpty &&
               !txt(j).trim().startsWith("//") &&
-              !blockCommentRegEx.matches(txt(j))) {
+              !blockCommentRegEx.matches(txt(j))
+            ) {
 
               // Tokenize the line and filter out unnecessary words
-              val words = txt(j).trim()
+              val words = txt(j)
+                .trim()
                 .split("\\s")
                 .filterNot(w => w == "wire" || w == "reg" || w == "integer")
                 .map(_.filter(c => c.isLetterOrDigit || c == '_'))
                 .filterNot(_.isEmpty)
-                .filterNot(_ (0).isDigit)
+                .filterNot(_(0).isDigit)
 
               // Identify and process ports or parameters
               if (words.length == 2 || words.length == 3) {
@@ -85,7 +95,8 @@ object VerilogModuleParser {
                     val n = words.last
                     module_boundary += VerilogPort(t, b, n, words.length == 2)
                   case "parameter" =>
-                    val n = words(1) // Parameters always have their name at index 1
+                    val n =
+                      words(1) // Parameters always have their name at index 1
                     module_boundary += VerilogParameterKey(n)
                   case _ =>
                 }
@@ -93,7 +104,9 @@ object VerilogModuleParser {
 
               // Break when the end of the port list is reached
               if (endPortsRegEx.matches(txt(j))) {
-                boundary.break((j, Some(VerilogModule(moduleName, module_boundary.toSeq))))
+                boundary.break(
+                  (j, Some(VerilogModule(moduleName, module_boundary.toSeq)))
+                )
               }
             }
           }

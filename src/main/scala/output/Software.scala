@@ -9,145 +9,173 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 object Software {
-	private val cpuRegEx = "\\s*,\\s*".r
+  private val cpuRegEx = "\\s*,\\s*".r
 
-	def apply(game: Project): Unit = {
-		if (game.cpus.isEmpty) return
-		println(s"Creating Software at ${Project.outPath}")
+  def apply(game: Project): Unit = {
+    if (game.cpus.isEmpty) return
+    println(s"Creating Software at ${Project.outPath}")
 
-		val out = Project.outPath
+    val out = Project.outPath
 
-		Utils.ensureDirectories(out)
-		Utils.ensureDirectories(out.resolve("programs_host"))
-		Utils.ensureDirectories(out.resolve("libs"))
+    Utils.ensureDirectories(out)
+    Utils.ensureDirectories(out.resolve("programs_host"))
+    Utils.ensureDirectories(out.resolve("libs"))
 
-		output.Compiler(game, out)
+    output.Compiler(game, out)
 
-		val program_paths          = game.cpus.map("programs_" + _.cpuType)
-		val in_program_paths       = program_paths.map(tmp_program_path(out).resolve)
-		val out_program_paths      = program_paths.map(out.resolve)
-		val programs_folder_exists = in_program_paths.map(Utils.doesFileOrDirectoryExist)
-		game.cpus.foreach(cpu => Utils.ensureDirectories(out.resolve("programs_" + cpu.cpuType)))
+    val program_paths = game.cpus.map("programs_" + _.cpuType)
+    val in_program_paths = program_paths.map(tmp_program_path(out).resolve)
+    val out_program_paths = program_paths.map(out.resolve)
+    val programs_folder_exists =
+      in_program_paths.map(Utils.doesFileOrDirectoryExist)
+    game.cpus.foreach(cpu =>
+      Utils.ensureDirectories(out.resolve("programs_" + cpu.cpuType))
+    )
 
-		relocateTmpSoftware(game, out)
+    relocateTmpSoftware(game, out)
 
-		//		output.Svd(game, out)
-		genScripts(game, out, out_program_paths, programs_folder_exists)
+    //		output.Svd(game, out)
+    genScripts(game, out, out_program_paths, programs_folder_exists)
 
-		val softwareInstances = game.allSoftwareInstances
-		for (instance <- softwareInstances) {
-			val instancePath = out.resolve(instance.name)
-			Utils.ensureDirectories(instancePath)
-			// Additional logic for handling software instances
-		}
+    val softwareInstances = game.allSoftwareInstances
+    for (instance <- softwareInstances) {
+      val instancePath = out.resolve(instance.name)
+      Utils.ensureDirectories(instancePath)
+      // Additional logic for handling software instances
+    }
 
-		// Example: Writing a summary file
-		val summaryPath = out.resolve("software_summary.txt")
-		val summaryContent = softwareInstances.map(_.name).mkString("\n")
-		Utils.writeFile(summaryPath, summaryContent)
-	}
+    // Example: Writing a summary file
+    val summaryPath = out.resolve("software_summary.txt")
+    val summaryContent = softwareInstances.map(_.name).mkString("\n")
+    Utils.writeFile(summaryPath, summaryContent)
+  }
 
-	def tmp_program_path(out: Path): Path = out.resolve("tmp")
+  def tmp_program_path(out: Path): Path = out.resolve("tmp")
 
-	private def relocateTmpSoftware(game: Project, out: Path): Unit = {
-		Utils.deleteDirectories(out.resolve("libs"))
+  private def relocateTmpSoftware(game: Project, out: Path): Unit = {
+    Utils.deleteDirectories(out.resolve("libs"))
 
-		// move from the tmp folder to its real place
-		Utils.rename(out.resolve("tmp").resolve("libs"),
-		             out.resolve("libs"))
+    // move from the tmp folder to its real place
+    Utils.rename(out.resolve("tmp").resolve("libs"), out.resolve("libs"))
 
-		val libraries = game.allSoftwareInstances.collect { case l: LibraryInstance => l }
+    val libraries = game.allSoftwareInstances.collect {
+      case l: LibraryInstance => l
+    }
 
-		val tmpPath = out.resolve("tmp")
-		val libPath = out.resolve("libs")
+    val tmpPath = out.resolve("tmp")
+    val libPath = out.resolve("libs")
 
-		for (cpu <- game.cpus) {
-			val cpuName        = cpu.cpuType
-			// replace programs we might have change but leave existing along (i.e. compilers)
-			val targetPrograms = s"programs_$cpuName"
-			val sourcePath     = tmpPath.resolve(targetPrograms)
-			val targetPath     = out.resolve(targetPrograms)
-			val df             = sourcePath.toFile
-			if (df.exists()) {
-				df.listFiles.foreach(f => {
-					val alreadyExists = Utils.doesFileOrDirectoryExist(targetPath.resolve(f.getName))
-					if (alreadyExists) {
-						Utils.deleteDirectories(targetPath.resolve(f.getName))
-					}
-					Utils.rename(f.toPath, targetPath.resolve(f.getName))
-				})
-			}
+    for (cpu <- game.cpus) {
+      val cpuName = cpu.cpuType
+      // replace programs we might have change but leave existing along (i.e. compilers)
+      val targetPrograms = s"programs_$cpuName"
+      val sourcePath = tmpPath.resolve(targetPrograms)
+      val targetPath = out.resolve(targetPrograms)
+      val df = sourcePath.toFile
+      if (df.exists()) {
+        df.listFiles.foreach(f => {
+          val alreadyExists =
+            Utils.doesFileOrDirectoryExist(targetPath.resolve(f.getName))
+          if (alreadyExists) {
+            Utils.deleteDirectories(targetPath.resolve(f.getName))
+          }
+          Utils.rename(f.toPath, targetPath.resolve(f.getName))
+        })
+      }
 
-			// create per platform library symbolic links
-			val cpuLibPath = out.resolve(s"libs_$cpuName")
-			Utils.deleteDirectories(cpuLibPath)
-			Utils.ensureDirectories(cpuLibPath)
-			val libraryDefines = ArrayBuffer[String]()
+      // create per platform library symbolic links
+      val cpuLibPath = out.resolve(s"libs_$cpuName")
+      Utils.deleteDirectories(cpuLibPath)
+      Utils.ensureDirectories(cpuLibPath)
+      val libraryDefines = ArrayBuffer[String]()
 
-			for (lib <- libraries) {
-				val all_cpus = if (lib.attributes.contains("cpus")) {
-					val cpusString = Utils.toString(lib.attributes("cpus"))
-					if (cpusString == "_") None
-					else Some(cpuRegEx.split(cpusString).toSeq.map(_.toLowerCase()))
-				} else None
+      for (lib <- libraries) {
+        val all_cpus = if (lib.attributes.contains("cpus")) {
+          val cpusString = Utils.toString(lib.attributes("cpus"))
+          if (cpusString == "_") None
+          else Some(cpuRegEx.split(cpusString).toSeq.map(_.toLowerCase()))
+        } else None
 
-				if (all_cpus.isEmpty || all_cpus.get.contains(cpuName)) {
-					val sourcePath = libPath.resolve(lib.name.replace('.', '_'))
-					val targetPath = out.resolve(s"libs_$cpuName").resolve(lib.name.replace('.', '_'))
-					libraryDefines += lib.name.replace('.', '_')
+        if (all_cpus.isEmpty || all_cpus.get.contains(cpuName)) {
+          val sourcePath = libPath.resolve(lib.name.replace('.', '_'))
+          val targetPath =
+            out.resolve(s"libs_$cpuName").resolve(lib.name.replace('.', '_'))
+          libraryDefines += lib.name.replace('.', '_')
 
-					Utils.ensureDirectories(targetPath.getParent())
-					Utils.createSymbolicLink(sourcePath, targetPath)
-				}
-			}
+          Utils.ensureDirectories(targetPath.getParent())
+          Utils.createSymbolicLink(sourcePath, targetPath)
+        }
+      }
 
-			generateSubdirLibraryMake(out.resolve(s"libs_$cpuName").resolve("CMakeLists.txt"))
-			generateCLibraryDefines(out.resolve(s"libs_$cpuName"), libraryDefines.toArray)
-			generateCMakeLibraryDefines(out.resolve(s"cmakelibrary_defines_$cpuName.cmake"), libraryDefines.toArray)
-		}
-	}
+      generateSubdirLibraryMake(
+        out.resolve(s"libs_$cpuName").resolve("CMakeLists.txt")
+      )
+      generateCLibraryDefines(
+        out.resolve(s"libs_$cpuName"),
+        libraryDefines.toArray
+      )
+      generateCMakeLibraryDefines(
+        out.resolve(s"cmakelibrary_defines_$cpuName.cmake"),
+        libraryDefines.toArray
+      )
+    }
+  }
 
-	private def generateCLibraryDefines(out: Path, libs: Array[String]): Unit = {
-		Utils.ensureDirectories(out.resolve("library_defines/include/library_defines/"))
+  private def generateCLibraryDefines(out: Path, libs: Array[String]): Unit = {
+    Utils.ensureDirectories(
+      out.resolve("library_defines/include/library_defines/")
+    )
 
-		val sb = new mutable.StringBuilder
-		sb ++= "// Autogenerated!\n"
-		sb ++= "#pragma once\n"
-		libs.foreach(f => {
-			sb ++= s"""#define GAGAMEOS_HAVE_LIB_${f.toUpperCase()} 1\n"""
-		})
-		Utils.writeFile(out.resolve("library_defines/include/library_defines/library_defines.h"), sb.result())
-		Utils.copy(Resources.stdResourcePath().resolve("catalogs/software/library_defines.cmake"),
-		           out.resolve("library_defines/CMakeLists.txt"))
-	}
+    val sb = new mutable.StringBuilder
+    sb ++= "// Autogenerated!\n"
+    sb ++= "#pragma once\n"
+    libs.foreach(f => {
+      sb ++= s"""#define GAGAMEOS_HAVE_LIB_${f.toUpperCase()} 1\n"""
+    })
+    Utils.writeFile(
+      out.resolve("library_defines/include/library_defines/library_defines.h"),
+      sb.result()
+    )
+    Utils.copy(
+      Resources
+        .stdResourcePath()
+        .resolve("catalogs/software/library_defines.cmake"),
+      out.resolve("library_defines/CMakeLists.txt")
+    )
+  }
 
-	private def generateCMakeLibraryDefines(out: Path, libs: Array[String]): Unit = {
-		val sb = new mutable.StringBuilder
-		sb ++= "# Autogenerated!\n"
-		libs.foreach(f => {
-			sb ++= s"""set(GAGAMEOS_HAVE_LIB_${f.toUpperCase()} 1)\n"""
-		})
-		Utils.writeFile(out, sb.result())
-	}
+  private def generateCMakeLibraryDefines(
+      out: Path,
+      libs: Array[String]
+  ): Unit = {
+    val sb = new mutable.StringBuilder
+    sb ++= "# Autogenerated!\n"
+    libs.foreach(f => {
+      sb ++= s"""set(GAGAMEOS_HAVE_LIB_${f.toUpperCase()} 1)\n"""
+    })
+    Utils.writeFile(out, sb.result())
+  }
 
-	private def generateSubdirLibraryMake(out: Path,
-	                                      excludes: Seq[String] = Seq()): Unit = {
-		val sb = new mutable.StringBuilder
-		sb ++=
-		"""
+  private def generateSubdirLibraryMake(
+      out: Path,
+      excludes: Seq[String] = Seq()
+  ): Unit = {
+    val sb = new mutable.StringBuilder
+    sb ++=
+      """
 			|file(GLOB _all LIST_DIRECTORIES true RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
 			|CONFIGURE_DEPENDS * )
 			|list(REMOVE_ITEM _all "CMakeLists.txt" "library_defines.h")
 			|""".stripMargin
 
-		for (ed <- excludes) {
-			sb ++=
-			f"""list(REMOVE_ITEM _all "$ed")
+    for (ed <- excludes) {
+      sb ++=
+        f"""list(REMOVE_ITEM _all "$ed")
 				 |""".stripMargin
-		}
+    }
 
-		sb ++=
-		"""
+    sb ++=
+      """
 			|foreach(sd ${_all})
 			| add_subdirectory(${sd})
 			|endforeach()
@@ -155,67 +183,81 @@ object Software {
 			|
 			|""".stripMargin
 
-		Utils.writeFile(out, sb.result())
-	}
+    Utils.writeFile(out, sb.result())
+  }
 
-	private def genScripts(game: Project,
-	                       out: Path,
-	                       programPaths: Seq[Path],
-	                       programPathExists: Seq[Boolean]): Unit = {
-		val sb = new StringBuilder
-		for ((cpu, i) <- game.cpus.zipWithIndex) {
-			if (programPathExists(i)) {
+  private def genScripts(
+      game: Project,
+      out: Path,
+      programPaths: Seq[Path],
+      programPathExists: Seq[Boolean]
+  ): Unit = {
+    val sb = new StringBuilder
+    for ((cpu, i) <- game.cpus.zipWithIndex) {
+      if (programPathExists(i)) {
 
-				val cpuName     = cpu.cpuType
-				val programName = "programs_" + cpuName
+        val cpuName = cpu.cpuType
+        val programName = "programs_" + cpuName
 
-				Utils.rename(programPaths(i), out.resolve(programName))
+        Utils.rename(programPaths(i), out.resolve(programName))
 
-				if (cpuName != "host") {
-					val sbpm = new mutable.StringBuilder
-					val sbm  = new mutable.StringBuilder
-					sbpm ++=
-					f"cmake -DCMAKE_TOOLCHAIN_FILE=$$PWD/${cpuName}_toolchain.cmake " +
-					f"-G Ninja -S . -B build/$programName -DCPU=$cpuName -DBOARD=${game.board.get.name}%n"
+        if (cpuName != "host") {
+          val sbpm = new mutable.StringBuilder
+          val sbm = new mutable.StringBuilder
+          sbpm ++=
+            f"cmake -DCMAKE_TOOLCHAIN_FILE=$$PWD/${cpuName}_toolchain.cmake " +
+              f"-G Ninja -S . -B build/$programName -DCPU=$cpuName -DBOARD=${game.board.get.name}%n"
 
-					sbm ++= f"cmake --build build/$programName%n"
+          sbm ++= f"cmake --build build/$programName%n"
 
-					sb ++= f"./premake_$programName.sh%n"
-					sb ++= f"./make_$programName.sh%n"
+          sb ++= f"./premake_$programName.sh%n"
+          sb ++= f"./make_$programName.sh%n"
 
-					val premakePath = out.resolve(s"premake_$programName.sh")
-					val makePath    = out.resolve(s"make_$programName.sh")
-					Utils.writeFile(premakePath, sbpm.result())
-					Utils.setFileExecutable(premakePath)
-					Utils.writeFile(makePath, sbm.result())
-					Utils.setFileExecutable(makePath)
+          val premakePath = out.resolve(s"premake_$programName.sh")
+          val makePath = out.resolve(s"make_$programName.sh")
+          Utils.writeFile(premakePath, sbpm.result())
+          Utils.setFileExecutable(premakePath)
+          Utils.writeFile(makePath, sbm.result())
+          Utils.setFileExecutable(makePath)
 
-					val excludes = if (cpuName == "host") {
-						game.cpus.flatMap { cpu => if (cpu.cpuType == "host") None else Some(cpu.triple) }
-					} else Seq()
+          val excludes = if (cpuName == "host") {
+            game.cpus.flatMap { cpu =>
+              if (cpu.cpuType == "host") None else Some(cpu.triple)
+            }
+          } else Seq()
 
-					generateSubdirProgramMake(out.resolve(s"$programName").resolve("CMakeLists.txt"),
-					                          excludes)
-				}
-			}
-		}
-		Utils.writeFile(out.resolve(s"make_programs.sh"), sb.result())
-		Utils.setFileExecutable(out.resolve(s"make_programs.sh"))
-		Utils.copy(Resources.stdResourcePath().resolve("catalogs/software/gagameos_root.cmake"),
-		           out.resolve("CMakeLists.txt"))
-		// workaround for microblaze gcc
-		Utils.copy(Resources.stdResourcePath().resolve("catalogs/software/empty-file.ld"),
-		           out.resolve("empty-file.ld"))
+          generateSubdirProgramMake(
+            out.resolve(s"$programName").resolve("CMakeLists.txt"),
+            excludes
+          )
+        }
+      }
+    }
+    Utils.writeFile(out.resolve(s"make_programs.sh"), sb.result())
+    Utils.setFileExecutable(out.resolve(s"make_programs.sh"))
+    Utils.copy(
+      Resources
+        .stdResourcePath()
+        .resolve("catalogs/software/gagameos_root.cmake"),
+      out.resolve("CMakeLists.txt")
+    )
+    // workaround for microblaze gcc
+    Utils.copy(
+      Resources.stdResourcePath().resolve("catalogs/software/empty-file.ld"),
+      out.resolve("empty-file.ld")
+    )
 
-		Utils.writeFile(out.resolve("make_software.sh"), sb.result())
-		Utils.setFileExecutable(out.resolve(s"make_software.sh"))
-	}
+    Utils.writeFile(out.resolve("make_software.sh"), sb.result())
+    Utils.setFileExecutable(out.resolve(s"make_software.sh"))
+  }
 
-	private def generateSubdirProgramMake(out: Path,
-	                                      excludes: Seq[String] = Seq()): Unit = {
-		val sb = new mutable.StringBuilder
-		sb ++=
-		"""
+  private def generateSubdirProgramMake(
+      out: Path,
+      excludes: Seq[String] = Seq()
+  ): Unit = {
+    val sb = new mutable.StringBuilder
+    sb ++=
+      """
 			|if(DEFINED ONLY_PROGRAM)
 			|   add_subdirectory(${ONLY_PROGRAM})
 			|else()
@@ -224,14 +266,14 @@ object Software {
 			|   list(REMOVE_ITEM _all "CMakeLists.txt" "library_defines.h")
 			|""".stripMargin
 
-		for (ed <- excludes) {
-			sb ++=
-			f"""  list(REMOVE_ITEM _all "$ed")
+    for (ed <- excludes) {
+      sb ++=
+        f"""  list(REMOVE_ITEM _all "$ed")
 				 |""".stripMargin
-		}
+    }
 
-		sb ++=
-		"""
+    sb ++=
+      """
 			| foreach(sd ${_all})
 			|   add_subdirectory(${sd})
 			| endforeach()
@@ -240,7 +282,7 @@ object Software {
 			|
 			|""".stripMargin
 
-		Utils.writeFile(out, sb.result())
-	}
+    Utils.writeFile(out, sb.result())
+  }
 
 }

@@ -1,7 +1,7 @@
 package overlord
 
 sealed trait DefinitionType {
-	val ident: Seq[String]
+  val ident: Seq[String]
 }
 
 sealed trait ChipDefinitionType extends DefinitionType
@@ -34,38 +34,40 @@ case class PinGroupDefinitionType(ident: Seq[String]) extends PortDefinitionType
 
 case class ClockDefinitionType(ident: Seq[String]) extends PortDefinitionType
 
-case class ProgramDefinitionType(ident: Seq[String]) extends SoftwareDefinitionType
+case class ProgramDefinitionType(ident: Seq[String])
+    extends SoftwareDefinitionType
 
-case class LibraryDefinitionType(ident: Seq[String]) extends SoftwareDefinitionType
+case class LibraryDefinitionType(ident: Seq[String])
+    extends SoftwareDefinitionType
 
 object DefinitionType {
-	def apply(in: String): DefinitionType = {
-		val defTypeName = in.split('.')
-		val tt          = defTypeName.map {
-			_.toLowerCase
-		}.toSeq
+  def apply(in: String): DefinitionType = {
+    val defTypeName = in.split('.')
+    val tt = defTypeName.map {
+      _.toLowerCase
+    }.toSeq
 
-		defTypeName.head.toLowerCase match {
-			case "ram"     => RamDefinitionType(tt)
-			case "cpu"     => CpuDefinitionType(tt)
-			case "storage" => StorageDefinitionType(tt)
-			case "graphic" => GraphicDefinitionType(tt)
-			case "net"     => NetDefinitionType(tt)
-			case "io"      => IoDefinitionType(tt)
-			case "board"   => BoardDefinitionType(tt)
-			case "soc"     => SocDefinitionType(tt)
-			case "switch"  => SwitchDefinitionType(tt)
-			case "other"   => OtherDefinitionType(tt)
+    defTypeName.head.toLowerCase match {
+      case "ram"     => RamDefinitionType(tt)
+      case "cpu"     => CpuDefinitionType(tt)
+      case "storage" => StorageDefinitionType(tt)
+      case "graphic" => GraphicDefinitionType(tt)
+      case "net"     => NetDefinitionType(tt)
+      case "io"      => IoDefinitionType(tt)
+      case "board"   => BoardDefinitionType(tt)
+      case "soc"     => SocDefinitionType(tt)
+      case "switch"  => SwitchDefinitionType(tt)
+      case "other"   => OtherDefinitionType(tt)
 
-			case "pin"      => PinGroupDefinitionType(tt)
-			case "pingroup" => PinGroupDefinitionType(tt)
-			case "clock"    => ClockDefinitionType(tt)
+      case "pin"      => PinGroupDefinitionType(tt)
+      case "pingroup" => PinGroupDefinitionType(tt)
+      case "clock"    => ClockDefinitionType(tt)
 
-			case "program" => ProgramDefinitionType(tt)
-			case "library" => LibraryDefinitionType(tt)
-			case _         =>
-				println(s"${defTypeName.head} unknown definition type\n")
-				OtherDefinitionType(tt)
-		}
-	}
+      case "program" => ProgramDefinitionType(tt)
+      case "library" => LibraryDefinitionType(tt)
+      case _ =>
+        println(s"${defTypeName.head} unknown definition type\n")
+        OtherDefinitionType(tt)
+    }
+  }
 }
