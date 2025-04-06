@@ -8,11 +8,19 @@ on:
     paths-ignore:
       - '.devcontainer/**'
       - 'overlord_template_project/**'
+      - 'docs/**'
+      - 'README.md'
+      - 'LICENSE'
+      - '.gitignore'
   pull_request:
     branches: [ main, master ]
     paths-ignore:
       - '.devcontainer/**'
       - 'overlord_template_project/**'
+      - 'docs/**'
+      - 'README.md'
+      - 'LICENSE'
+      - '.gitignore'
 
 jobs:
   build:
