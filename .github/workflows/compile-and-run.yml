@@ -51,8 +51,22 @@ jobs:
       
     - name: Stage application (only for manual trigger)
       if: ${{ github.event_name == 'workflow_dispatch' }}
-      run: sbt stage
+      run: sbt universal:stage
       
+    - name: Check executable existence
+      run: |
+        if [ ! -f target/universal/stage/bin/overlord ]; then
+          echo "ERROR: The overlord executable was not found at target/universal/stage/bin/overlord"
+          echo "This could be because the universal:stage task did not run correctly."
+          echo "Directory contents of target/universal/stage/bin:"
+          ls -la target/universal/stage/bin/ || echo "Directory doesn't exist"
+          echo "Directory contents of target/universal/stage:"
+          ls -la target/universal/stage/ || echo "Directory doesn't exist"
+          exit 1
+        else
+          echo "Found overlord executable at target/universal/stage/bin/overlord"
+        fi
+        
     - name: Prepare for template project run
       run: |
         # Make the overlord executable available

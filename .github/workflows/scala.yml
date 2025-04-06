@@ -30,7 +30,9 @@ jobs:
       run: sbt test
     - name: Build package
       run: sbt assembly
-
+    - name: Create universal package
+      run: sbt universal:stage
+      
     # Upload build artifacts for use in subsequent workflows
     - name: Upload target directory
       uses: actions/upload-artifact@v4
