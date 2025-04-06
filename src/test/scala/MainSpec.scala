@@ -63,4 +63,13 @@ class MainSpec extends AnyFunSuite {
     assert(options(Symbol("board")) == "test-board")
     assert(options(Symbol("infile")) == "example.over")
   }
+
+  test("Non-interactive console should set 'yes' option to true") {
+    val args = Array("create", "--board", "test-board", "example.over")
+    val options = MainUtils.nextOption(Map(), args.toList).updated(Symbol("yes"), true)
+
+    assert(options(Symbol("yes")) == true)
+    assert(options(Symbol("board")) == "test-board")
+    assert(options(Symbol("infile")) == "example.over")
+  }
 }

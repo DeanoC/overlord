@@ -69,6 +69,15 @@ jobs:
           echo "Found overlord executable at target/universal/stage/bin/overlord"
         fi
         
+    - name: Ensure standard catalog exists
+      run: |
+        if [ ! -d "${HOME}/gagameosstd_catalog" ]; then
+          echo "Standard catalog folder not found. Cloning from Git repository..."
+          git clone https://github.com/DeanoC/gagameos_stdcatalog.git ${HOME}/gagameosstd_catalog
+        else
+          echo "Standard catalog folder already exists."
+        fi
+
     - name: Prepare for template project run
       run: |
         # Make the overlord executable available

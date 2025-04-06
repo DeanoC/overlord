@@ -32,7 +32,8 @@ object Main {
 		}
 		type OptionMap = Map[Symbol, Any]
 
-		val options = MainUtils.nextOption(Map(), args.toList)
+		val initialOptions: Map[Symbol, Any] = MainUtils.nextOption(Map(), args.toList)
+		val options = initialOptions.updated(Symbol("yes"), initialOptions.contains(Symbol("yes")) || System.console() == null)
 		if (!options.contains(Symbol("infile"))) {
 			println(usage)
 			println(s"Arguments passed: ${args.mkString(" ")}")
@@ -89,8 +90,8 @@ object Main {
 				true
 			} else {
 				print("Would you like to download the standard catalog from Git? (y/n): ")
-				val response = scala.io.StdIn.readLine().trim.toLowerCase
-				response == "y" || response == "yes"
+				val response = scala.io.StdIn.readLine()
+				response != null && (response.trim.toLowerCase == "y" || response.trim.toLowerCase == "yes")
 			}
 			
 			if (shouldDownload) {
