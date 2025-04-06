@@ -22,36 +22,8 @@ RUN curl -L -o sbt-${SBT_VERSION}.deb https://repo.scala-sbt.org/scalasbt/debian
     && apt-get update \
     && apt-get install -y sbt
 
-# Install overlord if specified
-ARG INSTALL_OVERLORD=false
-RUN if [ "$INSTALL_OVERLORD" = "true" ]; then \
-    mkdir -p /tmp/overlord-install && \
-    cd /tmp/overlord-install && \
-    # Create a setup script that will be executed as part of container startup
-    echo '#!/bin/bash\n\
-# Build overlord if not already built\n\
-if [ ! -f /workspaces/overlord/target/universal/stage/bin/overlord ]; then\n\
-    echo "Building overlord..."\n\
-    cd /workspaces/overlord && sbt "stage; universal:packageBin"\n\
-fi\n\
-# Create symbolic link to the overlord command\n\
-if [ -f /workspaces/overlord/target/universal/stage/bin/overlord ]; then\n\
-    echo "Creating symlink to built overlord..."\n\
-    sudo ln -sf /workspaces/overlord/target/universal/stage/bin/overlord /usr/local/bin/overlord\n\
-    chmod +x /workspaces/overlord/target/universal/stage/bin/overlord\n\
-fi\n\
-# Fix permission for run.sh if it exists\n\
-if [ -f /workspaces/overlord/overlord_template_project/run.sh ]; then\n\
-    chmod +x /workspaces/overlord/overlord_template_project/run.sh\n\
-fi\n\
-# Fix permission for clean.sh if it exists\n\
-if [ -f /workspaces/overlord/overlord_template_project/clean.sh ]; then\n\
-    chmod +x /workspaces/overlord/overlord_template_project/clean.sh\n\
-fi\n'\
-    > /usr/local/bin/setup-overlord.sh && \
-    chmod +x /usr/local/bin/setup-overlord.sh && \
-    echo "/usr/local/bin/setup-overlord.sh" >> /home/vscode/.bashrc; \
-    fi
+# Add ~/bin to PATH in .bashrc
+RUN echo 'export PATH="$HOME/bin:$PATH"' >> /home/vscode/.bashrc
 
 # Clean up
 RUN apt-get autoremove -y \
