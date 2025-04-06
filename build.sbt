@@ -6,9 +6,30 @@ ThisBuild / licenses := Seq(
 	"The MIT License (MIT)" -> url("http://opensource.org/licenses/MIT")
 )
 
+// Enable plugins
+enablePlugins(JavaAppPackaging)
+enablePlugins(UniversalPlugin)
+// Enable Linux plugin
+enablePlugins(DebianPlugin)
+
+// Application packaging settings
+Compile / mainClass := Some("Main")
+maintainer := "deano@github.com"
+packageSummary := "Overlord Tool"
+packageDescription := "A tool for creating complex FPGA and MCU projects with YAML-based definitions."
+
+// Linux packaging settings
+Linux / name := "overlord"
+Debian / packageArchitecture := "all"  // Changed from Linux/packageArchitecture to Debian/packageArchitecture
+Linux / packageName := "overlord"
+
+// Native packager settings
+executableScriptName := "overlord"
+
 // Common settings
 lazy val commonSettings = Seq(
-	scalacOptions += "-deprecation"
+	scalacOptions += "-deprecation",
+	scalacOptions += "-unchecked"
 )
 
 // Dependencies
@@ -51,7 +72,7 @@ lazy val root = (project in file("."))
 	)
 
 // Configure sbt to recognize the test directory
-testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oD")
+Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oD")
 
 import sbtassembly.AssemblyPlugin.autoImport._
 

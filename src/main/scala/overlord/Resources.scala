@@ -9,7 +9,13 @@ import scala.language.postfixOps
 
 object Resources {
 	def stdResourcePath(): Path = {
-		Paths.get("../gagameosstd_catalog/").toAbsolutePath.normalize()
+		val pathStr = "~/gagameosstd_catalog/"
+		val expandedPath = if (pathStr.startsWith("~/")) {
+			Paths.get(System.getProperty("user.home"), pathStr.substring(2))
+		} else {
+			Paths.get(pathStr)
+		}
+		expandedPath.toAbsolutePath.normalize()
 	}
 
 	def overlordRootPath(): Path =

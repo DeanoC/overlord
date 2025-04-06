@@ -19,6 +19,7 @@ object Main {
 		   |     : --nostdprefabs - don't use the standard prefabs
 		   |     : --resources - use the specified path as the root of resources
 		   |     : --instance - specify the instance to update
+		   |     : -y, --yes - automatically agree (i.e. automatically download resource files without prompting)
 		   |     : filename should be a .over file to use for the project"""
 			.stripMargin
 
@@ -66,19 +67,57 @@ object Main {
 			overlord.Resources(Paths.get(path.asInstanceOf[String]))
 		}
 
-		if (!options.contains(Symbol("nostdresources")) && !Files.exists(Resources.stdResourcePath())) {
-			println(s"Warning: Standard resource folder '${Resources.stdResourcePath()}' does not exist.")
-			println("Cloning standard resource folder from Git repository...")
-			val cloneCommand = s"git clone https://github.com/DeanoC/gagameos_stdcatalog.git ${Resources.stdResourcePath()}"
-			val cloneResult = cloneCommand.!
-			if (cloneResult != 0) {
-				println("Error: Failed to clone the standard resource folder.")
-				sys.exit(1)
-			}
+		def isValidGitRepo(path: Path): Boolean = {
+			val gitDirPath = path.resolve(".git")
+			Files.exists(gitDirPath) && Files.isDirectory(gitDirPath)
 		}
 
-		if (!options.contains(Symbol("nostdresources")) && !Files.exists(Resources.stdResourcePath())) {
-			println(s"Warning: Standard resource folder '${Resources.stdResourcePath()}' does not exist.")
+		if (!options.contains(Symbol("nostdresources")) && 
+			(!Files.exists(Resources.stdResourcePath()) || !isValidGitRepo(Resources.stdResourcePath()))) {
+			
+			val repoExists = Files.exists(Resources.stdResourcePath())
+			val message = if (repoExists) {
+				s"Warning: Standard resource folder '${Resources.stdResourcePath()}' exists but is not a valid Git repository."
+			} else {
+				s"Warning: Standard resource folder '${Resources.stdResourcePath()}' does not exist."
+			}
+			println(message)
+			
+			val autoDownload = options.contains(Symbol("yes"))
+			val shouldDownload = if (autoDownload) {
+				println("Auto-downloading standard resource folder (-y/--yes specified)...")
+				true
+			} else {
+				print("Would you like to download the standard catalog from Git? (y/n): ")
+				val response = scala.io.StdIn.readLine().trim.toLowerCase
+				response == "y" || response == "yes"
+			}
+			
+			if (shouldDownload) {
+				if (repoExists) {
+					println("Removing invalid repository folder...")
+					val removeCommand = s"rm -rf ${Resources.stdResourcePath()}"
+					val removeResult = removeCommand.!
+					if (removeResult != 0) {
+						println("Error: Failed to remove invalid repository folder.")
+						sys.exit(1)
+					}
+				}
+				
+				println("Cloning standard resource folder from Git repository...")
+				val cloneCommand = s"git clone https://github.com/DeanoC/gagameos_stdcatalog.git ${Resources.stdResourcePath()}"
+				val cloneResult = cloneCommand.!
+				if (cloneResult != 0) {
+					println("Error: Failed to clone the standard resource folder.")
+					sys.exit(1)
+				} else {
+					println("Standard resource folder successfully downloaded.")
+				}
+			} else {
+				println("Download skipped. The standard catalog will not be available.")
+				println("Exiting as standard resources are required. Use --nostdresources to proceed without them.")
+				sys.exit(1)
+			}
 		}
 
 		val chipCatalog = new DefinitionCatalog
@@ -147,6 +186,10 @@ object MainUtils {
         nextOption(map + (Symbol("resources") -> value), tail)
       case "--instance" :: value :: tail =>
         nextOption(map + (Symbol("instance") -> value), tail)
+      case "-y" :: tail =>
+        nextOption(map + (Symbol("yes") -> true), tail)
+      case "--yes" :: tail =>
+        nextOption(map + (Symbol("yes") -> true), tail)
 
       case string :: opt2 :: tail if isSwitch(opt2) =>
         nextOption(map + (Symbol("infile") -> string), list.tail)

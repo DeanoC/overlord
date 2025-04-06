@@ -9,3 +9,4 @@ jvm
 native
 null
 /.bsp/sbt.json
+release/
