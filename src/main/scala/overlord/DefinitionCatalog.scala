@@ -1,6 +1,7 @@
 package overlord
 
 import gagameos._
+import overlord.Project
 
 import java.nio.file.{Files, Path, Paths}
 import scala.collection.mutable
@@ -78,7 +79,7 @@ class DefinitionCatalog {
 
 object DefinitionCatalog {
 	def fromFile(fileName: String, defaultMap: Map[String, Variant]): Option[Seq[DefinitionTrait]] = {
-		val filePath = Game.catalogPath.resolve(fileName)
+		val filePath = Project.catalogPath.resolve(fileName)
 
 		//println(s"Reading $fileName catalog")
 
@@ -87,11 +88,11 @@ object DefinitionCatalog {
 			return None
 		}
 
-		Game.pushCatalogPath(filePath.getParent)
+		Project.pushCatalogPath(filePath.getParent)
 
 		val source = Utils.readYaml(filePath)
 		val result = parse(fileName, source, defaultMap)
-		Game.popCatalogPath()
+		Project.popCatalogPath()
 		result
 	}
 
@@ -119,13 +120,13 @@ object DefinitionCatalog {
 			for (include <- tincs) {
 				val table = Utils.toTable(include)
 				val name  = Paths.get(Utils.toString(table("resource")))
-				Game.pushCatalogPath(name)
+				Project.pushCatalogPath(name)
 				val cat = DefinitionCatalog.fromFile(s"${name.getFileName}", defaults)
 				cat match {
 					case Some(value) => defs ++= value
 					case None        =>
 				}
-				Game.popCatalogPath()
+				Project.popCatalogPath()
 			}
 		}
 

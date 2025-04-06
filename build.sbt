@@ -33,6 +33,9 @@ lazy val dependencies = Seq(
 	"org.yaml" % "snakeyaml" % "2.0"
 )
 
+// Add ScalaTest dependency for unit testing
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.16" % Test
+
 // Main project (Scala 3)
 lazy val root = (project in file("."))
 	.settings(
@@ -46,6 +49,9 @@ lazy val root = (project in file("."))
 			"-explain"  // Detailed error explanations
 		)
 	)
+
+// Configure sbt to recognize the test directory
+testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oD")
 
 import sbtassembly.AssemblyPlugin.autoImport._
 

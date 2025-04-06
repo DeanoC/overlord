@@ -2,7 +2,7 @@ package overlord
 
 import gagameos.{ArrayV, Utils, Variant}
 import overlord.Instances.BoardInstance
-
+import overlord.Project
 import java.nio.file.{Path, Paths}
 import scala.collection.mutable
 import scala.language.postfixOps
@@ -34,7 +34,7 @@ case class Resources(path: Path) {
 			return Map()
 		}
 
-		Game.pushCatalogPath("catalogs/")
+		Project.pushCatalogPath("catalogs/")
 
 		val resources = Utils.toArray(parsed("resources"))
 
@@ -43,7 +43,7 @@ case class Resources(path: Path) {
 			DefinitionCatalog.fromFile(s"$name", Map[String, Variant]())
 		}).flatten.flatten.map(f => f.defType -> f).toMap
 
-		Game.popCatalogPath()
+		Project.popCatalogPath()
 		result
 	}
 
@@ -61,20 +61,20 @@ case class Resources(path: Path) {
 			return Map()
 		}
 
-		Game.pushInstancePath("prefabs/")
+		Project.pushInstancePath("prefabs/")
 
 		val resources = Utils.toArray(parsed("resources"))
 		val prefabs   = mutable.Map[String, Prefab]()
 		for (resource <- resources) {
 			val name = Utils.toString(resource)
-			Game.pushInstancePath(name)
+			Project.pushInstancePath(name)
 			prefabs ++= PrefabCatalog.fromFile(s"$name").map(f => {
 				(f.name.replace(".yaml", "") -> f)
 			})
-			Game.popInstancePath()
+			Project.popInstancePath()
 		}
 
-		Game.popInstancePath()
+		Project.popInstancePath()
 
 		prefabs.toMap
 	}

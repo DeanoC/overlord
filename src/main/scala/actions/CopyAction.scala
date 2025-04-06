@@ -1,7 +1,7 @@
 package actions
 
 import gagameos._
-import overlord.Game
+import overlord.Project
 import overlord.Instances.InstanceTrait
 
 import java.nio.file.{Path, Paths}
@@ -17,8 +17,8 @@ case class CopyAction(filename: String, language: String, srcPath: String)
 
 		val fn = filename.split('/').last
 
-		val srcAbsPath = Game.projectPath.resolve(Game.resolvePathMacros(instance, srcPath)).toAbsolutePath
-		dstAbsPath = Game.outPath.resolve(s"${instance.name}/$fn").toAbsolutePath
+		val srcAbsPath = Project.projectPath.resolve(Project.resolvePathMacros(instance, srcPath)).toAbsolutePath
+		dstAbsPath = Project.outPath.resolve(s"${instance.name}/$fn").toAbsolutePath
 		Utils.ensureDirectories(dstAbsPath.getParent)
 
 		val source = Utils. readFile(srcAbsPath)

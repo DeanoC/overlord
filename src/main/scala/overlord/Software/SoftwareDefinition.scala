@@ -2,7 +2,7 @@ package overlord.Software
 
 import actions.ActionsFile
 import gagameos.{StringV, Utils, Variant}
-import overlord.{DefinitionType, Game, SoftwareDefinitionTrait}
+import overlord.{DefinitionType, Project, SoftwareDefinitionTrait}
 
 import java.nio.file.Path
 
@@ -64,7 +64,7 @@ object SoftwareDefinition {
 	          name: String,
 	          dependencies: Seq[String],
 	          softwarePath: Path): Option[SoftwareDefinition] = {
-		Game.pushCatalogPath(softwarePath)
+		Project.pushCatalogPath(softwarePath)
 		val result = parse(defType,
 		                   	path,
 		                   	attributes,
@@ -72,7 +72,7 @@ object SoftwareDefinition {
 		                   	dependencies,
 							softwarePath,
 							Utils.readYaml(softwarePath))
-		Game.popCatalogPath()
+		Project.popCatalogPath()
 		result
 	}
 

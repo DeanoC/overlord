@@ -4,6 +4,7 @@ import gagameos._
 import overlord.Chip.Registers
 import overlord.Instances.{BoardInstance, ChipInstance, Container, CpuInstance, InstanceTrait}
 import overlord._
+import overlord.Project
 import scala.collection.mutable
 
 // import scalax.collection.mutable.Graph
@@ -42,7 +43,7 @@ object Report {
 	// private val switchEdgeDotAttribs  = Seq(DotAttr("style", "dashed"), DotAttr("color", "red"))
 	// private val defaultEdgeDotAttribs = Seq(DotAttr("color", "black"))
 
-	def apply(game: Game): Unit = {
+	def apply(game: Project): Unit = {
 
 		val sb   = new mutable.StringBuilder
 		val cpus = game.cpus
@@ -107,159 +108,14 @@ object Report {
 
 		sb ++= game.busDistanceMatrix.debugPrint
 
-		Utils.writeFile(Game.outPath.resolve("report.txt"), sb.result())
+		Utils.writeFile(Project.outPath.resolve("report.txt"), sb.result())
 
 //		outputDotGraph(game)
 	}
 
-	private def reportInstances(game: Game): String = {
+	private def reportInstances(game: Project): String = {
 		game.children.map(reportInstance(_)).mkString("")
 	}
-
-	private def outputDotGraph(game: Game) = {
-		// var (graph, maxDistance) = convertToGraph(game)
-
-		// //		graph = makeLegendGraph(graph, maxDistance)
-
-		// val root   = DotRootGraph(directed = true,
-		//                           id = Some(s"${game.name}"),
-		//                           attrStmts = Seq(
-		// 	                          DotAttrStmt(Elem.graph, Seq(DotAttr("ranksep", 0.02))),
-		// 	                          DotAttrStmt(Elem.edge, Seq(DotAttr("minlen", 3)))
-		// 	                          )
-		//                           )
-		// val legend = DotSubGraph(ancestor = root, subgraphId = "cluster_Legend")
-		// val pins   = DotSubGraph(ancestor = root, subgraphId = "pins",
-		//                          attrStmts = Seq(
-		// 	                         DotAttrStmt(Elem.graph, Seq(DotAttr("rank", "max"))),
-		// 	                         ))
-
-		// val context = GraphVizContent(Map(
-		// 	("root" -> root),
-		// 	("legend" -> legend),
-		// 	("pins" -> pins)
-		// 	))
-
-		// val dotText = graph.toDot(
-		// 	dotRoot = root,
-		// 	edgeTransformer = context.edgePrep,
-		// 	cNodeTransformer = Some(context.nodePrep),
-		// 	)
-
-		// Utils.writeFile(Game.outPath.resolve(s"${game.name}.dot"), dotText)
-
-		// for {cpu <- game.cpus} {
-		// 	val (cpuGraph, maxDistance) = cpuToGraph(game, cpu)
-
-		// 	val dotText = cpuGraph.toDot(
-		// 		dotRoot = root,
-		// 		edgeTransformer = context.edgePrep,
-		// 		cNodeTransformer = Some(context.nodePrep),
-		// 		)
-
-		// 	Utils.writeFile(Game.outPath.resolve(s"${cpu.name}.dot"), dotText)
-		// }
-
-	}
-/*
-	private def makeLegendGraph(graph: GraphType, maxDistance: Int): GraphType = {
-
-		val classCount                    = Utils.KnownSubClassesOfSealedType[DefinitionType]().size
-		// title
-		var dinsts: Array[DefinitionType] = Array(BoardDefinitionType(Seq(s"Legend")))
-
-		// each class
-		dinsts ++= Utils.KnownSubClassesOfSealedType[DefinitionType]().flatMap {
-			clazz => Utils.ConstructFromClassSymbol[DefinitionType](clazz, clazz.name)
-		}
-
-		if (classCount < maxDistance * 3) {
-			// some spacers
-			dinsts ++= {
-				0 until (maxDistance * 3 - classCount) map {
-					i => BoardDefinitionType(Seq(s"spacer$i"))
-				}
-			}
-		}
-
-		var g = graph
-		for (index <- 0 until dinsts.length - 1) {
-			val sinst = dinsts(index)
-			val einst = dinsts(index + 1)
-
-			def indexToTag(index: Int) =
-				index match {
-					case 0                               => TitleTypeTag
-					case x if 1 to classCount contains x => LegendTypeTag
-					case _                               => InvisibleSpacerTypeTag
-				}
-
-			val si = sinst.ident.mkString.replace("DefinitionType", "")
-			val ei = einst.ident.mkString.replace("DefinitionType", "")
-
-			g += ((si, sinst, indexToTag(index))
-			      ~>
-			      (ei, einst, indexToTag(index + 1)))
-		}
-		g
-	}
-*/
-	// private def convertToGraph(game: Game) = {
-	// 	var graph: GraphType = Graph[(String, DefinitionType, NodeStyleTypeTag), DiEdge]()
-	// 	for (node <- game.distanceMatrix.instanceArray) {
-	// 		graph += ((node.name, node.definition.defType, ChipTypeTag))
-	// 	}
-
-	// 	var maxDistance = 0
-
-	// 	for {i <- 0 until game.distanceMatrix.dim
-	// 	     if !game.distanceMatrix.isIsolated(i)} {
-	// 		for {j <- 0 until game.distanceMatrix.dim
-	// 		     if !game.distanceMatrix.isIsolated(j)} {
-	// 			maxDistance = maxDistance.max(game.distanceMatrix.distanceBetween(i, j))
-
-	// 			val route      = game.distanceMatrix.routeBetween(i, j)
-	// 			var startIndex = i
-	// 			for {endIndex <- route.indices} {
-	// 				val sinst = game.distanceMatrix.instanceArray(startIndex)
-	// 				val einst = game.distanceMatrix.instanceArray(route(endIndex))
-	// 				graph = graph.union(Graph((sinst.name, sinst.definition.defType, ChipTypeTag)
-	// 				          ~>
-	// 				          (einst.name, einst.definition.defType, ChipTypeTag)))
-	// 				startIndex = route(endIndex)
-	// 			}
-	// 		}
-	// 	}
-	// 	(graph, maxDistance)
-	// }
-
-	// private def cpuToGraph(game: Game, cpu: CpuInstance) = {
-	// 	var graph: GraphType = Graph[(String, DefinitionType, NodeStyleTypeTag), DiEdge]()
-	// 	for (node <- game.distanceMatrix.instanceArray) {
-	// 		graph += ((node.name, node.definition.defType, ChipTypeTag))
-	// 	}
-
-	// 	var maxDistance = 0
-
-	// 	val i = game.distanceMatrix.instanceArray.indexWhere(_ == cpu)
-	// 	for {j <- 0 until game.distanceMatrix.dim
-	// 	     if !game.distanceMatrix.isIsolated(j)} {
-	// 		maxDistance = maxDistance.max(game.distanceMatrix.distanceBetween(i, j))
-
-	// 		val route      = game.distanceMatrix.routeBetween(i, j)
-	// 		var startIndex = i
-	// 		for {endIndex <- route.indices} {
-	// 			val sinst = game.distanceMatrix.instanceArray(startIndex)
-	// 			val einst = game.distanceMatrix.instanceArray(route(endIndex))
-	// 			graph = graph.union(Graph((sinst.name, sinst.definition.defType, ChipTypeTag)
-	// 			          ~>
-	// 			          (einst.name, einst.definition.defType, ChipTypeTag)))
-	// 			startIndex = route(endIndex)
-	// 		}
-	// 	}
-
-	// 	(graph, maxDistance)
-	// }
 
 	private def reportContainer(container: Container,
 	                            indentLevel: Int = 0): String = {

@@ -2,7 +2,7 @@ package output
 
 import gagameos.Utils
 import overlord.Instances.LibraryInstance
-import overlord.{Game, Resources}
+import overlord.{Project, Resources}
 
 import java.nio.file.Path
 import scala.collection.mutable
@@ -11,11 +11,11 @@ import scala.collection.mutable.ArrayBuffer
 object Software {
 	private val cpuRegEx = "\\s*,\\s*".r
 
-	def apply(game: Game): Unit = {
+	def apply(game: Project): Unit = {
 		if (game.cpus.isEmpty) return
-		println(s"Creating Software at ${Game.outPath}")
+		println(s"Creating Software at ${Project.outPath}")
 
-		val out = Game.outPath
+		val out = Project.outPath
 
 		Utils.ensureDirectories(out)
 		Utils.ensureDirectories(out.resolve("programs_host"))
@@ -34,11 +34,22 @@ object Software {
 		//		output.Svd(game, out)
 		genScripts(game, out, out_program_paths, programs_folder_exists)
 
+		val softwareInstances = game.allSoftwareInstances
+		for (instance <- softwareInstances) {
+			val instancePath = out.resolve(instance.name)
+			Utils.ensureDirectories(instancePath)
+			// Additional logic for handling software instances
+		}
+
+		// Example: Writing a summary file
+		val summaryPath = out.resolve("software_summary.txt")
+		val summaryContent = softwareInstances.map(_.name).mkString("\n")
+		Utils.writeFile(summaryPath, summaryContent)
 	}
 
 	def tmp_program_path(out: Path): Path = out.resolve("tmp")
 
-	private def relocateTmpSoftware(game: Game, out: Path): Unit = {
+	private def relocateTmpSoftware(game: Project, out: Path): Unit = {
 		Utils.deleteDirectories(out.resolve("libs"))
 
 		// move from the tmp folder to its real place
@@ -147,7 +158,7 @@ object Software {
 		Utils.writeFile(out, sb.result())
 	}
 
-	private def genScripts(game: Game,
+	private def genScripts(game: Project,
 	                       out: Path,
 	                       programPaths: Seq[Path],
 	                       programPathExists: Seq[Boolean]): Unit = {

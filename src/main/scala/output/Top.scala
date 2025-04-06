@@ -4,11 +4,12 @@ import gagameos._
 import overlord.Connections.{InstanceLoc, WildCardConnectionPriority, Wire}
 import overlord.Instances.{ChipInstance, ClockInstance, PinGroupInstance}
 import overlord._
+import overlord.Project
 
 import scala.collection.mutable
 
 object Top {
-	def apply(game: Game): Unit = {
+	def apply(game: Project): Unit = {
 
 		val sb = new mutable.StringBuilder()
 
@@ -62,7 +63,7 @@ object Top {
 
 		sb ++= s"""endmodule\n"""
 
-		Utils.writeFile(Game.outPath.resolve(game.name + "_top.v"), sb.result())
+		Utils.writeFile(Project.outPath.resolve(game.name + "_top.v"), sb.result())
 	}
 
 	private def writeTopWires(wires: Seq[Wire]) = {

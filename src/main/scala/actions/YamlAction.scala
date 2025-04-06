@@ -1,7 +1,7 @@
 package actions
 
 import gagameos._
-import overlord.Game
+import overlord.Project
 import overlord.Instances.InstanceTrait
 
 import scala.collection.mutable
@@ -24,9 +24,9 @@ case class YamlAction(parameterKeys: Seq[String], filename: String)
 				case DoubleV(dbl)      => s"$k: $dbl\n"
 			})
 
-		val moddedOutPath = Game.outPath.resolve(Game.resolvePathMacros(instance, instance.name))
+		val moddedOutPath = Project.outPath.resolve(Project.resolvePathMacros(instance, instance.name))
 
-		val dstAbsPath = moddedOutPath.resolve(Game.resolvePathMacros(instance, filename))
+		val dstAbsPath = moddedOutPath.resolve(Project.resolvePathMacros(instance, filename))
 		Utils.ensureDirectories(dstAbsPath.getParent)
 
 		Utils.writeFile(dstAbsPath, sb.result())

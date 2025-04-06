@@ -1,6 +1,10 @@
 package output
 
-import overlord.Game
+import overlord.Project as OverlordProject
+
+// This object is responsible for generating the actual project file structure
+// based on the provided overlord.Project instance. It organizes the output
+// into directories and files for both hardware ("gate") and software ("soft") components.
 
 // Projects structure
 // build
@@ -27,26 +31,26 @@ import overlord.Game
 //
 
 object Project {
-	def apply(game: Game): Unit = {
-		val out = Game.outPath
+	def apply(game: OverlordProject): Unit = {
+		val out = OverlordProject.outPath
 		println(s"Creating project at ${out.toRealPath()}")
 
 		output.Report(game)
 
-		Game.pushOutPath("gate")
+		OverlordProject.pushOutPath("gate")
 		output.Xdc(game)
 		output.Top(game)
 		output.Edalize(game)
-		Game.popOutPath()
+		OverlordProject.popOutPath()
 
-		Game.pushOutPath("soft")
+		OverlordProject.pushOutPath("soft")
 		output.Software(game)
-		Game.popOutPath()
+		OverlordProject.popOutPath()
 	}
 }
 
 object UpdateProject {
-	def apply(game: Game, instance: Option[String]): Unit = {
+	def apply(game: OverlordProject, instance: Option[String]): Unit = {
 		instance match {
 			case Some(inst) =>
 
@@ -55,5 +59,4 @@ object UpdateProject {
 				Project(game)
 		}
 	}
-
 }

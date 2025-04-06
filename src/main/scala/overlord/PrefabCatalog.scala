@@ -1,6 +1,7 @@
 package overlord
 
 import gagameos.{ArrayV, Utils, Variant}
+import overlord.Project
 
 import java.nio.file.Files
 import scala.collection.mutable
@@ -55,7 +56,7 @@ class PrefabCatalog {
 
 object PrefabCatalog {
 	def fromFile(fileName: String): Seq[Prefab] = {
-		val filePath = Game.instancePath.resolve(fileName)
+		val filePath = Project.instancePath.resolve(fileName)
 
 //		println(s"Reading $fileName prefab")
 
@@ -64,7 +65,7 @@ object PrefabCatalog {
 			return Seq()
 		}
 
-		Game.pushInstancePath(filePath.getParent)
+		Project.pushInstancePath(filePath.getParent)
 		val source   = Utils.readYaml(filePath)
 		var prefabs  = Array[Prefab]()
 		val includes = mutable.HashMap[String, Prefab]()
@@ -97,9 +98,9 @@ object PrefabCatalog {
 			s._1 == "prefab" ||
 			s._1 == "include"
 		}
-		if (stuff.nonEmpty) prefabs ++= Seq(Prefab(name, Game.instancePath.toString, stuff, includes.toMap))
+		if (stuff.nonEmpty) prefabs ++= Seq(Prefab(name, Project.instancePath.toString, stuff, includes.toMap))
 
-		Game.popInstancePath()
+		Project.popInstancePath()
 		prefabs.toSeq
 	}
 }

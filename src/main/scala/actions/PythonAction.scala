@@ -1,7 +1,7 @@
 package actions
 
 import gagameos._
-import overlord.Game
+import overlord.Project
 import overlord.Instances.InstanceTrait
 
 case class PythonAction(script: String, args: String)
@@ -12,8 +12,8 @@ case class PythonAction(script: String, args: String)
 	override def execute(instance: InstanceTrait, parameters: Map[String, Variant]): Unit = {
 		import scala.language.postfixOps
 
-		val result = sys.process.Process(Seq("python3", s"$script", Game.resolvePathMacros(instance, s"$args")),
-		                                 Game.catalogPath.toFile).!
+		val result = sys.process.Process(Seq("python3", s"$script", Project.resolvePathMacros(instance, s"$args")),
+		                                 Project.catalogPath.toFile).!
 
 		if (result != 0) println(s"FAILED python3 of $script $args")
 

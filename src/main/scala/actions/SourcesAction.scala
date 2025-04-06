@@ -1,7 +1,7 @@
 package actions
 
 import gagameos._
-import overlord.Game
+import overlord.Project
 import overlord.Instances.InstanceTrait
 
 case class SourcesAction(filename: String, language: String)
@@ -12,7 +12,7 @@ case class SourcesAction(filename: String, language: String)
 	var actualSrcPath: String = ""
 
 	override def execute(instance: InstanceTrait, parameters: Map[String, Variant]): Unit = {
-		val srcNamePath = Game.tryPaths(instance, filename)
+		val srcNamePath = Project.tryPaths(instance, filename)
 		val srcAbsPath  = srcNamePath.toAbsolutePath
 
 		if (!srcAbsPath.toFile.exists()) {

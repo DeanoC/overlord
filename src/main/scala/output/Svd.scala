@@ -4,13 +4,14 @@ import gagameos.Utils
 import overlord.Chip.{BitsDesc, Register}
 import overlord.Instances.{ChipInstance, CpuInstance}
 import overlord._
+import overlord.Project
 
 import java.nio.file.{Path, Paths}
 import scala.collection.mutable
 import scala.xml.PrettyPrinter
 
 object Svd {
-  def apply(game: Game): Unit = {
+  def apply(game: Project): Unit = {
 
     val cpus = for (cpu <- game.cpus) yield 
       <cpu>
@@ -43,7 +44,7 @@ object Svd {
       </device>
     //@formatter:on
 
-    val out = Game.outPath
+    val out = Project.outPath
     Utils.ensureDirectories(out)
 
     // copy etc/CMSIS-SVD.xsd
@@ -117,51 +118,5 @@ object Svd {
     <endian>little</endian>
   }
 
-  private def outputRegisters(s: ChipInstance): Seq[xml.Elem] = ??? /*{
-    if (s.registerBanks.isEmpty) return Seq[xml.Elem]()
-
-    for (bank <- s.registerBanks.toIndexedSeq) yield {
-      val rl = s.registerLists.find(_.name == bank.registerListName) match {
-        case Some(value) => value
-        case None =>
-          println(s"Peripheral ${s.ident} ${bank.registerListName} is not found")
-          return Seq[xml.Elem]()
-      }
-
-      if (definitionsWritten.contains(bank.registerListName)) {
-        // derivedFrom case
-        val derivedFromName = definitionsWritten(bank.registerListName)
-        <peripheral derivedFrom={derivedFromName}>
-          <name>{bank.name}</name>
-          <version>1.0</version>
-          <description>{
-            if (rl.description.nonEmpty) rl.description
-            else "No description"
-          }</description>
-          <baseAddress>{f"${bank.address}"}</baseAddress>
-        </peripheral>
-      } else {
-        // new definition
-        definitionsWritten += (bank.registerListName -> bank.name)
-        <peripheral>
-          <name>{bank.name}</name>
-          <version>1.0</version>
-          <description>{
-            if (rl.description.nonEmpty) rl.description
-            else "No description"
-          }</description>
-          <baseAddress>{f"${bank.address}"}</baseAddress>
-          <addressBlock>
-            <offset>0x0</offset>
-            <size>{rl.sizeInBytes}</size>
-            <usage>registers</usage>
-            <protection>s</protection>
-          </addressBlock>
-          <registers>{
-            for (r <- rl.registers) yield outputRegister(r)
-          }</registers>
-        </peripheral>
-      }
-    }
-  }*/
+  private def outputRegisters(s: ChipInstance): Seq[xml.Elem] = ???
 }

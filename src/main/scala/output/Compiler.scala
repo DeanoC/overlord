@@ -2,13 +2,13 @@ package output
 
 import gagameos._
 import overlord.Instances.CpuInstance
-import overlord.{Game, Resources}
+import overlord.{Project, Resources}
 
 import java.nio.file.Path
 import scala.collection.mutable
 
 object Compiler {
-	def apply(game: Game, out: Path): Unit = {
+	def apply(game: Project, out: Path): Unit = {
 		if (game.cpus.isEmpty) return
 
 		println(s"Creating Compiler scripts at $out")
@@ -18,7 +18,7 @@ object Compiler {
 		game.cpus.foreach(genCMakeToolChains(_, out))
 	}
 
-	private def generateMakeCompilersScript(game: Game, out: Path): Boolean = {
+	private def generateMakeCompilersScript(game: Project, out: Path): Boolean = {
 		val compilerScriptBuilder = new StringBuilder
 		compilerScriptBuilder ++= (Utils.readFile(Resources.stdResourcePath().resolve("catalogs/software/make_compilers.sh")) match {
 			case Some(script) => script

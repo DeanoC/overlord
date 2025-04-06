@@ -4,6 +4,7 @@ import gagameos._
 import overlord.Connections._
 import overlord.Instances.{ChipInstance, Container}
 import overlord.Interfaces.UnconnectedLike
+import overlord.Project
 
 import java.nio.file.Path
 
@@ -12,14 +13,14 @@ object OutputGateware {
 	          gatePath: Path,
 	          constants: Seq[Constant],
 	          phase: Int): Unit = {
-		Game.pushCatalogPath(gatePath)
+		Project.pushCatalogPath(gatePath)
 
 		top.children
 			.collect { case c: ChipInstance => c }
 			.filter(_.isGateware)
 			.foreach(executePhase(_, top.unconnected, constants, phase))
 
-		Game.popCatalogPath()
+		Project.popCatalogPath()
 	}
 
 	private def executePhase(instance: ChipInstance,

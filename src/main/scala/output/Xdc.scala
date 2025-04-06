@@ -2,12 +2,12 @@ package output
 
 import gagameos._
 import overlord.Connections.{ConstantParameterType, FrequencyParameterType}
-import overlord.{DiffPinConstraint, Game, PinConstraint}
+import overlord.{DiffPinConstraint, Project, PinConstraint}
 
 import scala.collection.mutable
 
 object Xdc {
-	def apply(game: Game): Unit = {
+	def apply(game: Project): Unit = {
 		val sb = new mutable.StringBuilder
 
 		sb ++= "set_property CFGBVS VCCO [current_design]\n"
@@ -80,7 +80,7 @@ object Xdc {
 			sb ++= s"""create_clock -add -name ${sanatizeIdent(clk.name)} $periodTxt $waveformTxt [$pinOrPortTxt]\n"""
 		}
 
-		Utils.writeFile(Game.outPath.resolve(s"${game.name}.xdc"), sb.result())
+		Utils.writeFile(Project.outPath.resolve(s"${game.name}.xdc"), sb.result())
 	}
 
 	private def sanatizeIdent(in: String): String = {

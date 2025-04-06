@@ -5,6 +5,7 @@ import overlord.Chip.{BitsDesc, RegisterList, Registers}
 import overlord.Connections._
 import overlord.Instances._
 import overlord.Interfaces.{RamLike, RegisterBankLike}
+import overlord.Project
 
 import java.nio.file.{Path, Paths}
 import scala.collection.mutable
@@ -140,7 +141,8 @@ object OutputSoftware {
 		val uniqueRegisterLists = mutable.Set[String]()
 
 		for (cpu <- cpus) {
-			Utils.ensureDirectories(hwPath(Game.outPath))
+			val outPath = Project.outPath
+			Utils.ensureDirectories(hwPath(outPath))
 
 			val (_, chipAddresses) = extractRamAndRegisters(cpu, distanceMatrix, connected)
 
@@ -260,7 +262,7 @@ object OutputSoftware {
 
 		sb ++= genRegisterList(s"${uname}_", rl)
 
-		Utils.writeFile(filePath(hwPath(Game.outPath), rl.name.replace(".yaml", "")), sb.result())
+		Utils.writeFile(filePath(hwPath(Project.outPath), rl.name.replace(".yaml", "")), sb.result())
 	}
 
 	private def hwPath(out: Path) = hwRegsPath(out).resolve("registers")

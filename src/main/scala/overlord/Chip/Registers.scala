@@ -1,7 +1,7 @@
 package overlord.Chip
 
 import gagameos.{StringV, Utils, Variant}
-import overlord.Game
+import overlord.Project
 import overlord.Instances.InstanceTrait
 
 import java.nio.file.Path
@@ -66,7 +66,7 @@ object Registers {
 				val registerWindowSize = Utils.lookupBigInt(item, "register_window_size", -1)
 				val cpus               = decodeCpusString(Utils.lookupString(item, "cpus", "_"))
 
-				val path: Path = Game.tryPaths(instance, resource)
+				val path: Path = Project.tryPaths(instance, resource)
 	
 				if (path == null) {
 					println(s"RegisterBank $name resource $resource path $path not found")

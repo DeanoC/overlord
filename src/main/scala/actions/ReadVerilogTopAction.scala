@@ -3,7 +3,7 @@ package actions
 import gagameos._
 import input.{VerilogParameterKey, VerilogPort}
 import overlord.Chip.{Port, WireDirection}
-import overlord.Game
+import overlord.Project
 import overlord.Instances.{ChipInstance, InstanceTrait}
 import scala.util.boundary, boundary.break
 
@@ -23,8 +23,8 @@ case class ReadVerilogTopAction(filename: String)
 	override def execute(instance: ChipInstance, parameters: Map[String, Variant]): Unit = {
 		import scala.util.boundary, boundary.break
 
-		val expandedName = Game.resolveInstanceMacros(instance, filename)
-		val modules      = input.VerilogModuleParser(Game.tryPaths(instance, expandedName), instance.name)
+		val expandedName = Project.resolveInstanceMacros(instance, filename)
+		val modules      = input.VerilogModuleParser(Project.tryPaths(instance, expandedName), instance.name)
 
 		boundary {
 			val module = modules.find(_.name == instance.name).getOrElse {

@@ -4,7 +4,7 @@ import gagameos.{Utils, Variant}
 import overlord.Chip.{ChipDefinition, Port}
 import overlord.Interfaces.QueryInterface
 import overlord.Software.SoftwareDefinition
-import overlord.{DefinitionCatalog, DefinitionTrait, DefinitionType, Game}
+import overlord.{DefinitionCatalog, DefinitionTrait, DefinitionType, Project}
 
 import java.nio.file.Path
 import scala.collection.mutable
@@ -14,7 +14,7 @@ trait InstanceTrait extends QueryInterface {
 	val finalParameterTable: mutable.HashMap[String, Variant] = mutable.HashMap()
 
 	val name: String
-	val sourcePath: Path = Game.instancePath.toAbsolutePath
+	val sourcePath: Path = Project.instancePath.toAbsolutePath
 
 	def definition: DefinitionTrait
 
@@ -89,7 +89,7 @@ object Instance {
 		val defi = catalogs.findDefinition(defType) match {
 			case Some(d) => d
 			case None    =>
-				definitionFrom(catalogs, Game.projectPath, table, defType) match {
+				definitionFrom(catalogs, Project.projectPath, table, defType) match {
 					case Some(value) => value
 					case None        =>
 						println(s"No definition found or could be create $name $defType")

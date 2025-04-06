@@ -3,7 +3,7 @@ package actions
 import gagameos._
 import input.VerilogPort
 import overlord.Chip.{Port, WireDirection}
-import overlord.Game
+import overlord.Project
 import overlord.Instances.{ChipInstance, InstanceTrait}
 import scala.util.boundary, boundary.break
 
@@ -23,7 +23,7 @@ case class ReadYamlRegistersAction(name: String, process: Map[String, Variant])
 	override def execute(instance: ChipInstance, parameters: Map[String, Variant]): Unit = {
 		import scala.util.boundary, boundary.break
 
-		val expandedName = Game.resolveInstanceMacros(instance, name)
+		val expandedName = Project.resolveInstanceMacros(instance, name)
 		val registers    = input.YamlRegistersParser(instance, expandedName, instance.name)
 
 		boundary {

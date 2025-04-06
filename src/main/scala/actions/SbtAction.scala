@@ -1,7 +1,7 @@
 package actions
 
 import gagameos._
-import overlord.Game
+import overlord.Project
 import overlord.Instances.InstanceTrait
 
 case class SbtAction(mainScala: String, args: String, srcPath: String)
@@ -12,14 +12,14 @@ case class SbtAction(mainScala: String, args: String, srcPath: String)
 	override def execute(instance: InstanceTrait, parameters: Map[String, Variant]): Unit = {
 		import scala.language.postfixOps
 
-		val srcAbsPath    = Game.tryPaths(instance, srcPath)
-		val moddedOutPath = Game.outPath.resolve(instance.name)
+		val srcAbsPath    = Project.tryPaths(instance, srcPath)
+		val moddedOutPath = Project.outPath.resolve(instance.name)
 
 		Utils.ensureDirectories(moddedOutPath)
 
 		srcAbsPath.toFile.listFiles.foreach(f => if (f.isFile) Utils.copy(f.toPath, moddedOutPath.resolve(f.toPath.getFileName)))
 
-		val proargs = Game.resolvePathMacros(instance, args)
+		val proargs = Project.resolvePathMacros(instance, args)
 
 		val result = sys.process.Process(Seq("sbt", proargs), moddedOutPath.toFile).!
 
@@ -50,6 +50,6 @@ object SbtAction {
 		val mainScala = Utils.toString(process("main_scala"))
 		val args      = Utils.toString(process("args"))
 
-		Seq(SbtAction(mainScala, args, Game.catalogPath.toString))
+		Seq(SbtAction(mainScala, args, Project.catalogPath.toString))
 	}
 }

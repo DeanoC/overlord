@@ -1,7 +1,7 @@
 package actions
 
 import gagameos._
-import overlord.Game
+import overlord.Project
 import overlord.Instances.InstanceTrait
 
 case class GitCloneAction(url: String)
@@ -13,7 +13,7 @@ case class GitCloneAction(url: String)
 		import scala.language.postfixOps
 		import scala.sys.process._
 
-		val path = Game.outPath.resolve(url.split('/').last)
+		val path = Project.outPath.resolve(url.split('/').last)
 		if (!path.toFile.exists()) {
 			val result = s"git clone --recursive $url $path" !
 

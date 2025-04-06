@@ -4,13 +4,14 @@ import actions.{CopyAction, SourcesAction}
 import gagameos._
 import overlord.Instances._
 import overlord._
+import overlord.Project
 
 import scala.collection.mutable
 
 object Edalize {
-	def apply(game: Game): Unit = {
-		println(s"Creating Edalize script at ${Game.outPath}")
-		Utils.ensureDirectories(Game.outPath)
+	def apply(game: Project): Unit = {
+		println(s"Creating Edalize script at ${Project.outPath}")
+		Utils.ensureDirectories(Project.outPath)
 
 		val board = if (game.board.nonEmpty) game.board.get else {
 			print(s"No board instance found, aborting Edalize process")
@@ -123,8 +124,8 @@ object Edalize {
 			}
 		}
 
-		val absTopFilePath = Game.outPath.resolve(s"${game.name}_top.v").toAbsolutePath
-		val absXDCFilePath = Game.outPath.resolve(s"${game.name}.xdc").toAbsolutePath
+		val absTopFilePath = Project.outPath.resolve(s"${game.name}_top.v").toAbsolutePath
+		val absXDCFilePath = Project.outPath.resolve(s"${game.name}.xdc").toAbsolutePath
 
 		sb ++=
 		// @formatter:off
@@ -165,7 +166,7 @@ s"""    {'name': '${absXDCFilePath.toString}', 'file_type': 'xdc'}\n""" // Adjus
 			|
 			|""".stripMargin
 
-		Utils.writeFile(Game.outPath.resolve("edalize_build.py"), sb.result())
+		Utils.writeFile(Project.outPath.resolve("edalize_build.py"), sb.result())
 		*/
 	}
 

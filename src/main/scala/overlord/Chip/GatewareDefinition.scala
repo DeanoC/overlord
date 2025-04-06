@@ -3,7 +3,7 @@ package overlord.Chip
 import actions.ActionsFile
 import gagameos.Utils.VariantTable
 import gagameos.{Utils, Variant}
-import overlord.{DefinitionType, Game, GatewareDefinitionTrait}
+import overlord.{DefinitionType, Project, GatewareDefinitionTrait}
 
 import java.nio.file.{Path, Paths}
 
@@ -65,7 +65,7 @@ object GatewareDefinition {
 	          parameters: Map[String, Variant],
 	          fileName: String): Option[GatewareDefinition] = {
 		val fileNameAlone = Paths.get(fileName).getFileName
-		Game.pushCatalogPath(Paths.get(fileName))
+		Project.pushCatalogPath(Paths.get(fileName))
 		val result = parse(defType,
 		                   attributes,
 		                   dependencies,
@@ -73,8 +73,8 @@ object GatewareDefinition {
 		                   registers,
 		                   parameters,
 		                   fileName,
-		                   Utils.readYaml(Game.catalogPath.resolve(fileNameAlone)))
-		Game.popCatalogPath()
+		                   Utils.readYaml(Project.catalogPath.resolve(fileNameAlone)))
+		Project.popCatalogPath()
 		result
 	}
 
@@ -103,7 +103,7 @@ object GatewareDefinition {
 		else parameters
 
 		Some(GatewareDefinition(defType,
-		                        Game.catalogPath,
+		                        Project.catalogPath,
 		                        attributes,
 		                        dependencies,
 		                        ports,

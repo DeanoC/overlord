@@ -5,6 +5,7 @@ import gagameos.{Utils, Variant}
 import overlord.Chip.{ChipDefinition, Port, RegisterBank, Registers}
 import overlord.Instances._
 import overlord.Software.SoftwareDefinition
+import overlord.Project
 
 import java.nio.file.Path
 import scala.sys.exit
@@ -22,7 +23,7 @@ object Definition {
 	def apply(defi: Variant,
 	          defaults: Map[String, Variant]): DefinitionTrait = {
 
-		val path = Game.catalogPath
+		val path = Project.catalogPath
 
 		val table   = Utils.mergeAintoB(Utils.toTable(defi), defaults)
 		val deftype = DefinitionType(Utils.toString(table("type"))) match {

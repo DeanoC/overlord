@@ -1,7 +1,7 @@
 package actions
 
 import gagameos._
-import overlord.Game
+import overlord.Project
 import overlord.Instances.{InstanceTrait, ProgramInstance, SoftwareInstance}
 import java.nio.file.{Path, Paths}
 
@@ -47,12 +47,12 @@ case class TemplateAction(override val phase: Int,
 					else si.folder
 				} else si.folder
 
-				Game.outPath
+				Project.outPath
 					.resolve(folder)
 					.resolve(si.name.replace('.','_'))
 					.resolve(ofn)
 			case _                    =>
-				Game.outPath.resolve(ofn)
+				Project.outPath.resolve(ofn)
 		}
 		Utils.ensureDirectories(oPath.getParent)
 		Utils.writeFile(oPath, sourceString)
@@ -93,7 +93,7 @@ object TemplateAction {
 
 			TemplateAction(phase,
 			               cpus,
-										 Game.catalogPath,
+										 Project.catalogPath,
 			               inFilename,
 			               outFilename)
 		}
