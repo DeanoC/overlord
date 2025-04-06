@@ -30,3 +30,11 @@ jobs:
       run: sbt test
     - name: Build package
       run: sbt assembly
+      
+    # Upload build artifacts for use in subsequent workflows
+    - name: Upload target directory
+      uses: actions/upload-artifact@v3
+      with:
+        name: target-directory
+        path: target/
+        retention-days: 1

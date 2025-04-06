@@ -1,0 +1,82 @@
+name: Clean Compile and Run
+
+on:
+  workflow_run:
+    workflows: ["Scala CI"]
+    types:
+      - completed
+  workflow_dispatch:  # Allows manual triggering
+
+jobs:
+  compile-and-run:
+    runs-on: ubuntu-latest
+    # Only run if the Scala CI workflow succeeded or this was manually triggered
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    
+    steps:
+    - uses: actions/checkout@v3
+      
+    # Set up minimal environment for running the application
+    - name: Set up JDK 17
+      if: ${{ github.event_name == 'workflow_dispatch' }}
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: 'sbt'
+        
+    - name: Install sbt (only for manual trigger)
+      if: ${{ github.event_name == 'workflow_dispatch' }}
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y curl gnupg
+        echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | sudo tee /etc/apt/sources.list.d/sbt.list
+        curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x99E82A75642AC823" | sudo apt-key add
+        sudo apt-get update
+        sudo apt-get install sbt
+    
+    # For workflow_run triggers, download artifacts from the previous workflow
+    - name: Download target directory from previous workflow
+      if: ${{ github.event_name == 'workflow_run' }}
+      uses: dawidd6/action-download-artifact@v2
+      with:
+        workflow: scala.yml
+        name: target-directory
+        path: target/
+        
+    # For manual triggers, we need to compile from scratch
+    - name: Clean compile (only for manual trigger)
+      if: ${{ github.event_name == 'workflow_dispatch' }}
+      run: sbt clean compile
+      
+    - name: Stage application (only for manual trigger)
+      if: ${{ github.event_name == 'workflow_dispatch' }}
+      run: sbt stage
+      
+    - name: Prepare for template project run
+      run: |
+        # Make the overlord executable available
+        mkdir -p ${HOME}/bin
+        cp target/universal/stage/bin/overlord ${HOME}/bin/
+        chmod +x ${HOME}/bin/overlord
+        
+        # Copy lib directory
+        mkdir -p ${HOME}/lib
+        cp -r target/universal/stage/lib/* ${HOME}/lib/
+        
+        # Add to PATH
+        echo "${HOME}/bin" >> $GITHUB_PATH
+        
+    - name: Run template project
+      working-directory: ./overlord_template_project
+      run: |
+        # Error handling
+        set -e
+        
+        echo "Running template project with overlord"
+        overlord create template_project.over --board kv260 || {
+          echo "Error: Template project execution failed"
+          exit 1
+        }
+        
+        echo "Template project completed successfully"
