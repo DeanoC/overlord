@@ -1,7 +1,8 @@
 package overlord.Connections
 
 import overlord.Instances.{ChipInstance, InstanceTrait}
-import overlord.Interfaces.PortsLike
+import overlord.PortsLike
+import overlord._
 
 case class UnconnectedPortGroup(firstFullName: String,
                                 direction: ConnectionDirection,

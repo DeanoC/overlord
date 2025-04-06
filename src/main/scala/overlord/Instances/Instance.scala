@@ -1,10 +1,9 @@
 package overlord.Instances
 
 import gagameos.{Utils, Variant}
-import overlord.Chip.{ChipDefinition, Port}
-import overlord.Interfaces.QueryInterface
+import overlord.Hardware.{HardwareDefinition, Port}
+import overlord.{DefinitionCatalog, DefinitionTrait, DefinitionType, Project, QueryInterface}
 import overlord.Software.SoftwareDefinition
-import overlord.{DefinitionCatalog, DefinitionTrait, DefinitionType, Project}
 
 import java.nio.file.Path
 import scala.collection.mutable
@@ -110,7 +109,7 @@ object Instance {
 	: Option[DefinitionTrait] = {
 
 		if (table.contains("gateware")) {
-			val result = ChipDefinition(table, path)
+			val result = HardwareDefinition(table, path)
 			result match {
 				case Some(value) =>
 					catalogs.catalogs += (defType -> value)

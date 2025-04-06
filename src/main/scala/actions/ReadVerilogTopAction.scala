@@ -2,7 +2,7 @@ package actions
 
 import gagameos._
 import input.{VerilogParameterKey, VerilogPort}
-import overlord.Chip.{Port, WireDirection}
+import overlord.Hardware.{Port, WireDirection}
 import overlord.Project
 import overlord.Instances.{ChipInstance, InstanceTrait}
 import scala.util.boundary, boundary.break

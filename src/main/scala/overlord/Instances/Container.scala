@@ -1,6 +1,6 @@
 package overlord.Instances
 
-import overlord.Interfaces.UnconnectedLike
+import overlord.UnconnectedLike
 
 trait Container {
     def children   : Seq[InstanceTrait]

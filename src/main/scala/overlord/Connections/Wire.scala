@@ -1,9 +1,10 @@
 package overlord.Connections
 
-import overlord.Chip.InWireDirection
+import overlord.Hardware.InWireDirection
+import overlord.Instances.ChipInstance
 import overlord.DistanceMatrix
 import overlord.Instances.{ClockInstance, PinGroupInstance}
-
+import overlord._
 import scala.collection.mutable
 
 case class Wire(startLoc: InstanceLoc,

@@ -2,7 +2,7 @@ package overlord.Instances
 
 import gagameos.Utils.VariantTable
 import gagameos.{ArrayV, BigIntV, Utils, Variant}
-import overlord.Interfaces.SupplierBusLike
+import overlord.SupplierBusLike
 
 import scala.collection.mutable
 import scala.reflect.ClassTag

@@ -1,8 +1,9 @@
 package input
 
-import gagameos.{BigIntV, StringV, TableV}
-import overlord.Chip.{RegisterBank, Registers}
-import overlord.Instances.InstanceTrait
+import gagameos._
+import overlord.Hardware.{RegisterBank, Registers}
+import overlord.Instances.{ChipInstance, InstanceTrait}
+import overlord.Project
 
 object YamlRegistersParser {
 	def apply(instance: InstanceTrait, filename: String, name: String): Seq[RegisterBank] = {

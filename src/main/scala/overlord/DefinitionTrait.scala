@@ -2,7 +2,7 @@ package overlord
 
 import actions.ActionsFile
 import gagameos.{Utils, Variant}
-import overlord.Chip.{ChipDefinition, Port, RegisterBank, Registers}
+import overlord.Hardware.{HardwareDefinition, Port, RegisterBank, Registers}
 import overlord.Instances._
 import overlord.Software.SoftwareDefinition
 import overlord.Project
@@ -27,13 +27,13 @@ object Definition {
 
 		val table   = Utils.mergeAintoB(Utils.toTable(defi), defaults)
 		val deftype = DefinitionType(Utils.toString(table("type"))) match {
-			case _: ChipDefinitionType     => ChipDefinition(table, path)
+			case _: ChipDefinitionType     => HardwareDefinition(table, path)
 			case _: SoftwareDefinitionType => SoftwareDefinition(table, path)
 
-			// TODO these aren't really chips, but piggyback off ChipDefinition for now
-			case _: PinGroupDefinitionType => ChipDefinition(table, path)
-			case _: ClockDefinitionType    => ChipDefinition(table, path)
-			case _: BoardDefinitionType    => ChipDefinition(table, path)
+			// TODO these aren't really chips, but piggyback off HardwareDefinition for now
+			case _: PinGroupDefinitionType => HardwareDefinition(table, path)
+			case _: ClockDefinitionType    => HardwareDefinition(table, path)
+			case _: BoardDefinitionType    => HardwareDefinition(table, path)
 		}
 
 		deftype match {

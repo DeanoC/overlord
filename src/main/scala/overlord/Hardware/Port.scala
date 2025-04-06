@@ -1,4 +1,4 @@
-package overlord.Chip
+package overlord.Hardware
 import gagameos._
 
 
@@ -74,5 +74,5 @@ object Ports {
 				}
 			case StringV(s) => Some(Port(s, BitsDesc(1)))
 			case _ => None
-		}
+			}
 }

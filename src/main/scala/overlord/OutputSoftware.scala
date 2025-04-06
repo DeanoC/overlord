@@ -1,10 +1,10 @@
 package overlord
 
 import gagameos._
-import overlord.Chip.{BitsDesc, RegisterList, Registers}
+import overlord.Hardware.{BitsDesc, RegisterList, Registers}
 import overlord.Connections._
 import overlord.Instances._
-import overlord.Interfaces.{RamLike, RegisterBankLike}
+import overlord.{RamLike, RegisterBankLike}
 import overlord.Project
 
 import java.nio.file.{Path, Paths}
@@ -16,6 +16,10 @@ object OutputSoftware {
 		for (instance <- software) executeCpuInvariantSoftwareActions(instance, constants)
 	}
 
+	/**
+	 * Executes CPU-invariant software actions for a given software instance.
+	 * These actions are filtered by phase 1 and executed with merged parameters.
+	 */
 	private def executeCpuInvariantSoftwareActions(instance: SoftwareInstance,
 	                                               constants: Seq[Constant]): Unit = {
 		val software = instance.definition
@@ -73,6 +77,10 @@ object OutputSoftware {
 		for (instance <- software) executeCpuSpecificSoftwareActions(instance, cpus, keywordsPerCpu)
 	}
 
+	/**
+	 * Executes CPU-specific software actions for a given software instance.
+	 * These actions are filtered by phase 2 and executed with CPU-specific parameters.
+	 */
 	private def executeCpuSpecificSoftwareActions(instance: SoftwareInstance,
 	                                              cpus: Seq[CpuInstance],
 	                                              keywordsPerCpu: Array[Map[String, Variant]]): Unit = {
@@ -83,6 +91,10 @@ object OutputSoftware {
 		}
 	}
 
+	/**
+	 * Generates a memory map for a specific CPU based on its connections and distance matrix.
+	 * The memory map includes RAM ranges and chip addresses.
+	 */
 	private def generateMemoryMapFor(cpu: CpuInstance,
 	                                 distanceMatrix: DistanceMatrix,
 	                                 connected: Seq[Connected]): String = {
@@ -96,29 +108,67 @@ object OutputSoftware {
 	}
 
 	private def genChipMemoryMapFor(cpu: CpuInstance, distanceMatrix: DistanceMatrix, connected: Seq[Connected]): String = {
-
+		// Extract RAM ranges and chip addresses for the given CPU
 		val (ramRanges, chipAddresses) = extractRamAndRegisters(cpu, distanceMatrix, connected)
 
-		// add cpu specific register banks
-		for (rb <- cpu.banks) if (rb.baseAddress != -1) chipAddresses += ((rb.name, rb.name, cpu, rb.baseAddress))
+		// Add CPU-specific register banks to chip addresses
+		addCpuRegisterBanks(cpu, chipAddresses)
 
+		// Generate memory map strings for RAM ranges and chip addresses
+		val ramMap = generateRamMap(ramRanges.toSeq)
+		val chipMap = generateChipMap(chipAddresses.toSeq)
+
+		// Combine and return the memory map
+		ramMap + chipMap
+	}
+
+	/**
+	 * Adds CPU-specific register banks to the chip addresses list.
+	 */
+	private def addCpuRegisterBanks(cpu: CpuInstance, chipAddresses: mutable.ArrayBuffer[(String, String, ChipInstance, BigInt)]): Unit = {
+		for (rb <- cpu.banks if rb.baseAddress != -1) {
+			chipAddresses += ((rb.name, rb.name, cpu, rb.baseAddress))
+		}
+	}
+
+	/**
+	 * Generates memory map definitions for RAM ranges.
+	 */
+	private def generateRamMap(ramRanges: Seq[(RamLike, Int, BigInt, BigInt)]): String = {
 		val ramSizesByRam = mutable.Map[String, BigInt]()
+		val rsb = new mutable.StringBuilder
+
+		// Aggregate RAM sizes by owner
 		for ((ram, _, _, size) <- ramRanges) {
 			val si = ram.getOwner.name.replace('.', '_')
-			if (ramSizesByRam.contains(si)) ramSizesByRam(si) += size
-			else ramSizesByRam += (si -> size)
+			ramSizesByRam.updateWith(si) {
+				case Some(existingSize) => Some(existingSize + size)
+				case None => Some(size)
+			}
 		}
 
-		val rsb = new mutable.StringBuilder
-		for ((name, size) <- ramSizesByRam) rsb ++= f"%n#define ${name.toUpperCase}_TOTAL_SIZE_IN_BYTES $size${cPostFix(size)}%n"
+		// Generate RAM size definitions
+		for ((name, size) <- ramSizesByRam) {
+			rsb ++= f"%n#define ${name.toUpperCase}_TOTAL_SIZE_IN_BYTES $size${cPostFix(size)}%n"
+		}
 
+		// Generate RAM base address and size definitions
 		for ((ram, i, address, size) <- ramRanges) {
 			rsb ++= f"%n"
-			val si   = ram.getOwner.name.replace('.', '_')
+			val si = ram.getOwner.name.replace('.', '_')
 			val name = s"${si}_$i".toUpperCase
 			rsb ++= f"#define ${name}_BASE_ADDR 0x$address%x${cPostFix(address)}%n"
 			rsb ++= f"#define ${name}_SIZE_IN_BYTES $size${cPostFix(size)}%n"
 		}
+
+		rsb.result()
+	}
+
+	/**
+	 * Generates memory map definitions for chip addresses.
+	 */
+	private def generateChipMap(chipAddresses: Seq[(String, String, ChipInstance, BigInt)]): String = {
+		val rsb = new mutable.StringBuilder
 
 		for ((rbName, rlName, _, address) <- chipAddresses) {
 			val rbNameU = rbName.toUpperCase
@@ -127,7 +177,6 @@ object OutputSoftware {
 			if (address >= 0) {
 				rsb ++= f"%n#define ${rbNameU}_BASE_ADDR 0x$address%x${cPostFix(address)}%n"
 			} else {
-				// -1 bank address mean non MMIO register so no base address is valid
 				rsb ++= f"// These registers aren't MMIO accessible so require platform intrinsics to use%n"
 			}
 		}
@@ -154,6 +203,10 @@ object OutputSoftware {
 		for (rl <- uniqueRegisterLists) genHeadersFor(rl)
 	}
 
+	/**
+	 * Extracts RAM ranges and register addresses for a given CPU based on its connections.
+	 * This includes handling RAM-like interfaces and register banks.
+	 */
 	private def extractRamAndRegisters(cpu: CpuInstance, distanceMatrix: DistanceMatrix, connected: Seq[Connected]) = {
 
 		val ramRanges     = mutable.ArrayBuffer[(RamLike, Int, BigInt, BigInt)]()
@@ -174,7 +227,7 @@ object OutputSoftware {
 
 		distanceMatrix.connectedTo(cpu).filter(_.isVisibleToSoftware).foreach(ep => {
 			// is possible to have several routes between chips (multiple buses) by having multiple connects with different buses
-			// currently we ignore any but the first (TODO trace the correct route)
+			// currently we ignore any but the first (TODO: trace the correct route)
 			val routeConnections: Seq[Connected] = distanceMatrix.expandedRouteBetween(cpu, ep).map {
 				case (src, dst) => {
 					val cons = connected.filter(con => con.connectedBetween(src, dst, FirstToSecondConnection()))
@@ -247,6 +300,10 @@ object OutputSoftware {
 		(ramRanges, chipAddresses)
 	}
 
+	/**
+	 * Generates header files for a given register list.
+	 * The headers define register offsets, masks, and other metadata.
+	 */
 	private def genHeadersFor(registerListName: String): Unit = {
 		// output register definitions
 		val rl    = Registers.registerListCache(registerListName)
@@ -312,6 +369,9 @@ object OutputSoftware {
 		sb.result()
 	}
 
+	/**
+	 * Constructs the file path for a generated header file based on the output directory and name.
+	 */
 	private def filePath(out: Path, name: String): Path = {
 		val fn       = s"${name.replace('.', '_')}.h".toLowerCase()
 		val filename = Paths.get(fn).getFileName

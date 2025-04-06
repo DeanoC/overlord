@@ -1,4 +1,4 @@
-package overlord.Connections
+package overlord
 
 sealed trait ConnectionDirection {
 	override def toString: String =

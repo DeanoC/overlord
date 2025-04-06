@@ -1,7 +1,7 @@
 package output
 
 import gagameos._
-import overlord.Chip.Registers
+import overlord.Hardware.Registers
 import overlord.Instances.{BoardInstance, ChipInstance, Container, CpuInstance, InstanceTrait}
 import overlord._
 import overlord.Project

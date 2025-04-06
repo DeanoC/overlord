@@ -1,6 +1,7 @@
 package overlord.Connections
 
 import overlord.Instances.{ChipInstance, InstanceTrait}
+import overlord._
 
 case class UnconnectedLogical(firstFullName: String,
                               direction: ConnectionDirection,

@@ -1,4 +1,4 @@
-package overlord.Chip
+package overlord.Hardware
 
 import actions.ActionsFile
 import gagameos.Utils.VariantTable
@@ -7,6 +7,19 @@ import overlord.{DefinitionType, Project, GatewareDefinitionTrait}
 
 import java.nio.file.{Path, Paths}
 
+/**
+ * Represents a gateware definition with associated metadata, parameters, and actions.
+ *
+ * @param defType       The type of the definition.
+ * @param sourcePath    The source path of the definition.
+ * @param attributes    A map of attributes associated with the definition.
+ * @param dependencies  A sequence of driver dependencies.
+ * @param ports         A map of ports defined for the gateware.
+ * @param maxInstances  The maximum number of instances allowed (default is 1).
+ * @param registersV    A sequence of register definitions.
+ * @param parameters    A map of parameters for the gateware.
+ * @param actionsFile   The actions file associated with the gateware.
+ */
 case class GatewareDefinition(defType: DefinitionType,
                               sourcePath: Path,
                               attributes: Map[String, Variant],
@@ -19,7 +32,18 @@ case class GatewareDefinition(defType: DefinitionType,
                              ) extends GatewareDefinitionTrait {
 }
 
+/**
+ * Companion object for GatewareDefinition.
+ * Provides methods to create GatewareDefinition instances from various inputs.
+ */
 object GatewareDefinition {
+
+	/**
+	 * Creates a GatewareDefinition from a VariantTable.
+	 *
+	 * @param table The table containing gateware definition data.
+	 * @return An Option containing the GatewareDefinition if valid, otherwise None.
+	 */
 	def apply(table: VariantTable): Option[GatewareDefinition] = {
 		if (!table.contains("gateware")) return None
 
@@ -57,6 +81,18 @@ object GatewareDefinition {
 
 	}
 
+	/**
+	 * Creates a GatewareDefinition by parsing a file and combining it with provided metadata.
+	 *
+	 * @param defType       The type of the definition.
+	 * @param attributes    A map of attributes associated with the definition.
+	 * @param dependencies  A sequence of driver dependencies.
+	 * @param ports         A map of ports defined for the gateware.
+	 * @param registers     A sequence of register definitions.
+	 * @param parameters    A map of parameters for the gateware.
+	 * @param fileName      The name of the file containing additional gateware data.
+	 * @return An Option containing the GatewareDefinition if valid, otherwise None.
+	 */
 	def apply(defType: DefinitionType,
 	          attributes: Map[String, Variant],
 	          dependencies: Seq[String],
@@ -78,6 +114,19 @@ object GatewareDefinition {
 		result
 	}
 
+	/**
+	 * Parses a gateware definition from a file and combines it with provided metadata.
+	 *
+	 * @param defType       The type of the definition.
+	 * @param attributes    A map of attributes associated with the definition.
+	 * @param dependencies  A sequence of driver dependencies.
+	 * @param iports        A map of initial ports.
+	 * @param registers     A sequence of register definitions.
+	 * @param parameters    A map of parameters for the gateware.
+	 * @param fileName      The name of the file containing additional gateware data.
+	 * @param parsed        The parsed data from the file.
+	 * @return An Option containing the GatewareDefinition if valid, otherwise None.
+	 */
 	private def parse(defType: DefinitionType,
 	                  attributes: Map[String, Variant],
 	                  dependencies: Seq[String],

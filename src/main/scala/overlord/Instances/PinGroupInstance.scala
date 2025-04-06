@@ -1,7 +1,7 @@
 package overlord.Instances
 
 import gagameos._
-import overlord.Chip.{BitsDesc, Port, WireDirection}
+import overlord.Hardware.{BitsDesc, Port, WireDirection}
 import overlord.{ChipDefinitionTrait, DiffPinConstraint, PinConstraint, PinConstraintType}
 
 import scala.collection.mutable

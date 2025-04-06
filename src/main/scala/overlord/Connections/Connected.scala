@@ -1,9 +1,8 @@
 package overlord.Connections
 
-import overlord.Chip.Port
+import overlord.Hardware.Port
+import overlord.{BiDirectionConnection, ConnectionDirection, DefinitionTrait, GatewareDefinitionTrait, HardwareDefinitionTrait, QueryInterface, SoftwareDefinitionTrait}
 import overlord.Instances.{ChipInstance, ClockInstance, InstanceTrait, PinGroupInstance}
-import overlord.Interfaces.QueryInterface
-import overlord.{DefinitionTrait, GatewareDefinitionTrait, HardwareDefinitionTrait, SoftwareDefinitionTrait}
 
 sealed trait ConnectionPriority
 

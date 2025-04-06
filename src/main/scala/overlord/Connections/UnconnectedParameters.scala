@@ -2,6 +2,8 @@ package overlord.Connections
 
 import gagameos.{Utils, Variant}
 import overlord.Instances.{ChipInstance, InstanceTrait}
+import overlord.ConnectionDirection
+import overlord._
 
 sealed trait ParameterType
 
@@ -33,7 +35,7 @@ case class UnconnectedParameters(direction: ConnectionDirection,
 }
 
 object UnconnectedParameters {
-	def apply(direction: ConnectionDirection, secondFullName: String, parametersV: Array[Variant]): Unconnected = {
+	def apply(direction: ConnectionDirection, secondFullName: String, parametersV: Array[Variant]): UnconnectedLike = {
 		val parameters = parametersV.flatMap { v =>
 			val table = Utils.toTable(v)
 			if (!table.contains("name")) {

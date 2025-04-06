@@ -1,8 +1,11 @@
 package overlord.Connections
+import overlord._
 
-import overlord.Chip.{InOutWireDirection, Port}
+import overlord.Hardware.{InOutWireDirection, Port}
+import overlord.{ConnectionDirection, FirstToSecondConnection}
+
 import overlord.Instances.ChipInstance
-import overlord.Interfaces.PortsLike
+import overlord.PortsLike
 
 case class ConnectedPortGroup(connectionPriority: ConnectionPriority,
                               main: InstanceLoc,

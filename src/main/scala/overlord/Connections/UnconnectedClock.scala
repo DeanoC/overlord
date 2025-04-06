@@ -1,5 +1,7 @@
 package overlord.Connections
 
+import overlord._
+
 import overlord.Instances.{ChipInstance, InstanceTrait}
 
 case class UnconnectedClock(firstFullName: String,

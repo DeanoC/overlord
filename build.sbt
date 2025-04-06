@@ -37,6 +37,9 @@ lazy val dependencies = Seq(
 	// Collection compatibility
 	"org.scala-lang.modules" %% "scala-collection-compat" % "2.11.0",
 	
+	// Parser Combinators - needed for VerilogModuleParser
+	"org.scala-lang.modules" %% "scala-parser-combinators" % "2.3.0",
+	
 	// Test libraries
 	"org.scalactic" %% "scalactic" % "3.2.17",
 	"org.scalatest" %% "scalatest" % "3.2.17" % "test",

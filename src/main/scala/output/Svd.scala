@@ -1,7 +1,7 @@
 package output
 
+import overlord.Hardware.{BitsDesc, Register}
 import gagameos.Utils
-import overlord.Chip.{BitsDesc, Register}
 import overlord.Instances.{ChipInstance, CpuInstance}
 import overlord._
 import overlord.Project

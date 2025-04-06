@@ -1,4 +1,5 @@
 package overlord.Connections
+import overlord._
 
 
 case class ConnectedLogical(connectionPriority: ConnectionPriority,

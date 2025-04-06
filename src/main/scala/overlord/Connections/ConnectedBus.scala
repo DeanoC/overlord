@@ -1,7 +1,8 @@
 package overlord.Connections
 
+import overlord._
 import overlord.Instances.ChipInstance
-import overlord.Interfaces.SupplierBusLike
+import overlord.SupplierBusLike
 
 case class ConnectedBus(connectionPriority: ConnectionPriority,
                         main: InstanceLoc,

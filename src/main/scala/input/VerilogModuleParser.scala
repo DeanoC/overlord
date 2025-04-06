@@ -1,6 +1,9 @@
 package input
 
-import overlord.Chip.BitsDesc
+import overlord.Hardware.BitsDesc
+
+import scala.util.parsing.combinator._
+
 import java.nio.file.{Files, Path}
 import scala.collection.mutable
 

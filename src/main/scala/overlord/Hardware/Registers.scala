@@ -1,4 +1,4 @@
-package overlord.Chip
+package overlord.Hardware
 
 import gagameos.{StringV, Utils, Variant}
 import overlord.Project

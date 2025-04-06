@@ -3,7 +3,7 @@ package overlord
 import gagameos._
 import overlord.Connections._
 import overlord.Instances.{ChipInstance, Container}
-import overlord.Interfaces.UnconnectedLike
+import overlord.UnconnectedLike
 import overlord.Project
 
 import java.nio.file.Path

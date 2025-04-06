@@ -2,7 +2,7 @@ package overlord.Instances
 
 import gagameos.{Utils, Variant}
 import overlord.ChipDefinitionTrait
-import overlord.Interfaces.RamLike
+import overlord.RamLike
 
 import scala.reflect.ClassTag
 

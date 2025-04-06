@@ -1,5 +1,6 @@
 package overlord.Connections
 
+import overlord._
 import overlord.DefinitionType
 import overlord.Instances.ChipInstance
 
