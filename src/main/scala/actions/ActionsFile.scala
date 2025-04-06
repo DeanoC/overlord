@@ -59,7 +59,7 @@ object ActionsFile {
 						case "yaml"                => YamlAction(name, process)
 						case "sbt"                 => SbtAction(name, process)
 						case "read_verilog_top"    => ReadVerilogTopAction(name, process)
-//						case "read_yaml_registers" => ReadYamlRegistersAction(name, process)
+						case "read_yaml_registers" => ReadYamlRegistersAction(name, process)
 						case "templates"           => TemplateAction(name, process)
 						case "software_sources"    => SoftSourceAction(name, process)
 						case _                     =>

@@ -32,6 +32,18 @@ case class LatticeBoard() extends BoardType {
 		immutable.Map[String, Variant]()
 }
 
+case class GowinBoard(family: String, device: String) extends BoardType {
+	override val defaults: Map[String, Variant] =
+		immutable.Map[String, Variant](			
+			("pullup" -> BooleanV(false)),
+			("slew" -> StringV("Slow")),
+			("drive" -> IntV(8)),
+			("direction" -> StringV("None")),
+			("standard" -> StringV("LVCMOS33"))
+			)
+}
+
+
 case class BoardInstance(name: String,
                          boardType: BoardType,
                          override val definition: ChipDefinitionTrait,
@@ -80,7 +92,16 @@ object BoardInstance {
 					            Utils.toString(attribs("board_device")))
 				case "Altera"  => AlteraBoard()
 				case "Lattice" => LatticeBoard()
-				case _         => println(s"$name board has a unknown type");
+				case "Gowin"	=> 
+					if (!attribs.contains("board_family") ||
+					    !attribs.contains("board_device")) {
+						println(s"$name Gowin board requires a board_family AND " +
+						        s"board_device field")
+						break(None)
+					}
+					GowinBoard(	Utils.toString(attribs("board_family")),
+								Utils.toString(attribs("board_device")))
+				case _         => println(s"$name board has a unknown board_type");
 					break(None)
 			}
 			val defaults  = if (attribs.contains("defaults")) {

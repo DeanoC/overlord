@@ -243,10 +243,15 @@ object Utils {
 				return Map[String, Variant]()
 		}
 
-//		println(s"Reading $yamlPath YAML")
 		val yaml = new Yaml()
-		val parsed = yaml.load(source).asInstanceOf[java.util.Map[String, Any]]
-		parsed.asScala.map { case (k, v) => k -> toVariant(v) }.toMap
+		try {
+			val parsed = yaml.load(source).asInstanceOf[java.util.Map[String, Any]]
+			parsed.asScala.map { case (k, v) => k -> toVariant(v) }.toMap
+		} catch {
+			case e: Exception =>
+				println(s"Error parsing YAML file $yamlPath: ${e.getMessage}")
+				Map[String, Variant]()
+		}
 	}
 
 	def lookupString(tbl: VariantTable, key: String, or: String): String =

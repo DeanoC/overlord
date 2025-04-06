@@ -103,10 +103,7 @@ if [ -x "$OVERLORD_BIN_PATH" ]; then
     TEMPLATE_PROJECT_DIR="$PROJECT_DIR/overlord_template_project"
     cd "$TEMPLATE_PROJECT_DIR"
     echo -e "${YELLOW}Running template project from: $TEMPLATE_PROJECT_DIR${RESET}"
-    
-    # Run the overlord command directly with the template parameters
-    echo -e "${YELLOW}Running: overlord create template_project.over --board kv260${RESET}"
-    overlord create template_project.over --board kv260
+    ./run.sh
 else
     echo -e "${RED}Installation failed.${RESET}"
     exit 1

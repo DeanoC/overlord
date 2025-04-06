@@ -7,7 +7,7 @@ import overlord.Project
 import overlord.Instances.{ChipInstance, InstanceTrait}
 import scala.util.boundary, boundary.break
 
-case class ReadYamlRegistersAction(name: String, process: Map[String, Variant])
+case class ReadYamlRegistersAction(name: String, filename: String)
 	extends GatewareAction {
 
 	override val phase: Int = 2
@@ -21,13 +21,28 @@ case class ReadYamlRegistersAction(name: String, process: Map[String, Variant])
 	}
 
 	override def execute(instance: ChipInstance, parameters: Map[String, Variant]): Unit = {
-		import scala.util.boundary, boundary.break
-
-		val expandedName = Project.resolveInstanceMacros(instance, name)
+		val expandedName = Project.resolveInstanceMacros(instance, filename)
 		val registers    = input.YamlRegistersParser(instance, expandedName, instance.name)
+		instance.instanceRegisterBanks ++= registers
+	}
+}
 
-		boundary {
-			// ...existing code...
+
+object ReadYamlRegistersAction {
+	def apply(name: String, process: Map[String, Variant]): Option[ReadYamlRegistersAction] = {
+		if (!process.contains("source")) {
+			println(s"Read Yaml Registers process $name doesn't have a source field")
+			return None
 		}
+
+		val filename = process("source") match {
+			case s: StringV => s.value
+			case t: TableV  => Utils.toString(t.value("file"))
+			case _          =>
+				println("Read Yaml Register source field is malformed")
+				return None
+		}
+
+		Some(ReadYamlRegistersAction(name, filename))
 	}
 }
