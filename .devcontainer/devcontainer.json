@@ -4,6 +4,8 @@
         "dockerfile": "Dockerfile",
         "args": {}
     },
+    // Configure git to clone submodules
+    "initializeCommand": "git submodule update --init --recursive",
     "features": {
         "ghcr.io/devcontainers/features/github-cli:1": {}
     },
@@ -25,7 +27,8 @@
         }
     },
     "forwardPorts": [8080],
-    "postCreateCommand": "sbt update",
+    // Update postCreateCommand to also ensure submodules are updated
+    "postCreateCommand": "git submodule update --init --recursive && sbt update",
     "remoteUser": "vscode",
     "hostRequirements": {
         "memory": "8gb",
