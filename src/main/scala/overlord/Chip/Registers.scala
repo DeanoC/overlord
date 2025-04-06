@@ -6,6 +6,7 @@ import overlord.Instances.InstanceTrait
 
 import java.nio.file.Path
 import scala.collection.mutable
+import scala.util.boundary, boundary.break
 
 case class RegisterBank(name: String,
                         baseAddress: BigInt,
@@ -49,31 +50,38 @@ object Registers {
 
 	def apply(instance: InstanceTrait, registerDefs: Seq[Variant]): Seq[RegisterBank] = {
 
-		val tomls = mutable.ArrayBuffer[(String, Map[String, Variant])]()
+		val yamls = mutable.ArrayBuffer[(String, Map[String, Variant])]()
 
 		val registerBanks = for (inlineTable <- registerDefs) yield {
 			val item = Utils.toTable(inlineTable)
-			if (!item.contains("resource")) {
-				println(s"No resource in register table\n")
-				return Seq()
-			}
-			val resource           = Utils.toString(item("resource"))
-			val name               = Utils.lookupString(item, "name", "")
-			val baseAddress        = Utils.lookupBigInt(item, "base_address", -1)
-			val addressIncrement   = Utils.lookupBigInt(item, "address_increment", 0)
-			val registerWindowSize = Utils.lookupBigInt(item, "register_window_size", -1)
-			val cpus               = decodeCpusString(Utils.lookupString(item, "cpus", "_"))
+			boundary { 
+				if (!item.contains("resource")) {
+					println(s"No resource in register table\n")
+					break(Seq())
+				}
+				val resource           = Utils.toString(item("resource"))
+				val name               = Utils.lookupString(item, "name", "")
+				val baseAddress        = Utils.lookupBigInt(item, "base_address", -1)
+				val addressIncrement   = Utils.lookupBigInt(item, "address_increment", 0)
+				val registerWindowSize = Utils.lookupBigInt(item, "register_window_size", -1)
+				val cpus               = decodeCpusString(Utils.lookupString(item, "cpus", "_"))
 
-			val path: Path = Game.tryPaths(instance, resource)
+				val path: Path = Game.tryPaths(instance, resource)
+	
+				if (path == null) {
+					println(s"RegisterBank $name resource $resource path $path not found")
+					break(Seq())
+				}
 
-			val source = Utils.readToml(path)
-			tomls += ((resource, source))
+				val source = Utils.readYaml(path)
+				yamls += ((resource, source))
 
-			if (Registers.registerListCache.contains(resource)) {
-				Some(RegisterBank(name, baseAddress, addressIncrement, registerWindowSize, resource, cpus))
-			} else parseRegisterList(resource, source).flatMap { list =>
-				Registers.registerListCache(resource) = list
-				Some(RegisterBank(name, baseAddress, addressIncrement, registerWindowSize, resource, cpus))
+				if (Registers.registerListCache.contains(resource)) {
+					Some(RegisterBank(name, baseAddress, addressIncrement, registerWindowSize, resource, cpus))
+				} else parseRegisterList(resource, source).flatMap { list =>
+					Registers.registerListCache(resource) = list
+					Some(RegisterBank(name, baseAddress, addressIncrement, registerWindowSize, resource, cpus))
+				}
 			}
 		}
 		registerBanks.flatten

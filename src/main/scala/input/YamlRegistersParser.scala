@@ -4,9 +4,9 @@ import gagameos.{BigIntV, StringV, TableV}
 import overlord.Chip.{RegisterBank, Registers}
 import overlord.Instances.InstanceTrait
 
-object TomlRegistersParser {
+object YamlRegistersParser {
 	def apply(instance: InstanceTrait, filename: String, name: String): Seq[RegisterBank] = {
-		println(s"parsing $name toml for register definitions")
+		println(s"parsing $name yaml for register definitions")
 		val regSeq = Seq(TableV(Map(
 			"resource" -> StringV(filename),
 			"name" -> StringV(name),

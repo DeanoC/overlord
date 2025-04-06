@@ -57,10 +57,9 @@ object ActionsFile {
 						case "git"                 => GitCloneAction(name, process)
 						case "python"              => PythonAction(name, process)
 						case "yaml"                => YamlAction(name, process)
-						case "toml"                => TomlAction(name, process)
 						case "sbt"                 => SbtAction(name, process)
 						case "read_verilog_top"    => ReadVerilogTopAction(name, process)
-						case "read_toml_registers" => ReadTomlRegistersAction(name, process)
+//						case "read_yaml_registers" => ReadYamlRegistersAction(name, process)
 						case "templates"           => TemplateAction(name, process)
 						case "software_sources"    => SoftSourceAction(name, process)
 						case _                     =>

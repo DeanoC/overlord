@@ -3,6 +3,7 @@ import overlord._
 
 import java.nio.file.{Files, Path, Paths}
 import scala.annotation.tailrec
+import sys.process._
 
 object Main {
 	private val usage =
@@ -13,13 +14,15 @@ object Main {
 		   |     : --out  - path where generated files should be placed
 		   |     : --board - board definition to use
 		   |     : --nostdresources - don't use the standard catalog
-		   |     : --resources - use the specified path as the root of resources tomls
+		   |     : --resources - use the specified path as the root of resources
 		   |     : filename should be a .over file to use for the project"""
 			.stripMargin
 
 	def main(args: Array[String]): Unit = {
+
 		if (args.isEmpty) {
 			println(usage)
+			println("No arguments provided.")
 			sys.exit(1)
 		}
 		type OptionMap = Map[Symbol, Any]
@@ -59,6 +62,7 @@ object Main {
 				case option :: _                              =>
 					println(s"Unknown option: $option")
 					println(usage)
+					println(s"Arguments passed: ${args.mkString(" ")}")
 					sys.exit(1)
 			}
 		}
@@ -66,12 +70,14 @@ object Main {
 		val options = nextOption(Map(), args.toList)
 		if (!options.contains(Symbol("infile"))) {
 			println(usage)
+			println(s"Arguments passed: ${args.mkString(" ")}")
 			println("Error: filename is required")
 			sys.exit(1)
 		}
 
 		if (!options.contains(Symbol("board"))) {
 			println(usage)
+			println(s"Arguments passed: ${args.mkString(" ")}")
 			println("Error: board name is required")
 			sys.exit(1)
 		}
@@ -94,6 +100,17 @@ object Main {
 		val stdResources = Resources(Resources.stdResourcePath())
 		val resources = options.get(Symbol("resources")).map { path =>
 			overlord.Resources(Paths.get(path.asInstanceOf[String]))
+		}
+
+		if (!options.contains(Symbol("nostdresources")) && !Files.exists(Resources.stdResourcePath())) {
+			println(s"Warning: Standard resource folder '${Resources.stdResourcePath()}' does not exist.")
+			println("Cloning standard resource folder from Git repository...")
+			val cloneCommand = s"git clone https://github.com/DeanoC/gagameos_stdcatalog.git ${Resources.stdResourcePath()}"
+			val cloneResult = cloneCommand.!
+			if (cloneResult != 0) {
+				println("Error: Failed to clone the standard resource folder.")
+				sys.exit(1)
+			}
 		}
 
 		if (!options.contains(Symbol("nostdresources")) && !Files.exists(Resources.stdResourcePath())) {

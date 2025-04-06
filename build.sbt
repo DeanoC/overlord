@@ -29,9 +29,8 @@ lazy val dependencies = Seq(
 	"org.scala-graph" %% "graph-core" % "2.0.3",
 	"org.scala-graph" %% "graph-dot" % "2.0.0",
 	
-	// TOML parsing
-	"com.electronwill.night-config" % "toml" % "3.6.7",
-	"com.electronwill.night-config" % "core" % "3.6.7"
+	// Add SnakeYAML dependency for YAML parsing
+	"org.yaml" % "snakeyaml" % "2.0"
 )
 
 // Main project (Scala 3)
@@ -47,4 +46,11 @@ lazy val root = (project in file("."))
 			"-explain"  // Detailed error explanations
 		)
 	)
+
+import sbtassembly.AssemblyPlugin.autoImport._
+
+assemblyMergeStrategy := {
+  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+  case _                             => MergeStrategy.first
+}
 

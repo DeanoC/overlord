@@ -27,7 +27,7 @@ object SoftwareDefinition {
 
 		val software = if (!table.contains("software")) {
 			val name = defTypeName.split('.')
-			s"${name.last}/${name.last}.toml"
+			s"${name.last}/${name.last}.yaml"
 		} else {
 			Utils.toString(table("software"))
 		}
@@ -66,12 +66,12 @@ object SoftwareDefinition {
 	          softwarePath: Path): Option[SoftwareDefinition] = {
 		Game.pushCatalogPath(softwarePath)
 		val result = parse(defType,
-		                   path,
-		                   attributes,
-		                   name,
-		                   dependencies,
-		                   softwarePath,
-		                   Utils.readToml(softwarePath))
+		                   	path,
+		                   	attributes,
+		                   	name,
+		                   	dependencies,
+							softwarePath,
+							Utils.readYaml(softwarePath))
 		Game.popCatalogPath()
 		result
 	}

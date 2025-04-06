@@ -8,6 +8,7 @@ import overlord.Interfaces.{ChipLike, RegisterBankLike}
 import java.nio.file.{Files, Path, Paths}
 import scala.collection.mutable
 import scala.reflect.ClassTag
+import scala.util.boundary, boundary.break
 
 case class Game(name: String,
                 children: Seq[InstanceTrait],
@@ -198,7 +199,7 @@ object Game {
 							val softDef = instance.definition.asInstanceOf[SoftwareDefinitionTrait]
 							tryPaths(instance, softDef.actionsFilePath.getParent.toString + "/" + resource, 1)
 						} else {
-							println(s"tryPath: ${Paths.get(resource).normalize()} file not found")
+							println(s"tryPath: ${givenPath.toAbsolutePath} file not found")
 							Paths.get("")
 						}
 					} else outPath
@@ -284,12 +285,15 @@ object Game {
 		private def generateInstances(path: Path): Boolean = {
 			var newContainer = MutableContainer()
 			containerStack.push(newContainer)
-			val parsed = Utils.readToml(path)
+			val parsed = Utils.readYaml(path)
 			if (parsed.contains("defaults")) defaults ++= Utils.toTable(parsed("defaults"))
-			if (!processInstantiations(parsed, newContainer)) {
-				println(s"Instantiation failed")
-				false
-			} else true
+			boundary {
+				if (!processInstantiations(parsed, newContainer)) {
+					println(s"Instantiation failed")
+					break(false)
+				}
+			}
+			true
 		}
 
 		private def injectBoard(rootContainer: MutableContainer) = {
@@ -343,65 +347,66 @@ object Game {
 
 		private def processInstantiations(parsed: Map[String, Variant],
 		                                  container: MutableContainer): Boolean = {
+			boundary { 
+				// includes
+				if (parsed.contains("include")) {
+					val tincs = Utils.toArray(parsed("include"))
+					for (include <- tincs) {
+						val table           = Utils.toTable(include)
+						val incResourceName = Utils.toString(table("resource"))
+						val incResourcePath = Paths.get(incResourceName)
 
-			// includes
-			if (parsed.contains("include")) {
-				val tincs = Utils.toArray(parsed("include"))
-				for (include <- tincs) {
-					val table           = Utils.toTable(include)
-					val incResourceName = Utils.toString(table("resource"))
-					val incResourcePath = Paths.get(incResourceName)
-
-					prefabs.findPrefabInclude(incResourceName) match {
-						case Some(value) =>
-							Game.setInstancePath(value.path)
-							val variants = prefabs.flattenIncludesContents(value.name)
-							processInstantiations(variants, container)
-							Game.popInstancePath()
-						case None        =>
-							Utils.readFile(incResourcePath) match {
-								case Some(d) =>
-									if (!generateInstances(incResourcePath)) return false
-								case _       =>
-									println(s"Include resource file $incResourceName not found")
-									return false
-							}
+						prefabs.findPrefabInclude(incResourceName) match {
+							case Some(value) =>
+								Game.setInstancePath(value.path)
+								val variants = prefabs.flattenIncludesContents(value.name)
+								processInstantiations(variants, container)
+								Game.popInstancePath()
+							case None        =>
+								Utils.readFile(incResourcePath) match {
+									case Some(d) =>
+										if (!generateInstances(incResourcePath)) break(false)
+									case _       =>
+										println(s"Include resource file $incResourceName not found")
+										break(false)
+								}
+						}
 					}
 				}
-			}
 
-			// extract instances
-			if (parsed.contains("instance")) {
-				val instancesWanted = Utils.toArray(parsed("instance"))
-				val instances       = instancesWanted.flatMap(Instance(_, defaults.toMap, catalogs))
-				// do dependencies later when everything is flattened
-				container.mutableChildren ++= instances
-			}
+				// extract instances
+				if (parsed.contains("instance")) {
+					val instancesWanted = Utils.toArray(parsed("instance"))
+					val instances       = instancesWanted.flatMap(Instance(_, defaults.toMap, catalogs))
+					// do dependencies later when everything is flattened
+					container.mutableChildren ++= instances
+				}
 
-			// extract connections
-			if (parsed.contains("connection")) {
-				val connections = Utils.toArray(parsed("connection"))
-				container.mutableUnconnected ++= connections.flatMap(Unconnected(_))
-			}
+				// extract connections
+				if (parsed.contains("connection")) {
+					val connections = Utils.toArray(parsed("connection"))
+					container.mutableUnconnected ++= connections.flatMap(Unconnected(_))
+				}
 
-			var okay = true
+				var okay = true
 
-			// bring in wanted prefabs
-			if (parsed.contains("prefab")) {
-				val tpfs = Utils.toArray(parsed("prefab"))
-				for (prefab <- tpfs) {
-					val table = Utils.toTable(prefab)
-					val ident = Utils.toString(table("name"))
-					prefabs.findPrefab(ident) match {
-						case Some(pf) =>
-							okay &= processInstantiations(pf.stuff, container)
-						case None     =>
-							println(s"Error: prefab $ident not found")
-							return false
+				// bring in wanted prefabs
+				if (parsed.contains("prefab")) {
+					val tpfs = Utils.toArray(parsed("prefab"))
+					for (prefab <- tpfs) {
+						val table = Utils.toTable(prefab)
+						val ident = Utils.toString(table("name"))
+						prefabs.findPrefab(ident) match {
+							case Some(pf) =>
+								okay &= processInstantiations(pf.stuff, container)
+							case None     =>
+								println(s"Error: prefab $ident not found")
+								break(false)
+						}
 					}
 				}
+				okay
 			}
-			okay
 		}
 
 		private def resolveSoftwareDependencies(rootContainer: MutableContainer): Unit = {

@@ -248,7 +248,7 @@ object OutputSoftware {
 	private def genHeadersFor(registerListName: String): Unit = {
 		// output register definitions
 		val rl    = Registers.registerListCache(registerListName)
-		val name  = rl.name.split('/').last.replace(".toml", "")
+		val name  = rl.name.split('/').last.replace(".yaml", "")
 		val uname = name.toUpperCase()
 
 		val sb = new mutable.StringBuilder
@@ -260,7 +260,7 @@ object OutputSoftware {
 
 		sb ++= genRegisterList(s"${uname}_", rl)
 
-		Utils.writeFile(filePath(hwPath(Game.outPath), rl.name.replace(".toml", "")), sb.result())
+		Utils.writeFile(filePath(hwPath(Game.outPath), rl.name.replace(".yaml", "")), sb.result())
 	}
 
 	private def hwPath(out: Path) = hwRegsPath(out).resolve("registers")

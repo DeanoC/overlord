@@ -13,6 +13,34 @@ class DefinitionCatalog {
 
 	val catalogs: keyStore = mutable.HashMap()
 
+	def printDefinitionCatalogs(): Unit = {
+		println("Definition Catalogs:")
+		for {k <- catalogs.keys} {
+			println(s"k  ${k.ident.mkString(".")} ${k.getClass}")
+		}
+	}
+	def findDefinition(name: String): Option[value] = {
+		val ident = name.split('.').toList
+		var defi: Option[value] = None
+
+		for {k <- catalogs.keys
+		     if k.getClass == classOf[DefinitionType]
+		     if k.ident.length >= ident.length} {
+			var curMatch = 0
+			for {(s, i) <- k.ident.zipWithIndex
+			     if i < ident.length
+			     if i == curMatch
+			     if s == ident(i)
+			     } curMatch += 1
+
+			if (curMatch >= ident.length) {
+				defi = Some(catalogs(k))
+			}
+		}
+
+		defi
+	}
+
 	def findDefinition(defType: key): Option[value] = {
 		var bestMatch           = 0
 		var defi: Option[value] = None
@@ -20,19 +48,19 @@ class DefinitionCatalog {
 		for {k <- catalogs.keys
 		     if k.getClass == defType.getClass
 		     if k.ident.length >= defType.ident.length} {
-			var curMatch = 0
-			for {(s, i) <- k.ident.zipWithIndex
-			     if i < defType.ident.length
-			     if i == curMatch
-			     if s == defType.ident(i)
-			     } curMatch += 1
+				var curMatch = 0
+				for {(s, i) <- k.ident.zipWithIndex
+					if i < defType.ident.length
+					if i == curMatch
+					if s == defType.ident(i)
+					} curMatch += 1
 
-			if (curMatch > bestMatch &&
-			    curMatch >= defType.ident.length) {
-				defi = Some(catalogs(k))
-				bestMatch = curMatch
+				if (curMatch > bestMatch &&
+					curMatch >= defType.ident.length) {
+					defi = Some(catalogs(k))
+					bestMatch = curMatch
+				}
 			}
-		}
 
 		defi
 	}
@@ -52,7 +80,7 @@ object DefinitionCatalog {
 	def fromFile(fileName: String, defaultMap: Map[String, Variant]): Option[Seq[DefinitionTrait]] = {
 		val filePath = Game.catalogPath.resolve(fileName)
 
-		println(s"Reading $fileName catalog")
+		//println(s"Reading $fileName catalog")
 
 		if (!Files.exists(filePath.toAbsolutePath)) {
 			println(s"$fileName catalog at $filePath not found")
@@ -61,7 +89,7 @@ object DefinitionCatalog {
 
 		Game.pushCatalogPath(filePath.getParent)
 
-		val source = Utils.readToml(filePath)
+		val source = Utils.readYaml(filePath)
 		val result = parse(fileName, source, defaultMap)
 		Game.popCatalogPath()
 		result

@@ -73,7 +73,7 @@ object GatewareDefinition {
 		                   registers,
 		                   parameters,
 		                   fileName,
-		                   Utils.readToml(Game.catalogPath.resolve(fileNameAlone)))
+		                   Utils.readYaml(Game.catalogPath.resolve(fileNameAlone)))
 		Game.popCatalogPath()
 		result
 	}

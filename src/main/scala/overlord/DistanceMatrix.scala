@@ -5,6 +5,7 @@ import overlord.Instances.{ChipInstance, Container, PinGroupInstance}
 
 import scala.collection.mutable
 import scala.language.postfixOps
+import scala.util.boundary, boundary.break
 
 case class DistanceMatrix(instanceArray: Array[ChipInstance]) {
 	val dim: Int = instanceArray.length
@@ -127,16 +128,18 @@ case class DistanceMatrix(instanceArray: Array[ChipInstance]) {
 	}
 
 	def isIsolated(i: Int): Boolean = {
-		for {o <- 0 until dim
-		     if i != o
-		     d0 = distanceMatrix(i)(o)
-		     d1 = distanceMatrix(o)(i)
-		     if !(d0 == DistanceMatrix.NotComputed && d1 == DistanceMatrix.NotComputed)
-		     } {
-			val minCount = if (instanceArray(i).isInstanceOf[PinGroupInstance] || instanceArray(o).isInstanceOf[PinGroupInstance]) 1 else 0
-			if (d0 > minCount || d1 > minCount) return false
+		boundary {
+			for {o <- 0 until dim
+				if i != o
+				d0 = distanceMatrix(i)(o)
+				d1 = distanceMatrix(o)(i)
+				if !(d0 == DistanceMatrix.NotComputed && d1 == DistanceMatrix.NotComputed)
+				} {
+				val minCount = if (instanceArray(i).isInstanceOf[PinGroupInstance] || instanceArray(o).isInstanceOf[PinGroupInstance]) 1 else 0
+				if (d0 > minCount || d1 > minCount) break(false)
+			}
+			true
 		}
-		true
 	}
 
 }

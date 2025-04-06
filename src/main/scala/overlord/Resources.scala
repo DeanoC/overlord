@@ -9,7 +9,7 @@ import scala.language.postfixOps
 
 object Resources {
 	def stdResourcePath(): Path = {
-		Paths.get("../std_catalog/").toAbsolutePath.normalize()
+		Paths.get("../gagameosstd_catalog/").toAbsolutePath.normalize()
 	}
 
 	def overlordRootPath(): Path =
@@ -22,15 +22,15 @@ object Resources {
 
 case class Resources(path: Path) {
 	def loadCatalogs(): Map[DefinitionType, DefinitionTrait] = {
-		val parsed = Utils.readToml(path.resolve("catalogs.toml"))
+		val parsed = Utils.readYaml(path.resolve("catalogs.yaml"))
 
 		if (!parsed.contains("resources")) {
-			println("no resources array in catalog.toml")
+			println("no resources array in catalogs.yaml")
 			return Map()
 		}
 
 		if (!parsed("resources").isInstanceOf[ArrayV]) {
-			println("resources in catalog.toml isn't an array")
+			println("resources in catalogs.yaml isn't an array")
 			return Map()
 		}
 
@@ -49,15 +49,15 @@ case class Resources(path: Path) {
 
 	def loadPrefabs(): Map[String, Prefab] = {
 		val parsed =
-			Utils.readToml(path.resolve("prefabs.toml"))
+			Utils.readYaml(path.resolve("prefabs.yaml"))
 
 		if (!parsed.contains("resources")) {
-			println("no resources array in prefabs.toml")
+			println("no resources array in prefabs.yaml")
 			return Map()
 		}
 
 		if (!parsed("resources").isInstanceOf[ArrayV]) {
-			println("resources in prefabs.toml isn't an array")
+			println("resources in prefabs.yaml isn't an array")
 			return Map()
 		}
 
@@ -69,7 +69,7 @@ case class Resources(path: Path) {
 			val name = Utils.toString(resource)
 			Game.pushInstancePath(name)
 			prefabs ++= PrefabCatalog.fromFile(s"$name").map(f => {
-				(f.name.replace(".toml", "") -> f)
+				(f.name.replace(".yaml", "") -> f)
 			})
 			Game.popInstancePath()
 		}

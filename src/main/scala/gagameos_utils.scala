@@ -1,8 +1,5 @@
 package gagameos
-import com.electronwill.nightconfig.core.Config
-import com.electronwill.nightconfig.toml.TomlParser
-import compat.TomlCompat // Correct the import path
-import compat.TomlCompat.Value
+import org.yaml.snakeyaml.Yaml
 
 import java.io._
 import java.nio.file.{Files, Path}
@@ -185,6 +182,7 @@ object Utils {
 
 				num * mult
 		}
+		case i: IntV    => BigInt(i.value)
 		case _          => println(s"ERR $t not a big int"); 0
 	}
 
@@ -237,18 +235,18 @@ object Utils {
 		Some(s)
 	}
 
-	def readToml(tomlPath: Path): Map[String, Variant] = {
-		val source = readFile(tomlPath) match {
+	def readYaml(yamlPath: Path): Map[String, Variant] = {
+		val source = readFile(yamlPath) match {
 			case Some(value) => value
-			case None        => println(s"$tomlPath toml unable to be read")
+			case None        =>
+				println(s"$yamlPath YAML unable to be read")
 				return Map[String, Variant]()
 		}
 
-		val tparsed = new TomlParser().parse(source)
-		if (tparsed == null) {
-			println(s"$tomlPath has failed to parse")
-			Map[String, Variant]()
-		} else tparsed.entrySet().asScala.map(e => e.getKey -> toVariant(e.getValue)).toMap
+//		println(s"Reading $yamlPath YAML")
+		val yaml = new Yaml()
+		val parsed = yaml.load(source).asInstanceOf[java.util.Map[String, Any]]
+		parsed.asScala.map { case (k, v) => k -> toVariant(v) }.toMap
 	}
 
 	def lookupString(tbl: VariantTable, key: String, or: String): String =
@@ -263,16 +261,15 @@ object Utils {
 		case _           => println(s"ERR $t not a Table"); Map[String, Variant]()
 	}
 
-	def toVariant(t: Value): Variant = t match {
-		case Value.Str(v) => parseBigInt(v.asInstanceOf[String]) match { // Cast `v` to String
-			case Some(value) => BigIntV(value)
-			case None        => StringV(v)
-		}
-		case Value.Bool(v) => BooleanV(v)
-		case Value.Real(v) => DoubleV(v)
-		case Value.Num(v)  => BigIntV(v)
-		case Value.Tbl(v)  => TableV(v.map(e => e._1 -> toVariant(e._2)))
-		case Value.Arr(v)  => ArrayV(v.map(toVariant).toArray)
+	def toVariant(t: Any): Variant = t match {
+		case v: String => StringV(v)
+		case v: java.lang.Boolean => BooleanV(v)
+		case v: java.lang.Double => DoubleV(v)
+		case v: java.lang.Integer => IntV(v)
+		case v: java.util.Map[_, _] =>
+			TableV(v.asInstanceOf[java.util.Map[String, Any]].asScala.map { case (k, v) => k -> toVariant(v) }.toMap)
+		case v: java.util.List[_] => ArrayV(v.asScala.map(toVariant).toArray)
+		case _ => throw new IllegalArgumentException(s"Unsupported type: ${t.getClass}")
 	}
 
 	def lookupStrings(tbl: MutableVariantTable, key: String, or: String)

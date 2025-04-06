@@ -84,7 +84,7 @@ object Instance {
 				case _               => true
 			})
 
-		val defType = DefinitionType(defTypeString)
+		val defType = DefinitionType(defTypeString)	
 
 		val defi = catalogs.findDefinition(defType) match {
 			case Some(d) => d

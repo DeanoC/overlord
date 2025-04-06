@@ -4,6 +4,7 @@ import gagameos.{ArrayV, Utils, Variant}
 
 import java.nio.file.Files
 import scala.collection.mutable
+import scala.util.boundary, boundary.break
 
 case class Prefab(name: String,
                   path: String,
@@ -22,7 +23,11 @@ class PrefabCatalog {
 	}
 
 	def findPrefabInclude(include: String): Option[Prefab] = {
-		prefabs.foreach { case (_, prefab) => if (prefab.includes.contains(include)) return Some(prefab.includes(include)) }
+		boundary {
+			prefabs.foreach { case (_, prefab) =>
+				if (prefab.includes.contains(include)) break(Some(prefab.includes(include)))
+			}
+		}
 		None
 	}
 
@@ -52,7 +57,7 @@ object PrefabCatalog {
 	def fromFile(fileName: String): Seq[Prefab] = {
 		val filePath = Game.instancePath.resolve(fileName)
 
-		println(s"Reading $fileName prefab")
+//		println(s"Reading $fileName prefab")
 
 		if (!Files.exists(filePath.toAbsolutePath)) {
 			println(s"$fileName catalog at $filePath not found")
@@ -60,7 +65,7 @@ object PrefabCatalog {
 		}
 
 		Game.pushInstancePath(filePath.getParent)
-		val source   = Utils.readToml(filePath)
+		val source   = Utils.readYaml(filePath)
 		var prefabs  = Array[Prefab]()
 		val includes = mutable.HashMap[String, Prefab]()
 
