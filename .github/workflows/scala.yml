@@ -12,6 +12,7 @@ on:
       - 'README.md'
       - 'LICENSE'
       - '.gitignore'
+      - 'overlord.code-workspace'
   pull_request:
     branches: [ main, master ]
     paths-ignore:
@@ -21,6 +22,7 @@ on:
       - 'README.md'
       - 'LICENSE'
       - '.gitignore'
+      - 'overlord.code-workspace'
 
 jobs:
   build:
