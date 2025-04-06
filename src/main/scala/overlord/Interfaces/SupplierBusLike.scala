@@ -1,4 +1,4 @@
-package overlord
+package overlord.Interfaces
 
 import gagameos.Variant
 import overlord.Instances.ChipInstance

@@ -4,7 +4,7 @@ import gagameos.Utils
 import overlord.Instances._
 import overlord._
 
-import overlord.{MultiBusLike, PortsLike, RamLike, SupplierBusLike}
+import overlord.Interfaces.{PortsLike, RamLike, SupplierBusLike, MultiBusLike}
 
 case class UnconnectedBus(firstFullName: String,
                           direction: ConnectionDirection,

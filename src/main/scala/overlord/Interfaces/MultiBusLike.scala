@@ -1,4 +1,4 @@
-package overlord
+package overlord.Interfaces
 
 trait MultiBusLike extends ChipLike {
   def numberOfBuses: Int

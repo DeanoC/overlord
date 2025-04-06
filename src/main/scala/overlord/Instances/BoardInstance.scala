@@ -1,7 +1,7 @@
 package overlord.Instances
 
 import gagameos._
-import overlord.UnconnectedLike
+import overlord.Interfaces.UnconnectedLike
 import overlord.{ChipDefinitionTrait, Definition}
 import scala.util.boundary, boundary.break
 

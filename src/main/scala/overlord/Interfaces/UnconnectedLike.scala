@@ -1,5 +1,7 @@
-package overlord
+package overlord.Interfaces
 
+import overlord.ConnectionDirection
+import overlord.QueryInterface
 import overlord.Connections.{Connected, Constant}
 import overlord.Instances.{ChipInstance, InstanceTrait}
 

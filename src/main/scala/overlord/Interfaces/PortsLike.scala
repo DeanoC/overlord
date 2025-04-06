@@ -1,4 +1,4 @@
-package overlord
+package overlord.Interfaces
 
 import overlord.Hardware.Port
 import overlord.Instances.ChipInstance

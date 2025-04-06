@@ -5,7 +5,7 @@ import overlord.Hardware.{InOutWireDirection, Port}
 import overlord.{ConnectionDirection, FirstToSecondConnection}
 
 import overlord.Instances.ChipInstance
-import overlord.PortsLike
+import overlord.Interfaces.PortsLike
 
 case class ConnectedPortGroup(connectionPriority: ConnectionPriority,
                               main: InstanceLoc,

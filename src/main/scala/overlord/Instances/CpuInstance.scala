@@ -2,7 +2,8 @@ package overlord.Instances
 
 import gagameos.{Utils, Variant}
 import overlord.ChipDefinitionTrait
-import overlord.{BusLike, MultiBusLike, SupplierBusLike}
+import overlord.Interfaces.{MultiBusLike, SupplierBusLike}
+import overlord.Interfaces.BusLike
 
 import scala.reflect.ClassTag
 

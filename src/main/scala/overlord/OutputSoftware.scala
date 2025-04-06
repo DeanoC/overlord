@@ -4,7 +4,7 @@ import gagameos._
 import overlord.Hardware.{BitsDesc, RegisterList, Registers}
 import overlord.Connections._
 import overlord.Instances._
-import overlord.{RamLike, RegisterBankLike}
+import overlord.Interfaces.{RamLike, RegisterBankLike}
 import overlord.Project
 
 import java.nio.file.{Path, Paths}

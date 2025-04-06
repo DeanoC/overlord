@@ -4,6 +4,7 @@ import gagameos.{Utils, Variant}
 import overlord.Instances.{ChipInstance, InstanceTrait}
 import overlord.ConnectionDirection
 import overlord._
+import overlord.Interfaces._
 
 sealed trait ParameterType
 

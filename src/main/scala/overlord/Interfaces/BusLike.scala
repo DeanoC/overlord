@@ -1,4 +1,4 @@
-package overlord
+package overlord.Interfaces
 
 trait BusLike extends ChipLike {
   def isHardware: Boolean

@@ -2,7 +2,10 @@ package overlord.Instances
 
 import gagameos.{Utils, Variant}
 import overlord.Hardware.{Port, RegisterBank, Registers}
-import overlord.{ChipDefinitionTrait, GatewareDefinitionTrait, HardwareDefinitionTrait, QueryInterface, PortsLike, RegisterBankLike, MultiBusLike, BusLike, RamLike, SupplierBusLike}
+import overlord.{ChipDefinitionTrait, GatewareDefinitionTrait, HardwareDefinitionTrait, QueryInterface}
+import overlord.Interfaces.{PortsLike, RegisterBankLike, MultiBusLike, RamLike, SupplierBusLike}
+import overlord.Interfaces.BusLike
+import overlord.Interfaces._
 
 import scala.collection.mutable
 import scala.reflect.ClassTag

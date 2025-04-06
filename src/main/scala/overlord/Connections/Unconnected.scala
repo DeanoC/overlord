@@ -4,6 +4,7 @@ import gagameos.{Utils, Variant}
 import overlord.Hardware._
 import overlord.ConnectionDirection
 import overlord._
+import overlord.Interfaces._
 import overlord.Instances.{InstanceTrait, PinGroupInstance, Container}
 
 trait Unconnected extends QueryInterface with UnconnectedLike {

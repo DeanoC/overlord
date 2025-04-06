@@ -4,7 +4,7 @@ package overlord
 import gagameos._
 import overlord.Connections._
 import overlord.Instances._
-import overlord.{ChipLike, RegisterBankLike}
+import overlord.Interfaces.{ChipLike, RegisterBankLike}
 
 import java.nio.file.{Files, Path, Paths}
 import scala.collection.mutable
