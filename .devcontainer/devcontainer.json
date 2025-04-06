@@ -1,0 +1,30 @@
+{
+    "name": "Overlord Scala Development",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "terminal.integrated.shell.linux": "/bin/bash",
+                "java.server.launchMode": "Standard",
+                "editor.formatOnSave": true,
+                "editor.renderWhitespace": "boundary",
+                "files.trimTrailingWhitespace": true
+            },
+            "extensions": [
+                "scala-lang.scala",
+                "scalameta.metals",
+                "lightbend.vscode-sbt-scala",
+                "matthewpalmer.vscode-scala-format"
+            ]
+        }
+    },
+    "forwardPorts": [8080],
+    "postCreateCommand": "sbt update",
+    "remoteUser": "vscode",
+    "hostRequirements": {
+        "memory": "8gb",
+        "cpus": 4
+    }
+}
