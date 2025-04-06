@@ -89,16 +89,13 @@ jobs:
         echo "Running template project with overlord using run.sh"
         
         # Check if run.sh exists and is executable
-        if [ ! -f "overlord_template_project/run.sh" ]; then
+        if [ ! -f "${HOME}/overlord_template_project/run.sh" ]; then
           echo "ERROR: run.sh script not found"
           exit 1
         fi
-        
-        # Make sure run.sh is executable
-        chmod +x overlord_template_project/run.sh
-        
+      
         # Run the script
-        cd overlord_template_project
+        cd ${HOME}/overlord_template_project
         ./run.sh || {
           echo "Error: Template project execution failed"
           exit 1

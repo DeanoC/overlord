@@ -1,7 +1,10 @@
 {
     "name": "Overlord Scala Development",
     "build": {
-        "dockerfile": "Dockerfile"
+        "dockerfile": "Dockerfile",
+        "args": {
+            "INSTALL_OVERLORD": "true"
+        }
     },
     "customizations": {
         "vscode": {
@@ -21,10 +24,11 @@
         }
     },
     "forwardPorts": [8080],
-    "postCreateCommand": "sbt update",
+    "postCreateCommand": "sbt update && sudo ln -sf /workspaces/overlord/target/universal/stage/bin/overlord /usr/local/bin/overlord",
     "remoteUser": "vscode",
     "hostRequirements": {
         "memory": "8gb",
         "cpus": 4
-    }
+    },
+    "runArgs": ["--privileged"]
 }
