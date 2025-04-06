@@ -1,0 +1,3 @@
+[submodule "overlord_template_project"]
+	path = overlord_template_project
+	url = https://github.com/DeanoC/overlord_template_project.git
