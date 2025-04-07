@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "../gagameosstd_catalog"
+		},
+		{
+			"path": "../gagameos_uart"
 		}
 	],
 	"settings": {
