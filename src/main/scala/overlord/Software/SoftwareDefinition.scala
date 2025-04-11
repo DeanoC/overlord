@@ -97,7 +97,7 @@ object SoftwareDefinition {
       softwarePath: Path,
       parsed: Map[String, Variant]
   ): Option[SoftwareDefinition] = {
-    val actionsFile = ActionsFile(name, parsed)
+    val actionsFile = ActionsFile.createActionsFile(name, parsed)
 
     if (actionsFile.isEmpty) {
       println(s"Software actions file $name invalid\n")

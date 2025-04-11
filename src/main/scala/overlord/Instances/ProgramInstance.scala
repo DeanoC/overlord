@@ -15,18 +15,17 @@ object ProgramInstance {
       ident: String,
       definition: SoftwareDefinitionTrait,
       attribs: Map[String, Variant]
-  ): Option[ProgramInstance] = {
+  ): Either[String, ProgramInstance] = {
 
     if (
       !attribs.contains("name") &&
       !definition.attributes.contains("name")
     ) {
-      println(f"Programs must have a name attribute%n")
-      return None
+      Left(f"Programs must have a name attribute")
+    } else {
+      val sw = ProgramInstance(ident, definition)
+      sw.mergeAllAttributes(attribs)
+      Right(sw)
     }
-
-    val sw = ProgramInstance(ident, definition)
-    sw.mergeAllAttributes(attribs)
-    Some(sw)
   }
 }

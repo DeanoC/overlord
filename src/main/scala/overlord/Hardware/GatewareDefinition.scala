@@ -51,10 +51,11 @@ object GatewareDefinition {
     * @param table
     *   The table containing gateware definition data.
     * @return
-    *   An Option containing the GatewareDefinition if valid, otherwise None.
+    *   An Either containing the GatewareDefinition if valid, or an error message if invalid.
     */
-  def apply(table: VariantTable): Option[GatewareDefinition] = {
-    if (!table.contains("gateware")) return None
+  def apply(table: VariantTable): Either[String, GatewareDefinition] = {
+    if (!table.contains("gateware")) 
+      return Left("Table does not contain a 'gateware' field")
 
     val defTypeName = Utils.toString(table("type"))
 
@@ -85,18 +86,17 @@ object GatewareDefinition {
 
     val defType = DefinitionType(defTypeName)
 
-    Some(
-      GatewareDefinition(
-        defType,
-        attribs,
-        dependencies,
-        ports,
-        registers,
-        parameters,
-        Utils.toString(table("gateware"))
-      ).get
+    // Use parse method which we'll refactor to return Either
+    parse(
+      defType,
+      attribs,
+      dependencies,
+      ports,
+      registers,
+      parameters,
+      Utils.toString(table("gateware")),
+      table
     )
-
   }
 
   /** Creates a GatewareDefinition by parsing a file and combining it with
@@ -117,7 +117,7 @@ object GatewareDefinition {
     * @param fileName
     *   The name of the file containing additional gateware data.
     * @return
-    *   An Option containing the GatewareDefinition if valid, otherwise None.
+    *   An Either containing the GatewareDefinition if valid, or an error message if invalid.
     */
   def apply(
       defType: DefinitionType,
@@ -127,9 +127,10 @@ object GatewareDefinition {
       registers: Seq[Variant],
       parameters: Map[String, Variant],
       fileName: String
-  ): Option[GatewareDefinition] = {
+  ): Either[String, GatewareDefinition] = {
     val fileNameAlone = Paths.get(fileName).getFileName
     Project.pushCatalogPath(Paths.get(fileName))
+    val yaml = Utils.readYaml(Project.catalogPath.resolve(fileNameAlone))
     val result = parse(
       defType,
       attributes,
@@ -138,7 +139,7 @@ object GatewareDefinition {
       registers,
       parameters,
       fileName,
-      Utils.readYaml(Project.catalogPath.resolve(fileNameAlone))
+      yaml
     )
     Project.popCatalogPath()
     result
@@ -164,7 +165,7 @@ object GatewareDefinition {
     * @param parsed
     *   The parsed data from the file.
     * @return
-    *   An Option containing the GatewareDefinition if valid, otherwise None.
+    *   An Either containing the GatewareDefinition if valid, or an error message if invalid.
     */
   private def parse(
       defType: DefinitionType,
@@ -175,40 +176,40 @@ object GatewareDefinition {
       parameters: Map[String, Variant],
       fileName: String,
       parsed: Map[String, Variant]
-  ): Option[GatewareDefinition] = {
+  ): Either[String, GatewareDefinition] = {
 
-    val actionsFile = ActionsFile(fileName, parsed)
+    // ActionsFile.createActionsFile needs to be updated to use Either, but for now we'll adapt it
+    val actionsFile = ActionsFile.createActionsFile(fileName, parsed)
 
     if (actionsFile.isEmpty) {
-      println(s"Gateware actions file $fileName invalid\n")
-      return None
-    }
+      Left(s"Gateware actions file $fileName invalid")
+    } else {
+      val ports =
+        if (parsed.contains("ports"))
+          iports ++ Ports(Utils.toArray(parsed("ports")))
+            .map(t => t.name -> t)
+            .toMap
+        else iports
+        
+      val combinedParameters =
+        if (parsed.contains("parameters"))
+          Utils.toTable(parsed("parameters")) ++ parameters
+        else parameters
 
-    val ports =
-      if (parsed.contains("ports"))
-        iports ++ Ports(Utils.toArray(parsed("ports")))
-          .map(t => t.name -> t)
-          .toMap
-      else iports
-
-    val combinedParameters =
-      if (parsed.contains("parameters"))
-        Utils.toTable(parsed("parameters")) ++ parameters
-      else parameters
-
-    Some(
-      GatewareDefinition(
-        defType,
-        Project.catalogPath,
-        attributes,
-        dependencies,
-        ports,
-        1,
-        registers,
-        combinedParameters,
-        actionsFile.get
+      Right(
+        GatewareDefinition(
+          defType,
+          Project.catalogPath,
+          attributes,
+          dependencies,
+          ports,
+          1,
+          registers,
+          combinedParameters,
+          actionsFile.get
+        )
       )
-    )
+    }
   }
 
 }

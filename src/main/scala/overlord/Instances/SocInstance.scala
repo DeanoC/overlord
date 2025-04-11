@@ -13,9 +13,9 @@ object SocInstance {
       ident: String,
       definition: ChipDefinitionTrait,
       attribs: Map[String, Variant]
-  ): Option[SocInstance] = {
+  ): Either[String, SocInstance] = {
     val chip = SocInstance(ident, definition)
     chip.mergeAllAttributes(attribs)
-    Some(chip)
+    Right(chip)
   }
 }

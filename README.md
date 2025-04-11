@@ -33,20 +33,40 @@ The framework is optimized for a wide range of FPGA boards, featuring:
 
 ## Getting Started
 
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   ```
+Refer to the following documents to get started:
 
-2. Build the project using SBT:
-   ```bash
-   sbt compile
-   ```
+- [CLI Installation Guide](docs/cli-installation.md)
+- [Build Instructions](docs/build-instructions.md)
 
-3. Run the main application:
-   ```bash
-   sbt run
-   ```
+## Debugging in Visual Studio Code
+
+To debug Overlord in Visual Studio Code, you can use the following `launch.json` configuration:
+
+```json
+// filepath: /home/deano/overlord/.vscode/launch.json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "scala",
+      "request": "launch",
+      "name": "Debug Overlord",
+      "mainClass": "Main",
+      "buildTarget": "overlord",
+      "args": [
+        "create",
+        "~/overlord/overlord_template_project/template_project.over",
+        "--out",
+        "~/overlord/overlord_template_project/",
+        "--board",
+        "tangnano9k"
+      ]
+    }
+  ]
+}
+```
+
+This configuration assumes you are using the Metals extension for Scala in Visual Studio Code. Replace `tangnano9k` and `template_project.over` with your specific board and `.over` file.
 
 ## Documentation
 

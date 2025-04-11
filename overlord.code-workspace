@@ -4,9 +4,6 @@
 			"path": "."
 		},
 		{
-			"path": "../gagameosstd_catalog"
-		},
-		{
 			"path": "../gagameos_uart"
 		}
 	],

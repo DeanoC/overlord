@@ -8,14 +8,15 @@ import scala.collection.mutable
 import scala.language.postfixOps
 
 object Resources {
-  def stdResourcePath(): Path = {
-    val pathStr = "~/gagameosstd_catalog/"
-    val expandedPath = if (pathStr.startsWith("~/")) {
-      Paths.get(System.getProperty("user.home"), pathStr.substring(2))
-    } else {
-      Paths.get(pathStr)
-    }
-    expandedPath.toAbsolutePath.normalize()
+  private var stdResourcePathVar: Path = Paths
+    .get(System.getProperty("user.home"), "overlord", "gagameos_stdcatalog")
+    .toAbsolutePath
+    .normalize()
+
+  def stdResourcePath(): Path = stdResourcePathVar
+
+  def setStdResourcePath(path: Path): Unit = {
+    stdResourcePathVar = path
   }
 
   def overlordRootPath(): Path =

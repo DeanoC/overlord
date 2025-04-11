@@ -33,20 +33,24 @@ object VerilogModuleParser {
     "(/\\*([^*]|[\\r\\n]|(\\*+([^*/]|[\\r\\n])))*\\*+/)|(//.*)".r
 
   // Parses a Verilog file and extracts modules
-  def apply(absolutePath: Path, name: String): Seq[VerilogModule] = {
+  def apply(absolutePath: Path, name: String): Either[String, Seq[VerilogModule]] = {
     println(s"parsing $name verilog for ports and parameter")
 
-    val modules = mutable.ArrayBuffer[VerilogModule]()
-    var txt = load(absolutePath)
+    load(absolutePath) match {
+      case Left(error) => Left(error)
+      case Right(content) =>
+        val modules = mutable.ArrayBuffer[VerilogModule]()
+        var txt = content
 
-    // Process the file line by line to extract modules
-    while (txt.nonEmpty) {
-      val (nl, module) = extractModule(txt)
-      txt = txt.drop(nl)
-      if (module.nonEmpty) modules += module.get
+        // Process the file line by line to extract modules
+        while (txt.nonEmpty) {
+          val (nl, moduleOpt) = extractModule(txt)
+          txt = txt.drop(nl)
+          moduleOpt.foreach(modules += _)
+        }
+
+        Right(modules.toSeq)
     }
-
-    modules.toSeq
   }
 
   // Extracts a single module from the Verilog file
@@ -117,14 +121,19 @@ object VerilogModuleParser {
   }
 
   // Loads the Verilog file and returns its content as a sequence of lines
-  private def load(absolutePath: Path): Seq[String] = {
+  private def load(absolutePath: Path): Either[String, Seq[String]] = {
     if (!Files.exists(absolutePath)) {
-      println(s"$absolutePath does not exist")
-      Seq()
+      Left(s"File not found: $absolutePath does not exist")
     } else {
-      val file = absolutePath.toFile
-      val sourcetext = io.Source.fromFile(file)
-      sourcetext.getLines().toSeq
+      try {
+        val file = absolutePath.toFile
+        val sourcetext = io.Source.fromFile(file)
+        val lines = sourcetext.getLines().toSeq
+        sourcetext.close()
+        Right(lines)
+      } catch {
+        case e: Exception => Left(s"Error reading file $absolutePath: ${e.getMessage}")
+      }
     }
   }
 }

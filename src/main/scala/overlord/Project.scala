@@ -542,15 +542,13 @@ object Project {
       var newContainer = MutableContainer()
       containerStack.push(newContainer)
       val parsed = Utils.readYaml(path)
-      if (parsed.contains("defaults"))
-        defaults ++= Utils.toTable(parsed("defaults"))
-      boundary {
-        if (!processInstantiations(parsed, newContainer)) {
-          println(s"Instantiation failed")
-          break(false)
-        }
-      }
-      true
+      if (parsed.contains("defaults")) defaults ++= Utils.toTable(parsed("defaults"))
+
+      if (!processInstantiations(parsed, newContainer).getOrElse(false)) {
+        // Handle the error appropriately
+        println(s"Instantiation failed")
+        false
+      } else true
     }
 
     private def injectBoard(rootContainer: MutableContainer) = {
@@ -621,68 +619,77 @@ object Project {
     private def processInstantiations(
         parsed: Map[String, Variant],
         container: MutableContainer
-    ): Boolean = {
-      boundary {
-        // includes
-        if (parsed.contains("include")) {
-          val tincs = Utils.toArray(parsed("include"))
-          for (include <- tincs) {
-            val table = Utils.toTable(include)
-            val incResourceName = Utils.toString(table("resource"))
-            val incResourcePath = Paths.get(incResourceName)
+    ): Either[String, Boolean] = boundary {
+      // includes
+      if (parsed.contains("include")) {
+        val tincs = Utils.toArray(parsed("include"))
+        for (include <- tincs) {
+          val table = Utils.toTable(include)
+          val incResourceName = Utils.toString(table("resource"))
+          val incResourcePath = Paths.get(incResourceName)
 
-            prefabs.findPrefabInclude(incResourceName) match {
-              case Some(value) =>
-                Project.setInstancePath(value.path)
-                val variants = prefabs.flattenIncludesContents(value.name)
-                processInstantiations(variants, container)
-                Project.popInstancePath()
-              case None =>
-                Utils.readFile(incResourcePath) match {
-                  case Some(d) =>
-                    if (!generateInstances(incResourcePath)) break(false)
-                  case _ =>
-                    println(s"Include resource file $incResourceName not found")
-                    break(false)
-                }
-            }
+          prefabs.findPrefabInclude(incResourceName) match {
+            case Some(value) =>
+              Project.setInstancePath(value.path)
+              val variants = prefabs.flattenIncludesContents(value.name)
+              processInstantiations(variants, container) match {
+                case Left(error) => break(Left(error))
+                case _           => // continue
+              }
+              Project.popInstancePath()
+            case None =>
+              Utils.readFile(incResourcePath) match {
+                case Some(_) =>
+                  if (!generateInstances(incResourcePath)) {
+                    break(Left("Failed to generate instances"))
+                  }
+                case _ =>
+                  break(Left(s"Include resource file $incResourceName not found"))
+              }
           }
         }
-
-        // extract instances
-        if (parsed.contains("instance")) {
-          val instancesWanted = Utils.toArray(parsed("instance"))
-          val instances =
-            instancesWanted.flatMap(Instance(_, defaults.toMap, catalogs))
-          // do dependencies later when everything is flattened
-          container.mutableChildren ++= instances
-        }
-
-        // extract connections
-        if (parsed.contains("connection")) {
-          val connections = Utils.toArray(parsed("connection"))
-          container.mutableUnconnected ++= connections.flatMap(Unconnected(_))
-        }
-
-        var okay = true
-
-        // bring in wanted prefabs
-        if (parsed.contains("prefab")) {
-          val tpfs = Utils.toArray(parsed("prefab"))
-          for (prefab <- tpfs) {
-            val table = Utils.toTable(prefab)
-            val ident = Utils.toString(table("name"))
-            prefabs.findPrefab(ident) match {
-              case Some(pf) =>
-                okay &= processInstantiations(pf.stuff, container)
-              case None =>
-                println(s"Error: prefab $ident not found")
-                break(false)
-            }
-          }
-        }
-        okay
       }
+
+      // extract instances
+      if (parsed.contains("instance")) {
+        val instancesWanted = Utils.toArray(parsed("instance"))
+        val instances =
+          instancesWanted.flatMap(v =>
+            Instance(v, defaults.toMap, catalogs) match {
+              case Right(instance) => Some(instance)
+              case Left(error) =>
+                println(s"Error creating instance: $error")
+                None
+            }
+          )
+        container.mutableChildren ++= instances
+      }
+
+      // extract connections
+      if (parsed.contains("connection")) {
+        val connections = Utils.toArray(parsed("connection"))
+        container.mutableUnconnected ++= connections.flatMap(Unconnected(_))
+      }
+
+      // bring in wanted prefabs
+      if (parsed.contains("prefab")) {
+        val tpfs = Utils.toArray(parsed("prefab"))
+        for (prefab <- tpfs) {
+          val table = Utils.toTable(prefab)
+          val ident = Utils.toString(table("name"))
+          prefabs.findPrefab(ident) match {
+            case Some(pf) =>
+              processInstantiations(pf.stuff, container) match {
+                case Left(error) => break(Left(error))
+                case _           => // continue
+              }
+            case None =>
+              break(Left(s"Error: prefab $ident not found"))
+          }
+        }
+      }
+
+      Right(true)
     }
 
     private def resolveSoftwareDependencies(
@@ -721,20 +728,22 @@ object Project {
           ) {
             catalogs.findDefinition(d) match {
               case Some(defi) =>
-                val opt = defi.createInstance(n, Map[String, Variant]())
-                if (opt.nonEmpty) {
-                  val inst = opt.get
-                  assert(inst.isInstanceOf[SoftwareInstance])
-                  rootContainer.mutableChildren ++= Seq(inst)
-                  depSet += inst.asInstanceOf[SoftwareInstance]
-                  inst.definition.dependencies
-                    .filterNot(d => depStack.contains(d))
-                    .foreach(depStack.push)
-                  found = true;
-                } else
-                  println(
-                    s"ERROR: Software dependency $n ${defi.defType.ident.mkString(".")}"
-                  )
+                val result = defi.createInstance(n, Map[String, Variant]())
+                result match {
+                  case Right(inst) =>
+                    assert(inst.isInstanceOf[SoftwareInstance])
+                    rootContainer.mutableChildren ++= Seq(inst)
+                    depSet += inst.asInstanceOf[SoftwareInstance]
+                    inst.definition.dependencies
+                      .filterNot(d => depStack.contains(d))
+                      .foreach(depStack.push)
+                    found = true
+                  case Left(error) =>
+                    println(s"Failed to create instance for dependency $n: $error")
+                    println(
+                      s"ERROR: Software dependency $n ${defi.defType.ident.mkString(".")}"
+                    )
+                }
               case None =>
             }
           }

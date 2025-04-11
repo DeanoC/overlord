@@ -10,17 +10,21 @@ object YamlRegistersParser {
       instance: InstanceTrait,
       filename: String,
       name: String
-  ): Seq[RegisterBank] = {
-    println(s"parsing $name yaml for register definitions")
-    val regSeq = Seq(
-      TableV(
-        Map(
-          "resource" -> StringV(filename),
-          "name" -> StringV(name),
-          "base_address" -> BigIntV(0)
+  ): Either[String, Seq[RegisterBank]] = {
+    try {
+      val regSeq = Seq(
+        TableV(
+          Map(
+            "resource" -> StringV(filename),
+            "name" -> StringV(name),
+            "base_address" -> BigIntV(0)
+          )
         )
       )
-    )
-    Registers(instance, regSeq)
+      Right(Registers(instance, regSeq))
+    } catch {
+      case e: Exception => 
+        Left(s"Error parsing $name yaml for register definitions: ${e.getMessage}")
+    }
   }
 }

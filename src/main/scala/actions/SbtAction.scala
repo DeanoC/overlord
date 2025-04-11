@@ -46,34 +46,42 @@ case class SbtAction(mainScala: String, args: String, srcPath: String)
 
 object SbtAction {
   // Factory method to create a sequence of SbtAction instances from a process definition.
-  def apply(name: String, process: Map[String, Variant]): Seq[SbtAction] = {
-    // Validates the presence of required fields in the process definition.
+  def apply(name: String, process: Map[String, Variant]): Either[String, Seq[SbtAction]] = {
     if (!process.contains("args")) {
-      println(s"SBT process $name doesn't have a args field")
-      None
+      Left(s"SBT process $name doesn't have an args field")
+    } else if (!process.contains("main_scala")) {
+      Left(s"SBT process $name doesn't have a main_scala field")
+    } else if (!process("args").isInstanceOf[StringV]) {
+      Left(s"SBT process $name args isn't a string")
+    } else if (!process("main_scala").isInstanceOf[StringV]) {
+      Left(s"SBT process $name main_scala isn't a string")
+    } else {
+      try {
+        // Checks if the process includes a "with_build_sbt" flag and converts it to a boolean.
+        val withBuildSbt =
+          if (process.contains("with_build_sbt"))
+            Utils.toBoolean(process("with_build_sbt"))
+          else false
+
+        // Extracts the main Scala file and arguments from the process definition.
+        val mainScala = Utils.toString(process("main_scala"))
+        val args = Utils.toString(process("args"))
+
+        // Creates a sequence of SbtAction instances with the extracted parameters.
+        Right(Seq(SbtAction(mainScala, args, Project.catalogPath.toString)))
+      } catch {
+        case e: Exception => Left(s"Error processing SBT action in $name: ${e.getMessage}")
+      }
     }
-    if (!process.contains("main_scala")) {
-      println(s"SBT process $name doesn't have a main_scala field")
-      None
+  }
+  
+  // Legacy method for backward compatibility
+  def fromProcess(name: String, process: Map[String, Variant]): Seq[SbtAction] = {
+    apply(name, process) match {
+      case Right(actions) => actions
+      case Left(errorMsg) => 
+        println(errorMsg)
+        Seq.empty
     }
-
-    // Validates that the "args" field is a string.
-    if (!process("args").isInstanceOf[StringV]) {
-      println(s"SBT process $name args isn't a string")
-      None
-    }
-
-    // Checks if the process includes a "with_build_sbt" flag and converts it to a boolean.
-    val withBuildSbt =
-      if (process.contains("with_build_sbt"))
-        Utils.toBoolean(process("with_build_sbt"))
-      else false
-
-    // Extracts the main Scala file and arguments from the process definition.
-    val mainScala = Utils.toString(process("main_scala"))
-    val args = Utils.toString(process("args"))
-
-    // Creates a sequence of SbtAction instances with the extracted parameters.
-    Seq(SbtAction(mainScala, args, Project.catalogPath.toString))
   }
 }

@@ -76,110 +76,134 @@ object BoardInstance {
       name: String,
       definition: ChipDefinitionTrait,
       iattribs: Map[String, Variant]
-  ): Option[BoardInstance] = {
+  ): Either[String, BoardInstance] = {
 
     // Merge instance attributes with the definition's attributes.
     val attribs = Utils.mergeAintoB(iattribs, definition.attributes)
 
-    boundary {
-      // Ensure required attributes are present.
-      if (!attribs.contains("board_type")) {
-        println(s"${name} board requires a type value");
-        break(None)
-      }
+    // Ensure required attributes are present.
+    if (!attribs.contains("board_type")) {
+      return Left(s"${name} board requires a type value")
+    }
 
-      if (!attribs.contains("clocks")) {
-        println(s"${name} board requires some clocks");
-        break(None)
-      }
+    if (!attribs.contains("clocks")) {
+      return Left(s"${name} board requires some clocks")
+    }
 
-      if (!attribs.contains("pingroups")) {
-        println(s"${name} board requires some pingroups");
-        break(None)
-      }
-
-      // Determine the type of board based on attributes.
-      val boardType = Utils.toString(attribs("board_type")) match {
-        case "Xilinx" =>
-          if (
-            !attribs.contains("board_family") ||
-            !attribs.contains("board_device")
-          ) {
-            println(
-              s"$name Xilinx board requires a board_family AND " +
-                s"board_device field"
-            )
-            break(None)
-          }
-          XilinxBoard(
-            Utils.toString(attribs("board_family")),
-            Utils.toString(attribs("board_device"))
+    if (!attribs.contains("pingroups")) {
+      return Left(s"${name} board requires some pingroups")
+    }      
+    // Determine the type of board based on attributes.
+    val boardTypeResult = Utils.toString(attribs("board_type")) match {
+      case "Xilinx" =>
+        if (
+          !attribs.contains("board_family") ||
+          !attribs.contains("board_device")
+        ) {
+          Left(
+            s"$name Xilinx board requires a board_family AND " +
+              s"board_device field"
           )
-        case "Altera"  => AlteraBoard()
-        case "Lattice" => LatticeBoard()
-        case "Gowin" =>
-          if (
-            !attribs.contains("board_family") ||
-            !attribs.contains("board_device")
-          ) {
-            println(
-              s"$name Gowin board requires a board_family AND " +
-                s"board_device field"
-            )
-            break(None)
-          }
-          GowinBoard(
-            Utils.toString(attribs("board_family")),
-            Utils.toString(attribs("board_device"))
-          )
-        case _ =>
-          println(s"$name board has a unknown board_type");
-          break(None)
-      }
-      // Extract default attributes if present.
-      val defaults = if (attribs.contains("defaults")) {
-        Utils.toTable(attribs("defaults"))
-      } else Map[String, Variant]()
-
-      // Instantiate all clocks defined in the attributes.
-      val clocks = (for (pinv <- Utils.toArray(attribs("clocks"))) yield {
-        val table = Utils.toTable(pinv)
-        if (table.contains("name")) {
-          val name = Utils.toString(table("name"))
-          val clock = table ++ Map[String, Variant]("type" -> StringV(name))
-          Definition(TableV(clock), defaults).createInstance(s"$name", clock)
         } else {
-          println(s"clocks must have a name field")
-          break(None)
+          Right(XilinxBoard(
+            Utils.toString(attribs("board_family")),
+            Utils.toString(attribs("board_device"))
+          ))
         }
-      }).flatten.toSeq
-
-      // Instantiate all pingroups defined in the attributes.
-      val pingroups = (for (pinv <- Utils.toArray(attribs("pingroups"))) yield {
-        val table = Utils.toTable(pinv)
-        if (table.contains("name")) {
-          val name = Utils.toString(table("name"))
-          val pingroup =
-            table ++ Map[String, Variant]("type" -> StringV(s"pingroup.$name"))
-          Definition(TableV(pingroup), defaults)
-            .createInstance(s"$name", pingroup)
-        } else if (table.contains("names")) {
-          val names = Utils.toArray(table("names"))
-          (for (nameV <- names) yield {
-            val name = Utils.toString(nameV)
-            val pingroup = table ++
-              Map[String, Variant]("type" -> StringV(s"pingroup.$name"))
+      case "Altera"  => Right(AlteraBoard())
+      case "Lattice" => Right(LatticeBoard())
+      case "Gowin" =>
+        if (
+          !attribs.contains("board_family") ||
+          !attribs.contains("board_device")
+        ) {
+          Left(
+            s"$name Gowin board requires a board_family AND " +
+              s"board_device field"
+          )
+        } else {
+          Right(GowinBoard(
+            Utils.toString(attribs("board_family")),
+            Utils.toString(attribs("board_device"))
+          ))
+        }
+      case _ =>
+        Left(s"$name board has an unknown board_type")
+    }
+    
+    if (boardTypeResult.isLeft) {
+      return Left(boardTypeResult.left.getOrElse("Unknown board type error"))
+    }
+      
+    val boardType = boardTypeResult.toOption.get
+      
+    // Extract default attributes if present.
+    val defaults = if (attribs.contains("defaults")) {
+      Utils.toTable(attribs("defaults"))
+    } else Map[String, Variant]()
+      
+    // Instantiate all clocks defined in the attributes.
+      val clocksResult = Utils.toArray(attribs("clocks")).foldLeft[Either[String, Seq[InstanceTrait]]](Right(Seq.empty)) { 
+        case (Left(error), _) => Left(error)
+        case (Right(clocksAcc), pinv) => 
+          val table = Utils.toTable(pinv)
+          if (table.contains("name")) {
+            val name = Utils.toString(table("name"))
+            val clock = table ++ Map[String, Variant]("type" -> StringV(name))
+            Definition(TableV(clock), defaults).createInstance(s"$name", clock) match {
+              case Right(instance: InstanceTrait) => Right(clocksAcc :+ instance)
+              case Left(error) => Left(s"Error creating clock $name: $error")
+            }
+          } else {
+            Left(s"clocks must have a name field")
+          }
+      }
+      
+      if (clocksResult.isLeft) {
+        return Left(clocksResult.left.getOrElse("Error creating clocks"))
+      }
+      
+      val clocks = clocksResult.toOption.get      // Instantiate all pingroups defined in the attributes.
+      val pingroupsResult = Utils.toArray(attribs("pingroups")).foldLeft[Either[String, Seq[InstanceTrait]]](Right(Seq.empty)) {
+        case (Left(error), _) => Left(error)
+        case (Right(pingroupsAcc), pinv) =>
+          val table = Utils.toTable(pinv)
+          if (table.contains("name")) {
+            val name = Utils.toString(table("name"))
+            val pingroup =
+              table ++ Map[String, Variant]("type" -> StringV(s"pingroup.$name"))
             Definition(TableV(pingroup), defaults)
-              .createInstance(s"$name", pingroup)
-          }).flatten.toSeq
-        } else {
-          println(s"pin groups must either have a name or names field")
-          break(None)
-        }
-      }).flatten.toSeq
-
+              .createInstance(s"$name", pingroup) match {
+                case Right(instance: InstanceTrait) => Right(pingroupsAcc :+ instance)
+                case Left(error) => Left(s"Error creating pingroup $name: $error")
+              }
+          } else if (table.contains("names")) {
+            val names = Utils.toArray(table("names"))
+            names.foldLeft[Either[String, Seq[InstanceTrait]]](Right(pingroupsAcc)) {
+              case (Left(error), _) => Left(error)
+              case (Right(acc), nameV) =>
+                val name = Utils.toString(nameV)
+                val pingroup = table ++
+                  Map[String, Variant]("type" -> StringV(s"pingroup.$name"))
+                Definition(TableV(pingroup), defaults)
+                  .createInstance(s"$name", pingroup) match {
+                    case Right(instance: InstanceTrait) => Right(acc :+ instance)
+                    case Left(error) => Left(s"Error creating pingroup $name: $error")
+                  }
+            }
+          } else {
+            Left(s"pin groups must either have a name or names field")
+          }
+      }
+      
+      if (pingroupsResult.isLeft) {
+        return Left(pingroupsResult.left.getOrElse("Error creating pingroups"))
+      }
+      
+      val pingroups = pingroupsResult.toOption.get
+      
       // Create and return the BoardInstance.
-      Some(
+      Right(
         BoardInstance(
           name,
           boardType = boardType,
@@ -187,6 +211,5 @@ object BoardInstance {
           children = clocks ++ pingroups
         )
       )
-    }
   }
 }

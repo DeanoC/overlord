@@ -38,19 +38,47 @@ case class SourcesAction(filename: String, language: String) extends Action {
 
 object SourcesAction {
   // Factory method to create a sequence of SourcesAction instances from a process map.
-  def apply(name: String, process: Map[String, Variant]): Seq[SourcesAction] = {
+  def apply(name: String, process: Map[String, Variant]): Either[String, Seq[SourcesAction]] = {
     // Check if the process map contains a "sources" field.
     if (!process.contains("sources")) {
-      println(s"Sources process $name doesn't have a sources field")
-      return Seq()
+      Left(s"Sources process $name doesn't have a sources field")
+    } else {
+      try {
+        // Convert the "sources" field into an array of source entries.
+        val srcs = Utils.toArray(process("sources")).map(Utils.toTable)
+        
+        // Check for required fields in all entries first
+        val missingFields = srcs.zipWithIndex.collectFirst {
+          case (entry, idx) if !entry.contains("file") => 
+            Left(s"Source entry #${idx+1} in $name is missing the 'file' field")
+          case (entry, idx) if !entry.contains("language") => 
+            Left(s"Source entry for ${Utils.toString(entry("file"))} in $name is missing the 'language' field")
+        }
+        
+        missingFields match {
+          case Some(error) => error
+          case None =>
+            // Create a SourcesAction instance for each source entry.
+            val actions = for (entry <- srcs.toIndexedSeq) yield {
+              val filename = Utils.toString(entry("file"))
+              SourcesAction(filename, Utils.toString(entry("language")))
+            }
+            
+            Right(actions)
+        }
+      } catch {
+        case e: Exception => Left(s"Error processing sources in $name: ${e.getMessage}")
+      }
     }
-
-    // Convert the "sources" field into an array of source entries.
-    val srcs = Utils.toArray(process("sources")).map(Utils.toTable)
-    // Create a SourcesAction instance for each source entry.
-    for (entry <- srcs.toIndexedSeq) yield {
-      val filename = Utils.toString(entry("file"))
-      SourcesAction(filename, Utils.toString(entry("language")))
+  }
+  
+  // Legacy method for backward compatibility
+  def fromProcess(name: String, process: Map[String, Variant]): Seq[SourcesAction] = {
+    apply(name, process) match {
+      case Right(actions) => actions
+      case Left(errorMsg) => 
+        println(errorMsg)
+        Seq.empty
     }
   }
 }

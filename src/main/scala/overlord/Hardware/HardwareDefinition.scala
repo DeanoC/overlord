@@ -45,12 +45,12 @@ object HardwareDefinition {
     * @param path
     *   The source path of the definition.
     * @return
-    *   An Option containing the ChipDefinitionTrait if valid, otherwise None.
+    *   An Either containing the ChipDefinitionTrait if valid, or an error message if invalid.
     */
   def apply(
       table: Map[String, Variant],
       path: Path
-  ): Option[ChipDefinitionTrait] = {
+  ): Either[String, ChipDefinitionTrait] = {
     // Extract the type of the definition from the table
     val defTypeName = Utils.toString(table("type"))
 
@@ -72,72 +72,72 @@ object HardwareDefinition {
         name(0) != "other" &&
         name(0) != "clock") && name.length <= 2
     ) {
-      println(s"$defTypeName must have at least 3 elements A.B.C")
-      return None
-    }
-
-    // Extract register definitions
-    val registers: Seq[Variant] = Utils.lookupArray(table, "registers").toSeq
-
-    // Extract port definitions if available
-    val ports = {
-      if (table.contains("ports"))
-        Ports(Utils.toArray(table("ports"))).map(t => t.name -> t).toMap
-      else Map[String, Port]()
-    }
-
-    // Extract driver dependencies
-    val dependencies: Seq[String] = if (table.contains("drivers")) {
-      // Convert driver entries to a sequence of strings
-      val depends = Utils.toArray(table("drivers"))
-      depends.map(Utils.toString).toSeq
+      Left(s"$defTypeName must have at least 3 elements A.B.C")
     } else {
-      Seq()
-    }
+      // Extract register definitions
+      val registers: Seq[Variant] = Utils.lookupArray(table, "registers").toSeq
 
-    // Create a DefinitionType object for the definition
-    val defType = DefinitionType(defTypeName)
+      // Extract port definitions if available
+      val ports = {
+        if (table.contains("ports"))
+          Ports(Utils.toArray(table("ports"))).map(t => t.name -> t).toMap
+        else Map[String, Port]()
+      }
 
-    // Check if the definition contains gateware-specific information
-    if (table.contains("gateware")) {
+      // Extract driver dependencies
+      val dependencies: Seq[String] = if (table.contains("drivers")) {
+        // Convert driver entries to a sequence of strings
+        val depends = Utils.toArray(table("drivers"))
+        depends.map(Utils.toString).toSeq
+      } else {
+        Seq()
+      }
 
-      // Extract parameters for the gateware
-      val parameters: Map[String, Variant] = if (table.contains("parameters")) {
-        val params = Utils.toArray(table("parameters"))
-        (for (p <- params) yield {
-          val entry = Utils.toTable(p)
-          Utils.lookupString(entry, "name", "NO_NAME") -> entry("value")
-        }).toMap
-      } else Map[String, Variant]()
+      // Create a DefinitionType object for the definition
+      val defType = DefinitionType(defTypeName)
 
-      // Create a GatewareDefinition object
-      val gw = table("gateware")
-      GatewareDefinition(
-        defType,
-        attribs,
-        dependencies,
-        ports,
-        registers,
-        parameters,
-        Utils.toString(gw)
-      )
+      // Check if the definition contains gateware-specific information
+      if (table.contains("gateware")) {
 
-    } else {
-      // Handle hardware definitions by extracting the maximum instances allowed
-      val mi = Utils.lookupInt(table, "max_instances", 1)
+        // Extract parameters for the gateware
+        val parameters: Map[String, Variant] = if (table.contains("parameters")) {
+          val params = Utils.toArray(table("parameters"))
+          (for (p <- params) yield {
+            val entry = Utils.toTable(p)
+            Utils.lookupString(entry, "name", "NO_NAME") -> entry("value")
+          }).toMap
+        } else Map[String, Variant]()
 
-      // Create a FixedHardwareDefinition object
-      Some(
-        FixedHardwareDefinition(
-          defType,
-          path,
-          attribs,
+        // Create a GatewareDefinition object
+        val gw = table("gateware")
+        // Call the second GatewareDefinition.apply method with the correct parameter order
+        GatewareDefinition(
+          defType, 
+          attribs, 
           dependencies,
           ports,
-          mi,
-          registers
+          registers,
+          parameters,
+          Utils.toString(gw)
         )
-      )
+
+      } else {
+        // Handle hardware definitions by extracting the maximum instances allowed
+        val mi = Utils.lookupInt(table, "max_instances", 1)
+
+        // Create a FixedHardwareDefinition object
+        Right(
+          FixedHardwareDefinition(
+            defType,
+            path,
+            attribs,
+            dependencies,
+            ports,
+            mi,
+            registers
+          )
+        )
+      }
     }
   }
 }

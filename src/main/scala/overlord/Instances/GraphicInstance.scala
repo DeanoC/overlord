@@ -16,9 +16,9 @@ object GraphicInstance {
       ident: String,
       definition: ChipDefinitionTrait,
       attribs: Map[String, Variant]
-  ): Option[StorageInstance] = {
-    val storage = StorageInstance(ident, definition)
-    storage.mergeAllAttributes(attribs)
-    Some(storage)
+  ): Either[String, GraphicInstance] = {
+    val graphic = GraphicInstance(ident, definition)
+    graphic.mergeAllAttributes(attribs)
+    Right(graphic)
   }
 }

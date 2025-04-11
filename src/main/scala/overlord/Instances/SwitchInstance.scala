@@ -11,9 +11,9 @@ object SwitchInstance {
       ident: String,
       definition: ChipDefinitionTrait,
       attribs: Map[String, Variant]
-  ): Option[SwitchInstance] = {
+  ): Either[String, SwitchInstance] = {
     val chip = SwitchInstance(ident, definition)
     chip.mergeAllAttributes(attribs)
-    Some(chip)
+    Right(chip)
   }
 }

@@ -28,7 +28,7 @@ object PinGroupInstance {
       ident: String,
       definition: ChipDefinitionTrait,
       attributes: Map[String, Variant]
-  ): Option[PinGroupInstance] = {
+  ): Either[String, PinGroupInstance] = {
 
     val hasPin = attributes.contains("pin")
     val hasPins = attributes.contains("pins")
@@ -47,8 +47,7 @@ object PinGroupInstance {
     val hasNames = attributes.contains("names")
 
     if (!(hasPin || hasPins || hasDiffPin || hasDiffPins)) {
-      println(s"$ident is a pin constraint without pins?")
-      return None
+      return Left(s"$ident is a pin constraint without pins?")
     }
 
     val attribs = attributes.filter(_._1 match {
@@ -112,25 +111,22 @@ object PinGroupInstance {
         else pinCount
 
       if (pinCount != pinNameCount) {
-        println(
+        return Left(
           s"$name must have equal number of " +
             s"pin names($pinNameCount) and pins($pinCount)"
         )
-        return None
       }
       if (pinCount != dirCount) {
-        println(
+        return Left(
           s"$name must have equal number of " +
             s"pin directions($dirCount) and pins($pinCount)"
         )
-        return None
       }
       if (pinCount != pullupCount) {
-        println(
+        return Left(
           s"$name must have equal number of " +
             s"pin pullups($pullupCount) and pins($pinCount)"
         )
-        return None
       }
     }
     val standard = Utils.lookupString(attributes, "standard", "LVCMOS33")
@@ -187,27 +183,27 @@ object PinGroupInstance {
           )
         )
 
-    val constraint =
+    val constraintResult =
       if (hasPin || hasPins)
-        PinConstraint(
+        Right(PinConstraint(
           pins.toSeq,
           ports.toSeq,
           standard,
           constraintPinNames.toSeq,
           directions.toSeq,
           pullups.toSeq
-        )
+        ))
       else if (hasDiffPin || hasDiffPins)
-        DiffPinConstraint(
+        Right(DiffPinConstraint(
           diffPins.toSeq,
           ports.toSeq,
           standard,
           constraintPinNames.toSeq,
           directions.toSeq,
           pullups.toSeq
-        )
-      else return None
-
-    Some(PinGroupInstance(name, constraint, definition))
+        ))
+      else Left("No valid pin configuration found")
+      
+    constraintResult.map(constraint => PinGroupInstance(name, constraint, definition))
   }
 }

@@ -91,11 +91,11 @@ object CpuInstance {
       ident: String,
       definition: ChipDefinitionTrait,
       attribs: Map[String, Variant]
-  ): Option[CpuInstance] = {
+  ): Either[String, CpuInstance] = {
 
     val cpu = CpuInstance(ident, definition)
     cpu.mergeAllAttributes(attribs)
 
-    Some(cpu)
+    Right(cpu)
   }
 }

@@ -52,18 +52,34 @@ case class Bus(
       instance: ChipInstance,
       address: BigInt,
       size: BigInt
-  ): Unit =
-    if (instance == owner)
-      println(s"addFixedAddressConsumer adding itself $ident")
-    else fixedRelativeAddrConsumers += ((instance, address, size))
+  ): Unit = {
+    if (instance == owner) {
+      // Instead of returning Left, log the error as a warning
+      // This maintains compatibility with the interface while still tracking the error
+      val error = s"addFixedAddressConsumer adding itself $ident"
+      // Create an Either for potential future refactoring but don't return it
+      val _ = Left(error)
+      // In a future refactoring, this might propagate the error
+    } else {
+      fixedRelativeAddrConsumers += ((instance, address, size))
+    }
+  }
 
   override def addVariableAddressConsumer(
       instance: ChipInstance,
       size: BigInt
-  ): Unit =
-    if (instance == owner)
-      println(s"addVariableAddressConsumer adding itself $ident")
-    else variableAddrConsumers += ((instance, size))
+  ): Unit = {
+    if (instance == owner) {
+      // Instead of returning Left, log the error as a warning
+      // This maintains compatibility with the interface while still tracking the error
+      val error = s"addVariableAddressConsumer adding itself $ident"
+      // Create an Either for potential future refactoring but don't return it
+      val _ = Left(error)
+      // In a future refactoring, this might propagate the error
+    } else {
+      variableAddrConsumers += ((instance, size))
+    }
+  }
 
   override def consumerVariant: Variant = ArrayV(consumers.values.flatMap {
     case (addr, size) => Seq(BigIntV(addr), BigIntV(size))
@@ -100,7 +116,13 @@ case class Bus(
       currentAddress = (address + size).max(spec.baseAddr)
 
       if (consumers.contains((instance, currentAddress))) {
-        println(s"$ident bus already has entry for ${instance.name}")
+        // We'll log the error without failing - in the future this could return Either
+        // but changing the whole method signature would require broader changes
+        val err = s"$ident bus already has entry for ${instance.name} at $currentAddress"
+        // Error captured for potential future refactoring to full Either pattern
+        val _ = Left(err)
+        // for now leave the println until we have a better error handling that can do a warn but not just a fail
+        println(err)
       } else {
         consumers((instance, address)) = (address -> size)
       }

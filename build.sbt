@@ -1,4 +1,4 @@
-val scala3Version = "3.3.1" // Latest stable Scala 3 version
+val scala3Version = "3.3.5" // Updated to the latest recommended Scala 3 version
 
 ThisBuild / organization := "com.deanoc"
 ThisBuild / version := "1.0"
@@ -26,6 +26,12 @@ Linux / packageName := "overlord"
 // Native packager settings
 executableScriptName := "overlord"
 
+// Packaging workflow notes:
+// - 'sbt stage' will compile and prepare the application in target/universal/stage/
+// - 'sbt universal:packageBin' creates a zip package (includes compilation)
+// - 'sbt debian:packageBin' creates a .deb package (includes compilation)
+// - If you need a fat JAR, run 'sbt assembly' separately
+
 // Common settings
 lazy val commonSettings = Seq(
 	scalacOptions += "-deprecation",
@@ -52,19 +58,22 @@ lazy val dependencies = Seq(
 	"org.jgrapht" % "jgrapht-io" % "1.5.2",
 	"org.scala-graph" %% "graph-core" % "2.0.3",
 	"org.scala-graph" %% "graph-dot" % "2.0.0",
+
+	// Command line handling
+	"com.github.scopt" %% "scopt" % "4.1.0",
 	
 	// Add SnakeYAML dependency for YAML parsing
 	"org.yaml" % "snakeyaml" % "2.0"
 )
 
 // Main project (Scala 3)
-lazy val root = (project in file("."))
+lazy val overlord = (project in file("."))
 	.settings(
 		name := "overlord",
 		scalaVersion := scala3Version,
 		commonSettings,
 		libraryDependencies := dependencies,
-		maxErrors := 1,
+		maxErrors := 5,
 		scalacOptions ++= Seq(
 			"-feature",
 			"-explain"  // Detailed error explanations
@@ -73,6 +82,10 @@ lazy val root = (project in file("."))
 
 // Configure sbt to recognize the test directory
 Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oD")
+// Ensure Main is not executed during tests
+Test / fork := true
+Test / mainClass := None
+
 
 import sbtassembly.AssemblyPlugin.autoImport._
 
@@ -80,4 +93,3 @@ assemblyMergeStrategy := {
   case PathList("META-INF", xs @ _*) => MergeStrategy.discard
   case _                             => MergeStrategy.first
 }
-

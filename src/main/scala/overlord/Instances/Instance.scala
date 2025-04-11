@@ -90,39 +90,37 @@ object Instance {
       parsed: Variant,
       defaults: Map[String, Variant],
       catalogs: DefinitionCatalog
-  ): Option[InstanceTrait] = {
+  ): Either[String, InstanceTrait] = {
 
     val table = Utils.toTable(parsed)
 
     if (!table.contains("type")) {
-      println(s"$parsed doesn't have a type")
-      return None
-    }
+      Left(s"$parsed doesn't have a type")
+    } else {
+      val defTypeString = Utils.toString(table("type"))
+      val name = Utils.lookupString(table, "name", defTypeString)
 
-    val defTypeString = Utils.toString(table("type"))
-    val name = Utils.lookupString(table, "name", defTypeString)
+      val attribs: Map[String, Variant] = defaults ++ table.filter(_._1 match {
+        case "type" | "name" => false
+        case _               => true
+      })
 
-    val attribs: Map[String, Variant] = defaults ++ table.filter(_._1 match {
-      case "type" | "name" => false
-      case _               => true
-    })
+      val defType = DefinitionType(defTypeString)
 
-    val defType = DefinitionType(defTypeString)
-
-    val defi = catalogs.findDefinition(defType) match {
-      case Some(d) => d
-      case None =>
-        definitionFrom(catalogs, Project.projectPath, table, defType) match {
-          case Some(value) => value
+      for {
+        definition <- catalogs.findDefinition(defType) match {
+          case Some(d) => Right(d)
           case None =>
-            println(s"No definition found or could be create $name $defType")
-            return None
+            definitionFrom(catalogs, Project.projectPath, table, defType) match {
+              case Right(value) => Right(value)
+              case Left(error) => Left(s"No definition found or could be created for $name $defType: $error")
+            }
         }
-    }
-
-    defi.createInstance(name, attribs) match {
-      case Some(i) => Some(i)
-      case None    => None
+        instance <- definition.createInstance(name, attribs) match {
+          case Right(i: InstanceTrait) => Right(i)
+          case Left(error) => Left(s"Failed to create instance for $name with definition $defType: $error")
+        }
+      } yield instance
     }
   }
 
@@ -131,31 +129,26 @@ object Instance {
       path: Path,
       table: Map[String, Variant],
       defType: DefinitionType
-  ): Option[DefinitionTrait] = {
+  ): Either[String, DefinitionTrait] = {
 
     if (table.contains("gateware")) {
-      val result = HardwareDefinition(table, path)
-      result match {
-        case Some(value) =>
+      HardwareDefinition(table, path) match {
+        case Right(value) =>
           catalogs.catalogs += (defType -> value)
-          result
-        case None =>
-          println(s"$defType gateware was invalid")
-          None
+          Right(value)
+        case Left(error) =>
+          Left(s"$defType gateware was invalid: $error")
       }
     } else if (table.contains("software")) {
-      val result = SoftwareDefinition(table, path)
-      result match {
+      SoftwareDefinition(table, path) match {
         case Some(value) =>
           catalogs.catalogs += (defType -> value)
-          result
+          Right(value)
         case None =>
-          println(s"$defType software was invalid")
-          None
+          Left(s"$defType software was invalid")
       }
     } else {
-      println(s"$defType not found in any catalogs")
-      None
+      Left(s"$defType not found in any catalogs")
     }
   }
 }

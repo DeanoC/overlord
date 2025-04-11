@@ -25,74 +25,83 @@ case class ActionsFile(actions: Seq[Action])
 
 object ActionsFile {
   // Factory method to create an ActionsFile from a name and parsed data.
-  def apply(name: String, parsed: Map[String, Variant]): Option[ActionsFile] = {
-    // Check if the parsed data contains an "actions" field of type ArrayV.
-    if (
-      !parsed.contains("actions") ||
-      !parsed("actions").isInstanceOf[ArrayV]
-    ) {
-      println(s"$name doesn't have an actions field")
-      return None
-    }
-
-    // Check if the parsed data contains a "process" field of type ArrayV.
-    if (
-      !parsed.contains("process") ||
-      !parsed("process").isInstanceOf[ArrayV]
-    ) {
-      println(s"$name doesn't have process fields")
-      return None
-    }
-
-    // Extract processes from the parsed data.
-    val processes =
-      (for {
-        tprocess <- Utils.toArray(parsed("process"))
-        tbl = Utils.toTable(tprocess)
-      } yield {
-        // Ensure each process has a "name" field.
-        if (tbl.contains("name"))
-          Some(Utils.toString(tbl("name")) -> tbl)
-        else None
-      }).flatten.toMap
-
-    // Extract actions and map them to their corresponding processes.
-    val actions =
-      (for {
-        taction <- Utils.toArray(parsed("actions"))
-        action = Utils.toString(taction)
-      } yield {
-
-        boundary {
-          // Ensure the action references a valid process.
-          if (!processes.contains(action)) {
-            println(s"$action process not found in $name")
-            break(None)
-          }
-
-          val process = processes(action)
-          // Match the processor type to create the appropriate action.
-          Utils.toString(process("processor")) match {
-            case "copy"                => CopyAction(name, process)
-            case "sources"             => SourcesAction(name, process)
-            case "git"                 => GitCloneAction(name, process)
-            case "python"              => PythonAction(name, process)
-            case "yaml"                => YamlAction(name, process)
-            case "sbt"                 => SbtAction(name, process)
-            case "read_verilog_top"    => ReadVerilogTopAction(name, process)
-            case "read_yaml_registers" => ReadYamlRegistersAction(name, process)
-            case "templates"           => TemplateAction(name, process)
-            case "software_sources"    => SoftSourceAction(name, process)
-            case _                     =>
-              // Handle unknown processor types.
-              println(f"Unknown action processor (${Utils
-                  .toString(process("processor"))}) in $name")
-              break(None)
+  def apply(name: String, parsed: Map[String, Variant]): Either[String, ActionsFile] = {
+    // Check if the parsed data contains required fields
+    if (!parsed.contains("actions") || !parsed("actions").isInstanceOf[ArrayV]) {
+      Left(s"$name doesn't have an actions field")
+    } else if (!parsed.contains("process") || !parsed("process").isInstanceOf[ArrayV]) {
+      Left(s"$name doesn't have process fields")
+    } else {
+      try {
+        // Extract processes from the parsed data
+        val processEntries = Utils.toArray(parsed("process"))
+          .map(Utils.toTable)
+          .filter(_.contains("name"))
+          .map(tbl => Utils.toString(tbl("name")) -> tbl)
+          .toMap
+        
+        // Process each action and collect results
+        val actionResults = Utils.toArray(parsed("actions")).map { taction =>
+          val actionName = Utils.toString(taction)
+          
+          // Check if process exists
+          if (!processEntries.contains(actionName)) {
+            Left(s"Action process $actionName not found in $name")
+          } else {
+            val process = processEntries(actionName)
+            
+            // Check if processor type exists
+            if (!process.contains("processor")) {
+              Left(s"Process $actionName in $name doesn't have a processor field")
+            } else {
+              // Create appropriate action based on processor type
+              Utils.toString(process("processor")) match {
+                case "copy"                => CopyAction(name, process)
+                case "sources"             => SourcesAction(name, process)
+                case "git"                 => GitCloneAction(name, process)
+                case "shell"               => ShellAction(name, process)
+                case "python"              => PythonAction(name, process)
+                case "yaml"                => YamlAction(name, process)
+                case "sbt"                 => SbtAction(name, process)
+                case "read_verilog_top"    => ReadVerilogTopAction(name, process)
+                case "read_yaml_registers" => ReadYamlRegistersAction(name, process)
+                case "templates"           => TemplateAction(name, process)
+                case "software_sources"    => SoftSourceAction(name, process)
+                case processorType         =>
+                  Left(s"Unknown action processor ($processorType) in $name")
+              }
+            }
           }
         }
-      }).flatten
-
-    // Return an ActionsFile containing the extracted actions.
-    Some(ActionsFile(actions.toSeq))
+        
+        // Check for any errors in processing actions
+        val firstError = actionResults.collectFirst {
+          case Left(error) => error
+        }
+        
+        firstError match {
+          case Some(error) => Left(error)
+          case None => 
+            // Combine all action sequences into one
+            val combinedActions = actionResults.collect {
+              case Right(actionSeq) => actionSeq
+            }.flatten
+            
+            Right(ActionsFile(combinedActions.toIndexedSeq))
+        }
+      } catch {
+        case e: Exception => Left(s"Error processing actions file $name: ${e.getMessage}")
+      }
+    }
+  }
+  
+  // Legacy method for backward compatibility
+  def createActionsFile(name: String, parsed: Map[String, Variant]): Option[ActionsFile] = {
+    apply(name, parsed) match {
+      case Right(actionsFile) => Some(actionsFile)
+      case Left(errorMsg) => 
+        println(errorMsg)
+        None
+    }
   }
 }

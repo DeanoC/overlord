@@ -248,7 +248,8 @@ object Utils {
     val source = readFile(yamlPath) match {
       case Some(value) => value
       case None =>
-        println(s"$yamlPath YAML unable to be read")
+        // Log and return an empty map if the file cannot be read
+        println(s"Warning: $yamlPath YAML file could not be read.")
         return Map[String, Variant]()
     }
 
@@ -258,7 +259,8 @@ object Utils {
       parsed.asScala.map { case (k, v) => k -> toVariant(v) }.toMap
     } catch {
       case e: Exception =>
-        println(s"Error parsing YAML file $yamlPath: ${e.getMessage}")
+        // Log the error and return an empty map instead of throwing an exception
+        println(s"Warning: Error parsing YAML file $yamlPath: ${e.getMessage}")
         Map[String, Variant]()
     }
   }

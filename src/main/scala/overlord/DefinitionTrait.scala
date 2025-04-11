@@ -19,7 +19,7 @@ trait DefinitionTrait {
   def createInstance(
       name: String,
       attribs: Map[String, Variant]
-  ): Option[InstanceTrait]
+  ): Either[String, InstanceTrait]
 }
 
 object Definition {
@@ -39,7 +39,12 @@ object Definition {
     }
 
     deftype match {
-      case Some(value) => value
+      case Right(value) => value
+      case Left(error) =>
+        println(s"Invalid definition type $path: $error")
+        exit()
+      // The following cases should no longer be needed once all methods return Either
+      case Some(value) => value  // For backward compatibility with methods still returning Option
       case None =>
         println(s"Invalid definition type $path")
         exit()
@@ -58,8 +63,8 @@ trait ChipDefinitionTrait extends DefinitionTrait {
   def createInstance(
       name: String,
       attribs: Map[String, Variant]
-  ): Option[InstanceTrait] = {
-    val instance = defType match {
+  ): Either[String, InstanceTrait] = {
+    val instanceResult = defType match {
       case _: RamDefinitionType     => RamInstance(name, this, attribs)
       case _: CpuDefinitionType     => CpuInstance(name, this, attribs)
       case _: GraphicDefinitionType => GraphicInstance(name, this, attribs)
@@ -68,17 +73,19 @@ trait ChipDefinitionTrait extends DefinitionTrait {
       case _: IoDefinitionType      => IoInstance(name, this, attribs)
       case _: SocDefinitionType     => SocInstance(name, this, attribs)
       case _: SwitchDefinitionType  => SwitchInstance(name, this, attribs)
-      case _: OtherDefinitionType   => OtherInstance(name, this, attribs)
-
+      case _: OtherDefinitionType   => OtherInstance(name, this, attribs) 
       case _: PinGroupDefinitionType => PinGroupInstance(name, this, attribs)
       case _: ClockDefinitionType    => ClockInstance(name, this, attribs)
       case _: BoardDefinitionType    => BoardInstance(name, this, attribs)
-      case _ =>
-        println(s"$defType is invalid for chip\n")
-        None
+      case _ => Left(s"$defType is invalid for chip")
     }
-    if (instance.nonEmpty) registers = Registers(instance.get, registersV)
-    instance
+    
+    instanceResult match {
+      case Right(instance) => 
+        registers = Registers(instance, registersV)
+        Right(instance)
+      case Left(error) => Left(error)
+    }
   }
 }
 
@@ -95,13 +102,11 @@ trait SoftwareDefinitionTrait extends DefinitionTrait {
   def createInstance(
       name: String,
       attribs: Map[String, Variant]
-  ): Option[InstanceTrait] = {
+  ): Either[String, InstanceTrait] = {
     defType match {
       case _: LibraryDefinitionType => LibraryInstance(name, this, attribs)
       case _: ProgramDefinitionType => ProgramInstance(name, this, attribs)
-      case _ =>
-        println(s"$defType is invalid for software\n")
-        None
+      case _ => Left(s"$defType is invalid for software")
     }
   }
 }

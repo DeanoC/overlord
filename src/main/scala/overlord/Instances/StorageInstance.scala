@@ -16,9 +16,9 @@ object StorageInstance {
       ident: String,
       definition: ChipDefinitionTrait,
       attribs: Map[String, Variant]
-  ): Option[StorageInstance] = {
+  ): Either[String, StorageInstance] = {
     val storage = StorageInstance(ident, definition)
     storage.mergeAllAttributes(attribs)
-    Some(storage)
+    Right(storage)
   }
 }

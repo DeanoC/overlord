@@ -22,11 +22,10 @@ object ClockInstance {
       name: String,
       definition: ChipDefinitionTrait,
       attribs: Map[String, Variant]
-  ): Option[ClockInstance] = {
+  ): Either[String, ClockInstance] = {
 
     if (!definition.attributes.contains("pin") && !attribs.contains("pin")) {
-      println(f"$name is a clock without a pin attribute")
-      None
+      Left(f"$name is a clock without a pin attribute")
     } else {
       val clock = ClockInstance(name, definition)
       clock.mergeAttribute(attribs, "pin")
@@ -34,7 +33,7 @@ object ClockInstance {
       clock.mergeAttribute(attribs, "period")
       clock.mergeAttribute(attribs, "waveform")
 
-      Some(clock)
+      Right(clock)
     }
   }
 }

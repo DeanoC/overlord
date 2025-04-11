@@ -45,17 +45,28 @@ object GitCloneAction {
   def apply(
       name: String,
       process: Map[String, Variant]
-  ): Seq[GitCloneAction] = {
+  ): Either[String, Seq[GitCloneAction]] = {
     // Ensure the process map contains a "url" field
     if (!process.contains("url")) {
-      println(s"Git Clone process $name doesn't have a url field")
-      return Seq()
+      Left(s"Git Clone process $name doesn't have a url field")
+    } else if (!process("url").isInstanceOf[StringV]) {
+      Left(s"Git Clone process $name url isn't a string")
+    } else {
+      // Create a GitCloneAction instance using the URL from the process map
+      Right(Seq(GitCloneAction(Utils.toString(process("url")))))
     }
-
-    // Placeholder for additional logic (if needed)
-    ???
-
-    // Create a GitCloneAction instance using the URL from the process map
-    Seq(GitCloneAction(Utils.toString(process("url"))))
+  }
+  
+  // Legacy method for backward compatibility
+  def fromProcess(
+      name: String,
+      process: Map[String, Variant]
+  ): Seq[GitCloneAction] = {
+    apply(name, process) match {
+      case Right(actions) => actions
+      case Left(errorMsg) => 
+        println(errorMsg)
+        Seq.empty
+    }
   }
 }

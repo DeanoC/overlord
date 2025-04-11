@@ -14,9 +14,9 @@ object OtherInstance {
       ident: String,
       definition: ChipDefinitionTrait,
       attribs: Map[String, Variant]
-  ): Option[OtherInstance] = {
+  ): Either[String, OtherInstance] = {
     val other = OtherInstance(ident, definition)
     other.mergeAllAttributes(attribs)
-    Some(other)
+    Right(other)
   }
 }

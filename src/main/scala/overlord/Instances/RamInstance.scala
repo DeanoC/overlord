@@ -50,17 +50,16 @@ object RamInstance {
       ident: String,
       definition: ChipDefinitionTrait,
       attribs: Map[String, Variant]
-  ): Option[RamInstance] = {
+  ): Either[String, RamInstance] = {
     if (
       (!definition.attributes
         .contains("ranges")) && (!attribs.contains("ranges"))
     ) {
-      println(s"ERROR: ram ${ident} has no ranges, so isn't a valid range")
-      return None
+      Left(s"ERROR: ram ${ident} has no ranges, so isn't a valid range")
+    } else {
+      val ram = RamInstance(ident, definition)
+      ram.mergeAllAttributes(attribs)
+      Right(ram)
     }
-
-    val ram = RamInstance(ident, definition)
-    ram.mergeAllAttributes(attribs)
-    Some(ram)
   }
 }

@@ -38,37 +38,63 @@ case class ReadYamlRegistersAction(name: String, filename: String)
     // Resolve macros in the filename based on the instance context.
     val expandedName = Project.resolveInstanceMacros(instance, filename)
     // Parse the YAML file to retrieve register definitions.
-    val registers =
-      input.YamlRegistersParser(instance, expandedName, instance.name)
-    // Append the parsed registers to the instance's register banks.
-    instance.instanceRegisterBanks ++= registers
+    input.YamlRegistersParser(instance, expandedName, instance.name) match {
+      case Right(registers) =>
+        // Append the parsed registers to the instance's register banks.
+        instance.instanceRegisterBanks ++= registers
+      case Left(error) =>
+        println(s"Error in ${instance.name}: $error")
+    }
   }
 }
 
-// Companion object to create instances of ReadYamlRegistersAction.
 object ReadYamlRegistersAction {
   // Factory method to create a ReadYamlRegistersAction from a process definition.
   def apply(
       name: String,
       process: Map[String, Variant]
-  ): Option[ReadYamlRegistersAction] = {
-    // Ensure the process contains a "source" field; otherwise, log a warning and return None.
+  ): Either[String, Seq[ReadYamlRegistersAction]] = {
+    // Ensure the process contains a "source" field
     if (!process.contains("source")) {
-      println(s"Read Yaml Registers process $name doesn't have a source field")
-      return None
+      Left(s"Read Yaml Registers process $name doesn't have a source field")
+    } else {
+      try {
+        // Extract the filename from the "source" field, handling different data types.
+        val filenameEither = process("source") match {
+          case s: StringV => Right(s.value)
+          case t: TableV => 
+            if (!t.value.contains("file")) {
+              Left(s"Read Yaml Registers process $name has a table without a file field")
+            } else {
+              Right(Utils.toString(t.value("file")))
+            }
+          case other => 
+            Left(s"Read Yaml Registers source field is malformed: ${other.getClass.getSimpleName}")
+        }
+        
+        filenameEither.flatMap { filename =>
+          if (filename.isEmpty) {
+            Left(s"Read Yaml Registers process $name has an empty filename")
+          } else {
+            Right(Seq(ReadYamlRegistersAction(name, filename)))
+          }
+        }
+      } catch {
+        case e: Exception => Left(s"Error processing Read Yaml Registers in $name: ${e.getMessage}")
+      }
     }
-
-    // Extract the filename from the "source" field, handling different data types.
-    val filename = process("source") match {
-      case s: StringV => s.value
-      case t: TableV  => Utils.toString(t.value("file"))
-      case _          =>
-        // Log an error if the "source" field is malformed and return None.
-        println("Read Yaml Register source field is malformed")
-        return None
+  }
+  
+  // Legacy method for backward compatibility
+  def fromProcess(
+      name: String,
+      process: Map[String, Variant]
+  ): Seq[ReadYamlRegistersAction] = {
+    apply(name, process) match {
+      case Right(actions) => actions
+      case Left(errorMsg) => 
+        println(errorMsg)
+        Seq.empty
     }
-
-    // Return a new instance of ReadYamlRegistersAction.
-    Some(ReadYamlRegistersAction(name, filename))
   }
 }

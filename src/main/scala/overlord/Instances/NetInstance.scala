@@ -15,10 +15,9 @@ object NetInstance {
       ident: String,
       definition: ChipDefinitionTrait,
       attribs: Map[String, Variant]
-  ): Option[NetInstance] = {
+  ): Either[String, NetInstance] = {
     val net = NetInstance(ident, definition)
     net.mergeAllAttributes(attribs)
-    Some(net)
-
+    Right(net)
   }
 }

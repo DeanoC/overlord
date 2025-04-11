@@ -15,18 +15,17 @@ object LibraryInstance {
       ident: String,
       definition: SoftwareDefinitionTrait,
       attribs: Map[String, Variant]
-  ): Option[LibraryInstance] = {
+  ): Either[String, LibraryInstance] = {
 
     if (
       !attribs.contains("name") &&
       !definition.attributes.contains("name")
     ) {
-      println(f"Libraries must have a name attribute%n")
-      return None
+      Left(f"Libraries must have a name attribute")
+    } else {
+      val sw = LibraryInstance(ident, definition)
+      sw.mergeAllAttributes(attribs)
+      Right(sw)
     }
-
-    val sw = LibraryInstance(ident, definition)
-    sw.mergeAllAttributes(attribs)
-    Some(sw)
   }
 }

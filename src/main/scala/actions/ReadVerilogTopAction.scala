@@ -34,34 +34,39 @@ case class ReadVerilogTopAction(filename: String) extends GatewareAction {
 
     // Resolves the filename with macros and parses Verilog modules
     val expandedName = Project.resolveInstanceMacros(instance, filename)
-    val modules = input.VerilogModuleParser(
+    input.VerilogModuleParser(
       Project.tryPaths(instance, expandedName),
       instance.name
-    )
-
-    boundary {
-      // Finds the module matching the instance name or filename
-      val module = modules.find(_.name == instance.name).getOrElse {
-        modules
-          .find(_.name == expandedName.split("/").last.replace(".v", ""))
-          .getOrElse {
-            break(())
+    ) match {
+      case Right(parsedModules) => 
+        boundary {
+          // Finds the module matching the instance name or filename
+          val module = parsedModules.find(_.name == instance.name).getOrElse {
+            parsedModules
+              .find(_.name == expandedName.split("/").last.replace(".v", ""))
+              .getOrElse {
+                println(s"Warning: No matching module found for ${instance.name}")
+                break(())
+              }
           }
-      }
 
-      // Updates the instance with module details
-      instance.moduleName = module.name
-      val ports = module.module_boundary.collect { case p: VerilogPort => p }
-      val parameterKeys = module.module_boundary.collect {
-        case p: VerilogParameterKey => p
-      }
-      ports.foreach(p =>
-        instance.mergePort(
-          p.name,
-          Port(p.name, p.bits, WireDirection(p.direction), p.knownWidth)
-        )
-      )
-      parameterKeys.foreach(p => instance.mergeParameterKey(p.parameter))
+          // Updates the instance with module details
+          instance.moduleName = module.name
+          val ports = module.module_boundary.collect { case p: VerilogPort => p }
+          val parameterKeys = module.module_boundary.collect {
+            case p: VerilogParameterKey => p
+          }
+          ports.foreach(p =>
+            instance.mergePort(
+              p.name,
+              Port(p.name, p.bits, WireDirection(p.direction), p.knownWidth)
+            )
+          )
+          parameterKeys.foreach(p => instance.mergeParameterKey(p.parameter))
+        }
+      
+      case Left(error) =>
+        println(s"Error parsing Verilog module for ${instance.name}: $error")
     }
   }
 }
@@ -71,19 +76,46 @@ object ReadVerilogTopAction {
   def apply(
       name: String,
       process: Map[String, Variant]
-  ): Option[ReadVerilogTopAction] = {
+  ): Either[String, Seq[ReadVerilogTopAction]] = {
     if (!process.contains("source")) {
-      println(s"Read Verilog Top process $name doesn't have a source field")
-      return None
+      Left(s"Read Verilog Top process $name doesn't have a source field")
+    } else {
+      try {
+        // Extracts the filename from the process map
+        val filenameEither = process("source") match {
+          case s: StringV => Right(s.value)
+          case t: TableV => 
+            if (!t.value.contains("file")) {
+              Left(s"Read Verilog Top process $name has a table without a file field")
+            } else {
+              Right(Utils.toString(t.value("file")))
+            }
+          case other => 
+            Left(s"Read Verilog Top process $name source is an invalid type: ${other.getClass.getSimpleName}")
+        }
+         filenameEither.flatMap { filename =>
+          if (filename.isEmpty) {
+            Left(s"Read Verilog Top process $name has an empty filename")
+          } else {
+            Right(Seq(ReadVerilogTopAction(filename)))
+          }
+        }
+      } catch {
+        case e: Exception => Left(s"Error processing Read Verilog Top in $name: ${e.getMessage}")
+      }
     }
-
-    // Extracts the filename from the process map
-    val filename = process("source") match {
-      case s: StringV => s.value
-      case t: TableV  => Utils.toString(t.value("file"))
-      case _          => println("Source is an invalid type"); ""
+  }
+  
+  // Legacy method for backward compatibility
+  def fromProcess(
+      name: String,
+      process: Map[String, Variant]
+  ): Seq[ReadVerilogTopAction] = {
+    apply(name, process) match {
+      case Right(actions) => actions
+      case Left(errorMsg) => 
+        println(errorMsg)
+        Seq.empty
     }
-
-    Some(ReadVerilogTopAction(filename))
   }
 }

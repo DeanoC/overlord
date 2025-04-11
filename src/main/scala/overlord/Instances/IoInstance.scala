@@ -15,10 +15,9 @@ object IoInstance {
       ident: String,
       definition: ChipDefinitionTrait,
       attribs: Map[String, Variant]
-  ): Option[IoInstance] = {
-    val net = IoInstance(ident, definition)
-    net.mergeAllAttributes(attribs)
-    Some(net)
-
+  ): Either[String, IoInstance] = {
+    val io = IoInstance(ident, definition)
+    io.mergeAllAttributes(attribs)
+    Right(io)
   }
 }

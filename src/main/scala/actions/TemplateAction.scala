@@ -92,52 +92,86 @@ object TemplateAction {
   def apply(
       name: String,
       process: Map[String, Variant]
-  ): Seq[TemplateAction] = {
+  ): Either[String, Seq[TemplateAction]] = {
     // Check if the process contains a "sources" field
     if (!process.contains("sources")) {
-      println(s"Template process $name doesn't have a sources field")
-      return Seq() // Return an empty sequence if "sources" is missing
-    }
+      Left(s"Template process $name doesn't have a sources field")
+    } else {
 
-    // Convert the "sources" field into an array of tables
-    val srcs = Utils.toArray(process("sources")).map(Utils.toTable)
+      try {
+        // Convert the "sources" field into an array of tables
+        val srcs = Utils.toArray(process("sources")).map(Utils.toTable)
 
-    // Parse the "cpus" field if it exists
-    val all_cpus = if (process.contains("cpus")) {
-      val cpusString = Utils.toString(process("cpus"))
-      if (cpusString == "_") Some(Seq()) // Special case for "_"
-      else
-        Some(
-          cpuRegEx.split(cpusString).toSeq
-        ) // Split CPU string into a sequence
-    } else None
+        // Parse the "cpus" field if it exists
+        val all_cpus = if (process.contains("cpus")) {
+          val cpusString = Utils.toString(process("cpus"))
+          if (cpusString == "_") Some(Seq()) // Special case for "_"
+          else
+            Some(
+              cpuRegEx.split(cpusString).toSeq
+            ) // Split CPU string into a sequence
+        } else None
 
-    // Iterate over each source entry to create TemplateAction instances
-    for (entry <- srcs.toIndexedSeq) yield {
-      // Determine the phase and CPUs for the current entry
-      val (phase, cpus) =
-        if (entry.contains("cpus")) {
-          val cpusString = Utils.toString(entry("cpus"))
-          if (cpusString == "_") (2, Seq()) // Special case for "_"
-          else {
-            val cpus = cpuRegEx.split(cpusString)
-            if (all_cpus.isDefined)
-              (
-                2,
-                cpus.intersect(all_cpus.get).toSeq.map(_.toLowerCase())
-              ) // Filter CPUs
-            else (2, cpus.toSeq)
+        // Check for required fields in all entries first
+        val missingFields = srcs.zipWithIndex.collectFirst {
+          case (entry, idx) if !entry.contains("in") => 
+            Left(s"Template entry #${idx+1} in $name is missing the 'in' field")
+          case (entry, idx) if !entry.contains("out") => 
+            Left(s"Template entry #${idx+1} in $name is missing the 'out' field")
+        }
+        
+        missingFields match {
+          case Some(error) => error
+          case None =>
+            // Create TemplateAction instances for each valid entry
+            val actions = for (entry <- srcs.toIndexedSeq) yield {
+                // Determine the phase and CPUs for the current entry
+              val phaseAndCpus: (Int, Seq[String]) = {
+                if (entry.contains("cpus")) {
+                  val cpusString = Utils.toString(entry("cpus"))
+                  if (cpusString == "_") (2, Seq()) // Special case for "_"
+                  else {
+                    val cpusList = cpuRegEx.split(cpusString)
+                    if (all_cpus.isDefined)
+                      (
+                        2,
+                        cpusList.intersect(all_cpus.get).toSeq.map(_.toLowerCase())
+                      ) // Filter CPUs
+                    else (2, cpusList.toSeq)
+                  }
+                } else if (all_cpus.isDefined)
+                  (2, all_cpus.get) // Use global CPUs if defined
+                else (1, Seq()) // Default to phase 1 with no CPUs
+              }
+              // Extract phase and CPUs from the tuple
+              val phase = phaseAndCpus._1
+              val cpus = phaseAndCpus._2
+
+              // Extract input and output file names from the entry
+              val inFilename = Utils.toString(entry("in"))
+              val outFilename = Utils.toString(entry("out"))
+
+              // Create a TemplateAction instance
+              TemplateAction(phase, cpus, Project.catalogPath, inFilename, outFilename)
           }
-        } else if (all_cpus.isDefined)
-          (2, all_cpus.get) // Use global CPUs if defined
-        else (1, Seq()) // Default to phase 1 with no CPUs
-
-      // Extract input and output file names from the entry
-      val inFilename = Utils.toString(entry("in"))
-      val outFilename = Utils.toString(entry("out"))
-
-      // Create a TemplateAction instance
-      TemplateAction(phase, cpus, Project.catalogPath, inFilename, outFilename)
+            Right(actions)
+         }
+      } catch {
+        case e: Exception => Left(s"Error processing template in $name: ${e.getMessage}")
+      }
+    }
+  }
+  
+  // Legacy method for backward compatibility
+  def fromProcess(
+      name: String,
+      process: Map[String, Variant]
+  ): Seq[TemplateAction] = {
+    apply(name, process) match {
+      case Right(actions) => actions
+      case Left(errorMsg) => 
+        println(errorMsg)
+        Seq.empty
     }
   }
 }

@@ -76,31 +76,36 @@ case class YamlAction(parameterKeys: Seq[String], filename: String)
 
 object YamlAction {
   // Factory method to create YamlAction instances from a process definition.
-  def apply(name: String, process: Map[String, Variant]): Seq[YamlAction] = {
-    // Validate the presence and type of the "parameters" field.
+  def apply(name: String, process: Map[String, Variant]): Either[String, Seq[YamlAction]] = {
     if (!process.contains("parameters")) {
-      println(s"Yaml process $name doesn't have a parameters field")
-      return Seq()
-    }
-    if (!process("parameters").isInstanceOf[ArrayV]) {
-      println(s"Yaml process $name parameters isn't an array")
-      return Seq()
-    }
-    // Validate the presence and type of the "filename" field.
-    if (!process.contains("filename")) {
-      println(s"Yaml process $name doesn't have a filename field")
-      return Seq()
-    }
-    if (!process("filename").isInstanceOf[StringV]) {
-      println(s"Yaml process $name filename isn't a string")
-      return Seq()
-    }
+      Left(s"Yaml process $name doesn't have a parameters field")
+    } else if (!process("parameters").isInstanceOf[ArrayV]) {
+      Left(s"Yaml process $name parameters isn't an array")
+    } else if (!process.contains("filename")) {
+      Left(s"Yaml process $name doesn't have a filename field")
+    } else if (!process("filename").isInstanceOf[StringV]) {
+      Left(s"Yaml process $name filename isn't a string")
+    } else {
+      try {
+        // Extract and convert the filename and parameters.
+        val filename = Utils.toString(process("filename"))
+        val parameters = Utils.toArray(process("parameters")).map(Utils.toString)
 
-    // Extract and convert the filename and parameters.
-    val filename = Utils.toString(process("filename"))
-    val parameters = Utils.toArray(process("parameters")).map(Utils.toString)
-
-    // Return a sequence of YamlAction instances.
-    Seq(YamlAction(parameters.toIndexedSeq, filename))
+        // Return a sequence of YamlAction instances.
+        Right(Seq(YamlAction(parameters.toIndexedSeq, filename)))
+      } catch {
+        case e: Exception => Left(s"Error processing yaml in $name: ${e.getMessage}")
+      }
+    }
+  }
+  
+  // Legacy method for backward compatibility
+  def fromProcess(name: String, process: Map[String, Variant]): Seq[YamlAction] = {
+    apply(name, process) match {
+      case Right(actions) => actions
+      case Left(errorMsg) => 
+        println(errorMsg)
+        Seq.empty
+    }
   }
 }
