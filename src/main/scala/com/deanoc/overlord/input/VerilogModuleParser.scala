@@ -78,13 +78,13 @@ object VerilogModuleParser extends Logging {
       val line = txt(i).trim()
       // Check if the line contains a module definition
       if (line.contains("module") && !line.startsWith("//") && !blockCommentRegEx.matches(line)) {
-        //debug(s"START ${txt(i)}")
+        trace(s"START ${txt(i)}")
         
         // Extract module name using regex
         moduleRegEx.findFirstMatchIn(line) match {
           case Some(m) =>
             val moduleName = m.group(1)
-            //debug(s"Found module definition: $moduleName at line $i")
+            trace(s"Found module definition: $moduleName at line $i")
             val module_boundary = mutable.ArrayBuffer[VerilogBoundary]()
             
             // Check if this is a one-line module (contains both module and endmodule)
@@ -98,7 +98,7 @@ object VerilogModuleParser extends Logging {
               foundInlinePorts = true
               val direction = portMatch.group(1)
               val name = portMatch.group(2)
-              //debug(s"Found inline port: $direction $name")
+              trace(s"Found inline port: $direction $name")
               
               val bitWidth = bitRegEx.findFirstIn(line) match {
                 case Some(value) => BitsDesc(value)
@@ -126,17 +126,17 @@ object VerilogModuleParser extends Logging {
                   !line.startsWith("//") &&
                   !blockCommentRegEx.matches(txt(j))
                 ) {
-                  //debug(s"Processing line $j: ${txt(j)}")
+                  trace(s"Processing line $j: ${txt(j)}")
                   
                   // Special handling for parameter lines
                   if (line.startsWith("parameter")) {
                     val paramPattern = "parameter\\s+(\\w+).*".r
                     line match {
                       case paramPattern(paramName) => 
-                        //debug(s"Found parameter by direct match: $paramName")
+                        trace(s"Found parameter by direct match: $paramName")
                         module_boundary += VerilogParameterKey(paramName)
                       case _ => 
-                        debug(s"Parameter line found but couldn't extract name: $line")
+                        warn(s"Parameter line found but couldn't extract name: $line")
                     }
                   } else {
                     // Tokenize the line and filter out unnecessary words
@@ -158,14 +158,14 @@ object VerilogModuleParser extends Logging {
                         case Some(value) => BitsDesc(value)
                         case None => BitsDesc(1)
                       }
-                      //debug(s"Found port: $t $n")
+                      trace(s"Found port: $t $n")
                       module_boundary += VerilogPort(t, b, n, words.length == 2)
                     }
                   }
 
                   // Check for end of port list
                   if (endPortsRegEx.matches(txt(j))) {
-                    //debug(s"End of port list reached at line $j")
+                    trace(s"End of port list reached at line $j")
                     
                     // Now scan ahead for parameters and port declarations after the port list
                     var k = j + 1
@@ -184,10 +184,10 @@ object VerilogModuleParser extends Logging {
                           val paramPattern = "parameter\\s+(\\w+).*".r
                           line match {
                             case paramPattern(paramName) => 
-                              //debug(s"Found parameter after port list: $paramName at line $k")
+                              trace(s"Found parameter after port list: $paramName at line $k")
                               module_boundary += VerilogParameterKey(paramName)
                             case _ =>
-                              debug(s"Parameter line after port list couldn't be parsed: $line")
+                              warn(s"Parameter line after port list couldn't be parsed: $line")
                           }
                         } 
                         // Check for localparam declarations - they're often used like parameters
@@ -195,11 +195,11 @@ object VerilogModuleParser extends Logging {
                           foundDefs = true
                           line match {
                             case localParamRegEx(paramName) => 
-                              //debug(s"Found localparam after port list: $paramName at line $k")
+                              trace(s"Found localparam after port list: $paramName at line $k")
                               // We treat localparams like parameters for simplicity
                               module_boundary += VerilogParameterKey(paramName)
                             case _ =>
-                              debug(s"Localparam line couldn't be parsed: $line")
+                              warn(s"Localparam line couldn't be parsed: $line")
                           }
                         }
                         // Check for port declarations (input, output, inout)
@@ -211,7 +211,7 @@ object VerilogModuleParser extends Logging {
                           
                           line match {
                             case portPattern(direction, portName) =>
-                              //debug(s"Found port after port list: $direction $portName at line $k")
+                              trace(s"Found port after port list: $direction $portName at line $k")
                               
                               // Handle multi-dimensional ports
                               val b = if (multiBitRegEx.findFirstIn(line).isDefined) {
@@ -241,22 +241,22 @@ object VerilogModuleParser extends Logging {
                                   }
                                   module_boundary += VerilogPort(direction, b, portName, true)
                                 case _ =>
-                                  debug(s"Port line after port list couldn't be parsed: $line")
+                                  warn(s"Port line after port list couldn't be parsed: $line")
                               }
                           }
                         }
                         // Also check for wire/reg declarations with bit widths
                         else if (line.startsWith("wire") || line.startsWith("reg")) {
                           // These might be internal nets but could still be useful for analysis
-                          //debug(s"Found internal net declaration: $line")
+                          trace(s"Found internal net declaration: $line")
                         }
                       }
                       k += 1
                     }
                     
-                    //debug(s"END ${txt(k)}")
+                    trace(s"END ${txt(k)}")
                     if (foundDefs) {
-                      //debug(s"Added definitions from after port list")
+                      trace(s"Added definitions from after port list")
                     }
                     
                     modules += VerilogModule(moduleName, module_boundary.toSeq)
@@ -270,7 +270,7 @@ object VerilogModuleParser extends Logging {
                 
                 // Check if we've reached the end of the module
                 if (j < txt.length && txt(j).contains("endmodule")) {
-                  //debug(s"Found endmodule at line $j")
+                  trace(s"Found endmodule at line $j")
                   moduleEnded = true
                   // Add module if we haven't added it already
                   if (!modules.exists(_.name == moduleName)) {
@@ -285,7 +285,7 @@ object VerilogModuleParser extends Logging {
                 i = j  // j is already positioned after endmodule
               } else {
                 // If we didn't find a proper end, we still add the module with what we found
-                debug(s"No explicit end marker found for module $moduleName, adding anyway")
+                warn(s"No explicit end marker found for module $moduleName, adding anyway")
                 if (!modules.exists(_.name == moduleName)) {
                   modules += VerilogModule(moduleName, module_boundary.toSeq)
                 }
@@ -293,7 +293,7 @@ object VerilogModuleParser extends Logging {
               }
             }
           case None => 
-            debug(s"Module keyword found but couldn't extract module name from: ${txt(i)}")
+            warn(s"Module keyword found but couldn't extract module name from: ${txt(i)}")
             i += 1
         }
       } else {

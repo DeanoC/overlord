@@ -73,6 +73,18 @@ case class ReadVerilogTopAction(filename: String) extends GatewareAction with Lo
           val parameterKeys = module.module_boundary.collect {
             case p: VerilogParameterKey => p
           }
+          
+          // Log detected ports and parameters
+          debug(s"Detected ${ports.size} ports for ${instance.name}:")
+          ports.foreach(p => 
+            debug(s"  - Port: ${p.name}, Direction: ${p.direction}, Bits: ${p.bits}, Width: ${p.knownWidth}")
+          )
+          
+          debug(s"Detected ${parameterKeys.size} parameters for ${instance.name}:")
+          parameterKeys.foreach(p => 
+            debug(s"  - Parameter: ${p.parameter}")
+          )
+          
           ports.foreach(p =>
             instance.mergePort(
               p.name,

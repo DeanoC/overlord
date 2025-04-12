@@ -15,12 +15,11 @@
   </appender>
 
   <!-- Root logger configuration -->
-  <root level="INFO">
+  <root level="TRACE">
     <appender-ref ref="CONSOLE" />
     <appender-ref ref="FILE" />
   </root>
 
   <!-- Set specific loggers to different levels as needed -->
-  <logger name="com.deanoc.overlord" level="DEBUG" />
   <logger name="org.scala" level="WARN" /> <!-- Added logger for Scala library -->
 </configuration>

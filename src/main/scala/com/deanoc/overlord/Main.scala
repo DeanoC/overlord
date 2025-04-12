@@ -8,6 +8,7 @@ import java.nio.file.{Files, Path, Paths}
 import scala.annotation.tailrec
 import sys.process._
 import scopt.OParser
+import org.slf4j.event.Level
 
 object Main extends Logging {
   case class Config(
@@ -20,7 +21,10 @@ object Main extends Logging {
       instance: Option[String] = None,
       yes: Boolean = false,
       infile: Option[String] = None,
-      stdresource: Option[String] = None
+      stdresource: Option[String] = None,
+      noexit: Boolean = false,
+      trace: Option[String] = None,
+      debug: Option[String] = None
   )
 
   val parser: OParser[_, Config] = {
@@ -79,6 +83,15 @@ object Main extends Logging {
         .optional()
         .action((x, c) => c.copy(infile = Some(x)))
         .text("filename should be a .over file to use for the project"),
+      opt[Unit]("noexit")
+        .action((_, c) => c.copy(noexit = true))
+        .text("disable automatic exit on error logs"),
+      opt[String]("trace")
+        .action((x, c) => c.copy(trace = Some(x)))
+        .text("enable trace logging for comma-separated list of modules (can use short names)"),
+      opt[String]("debug")
+        .action((x, c) => c.copy(debug = Some(x)))
+        .text("enable debug logging for comma-separated list of modules (can use short names)"),
       opt[String]("stdresource")
         .action((x, c) => c.copy(stdresource = Some(x)))
         .text(s"specify the standard resource path {default: ${Resources.stdResourcePath()}}")
@@ -92,12 +105,56 @@ object Main extends Logging {
 
     OParser.parse(parser, args, initialConfig.copy(yes = initialConfig.yes || isNonInteractive)) match {
       case Some(config) =>
+        // Configure ModuleLogger to exit on error (or not) based on command line option
+        ModuleLogger.setExitOnError(!config.noexit)
+        
+        // Helper function to process module names and set log levels
+        def configureModuleLogLevels(modulesList: String, level: Level): Unit = {
+          val moduleNames = modulesList.split(',').map(_.trim).filter(_.nonEmpty)
+          
+          moduleNames.foreach { moduleName =>
+            // Handle various formats of module names
+            val baseNames = if (moduleName.startsWith("com.")) {
+              // Full package name - use as is
+              Seq(moduleName)
+            } else {
+              // Simple name - just add the package prefix
+              Seq(s"com.deanoc.overlord.$moduleName")
+            }
+            
+            // For each potential base name, also handle both class and object forms
+            val names = baseNames.flatMap(base => Seq(base, s"$base$$"))
+            
+            names.foreach { name =>
+              info(s"Enabling ${level.name()} logging for module: $name")
+              ModuleLogger.setModuleLogLevel(name, level)
+            }
+          }
+        }
+        
+        // Set log levels first, before any logging happens
+        // Set trace logging for specific modules if requested
+        config.trace.foreach { traceModules =>
+          configureModuleLogLevels(traceModules, Level.TRACE)
+        }
+        
+        // Set debug logging for specific modules if requested
+        config.debug.foreach { debugModules =>
+          configureModuleLogLevels(debugModules, Level.DEBUG)
+        }
+        
+        // Add test messages at different levels for the Main module
+        trace("This is a TRACE level message - should only show with --trace")
+        debug("This is a DEBUG level message - should show with --debug")
+        info("This is an INFO level message - should always show")
+        
+        // Debug log the parsed configuration
+        logConfigDetails(config)
+        
         val usage = OParser.usage(parser) // Dynamically generate usage text
         val filename = config.infile.getOrElse {
+          warn("Missing required input file. Please specify a .over file.")
           error(usage) // Show usage message
-          error(
-            "Error: Missing required input file. Please specify a .over file."
-          )
           sys.exit(1)
         }
         val expandedFilename = if (filename.startsWith("~")) {
@@ -106,8 +163,8 @@ object Main extends Logging {
           filename
         }
         if (!Files.exists(Paths.get(expandedFilename))) {
+          warn(s"$expandedFilename does not exist")
           error(usage)
-          error(s"Error: $expandedFilename does not exist")
           sys.exit(1)
         }
 
@@ -155,17 +212,15 @@ object Main extends Logging {
 
           val repoExists = Files.exists(stdResourcePath)
           val message = if (repoExists) {
-            s"Warning: Standard resource folder '$stdResourcePath' exists but is not a valid Git repository."
+            s"Standard resource folder '$stdResourcePath' exists but is not a valid Git repository."
           } else {
-            s"Warning: Standard resource folder '$stdResourcePath' does not exist."
+            s"Standard resource folder '$stdResourcePath' does not exist."
           }
-          warn(message)
+          info(message)
 
           val autoDownload = config.yes
           val shouldDownload = if (autoDownload) {
-            info(
-              "Auto-downloading standard resource folder (-y/--yes specified)..."
-            )
+            info("Auto-downloading standard resource folder (-y/--yes specified)...")
             true
           } else {
             info("Waiting for user input about downloading resources")
@@ -283,5 +338,23 @@ object Main extends Logging {
         error(OParser.usage(parser)) // Show dynamically generated usage message
         sys.exit(1)
     }
+  }
+  
+  // Helper method to log the details of the configuration for debugging
+  private def logConfigDetails(config: Config): Unit = {
+    debug("Configuration after parsing:")
+    debug(s"- Command: ${config.command.getOrElse("None")}")
+    debug(s"- Output directory: ${config.out}")
+    debug(s"- Board: ${config.board.getOrElse("None")}")
+    debug(s"- No standard resources: ${config.nostdresources}")
+    debug(s"- No standard prefabs: ${config.nostdprefabs}")
+    debug(s"- Resources path: ${config.resources.getOrElse("None")}")
+    debug(s"- Instance: ${config.instance.getOrElse("None")}")
+    debug(s"- Auto-yes: ${config.yes}")
+    debug(s"- Input file: ${config.infile.getOrElse("None")}")
+    debug(s"- Standard resource path: ${config.stdresource.getOrElse("Default")}")
+    debug(s"- No exit on error: ${config.noexit}")
+    debug(s"- Trace modules: ${config.trace.getOrElse("None")}")
+    debug(s"- Debug modules: ${config.debug.getOrElse("None")}")
   }
 }
