@@ -10,3 +10,4 @@ native
 null
 /.bsp/sbt.json
 release/
+logs/

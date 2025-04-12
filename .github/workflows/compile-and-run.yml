@@ -78,6 +78,15 @@ jobs:
           echo "Standard catalog folder already exists."
         fi
 
+    - name: Ensure overlord_template_project exists
+      run: |
+        if [ ! -d "${HOME}/overlord_template_project" ]; then
+          echo "overlord_template_project folder not found. Cloning from Git repository..."
+          git clone https://github.com/DeanoC/overlord_template_project.git ${HOME}/overlord_template_project
+        else
+          echo "overlord_template_project folder already exists."
+        fi
+
     - name: Prepare for template project run
       run: |
         # Make the overlord executable available
