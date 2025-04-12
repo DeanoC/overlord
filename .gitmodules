@@ -1,6 +1,0 @@
-[submodule "overlord_template_project"]
-	path = overlord_template_project
-	url = https://github.com/DeanoC/overlord_template_project.git
-[submodule "gagameos_stdcatalog"]
-	path = gagameos_stdcatalog
-	url = https://github.com/DeanoC/gagameos_stdcatalog.git
