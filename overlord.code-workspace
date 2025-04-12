@@ -5,6 +5,13 @@
 		},
 		{
 			"path": "../gagameos_uart"
+		},
+		{
+			"name": "overlord_template_project",
+			"path": "../overlord_template_project"
+		},
+		{
+			"path": "../gagameos_stdcatalog"
 		}
 	],
 	"settings": {
