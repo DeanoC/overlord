@@ -142,12 +142,7 @@ object Main extends Logging {
         config.debug.foreach { debugModules =>
           configureModuleLogLevels(debugModules, Level.DEBUG)
         }
-        
-        // Add test messages at different levels for the Main module
-        trace("This is a TRACE level message - should only show with --trace")
-        debug("This is a DEBUG level message - should show with --debug")
-        info("This is an INFO level message - should always show")
-        
+               
         // Debug log the parsed configuration
         logConfigDetails(config)
         

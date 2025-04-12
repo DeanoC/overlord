@@ -3,7 +3,7 @@ package com.deanoc.overlord
 import com.deanoc.overlord.Connections._
 import com.deanoc.overlord.Instances._
 import com.deanoc.overlord.Interfaces.{ChipLike, RegisterBankLike}
-import com.deanoc.overlord.utils.{Utils, Variant, ArrayV, TableV, StringV}
+import com.deanoc.overlord.utils.{Utils, Variant, ArrayV, TableV, StringV, Logging}
 
 import java.nio.file.{Files, Path, Paths}
 import scala.collection.mutable
@@ -156,7 +156,7 @@ case class Project(
       .filter(f => distanceMatrix.isConnectedBetween(instance, f.getOwner))
 }
 
-object Project {
+object Project extends Logging {
   // Stacks for managing paths during project setup and execution.
   private val catalogPathStack: mutable.Stack[Path] = mutable.Stack[Path]()
   private val instancePathStack: mutable.Stack[Path] = mutable.Stack[Path]()
@@ -385,14 +385,13 @@ object Project {
     for (i <- 0 until catalogs.catalogs.size) {
       for (j <- i + 1 until catalogs.catalogs.size) {
         if ((keyArray(i).ident == keyArray(j).ident)) {
-          println(
-            s"WARN: Duplicate definition name ${keyArray(i).ident} detected"
+          warn(s"Duplicate definition name ${keyArray(i).ident} detected"
           )
         }
       }
     }
 
-    val gb = new GameBuilder(gameName, board, gamePath, catalogs, prefabs)
+    val gb = new ProjectBuilder(gameName, board, gamePath, catalogs, prefabs)
     gb.toGame()
   }
 
@@ -438,13 +437,13 @@ object Project {
     } else givenPath
   }
 
-  private class GameBuilder(
+  private class ProjectBuilder(
       gameName: String,
       board: String,
       gamePath: Path,
       catalogs: DefinitionCatalog,
       prefabs: PrefabCatalog
-  ) {
+  ) extends Logging {
 
     val containerStack: mutable.Stack[Container] = mutable.Stack()
 
@@ -454,7 +453,7 @@ object Project {
       generateInstances(gamePath)
 
       if (containerStack.isEmpty) {
-        println("Previous Errors mean game cannot be created\n")
+        error("Previous Errors mean project cannot be created\n")
         return None
       }
 
@@ -546,7 +545,7 @@ object Project {
 
       if (!processInstantiations(parsed, newContainer).getOrElse(false)) {
         // Handle the error appropriately
-        println(s"Instantiation failed")
+        error(s"Instantiation failed")
         false
       } else true
     }
@@ -628,6 +627,8 @@ object Project {
           val incResourceName = Utils.toString(table("resource"))
           val incResourcePath = Paths.get(incResourceName)
 
+          debug(s"include: $incResourceName at $incResourcePath")
+
           prefabs.findPrefabInclude(incResourceName) match {
             case Some(value) =>
               Project.setInstancePath(value.path)
@@ -659,8 +660,8 @@ object Project {
           instancesWanted.flatMap(v =>
             Instance(v, defaults.toMap, catalogs) match {
               case Right(instance) => Some(instance)
-              case Left(error) =>
-                println(s"Error creating instance: $error")
+              case Left(err) =>
+                error(s"creating instance: $err")
                 None
             }
           )
@@ -682,11 +683,11 @@ object Project {
           prefabs.findPrefab(ident) match {
             case Some(pf) =>
               processInstantiations(pf.stuff, container) match {
-                case Left(error) => break(Left(error))
+                case Left(err) => break(Left(err))
                 case _           => // continue
               }
             case None =>
-              break(Left(s"Error: prefab $ident not found"))
+              break(Left(s"prefab $ident not found"))
           }
         }
       }
@@ -740,18 +741,15 @@ object Project {
                       .filterNot(d => depStack.contains(d))
                       .foreach(depStack.push)
                     found = true
-                  case Left(error) =>
-                    println(
-                      s"Failed to create instance for dependency $n: $error"
-                    )
-                    println(
-                      s"ERROR: Software dependency $n ${defi.defType.ident.mkString(".")}"
+                  case Left(err) =>
+                    error(
+                      s"Failed to create instance for software dependency $n: $err in ${defi.defType.ident.mkString(".")}"
                     )
                 }
               case None =>
             }
           }
-          if (!found) println(s"ERROR: Software dependency $n not found")
+          if (!found) error(s"Software dependency $n not found")
         }
       }
     }
