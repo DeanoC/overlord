@@ -28,7 +28,7 @@ object Main extends Logging {
     import builder._
     OParser.sequence(
       programName("overlord"),
-      head("overlord", "1.0"),
+      head("overlord", "0.1.0"),
       cmd("create")
         .action((_, c) => c.copy(command = Some("create")))
         .text("generate a compile project with all sub parts at 'out'")
@@ -81,7 +81,7 @@ object Main extends Logging {
         .text("filename should be a .over file to use for the project"),
       opt[String]("stdresource")
         .action((x, c) => c.copy(stdresource = Some(x)))
-        .text("specify the standard resource path")
+        .text(s"specify the standard resource path {default: ${Resources.stdResourcePath()}}")
     )
   }
 

@@ -8,6 +8,7 @@ import scala.collection.mutable
 import scala.language.postfixOps
 
 object Resources {
+  // Initialize with absolute path to avoid working directory issues
   private var stdResourcePathVar: Path = Paths
     .get(System.getProperty("user.home"), "gagameos_stdcatalog")
     .toAbsolutePath
@@ -16,7 +17,17 @@ object Resources {
   def stdResourcePath(): Path = stdResourcePathVar
 
   def setStdResourcePath(path: Path): Unit = {
-    stdResourcePathVar = path
+    stdResourcePathVar = path.toAbsolutePath.normalize()
+  }
+
+  // Helper method to resolve a path that might start with ~
+  def resolvePath(pathString: String): Path = {
+    val expanded = if (pathString.startsWith("~")) {
+      pathString.replaceFirst("~", System.getProperty("user.home"))
+    } else {
+      pathString
+    }
+    Paths.get(expanded).toAbsolutePath.normalize()
   }
 
   def overlordRootPath(): Path =

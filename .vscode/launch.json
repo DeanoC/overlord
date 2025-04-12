@@ -8,13 +8,13 @@
           "type": "scala",
           "request": "launch",
           "name": "Launch Overlord Main",
-          "mainClass": "Main",
-          "buildTarget": "root",
+          "mainClass": "com.deanoc.overlord.Main",
+          "buildTarget": "overlord",
           "args": [
             "create",
-            "~/overlord/overlord_template_project/template_project.over",
+            "~/overlord_template_project/template_project.over",
             "--out",
-            "~/overlord/overlord_template_project/",
+            "~/overlord_template_project/",
             "--board",
             "tangnano9k"
           ],
