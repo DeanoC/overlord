@@ -86,7 +86,11 @@ object Main extends Logging {
   }
 
   def main(args: Array[String]): Unit = {
-    OParser.parse(parser, args, Config()) match {
+    // Parse arguments and set `yes` to true if running in a non-interactive environment
+    val initialConfig = Config()
+    val isNonInteractive = System.console() == null
+
+    OParser.parse(parser, args, initialConfig.copy(yes = initialConfig.yes || isNonInteractive)) match {
       case Some(config) =>
         val usage = OParser.usage(parser) // Dynamically generate usage text
         val filename = config.infile.getOrElse {
