@@ -1,4 +1,4 @@
-import com.deanoc.overlord.utils
+package com.deanoc.overlord.utils
 
 import org.scalatest.funsuite.AnyFunSuite
 import java.nio.file.{Files, Paths}

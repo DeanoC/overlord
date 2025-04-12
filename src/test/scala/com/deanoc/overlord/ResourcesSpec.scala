@@ -1,7 +1,7 @@
 package com.deanoc.overlord
 
 import org.scalatest.funsuite.AnyFunSuite
-import java.nio.file.{Path, Paths}
+import java.nio.file.Paths
 
 class ResourcesSpec extends AnyFunSuite {
 

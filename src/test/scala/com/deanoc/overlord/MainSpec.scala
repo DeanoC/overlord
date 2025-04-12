@@ -1,5 +1,7 @@
-import Main.Config
-import Main.parser
+package com.deanoc.overlord
+
+import com.deanoc.overlord.Main.Config
+import com.deanoc.overlord.Main.parser
 import org.scalatest.funsuite.AnyFunSuite
 import java.nio.file.{Files, Paths}
 
@@ -23,8 +25,17 @@ class MainSpec extends AnyFunSuite {
     }
   }
 
-  test("Option parsing should correctly parse create command with output path") {
-    val args = Array("create", "--out", "./output", "--board", "test-board", "example.over")
+  test(
+    "Option parsing should correctly parse create command with output path"
+  ) {
+    val args = Array(
+      "create",
+      "--out",
+      "./output",
+      "--board",
+      "test-board",
+      "example.over"
+    )
     val config = suppressOutput {
       OParser.parse(parser, args, Config()).get
     }
@@ -71,13 +82,17 @@ class MainSpec extends AnyFunSuite {
     assert(config.infile.contains("example.over"))
   }
 
-  test("Option parsing should handle both resource flags and auto download options") {
+  test(
+    "Option parsing should handle both resource flags and auto download options"
+  ) {
     val args = Array(
-      "create", 
-      "--nostdresources", 
-      "--resources", "./custom-resources", 
-      "--yes", 
-      "--board", "test-board", 
+      "create",
+      "--nostdresources",
+      "--resources",
+      "./custom-resources",
+      "--yes",
+      "--board",
+      "test-board",
       "example.over"
     )
     val config = suppressOutput {
