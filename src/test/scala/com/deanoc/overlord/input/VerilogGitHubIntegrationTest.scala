@@ -81,7 +81,7 @@ class VerilogGitHubIntegrationTest extends AnyFlatSpec with Matchers {
 
   // This test can be run manually when needed, as it downloads files from GitHub
   // Remove "ignore" to run it
-  ignore should "parse Verilog files from popular GitHub repositories" in {
+  it should "parse Verilog files from popular GitHub repositories" in {
     val tempDir = Files.createTempDirectory("github_verilog_tests").toFile
     tempDir.deleteOnExit()
 

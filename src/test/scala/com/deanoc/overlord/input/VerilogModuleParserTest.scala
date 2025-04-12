@@ -107,18 +107,20 @@ class VerilogModuleParserTest extends AnyFlatSpec with Matchers {
     val firstModuleOpt = modules.find(_.name == "first")
     firstModuleOpt.isDefined shouldBe true
     
-    // Get ports from the first module (no need to verify input/output types since we can see from
-    // logs that only output ports are being parsed from the inline module declarations)
+    // Get ports from the first module - now we should find both input and output ports
     firstModuleOpt.foreach { module =>
       val ports = module.module_boundary.collect { case p: VerilogPort => p }
-      // The parser is finding the output port 'b' but not the input port 'a'
-      // So we just verify that we have at least one port
-      ports.nonEmpty shouldBe true
+      ports.length should be >= 2
       
-      // Verify the output port is correctly identified
+      // Verify both input and output ports are found
+      val inputPorts = ports.filter(_.direction == "input")
       val outputPorts = ports.filter(_.direction == "output")
+      
+      inputPorts.nonEmpty shouldBe true
       outputPorts.nonEmpty shouldBe true
-      outputPorts.head.name shouldBe "b"
+      
+      inputPorts.map(_.name) should contain ("a")
+      outputPorts.map(_.name) should contain ("b")
     }
     
     // Check for the second module if available
@@ -129,11 +131,16 @@ class VerilogModuleParserTest extends AnyFlatSpec with Matchers {
       // Similarly check ports for the second module
       secondModuleOpt.foreach { module =>
         val ports = module.module_boundary.collect { case p: VerilogPort => p }
-        ports.nonEmpty shouldBe true
+        ports.length should be >= 2
         
+        val inputPorts = ports.filter(_.direction == "input")
         val outputPorts = ports.filter(_.direction == "output")
+        
+        inputPorts.nonEmpty shouldBe true
         outputPorts.nonEmpty shouldBe true
-        outputPorts.head.name shouldBe "y"
+        
+        inputPorts.map(_.name) should contain ("x")
+        outputPorts.map(_.name) should contain ("y")
       }
     }
   }

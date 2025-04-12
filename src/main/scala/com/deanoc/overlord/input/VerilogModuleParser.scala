@@ -85,22 +85,21 @@ object VerilogModuleParser extends Logging {
             val module_boundary = mutable.ArrayBuffer[VerilogBoundary]()
             
             // Process the first line of the module for potential port definitions
-            val firstLineWords = line
-              .split("\\s+|,")  // Split by whitespace or comma
-              .filterNot(w => w == "wire" || w == "reg" || w == "integer" || w == "module")
-              .map(_.trim)
-              .filterNot(_.isEmpty)
+            // Extract ports from inline module declaration (e.g., module first(input a, output b);)
+            val inlinePortRegex = "(input|output|inout)\\s+(?:wire|reg)?\\s*(?:\\[.*?\\])?\\s*(\\w+)".r
+            val matchesIter = inlinePortRegex.findAllMatchIn(line)
+            
+            matchesIter.foreach { portMatch =>
+              val direction = portMatch.group(1)
+              val name = portMatch.group(2)
+              debug(s"Found inline port: $direction $name")
               
-            // Quickly parse simple ports defined on the module line itself
-            if (firstLineWords.length >= 3) { // module name input/output name
-              for (j <- 1 until firstLineWords.length - 1) {
-                if (firstLineWords(j) == "input" || firstLineWords(j) == "output" || firstLineWords(j) == "inout") {
-                  val t = firstLineWords(j)
-                  val n = firstLineWords(j+1).replaceAll("[();]", "")
-                  debug(s"Found port on module line: $t $n")
-                  module_boundary += VerilogPort(t, BitsDesc(1), n, true)
-                }
+              val bitWidth = bitRegEx.findFirstIn(line) match {
+                case Some(value) => BitsDesc(value)
+                case None => BitsDesc(1)
               }
+              
+              module_boundary += VerilogPort(direction, bitWidth, name, true)
             }
             
             // Continue processing the module body
@@ -284,9 +283,6 @@ object VerilogModuleParser extends Logging {
             debug(s"Module keyword found but couldn't extract module name from: ${txt(i)}")
             i += 1
         }
-      } else if (line.contains("endmodule")) {
-        debug(s"END ${txt(i)}")
-        i += 1
       } else {
         debug(s"END ${txt(i)}")
         i += 1
