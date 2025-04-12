@@ -8,6 +8,7 @@
 			"path": "../overlord_template_project"
 		},
 		{
+			"name": "gagameos_stdcatalog",
 			"path": "../gagameos_stdcatalog"
 		}
 	],
