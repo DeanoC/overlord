@@ -9,7 +9,7 @@ import scala.language.postfixOps
 
 object Resources {
   private var stdResourcePathVar: Path = Paths
-    .get(System.getProperty("user.home"), "overlord", "gagameos_stdcatalog")
+    .get(System.getProperty("user.home"), "gagameos_stdcatalog")
     .toAbsolutePath
     .normalize()
 
