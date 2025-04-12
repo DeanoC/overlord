@@ -24,6 +24,7 @@ handle_error() {
 
 # Default settings
 ENABLE_ASSEMBLY=false
+ENABLE_DOCS=false
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -35,6 +36,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     -a|--with-assembly)
       ENABLE_ASSEMBLY=true
+      shift
+      ;;
+    --with-docs)
+      ENABLE_DOCS=true
       shift
       ;;
     *)
@@ -58,19 +63,35 @@ if [ $? -ne 0 ]; then
 fi
 echo -e "\033[0;32m✓ Compilation successful\033[0m"
 
+if [ "$ENABLE_DOCS" = true ]; then
+  echo "2. Generating Scala documentation..."
+  sbt doc
+  if [ $? -ne 0 ]; then
+    handle_error "Documentation"
+  fi
+  echo -e "\033[0;32m✓ Documentation generation successful\033[0m"
+else
+  echo "2. Skipping documentation generation..."
+fi
+
 if [ "$ENABLE_ASSEMBLY" = true ]; then
-  echo "2. Building fat JAR with assembly..."
+  echo "3. Building fat JAR with assembly..."
   sbt assembly
   if [ $? -ne 0 ]; then
     handle_error "Assembly"
   fi
   echo -e "\033[0;32m✓ Assembly successful\033[0m"
 else
-  echo "2. Skipping assembly step (fat JAR will not be built)..."
+  echo "3. Skipping assembly step (fat JAR will not be built)..."
 fi
 
-echo "3. Preparing staged application..."
-sbt stage
+echo "4. Preparing staged application..."
+if [ "$ENABLE_DOCS" = false ]; then
+  echo "Skipping documentation during stage..."
+  sbt 'set Compile / doc / sources := Seq()' stage
+else
+  sbt stage
+fi
 if [ $? -ne 0 ]; then
   handle_error "Stage"
 fi

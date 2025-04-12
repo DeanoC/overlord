@@ -1,0 +1,26 @@
+<configuration>
+  <!-- Console appender with colors -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) %cyan(%logger{15}) - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- File appender -->
+  <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <file>logs/overlord.log</file>
+    <encoder>
+      <pattern>%date %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <!-- Root logger configuration -->
+  <root level="INFO">
+    <appender-ref ref="CONSOLE" />
+    <appender-ref ref="FILE" />
+  </root>
+
+  <!-- Set specific loggers to different levels as needed -->
+  <logger name="com.deanoc.overlord" level="DEBUG" />
+  <logger name="org.scala" level="WARN" /> <!-- Added logger for Scala library -->
+</configuration>
