@@ -37,6 +37,8 @@ object VerilogModuleParser extends Logging {
   private val localParamRegEx = "\\s*localparam\\s+(\\w+).*".r
   // Add regex for multi-dimensional bit vectors
   private val multiBitRegEx = "\\[\\d+:\\d+\\]\\s*\\[\\d+:\\d+\\]".r
+  // Add a regex for detecting ports in one-line modules
+  private val inlinePortRegex = "(input|output|inout)\\s+(?:wire|reg)?\\s*(?:\\[.*?\\])?\\s*(\\w+)".r
 
   // Parses a Verilog file and extracts modules
   def apply(
@@ -75,8 +77,9 @@ object VerilogModuleParser extends Logging {
     while (i < txt.length) {
       val line = txt(i).trim()
       // Check if the line contains a module definition
-      if (line.contains("module") && !line.contains("endmodule")) {
+      if (line.contains("module") && !line.startsWith("//") && !blockCommentRegEx.matches(line)) {
         debug(s"START ${txt(i)}")
+        
         // Extract module name using regex
         moduleRegEx.findFirstMatchIn(line) match {
           case Some(m) =>
@@ -84,12 +87,15 @@ object VerilogModuleParser extends Logging {
             debug(s"Found module definition: $moduleName at line $i")
             val module_boundary = mutable.ArrayBuffer[VerilogBoundary]()
             
-            // Process the first line of the module for potential port definitions
-            // Extract ports from inline module declaration (e.g., module first(input a, output b);)
-            val inlinePortRegex = "(input|output|inout)\\s+(?:wire|reg)?\\s*(?:\\[.*?\\])?\\s*(\\w+)".r
+            // Check if this is a one-line module (contains both module and endmodule)
+            val isOneLineModule = line.contains("endmodule")
+            
+            // Process the module declaration line for inline ports
             val matchesIter = inlinePortRegex.findAllMatchIn(line)
             
+            var foundInlinePorts = false
             matchesIter.foreach { portMatch =>
+              foundInlinePorts = true
               val direction = portMatch.group(1)
               val name = portMatch.group(2)
               debug(s"Found inline port: $direction $name")
@@ -102,189 +108,195 @@ object VerilogModuleParser extends Logging {
               module_boundary += VerilogPort(direction, bitWidth, name, true)
             }
             
-            // Continue processing the module body
-            var j = i + 1
-            var moduleEnded = false
-            
-            // Process module contents until we find the end
-            while (j < txt.length && !moduleEnded) {
-              val line = txt(j).trim()
-              if (
-                line.nonEmpty &&
-                !line.startsWith("//") &&
-                !blockCommentRegEx.matches(txt(j))
-              ) {
-                debug(s"Processing line $j: ${txt(j)}")
-                
-                // Special handling for parameter lines
-                if (line.startsWith("parameter")) {
-                  val paramPattern = "parameter\\s+(\\w+).*".r
-                  line match {
-                    case paramPattern(paramName) => 
-                      debug(s"Found parameter by direct match: $paramName")
-                      module_boundary += VerilogParameterKey(paramName)
-                    case _ => 
-                      debug(s"Parameter line found but couldn't extract name: $line")
-                  }
-                } else {
-                  // Tokenize the line and filter out unnecessary words
-                  val words = line
-                    .split("\\s+|,")  // Split by whitespace or comma
-                    .filterNot(w => w == "wire" || w == "reg" || w == "integer")
-                    .map(_.trim)
-                    .filterNot(_.isEmpty)
-                    .take(2)  // Only take the first two tokens (direction and name)
-                    .map(_.filter(c => c.isLetterOrDigit || c == '_'))
-                    .filterNot(_.isEmpty)
-                    .filterNot(w => w.nonEmpty && w(0).isDigit)
-
-                  // Identify and process ports
-                  if (words.length >= 2 && (words(0) == "input" || words(0) == "output" || words(0) == "inout")) {
-                    val t = words(0)
-                    val n = words(1)
-                    val b = bitRegEx.findFirstIn(txt(j)) match {
-                      case Some(value) => BitsDesc(value)
-                      case None => BitsDesc(1)
+            // If this is a one-line module, add it now and continue
+            if (isOneLineModule) {
+              debug(s"Found one-line module: $moduleName with ${module_boundary.length} ports")
+              modules += VerilogModule(moduleName, module_boundary.toSeq)
+              i += 1 // Increment counter to avoid infinite loop
+            } else {
+              // Otherwise process the rest of the module as before
+              var j = i + 1
+              var moduleEnded = false
+              
+              // Process module contents until we find the end
+              while (j < txt.length && !moduleEnded) {
+                val line = txt(j).trim()
+                if (
+                  line.nonEmpty &&
+                  !line.startsWith("//") &&
+                  !blockCommentRegEx.matches(txt(j))
+                ) {
+                  debug(s"Processing line $j: ${txt(j)}")
+                  
+                  // Special handling for parameter lines
+                  if (line.startsWith("parameter")) {
+                    val paramPattern = "parameter\\s+(\\w+).*".r
+                    line match {
+                      case paramPattern(paramName) => 
+                        debug(s"Found parameter by direct match: $paramName")
+                        module_boundary += VerilogParameterKey(paramName)
+                      case _ => 
+                        debug(s"Parameter line found but couldn't extract name: $line")
                     }
-                    debug(s"Found port: $t $n")
-                    module_boundary += VerilogPort(t, b, n, words.length == 2)
-                  }
-                }
+                  } else {
+                    // Tokenize the line and filter out unnecessary words
+                    val words = line
+                      .split("\\s+|,")  // Split by whitespace or comma
+                      .filterNot(w => w == "wire" || w == "reg" || w == "integer")
+                      .map(_.trim)
+                      .filterNot(_.isEmpty)
+                      .take(2)  // Only take the first two tokens (direction and name)
+                      .map(_.filter(c => c.isLetterOrDigit || c == '_'))
+                      .filterNot(_.isEmpty)
+                      .filterNot(w => w.nonEmpty && w(0).isDigit)
 
-                // Check for end of port list
-                if (endPortsRegEx.matches(txt(j))) {
-                  debug(s"End of port list reached at line $j")
-                  
-                  // Now scan ahead for parameters and port declarations after the port list
-                  var k = j + 1
-                  var foundDefs = false
-                  
-                  while (k < txt.length && !txt(k).contains("endmodule")) {
-                    val line = txt(k).trim()
-                    if (
-                      line.nonEmpty &&
-                      !line.startsWith("//") &&
-                      !blockCommentRegEx.matches(txt(k))
-                    ) {
-                      // Check for parameter declarations
-                      if (line.startsWith("parameter")) {
-                        foundDefs = true
-                        val paramPattern = "parameter\\s+(\\w+).*".r
-                        line match {
-                          case paramPattern(paramName) => 
-                            debug(s"Found parameter after port list: $paramName at line $k")
-                            module_boundary += VerilogParameterKey(paramName)
-                          case _ =>
-                            debug(s"Parameter line after port list couldn't be parsed: $line")
-                        }
-                      } 
-                      // Check for localparam declarations - they're often used like parameters
-                      else if (line.startsWith("localparam")) {
-                        foundDefs = true
-                        line match {
-                          case localParamRegEx(paramName) => 
-                            debug(s"Found localparam after port list: $paramName at line $k")
-                            // We treat localparams like parameters for simplicity
-                            module_boundary += VerilogParameterKey(paramName)
-                          case _ =>
-                            debug(s"Localparam line couldn't be parsed: $line")
-                        }
+                    // Identify and process ports
+                    if (words.length >= 2 && (words(0) == "input" || words(0) == "output" || words(0) == "inout")) {
+                      val t = words(0)
+                      val n = words(1)
+                      val b = bitRegEx.findFirstIn(txt(j)) match {
+                        case Some(value) => BitsDesc(value)
+                        case None => BitsDesc(1)
                       }
-                      // Check for port declarations (input, output, inout)
-                      else if (line.startsWith("input") || line.startsWith("output") || line.startsWith("inout")) {
-                        foundDefs = true
-                        
-                        // Enhanced regex to handle more port declaration formats
-                        val portPattern = "(input|output|inout)\\s+(?:(?:wire|reg)\\s+)?(?:\\[.*?\\]\\s*)?(\\w+).*".r
-                        
-                        line match {
-                          case portPattern(direction, portName) =>
-                            debug(s"Found port after port list: $direction $portName at line $k")
-                            
-                            // Handle multi-dimensional ports
-                            val b = if (multiBitRegEx.findFirstIn(line).isDefined) {
-                              debug(s"Found multi-dimensional port: $portName")
-                              // For multi-dimensional ports, just use the first dimension for now
-                              bitRegEx.findFirstIn(line) match {
-                                case Some(value) => BitsDesc(value)
-                                case None => BitsDesc(1)
-                              }
-                            } else {
-                              bitRegEx.findFirstIn(line) match {
-                                case Some(value) => BitsDesc(value)
-                                case None => BitsDesc(1)
-                              }
-                            }
-                            
-                            module_boundary += VerilogPort(direction, b, portName, true)
-                          case _ =>
-                            // Try to handle array-style port declarations
-                            val arrayPortPattern = "(input|output|inout)\\s+(?:(?:wire|reg)\\s+)?(?:\\[.*?\\]\\s*)?(\\w+)\\s*\\[.*?\\].*".r
-                            line match {
-                              case arrayPortPattern(direction, portName) =>
-                                debug(s"Found array port: $direction $portName at line $k")
-                                val b = bitRegEx.findFirstIn(line) match {
+                      debug(s"Found port: $t $n")
+                      module_boundary += VerilogPort(t, b, n, words.length == 2)
+                    }
+                  }
+
+                  // Check for end of port list
+                  if (endPortsRegEx.matches(txt(j))) {
+                    debug(s"End of port list reached at line $j")
+                    
+                    // Now scan ahead for parameters and port declarations after the port list
+                    var k = j + 1
+                    var foundDefs = false
+                    
+                    while (k < txt.length && !txt(k).contains("endmodule")) {
+                      val line = txt(k).trim()
+                      if (
+                        line.nonEmpty &&
+                        !line.startsWith("//") &&
+                        !blockCommentRegEx.matches(txt(k))
+                      ) {
+                        // Check for parameter declarations
+                        if (line.startsWith("parameter")) {
+                          foundDefs = true
+                          val paramPattern = "parameter\\s+(\\w+).*".r
+                          line match {
+                            case paramPattern(paramName) => 
+                              debug(s"Found parameter after port list: $paramName at line $k")
+                              module_boundary += VerilogParameterKey(paramName)
+                            case _ =>
+                              debug(s"Parameter line after port list couldn't be parsed: $line")
+                          }
+                        } 
+                        // Check for localparam declarations - they're often used like parameters
+                        else if (line.startsWith("localparam")) {
+                          foundDefs = true
+                          line match {
+                            case localParamRegEx(paramName) => 
+                              debug(s"Found localparam after port list: $paramName at line $k")
+                              // We treat localparams like parameters for simplicity
+                              module_boundary += VerilogParameterKey(paramName)
+                            case _ =>
+                              debug(s"Localparam line couldn't be parsed: $line")
+                          }
+                        }
+                        // Check for port declarations (input, output, inout)
+                        else if (line.startsWith("input") || line.startsWith("output") || line.startsWith("inout")) {
+                          foundDefs = true
+                          
+                          // Enhanced regex to handle more port declaration formats
+                          val portPattern = "(input|output|inout)\\s+(?:(?:wire|reg)\\s+)?(?:\\[.*?\\]\\s*)?(\\w+).*".r
+                          
+                          line match {
+                            case portPattern(direction, portName) =>
+                              debug(s"Found port after port list: $direction $portName at line $k")
+                              
+                              // Handle multi-dimensional ports
+                              val b = if (multiBitRegEx.findFirstIn(line).isDefined) {
+                                debug(s"Found multi-dimensional port: $portName")
+                                // For multi-dimensional ports, just use the first dimension for now
+                                bitRegEx.findFirstIn(line) match {
                                   case Some(value) => BitsDesc(value)
                                   case None => BitsDesc(1)
                                 }
-                                module_boundary += VerilogPort(direction, b, portName, true)
-                              case _ =>
-                                debug(s"Port line after port list couldn't be parsed: $line")
-                            }
+                              } else {
+                                bitRegEx.findFirstIn(line) match {
+                                  case Some(value) => BitsDesc(value)
+                                  case None => BitsDesc(1)
+                                }
+                              }
+                              
+                              module_boundary += VerilogPort(direction, b, portName, true)
+                            case _ =>
+                              // Try to handle array-style port declarations
+                              val arrayPortPattern = "(input|output|inout)\\s+(?:(?:wire|reg)\\s+)?(?:\\[.*?\\]\\s*)?(\\w+)\\s*\\[.*?\\].*".r
+                              line match {
+                                case arrayPortPattern(direction, portName) =>
+                                  debug(s"Found array port: $direction $portName at line $k")
+                                  val b = bitRegEx.findFirstIn(line) match {
+                                    case Some(value) => BitsDesc(value)
+                                    case None => BitsDesc(1)
+                                  }
+                                  module_boundary += VerilogPort(direction, b, portName, true)
+                                case _ =>
+                                  debug(s"Port line after port list couldn't be parsed: $line")
+                              }
+                          }
+                        }
+                        // Also check for wire/reg declarations with bit widths
+                        else if (line.startsWith("wire") || line.startsWith("reg")) {
+                          // These might be internal nets but could still be useful for analysis
+                          debug(s"Found internal net declaration: $line")
                         }
                       }
-                      // Also check for wire/reg declarations with bit widths
-                      else if (line.startsWith("wire") || line.startsWith("reg")) {
-                        // These might be internal nets but could still be useful for analysis
-                        debug(s"Found internal net declaration: $line")
-                      }
+                      k += 1
                     }
-                    k += 1
+                    
+                    debug(s"END ${txt(k)}")
+                    if (foundDefs) {
+                      debug(s"Added definitions from after port list")
+                    }
+                    
+                    modules += VerilogModule(moduleName, module_boundary.toSeq)
+                    moduleEnded = true
+                    
+                    // Skip to after this module to look for more modules
+                    j = k + 1
                   }
-                  
-                  debug(s"END ${txt(k)}")
-                  if (foundDefs) {
-                    debug(s"Added definitions from after port list")
-                  }
-                  
-                  modules += VerilogModule(moduleName, module_boundary.toSeq)
+                }
+                j += 1
+                
+                // Check if we've reached the end of the module
+                if (j < txt.length && txt(j).contains("endmodule")) {
+                  debug(s"Found endmodule at line $j")
                   moduleEnded = true
-                  
-                  // Skip to after this module to look for more modules
-                  j = k + 1
+                  // Add module if we haven't added it already
+                  if (!modules.exists(_.name == moduleName)) {
+                    modules += VerilogModule(moduleName, module_boundary.toSeq)
+                  }
+                  j += 1 // Skip past the endmodule line
                 }
               }
-              j += 1
               
-              // Check if we've reached the end of the module
-              if (j < txt.length && txt(j).contains("endmodule")) {
-                debug(s"Found endmodule at line $j")
-                moduleEnded = true
-                // Add module if we haven't added it already
+              // If we found the module end, resume outer scanning from there
+              if (moduleEnded) {
+                i = j  // j is already positioned after endmodule
+              } else {
+                // If we didn't find a proper end, we still add the module with what we found
+                debug(s"No explicit end marker found for module $moduleName, adding anyway")
                 if (!modules.exists(_.name == moduleName)) {
                   modules += VerilogModule(moduleName, module_boundary.toSeq)
                 }
-                j += 1 // Skip past the endmodule line
+                i = j
               }
-            }
-            
-            // If we found the module end, resume outer scanning from there
-            if (moduleEnded) {
-              i = j  // j is already positioned after endmodule
-            } else {
-              // If we didn't find a proper end, we still add the module with what we found
-              debug(s"No explicit end marker found for module $moduleName, adding anyway")
-              if (!modules.exists(_.name == moduleName)) {
-                modules += VerilogModule(moduleName, module_boundary.toSeq)
-              }
-              i = j
             }
           case None => 
             debug(s"Module keyword found but couldn't extract module name from: ${txt(i)}")
             i += 1
         }
       } else {
-        debug(s"END ${txt(i)}")
         i += 1
       }
     }

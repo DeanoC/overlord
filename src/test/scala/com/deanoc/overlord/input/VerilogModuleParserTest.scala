@@ -228,6 +228,33 @@ class VerilogModuleParserTest extends AnyFlatSpec with Matchers {
     parameters.length shouldBe 6  // CLKS_PER_BIT + 5 localparams
   }
 
+  it should "parse a compact one-line module" in {
+    val tempFile = createTempFile(
+      "module test(input a, output b); endmodule"
+    )
+
+    val result = VerilogModuleParser(tempFile, "test")
+    result.isRight shouldBe true
+    
+    val modules = result.getOrElse(Seq.empty)
+    modules.length shouldBe 1
+    
+    val module = modules.head
+    module.name shouldBe "test"
+    
+    val ports = module.module_boundary.collect { case p: VerilogPort => p }
+    ports.length should be >= 2
+    
+    val inputPorts = ports.filter(_.direction == "input")
+    val outputPorts = ports.filter(_.direction == "output")
+    
+    inputPorts.nonEmpty shouldBe true
+    outputPorts.nonEmpty shouldBe true
+    
+    inputPorts.map(_.name) should contain ("a")
+    outputPorts.map(_.name) should contain ("b")
+  }
+
   // Helper method to create a temp file with Verilog content
   private def createTempFile(content: String): Path = {
     val tempDir = Files.createTempDirectory("verilog_parser_tests")
