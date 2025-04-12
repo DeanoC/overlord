@@ -7,31 +7,58 @@ import com.deanoc.overlord.{ConnectionDirection, FirstToSecondConnection}
 import com.deanoc.overlord.Instances.ChipInstance
 import com.deanoc.overlord.Interfaces.PortsLike
 
+/** Represents a group of connected ports between two components.
+  *
+  * This case class defines the connection between two instances, including
+  * their ports and connection direction.
+  *
+  * @param connectionPriority
+  *   The priority of this connection.
+  * @param main
+  *   The main/source instance location.
+  * @param direction
+  *   The direction of the connection.
+  * @param secondary
+  *   The secondary/target instance location.
+  */
 case class ConnectedPortGroup(
     connectionPriority: ConnectionPriority,
     main: InstanceLoc,
     direction: ConnectionDirection,
     secondary: InstanceLoc
 ) extends Connected {
+
+  /** Checks if the connection involves the specified chip instance. */
   override def connectedTo(inst: ChipInstance): Boolean =
     (main.instance.name == inst.name) || (secondary.instance.name == inst.name)
 
+  /** Returns the first (source) instance location in this connection. */
   override def first: Option[InstanceLoc] = Some(main)
 
+  /** Returns the second (target) instance location in this connection. */
   override def second: Option[InstanceLoc] = Some(secondary)
 
+  /** Retrieves the full name of the first instance. */
   override def firstFullName: String = main.instance.name
 
+  /** Retrieves the full name of the second instance. */
   override def secondFullName: String = secondary.instance.name
 
+  /** Checks if the connection is between a pin and a chip. */
   override def isPinToChip: Boolean = main.isPin && secondary.isChip
 
+  /** Checks if the connection is between two chips. */
   override def isChipToChip: Boolean = main.isChip && secondary.isChip
 
+  /** Checks if the connection is between a chip and a pin. */
   override def isChipToPin: Boolean = main.isChip && secondary.isPin
 
+  /** Checks if the connection involves a clock. */
   override def isClock: Boolean = false
 
+  /** Determines if the connection exists between two chip instances in the
+    * specified direction.
+    */
   override def connectedBetween(
       s: ChipInstance,
       e: ChipInstance,
@@ -51,7 +78,26 @@ case class ConnectedPortGroup(
   }
 }
 
+/** Factory object for creating instances of `ConnectedPortGroup`. */
 object ConnectedPortGroup {
+
+  /** Creates a `ConnectedPortGroup` instance.
+    *
+    * @param fi
+    *   The first port's owner.
+    * @param fp
+    *   The first port.
+    * @param fn
+    *   The name of the first port.
+    * @param si
+    *   The second port's owner.
+    * @param sp
+    *   The second port.
+    * @param direction
+    *   The direction of the connection.
+    * @return
+    *   A new `ConnectedPortGroup` instance.
+    */
   def apply(
       fi: PortsLike,
       fp: Port,

@@ -1,24 +1,26 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-          "type": "scala",
-          "request": "launch",
-          "name": "Launch Overlord Main",
-          "mainClass": "com.deanoc.overlord.Main",
-          "buildTarget": "overlord",
-          "args": [
-            "create",
-            "~/overlord_template_project/template_project.over",
-            "--out",
-            "~/overlord_template_project/",
-            "--board",
-            "tangnano9k"
-          ],
-          "jvmOptions": []
-        }
-    ]
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "scala",
+      "request": "launch",
+      "name": "Launch Overlord Main",
+      "mainClass": "com.deanoc.overlord.Main",
+      "buildTarget": "overlord",
+      "args": [
+        "create",
+        "../overlord_template_project/template_project.over",
+        "--out",
+        "../overlord_template_project/",
+        "--board",
+        "tangnano9k",
+        "--stdresource",
+        "../gagameos_stdcatalog"
+      ],
+      "jvmOptions": []
+    }
+  ]
 }

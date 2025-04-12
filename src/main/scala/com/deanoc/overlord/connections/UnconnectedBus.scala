@@ -11,6 +11,27 @@ import com.deanoc.overlord.Interfaces.{
   MultiBusLike
 }
 
+/** Represents an unconnected bus between two components.
+  *
+  * This case class defines the properties and methods for managing unconnected
+  * bus connections, including pre-connection checks, finalization, and
+  * establishing connections.
+  *
+  * @param firstFullName
+  *   The full name of the first component in the connection.
+  * @param direction
+  *   The direction of the connection.
+  * @param secondFullName
+  *   The full name of the second component in the connection.
+  * @param busProtocol
+  *   The protocol used by the bus (default is "default").
+  * @param supplierBusName
+  *   The name of the supplier bus (optional).
+  * @param consumerBusName
+  *   The name of the consumer bus (optional).
+  * @param silent
+  *   Whether to suppress error messages (default is false).
+  */
 case class UnconnectedBus(
     firstFullName: String,
     direction: ConnectionDirection,
@@ -21,6 +42,11 @@ case class UnconnectedBus(
     silent: Boolean = false
 ) extends Unconnected {
 
+  /** Performs pre-connection checks for the bus connection.
+    *
+    * @param unexpanded
+    *   A sequence of unexpanded chip instances.
+    */
   override def preConnect(unexpanded: Seq[ChipInstance]): Unit = {
     if (direction == BiDirectionConnection()) {
       println(
@@ -64,6 +90,13 @@ case class UnconnectedBus(
     supplierToConsumerHookup(bus, other)
   }
 
+  /** Collects constants associated with the unconnected bus.
+    *
+    * @param unexpanded
+    *   A sequence of unexpanded instance traits.
+    * @return
+    *   A sequence of constants (empty for this implementation).
+    */
   override def collectConstants(unexpanded: Seq[InstanceTrait]): Seq[Constant] =
     Seq()
 
@@ -106,6 +139,81 @@ case class UnconnectedBus(
 
   }
 
+  /** Establishes the connection between the supplier and consumer buses.
+    *
+    * @param unexpanded
+    *   A sequence of unexpanded chip instances.
+    * @return
+    *   A sequence of connected components.
+    */
+  override def connect(unexpanded: Seq[ChipInstance]): Seq[Connected] = {
+    val mo = matchInstances(firstFullName, unexpanded)
+    val so = matchInstances(secondFullName, unexpanded)
+
+    if (mo.length != 1 || so.length != 1) {
+      if (!silent)
+        println(
+          s"connection $firstFullName between $secondFullName count error"
+        )
+      return Seq[ConnectedBetween]()
+    }
+
+    val mainIL = mo.head
+    val otherIL = so.head
+
+    val (bus: SupplierBusLike, other: ChipInstance) =
+      getBus(mainIL, otherIL, direction) match {
+        case Some(result) => result
+        case None         => return Seq()
+      }
+
+    val busConnection = Seq[Connected](
+      ConnectedBus(
+        GroupConnectionPriority(),
+        mainIL,
+        direction,
+        otherIL,
+        bus,
+        other
+      )
+    )
+
+    // pure hardware buses require no pre-connecting
+    if (mainIL.isHardware && otherIL.isHardware) return busConnection
+
+    val busPorts: PortsLike = bus.getInterfaceUnwrapped[PortsLike]
+    val otherPorts: PortsLike = other.getInterfaceUnwrapped[PortsLike]
+    val busPrefix = bus.getPrefix
+    val otherPrefix = Utils.lookupString(other.attributes, "bus_prefix", "bus_")
+
+    val cpgs: Seq[Connected] = for {
+      fp <- busPorts.getPortsStartingWith(busPrefix)
+      otherName = s"${otherPrefix}${fp.name.replace(busPrefix, "")}"
+      sp <- otherPorts.getPortsMatchingName(otherName)
+    } yield ConnectedPortGroup(
+      busPorts,
+      fp,
+      mainIL.fullName,
+      otherPorts,
+      sp,
+      direction
+    )
+
+    busConnection ++ cpgs
+  }
+
+  /** Retrieves the bus connection between two instance locations.
+    *
+    * @param mainIL
+    *   The main instance location.
+    * @param otherIL
+    *   The other instance location.
+    * @param direction
+    *   The direction of the connection.
+    * @return
+    *   An optional tuple containing the supplier bus and the other chip
+    *   instance.
+    */
   private def getBus(
       mainIL: InstanceLoc,
       otherIL: InstanceLoc,
@@ -240,62 +348,6 @@ case class UnconnectedBus(
     }
 
     Some(supplierBus, other)
-  }
-
-  override def connect(unexpanded: Seq[ChipInstance]): Seq[Connected] = {
-    val mo = matchInstances(firstFullName, unexpanded)
-    val so = matchInstances(secondFullName, unexpanded)
-
-    if (mo.length != 1 || so.length != 1) {
-      if (!silent)
-        println(
-          s"connection $firstFullName between $secondFullName count error"
-        )
-      return Seq[ConnectedBetween]()
-    }
-
-    val mainIL = mo.head
-    val otherIL = so.head
-
-    val (bus: SupplierBusLike, other: ChipInstance) =
-      getBus(mainIL, otherIL, direction) match {
-        case Some(result) => result
-        case None         => return Seq()
-      }
-
-    val busConnection = Seq[Connected](
-      ConnectedBus(
-        GroupConnectionPriority(),
-        mainIL,
-        direction,
-        otherIL,
-        bus,
-        other
-      )
-    )
-
-    // pure hardware buses require no pre-connecting
-    if (mainIL.isHardware && otherIL.isHardware) return busConnection
-
-    val busPorts: PortsLike = bus.getInterfaceUnwrapped[PortsLike]
-    val otherPorts: PortsLike = other.getInterfaceUnwrapped[PortsLike]
-    val busPrefix = bus.getPrefix
-    val otherPrefix = Utils.lookupString(other.attributes, "bus_prefix", "bus_")
-
-    val cpgs: Seq[Connected] = for {
-      fp <- busPorts.getPortsStartingWith(busPrefix)
-      otherName = s"${otherPrefix}${fp.name.replace(busPrefix, "")}"
-      sp <- otherPorts.getPortsMatchingName(otherName)
-    } yield ConnectedPortGroup(
-      busPorts,
-      fp,
-      mainIL.fullName,
-      otherPorts,
-      sp,
-      direction
-    )
-
-    busConnection ++ cpgs
   }
 
 }

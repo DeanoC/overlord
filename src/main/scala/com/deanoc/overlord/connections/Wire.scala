@@ -7,17 +7,39 @@ import com.deanoc.overlord.Instances.{ClockInstance, PinGroupInstance}
 import com.deanoc.overlord._
 import scala.collection.mutable
 
+/** Represents a physical wire connection between components.
+  *
+  * @param startLoc
+  *   The starting location of the wire.
+  * @param endLocs
+  *   A sequence of ending locations for the wire.
+  * @param priority
+  *   The priority of the connection.
+  * @param knownWidth
+  *   Indicates whether the width of the wire is known.
+  */
 case class Wire(
     startLoc: InstanceLoc,
     endLocs: Seq[InstanceLoc],
     priority: ConnectionPriority,
     knownWidth: Boolean
 ) {
+
+  /** Checks if the starting location is a pin or clock.
+    *
+    * @return
+    *   True if the starting location is a pin or clock, false otherwise.
+    */
   def isStartPinOrClock: Boolean = startLoc.instance
     .isInstanceOf[PinGroupInstance] ||
     startLoc.instance
       .isInstanceOf[ClockInstance]
 
+  /** Finds an ending location that is a pin or clock.
+    *
+    * @return
+    *   An optional instance location that is a pin or clock.
+    */
   def findEndIsPinOrClock: Option[InstanceLoc] =
     endLocs.find(il =>
       il.instance.isInstanceOf[PinGroupInstance] ||
@@ -25,8 +47,28 @@ case class Wire(
     )
 }
 
+/** Companion object for managing wires.
+  *
+  * Provides methods for creating wires from logical connections and managing
+  * intermediate ghost wires.
+  */
 object Wires {
 
+  /** Represents an intermediate ghost wire used during wire creation.
+    *
+    * @param sp
+    *   The starting point index in the distance matrix.
+    * @param ep
+    *   The ending point index in the distance matrix.
+    * @param sloc
+    *   The starting location of the ghost wire.
+    * @param eloc
+    *   The ending location of the ghost wire.
+    * @param direction
+    *   The direction of the connection.
+    * @param priority
+    *   The priority of the connection.
+    */
   private case class GhostWire(
       sp: Int,
       ep: Int,
@@ -36,6 +78,15 @@ object Wires {
       priority: ConnectionPriority
   )
 
+  /** Creates a sequence of physical wires from logical connections.
+    *
+    * @param dm
+    *   The distance matrix used to determine routing.
+    * @param connected
+    *   A sequence of logical connections.
+    * @return
+    *   A sequence of physical wires.
+    */
   def apply(dm: DistanceMatrix, connected: Seq[Connected]): Seq[Wire] = {
 
     val wires = mutable.ArrayBuffer[Wire]()

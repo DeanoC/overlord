@@ -11,8 +11,23 @@ import com.deanoc.overlord.Instances.{
   Container
 }
 
+/**
+  * Trait representing unconnected components in the system.
+  *
+  * Provides methods for matching instances and creating connections between
+  * components that are not yet connected.
+  */
 trait Unconnected extends QueryInterface with UnconnectedLike {
 
+  /**
+    * Matches instances based on a name and returns their locations.
+    *
+    * @param nameToMatch
+    *   The name to match against.
+    * @param unexpanded
+    *   A sequence of unexpanded instances.
+    * @return A sequence of matched instance locations.
+    */
   protected def matchInstances(
       nameToMatch: String,
       unexpanded: Seq[InstanceTrait]
@@ -29,6 +44,17 @@ trait Unconnected extends QueryInterface with UnconnectedLike {
     })
   }
 
+  /**
+    * Connects two ports between two instance locations.
+    *
+    * @param cbp
+    *   The connection priority.
+    * @param fil
+    *   The first instance location.
+    * @param sil
+    *   The second instance location.
+    * @return A `ConnectedPortGroup` representing the connection.
+    */
   protected def ConnectPortBetween(
       cbp: ConnectionPriority,
       fil: InstanceLoc,
@@ -75,8 +101,16 @@ trait Unconnected extends QueryInterface with UnconnectedLike {
   }
 }
 
+/** Factory object for creating instances of `Unconnected`. */
 object Unconnected {
 
+  /**
+    * Creates an `UnconnectedLike` instance based on the provided connection variant.
+    *
+    * @param connection
+    *   The connection variant.
+    * @return An optional `UnconnectedLike` instance.
+    */
   def apply(connection: Variant): Option[UnconnectedLike] = {
     val table = Utils.toTable(connection)
 
