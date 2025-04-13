@@ -1,7 +1,7 @@
 package com.deanoc.overlord.Connections
 
 import com.deanoc.overlord._
-import com.deanoc.overlord.utils.{Utils, Variant}
+import com.deanoc.overlord.utils.{Utils, Variant, Logging}
 import com.deanoc.overlord.Hardware.{Port, BitsDesc, InWireDirection, OutWireDirection, InOutWireDirection}
 import com.deanoc.overlord.Interfaces._
 import com.deanoc.overlord.Instances.{ChipInstance, InstanceTrait, PinGroupInstance}
@@ -12,7 +12,7 @@ import com.deanoc.overlord.Instances.{ChipInstance, InstanceTrait, PinGroupInsta
  * This extracts the parsing logic from individual connection classes,
  * making the code more maintainable and following separation of concerns.
  */
-object ConnectionParser {
+object ConnectionParser extends Logging {
   /**
    * Parses a connection variant and creates the appropriate UnconnectedLike instance.
    *
@@ -23,20 +23,20 @@ object ConnectionParser {
     val table = Utils.toTable(connection)
 
     if (!table.contains("type")) {
-      println(s"connection $connection requires a type field")
+      error(s"connection $connection requires a type field")
       return None
     }
     val conntype = Utils.toString(table("type"))
 
     if (!table.contains("connection")) {
-      println(s"connection $conntype requires a connection field")
+      error(s"connection $conntype requires a connection field")
       return None
     }
 
     val cons = Utils.toString(table("connection"))
     val con = cons.split(' ')
     if (con.length != 3) {
-      println(s"$conntype has an invalid connection field: $cons")
+      error(s"$conntype has an invalid connection field: $cons")
       return None
     }
     
@@ -46,7 +46,7 @@ object ConnectionParser {
       case "<->" | "<>" => (con(0), BiDirectionConnection(), con(2))
       case "<-"         => (con(0), SecondToFirstConnection(), con(2))
       case _ =>
-        println(s"$conntype has an invalid connection ${con(1)} : $cons")
+        error(s"$conntype has an invalid connection ${con(1)} : $cons")
         return None
     }
 
@@ -95,7 +95,7 @@ object ConnectionParser {
         Some(UnconnectedLogical(first, dir, secondary))
         
       case _ =>
-        println(s"$conntype is an unknown connection type")
+        error(s"$conntype is an unknown connection type")
         None
     }
   }
@@ -146,9 +146,7 @@ object ConnectionParser {
     val parameters = parametersV.flatMap { v =>
       val table = Utils.toTable(v)
       if (!table.contains("name")) {
-        println(
-          s"parameter $v has no name field"
-        )
+        error(s"parameter $v has no name field")
         None
       } else {
         val name = Utils.lookupString(table, "name", "NO_NAME")
@@ -156,7 +154,7 @@ object ConnectionParser {
           val typeStr = Utils.toString(table("type"))
           if (typeStr == "frequency") {
             if (!table.contains("value")) {
-              println(s"frequency parameter $name has no value field")
+              error(s"frequency parameter $name has no value field")
               // Can't return None here, instead skip this parameter
               null
             } else {
@@ -166,7 +164,7 @@ object ConnectionParser {
             }
           } else {
             if (!table.contains("value")) {
-              println(s"constant parameter $name has no value field")
+              error(s"constant parameter $name has no value field")
               // Can't return None here, instead skip this parameter
               null
             } else {
@@ -175,7 +173,7 @@ object ConnectionParser {
           }
         } else {
           if (!table.contains("value")) {
-            println(s"parameter $name has no value field")
+            error(s"parameter $name has no value field")
             // Can't return None here, instead skip this parameter
             null
           } else {
@@ -211,7 +209,7 @@ object ConnectionParser {
       } else if (fil.isClock) {
         Port(fil.fullName, BitsDesc(1), InWireDirection())
       } else {
-        if (fil.isGateware) println(s"${fil.fullName} unable to get port")
+        if (fil.isGateware) error(s"${fil.fullName} unable to get port")
         Port(fil.fullName, BitsDesc(1), InWireDirection())
       }
     }
@@ -222,7 +220,7 @@ object ConnectionParser {
       } else if (sil.isClock) {
         Port(sil.fullName, BitsDesc(1), OutWireDirection())
       } else {
-        if (sil.isGateware) println(s"${sil.fullName} unable to get port")
+        if (sil.isGateware) error(s"${sil.fullName} unable to get port")
         Port(sil.fullName, fp.width, InWireDirection())
       }
     }
