@@ -2,7 +2,7 @@ package com.deanoc.overlord.connections
 import com.deanoc.overlord._
 
 import com.deanoc.overlord.hardware.{InOutWireDirection, Port}
-import com.deanoc.overlord.ConnectionDirection
+import com.deanoc.overlord.connections.ConnectionDirection
 
 import com.deanoc.overlord.instances.ChipInstance
 import com.deanoc.overlord.interfaces.PortsLike

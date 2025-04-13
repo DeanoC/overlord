@@ -2,6 +2,7 @@ package com.deanoc.overlord
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+import com.deanoc.overlord.connections.ConnectionDirection
 
 class ConnectionDirectionSpec extends AnyFlatSpec with Matchers {
 

@@ -1,6 +1,7 @@
 package com.deanoc.overlord.connections
 
 import com.deanoc.overlord._
+import com.deanoc.overlord.connections.ConnectionDirection
 
 /** Represents a logical connection between two components in the system.
   *

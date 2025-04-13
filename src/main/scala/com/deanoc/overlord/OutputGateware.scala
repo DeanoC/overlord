@@ -3,6 +3,7 @@ package com.deanoc.overlord
 import java.nio.file.Path
 
 import com.deanoc.overlord.connections._
+import com.deanoc.overlord.connections.ConnectionDirection
 import com.deanoc.overlord.instances.{ChipInstance, Container}
 import com.deanoc.overlord.interfaces.UnconnectedLike
 import com.deanoc.overlord.Project

@@ -3,6 +3,7 @@ package com.deanoc.overlord.connections
 import com.deanoc.overlord.utils.{Utils, Logging}
 import com.deanoc.overlord.instances._
 import com.deanoc.overlord._
+import com.deanoc.overlord.connections.ConnectionDirection
 
 import com.deanoc.overlord.interfaces.{
   PortsLike,

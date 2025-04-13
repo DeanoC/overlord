@@ -3,6 +3,7 @@ package com.deanoc.overlord.connections
 import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
 import com.deanoc.overlord.interfaces.PortsLike
 import com.deanoc.overlord._
+import com.deanoc.overlord.connections.ConnectionDirection
 
 /**
   * Represents an unconnected port group connection between two components.

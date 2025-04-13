@@ -2,7 +2,7 @@ package com.deanoc.overlord
 
 import com.deanoc.overlord.connections._
 import com.deanoc.overlord.instances.{ChipInstance, Container, PinGroupInstance}
-import com.deanoc.overlord.ConnectionDirection.*
+import com.deanoc.overlord.connections.ConnectionDirection.*
 import scala.collection.mutable
 import scala.language.postfixOps
 import scala.util.boundary, boundary.break

@@ -5,6 +5,7 @@ import com.deanoc.overlord.instances.ChipInstance
 import com.deanoc.overlord.DistanceMatrix
 import com.deanoc.overlord.instances.{ClockInstance, PinGroupInstance}
 import com.deanoc.overlord._
+import com.deanoc.overlord.connections.ConnectionDirection
 import scala.collection.mutable
 
 /** Represents a physical wire connection between components.

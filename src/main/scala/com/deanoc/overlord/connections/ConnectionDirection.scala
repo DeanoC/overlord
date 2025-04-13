@@ -1,4 +1,4 @@
-package com.deanoc.overlord
+package com.deanoc.overlord.connections
 
 enum ConnectionDirection {
   case FirstToSecond, SecondToFirst, BiDirectional

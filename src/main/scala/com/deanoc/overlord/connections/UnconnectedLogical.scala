@@ -2,6 +2,7 @@ package com.deanoc.overlord.connections
 
 import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
 import com.deanoc.overlord._
+import com.deanoc.overlord.connections.ConnectionDirection
 
 /** Represents an unconnected logical connection between two components.
   *

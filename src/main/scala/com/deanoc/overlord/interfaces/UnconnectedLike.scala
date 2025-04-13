@@ -1,6 +1,6 @@
 package com.deanoc.overlord.interfaces
 
-import com.deanoc.overlord.ConnectionDirection
+import com.deanoc.overlord.connections.ConnectionDirection
 import com.deanoc.overlord.QueryInterface
 import com.deanoc.overlord.connections.{Connected, Constant}
 import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}

@@ -1,6 +1,7 @@
 package com.deanoc.overlord.connections
 
 import com.deanoc.overlord._
+import com.deanoc.overlord.connections.ConnectionDirection
 import com.deanoc.overlord.utils.{Utils, Variant, Logging}
 import com.deanoc.overlord.hardware.{Port, BitsDesc, InWireDirection, OutWireDirection, InOutWireDirection}
 import com.deanoc.overlord.interfaces._
