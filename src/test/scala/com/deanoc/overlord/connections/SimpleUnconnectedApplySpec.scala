@@ -43,7 +43,7 @@ class SimpleUnconnectedApplySpec extends AnyFlatSpec with Matchers with SilentLo
     result.get shouldBe a[UnconnectedPort]
     val port = result.get.asInstanceOf[UnconnectedPort]
     port.firstFullName shouldBe "device1"
-    assert(port.direction.isInstanceOf[FirstToSecondConnection])
+    assert(port.direction == ConnectionDirection.FirstToSecond)
     port.secondFullName shouldBe "device2"
   }
   
@@ -67,7 +67,7 @@ class SimpleUnconnectedApplySpec extends AnyFlatSpec with Matchers with SilentLo
     result.get shouldBe a[UnconnectedBus]
     val bus = result.get.asInstanceOf[UnconnectedBus]
     bus.firstFullName shouldBe "cpu"
-    assert(bus.direction.isInstanceOf[FirstToSecondConnection])
+    assert(bus.direction == ConnectionDirection.FirstToSecond)
     bus.secondFullName shouldBe "memory"
     bus.busProtocol shouldBe "axi4"
     bus.supplierBusName shouldBe "main_bus"
@@ -91,7 +91,7 @@ class SimpleUnconnectedApplySpec extends AnyFlatSpec with Matchers with SilentLo
     result.get shouldBe a[UnconnectedLogical]
     val logical = result.get.asInstanceOf[UnconnectedLogical]
     logical.firstFullName shouldBe "comp1"
-    assert(logical.direction.isInstanceOf[FirstToSecondConnection])
+    assert(logical.direction == ConnectionDirection.FirstToSecond)
     logical.secondFullName shouldBe "comp2"
   }
   
@@ -112,7 +112,7 @@ class SimpleUnconnectedApplySpec extends AnyFlatSpec with Matchers with SilentLo
     result.get shouldBe a[UnconnectedClock]
     val clock = result.get.asInstanceOf[UnconnectedClock]
     clock.firstFullName shouldBe "clk"
-    assert(clock.direction.isInstanceOf[FirstToSecondConnection])
+    assert(clock.direction == ConnectionDirection.FirstToSecond)
     clock.secondFullName shouldBe "device"
   }
   
@@ -124,7 +124,7 @@ class SimpleUnconnectedApplySpec extends AnyFlatSpec with Matchers with SilentLo
     
     val biResult = Unconnected.apply(Utils.toVariant(biMap))
     biResult shouldBe defined
-    assert(biResult.get.asInstanceOf[UnconnectedPort].direction.isInstanceOf[BiDirectionConnection])
+    assert(biResult.get.asInstanceOf[UnconnectedPort].direction == ConnectionDirection.BiDirectional)
     
     // Test second-to-first connection
     val reverseMap = new java.util.HashMap[String, Any]()
@@ -133,7 +133,7 @@ class SimpleUnconnectedApplySpec extends AnyFlatSpec with Matchers with SilentLo
     
     val reverseResult = Unconnected.apply(Utils.toVariant(reverseMap))
     reverseResult shouldBe defined
-    assert(reverseResult.get.asInstanceOf[UnconnectedPort].direction.isInstanceOf[SecondToFirstConnection])
+    assert(reverseResult.get.asInstanceOf[UnconnectedPort].direction == ConnectionDirection.SecondToFirst)
   }
   
   it should "parse port group connections with prefixes" in {

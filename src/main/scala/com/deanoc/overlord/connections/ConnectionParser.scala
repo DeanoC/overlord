@@ -64,9 +64,9 @@ object ConnectionParser extends Logging {
     
     // Parse the connection direction from the identified symbol
     val dir = dirSymbol match {
-      case "->"      => FirstToSecondConnection()
-      case "<->" | "<>" => BiDirectionConnection()
-      case "<-"      => SecondToFirstConnection()
+      case "->"      => ConnectionDirection.FirstToSecond
+      case "<->" | "<>" => ConnectionDirection.BiDirectional
+      case "<-"      => ConnectionDirection.SecondToFirst
       case _ =>
         error(s"$conntype has an invalid connection $dirSymbol : $cons")
         return None
@@ -261,6 +261,6 @@ object ConnectionParser extends Logging {
     val fmloc = InstanceLoc(fil.instance, Some(fport), fil.fullName)
     val fsloc = InstanceLoc(sil.instance, Some(sport), sil.fullName)
 
-    ConnectedPortGroup(cbp, fmloc, FirstToSecondConnection(), fsloc)
+    ConnectedPortGroup(cbp, fmloc, ConnectionDirection.FirstToSecond, fsloc)
   }
 }

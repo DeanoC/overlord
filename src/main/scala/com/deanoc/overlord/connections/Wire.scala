@@ -95,10 +95,10 @@ object Wires {
     // connection are logical, wires are physical
     connected.foreach(c => {
       val (sp, ep) = c.direction match {
-        case FirstToSecondConnection() => dm.indicesOf(c)
-        case SecondToFirstConnection() =>
+        case ConnectionDirection.FirstToSecond => dm.indicesOf(c)
+        case ConnectionDirection.SecondToFirst =>
           (dm.indicesOf(c)._2, dm.indicesOf(c)._1)
-        case BiDirectionConnection() => dm.indicesOf(c)
+        case ConnectionDirection.BiDirectional => dm.indicesOf(c)
       }
       if (!(sp < 0 || ep < 0 || c.first.isEmpty || c.second.isEmpty)) {
         val f = c.first.get

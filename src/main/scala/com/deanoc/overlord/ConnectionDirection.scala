@@ -1,22 +1,17 @@
 package com.deanoc.overlord
 
-sealed trait ConnectionDirection {
-  override def toString: String =
-    this match {
-      case FirstToSecondConnection() => "first to second"
-      case SecondToFirstConnection() => "second to first"
-      case BiDirectionConnection()   => "bi direction"
-    }
+enum ConnectionDirection {
+  case FirstToSecond, SecondToFirst, BiDirectional
+
+  override def toString: String = this match {
+    case FirstToSecond => "first to second"
+    case SecondToFirst => "second to first"
+    case BiDirectional => "bi direction"
+  }
 
   def flip: ConnectionDirection = this match {
-    case FirstToSecondConnection() => SecondToFirstConnection()
-    case SecondToFirstConnection() => FirstToSecondConnection()
-    case BiDirectionConnection()   => this
+    case FirstToSecond => SecondToFirst
+    case SecondToFirst => FirstToSecond
+    case BiDirectional => this // BiDirectional remains unchanged
   }
 }
-
-case class FirstToSecondConnection() extends ConnectionDirection
-
-case class SecondToFirstConnection() extends ConnectionDirection
-
-case class BiDirectionConnection() extends ConnectionDirection

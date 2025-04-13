@@ -1,6 +1,5 @@
 package com.deanoc.overlord.connections
 
-import scala.language.implicitConversions
 /**
  * Represents the priority level of a connection, used to resolve conflicts
  * when multiple connection rules apply to the same components.

@@ -65,7 +65,7 @@ object OutputGateware {
                   ("protocol", StringV(b.busProtocol)),
                   (
                     "supplier",
-                    if (b.direction == FirstToSecondConnection() && isFirst)
+                    if (b.direction == ConnectionDirection.FirstToSecond && isFirst)
                       BooleanV(true)
                     else BooleanV(false)
                   )

@@ -37,7 +37,7 @@ class ConnectedBusSpec extends AnyFlatSpec with Matchers with MockitoSugar with 
     val busConn = ConnectedBus(
       ConnectionPriority.Explicit,
       srcLoc,
-      FirstToSecondConnection(),
+      ConnectionDirection.FirstToSecond,
       destLoc,
       mockSupplierBusLike,
       destInstance
@@ -47,7 +47,7 @@ class ConnectedBusSpec extends AnyFlatSpec with Matchers with MockitoSugar with 
     busConn.connectionPriority shouldBe ConnectionPriority.Explicit
     busConn.first.get shouldBe srcLoc
     busConn.second.get shouldBe destLoc
-    busConn.direction shouldBe a[FirstToSecondConnection]
+    (busConn.direction == ConnectionDirection.FirstToSecond) shouldBe true
     busConn.firstFullName shouldBe "top.source"
     busConn.secondFullName shouldBe "top.destination"
     busConn.firstLastName shouldBe "source"
@@ -76,7 +76,7 @@ class ConnectedBusSpec extends AnyFlatSpec with Matchers with MockitoSugar with 
     val forwardBus = ConnectedBus(
       ConnectionPriority.Explicit,
       srcLoc,
-      FirstToSecondConnection(),
+      ConnectionDirection.FirstToSecond,
       destLoc,
       mockSupplierBusLike,
       destInstance
@@ -86,7 +86,7 @@ class ConnectedBusSpec extends AnyFlatSpec with Matchers with MockitoSugar with 
     val biBus = ConnectedBus(
       ConnectionPriority.Explicit,
       srcLoc,
-      BiDirectionConnection(),
+      ConnectionDirection.BiDirectional,
       destLoc,
       mockSupplierBusLike,
       destInstance
@@ -102,20 +102,20 @@ class ConnectedBusSpec extends AnyFlatSpec with Matchers with MockitoSugar with 
     forwardBus.connectedBetween(destInstance, srcInstance) shouldBe true // default is bidirectional
     
     // Test with explicit directions
-    forwardBus.connectedBetween(srcInstance, destInstance, FirstToSecondConnection()) shouldBe true
-    forwardBus.connectedBetween(destInstance, srcInstance, FirstToSecondConnection()) shouldBe false
-    forwardBus.connectedBetween(srcInstance, destInstance, SecondToFirstConnection()) shouldBe false
-    forwardBus.connectedBetween(destInstance, srcInstance, SecondToFirstConnection()) shouldBe true
-    forwardBus.connectedBetween(srcInstance, destInstance, BiDirectionConnection()) shouldBe true
-    forwardBus.connectedBetween(destInstance, srcInstance, BiDirectionConnection()) shouldBe true
+    forwardBus.connectedBetween(srcInstance, destInstance, ConnectionDirection.FirstToSecond) shouldBe true
+    forwardBus.connectedBetween(destInstance, srcInstance, ConnectionDirection.FirstToSecond) shouldBe false
+    forwardBus.connectedBetween(srcInstance, destInstance, ConnectionDirection.SecondToFirst) shouldBe false
+    forwardBus.connectedBetween(destInstance, srcInstance, ConnectionDirection.SecondToFirst) shouldBe true
+    forwardBus.connectedBetween(srcInstance, destInstance, ConnectionDirection.BiDirectional) shouldBe true
+    forwardBus.connectedBetween(destInstance, srcInstance, ConnectionDirection.BiDirectional) shouldBe true
     
     // Test bidirectional bus connections
-    biBus.connectedBetween(srcInstance, destInstance, FirstToSecondConnection()) shouldBe true
-    biBus.connectedBetween(destInstance, srcInstance, FirstToSecondConnection()) shouldBe false
-    biBus.connectedBetween(srcInstance, destInstance, SecondToFirstConnection()) shouldBe false
-    biBus.connectedBetween(destInstance, srcInstance, SecondToFirstConnection()) shouldBe true
-    biBus.connectedBetween(srcInstance, destInstance, BiDirectionConnection()) shouldBe true
-    biBus.connectedBetween(destInstance, srcInstance, BiDirectionConnection()) shouldBe true
+    biBus.connectedBetween(srcInstance, destInstance, ConnectionDirection.FirstToSecond) shouldBe true
+    biBus.connectedBetween(destInstance, srcInstance, ConnectionDirection.FirstToSecond) shouldBe false
+    biBus.connectedBetween(srcInstance, destInstance, ConnectionDirection.SecondToFirst) shouldBe false
+    biBus.connectedBetween(destInstance, srcInstance, ConnectionDirection.SecondToFirst) shouldBe true
+    biBus.connectedBetween(srcInstance, destInstance, ConnectionDirection.BiDirectional) shouldBe true
+    biBus.connectedBetween(destInstance, srcInstance, ConnectionDirection.BiDirectional) shouldBe true
   }
   
   it should "correctly identify chip-to-chip connections" in {
@@ -134,7 +134,7 @@ class ConnectedBusSpec extends AnyFlatSpec with Matchers with MockitoSugar with 
     val busConn = ConnectedBus(
       ConnectionPriority.Explicit,
       srcLoc,
-      FirstToSecondConnection(),
+      ConnectionDirection.FirstToSecond,
       destLoc,
       mockSupplierBusLike,
       destInstance
@@ -163,7 +163,7 @@ class ConnectedBusSpec extends AnyFlatSpec with Matchers with MockitoSugar with 
     val busConn = ConnectedBus(
       ConnectionPriority.Explicit,
       srcLoc,
-      FirstToSecondConnection(),
+      ConnectionDirection.FirstToSecond,
       destLoc,
       mockSupplierBusLike,
       destInstance

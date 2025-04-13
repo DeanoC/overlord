@@ -36,7 +36,7 @@ class ConnectionParserBasicSpec extends AnyFlatSpec with Matchers with SilentLog
     result shouldBe defined
     val port = result.get.asInstanceOf[UnconnectedPort]
     port.firstFullName shouldBe "device1"
-    assert(port.direction.isInstanceOf[FirstToSecondConnection])
+    assert(port.direction == ConnectionDirection.FirstToSecond)
     port.secondFullName shouldBe "device2"
   }
   
@@ -47,7 +47,7 @@ class ConnectionParserBasicSpec extends AnyFlatSpec with Matchers with SilentLog
     result shouldBe defined
     val port = result.get.asInstanceOf[UnconnectedPort]
     port.firstFullName shouldBe "device1"
-    assert(port.direction.isInstanceOf[BiDirectionConnection])
+    assert(port.direction == ConnectionDirection.BiDirectional)
     port.secondFullName shouldBe "device2"
   }
   
@@ -58,7 +58,7 @@ class ConnectionParserBasicSpec extends AnyFlatSpec with Matchers with SilentLog
     result shouldBe defined
     val port = result.get.asInstanceOf[UnconnectedPort]
     port.firstFullName shouldBe "device1"
-    assert(port.direction.isInstanceOf[BiDirectionConnection])
+    assert(port.direction == ConnectionDirection.BiDirectional)
     port.secondFullName shouldBe "device2"
   }
   
@@ -69,7 +69,7 @@ class ConnectionParserBasicSpec extends AnyFlatSpec with Matchers with SilentLog
     result shouldBe defined
     val port = result.get.asInstanceOf[UnconnectedPort]
     port.firstFullName shouldBe "device1"
-    assert(port.direction.isInstanceOf[SecondToFirstConnection])
+    assert(port.direction == ConnectionDirection.SecondToFirst)
     port.secondFullName shouldBe "device2"
   }
   

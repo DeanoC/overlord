@@ -48,7 +48,7 @@ case class UnconnectedBus(
     *   A sequence of unexpanded chip instances.
     */
   override def preConnect(unexpanded: Seq[ChipInstance]): Unit = {
-    if (direction == BiDirectionConnection()) {
+    if (direction == ConnectionDirection.BiDirectional) {
       error(
         s"connection between ${firstFullName} and $secondFullName is a undirected bus connection"
       )
@@ -242,17 +242,17 @@ case class UnconnectedBus(
 
     val multiBuses0: (Option[MultiBusLike], Option[MultiBusLike]) =
       direction match {
-        case FirstToSecondConnection() =>
+        case ConnectionDirection.FirstToSecond =>
           (
             mainIL.instance.getInterface[MultiBusLike],
             otherIL.instance.getInterface[MultiBusLike]
           )
-        case SecondToFirstConnection() =>
+        case ConnectionDirection.SecondToFirst =>
           (
             otherIL.instance.getInterface[MultiBusLike],
             mainIL.instance.getInterface[MultiBusLike]
           )
-        case BiDirectionConnection() =>
+        case ConnectionDirection.BiDirectional =>
           error(
             s"connection between ${firstFullName} and $secondFullName is a undirected bus connection"
           )
@@ -284,7 +284,7 @@ case class UnconnectedBus(
     }
 
     if (
-      direction == SecondToFirstConnection() && !mainIL.instance
+      direction == ConnectionDirection.SecondToFirst && !mainIL.instance
         .isInstanceOf[ChipInstance]
     ) {
       error(
@@ -292,7 +292,7 @@ case class UnconnectedBus(
       );
       return None
     } else if (
-      direction == FirstToSecondConnection() && !otherIL.instance
+      direction == ConnectionDirection.FirstToSecond && !otherIL.instance
         .isInstanceOf[ChipInstance]
     ) {
       error(
@@ -302,7 +302,7 @@ case class UnconnectedBus(
     }
 
     val other: ChipInstance =
-      (if (direction == SecondToFirstConnection()) mainIL.instance
+      (if (direction == ConnectionDirection.SecondToFirst) mainIL.instance
        else otherIL.instance).asInstanceOf[ChipInstance]
     // search through suppliers name and protocols for a match
     val supplierBus: SupplierBusLike = {

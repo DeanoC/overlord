@@ -2,7 +2,6 @@ package com.deanoc.overlord.connections
 
 import com.deanoc.overlord.hardware.Port
 import com.deanoc.overlord.{
-  BiDirectionConnection,
   ConnectionDirection,
   DefinitionTrait,
   GatewareDefinitionTrait,
@@ -83,7 +82,7 @@ trait Connected extends QueryInterface {
     *   True if the connection is between the two instances.
     */
   def connectedBetween(s: ChipInstance, e: ChipInstance): Boolean =
-    connectedBetween(s, e, BiDirectionConnection())
+    connectedBetween(s, e, ConnectionDirection.BiDirectional)
 
   /** Checks if this connection is between two specified instances with a
     * specific direction.

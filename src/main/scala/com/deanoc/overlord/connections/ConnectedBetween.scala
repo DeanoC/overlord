@@ -55,13 +55,13 @@ trait ConnectedBetween extends Connected {
     if (first.isEmpty || second.isEmpty) false
     else {
       d match {
-        case FirstToSecondConnection() => (
+        case ConnectionDirection.FirstToSecond => (
           first.get.instance == s && second.get.instance == e
         )
-        case SecondToFirstConnection() => (
+        case ConnectionDirection.SecondToFirst => (
           first.get.instance == e && second.get.instance == s
         )
-        case BiDirectionConnection() => (
+        case ConnectionDirection.BiDirectional => (
           (first.get.instance == s && second.get.instance == e) || (first.get.instance == e && second.get.instance == s)
         )
       }

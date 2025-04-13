@@ -48,7 +48,7 @@ class ConnectionParserComprehensiveSpec extends AnyFlatSpec with Matchers with M
     firstToSecondResult.get shouldBe a[UnconnectedPort]
     val port1 = firstToSecondResult.get.asInstanceOf[UnconnectedPort]
     port1.firstFullName shouldBe "device1"
-    port1.direction shouldBe a[FirstToSecondConnection]
+    (port1.direction == ConnectionDirection.FirstToSecond) shouldBe true
     port1.secondFullName shouldBe "device2"
     
     // Test second-to-first connection
@@ -59,7 +59,7 @@ class ConnectionParserComprehensiveSpec extends AnyFlatSpec with Matchers with M
     secondToFirstResult.get shouldBe a[UnconnectedPort]
     val port2 = secondToFirstResult.get.asInstanceOf[UnconnectedPort]
     port2.firstFullName shouldBe "device1"
-    port2.direction shouldBe a[SecondToFirstConnection]
+    (port2.direction == ConnectionDirection.SecondToFirst) shouldBe true
     port2.secondFullName shouldBe "device2"
     
     // Test bidirectional connection with <->
@@ -67,10 +67,10 @@ class ConnectionParserComprehensiveSpec extends AnyFlatSpec with Matchers with M
     val biDir1Result = ConnectionParser.parseConnection(biDir1)
     
     biDir1Result shouldBe defined
-    biDir1Result.get shouldBe a[UnconnectedPort]
+    assert(biDir1Result.get.isInstanceOf[UnconnectedPort])
     val port3 = biDir1Result.get.asInstanceOf[UnconnectedPort]
     port3.firstFullName shouldBe "device1"
-    port3.direction shouldBe a[BiDirectionConnection]
+    (port3.direction == ConnectionDirection.BiDirectional) shouldBe true
     port3.secondFullName shouldBe "device2"
     
     // Test bidirectional connection with <>
@@ -78,10 +78,10 @@ class ConnectionParserComprehensiveSpec extends AnyFlatSpec with Matchers with M
     val biDir2Result = ConnectionParser.parseConnection(biDir2)
     
     biDir2Result shouldBe defined
-    biDir2Result.get shouldBe a[UnconnectedPort]
+    assert(biDir2Result.get.isInstanceOf[UnconnectedPort])
     val port4 = biDir2Result.get.asInstanceOf[UnconnectedPort]
     port4.firstFullName shouldBe "device1"
-    port4.direction shouldBe a[BiDirectionConnection]
+    (port4.direction == ConnectionDirection.BiDirectional) shouldBe true
     port4.secondFullName shouldBe "device2"
   }
   
@@ -101,10 +101,10 @@ class ConnectionParserComprehensiveSpec extends AnyFlatSpec with Matchers with M
     val result = ConnectionParser.parseConnection(busVariant)
     
     result shouldBe defined
-    result.get shouldBe a[UnconnectedBus]
+    assert(result.get.isInstanceOf[UnconnectedBus])
     val bus = result.get.asInstanceOf[UnconnectedBus]
     bus.firstFullName shouldBe "cpu"
-    bus.direction shouldBe a[FirstToSecondConnection]
+    (bus.direction == ConnectionDirection.FirstToSecond) shouldBe true
     bus.secondFullName shouldBe "memory"
     bus.busProtocol shouldBe "axi4"
     bus.supplierBusName shouldBe "main_bus"
@@ -150,10 +150,10 @@ class ConnectionParserComprehensiveSpec extends AnyFlatSpec with Matchers with M
     val result = ConnectionParser.parseConnection(portGroupVariant)
     
     result shouldBe defined
-    result.get shouldBe a[UnconnectedPortGroup]
+    assert(result.get.isInstanceOf[UnconnectedPortGroup])
     val portGroup = result.get.asInstanceOf[UnconnectedPortGroup]
     portGroup.firstFullName shouldBe "uart0"
-    portGroup.direction shouldBe a[FirstToSecondConnection]
+    (portGroup.direction == ConnectionDirection.FirstToSecond) shouldBe true
     portGroup.secondFullName shouldBe "uart1"
     portGroup.first_prefix shouldBe "tx_"
     portGroup.second_prefix shouldBe "rx_"
@@ -166,10 +166,10 @@ class ConnectionParserComprehensiveSpec extends AnyFlatSpec with Matchers with M
     val result = ConnectionParser.parseConnection(logicalVariant)
     
     result shouldBe defined
-    result.get shouldBe a[UnconnectedLogical]
+    assert(result.get.isInstanceOf[UnconnectedLogical])
     val logical = result.get.asInstanceOf[UnconnectedLogical]
     logical.firstFullName shouldBe "block1"
-    logical.direction shouldBe a[FirstToSecondConnection]
+    (logical.direction == ConnectionDirection.FirstToSecond) shouldBe true
     logical.secondFullName shouldBe "block2"
   }
   
@@ -179,10 +179,10 @@ class ConnectionParserComprehensiveSpec extends AnyFlatSpec with Matchers with M
     val result = ConnectionParser.parseConnection(clockVariant)
     
     result shouldBe defined
-    result.get shouldBe a[UnconnectedClock]
+    assert(result.get.isInstanceOf[UnconnectedClock])
     val clock = result.get.asInstanceOf[UnconnectedClock]
     clock.firstFullName shouldBe "system_clock"
-    clock.direction shouldBe a[FirstToSecondConnection]
+    (clock.direction == ConnectionDirection.FirstToSecond) shouldBe true
     clock.secondFullName shouldBe "cpu"
   }
   
@@ -257,10 +257,10 @@ class ConnectionParserComprehensiveSpec extends AnyFlatSpec with Matchers with M
     val result = ConnectionParser.parseConnection(whitespaceVariant)
     
     result shouldBe defined
-    result.get shouldBe a[UnconnectedPort]
+    assert(result.get.isInstanceOf[UnconnectedPort])
     val port = result.get.asInstanceOf[UnconnectedPort]
     port.firstFullName shouldBe "device1"
-    port.direction shouldBe a[FirstToSecondConnection]
+    assert(port.direction == ConnectionDirection.FirstToSecond)
     port.secondFullName shouldBe "device2"
   }
   
@@ -324,14 +324,14 @@ class ConnectionParserComprehensiveSpec extends AnyFlatSpec with Matchers with M
     
     // Parse parameters
     val result = ConnectionParser.parseParametersConnection(
-      FirstToSecondConnection(),
+      ConnectionDirection.FirstToSecond,
       "target_device",
       parametersArray
     )
     
     // Check result
-    result shouldBe a[UnconnectedParameters]
-    result.direction shouldBe a[FirstToSecondConnection]
+    assert(result.isInstanceOf[UnconnectedParameters])
+    assert(result.direction == ConnectionDirection.FirstToSecond)
     result.instanceName shouldBe "target_device"
     result.parameters.length shouldBe 3
     
@@ -389,7 +389,7 @@ class ConnectionParserComprehensiveSpec extends AnyFlatSpec with Matchers with M
       
       // Parse parameters
       val result = ConnectionParser.parseParametersConnection(
-        FirstToSecondConnection(),
+        ConnectionDirection.FirstToSecond,
         "target_device",
         parametersArray
       )
@@ -435,7 +435,7 @@ class ConnectionParserComprehensiveSpec extends AnyFlatSpec with Matchers with M
     result.second.get.instance shouldBe chipInstance2
     result.second.get.port.get.name shouldBe "out_port"
     result.second.get.port.get.direction shouldBe a[OutWireDirection]
-    result.direction shouldBe a[FirstToSecondConnection]
+    (result.direction == ConnectionDirection.FirstToSecond) shouldBe true
   }
   
   it should "handle InOutWireDirection correctly" in {

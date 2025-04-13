@@ -2,7 +2,7 @@ package com.deanoc.overlord.connections
 import com.deanoc.overlord._
 
 import com.deanoc.overlord.hardware.{InOutWireDirection, Port}
-import com.deanoc.overlord.{ConnectionDirection, FirstToSecondConnection}
+import com.deanoc.overlord.ConnectionDirection
 
 import com.deanoc.overlord.instances.ChipInstance
 import com.deanoc.overlord.interfaces.PortsLike
@@ -65,13 +65,13 @@ case class ConnectedPortGroup(
       d: ConnectionDirection
   ): Boolean = {
     d match {
-      case FirstToSecondConnection() => (
+      case ConnectionDirection.FirstToSecond => (
         main.instance == s && secondary.instance == e
       )
-      case SecondToFirstConnection() => (
+      case ConnectionDirection.SecondToFirst => (
         main.instance == e && secondary.instance == s
       )
-      case BiDirectionConnection() => (
+      case ConnectionDirection.BiDirectional => (
         (main.instance == s && secondary.instance == e) || (main.instance == e && secondary.instance == s)
       )
     }

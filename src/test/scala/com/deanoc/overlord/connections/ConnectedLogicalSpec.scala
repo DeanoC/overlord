@@ -39,7 +39,7 @@ class ConnectedLogicalSpec extends AnyFlatSpec with Matchers with MockitoSugar w
     val logicalConn = ConnectedLogical(
       ConnectionPriority.Explicit,
       srcLoc,
-      FirstToSecondConnection(),
+      ConnectionDirection.FirstToSecond,
       destLoc
     )
     
@@ -47,7 +47,7 @@ class ConnectedLogicalSpec extends AnyFlatSpec with Matchers with MockitoSugar w
     logicalConn.connectionPriority shouldBe ConnectionPriority.Explicit
     logicalConn.first.get shouldBe srcLoc
     logicalConn.second.get shouldBe destLoc
-    logicalConn.direction shouldBe a[FirstToSecondConnection]
+    (logicalConn.direction == ConnectionDirection.FirstToSecond) shouldBe true
     logicalConn.firstFullName shouldBe "top.source"
     logicalConn.secondFullName shouldBe "top.destination"
     logicalConn.firstLastName shouldBe "source"
@@ -76,7 +76,7 @@ class ConnectedLogicalSpec extends AnyFlatSpec with Matchers with MockitoSugar w
     val forwardLogical = ConnectedLogical(
       ConnectionPriority.Explicit,
       srcLoc,
-      FirstToSecondConnection(),
+      ConnectionDirection.FirstToSecond,
       destLoc
     )
     
@@ -84,7 +84,7 @@ class ConnectedLogicalSpec extends AnyFlatSpec with Matchers with MockitoSugar w
     val biLogical = ConnectedLogical(
       ConnectionPriority.Explicit,
       srcLoc,
-      BiDirectionConnection(),
+      ConnectionDirection.BiDirectional,
       destLoc
     )
     
@@ -98,20 +98,20 @@ class ConnectedLogicalSpec extends AnyFlatSpec with Matchers with MockitoSugar w
     forwardLogical.connectedBetween(destInstance, srcInstance) shouldBe true // default is bidirectional
     
     // Test with explicit directions
-    forwardLogical.connectedBetween(srcInstance, destInstance, FirstToSecondConnection()) shouldBe true
-    forwardLogical.connectedBetween(destInstance, srcInstance, FirstToSecondConnection()) shouldBe false
-    forwardLogical.connectedBetween(srcInstance, destInstance, SecondToFirstConnection()) shouldBe false
-    forwardLogical.connectedBetween(destInstance, srcInstance, SecondToFirstConnection()) shouldBe true
-    forwardLogical.connectedBetween(srcInstance, destInstance, BiDirectionConnection()) shouldBe true
-    forwardLogical.connectedBetween(destInstance, srcInstance, BiDirectionConnection()) shouldBe true
+    forwardLogical.connectedBetween(srcInstance, destInstance, ConnectionDirection.FirstToSecond) shouldBe true
+    forwardLogical.connectedBetween(destInstance, srcInstance, ConnectionDirection.FirstToSecond) shouldBe false
+    forwardLogical.connectedBetween(srcInstance, destInstance, ConnectionDirection.SecondToFirst) shouldBe false
+    forwardLogical.connectedBetween(destInstance, srcInstance, ConnectionDirection.SecondToFirst) shouldBe true
+    forwardLogical.connectedBetween(srcInstance, destInstance, ConnectionDirection.BiDirectional) shouldBe true
+    forwardLogical.connectedBetween(destInstance, srcInstance, ConnectionDirection.BiDirectional) shouldBe true
     
     // Test bidirectional logical connections
-    biLogical.connectedBetween(srcInstance, destInstance, FirstToSecondConnection()) shouldBe true
-    biLogical.connectedBetween(destInstance, srcInstance, FirstToSecondConnection()) shouldBe false
-    biLogical.connectedBetween(srcInstance, destInstance, SecondToFirstConnection()) shouldBe false
-    biLogical.connectedBetween(destInstance, srcInstance, SecondToFirstConnection()) shouldBe true
-    biLogical.connectedBetween(srcInstance, destInstance, BiDirectionConnection()) shouldBe true
-    biLogical.connectedBetween(destInstance, srcInstance, BiDirectionConnection()) shouldBe true
+    biLogical.connectedBetween(srcInstance, destInstance, ConnectionDirection.FirstToSecond) shouldBe true
+    biLogical.connectedBetween(destInstance, srcInstance, ConnectionDirection.FirstToSecond) shouldBe false
+    biLogical.connectedBetween(srcInstance, destInstance, ConnectionDirection.SecondToFirst) shouldBe false
+    biLogical.connectedBetween(destInstance, srcInstance, ConnectionDirection.SecondToFirst) shouldBe true
+    biLogical.connectedBetween(srcInstance, destInstance, ConnectionDirection.BiDirectional) shouldBe true
+    biLogical.connectedBetween(destInstance, srcInstance, ConnectionDirection.BiDirectional) shouldBe true
   }
   
   it should "correctly identify chip-to-chip connections" in {
@@ -132,7 +132,7 @@ class ConnectedLogicalSpec extends AnyFlatSpec with Matchers with MockitoSugar w
     val logicalConn = ConnectedLogical(
       ConnectionPriority.Explicit,
       srcLoc,
-      FirstToSecondConnection(),
+      ConnectionDirection.FirstToSecond,
       destLoc
     )
     
@@ -161,7 +161,7 @@ class ConnectedLogicalSpec extends AnyFlatSpec with Matchers with MockitoSugar w
     val logicalConn = ConnectedLogical(
       ConnectionPriority.Explicit,
       srcLoc,
-      FirstToSecondConnection(),
+      ConnectionDirection.FirstToSecond,
       destLoc
     )
     
@@ -189,28 +189,28 @@ class ConnectedLogicalSpec extends AnyFlatSpec with Matchers with MockitoSugar w
     val explicitConn = ConnectedLogical(
       ConnectionPriority.Explicit,
       srcLoc,
-      FirstToSecondConnection(),
+      ConnectionDirection.FirstToSecond,
       destLoc
     )
     
     val groupConn = ConnectedLogical(
       ConnectionPriority.Group,
       srcLoc,
-      FirstToSecondConnection(),
+      ConnectionDirection.FirstToSecond,
       destLoc
     )
     
     val wildcardConn = ConnectedLogical(
       ConnectionPriority.WildCard,
       srcLoc,
-      FirstToSecondConnection(),
+      ConnectionDirection.FirstToSecond,
       destLoc
     )
     
     val fakeConn = ConnectedLogical(
       ConnectionPriority.Fake,
       srcLoc,
-      FirstToSecondConnection(),
+      ConnectionDirection.FirstToSecond,
       destLoc
     )
     

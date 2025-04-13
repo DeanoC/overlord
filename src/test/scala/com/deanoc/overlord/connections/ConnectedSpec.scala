@@ -124,21 +124,21 @@ class ConnectedSpec extends AnyFlatSpec with Matchers with MockitoSugar with Sil
     val chipToChip = ConnectedPortGroup(
       ConnectionPriority.Explicit,
       chipLoc1,
-      FirstToSecondConnection(),
+      ConnectionDirection.FirstToSecond,
       chipLoc2
     )
     
     val pinToChip = ConnectedPortGroup(
       ConnectionPriority.Explicit,
       pinLoc,
-      FirstToSecondConnection(),
+      ConnectionDirection.FirstToSecond,
       chipLoc1
     )
     
     val chipToPin = ConnectedPortGroup(
       ConnectionPriority.Explicit,
       chipLoc1,
-      FirstToSecondConnection(),
+      ConnectionDirection.FirstToSecond,
       pinLoc
     )
     
@@ -188,7 +188,7 @@ class ConnectedSpec extends AnyFlatSpec with Matchers with MockitoSugar with Sil
     val connection = ConnectedPortGroup(
       ConnectionPriority.Explicit,
       chipLoc1,
-      FirstToSecondConnection(),
+      ConnectionDirection.FirstToSecond,
       chipLoc2
     )
     
@@ -208,11 +208,11 @@ class ConnectedSpec extends AnyFlatSpec with Matchers with MockitoSugar with Sil
     connection.connectedBetween(chipInstance3, chipInstance2) shouldBe false
     
     // Test with explicit direction provided
-    connection.connectedBetween(chipInstance1, chipInstance2, FirstToSecondConnection()) shouldBe true
-    connection.connectedBetween(chipInstance2, chipInstance1, FirstToSecondConnection()) shouldBe false
-    connection.connectedBetween(chipInstance1, chipInstance2, SecondToFirstConnection()) shouldBe false
-    connection.connectedBetween(chipInstance2, chipInstance1, SecondToFirstConnection()) shouldBe true
-    connection.connectedBetween(chipInstance1, chipInstance2, BiDirectionConnection()) shouldBe true
-    connection.connectedBetween(chipInstance2, chipInstance1, BiDirectionConnection()) shouldBe true
+    connection.connectedBetween(chipInstance1, chipInstance2, ConnectionDirection.FirstToSecond) shouldBe true
+    connection.connectedBetween(chipInstance2, chipInstance1, ConnectionDirection.FirstToSecond) shouldBe false
+    connection.connectedBetween(chipInstance1, chipInstance2, ConnectionDirection.SecondToFirst) shouldBe false
+    connection.connectedBetween(chipInstance2, chipInstance1, ConnectionDirection.SecondToFirst) shouldBe true
+    connection.connectedBetween(chipInstance1, chipInstance2, ConnectionDirection.BiDirectional) shouldBe true
+    connection.connectedBetween(chipInstance2, chipInstance1, ConnectionDirection.BiDirectional) shouldBe true
   }
 }

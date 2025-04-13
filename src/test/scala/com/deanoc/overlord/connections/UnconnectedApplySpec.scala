@@ -42,7 +42,7 @@ class UnconnectedApplySpec extends AnyFlatSpec with Matchers with MockitoSugar w
     result.get shouldBe a[UnconnectedPort]
     val port = result.get.asInstanceOf[UnconnectedPort]
     port.firstFullName shouldBe "device1"
-    port.direction shouldBe a[FirstToSecondConnection]
+    (port.direction == ConnectionDirection.FirstToSecond) shouldBe true
     port.secondFullName shouldBe "device2"
   }
   
@@ -65,7 +65,7 @@ class UnconnectedApplySpec extends AnyFlatSpec with Matchers with MockitoSugar w
     result.get shouldBe a[UnconnectedBus]
     val bus = result.get.asInstanceOf[UnconnectedBus]
     bus.firstFullName shouldBe "cpu"
-    bus.direction shouldBe a[FirstToSecondConnection]
+    assert(bus.direction == ConnectionDirection.FirstToSecond)
     bus.secondFullName shouldBe "memory"
     bus.busProtocol shouldBe "axi4"
     bus.supplierBusName shouldBe "main_bus"
@@ -82,7 +82,7 @@ class UnconnectedApplySpec extends AnyFlatSpec with Matchers with MockitoSugar w
     result.get shouldBe a[UnconnectedLogical]
     val logical = result.get.asInstanceOf[UnconnectedLogical]
     logical.firstFullName shouldBe "comp1"
-    logical.direction shouldBe a[FirstToSecondConnection]
+    assert(logical.direction == ConnectionDirection.FirstToSecond)
     logical.secondFullName shouldBe "comp2"
   }
   
@@ -98,7 +98,7 @@ class UnconnectedApplySpec extends AnyFlatSpec with Matchers with MockitoSugar w
     result.get shouldBe a[UnconnectedClock]
     val clock = result.get.asInstanceOf[UnconnectedClock]
     clock.firstFullName shouldBe "clk"
-    clock.direction shouldBe a[FirstToSecondConnection]
+    assert(clock.direction == ConnectionDirection.FirstToSecond)
     clock.secondFullName shouldBe "device"
   }
   
@@ -124,7 +124,7 @@ class UnconnectedApplySpec extends AnyFlatSpec with Matchers with MockitoSugar w
     result.get shouldBe a[UnconnectedPortGroup]
     val portGroup = result.get.asInstanceOf[UnconnectedPortGroup]
     portGroup.firstFullName shouldBe "uart0"
-    portGroup.direction shouldBe a[FirstToSecondConnection]
+    assert(portGroup.direction == ConnectionDirection.FirstToSecond)
     portGroup.secondFullName shouldBe "uart1"
     portGroup.first_prefix shouldBe "tx_"
     portGroup.second_prefix shouldBe "rx_"
@@ -161,7 +161,7 @@ class UnconnectedApplySpec extends AnyFlatSpec with Matchers with MockitoSugar w
     result shouldBe defined
     result.get shouldBe a[UnconnectedParameters]
     val params = result.get.asInstanceOf[UnconnectedParameters]
-    params.direction shouldBe a[FirstToSecondConnection]
+    assert(params.direction == ConnectionDirection.FirstToSecond)
     params.instanceName shouldBe "target"
   }
   
@@ -170,13 +170,13 @@ class UnconnectedApplySpec extends AnyFlatSpec with Matchers with MockitoSugar w
     val biDirectionalVariant = createConnectionVariant("port", "device1 <-> device2")
     val biDirResult = Unconnected.apply(biDirectionalVariant)
     biDirResult shouldBe defined
-    biDirResult.get.asInstanceOf[UnconnectedPort].direction shouldBe a[BiDirectionConnection]
+    assert(biDirResult.get.asInstanceOf[UnconnectedPort].direction == ConnectionDirection.BiDirectional)
     
     // Test second-to-first connections
     val reverseVariant = createConnectionVariant("port", "device1 <- device2")
     val reverseResult = Unconnected.apply(reverseVariant)
     reverseResult shouldBe defined
-    reverseResult.get.asInstanceOf[UnconnectedPort].direction shouldBe a[SecondToFirstConnection]
+    assert(reverseResult.get.asInstanceOf[UnconnectedPort].direction == ConnectionDirection.SecondToFirst)
   }
   
   it should "reject missing required fields" in {
@@ -245,7 +245,7 @@ class UnconnectedApplySpec extends AnyFlatSpec with Matchers with MockitoSugar w
     result.get shouldBe a[UnconnectedPort]
     val port = result.get.asInstanceOf[UnconnectedPort]
     port.firstFullName shouldBe "device1"
-    port.direction shouldBe a[FirstToSecondConnection]
+    assert(port.direction == ConnectionDirection.FirstToSecond)
     port.secondFullName shouldBe "device2"
   }
 }

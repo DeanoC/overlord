@@ -284,7 +284,7 @@ object OutputSoftware {
           distanceMatrix.expandedRouteBetween(cpu, ep).map {
             case (src, dst) => {
               val cons = connected.filter(con =>
-                con.connectedBetween(src, dst, FirstToSecondConnection())
+                con.connectedBetween(src, dst, ConnectionDirection.FirstToSecond)
               )
               val hd = cons.head
               // try and swap port group for a parallel bus connection which has info about which bus was used
