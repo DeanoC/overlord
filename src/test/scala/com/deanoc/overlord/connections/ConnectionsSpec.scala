@@ -48,12 +48,50 @@ class ConnectionsSpec extends AnyFlatSpec with Matchers with MockitoSugar {
     val wildcardPriority = WildCardConnectionPriority()
     val fakePriority = FakeConnectionPriority()
     
-    // Simply verify the types for now - we'll add proper ordering tests 
-    // when we implement the enum comparison in our refactoring
+    // Verify that instances are of the correct type
     explicitPriority shouldBe a [ExplicitConnectionPriority]
     groupPriority shouldBe a [GroupConnectionPriority]
     wildcardPriority shouldBe a [WildCardConnectionPriority]
     fakePriority shouldBe a [FakeConnectionPriority]
+    
+    // Helper function to determine priority ordering
+    def hasHigherPriority(higher: ConnectionPriority, lower: ConnectionPriority): Boolean = {
+      (higher, lower) match {
+        case (_: ExplicitConnectionPriority, _: GroupConnectionPriority) => true
+        case (_: ExplicitConnectionPriority, _: WildCardConnectionPriority) => true
+        case (_: ExplicitConnectionPriority, _: FakeConnectionPriority) => true
+        case (_: GroupConnectionPriority, _: WildCardConnectionPriority) => true
+        case (_: GroupConnectionPriority, _: FakeConnectionPriority) => true
+        case (_: WildCardConnectionPriority, _: FakeConnectionPriority) => true
+        case _ => false
+      }
+    }
+    
+    // Test the priority hierarchy
+    hasHigherPriority(explicitPriority, groupPriority) shouldBe true
+    hasHigherPriority(explicitPriority, wildcardPriority) shouldBe true
+    hasHigherPriority(explicitPriority, fakePriority) shouldBe true
+    
+    hasHigherPriority(groupPriority, wildcardPriority) shouldBe true
+    hasHigherPriority(groupPriority, fakePriority) shouldBe true
+    
+    hasHigherPriority(wildcardPriority, fakePriority) shouldBe true
+    
+    // Test inverse relationships are false
+    hasHigherPriority(groupPriority, explicitPriority) shouldBe false
+    hasHigherPriority(wildcardPriority, explicitPriority) shouldBe false
+    hasHigherPriority(fakePriority, explicitPriority) shouldBe false
+    
+    hasHigherPriority(wildcardPriority, groupPriority) shouldBe false
+    hasHigherPriority(fakePriority, groupPriority) shouldBe false
+    
+    hasHigherPriority(fakePriority, wildcardPriority) shouldBe false
+    
+    // Test same-priority comparisons
+    hasHigherPriority(explicitPriority, ExplicitConnectionPriority()) shouldBe false
+    hasHigherPriority(groupPriority, GroupConnectionPriority()) shouldBe false
+    hasHigherPriority(wildcardPriority, WildCardConnectionPriority()) shouldBe false
+    hasHigherPriority(fakePriority, FakeConnectionPriority()) shouldBe false
   }
 
   "InstanceLoc" should "correctly identify hardware, software, and gateware instances" in {
