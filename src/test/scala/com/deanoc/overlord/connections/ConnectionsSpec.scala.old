@@ -1,0 +1,783 @@
+package com.deanoc.overlord.Connections
+
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import com.deanoc.overlord.{BiDirectionConnection, ConnectionDirection, FirstToSecondConnection, SecondToFirstConnection, DefinitionTrait, GatewareDefinitionTrait, HardwareDefinitionTrait, SoftwareDefinitionTrait, DefinitionType}
+import com.deanoc.overlord.Hardware.Port
+import com.deanoc.overlord.Instances.{ChipInstance, InstanceTrait}
+import com.deanoc.overlord.utils.{Utils, Variant}
+import com.deanoc.overlord.Interfaces.SupplierBusLike
+import com.deanoc.overlord.Connections.{
+  ExplicitConnectionPriority, GroupConnectionPriority, 
+  WildCardConnectionPriority, FakeConnectionPriority,
+  InstanceLoc, ConnectedBus, ConnectedLogical, Wire,
+  Constant, ConnectionPriority, Parameter
+}
+import com.deanoc.overlord.Software.SoftwareDefinition
+import com.deanoc.overlord.actions.ActionsFile
+import java.nio.file.{Path, Paths}
+import org.scalatestplus.mockito.MockitoSugar
+import org.mockito.Mockito.when
+
+/**
+ * Test cases for the Connections module to verify behavior before and after refactoring.
+ * 
+ * These tests focus on the external behavior of the connections system to ensure
+ * that our refactoring doesn't change functionality.
+ */
+class ConnectionsSpec extends AnyFlatSpec with Matchers with MockitoSugar {
+  
+  // Utility method to convert a Map to a Variant for testing
+  def mapToVariant(map: Map[String, Any]): Variant = {
+    // Convert the map values to their Variant equivalents
+    val variantMap = map.map {
+      case (key, value) => (key, toVariant(value))
+    }
+    Utils.toVariant(variantMap)
+  }
+  
+  // Helper method to convert various types to Variant
+  private def toVariant(value: Any): Variant = value match {
+    case s: String => Utils.toVariant(s)
+    case b: Boolean => Utils.toVariant(b)
+    case i: Int => Utils.toVariant(i)
+    case l: List[_] => Utils.toVariant(l.map(toVariant).toArray)
+    case m: Map[_, _] => 
+      val strMap = m.asInstanceOf[Map[String, Any]]
+      Utils.toVariant(strMap.map { case (k, v) => (k, toVariant(v)) })
+    case _ => Utils.toVariant(value.toString)
+  }
+  
+  // Helper method to create a mock ChipInstance for testing
+  def createMockInstance(name: String): ChipInstance = {
+    val mockInstance = mock[ChipInstance]
+    when(mockInstance.name).thenReturn(name)
+    mockInstance
+  }
+  
+  // Helper method to create a mock Port for testing
+  def createMockPort(name: String): Port = {
+    val mockPort = mock[Port]
+    when(mockPort.name).thenReturn(name)
+    mockPort
+  }
+  
+  "ConnectionPriority" should "maintain proper hierarchy for conflict resolution" in {
+    // Verify that the priority hierarchy is maintained: Explicit > Group > WildCard > Fake
+    val explicitPriority = ExplicitConnectionPriority()
+    val groupPriority = GroupConnectionPriority()
+    val wildcardPriority = WildCardConnectionPriority()
+    val fakePriority = FakeConnectionPriority()
+    
+    // Verify that instances are of the correct type
+    explicitPriority shouldBe a [ExplicitConnectionPriority]
+    groupPriority shouldBe a [GroupConnectionPriority]
+    wildcardPriority shouldBe a [WildCardConnectionPriority]
+    fakePriority shouldBe a [FakeConnectionPriority]
+    
+    // Helper function to determine priority ordering
+    def hasHigherPriority(higher: ConnectionPriority, lower: ConnectionPriority): Boolean = {
+      (higher, lower) match {
+        case (_: ExplicitConnectionPriority, _: GroupConnectionPriority) => true
+        case (_: ExplicitConnectionPriority, _: WildCardConnectionPriority) => true
+        case (_: ExplicitConnectionPriority, _: FakeConnectionPriority) => true
+        case (_: GroupConnectionPriority, _: WildCardConnectionPriority) => true
+        case (_: GroupConnectionPriority, _: FakeConnectionPriority) => true
+        case (_: WildCardConnectionPriority, _: FakeConnectionPriority) => true
+        case _ => false
+      }
+    }
+    
+    // Test the priority hierarchy
+    hasHigherPriority(explicitPriority, groupPriority) shouldBe true
+    hasHigherPriority(explicitPriority, wildcardPriority) shouldBe true
+    hasHigherPriority(explicitPriority, fakePriority) shouldBe true
+    
+    hasHigherPriority(groupPriority, wildcardPriority) shouldBe true
+    hasHigherPriority(groupPriority, fakePriority) shouldBe true
+    
+    hasHigherPriority(wildcardPriority, fakePriority) shouldBe true
+    
+    // Test inverse relationships are false
+    hasHigherPriority(groupPriority, explicitPriority) shouldBe false
+    hasHigherPriority(wildcardPriority, explicitPriority) shouldBe false
+    hasHigherPriority(fakePriority, explicitPriority) shouldBe false
+    
+    hasHigherPriority(wildcardPriority, groupPriority) shouldBe false
+    hasHigherPriority(fakePriority, groupPriority) shouldBe false
+    
+    hasHigherPriority(fakePriority, wildcardPriority) shouldBe false
+    
+    // Test same-priority comparisons
+    hasHigherPriority(explicitPriority, ExplicitConnectionPriority()) shouldBe false
+    hasHigherPriority(groupPriority, GroupConnectionPriority()) shouldBe false
+    hasHigherPriority(wildcardPriority, WildCardConnectionPriority()) shouldBe false
+    hasHigherPriority(fakePriority, FakeConnectionPriority()) shouldBe false
+  }
+
+  "InstanceLoc" should "correctly identify hardware, software, and gateware instances" in {
+    // Create concrete anonymous implementations since we can't mock abstract traits
+    
+    // Create a concrete hardware definition that extends HardwareDefinitionTrait with all required members
+    val hardwareDefinition = new HardwareDefinitionTrait {
+      override val attributes: Map[String, Variant] = Map.empty
+      override val defType: DefinitionType = DefinitionType("hardware")
+      override val maxInstances: Int = 1
+      override val ports: Map[String, Port] = Map.empty
+      override protected val registersV: Seq[Variant] = Seq.empty
+      override val dependencies: Seq[String] = Seq.empty
+      override val sourcePath: Path = Paths.get("/path/to/hardware")
+      override def toString(): String = "HardwareDefinition"
+    }
+    
+    val hardwareInstance = createMockInstance("HardwareDevice")
+    when(hardwareInstance.definition).thenReturn(hardwareDefinition)
+    
+    // Create a concrete gateware definition that extends GatewareDefinitionTrait with all required members
+    val gatewareDefinition = new GatewareDefinitionTrait {
+      override val attributes: Map[String, Variant] = Map.empty
+      override val defType: DefinitionType = DefinitionType("gateware")
+      override val maxInstances: Int = 1
+      override val ports: Map[String, Port] = Map.empty
+      override protected val registersV: Seq[Variant] = Seq.empty
+      override val dependencies: Seq[String] = Seq.empty
+      override val sourcePath: Path = Paths.get("/path/to/gateware")
+      override val actionsFile: ActionsFile = mock[ActionsFile]
+      override val parameters: Map[String, Variant] = Map.empty
+      override def toString(): String = "GatewareDefinition"
+    }
+    
+    val gatewareInstance = createMockInstance("GatewareDevice")
+    when(gatewareInstance.definition).thenReturn(gatewareDefinition)
+    
+    // For software instances, we need to use SoftwareInstance since it expects
+    // a SoftwareDefinitionTrait, not a ChipDefinitionTrait
+    
+    val softwareDefinition = SoftwareDefinition(
+      defType = DefinitionType("program"),
+      sourcePath = Paths.get("/path/to/source"),
+      attributes = Map.empty[String, Variant],
+      parameters = Map.empty[String, Variant],
+      dependencies = Seq.empty[String],
+      actionsFilePath = Paths.get("/path/to/actions"),
+      actionsFile = mock[ActionsFile]
+    )
+    
+    // Create a proper SoftwareInstance mock for the software test
+    val softwareInstance = mock[com.deanoc.overlord.Instances.SoftwareInstance]
+    when(softwareInstance.name).thenReturn("SoftwareComponent")
+    when(softwareInstance.definition).thenReturn(softwareDefinition)
+
+    when(softwareInstance.definition).thenReturn(softwareDefinition)
+    
+    // Then we need to specifically set the desired isInstanceOf behavior
+    // This requires a different mocking technique
+    
+    val hardwareLoc = InstanceLoc(hardwareInstance, None, "hw.full.path")
+    val gatewareLoc = InstanceLoc(gatewareInstance, None, "gw.full.path")
+    val softwareLoc = InstanceLoc(softwareInstance, None, "sw.full.path")
+    
+    // Since we've set up the mocks correctly with the appropriate definition types,
+    // the isHardware, isGateware, and isSoftware methods should work correctly
+    hardwareLoc.isHardware shouldBe true
+    hardwareLoc.isGateware shouldBe false
+    hardwareLoc.isSoftware shouldBe false
+    
+    gatewareLoc.isHardware shouldBe false
+    gatewareLoc.isGateware shouldBe true
+    gatewareLoc.isSoftware shouldBe false
+    
+    softwareLoc.isHardware shouldBe false
+    softwareLoc.isGateware shouldBe false
+    softwareLoc.isSoftware shouldBe true
+  }
+  
+  "ConnectedBus" should "correctly represent bus connections" in {
+    val sourceInstance = createMockInstance("SourceDevice")
+    val targetInstance = createMockInstance("TargetDevice")
+    val sourceLoc = InstanceLoc(sourceInstance, None, "source.full.path")
+    val targetLoc = InstanceLoc(targetInstance, None, "target.full.path")
+    val bus = mock[SupplierBusLike]
+    
+    val busConnection = ConnectedBus(
+      ExplicitConnectionPriority(),
+      sourceLoc,
+      FirstToSecondConnection(),
+      targetLoc,
+      bus,
+      targetInstance.asInstanceOf[ChipInstance]
+    )
+    
+    busConnection.connectionPriority shouldBe a[ExplicitConnectionPriority]
+    busConnection.main shouldBe sourceLoc
+    busConnection.direction shouldBe a[FirstToSecondConnection]
+    busConnection.secondary shouldBe targetLoc
+    busConnection.bus shouldBe bus
+    busConnection.other shouldBe targetInstance
+    
+    // Test the ConnectedBetween methods
+    busConnection.first shouldBe Some(sourceLoc)
+    busConnection.second shouldBe Some(targetLoc)
+  }
+  
+  "ConnectedLogical" should "correctly represent logical connections" in {
+    val sourceInstance = createMockInstance("SourceDevice")
+    val targetInstance = createMockInstance("TargetDevice")
+    val sourceLoc = InstanceLoc(sourceInstance, None, "source.full.path")
+    val targetLoc = InstanceLoc(targetInstance, None, "target.full.path")
+    
+    val logicalConnection = ConnectedLogical(
+      ExplicitConnectionPriority(),
+      sourceLoc,
+      FirstToSecondConnection(),
+      targetLoc
+    )
+    
+    logicalConnection.connectionPriority shouldBe a[ExplicitConnectionPriority]
+    logicalConnection.main shouldBe sourceLoc
+    logicalConnection.direction shouldBe a[FirstToSecondConnection]
+    logicalConnection.secondary shouldBe targetLoc
+    
+    // Test the ConnectedBetween methods
+    logicalConnection.first shouldBe Some(sourceLoc)
+    logicalConnection.second shouldBe Some(targetLoc)
+  }
+  
+  "Constant" should "correctly represent constant parameter connections" in {
+    val instance = createMockInstance("Device")
+    val port = createMockPort("testPort")
+    
+    // Create a parameter with a constant value
+    val paramName = "testParam"
+    val paramValue = Utils.toVariant("42") // Convert to Variant
+    val paramType = ConstantParameterType(paramValue) // Create proper ParameterType
+    val parameter = Parameter(paramName, paramType)
+    
+    // Create the constant connection
+    val constantConnection = Constant(instance, parameter)
+    
+    // Verify the connection properties
+    constantConnection.instance shouldBe instance
+    constantConnection.parameter shouldBe parameter
+    constantConnection.parameter.name shouldBe paramName
+    constantConnection.parameter.parameterType shouldBe paramType
+  }
+  
+  "Wire" should "correctly represent connections between components" in {
+    val sourceInstance = createMockInstance("SourceDevice")
+    val targetInstance = createMockInstance("TargetDevice")
+    val sourcePort = createMockPort("outPort")
+    val targetPort = createMockPort("inPort")
+    
+    val sourceLoc = InstanceLoc(sourceInstance, Some(sourcePort), "source.out.path")
+    val targetLoc = InstanceLoc(targetInstance, Some(targetPort), "target.in.path")
+    
+    val wire = Wire(
+      sourceLoc,
+      Seq(targetLoc),
+      ExplicitConnectionPriority(),
+      true
+    )
+    
+    wire.startLoc shouldBe sourceLoc
+    wire.endLocs shouldBe Seq(targetLoc)
+    wire.priority shouldBe a[ExplicitConnectionPriority]
+    wire.knownWidth shouldBe true
+  }
+
+  // Parser Tests
+  "Unconnected.apply parser" should "correctly parse port connections" in {
+    // Create a variant representing a port connection
+    val portConnectionYaml = Utils.mapToVariant(Map(
+      "type" -> "port",
+      "connection" -> "device1 -> device2"
+    ))
+    
+    // Parse the connection
+    val result = Unconnected.apply(portConnectionYaml)
+    
+    // Verify the result
+    result shouldBe defined
+    result.get shouldBe a[UnconnectedPort]
+    val unconnectedPort = result.get.asInstanceOf[UnconnectedPort]
+    
+    // Verify the parsed values
+    unconnectedPort.firstFullName shouldBe "device1"
+    unconnectedPort.direction shouldBe a[FirstToSecondConnection]
+    unconnectedPort.secondFullName shouldBe "device2"
+  }
+  
+  it should "correctly parse bidirectional connections" in {
+    // Create a variant representing a bidirectional port connection
+    val biDirectionalYaml = Utils.mapToVariant(Map(
+      "type" -> "port",
+      "connection" -> "device1 <-> device2"
+    ))
+    
+    // Parse the connection
+    val result = Unconnected.apply(biDirectionalYaml)
+    
+    // Verify the result
+    result shouldBe defined
+    result.get shouldBe a[UnconnectedPort]
+    val unconnectedPort = result.get.asInstanceOf[UnconnectedPort]
+    
+    // Verify the parsed values
+    unconnectedPort.firstFullName shouldBe "device1"
+    unconnectedPort.direction shouldBe a[BiDirectionConnection]
+    unconnectedPort.secondFullName shouldBe "device2"
+  }
+  
+  it should "correctly parse reverse direction connections" in {
+    // Create a variant representing a reverse direction port connection
+    val reverseDirectionYaml = Utils.mapToVariant(Map(
+      "type" -> "port",
+      "connection" -> "device1 <- device2"
+    ))
+    
+    // Parse the connection
+    val result = Unconnected.apply(reverseDirectionYaml)
+    
+    // Verify the result
+    result shouldBe defined
+    result.get shouldBe a[UnconnectedPort]
+    val unconnectedPort = result.get.asInstanceOf[UnconnectedPort]
+    
+    // Verify the parsed values
+    unconnectedPort.firstFullName shouldBe "device1"
+    unconnectedPort.direction shouldBe a[SecondToFirstConnection]
+    unconnectedPort.secondFullName shouldBe "device2"
+  }
+  
+  it should "correctly parse clock connections" in {
+    // Create a variant representing a clock connection
+    val clockConnectionYaml = Utils.mapToVariant(Map(
+      "type" -> "clock",
+      "connection" -> "clock_source -> clock_consumer"
+    ))
+    
+    // Parse the connection
+    val result = Unconnected.apply(clockConnectionYaml)
+    
+    // Verify the result
+    result shouldBe defined
+    result.get shouldBe a[UnconnectedClock]
+    val unconnectedClock = result.get.asInstanceOf[UnconnectedClock]
+    
+    // Verify the parsed values
+    unconnectedClock.firstFullName shouldBe "clock_source"
+    unconnectedClock.direction shouldBe a[FirstToSecondConnection]
+    unconnectedClock.secondFullName shouldBe "clock_consumer"
+  }
+  
+  it should "correctly parse parameters connections" in {
+    // Create a variant representing a parameters connection
+    val paramsConnectionYaml = Utils.mapToVariant(Map(
+      "type" -> "parameters",
+      "connection" -> "_ -> target_device",
+      "parameters" -> List("param1", "param2", "param3")
+    ))
+    
+    // Parse the connection
+    val result = Unconnected.apply(paramsConnectionYaml)
+    
+    // Verify the result
+    result shouldBe defined
+    result.get shouldBe a[UnconnectedParameters]
+    val unconnectedParams = result.get.asInstanceOf[UnconnectedParameters]
+    
+    // Verify the parsed values
+    unconnectedParams.direction shouldBe a[FirstToSecondConnection]
+    unconnectedParams.secondFullName shouldBe "target_device"
+    unconnectedParams.parameters should contain allOf("param1", "param2", "param3")
+  }
+  
+  it should "correctly parse port group connections" in {
+    // Create a variant representing a port group connection
+    val portGroupConnectionYaml = Utils.mapToVariant(Map(
+      "type" -> "port_group",
+      "connection" -> "device1 -> device2",
+      "first_prefix" -> "tx_",
+      "second_prefix" -> "rx_",
+      "excludes" -> List("clock", "reset")
+    ))
+    
+    // Parse the connection
+    val result = Unconnected.apply(portGroupConnectionYaml)
+    
+    // Verify the result
+    result shouldBe defined
+    result.get shouldBe a[UnconnectedPortGroup]
+    val unconnectedPortGroup = result.get.asInstanceOf[UnconnectedPortGroup]
+    
+    // Verify the parsed values
+    unconnectedPortGroup.firstFullName shouldBe "device1"
+    unconnectedPortGroup.direction shouldBe a[FirstToSecondConnection]
+    unconnectedPortGroup.secondFullName shouldBe "device2"
+    unconnectedPortGroup.firstPrefix shouldBe "tx_"
+    unconnectedPortGroup.secondPrefix shouldBe "rx_"
+    unconnectedPortGroup.excludes should contain allOf("clock", "reset")
+  }
+  
+  it should "correctly parse bus connections" in {
+    // Create a variant representing a bus connection
+    val busConnectionYaml = Utils.mapToVariant(Map(
+      "type" -> "bus",
+      "connection" -> "cpu -> memory",
+      "bus_protocol" -> "axi4",
+      "bus_name" -> "main_bus",
+      "consumer_bus_name" -> "slave_bus",
+      "silent" -> true
+    ))
+    
+    // Parse the connection
+    val result = Unconnected.apply(busConnectionYaml)
+    
+    // Verify the result
+    result shouldBe defined
+    result.get shouldBe a[UnconnectedBus]
+    val unconnectedBus = result.get.asInstanceOf[UnconnectedBus]
+    
+    // Verify the parsed values
+    unconnectedBus.firstFullName shouldBe "cpu"
+    unconnectedBus.direction shouldBe a[FirstToSecondConnection]
+    unconnectedBus.secondFullName shouldBe "memory"
+    unconnectedBus.busProtocol shouldBe "axi4"
+    unconnectedBus.supplierBusName shouldBe "main_bus"
+    unconnectedBus.consumerBusName shouldBe "slave_bus"
+    unconnectedBus.silent shouldBe true
+  }
+  
+  it should "correctly parse logical connections" in {
+    // Create a variant representing a logical connection
+    val logicalConnectionYaml = Utils.mapToVariant(Map(
+      "type" -> "logical",
+      "connection" -> "component1 -> component2"
+    ))
+    
+    // Parse the connection
+    val result = Unconnected.apply(logicalConnectionYaml)
+    
+    // Verify the result
+    result shouldBe defined
+    result.get shouldBe a[UnconnectedLogical]
+    val unconnectedLogical = result.get.asInstanceOf[UnconnectedLogical]
+    
+    // Verify the parsed values
+    unconnectedLogical.firstFullName shouldBe "component1"
+    unconnectedLogical.direction shouldBe a[FirstToSecondConnection]
+    unconnectedLogical.secondFullName shouldBe "component2"
+  }
+  
+  it should "return None for invalid connection format" in {
+    // Create a variant with invalid connection string (wrong format)
+    val invalidFormatYaml = Utils.mapToVariant(Map(
+      "type" -> "port",
+      "connection" -> "device1 => device2"  // Invalid direction symbol
+    ))
+    
+    // Parse the connection
+    val result = Unconnected.apply(invalidFormatYaml)
+    
+    // Verify the result is None for invalid format
+    result shouldBe None
+  }
+  
+  it should "return None for missing type field" in {
+    // Create a variant missing the required type field
+    val missingTypeYaml = Utils.mapToVariant(Map(
+      "connection" -> "device1 -> device2"
+    ))
+    
+    // Parse the connection
+    val result = Unconnected.apply(missingTypeYaml)
+    
+    // Verify the result is None for missing type
+    result shouldBe None
+  }
+  
+  it should "return None for missing connection field" in {
+    // Create a variant missing the required connection field
+    val missingConnectionYaml = Utils.mapToVariant(Map(
+      "type" -> "port"
+    ))
+    
+    // Parse the connection
+    val result = Unconnected.apply(missingConnectionYaml)
+    
+    // Verify the result is None for missing connection
+    result shouldBe None
+  }
+  
+  it should "return None for unknown connection type" in {
+    // Create a variant with an unknown connection type
+    val unknownTypeYaml = Utils.mapToVariant(Map(
+      "type" -> "unknown_type",
+      "connection" -> "device1 -> device2"
+    ))
+    
+    // Parse the connection
+    val result = Unconnected.apply(missingConnectionYaml)
+    
+    // Verify the result is None for unknown connection type
+    result shouldBe None
+  }
+  
+  it should "return None for parameters connection with invalid first value" in {
+    // Create a variant with a parameters connection but invalid first value (should be "_")
+    val invalidParametersYaml = Utils.mapToVariant(Map(
+      "type" -> "parameters",
+      "connection" -> "device1 -> device2",  // First should be "_"
+      "parameters" -> List("param1", "param2")
+    ))
+    
+    // Parse the connection
+    val result = Unconnected.apply(invalidParametersYaml)
+    
+    // Verify the result is None for invalid parameters format
+    result shouldBe None
+  }
+
+  // Additional tests for Connected.apply and other apply methods in connections
+  
+  "ConnectedPortGroup.apply" should "correctly create a connected port group between two ports" in {
+    // Create mock ports interface implementations
+    val firstPortsLike = mock[PortsLike]
+    val secondPortsLike = mock[PortsLike]
+    
+    // Create mock ports
+    val firstPort = createMockPort("tx_data")
+    val secondPort = createMockPort("rx_data")
+    
+    // Define port directions
+    when(firstPort.direction).thenReturn(OutWireDirection())
+    when(secondPort.direction).thenReturn(InWireDirection())
+    
+    // Test ConnectedPortGroup.apply factory method
+    val connectedGroup = ConnectedPortGroup(
+      firstPortsLike,
+      firstPort,
+      "device1",
+      secondPortsLike,
+      secondPort,
+      FirstToSecondConnection()
+    )
+    
+    // Verify the result
+    connectedGroup shouldBe a[ConnectedPortGroup]
+    
+    // Verify the first instance location
+    connectedGroup.main.instance shouldBe firstPortsLike
+    connectedGroup.main.port.get.direction shouldBe a[OutWireDirection]
+    
+    // Verify the second instance location
+    connectedGroup.secondary.instance shouldBe secondPortsLike
+    connectedGroup.secondary.port.get.direction shouldBe a[InWireDirection]
+    
+    // Verify direction
+    connectedGroup.direction shouldBe a[FirstToSecondConnection]
+  }
+  
+  it should "correctly handle bidirectional connections" in {
+    // Create mock ports interface implementations
+    val firstPortsLike = mock[PortsLike]
+    val secondPortsLike = mock[PortsLike]
+    
+    // Create mock ports
+    val firstPort = createMockPort("uart_tx")
+    val secondPort = createMockPort("uart_rx")
+    
+    // Define port directions with InOutWireDirection
+    when(firstPort.direction).thenReturn(InOutWireDirection())
+    when(secondPort.direction).thenReturn(OutWireDirection())
+    
+    // Test ConnectedPortGroup.apply factory method with bidirectional setup
+    val connectedGroup = ConnectedPortGroup(
+      firstPortsLike,
+      firstPort,
+      "device1",
+      secondPortsLike,
+      secondPort,
+      BiDirectionConnection()
+    )
+    
+    // Verify that direction handling is correct
+    // When first port is InOut and second is Out, first should adopt second's direction
+    connectedGroup.main.port.get.direction shouldBe a[OutWireDirection]
+    connectedGroup.secondary.port.get.direction shouldBe a[OutWireDirection]
+  }
+  
+  "UnconnectedParameters.apply" should "correctly create parameters connection" in {
+    // Define sample parameters
+    val paramsArray = Array(
+      Utils.mapToVariant(Map(
+        "name" -> "clockFrequency",
+        "value" -> "100MHz",
+        "type" -> "frequency"
+      )),
+      Utils.mapToVariant(Map(
+        "name" -> "enableInterrupt",
+        "value" -> "true",
+        "type" -> "constant"
+      ))
+    )
+    
+    // Create UnconnectedParameters using the apply method
+    val result = UnconnectedParameters.apply(
+      FirstToSecondConnection(),
+      "peripheralDevice",
+      paramsArray
+    )
+    
+    // Verify the result
+    result shouldBe a[UnconnectedParameters]
+    val params = result.asInstanceOf[UnconnectedParameters]
+    
+    // Verify basic properties
+    params.direction shouldBe a[FirstToSecondConnection]
+    params.secondFullName shouldBe "peripheralDevice"
+    
+    // Verify that parameters were correctly parsed
+    params.parameters.length shouldBe 2
+    
+    // Find the parameters by name
+    val clockParam = params.parameters.find(_.name == "clockFrequency").get
+    val interruptParam = params.parameters.find(_.name == "enableInterrupt").get
+    
+    // Verify frequency parameter
+    clockParam.parameterType shouldBe a[FrequencyParameterType]
+    val freqType = clockParam.parameterType.asInstanceOf[FrequencyParameterType]
+    freqType.freq shouldBe 100000000 // 100MHz in Hz
+    
+    // Verify constant parameter
+    interruptParam.parameterType shouldBe a[ConstantParameterType]
+    val constType = interruptParam.parameterType.asInstanceOf[ConstantParameterType]
+    Utils.toBoolean(constType.value) shouldBe true
+  }
+  
+  "UnconnectedClock.connect" should "correctly create connected port groups" in {
+    // Create an UnconnectedClock instance
+    val unconnectedClock = UnconnectedClock("clock_src", FirstToSecondConnection(), "clock_dest")
+    
+    // Create mock instances
+    val clockSourceInstance = mock[ChipInstance]
+    val clockDestInstance = mock[ChipInstance]
+    
+    // Set up names for the instances
+    when(clockSourceInstance.name).thenReturn("clock_src")
+    when(clockDestInstance.name).thenReturn("clock_dest")
+    
+    // Mock hasInterface to return true for PortsLike
+    when(clockSourceInstance.hasInterface[PortsLike]).thenReturn(true)
+    when(clockDestInstance.hasInterface[PortsLike]).thenReturn(true)
+    
+    // Create mock PortsLike interfaces
+    val sourcePortsLike = mock[PortsLike]
+    val destPortsLike = mock[PortsLike]
+    
+    // Set up getInterfaceUnwrapped to return our mock interfaces
+    when(clockSourceInstance.getInterfaceUnwrapped[PortsLike]).thenReturn(sourcePortsLike)
+    when(clockDestInstance.getInterfaceUnwrapped[PortsLike]).thenReturn(destPortsLike)
+    
+    // Mock the getMatchNameAndPort method to return valid names and ports
+    when(clockSourceInstance.getMatchNameAndPort("clock_src")).thenReturn((Some("clock_src"), None))
+    when(clockDestInstance.getMatchNameAndPort("clock_dest")).thenReturn((Some("clock_dest"), None))
+    
+    // Create mock ports for the clock connection
+    val sourcePort = createMockPort("clk_out")
+    val destPort = createMockPort("clk_in")
+    
+    // Set port directions
+    when(sourcePort.direction).thenReturn(OutWireDirection())
+    when(destPort.direction).thenReturn(InWireDirection())
+    
+    // Mock getPortsStartingWith to return our mock ports
+    when(sourcePortsLike.getPortsStartingWith("")).thenReturn(Seq(sourcePort))
+    when(destPortsLike.getPortsStartingWith("")).thenReturn(Seq(destPort))
+    
+    // Define test data to match name splitting
+    when(sourcePort.name).thenReturn("clock_src")
+    when(destPort.name).thenReturn("clock_dest")
+    
+    // Connect the clock
+    val unexpanded = Seq(clockSourceInstance, clockDestInstance)
+    val connected = unconnectedClock.connect(unexpanded)
+    
+    // Verify the result
+    connected should not be empty
+    connected.head shouldBe a[ConnectedPortGroup]
+    
+    // Verify connection properties
+    val connectedPort = connected.head.asInstanceOf[ConnectedPortGroup]
+    connectedPort.direction shouldBe a[FirstToSecondConnection]
+    connectedPort.connectionPriority shouldBe a[ExplicitConnectionPriority]
+  }
+  
+  "UnconnectedLogical.connect" should "correctly create connected logical components" in {
+    // Create an UnconnectedLogical instance
+    val unconnectedLogical = UnconnectedLogical("component1", FirstToSecondConnection(), "component2")
+    
+    // Create mock instances
+    val firstInstance = mock[ChipInstance]
+    val secondInstance = mock[ChipInstance]
+    
+    // Set up names for the instances
+    when(firstInstance.name).thenReturn("component1")
+    when(secondInstance.name).thenReturn("component2")
+    
+    // Mock getMatchNameAndPort to return valid names
+    when(firstInstance.getMatchNameAndPort("component1")).thenReturn((Some("component1"), None))
+    when(secondInstance.getMatchNameAndPort("component2")).thenReturn((Some("component2"), None))
+    
+    // Connect the logical components
+    val unexpanded = Seq(firstInstance, secondInstance)
+    val connected = unconnectedLogical.connect(unexpanded)
+    
+    // Verify the result
+    connected should not be empty
+    connected.head shouldBe a[ConnectedLogical]
+    
+    // Verify connection properties
+    val connectedLogical = connected.head.asInstanceOf[ConnectedLogical]
+    connectedLogical.direction shouldBe a[FirstToSecondConnection]
+    connectedLogical.connectionPriority shouldBe a[ExplicitConnectionPriority]
+    connectedLogical.main.instance shouldBe firstInstance
+    connectedLogical.secondary.instance shouldBe secondInstance
+  }
+  
+  "Wire" should "correctly handle multiple endpoints" in {
+    // Create mock instances and ports
+    val sourceInstance = createMockInstance("source")
+    val targetInstance1 = createMockInstance("target1")
+    val targetInstance2 = createMockInstance("target2")
+    
+    val sourcePort = createMockPort("out")
+    val targetPort1 = createMockPort("in1")
+    val targetPort2 = createMockPort("in2")
+    
+    // Set up port directions
+    when(sourcePort.direction).thenReturn(OutWireDirection())
+    when(targetPort1.direction).thenReturn(InWireDirection())
+    when(targetPort2.direction).thenReturn(InWireDirection())
+    
+    // Create instance locations
+    val sourceLoc = InstanceLoc(sourceInstance, Some(sourcePort), "source.out")
+    val targetLoc1 = InstanceLoc(targetInstance1, Some(targetPort1), "target1.in1") 
+    val targetLoc2 = InstanceLoc(targetInstance2, Some(targetPort2), "target2.in2")
+    
+    // Create a wire with multiple endpoints
+    val wire = Wire(
+      sourceLoc,
+      Seq(targetLoc1, targetLoc2),
+      ExplicitConnectionPriority(),
+      true
+    )
+    
+    // Verify the wire properties
+    wire.startLoc shouldBe sourceLoc
+    wire.endLocs should contain allOf(targetLoc1, targetLoc2)
+    wire.endLocs.length shouldBe 2
+    wire.priority shouldBe a[ExplicitConnectionPriority]
+    wire.knownWidth shouldBe true
+  }
+}

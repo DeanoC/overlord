@@ -106,6 +106,7 @@ object ConnectedPortGroup {
       sp: Port,
       direction: ConnectionDirection
   ): ConnectedPortGroup = {
+    // Handle wire directions - wires need to be properly directed
     var firstDirection = fp.direction
     var secondDirection = sp.direction
 
@@ -117,9 +118,11 @@ object ConnectedPortGroup {
     val fport = fp.copy(direction = firstDirection)
     val sport = sp.copy(direction = secondDirection)
 
+    // Create instance locations with updated port directions
     val fmloc = InstanceLoc(fi.getOwner, Some(fport), s"$fn.${fp.name}")
     val fsloc = InstanceLoc(si.getOwner, Some(sport), s"$fn.${sp.name}")
 
+    // Create the connected port group with a default GroupConnectionPriority
     ConnectedPortGroup(GroupConnectionPriority(), fmloc, direction, fsloc)
   }
 }

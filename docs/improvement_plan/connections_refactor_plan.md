@@ -1,6 +1,9 @@
-// Now, let's create a refactoring plan to guide our work
-
 # Connections Module Refactoring Plan
+
+# test code lives in 
+overlord/src/test/scala/com/deanoc/overlord
+# main code lives 
+overlord/src/main/scala/com/deanoc/overlord
 
 ## Goals
 - Improve code maintainability and readability
