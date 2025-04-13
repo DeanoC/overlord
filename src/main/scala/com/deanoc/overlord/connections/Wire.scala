@@ -24,17 +24,15 @@ case class Wire(
     endLocs: Seq[InstanceLoc],
     priority: ConnectionPriority,
     knownWidth: Boolean
-) {
-
+):
   /** Checks if the starting location is a pin or clock.
     *
     * @return
     *   True if the starting location is a pin or clock, false otherwise.
     */
-  def isStartPinOrClock: Boolean = startLoc.instance
-    .isInstanceOf[PinGroupInstance] ||
-    startLoc.instance
-      .isInstanceOf[ClockInstance]
+  def isStartPinOrClock: Boolean = startLoc.instance match
+    case _: PinGroupInstance | _: ClockInstance => true
+    case _ => false
 
   /** Finds an ending location that is a pin or clock.
     *
@@ -42,19 +40,17 @@ case class Wire(
     *   An optional instance location that is a pin or clock.
     */
   def findEndIsPinOrClock: Option[InstanceLoc] =
-    endLocs.find(il =>
-      il.instance.isInstanceOf[PinGroupInstance] ||
-        il.instance.isInstanceOf[ClockInstance]
-    )
-}
+    endLocs.find: il =>
+      il.instance match
+        case _: PinGroupInstance | _: ClockInstance => true
+        case _ => false
 
 /** Companion object for managing wires.
   *
   * Provides methods for creating wires from logical connections and managing
   * intermediate ghost wires.
   */
-object Wires {
-
+object Wires:
   /** Represents an intermediate ghost wire used during wire creation.
     *
     * @param sp
@@ -88,103 +84,97 @@ object Wires {
     * @return
     *   A sequence of physical wires.
     */
-  def apply(dm: DistanceMatrix, connected: Seq[Connected]): Seq[Wire] = {
-
-    val wires = mutable.ArrayBuffer[Wire]()
-    val ghosts = mutable.ArrayBuffer[GhostWire]()
+  def apply(dm: DistanceMatrix, connected: Seq[Connected]): Seq[Wire] =
+    val wires = mutable.ArrayBuffer.empty[Wire]
+    val ghosts = mutable.ArrayBuffer.empty[GhostWire]
 
     // connection are logical, wires are physical
-    connected.foreach(c => {
-      val (sp, ep) = c.direction match {
+    for c <- connected do
+      val (sp, ep) = c.direction match
         case ConnectionDirection.FirstToSecond => dm.indicesOf(c)
-        case ConnectionDirection.SecondToFirst =>
-          (dm.indicesOf(c)._2, dm.indicesOf(c)._1)
+        case ConnectionDirection.SecondToFirst => (dm.indicesOf(c)._2, dm.indicesOf(c)._1)
         case ConnectionDirection.BiDirectional => dm.indicesOf(c)
-      }
-      if (!(sp < 0 || ep < 0 || c.first.isEmpty || c.second.isEmpty)) {
-        val f = c.first.get
-        val s = c.second.get
-        val route = dm.routeBetween(sp, ep)
+      
+      // Use Option pattern matching with guard
+      if (sp >= 0 && ep >= 0) then
+        (c.first, c.second) match
+          case (Some(f), Some(s)) =>
+            val route = dm.routeBetween(sp, ep)
+            
+            var cp = sp
+            for p <- route do
+              // Create cploc based on position
+              val cploc =
+                if cp == sp then f
+                else if cp == ep then s
+                else InstanceLoc(dm.instanceOf(cp), None, dm.instanceOf(cp).name)
+              
+              // Create ploc based on position
+              val ploc =
+                if p == sp then f
+                else if p == ep then s
+                else InstanceLoc(dm.instanceOf(p), None, dm.instanceOf(p).name)
+              
+              ghosts += GhostWire(
+                cp,
+                p,
+                cploc,
+                ploc,
+                c.direction,
+                c.connectionPriority
+              )
+              cp = p
+          case _ => () // First or second is None
+      else
+        () // Invalid indices
 
-        var cp = sp
-        for { p <- route } {
-          val cploc =
-            if (cp == sp) f
-            else if (cp == ep) s
-            else
-              InstanceLoc(dm.instanceOf(cp), None, dm.instanceOf(cp).name)
-          val ploc =
-            if (p == sp) f
-            else if (p == ep) s
-            else
-              InstanceLoc(dm.instanceOf(p), None, dm.instanceOf(p).name)
-
-          ghosts += GhostWire(
-            cp,
-            p,
-            cploc,
-            ploc,
-            c.direction,
-            c.connectionPriority
-          )
-          cp = p
-        }
-      }
-    })
-
-    val (fanoutTmpWires, singleTmpWires) = {
+    val (fanoutTmpWires, singleTmpWires) =
       val fotWires =
-        mutable.HashMap[
+        mutable.HashMap.empty[
           InstanceLoc,
           (ConnectionPriority, mutable.ArrayBuffer[InstanceLoc])
-        ]()
+        ]
       val sTmpWires =
-        mutable.HashMap[InstanceLoc, (ConnectionPriority, InstanceLoc)]()
+        mutable.HashMap.empty[InstanceLoc, (ConnectionPriority, InstanceLoc)]
 
-      for {
+      for
         i <- ghosts.indices
         startLoc = ghosts(i).sloc
         endLoc = ghosts(i).eloc
         priority = ghosts(i).priority
-      } {
-        if (fotWires.contains(startLoc))
+      do
+        if fotWires.contains(startLoc) then
           fotWires(startLoc)._2 += endLoc
         else
           fotWires += (startLoc -> (priority, mutable.ArrayBuffer(endLoc)))
-      }
 
-      val multiFanoutTmpWires = (for ((sl, (pr, els)) <- fotWires) yield {
-        if (els.length == 1) {
-          if (
-            sl.port.nonEmpty &&
-            sl.port.get.direction == InWireDirection()
-          )
-            sTmpWires += ((els(0), ->(pr, sl)))
-          else sTmpWires += (sl -> (pr, els(0)))
-          None
-        } else Some(sl -> (pr, els))
-      }).flatten.toMap
+      val multiFanoutTmpWires = for
+        (sl, (pr, els)) <- fotWires
+      yield
+        els match
+          case arr if arr.length == 1 && sl.port.exists(_.direction == InWireDirection()) =>
+            sTmpWires += (arr(0) -> (pr, sl))
+            None
+          case arr if arr.length == 1 =>
+            sTmpWires += (sl -> (pr, arr(0)))
+            None
+          case _ =>
+            Some(sl -> (pr, els.toSeq))
 
-      (multiFanoutTmpWires, sTmpWires)
-    }
+      (multiFanoutTmpWires.flatten.toMap, sTmpWires.toMap)
 
-    wires ++= fanoutTmpWires.map { case (sl, (pr, els)) =>
-      var knownWidth: Boolean =
-        if (sl.port.isDefined) sl.port.get.knownWidth else true
-      Wire(sl, els.toSeq, pr, knownWidth)
-    }
-    wires ++= singleTmpWires.map { case (sl, (pr, el)) =>
-      val knownWidth: Boolean =
-        if (sl.port.isDefined) sl.port.get.knownWidth else true
-      Wire(sl, Seq(el), pr, knownWidth)
-    }
+    // Process fanout wires using concise function syntax
+    wires ++= fanoutTmpWires.map:
+      case (sl, (pr, els)) =>
+        Wire(sl, els, pr, sl.port.map(_.knownWidth).getOrElse(true))
+    
+    // Process single wires using concise function syntax
+    wires ++= singleTmpWires.map:
+      case (sl, (pr, el)) =>
+        Wire(sl, Seq(el), pr, sl.port.map(_.knownWidth).getOrElse(true))
 
-    wires.sortInPlaceWith((a, b) =>
-      a.startLoc.instance.name <
-        b.startLoc.instance.name
-    )
+    // Sort the wires by instance name using concise function syntax
+    wires.sortInPlaceWith:
+      case (a, b) => a.startLoc.instance.name < b.startLoc.instance.name
 
     wires.toSeq
-
-  }
-}
