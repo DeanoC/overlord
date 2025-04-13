@@ -4,6 +4,7 @@ import com.deanoc.overlord.utils.{Utils, Logging}
 import com.deanoc.overlord.instances._
 import com.deanoc.overlord._
 import com.deanoc.overlord.connections.ConnectionDirection
+import com.deanoc.overlord.connections.ConnectionTypes.{BusName, InstanceName}
 
 import com.deanoc.overlord.interfaces.{
   PortsLike,
@@ -37,11 +38,12 @@ case class UnconnectedBus(
     firstFullName: String,
     direction: ConnectionDirection,
     secondFullName: String,
-    busProtocol: String = "default",
-    supplierBusName: String = "",
-    consumerBusName: String = "",
+    busProtocol: BusName = BusName.default,
+    supplierBusName: BusName = BusName.empty,
+    consumerBusName: BusName = BusName.empty,
     silent: Boolean = false
-) extends Unconnected with Logging {
+) extends Unconnected
+    with Logging {
 
   /** Performs pre-connection checks for the bus connection.
     *
@@ -307,11 +309,12 @@ case class UnconnectedBus(
        else otherIL.instance).asInstanceOf[ChipInstance]
     // search through suppliers name and protocols for a match
     val supplierBus: SupplierBusLike = {
-      val byName = supplierMultiBus.getFirstSupplierBusByName(supplierBusName)
+      val byName =
+        supplierMultiBus.getFirstSupplierBusByName(supplierBusName.toString)
       if (byName.nonEmpty) byName.get
       else if (supplierBusName.isEmpty) {
         val byProtocol =
-          supplierMultiBus.getFirstSupplierBusOfProtocol(busProtocol)
+          supplierMultiBus.getFirstSupplierBusOfProtocol(busProtocol.toString)
         if (byProtocol.nonEmpty) byProtocol.get
         else {
           error(
@@ -330,10 +333,11 @@ case class UnconnectedBus(
     // now check the selected supplier bus is supported on the consumer side it is also a multi bus
     if (consumerMultiBusesO.nonEmpty) {
       val consumerMultiBus = consumerMultiBusesO.get
-      val byName = consumerMultiBus.getFirstConsumerBusByName(consumerBusName)
+      val byName =
+        consumerMultiBus.getFirstConsumerBusByName(consumerBusName.toString)
       if (byName.isEmpty && busProtocol.nonEmpty) {
         val byProtocol =
-          consumerMultiBus.getFirstConsumerBusOfProtocol(busProtocol)
+          consumerMultiBus.getFirstConsumerBusOfProtocol(busProtocol.toString)
         if (byProtocol.isEmpty) {
           error(
             s"$firstFullName and $secondFullName are trying to connect but consumer doesn't support $busProtocol protocol"

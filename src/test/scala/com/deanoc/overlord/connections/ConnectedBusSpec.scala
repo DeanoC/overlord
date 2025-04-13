@@ -13,6 +13,8 @@ import com.deanoc.overlord.hardware.{
 import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
 import com.deanoc.overlord.interfaces.{BusLike, SupplierBusLike}
 import org.mockito.Mockito
+import com.deanoc.overlord.connections.ConnectedExtensions._
+import scala.language.implicitConversions
 
 /** Test suite for the ConnectedBus class. This test suite focuses on the
   * behavior of bus connections to establish a baseline before refactoring.

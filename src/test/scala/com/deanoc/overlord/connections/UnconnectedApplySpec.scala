@@ -5,38 +5,44 @@ import org.scalatest.matchers.should.Matchers
 import com.deanoc.overlord._
 import com.deanoc.overlord.utils.{Utils, Variant, SilentLogger}
 import org.scalatestplus.mockito.MockitoSugar
+import scala.language.implicitConversions
+import com.deanoc.overlord.connections.ConnectionTypesTestExtensions._
 
-class UnconnectedApplySpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLogger {
-  
+class UnconnectedApplySpec
+    extends AnyFlatSpec
+    with Matchers
+    with MockitoSugar
+    with SilentLogger {
+
   // Helper method to create a variant for testing
   private def createConnectionVariant(
-    connType: String,
-    connection: String,
-    additionalParams: Map[String, Any] = Map.empty
+      connType: String,
+      connection: String,
+      additionalParams: Map[String, Any] = Map.empty
   ): Variant = {
     // Create a Java HashMap which is supported by Utils.toVariant
     val map = new java.util.HashMap[String, Any]()
-    
+
     // Add the required fields
     map.put("type", connType)
     map.put("connection", connection)
-    
+
     // Add any additional parameters
     additionalParams.foreach { case (key, value) =>
       map.put(key, value)
     }
-    
+
     // Convert to Variant
     Utils.toVariant(map)
   }
-  
+
   "Unconnected.apply" should "parse port connections" in {
     // Create a simple port connection variant
     val portVariant = createConnectionVariant("port", "device1 -> device2")
-    
+
     // Parse the connection
     val result = Unconnected.apply(portVariant)
-    
+
     // Verify the result
     result shouldBe defined
     result.get shouldBe a[UnconnectedPort]
@@ -45,7 +51,7 @@ class UnconnectedApplySpec extends AnyFlatSpec with Matchers with MockitoSugar w
     (port.direction == ConnectionDirection.FirstToSecond) shouldBe true
     port.secondFullName shouldBe "device2"
   }
-  
+
   it should "parse bus connections" in {
     // Create additional parameters as raw values
     val busParams = Map(
@@ -53,13 +59,13 @@ class UnconnectedApplySpec extends AnyFlatSpec with Matchers with MockitoSugar w
       "bus_name" -> "main_bus",
       "consumer_bus_name" -> "mem_bus"
     )
-    
+
     // Create a bus connection variant
     val busVariant = createConnectionVariant("bus", "cpu -> memory", busParams)
-    
+
     // Parse the connection
     val result = Unconnected.apply(busVariant)
-    
+
     // Verify the result
     result shouldBe defined
     result.get shouldBe a[UnconnectedBus]
@@ -67,17 +73,23 @@ class UnconnectedApplySpec extends AnyFlatSpec with Matchers with MockitoSugar w
     bus.firstFullName shouldBe "cpu"
     assert(bus.direction == ConnectionDirection.FirstToSecond)
     bus.secondFullName shouldBe "memory"
-    bus.busProtocol shouldBe "axi4"
-    bus.supplierBusName shouldBe "main_bus"
-    bus.consumerBusName shouldBe "mem_bus"
+    ConnectionTypesTestExtensions.assertBusNameEquals(bus.busProtocol, "axi4")
+    ConnectionTypesTestExtensions.assertBusNameEquals(
+      bus.supplierBusName,
+      "main_bus"
+    )
+    ConnectionTypesTestExtensions.assertBusNameEquals(
+      bus.consumerBusName,
+      "mem_bus"
+    )
   }
 
   it should "parse logical connections" in {
     // Create a logical connection variant
     val logicalVariant = createConnectionVariant("logical", "comp1 -> comp2")
-    
+
     val result = Unconnected.apply(logicalVariant)
-    
+
     result shouldBe defined
     result.get shouldBe a[UnconnectedLogical]
     val logical = result.get.asInstanceOf[UnconnectedLogical]
@@ -85,14 +97,14 @@ class UnconnectedApplySpec extends AnyFlatSpec with Matchers with MockitoSugar w
     assert(logical.direction == ConnectionDirection.FirstToSecond)
     logical.secondFullName shouldBe "comp2"
   }
-  
+
   it should "parse clock connections" in {
     // Create a clock connection variant
     val clockVariant = createConnectionVariant("clock", "clk -> device")
-    
+
     // Parse the connection
     val result = Unconnected.apply(clockVariant)
-    
+
     // Verify the result
     result shouldBe defined
     result.get shouldBe a[UnconnectedClock]
@@ -101,24 +113,25 @@ class UnconnectedApplySpec extends AnyFlatSpec with Matchers with MockitoSugar w
     assert(clock.direction == ConnectionDirection.FirstToSecond)
     clock.secondFullName shouldBe "device"
   }
-  
+
   it should "parse port group connections with additional parameters" in {
     // Create a port group variant with prefixes and excludes
     val excludesList = new java.util.ArrayList[String]()
     excludesList.add("clock")
     excludesList.add("reset")
-    
+
     val portGroupParams = Map(
       "first_prefix" -> "tx_",
       "second_prefix" -> "rx_",
       "excludes" -> excludesList
     )
-    
-    val portGroupVariant = createConnectionVariant("port_group", "uart0 -> uart1", portGroupParams)
-    
+
+    val portGroupVariant =
+      createConnectionVariant("port_group", "uart0 -> uart1", portGroupParams)
+
     // Parse the connection
     val result = Unconnected.apply(portGroupVariant)
-    
+
     // Verify the result
     result shouldBe defined
     result.get shouldBe a[UnconnectedPortGroup]
@@ -128,35 +141,35 @@ class UnconnectedApplySpec extends AnyFlatSpec with Matchers with MockitoSugar w
     portGroup.secondFullName shouldBe "uart1"
     portGroup.first_prefix shouldBe "tx_"
     portGroup.second_prefix shouldBe "rx_"
-    portGroup.excludes should contain allOf("clock", "reset")
+    portGroup.excludes should contain allOf ("clock", "reset")
   }
-  
+
   it should "handle parameters connections" in {
     // Create parameters array
     val paramsList = new java.util.ArrayList[java.util.Map[String, Any]]()
-    
+
     // Add parameter 1
     val param1 = new java.util.HashMap[String, Any]()
     param1.put("name", "param1")
     param1.put("value", "value1")
     paramsList.add(param1)
-    
+
     // Add parameter 2
     val param2 = new java.util.HashMap[String, Any]()
     param2.put("name", "param2")
     param2.put("value", "value2")
     paramsList.add(param2)
-    
+
     // Create the parameters connection variant
     val parametersVariant = createConnectionVariant(
       "parameters",
       "_ -> target",
       Map("parameters" -> paramsList)
     )
-    
+
     // Parse the connection
     val result = Unconnected.apply(parametersVariant)
-    
+
     // Verify the result
     result shouldBe defined
     result.get shouldBe a[UnconnectedParameters]
@@ -164,21 +177,30 @@ class UnconnectedApplySpec extends AnyFlatSpec with Matchers with MockitoSugar w
     assert(params.direction == ConnectionDirection.FirstToSecond)
     params.instanceName shouldBe "target"
   }
-  
+
   it should "handle different connection directions" in {
     // Test bi-directional connections
-    val biDirectionalVariant = createConnectionVariant("port", "device1 <-> device2")
+    val biDirectionalVariant =
+      createConnectionVariant("port", "device1 <-> device2")
     val biDirResult = Unconnected.apply(biDirectionalVariant)
     biDirResult shouldBe defined
-    assert(biDirResult.get.asInstanceOf[UnconnectedPort].direction == ConnectionDirection.BiDirectional)
-    
+    assert(
+      biDirResult.get
+        .asInstanceOf[UnconnectedPort]
+        .direction == ConnectionDirection.BiDirectional
+    )
+
     // Test second-to-first connections
     val reverseVariant = createConnectionVariant("port", "device1 <- device2")
     val reverseResult = Unconnected.apply(reverseVariant)
     reverseResult shouldBe defined
-    assert(reverseResult.get.asInstanceOf[UnconnectedPort].direction == ConnectionDirection.SecondToFirst)
+    assert(
+      reverseResult.get
+        .asInstanceOf[UnconnectedPort]
+        .direction == ConnectionDirection.SecondToFirst
+    )
   }
-  
+
   it should "reject missing required fields" in {
     withSilentLogs {
       // Missing type field
@@ -186,7 +208,7 @@ class UnconnectedApplySpec extends AnyFlatSpec with Matchers with MockitoSugar w
       missingTypeMap.put("connection", "a -> b")
       val missingType = Utils.toVariant(missingTypeMap)
       Unconnected.apply(missingType) shouldBe None
-      
+
       // Missing connection field
       val missingConnectionMap = new java.util.HashMap[String, Any]()
       missingConnectionMap.put("type", "port")
@@ -194,53 +216,54 @@ class UnconnectedApplySpec extends AnyFlatSpec with Matchers with MockitoSugar w
       Unconnected.apply(missingConnection) shouldBe None
     }
   }
-  
+
   it should "reject invalid connection format" in {
     withSilentLogs {
       // Invalid direction symbol
       val invalidDirection = createConnectionVariant("port", "a => b")
       Unconnected.apply(invalidDirection) shouldBe None
-      
+
       // Invalid parts count
       val invalidParts = createConnectionVariant("port", "a -> b -> c")
       Unconnected.apply(invalidParts) shouldBe None
     }
   }
-  
+
   it should "reject unknown connection types" in {
     withSilentLogs {
       val unknownType = createConnectionVariant("unknown_type", "a -> b")
       Unconnected.apply(unknownType) shouldBe None
     }
   }
-  
+
   it should "reject parameters connections with invalid first value" in {
     // For parameters, first value must be "_"
     // Create parameter entry
     val paramsList = new java.util.ArrayList[java.util.Map[String, Any]]()
-    
+
     // Add a parameter
     val param = new java.util.HashMap[String, Any]()
     param.put("name", "param")
     param.put("value", "val")
     paramsList.add(param)
-    
+
     // Create the invalid parameters connection variant
     val invalidParams = createConnectionVariant(
       "parameters",
       "device1 -> device2", // should be "_ -> device2"
       Map("parameters" -> paramsList)
     )
-    
+
     Unconnected.apply(invalidParams) shouldBe None
   }
 
   it should "handle excessive whitespace in connection strings" in {
     // Test with varied whitespace around the direction symbol and device names
-    val withExtraWhitespace = createConnectionVariant("port", "  device1    ->      device2  ")
-    
+    val withExtraWhitespace =
+      createConnectionVariant("port", "  device1    ->      device2  ")
+
     val result = Unconnected.apply(withExtraWhitespace)
-    
+
     result shouldBe defined
     result.get shouldBe a[UnconnectedPort]
     val port = result.get.asInstanceOf[UnconnectedPort]

@@ -3,33 +3,48 @@ package com.deanoc.overlord.connections
 import com.deanoc.overlord._
 import com.deanoc.overlord.connections.ConnectionDirection
 import com.deanoc.overlord.utils.{Utils, Variant, Logging}
-import com.deanoc.overlord.hardware.{Port, BitsDesc, InWireDirection, OutWireDirection, InOutWireDirection}
+import com.deanoc.overlord.hardware.{
+  Port,
+  BitsDesc,
+  InWireDirection,
+  OutWireDirection,
+  InOutWireDirection
+}
 import com.deanoc.overlord.interfaces._
-import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait, PinGroupInstance}
+import com.deanoc.overlord.instances.{
+  ChipInstance,
+  InstanceTrait,
+  PinGroupInstance
+}
+import com.deanoc.overlord.connections.ConnectionTypes.{BusName}
 
-/**
- * Module containing parsers for various connection types.
- */
+/** Module containing parsers for various connection types.
+  */
 object ConnectionParser extends Logging {
-  /**
-   * Parse a string into a ConnectionPriority
-   *
-   * @param str The string representation of the priority
-   * @return An Option containing the ConnectionPriority or None if invalid
-   */
-  def parseConnectionPriority(str: String): Option[ConnectionPriority] = str.toLowerCase match
-    case "explicit" => Some(ConnectionPriority.Explicit)
-    case "group" => Some(ConnectionPriority.Group)
-    case "wildcard" => Some(ConnectionPriority.WildCard)
-    case "fake" => Some(ConnectionPriority.Fake)
-    case _ => None
-    
-  /**
-   * Parses a connection variant and creates the appropriate UnconnectedLike instance.
-   *
-   * @param connection The connection variant to parse.
-   * @return An optional UnconnectedLike instance based on the parsed connection.
-   */
+
+  /** Parse a string into a ConnectionPriority
+    *
+    * @param str
+    *   The string representation of the priority
+    * @return
+    *   An Option containing the ConnectionPriority or None if invalid
+    */
+  def parseConnectionPriority(str: String): Option[ConnectionPriority] =
+    str.toLowerCase match
+      case "explicit" => Some(ConnectionPriority.Explicit)
+      case "group"    => Some(ConnectionPriority.Group)
+      case "wildcard" => Some(ConnectionPriority.WildCard)
+      case "fake"     => Some(ConnectionPriority.Fake)
+      case _          => None
+
+  /** Parses a connection variant and creates the appropriate UnconnectedLike
+    * instance.
+    *
+    * @param connection
+    *   The connection variant to parse.
+    * @return
+    *   An optional UnconnectedLike instance based on the parsed connection.
+    */
   def parseConnection(connection: Variant): Option[UnconnectedLike] = {
     val table = Utils.toTable(connection)
 
@@ -45,29 +60,34 @@ object ConnectionParser extends Logging {
     }
 
     val cons = Utils.toString(table("connection"))
-    
+
     // More robust parsing of connection string that handles extra whitespace
     // First, identify which connection operator is present
     val connectionPattern = "(.+?)\\s*(<->|<>|->|<-)\\s*(.+)".r
-    
+
     val (first, dirSymbol, secondary) = cons match {
-      case connectionPattern(left, op, right) => 
+      case connectionPattern(left, op, right) =>
         // Check that the right side doesn't contain any more operators
-        if (right.contains("->") || right.contains("<-") || right.contains("<>") || right.contains("<->")) {
-          error(s"$conntype has an invalid connection field with multiple operators: $cons")
+        if (
+          right.contains("->") || right
+            .contains("<-") || right.contains("<>") || right.contains("<->")
+        ) {
+          error(
+            s"$conntype has an invalid connection field with multiple operators: $cons"
+          )
           return None
         }
         (left.trim, op, right.trim)
-      case _ => 
+      case _ =>
         error(s"$conntype has an invalid connection field: $cons")
         return None
     }
-    
+
     // Parse the connection direction from the identified symbol
     val dir = dirSymbol match {
-      case "->"      => ConnectionDirection.FirstToSecond
+      case "->"         => ConnectionDirection.FirstToSecond
       case "<->" | "<>" => ConnectionDirection.BiDirectional
-      case "<-"      => ConnectionDirection.SecondToFirst
+      case "<-"         => ConnectionDirection.SecondToFirst
       case _ =>
         error(s"$conntype has an invalid connection $dirSymbol : $cons")
         return None
@@ -75,12 +95,12 @@ object ConnectionParser extends Logging {
 
     // Create the appropriate connection type based on the "type" field
     conntype match {
-      case "port"  => 
+      case "port" =>
         Some(UnconnectedPort(first, dir, secondary))
-        
-      case "clock" => 
+
+      case "clock" =>
         Some(UnconnectedClock(first, dir, secondary))
-        
+
       case "parameters" =>
         if (first != "_") None
         else
@@ -91,7 +111,7 @@ object ConnectionParser extends Logging {
               Utils.lookupArray(table, "parameters")
             )
           )
-          
+
       case "port_group" =>
         Some(
           UnconnectedPortGroup(
@@ -103,8 +123,8 @@ object ConnectionParser extends Logging {
             Utils.lookupArray(table, "excludes").toSeq.map(Utils.toString)
           )
         )
-        
-      case "bus" => 
+
+      case "bus" =>
         Some(
           parseBusConnection(
             first,
@@ -113,25 +133,29 @@ object ConnectionParser extends Logging {
             table
           )
         )
-        
-      case "logical" => 
+
+      case "logical" =>
         Some(UnconnectedLogical(first, dir, secondary))
-        
+
       case _ =>
         error(s"$conntype is an unknown connection type")
         None
     }
   }
 
-  /**
-   * Parses a bus connection from the connection table.
-   *
-   * @param first The name of the first component in the connection.
-   * @param dir The direction of the connection.
-   * @param secondary The name of the second component in the connection.
-   * @param table The table of connection attributes.
-   * @return An UnconnectedBus instance.
-   */
+  /** Parses a bus connection from the connection table.
+    *
+    * @param first
+    *   The name of the first component in the connection.
+    * @param dir
+    *   The direction of the connection.
+    * @param secondary
+    *   The name of the second component in the connection.
+    * @param table
+    *   The table of connection attributes.
+    * @return
+    *   An UnconnectedBus instance.
+    */
   private def parseBusConnection(
       first: String,
       dir: ConnectionDirection,
@@ -141,26 +165,29 @@ object ConnectionParser extends Logging {
     val supplierBusName = Utils.lookupString(table, "bus_name", "")
     val consumerBusName =
       Utils.lookupString(table, "consumer_bus_name", supplierBusName)
-      
+
     UnconnectedBus(
       first,
       dir,
       secondary,
-      Utils.lookupString(table, "bus_protocol", "internal"),
-      supplierBusName,
-      consumerBusName,
+      BusName.apply(Utils.lookupString(table, "bus_protocol", "internal")),
+      BusName.apply(supplierBusName),
+      BusName.apply(consumerBusName),
       Utils.lookupBoolean(table, "silent", or = false)
     )
   }
 
-  /**
-   * Parses a parameters connection from the parameters array.
-   *
-   * @param direction The direction of the connection.
-   * @param secondFullName The name of the instance associated with the parameters.
-   * @param parametersV An array of parameter variants.
-   * @return An UnconnectedParameters instance.
-   */
+  /** Parses a parameters connection from the parameters array.
+    *
+    * @param direction
+    *   The direction of the connection.
+    * @param secondFullName
+    *   The name of the instance associated with the parameters.
+    * @param parametersV
+    *   An array of parameter variants.
+    * @return
+    *   An UnconnectedParameters instance.
+    */
   def parseParametersConnection(
       direction: ConnectionDirection,
       secondFullName: String,
@@ -207,19 +234,22 @@ object ConnectionParser extends Logging {
         if (paramType != null) Some(Parameter(name, paramType)) else None
       }
     }.toSeq
-    
+
     // Create and return the UnconnectedParameters instance
     new UnconnectedParameters(direction, secondFullName, parameters)
   }
-  
-  /**
-   * Parses a port connection between two instances.
-   *
-   * @param cbp The connection priority.
-   * @param fil The first instance location.
-   * @param sil The second instance location.
-   * @return A ConnectedPortGroup representing the connection.
-   */
+
+  /** Parses a port connection between two instances.
+    *
+    * @param cbp
+    *   The connection priority.
+    * @param fil
+    *   The first instance location.
+    * @param sil
+    *   The second instance location.
+    * @return
+    *   A ConnectedPortGroup representing the connection.
+    */
   def parsePortConnection(
       cbp: ConnectionPriority,
       fil: InstanceLoc,

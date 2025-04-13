@@ -18,10 +18,13 @@ import com.deanoc.overlord.instances.{
 
 /** Represents a location in the connection system, combining an instance, an
   * optional port, and a fully qualified name.
-  * 
-  * @param instance The hardware/software/gateware instance.
-  * @param port Optional port if the connection involves a specific port.
-  * @param fullName The fully qualified name of this location.
+  *
+  * @param instance
+  *   The hardware/software/gateware instance.
+  * @param port
+  *   Optional port if the connection involves a specific port.
+  * @param fullName
+  *   The fully qualified name of this location.
   */
 case class InstanceLoc(
     instance: InstanceTrait,
@@ -52,15 +55,19 @@ case class InstanceLoc(
 }
 
 /** Base trait for all connection types in the system.
-  * 
+  *
   * Connections represent links between components, such as buses, logical
   * connections, or constants. These are defined in configuration files like
   * `fabric.yaml` with fields such as `type`, `connection`, and optional
   * `bus_name`.
   */
 trait Connected extends QueryInterface {
+
   /** The priority of this connection, used to resolve conflicts. */
   val connectionPriority: ConnectionPriority
+
+  /** The name of this connection */
+  def connectionName: ConnectionTypes.ConnectionName
 
   /** Checks if this connection involves the specified instance.
     *
@@ -140,33 +147,7 @@ trait Connected extends QueryInterface {
     */
   def secondFullName: String
 
-  /** Returns the last segment of the first instance's fully qualified name.
-    *
-    * @return
-    *   The last part of the first instance's name (after the last dot).
-    */
-  def firstLastName: String = firstFullName.split('.').last
-
-  /** Returns the last segment of the second instance's fully qualified name.
-    *
-    * @return
-    *   The last part of the second instance's name (after the last dot).
-    */
-  def secondLastName: String = secondFullName.split('.').last
-
-  /** Returns the first segment of the first instance's fully qualified name.
-    *
-    * @return
-    *   The first part of the first instance's name (before the first dot).
-    */
-  def firstHeadName: String = firstFullName.split('.').head
-
-  /** Returns the first segment of the second instance's fully qualified name.
-    *
-    * @return
-    *   The first part of the second instance's name (before the first dot).
-    */
-  def secondHeadName: String = secondFullName.split('.').head
+  // Name operations moved to extension methods in ConnectedExtensions
 
   /** Checks if this connection is from a pin to a chip.
     *

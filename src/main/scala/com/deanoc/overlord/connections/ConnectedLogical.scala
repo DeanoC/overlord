@@ -2,6 +2,7 @@ package com.deanoc.overlord.connections
 
 import com.deanoc.overlord._
 import com.deanoc.overlord.connections.ConnectionDirection
+import com.deanoc.overlord.instances.ChipInstance
 
 /** Represents a logical connection between two components in the system.
   *
@@ -36,9 +37,54 @@ case class ConnectedLogical(
     secondary: InstanceLoc
 ) extends ConnectedBetween {
 
+  /** The name of this connection */
+  override def connectionName: ConnectionTypes.ConnectionName =
+    ConnectionTypes.ConnectionName(
+      s"${firstFullName}_to_${secondFullName}_logical"
+    )
+
   /** Returns the first (source) instance location in this connection. */
   override def first: Option[InstanceLoc] = Some(main)
 
   /** Returns the second (target) instance location in this connection. */
   override def second: Option[InstanceLoc] = Some(secondary)
+
+  // Implement abstract methods from ConnectedBetween
+  override def connectedTo(inst: ChipInstance): Boolean =
+    (first.nonEmpty && first.get.instance.name == inst.name) ||
+      (second.nonEmpty && second.get.instance.name == inst.name)
+
+  override def connectedBetween(
+      s: ChipInstance,
+      e: ChipInstance,
+      d: ConnectionDirection
+  ): Boolean =
+    if (first.isEmpty || second.isEmpty) false
+    else
+      d match
+        case ConnectionDirection.FirstToSecond =>
+          first.get.instance == s && second.get.instance == e
+        case ConnectionDirection.SecondToFirst =>
+          first.get.instance == e && second.get.instance == s
+        case ConnectionDirection.BiDirectional =>
+          (first.get.instance == s && second.get.instance == e) ||
+          (first.get.instance == e && second.get.instance == s)
+
+  override def isPinToChip: Boolean =
+    first.nonEmpty && second.nonEmpty && first.get.isPin && second.get.isChip
+
+  override def isChipToChip: Boolean =
+    first.nonEmpty && second.nonEmpty && first.get.isChip && second.get.isChip
+
+  override def isChipToPin: Boolean =
+    first.nonEmpty && second.nonEmpty && first.get.isChip && second.get.isPin
+
+  override def isClock: Boolean =
+    (first.nonEmpty && first.get.isClock) || (second.nonEmpty && second.get.isClock)
+
+  override def firstFullName: String =
+    if (first.nonEmpty) first.get.fullName else "NOT_CONNECTED"
+
+  override def secondFullName: String =
+    if (second.nonEmpty) second.get.fullName else "NOT_CONNECTED"
 }
