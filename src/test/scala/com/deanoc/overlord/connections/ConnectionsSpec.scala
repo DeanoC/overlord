@@ -184,29 +184,25 @@ class ConnectionsSpec extends AnyFlatSpec with Matchers with MockitoSugar {
     logicalConnection.second shouldBe Some(targetLoc)
   }
   
-  // Commented out until we have a proper implementation of ConnectedConstant
-  // "ConnectedConstant" should "correctly represent constant connections" in {
-  //   val instance = createMockInstance("Device")
-  //   val port = createMockPort("testPort")
-  //   val instanceLoc = InstanceLoc(instance, Some(port), "device.port.path")
-  //   val constantValue = 42
-  //   
-  //   val constantConnection = ConnectedConstant(
-  //     ExplicitConnectionPriority(),
-  //     instanceLoc,
-  //     ConnectionDirection.OneWay,
-  //     constantValue
-  //   )
-  //   
-  //   constantConnection.connectionPriority shouldBe a[ExplicitConnectionPriority]
-  //   constantConnection.main shouldBe instanceLoc
-  //   constantConnection.direction shouldBe ConnectionDirection.OneWay
-  //   constantConnection.value shouldBe constantValue
-  //   
-  //   // Test the Connected methods
-  //   constantConnection.first shouldBe Some(instanceLoc)
-  //   constantConnection.second shouldBe None
-  // }
+  "Constant" should "correctly represent constant parameter connections" in {
+    val instance = createMockInstance("Device")
+    val port = createMockPort("testPort")
+    
+    // Create a parameter with a constant value
+    val paramName = "testParam"
+    val paramValue = Utils.toVariant("42") // Convert to Variant
+    val paramType = ConstantParameterType(paramValue) // Create proper ParameterType
+    val parameter = Parameter(paramName, paramType)
+    
+    // Create the constant connection
+    val constantConnection = Constant(instance, parameter)
+    
+    // Verify the connection properties
+    constantConnection.instance shouldBe instance
+    constantConnection.parameter shouldBe parameter
+    constantConnection.parameter.name shouldBe paramName
+    constantConnection.parameter.parameterType shouldBe paramType
+  }
   
   "Wire" should "correctly represent connections between components" in {
     val sourceInstance = createMockInstance("SourceDevice")
