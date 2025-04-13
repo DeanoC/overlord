@@ -1,7 +1,7 @@
-package com.deanoc.overlord.Interfaces
+package com.deanoc.overlord.interfaces
 
 import com.deanoc.overlord.QueryInterface
-import com.deanoc.overlord.Hardware.RegisterBank
+import com.deanoc.overlord.hardware.RegisterBank
 
 trait RegisterBankLike extends QueryInterface {
   def maxInstances: Int

@@ -1,7 +1,7 @@
-package com.deanoc.overlord.Instances
+package com.deanoc.overlord.instances
 
 import com.deanoc.overlord.utils._
-import com.deanoc.overlord.Interfaces.UnconnectedLike
+import com.deanoc.overlord.interfaces.UnconnectedLike
 import com.deanoc.overlord.{ChipDefinitionTrait, Definition}
 import scala.util.boundary, boundary.break
 

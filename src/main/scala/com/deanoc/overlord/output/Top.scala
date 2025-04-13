@@ -4,12 +4,12 @@ import scala.collection.mutable
 
 import com.deanoc.overlord.utils._
 import com.deanoc.overlord.{Project}
-import com.deanoc.overlord.Connections.{
+import com.deanoc.overlord.connections.{
   InstanceLoc,
   WildCardConnectionPriority,
   Wire
 }
-import com.deanoc.overlord.Instances.{
+import com.deanoc.overlord.instances.{
   ChipInstance,
   ClockInstance,
   PinGroupInstance

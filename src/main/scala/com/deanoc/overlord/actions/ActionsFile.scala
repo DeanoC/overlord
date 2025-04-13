@@ -1,7 +1,7 @@
 package com.deanoc.overlord.actions
 
 import com.deanoc.overlord.utils.{Variant, ArrayV, Utils}
-import com.deanoc.overlord.Instances.{ChipInstance, InstanceTrait}
+import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
 import scala.util.boundary, boundary.break
 
 // Represents a generic action with a phase and an execution method.

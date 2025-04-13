@@ -2,9 +2,9 @@ package com.deanoc.overlord
 
 import java.nio.file.Path
 
-import com.deanoc.overlord.Connections._
-import com.deanoc.overlord.Instances.{ChipInstance, Container}
-import com.deanoc.overlord.Interfaces.UnconnectedLike
+import com.deanoc.overlord.connections._
+import com.deanoc.overlord.instances.{ChipInstance, Container}
+import com.deanoc.overlord.interfaces.UnconnectedLike
 import com.deanoc.overlord.Project
 import com.deanoc.overlord.utils._
 object OutputGateware {

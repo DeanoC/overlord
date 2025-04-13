@@ -1,4 +1,4 @@
-package com.deanoc.overlord.Connections
+package com.deanoc.overlord.connections
 
 import com.deanoc.overlord._
 

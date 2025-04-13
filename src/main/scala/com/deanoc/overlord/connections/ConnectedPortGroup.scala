@@ -1,11 +1,11 @@
-package com.deanoc.overlord.Connections
+package com.deanoc.overlord.connections
 import com.deanoc.overlord._
 
-import com.deanoc.overlord.Hardware.{InOutWireDirection, Port}
+import com.deanoc.overlord.hardware.{InOutWireDirection, Port}
 import com.deanoc.overlord.{ConnectionDirection, FirstToSecondConnection}
 
-import com.deanoc.overlord.Instances.ChipInstance
-import com.deanoc.overlord.Interfaces.PortsLike
+import com.deanoc.overlord.instances.ChipInstance
+import com.deanoc.overlord.interfaces.PortsLike
 
 /** Represents a group of connected ports between two components.
   *

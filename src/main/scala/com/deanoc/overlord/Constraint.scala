@@ -1,7 +1,7 @@
 package com.deanoc.overlord
 
-import com.deanoc.overlord.Hardware.Port
-import com.deanoc.overlord.Instances.InstanceTrait
+import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.instances.InstanceTrait
 
 sealed trait PinConstraintType {
   val ports: Seq[Port]

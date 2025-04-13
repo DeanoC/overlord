@@ -1,8 +1,8 @@
-package com.deanoc.overlord.Connections
+package com.deanoc.overlord.connections
 
 import com.deanoc.overlord._
 import com.deanoc.overlord.DefinitionType
-import com.deanoc.overlord.Instances.ChipInstance
+import com.deanoc.overlord.instances.ChipInstance
 
 /**
   * Trait representing a connection between two components with a defined priority and direction.

@@ -9,9 +9,9 @@ import com.deanoc.overlord.input.{
   VerilogPort,
   VerilogModuleParser
 }
-import com.deanoc.overlord.Hardware.{Port, WireDirection}
+import com.deanoc.overlord.hardware.{Port, WireDirection}
 import com.deanoc.overlord.Project
-import com.deanoc.overlord.Instances.{ChipInstance, InstanceTrait}
+import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
 
 case class ReadVerilogTopAction(filename: String) extends GatewareAction with Logging {
 

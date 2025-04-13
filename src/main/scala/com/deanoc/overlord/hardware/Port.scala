@@ -1,4 +1,4 @@
-package com.deanoc.overlord.Hardware
+package com.deanoc.overlord.hardware
 import com.deanoc.overlord.utils.{Utils, Variant, StringV, TableV}
 
 sealed trait WireDirection {

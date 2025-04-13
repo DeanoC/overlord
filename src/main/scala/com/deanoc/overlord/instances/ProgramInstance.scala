@@ -1,4 +1,4 @@
-package com.deanoc.overlord.Instances
+package com.deanoc.overlord.instances
 
 import com.deanoc.overlord.utils.Variant
 import com.deanoc.overlord.SoftwareDefinitionTrait

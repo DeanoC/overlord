@@ -3,9 +3,9 @@ package com.deanoc.overlord.output
 import scala.collection.mutable
 
 import com.deanoc.overlord.utils.Utils
-import com.deanoc.overlord.Hardware.Registers
-import com.deanoc.overlord.Instances.InstanceTrait
-import com.deanoc.overlord.Instances.{
+import com.deanoc.overlord.hardware.Registers
+import com.deanoc.overlord.instances.InstanceTrait
+import com.deanoc.overlord.instances.{
   BoardInstance,
   ChipInstance,
   Container,

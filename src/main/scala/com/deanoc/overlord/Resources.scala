@@ -1,7 +1,7 @@
 package com.deanoc.overlord
 
 import com.deanoc.overlord.utils.{ArrayV, Utils, Variant}
-import com.deanoc.overlord.Instances.BoardInstance
+import com.deanoc.overlord.instances.BoardInstance
 import com.deanoc.overlord.Project
 import java.nio.file.{Path, Paths}
 import scala.collection.mutable

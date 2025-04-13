@@ -1,7 +1,7 @@
-package com.deanoc.overlord.Interfaces
+package com.deanoc.overlord.interfaces
 
 import com.deanoc.overlord.utils.Variant
-import com.deanoc.overlord.Instances.ChipInstance
+import com.deanoc.overlord.instances.ChipInstance
 
 trait SupplierBusLike extends BusLike {
   override def isSupplier: Boolean = true

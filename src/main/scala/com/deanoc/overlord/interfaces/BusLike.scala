@@ -1,4 +1,4 @@
-package com.deanoc.overlord.Interfaces
+package com.deanoc.overlord.interfaces
 
 trait BusLike extends ChipLike {
   def isHardware: Boolean

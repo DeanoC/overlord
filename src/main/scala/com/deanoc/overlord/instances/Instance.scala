@@ -1,7 +1,7 @@
-package com.deanoc.overlord.Instances
+package com.deanoc.overlord.instances
 
 import com.deanoc.overlord.utils.{Utils, Variant}
-import com.deanoc.overlord.Hardware.{HardwareDefinition, Port}
+import com.deanoc.overlord.hardware.{HardwareDefinition, Port}
 import com.deanoc.overlord.{
   DefinitionCatalog,
   DefinitionTrait,
@@ -9,7 +9,7 @@ import com.deanoc.overlord.{
   Project,
   QueryInterface
 }
-import com.deanoc.overlord.Software.SoftwareDefinition
+import com.deanoc.overlord.software.SoftwareDefinition
 
 import java.nio.file.Path
 import scala.collection.mutable

@@ -1,10 +1,10 @@
 package com.deanoc.overlord
 
 import com.deanoc.overlord.utils._
-import com.deanoc.overlord.Hardware.{BitsDesc, RegisterList, Registers}
-import com.deanoc.overlord.Connections._
-import com.deanoc.overlord.Instances._
-import com.deanoc.overlord.Interfaces.{RamLike, RegisterBankLike}
+import com.deanoc.overlord.hardware.{BitsDesc, RegisterList, Registers}
+import com.deanoc.overlord.connections._
+import com.deanoc.overlord.instances._
+import com.deanoc.overlord.interfaces.{RamLike, RegisterBankLike}
 import com.deanoc.overlord.Project
 
 import java.nio.file.{Path, Paths}

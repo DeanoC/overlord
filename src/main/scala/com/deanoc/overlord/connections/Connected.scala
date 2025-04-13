@@ -1,6 +1,6 @@
-package com.deanoc.overlord.Connections
+package com.deanoc.overlord.connections
 
-import com.deanoc.overlord.Hardware.Port
+import com.deanoc.overlord.hardware.Port
 import com.deanoc.overlord.{
   BiDirectionConnection,
   ConnectionDirection,
@@ -10,7 +10,7 @@ import com.deanoc.overlord.{
   QueryInterface,
   SoftwareDefinitionTrait
 }
-import com.deanoc.overlord.Instances.{
+import com.deanoc.overlord.instances.{
   ChipInstance,
   ClockInstance,
   InstanceTrait,

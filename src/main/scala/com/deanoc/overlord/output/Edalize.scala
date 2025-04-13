@@ -4,7 +4,7 @@ import scala.collection.mutable
 
 import com.deanoc.overlord.utils.Utils
 import com.deanoc.overlord.actions.{CopyAction, SourcesAction}
-import com.deanoc.overlord.Instances.{BoardInstance, ChipInstance}
+import com.deanoc.overlord.instances.{BoardInstance, ChipInstance}
 import com.deanoc.overlord.{Project, GatewareDefinitionTrait}
 
 object Edalize {

@@ -1,8 +1,8 @@
-package com.deanoc.overlord.Connections
+package com.deanoc.overlord.connections
 
 import com.deanoc.overlord._
-import com.deanoc.overlord.Instances.ChipInstance
-import com.deanoc.overlord.Interfaces.SupplierBusLike
+import com.deanoc.overlord.instances.ChipInstance
+import com.deanoc.overlord.interfaces.SupplierBusLike
 
 /** Represents a bus connection between two components in the system.
   *

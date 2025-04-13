@@ -1,11 +1,11 @@
-package com.deanoc.overlord.Connections
+package com.deanoc.overlord.connections
 
 import com.deanoc.overlord.utils.{Utils, Variant}
-import com.deanoc.overlord.Instances.{ChipInstance, InstanceTrait}
+import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
 import com.deanoc.overlord.ConnectionDirection
 import com.deanoc.overlord._
-import com.deanoc.overlord.Interfaces._
-import com.deanoc.overlord.Connections.ConnectionParser
+import com.deanoc.overlord.interfaces._
+import com.deanoc.overlord.connections.ConnectionParser
 
 /**
   * Represents the type of a parameter.

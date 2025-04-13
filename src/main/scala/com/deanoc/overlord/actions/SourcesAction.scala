@@ -2,7 +2,7 @@ package com.deanoc.overlord.actions
 
 import com.deanoc.overlord.utils._
 import com.deanoc.overlord.Project
-import com.deanoc.overlord.Instances.InstanceTrait
+import com.deanoc.overlord.instances.InstanceTrait
 
 // Represents an action to handle source files with a specific filename and language.
 case class SourcesAction(filename: String, language: String) extends Action {

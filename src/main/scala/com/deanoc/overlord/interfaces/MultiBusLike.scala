@@ -1,4 +1,4 @@
-package com.deanoc.overlord.Interfaces
+package com.deanoc.overlord.interfaces
 
 trait MultiBusLike extends ChipLike {
   def numberOfBuses: Int

@@ -2,9 +2,9 @@ package com.deanoc.overlord.actions
 
 import com.deanoc.overlord.utils._
 import com.deanoc.overlord.input.{VerilogPort, YamlRegistersParser}
-import com.deanoc.overlord.Hardware.{Port, WireDirection}
+import com.deanoc.overlord.hardware.{Port, WireDirection}
 import com.deanoc.overlord.Project
-import com.deanoc.overlord.Instances.{ChipInstance, InstanceTrait}
+import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
 import scala.util.boundary, boundary.break
 
 // Represents an action to read YAML-defined registers and associate them with a chip instance.

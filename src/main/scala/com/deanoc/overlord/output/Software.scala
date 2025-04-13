@@ -1,7 +1,7 @@
 package com.deanoc.overlord.output
 
 import com.deanoc.overlord.utils.Utils
-import com.deanoc.overlord.Instances.LibraryInstance
+import com.deanoc.overlord.instances.LibraryInstance
 import com.deanoc.overlord.{Project, Resources}
 
 import java.nio.file.Path

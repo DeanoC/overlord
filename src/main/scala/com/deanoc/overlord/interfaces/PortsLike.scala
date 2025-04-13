@@ -1,7 +1,7 @@
-package com.deanoc.overlord.Interfaces
+package com.deanoc.overlord.interfaces
 
-import com.deanoc.overlord.Hardware.Port
-import com.deanoc.overlord.Instances.ChipInstance
+import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.instances.ChipInstance
 
 trait PortsLike extends ChipLike {
   def getPortsStartingWith(startsWith: String): Seq[Port]

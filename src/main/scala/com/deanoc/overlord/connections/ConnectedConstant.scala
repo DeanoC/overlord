@@ -1,6 +1,6 @@
-package com.deanoc.overlord.Connections
+package com.deanoc.overlord.connections
 
-import com.deanoc.overlord.Instances.InstanceTrait
+import com.deanoc.overlord.instances.InstanceTrait
 
 /** Represents a constant connection between an instance and a parameter.
   *

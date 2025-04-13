@@ -1,7 +1,7 @@
 package com.deanoc.overlord
 
-import com.deanoc.overlord.Connections._
-import com.deanoc.overlord.Instances.{ChipInstance, Container, PinGroupInstance}
+import com.deanoc.overlord.connections._
+import com.deanoc.overlord.instances.{ChipInstance, Container, PinGroupInstance}
 
 import scala.collection.mutable
 import scala.language.postfixOps

@@ -1,10 +1,10 @@
-package com.deanoc.overlord.Connections
+package com.deanoc.overlord.connections
 
 import com.deanoc.overlord.utils.{Utils, Logging}
-import com.deanoc.overlord.Instances._
+import com.deanoc.overlord.instances._
 import com.deanoc.overlord._
 
-import com.deanoc.overlord.Interfaces.{
+import com.deanoc.overlord.interfaces.{
   PortsLike,
   RamLike,
   SupplierBusLike,

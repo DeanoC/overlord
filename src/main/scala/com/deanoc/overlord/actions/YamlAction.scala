@@ -2,7 +2,7 @@ package com.deanoc.overlord.actions
 
 import com.deanoc.overlord.utils._
 import com.deanoc.overlord.Project
-import com.deanoc.overlord.Instances.InstanceTrait
+import com.deanoc.overlord.instances.InstanceTrait
 
 import scala.collection.mutable
 

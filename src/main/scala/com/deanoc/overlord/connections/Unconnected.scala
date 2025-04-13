@@ -1,11 +1,11 @@
-package com.deanoc.overlord.Connections
+package com.deanoc.overlord.connections
 
 import com.deanoc.overlord.utils.{Utils, Variant}
-import com.deanoc.overlord.Hardware._
+import com.deanoc.overlord.hardware._
 import com.deanoc.overlord.ConnectionDirection
 import com.deanoc.overlord._
-import com.deanoc.overlord.Interfaces._
-import com.deanoc.overlord.Instances.{
+import com.deanoc.overlord.interfaces._
+import com.deanoc.overlord.instances.{
   InstanceTrait,
   PinGroupInstance,
   Container

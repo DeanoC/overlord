@@ -1,10 +1,10 @@
-package com.deanoc.overlord.Connections
+package com.deanoc.overlord.connections
 
 import com.deanoc.overlord._
 import com.deanoc.overlord.utils.{Utils, Variant, Logging}
-import com.deanoc.overlord.Hardware.{Port, BitsDesc, InWireDirection, OutWireDirection, InOutWireDirection}
-import com.deanoc.overlord.Interfaces._
-import com.deanoc.overlord.Instances.{ChipInstance, InstanceTrait, PinGroupInstance}
+import com.deanoc.overlord.hardware.{Port, BitsDesc, InWireDirection, OutWireDirection, InOutWireDirection}
+import com.deanoc.overlord.interfaces._
+import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait, PinGroupInstance}
 
 /**
  * Module containing parsers for various connection types.

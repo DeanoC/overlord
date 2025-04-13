@@ -1,4 +1,4 @@
-package com.deanoc.overlord.Hardware
+package com.deanoc.overlord.hardware
 
 import com.deanoc.overlord.utils.Utils
 import com.deanoc.overlord.utils.Variant

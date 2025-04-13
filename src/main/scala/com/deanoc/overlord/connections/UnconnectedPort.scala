@@ -1,8 +1,8 @@
-package com.deanoc.overlord.Connections
+package com.deanoc.overlord.connections
 
 import com.deanoc.overlord._
-import com.deanoc.overlord.Instances.{ChipInstance, InstanceTrait}
-import com.deanoc.overlord.Interfaces.PortsLike
+import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
+import com.deanoc.overlord.interfaces.PortsLike
 
 /** Represents an unconnected port connection between two components.
   *

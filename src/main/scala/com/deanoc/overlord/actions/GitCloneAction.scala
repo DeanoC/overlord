@@ -2,7 +2,7 @@ package com.deanoc.overlord.actions
 
 import com.deanoc.overlord.utils._
 import com.deanoc.overlord.Project
-import com.deanoc.overlord.Instances.InstanceTrait
+import com.deanoc.overlord.instances.InstanceTrait
 
 // Represents an action to clone a Git repository
 case class GitCloneAction(url: String) extends Action {
