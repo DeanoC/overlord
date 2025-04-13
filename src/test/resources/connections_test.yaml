@@ -1,0 +1,10 @@
+connections:
+  - bus_name: test_bus
+    connection: ModuleA -> ModuleB
+    type: bus
+  - connection: ModuleA -> ModuleC
+    type: logical
+  - connection: ModuleB.port1 -> 0x42
+    type: constant
+  - connection: ModuleC.clk -> ClockSource
+    type: logical

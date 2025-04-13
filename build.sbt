@@ -49,6 +49,7 @@ lazy val dependencies = Seq(
   // Test libraries
   "org.scalactic" %% "scalactic" % "3.2.17",
   "org.scalatest" %% "scalatest" % "3.2.17" % "test",
+  "org.scalatestplus" %% "mockito-4-11" % "3.2.17.0" % "test",
 
   // XML handling
   "org.scala-lang.modules" %% "scala-xml" % "2.2.0",
