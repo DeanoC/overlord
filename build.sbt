@@ -80,7 +80,7 @@ lazy val overlord = (project in file("."))
     scalacOptions ++= Seq(
 //      "-Yexplicit-nulls", // Enable null safety in Scala 3
       "-feature",
-      "-explain" // Detailed error explanations
+//      "-explain" // Detailed error explanations
     )
   )
 

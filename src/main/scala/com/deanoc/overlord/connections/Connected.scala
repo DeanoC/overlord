@@ -17,38 +17,12 @@ import com.deanoc.overlord.instances.{
   PinGroupInstance
 }
 
-/** Represents the priority level of a connection, used to resolve conflicts
-  * when multiple connection rules apply to the same components.
-  */
-sealed trait ConnectionPriority
-
-/** Priority for connections made through grouped components, such as pin
-  * groups.
-  */
-case class GroupConnectionPriority() extends ConnectionPriority
-
-/** Priority for wildcard connections, typically used as a fallback.
-  */
-case class WildCardConnectionPriority() extends ConnectionPriority
-
-/** Priority for explicitly defined connections, which take precedence over
-  * others.
-  */
-case class ExplicitConnectionPriority() extends ConnectionPriority
-
-/** Priority for placeholder or simulated connections, often used in testing.
-  */
-case class FakeConnectionPriority() extends ConnectionPriority
-
 /** Represents a location in the connection system, combining an instance, an
   * optional port, and a fully qualified name.
-  *
-  * @param instance
-  *   The hardware/software/gateware instance.
-  * @param port
-  *   Optional port if the connection involves a specific port.
-  * @param fullName
-  *   The fully qualified name of this location.
+  * 
+  * @param instance The hardware/software/gateware instance.
+  * @param port Optional port if the connection involves a specific port.
+  * @param fullName The fully qualified name of this location.
   */
 case class InstanceLoc(
     instance: InstanceTrait,
@@ -79,23 +53,13 @@ case class InstanceLoc(
 }
 
 /** Base trait for all connection types in the system.
-  *
+  * 
   * Connections represent links between components, such as buses, logical
   * connections, or constants. These are defined in configuration files like
   * `fabric.yaml` with fields such as `type`, `connection`, and optional
   * `bus_name`.
-  *
-  * Example from `fabric.yaml`:
-  * ```yaml
-  * - bus_name: fpd_ocm
-  *   connection: FPDMainSwitch -> OCMSwitch
-  *   type: bus
-  * - connection: FPDMainSwitch -> LPDInboundSwitch
-  *   type: logical
-  * ```
   */
 trait Connected extends QueryInterface {
-
   /** The priority of this connection, used to resolve conflicts. */
   val connectionPriority: ConnectionPriority
 

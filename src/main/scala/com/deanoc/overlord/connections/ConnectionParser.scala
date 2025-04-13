@@ -8,11 +8,21 @@ import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait, PinGroupInsta
 
 /**
  * Module containing parsers for various connection types.
- * 
- * This extracts the parsing logic from individual connection classes,
- * making the code more maintainable and following separation of concerns.
  */
 object ConnectionParser extends Logging {
+  /**
+   * Parse a string into a ConnectionPriority
+   *
+   * @param str The string representation of the priority
+   * @return An Option containing the ConnectionPriority or None if invalid
+   */
+  def parseConnectionPriority(str: String): Option[ConnectionPriority] = str.toLowerCase match
+    case "explicit" => Some(ConnectionPriority.Explicit)
+    case "group" => Some(ConnectionPriority.Group)
+    case "wildcard" => Some(ConnectionPriority.WildCard)
+    case "fake" => Some(ConnectionPriority.Fake)
+    case _ => None
+    
   /**
    * Parses a connection variant and creates the appropriate UnconnectedLike instance.
    *

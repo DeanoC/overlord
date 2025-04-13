@@ -122,7 +122,7 @@ object ConnectedPortGroup {
     val fmloc = InstanceLoc(fi.getOwner, Some(fport), s"$fn.${fp.name}")
     val fsloc = InstanceLoc(si.getOwner, Some(sport), s"$fn.${sp.name}")
 
-    // Create the connected port group with a default GroupConnectionPriority
-    ConnectedPortGroup(GroupConnectionPriority(), fmloc, direction, fsloc)
+    // Create the connected port group with Group priority
+    ConnectedPortGroup(ConnectionPriority.Group, fmloc, direction, fsloc)
   }
 }

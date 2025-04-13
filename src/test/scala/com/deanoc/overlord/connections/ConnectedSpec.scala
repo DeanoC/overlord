@@ -1,5 +1,6 @@
 package com.deanoc.overlord.connections
 
+import scala.language.implicitConversions
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
@@ -19,16 +20,17 @@ class ConnectedSpec extends AnyFlatSpec with Matchers with MockitoSugar with Sil
 
   // ConnectionPriority tests
   "ConnectionPriority" should "define different priority levels" in {
-    // Verify that different priority types exist and are distinct
-    val explicit = ExplicitConnectionPriority()
-    val group = GroupConnectionPriority()
-    val wildcard = WildCardConnectionPriority()
-    val fake = FakeConnectionPriority()
+    // Use enum values directly
+    val explicit = ConnectionPriority.Explicit
+    val group = ConnectionPriority.Group
+    val wildcard = ConnectionPriority.WildCard
+    val fake = ConnectionPriority.Fake
     
-    explicit shouldBe a[ConnectionPriority]
-    group shouldBe a[ConnectionPriority]
-    wildcard shouldBe a[ConnectionPriority]
-    fake shouldBe a[ConnectionPriority]
+    // Verify type and equality
+    explicit shouldBe ConnectionPriority.Explicit
+    group shouldBe ConnectionPriority.Group
+    wildcard shouldBe ConnectionPriority.WildCard
+    fake shouldBe ConnectionPriority.Fake
     
     // Verify they are different instances
     explicit should not be group
@@ -120,21 +122,21 @@ class ConnectedSpec extends AnyFlatSpec with Matchers with MockitoSugar with Sil
     
     // Create different connection types
     val chipToChip = ConnectedPortGroup(
-      ExplicitConnectionPriority(),
+      ConnectionPriority.Explicit,
       chipLoc1,
       FirstToSecondConnection(),
       chipLoc2
     )
     
     val pinToChip = ConnectedPortGroup(
-      ExplicitConnectionPriority(),
+      ConnectionPriority.Explicit,
       pinLoc,
       FirstToSecondConnection(),
       chipLoc1
     )
     
     val chipToPin = ConnectedPortGroup(
-      ExplicitConnectionPriority(),
+      ConnectionPriority.Explicit,
       chipLoc1,
       FirstToSecondConnection(),
       pinLoc
@@ -184,7 +186,7 @@ class ConnectedSpec extends AnyFlatSpec with Matchers with MockitoSugar with Sil
     
     // Create connection with FirstToSecondConnection
     val connection = ConnectedPortGroup(
-      ExplicitConnectionPriority(),
+      ConnectionPriority.Explicit,
       chipLoc1,
       FirstToSecondConnection(),
       chipLoc2

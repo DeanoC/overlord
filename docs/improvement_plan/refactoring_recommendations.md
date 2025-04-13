@@ -93,42 +93,6 @@ private def validateSingleInstance(locs: Seq[InstanceLoc], name: String): Either
 }
 ```
 
-## 4. Refactor YAML Processing
-
-### Current Issues:
-- YAML processing is scattered across different classes
-- The `Unconnected.apply` method handles all YAML parsing in a single large method
-- Validation of YAML structure is mixed with object creation
-
-### Recommendations:
-- **Create a dedicated ConnectionParser object**: Separate YAML parsing from business logic
-- **Implement the Factory pattern**: Use factory methods for creating connection instances
-- **Add validation as a separate step**: Validate YAML structure before attempting to create objects
-
-```scala
-// Example: ConnectionParser object
-object ConnectionParser {
-  def parseConnection(connection: Variant): Either[ConnectionError, UnconnectedLike] = {
-    for {
-      connType <- getConnectionType(connection)
-      connectionStr <- getConnectionString(connection)
-      (first, dir, second) <- parseConnectionString(connectionStr)
-      result <- createConnection(connType, first, dir, second, connection)
-    } yield result
-  }
-  
-  private def getConnectionType(connection: Variant): Either[ConnectionError, String] = {
-    val table = Utils.toTable(connection)
-    if (!table.contains("type")) 
-      Left(MissingField("type"))
-    else 
-      Right(Utils.toString(table("type")))
-  }
-  
-  // Additional helper methods...
-}
-```
-
 ## 5. Replace Mutable Collections with Immutable Alternatives
 
 ### Current Issues:

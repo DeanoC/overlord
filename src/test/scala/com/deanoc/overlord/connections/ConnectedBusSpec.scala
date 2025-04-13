@@ -35,7 +35,7 @@ class ConnectedBusSpec extends AnyFlatSpec with Matchers with MockitoSugar with 
     
     // Create ConnectedBus
     val busConn = ConnectedBus(
-      ExplicitConnectionPriority(),
+      ConnectionPriority.Explicit,
       srcLoc,
       FirstToSecondConnection(),
       destLoc,
@@ -44,7 +44,7 @@ class ConnectedBusSpec extends AnyFlatSpec with Matchers with MockitoSugar with 
     )
     
     // Test basic properties
-    busConn.connectionPriority shouldBe a[ExplicitConnectionPriority]
+    busConn.connectionPriority shouldBe ConnectionPriority.Explicit
     busConn.first.get shouldBe srcLoc
     busConn.second.get shouldBe destLoc
     busConn.direction shouldBe a[FirstToSecondConnection]
@@ -74,7 +74,7 @@ class ConnectedBusSpec extends AnyFlatSpec with Matchers with MockitoSugar with 
     
     // Create ConnectedBus with FirstToSecond direction
     val forwardBus = ConnectedBus(
-      ExplicitConnectionPriority(),
+      ConnectionPriority.Explicit,
       srcLoc,
       FirstToSecondConnection(),
       destLoc,
@@ -84,7 +84,7 @@ class ConnectedBusSpec extends AnyFlatSpec with Matchers with MockitoSugar with 
     
     // Create ConnectedBus with bidirectional connection
     val biBus = ConnectedBus(
-      ExplicitConnectionPriority(),
+      ConnectionPriority.Explicit,
       srcLoc,
       BiDirectionConnection(),
       destLoc,
@@ -132,7 +132,7 @@ class ConnectedBusSpec extends AnyFlatSpec with Matchers with MockitoSugar with 
     
     // Create ConnectedBus
     val busConn = ConnectedBus(
-      ExplicitConnectionPriority(),
+      ConnectionPriority.Explicit,
       srcLoc,
       FirstToSecondConnection(),
       destLoc,
@@ -161,7 +161,7 @@ class ConnectedBusSpec extends AnyFlatSpec with Matchers with MockitoSugar with 
     
     // Create ConnectedBus
     val busConn = ConnectedBus(
-      ExplicitConnectionPriority(),
+      ConnectionPriority.Explicit,
       srcLoc,
       FirstToSecondConnection(),
       destLoc,

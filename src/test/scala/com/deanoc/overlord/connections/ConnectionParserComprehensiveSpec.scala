@@ -1,5 +1,6 @@
 package com.deanoc.overlord.connections
 
+import scala.language.implicitConversions
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
@@ -420,14 +421,14 @@ class ConnectionParserComprehensiveSpec extends AnyFlatSpec with Matchers with M
     
     // Parse port connection
     val result = ConnectionParser.parsePortConnection(
-      ExplicitConnectionPriority(),
+      ConnectionPriority.Explicit,
       srcLoc,
       destLoc
     )
     
     // Check result
     result shouldBe a[ConnectedPortGroup]
-    result.connectionPriority shouldBe a[ExplicitConnectionPriority]
+    result.connectionPriority shouldBe ConnectionPriority.Explicit
     result.first.get.instance shouldBe chipInstance1
     result.first.get.port.get.name shouldBe "in_port"
     result.first.get.port.get.direction shouldBe a[InWireDirection]
@@ -455,7 +456,7 @@ class ConnectionParserComprehensiveSpec extends AnyFlatSpec with Matchers with M
     val destLoc1 = InstanceLoc(chipInstance2, Some(inPort), "destination1")
     
     val result1 = ConnectionParser.parsePortConnection(
-      ExplicitConnectionPriority(),
+      ConnectionPriority.Explicit,
       srcLoc1,
       destLoc1
     )
@@ -468,7 +469,7 @@ class ConnectionParserComprehensiveSpec extends AnyFlatSpec with Matchers with M
     val destLoc2 = InstanceLoc(chipInstance2, Some(outPort), "destination2")
     
     val result2 = ConnectionParser.parsePortConnection(
-      ExplicitConnectionPriority(),
+      ConnectionPriority.Explicit,
       srcLoc2,
       destLoc2
     )
@@ -481,7 +482,7 @@ class ConnectionParserComprehensiveSpec extends AnyFlatSpec with Matchers with M
     val destLoc3 = InstanceLoc(chipInstance2, Some(inOutPort), "destination3")
     
     val result3 = ConnectionParser.parsePortConnection(
-      ExplicitConnectionPriority(),
+      ConnectionPriority.Explicit,
       srcLoc3,
       destLoc3
     )

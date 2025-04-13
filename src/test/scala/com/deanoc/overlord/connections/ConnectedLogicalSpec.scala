@@ -1,5 +1,6 @@
 package com.deanoc.overlord.connections
 
+import scala.language.implicitConversions
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
@@ -36,14 +37,14 @@ class ConnectedLogicalSpec extends AnyFlatSpec with Matchers with MockitoSugar w
     
     // Create ConnectedLogical
     val logicalConn = ConnectedLogical(
-      ExplicitConnectionPriority(),
+      ConnectionPriority.Explicit,
       srcLoc,
       FirstToSecondConnection(),
       destLoc
     )
     
     // Test basic properties
-    logicalConn.connectionPriority shouldBe a[ExplicitConnectionPriority]
+    logicalConn.connectionPriority shouldBe ConnectionPriority.Explicit
     logicalConn.first.get shouldBe srcLoc
     logicalConn.second.get shouldBe destLoc
     logicalConn.direction shouldBe a[FirstToSecondConnection]
@@ -73,7 +74,7 @@ class ConnectedLogicalSpec extends AnyFlatSpec with Matchers with MockitoSugar w
     
     // Create ConnectedLogical with FirstToSecond direction
     val forwardLogical = ConnectedLogical(
-      ExplicitConnectionPriority(),
+      ConnectionPriority.Explicit,
       srcLoc,
       FirstToSecondConnection(),
       destLoc
@@ -81,7 +82,7 @@ class ConnectedLogicalSpec extends AnyFlatSpec with Matchers with MockitoSugar w
     
     // Create ConnectedLogical with bidirectional connection
     val biLogical = ConnectedLogical(
-      ExplicitConnectionPriority(),
+      ConnectionPriority.Explicit,
       srcLoc,
       BiDirectionConnection(),
       destLoc
@@ -129,7 +130,7 @@ class ConnectedLogicalSpec extends AnyFlatSpec with Matchers with MockitoSugar w
     
     // Create ConnectedLogical
     val logicalConn = ConnectedLogical(
-      ExplicitConnectionPriority(),
+      ConnectionPriority.Explicit,
       srcLoc,
       FirstToSecondConnection(),
       destLoc
@@ -158,7 +159,7 @@ class ConnectedLogicalSpec extends AnyFlatSpec with Matchers with MockitoSugar w
     
     // Create ConnectedLogical
     val logicalConn = ConnectedLogical(
-      ExplicitConnectionPriority(),
+      ConnectionPriority.Explicit,
       srcLoc,
       FirstToSecondConnection(),
       destLoc
@@ -186,37 +187,37 @@ class ConnectedLogicalSpec extends AnyFlatSpec with Matchers with MockitoSugar w
     
     // Create connections with different priorities
     val explicitConn = ConnectedLogical(
-      ExplicitConnectionPriority(),
+      ConnectionPriority.Explicit,
       srcLoc,
       FirstToSecondConnection(),
       destLoc
     )
     
     val groupConn = ConnectedLogical(
-      GroupConnectionPriority(),
+      ConnectionPriority.Group,
       srcLoc,
       FirstToSecondConnection(),
       destLoc
     )
     
     val wildcardConn = ConnectedLogical(
-      WildCardConnectionPriority(),
+      ConnectionPriority.WildCard,
       srcLoc,
       FirstToSecondConnection(),
       destLoc
     )
     
     val fakeConn = ConnectedLogical(
-      FakeConnectionPriority(),
+      ConnectionPriority.Fake,
       srcLoc,
       FirstToSecondConnection(),
       destLoc
     )
     
     // Verify connection priorities
-    explicitConn.connectionPriority shouldBe a[ExplicitConnectionPriority]
-    groupConn.connectionPriority shouldBe a[GroupConnectionPriority]
-    wildcardConn.connectionPriority shouldBe a[WildCardConnectionPriority]
-    fakeConn.connectionPriority shouldBe a[FakeConnectionPriority]
+    explicitConn.connectionPriority shouldBe ConnectionPriority.Explicit
+    groupConn.connectionPriority shouldBe ConnectionPriority.Group
+    wildcardConn.connectionPriority shouldBe ConnectionPriority.WildCard
+    fakeConn.connectionPriority shouldBe ConnectionPriority.Fake
   }
 }

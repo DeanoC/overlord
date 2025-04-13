@@ -5,8 +5,8 @@ import scala.collection.mutable
 import com.deanoc.overlord.utils._
 import com.deanoc.overlord.{Project}
 import com.deanoc.overlord.connections.{
+  ConnectionPriority,
   InstanceLoc,
-  WildCardConnectionPriority,
   Wire
 }
 import com.deanoc.overlord.instances.{
@@ -88,7 +88,7 @@ object Top {
     }
 
     for {
-      wire <- wires.filterNot(_.priority == WildCardConnectionPriority())
+      wire <- wires.filterNot(_.priority == ConnectionPriority.WildCard)
       oloc = wire.findEndIsPinOrClock
       if oloc.nonEmpty
       loc = oloc.get

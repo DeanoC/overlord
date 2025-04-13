@@ -169,7 +169,7 @@ case class UnconnectedBus(
 
     val busConnection = Seq[Connected](
       ConnectedBus(
-        GroupConnectionPriority(),
+        ConnectionPriority.Group,
         mainIL,
         direction,
         otherIL,

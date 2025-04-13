@@ -33,13 +33,14 @@ case class UnconnectedLogical(
     val mo = matchInstances(firstFullName, unexpanded)
     val so = matchInstances(secondFullName, unexpanded)
 
-    val cbp =
+    // Use enum values directly instead of compatibility classes
+    val connectionPriority =
       if (mo.length > 1 || so.length > 1)
-        WildCardConnectionPriority()
-      else ExplicitConnectionPriority()
+        ConnectionPriority.WildCard
+      else ConnectionPriority.Explicit
 
     for { mloc <- mo; sloc <- so } yield ConnectedLogical(
-      cbp,
+      connectionPriority,
       mloc,
       direction,
       sloc

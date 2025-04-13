@@ -41,10 +41,6 @@ overlord/src/main/scala/com/deanoc/overlord
 10. Apply `transparent traits` where applicable
 
 ## Refactoring Steps
-1. Fix package declaration inconsistency
-   - Update all files to use lowercase "connections" in package declarations
-   - Ensure imports across the codebase reflect this change
-   
 2. Convert ConnectionPriority to an enum
    - Replace the sealed trait and case classes with a proper Scala 3 enum
    
