@@ -9,6 +9,7 @@ object ModuleLogger {
   private var defaultLevel: Level = Level.INFO
   private var exitOnErrorEnabled: Boolean = false
   private var exitCode: Int = 1
+  private var silentMode: Boolean = false // Flag to enable/disable all logging output
   
   // Set the logging level for a specific module
   def setModuleLogLevel(moduleName: String, level: Level): Unit = {
@@ -25,8 +26,21 @@ object ModuleLogger {
     defaultLevel = level
   }
 
+  // Enable or disable silent mode for testing
+  def setSilentMode(silent: Boolean): Unit = {
+    silentMode = silent
+  }
+  
+  // Check if silent mode is enabled
+  def isSilentMode(): Boolean = silentMode
+
   // Check if a specific logging level is enabled for a module
   def isLevelEnabled(moduleName: String, level: Level): Boolean = {
+    if (silentMode) {
+      // When in silent mode, don't log anything
+      return false
+    }
+    
     val moduleLevel = getModuleLogLevel(moduleName)
 
     // Check if the requested level is less than or equal to the module's level
@@ -96,13 +110,17 @@ trait Logging extends LazyLogging {
   def warn(message: => String): Unit = {
     if (ModuleLogger.isLevelEnabled(moduleName, Level.WARN)) {
       logger.warn(message)
+      // Note: warnings are automatically silenced by isLevelEnabled when in silent mode
     }
   }
   
   def error(message: => String): Unit = {
     if (ModuleLogger.isLevelEnabled(moduleName, Level.ERROR)) {
       logger.error(message)
-      ModuleLogger.exitApplication()
+      // Even in silent mode, we should respect exit on error
+      if (!ModuleLogger.isSilentMode()) {
+        ModuleLogger.exitApplication()
+      }
     }
   }
   
@@ -128,13 +146,17 @@ trait Logging extends LazyLogging {
   def warn(message: => String, arg: Any): Unit = {
     if (ModuleLogger.isLevelEnabled(moduleName, Level.WARN)) {
       logger.warn(message, arg)
+      // Note: warnings are automatically silenced by isLevelEnabled when in silent mode
     }
   }
   
   def error(message: => String, arg: Any): Unit = {
     if (ModuleLogger.isLevelEnabled(moduleName, Level.ERROR)) {
       logger.error(message, arg)
-      ModuleLogger.exitApplication()
+      // Even in silent mode, we should respect exit on error
+      if (!ModuleLogger.isSilentMode()) {
+        ModuleLogger.exitApplication()
+      }
     }
   }
 }

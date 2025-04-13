@@ -2,21 +2,11 @@ package com.deanoc.overlord.connections
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import com.deanoc.overlord.{
-  BiDirectionConnection, 
-  FirstToSecondConnection, 
-  SecondToFirstConnection
-}
-import com.deanoc.overlord.utils.{Utils, Variant}
+import com.deanoc.overlord._
+import com.deanoc.overlord.utils.{Utils, Variant, SilentLogger}
 import org.scalatestplus.mockito.MockitoSugar
 
-/**
- * Test suite specifically for the Unconnected.apply method.
- *
- * This test suite verifies the parsing behavior of the Unconnected.apply method,
- * focusing on how it handles different connection types and edge cases.
- */
-class UnconnectedApplySpec extends AnyFlatSpec with Matchers with MockitoSugar {
+class UnconnectedApplySpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLogger {
   
   // Helper method to create a variant for testing
   private def createConnectionVariant(
@@ -190,32 +180,38 @@ class UnconnectedApplySpec extends AnyFlatSpec with Matchers with MockitoSugar {
   }
   
   it should "reject missing required fields" in {
-    // Missing type field
-    val missingTypeMap = new java.util.HashMap[String, Any]()
-    missingTypeMap.put("connection", "a -> b")
-    val missingType = Utils.toVariant(missingTypeMap)
-    Unconnected.apply(missingType) shouldBe None
-    
-    // Missing connection field
-    val missingConnectionMap = new java.util.HashMap[String, Any]()
-    missingConnectionMap.put("type", "port")
-    val missingConnection = Utils.toVariant(missingConnectionMap)
-    Unconnected.apply(missingConnection) shouldBe None
+    withSilentLogs {
+      // Missing type field
+      val missingTypeMap = new java.util.HashMap[String, Any]()
+      missingTypeMap.put("connection", "a -> b")
+      val missingType = Utils.toVariant(missingTypeMap)
+      Unconnected.apply(missingType) shouldBe None
+      
+      // Missing connection field
+      val missingConnectionMap = new java.util.HashMap[String, Any]()
+      missingConnectionMap.put("type", "port")
+      val missingConnection = Utils.toVariant(missingConnectionMap)
+      Unconnected.apply(missingConnection) shouldBe None
+    }
   }
   
   it should "reject invalid connection format" in {
-    // Invalid direction symbol
-    val invalidDirection = createConnectionVariant("port", "a => b")
-    Unconnected.apply(invalidDirection) shouldBe None
-    
-    // Invalid parts count
-    val invalidParts = createConnectionVariant("port", "a -> b -> c")
-    Unconnected.apply(invalidParts) shouldBe None
+    withSilentLogs {
+      // Invalid direction symbol
+      val invalidDirection = createConnectionVariant("port", "a => b")
+      Unconnected.apply(invalidDirection) shouldBe None
+      
+      // Invalid parts count
+      val invalidParts = createConnectionVariant("port", "a -> b -> c")
+      Unconnected.apply(invalidParts) shouldBe None
+    }
   }
   
   it should "reject unknown connection types" in {
-    val unknownType = createConnectionVariant("unknown_type", "a -> b")
-    Unconnected.apply(unknownType) shouldBe None
+    withSilentLogs {
+      val unknownType = createConnectionVariant("unknown_type", "a -> b")
+      Unconnected.apply(unknownType) shouldBe None
+    }
   }
   
   it should "reject parameters connections with invalid first value" in {
@@ -237,5 +233,19 @@ class UnconnectedApplySpec extends AnyFlatSpec with Matchers with MockitoSugar {
     )
     
     Unconnected.apply(invalidParams) shouldBe None
+  }
+
+  it should "handle excessive whitespace in connection strings" in {
+    // Test with varied whitespace around the direction symbol and device names
+    val withExtraWhitespace = createConnectionVariant("port", "  device1    ->      device2  ")
+    
+    val result = Unconnected.apply(withExtraWhitespace)
+    
+    result shouldBe defined
+    result.get shouldBe a[UnconnectedPort]
+    val port = result.get.asInstanceOf[UnconnectedPort]
+    port.firstFullName shouldBe "device1"
+    port.direction shouldBe a[FirstToSecondConnection]
+    port.secondFullName shouldBe "device2"
   }
 }

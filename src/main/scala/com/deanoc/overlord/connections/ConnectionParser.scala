@@ -34,19 +34,31 @@ object ConnectionParser extends Logging {
     }
 
     val cons = Utils.toString(table("connection"))
-    val con = cons.split(' ')
-    if (con.length != 3) {
-      error(s"$conntype has an invalid connection field: $cons")
-      return None
+    
+    // More robust parsing of connection string that handles extra whitespace
+    // First, identify which connection operator is present
+    val connectionPattern = "(.+?)\\s*(<->|<>|->|<-)\\s*(.+)".r
+    
+    val (first, dirSymbol, secondary) = cons match {
+      case connectionPattern(left, op, right) => 
+        // Check that the right side doesn't contain any more operators
+        if (right.contains("->") || right.contains("<-") || right.contains("<>") || right.contains("<->")) {
+          error(s"$conntype has an invalid connection field with multiple operators: $cons")
+          return None
+        }
+        (left.trim, op, right.trim)
+      case _ => 
+        error(s"$conntype has an invalid connection field: $cons")
+        return None
     }
     
-    // Parse the connection direction from the middle component
-    val (first, dir, secondary) = con(1) match {
-      case "->"         => (con(0), FirstToSecondConnection(), con(2))
-      case "<->" | "<>" => (con(0), BiDirectionConnection(), con(2))
-      case "<-"         => (con(0), SecondToFirstConnection(), con(2))
+    // Parse the connection direction from the identified symbol
+    val dir = dirSymbol match {
+      case "->"      => FirstToSecondConnection()
+      case "<->" | "<>" => BiDirectionConnection()
+      case "<-"      => SecondToFirstConnection()
       case _ =>
-        error(s"$conntype has an invalid connection ${con(1)} : $cons")
+        error(s"$conntype has an invalid connection $dirSymbol : $cons")
         return None
     }
 

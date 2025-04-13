@@ -27,6 +27,7 @@ object Main extends Logging {
       debug: Option[String] = None
   )
 
+  
   val parser: OParser[_, Config] = {
     val builder = OParser.builder[Config]
     import builder._

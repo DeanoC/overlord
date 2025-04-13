@@ -2,17 +2,28 @@ package com.deanoc.overlord.connections
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-import com.deanoc.overlord.utils.{Utils, Variant}
-import com.deanoc.overlord.{FirstToSecondConnection, SecondToFirstConnection, BiDirectionConnection}
-import scala.jdk.CollectionConverters._
+import com.deanoc.overlord._
+import com.deanoc.overlord.utils.{Utils, Variant, SilentLogger}
 
-/**
- * Simplified test suite for the Unconnected.apply method.
- * 
- * This test focuses on the basic parsing functionality of Unconnected.apply
- * with minimal dependencies on complex Variant creation.
- */
-class SimpleUnconnectedApplySpec extends AnyFlatSpec with Matchers {
+class SimpleUnconnectedApplySpec extends AnyFlatSpec with Matchers with SilentLogger {
+  
+  /**
+   * Helper method to create a variant for testing with minimal fields.
+   *
+   * @param fields A map of field names to values to include in the variant
+   * @return A Variant containing the specified fields
+   */
+  private def createMinimalVariant(fields: Map[String, Any]): Variant = {
+    val map = new java.util.HashMap[String, Any]()
+    
+    // Add all fields from the map
+    fields.foreach { case (key, value) =>
+      map.put(key, value)
+    }
+    
+    // Convert to Variant
+    Utils.toVariant(map)
+  }
   
   // Simple test for port connection
   "Unconnected.apply" should "parse port connections" in {
@@ -157,17 +168,15 @@ class SimpleUnconnectedApplySpec extends AnyFlatSpec with Matchers {
   }
   
   it should "reject connections with missing fields" in {
-    // Missing type field
-    val missingTypeMap = new java.util.HashMap[String, Any]()
-    missingTypeMap.put("connection", "a -> b")
-    
-    Unconnected.apply(Utils.toVariant(missingTypeMap)) shouldBe None
-    
-    // Missing connection field
-    val missingConnMap = new java.util.HashMap[String, Any]()
-    missingConnMap.put("type", "port")
-    
-    Unconnected.apply(Utils.toVariant(missingConnMap)) shouldBe None
+    withSilentLogs {
+      // Create a test case with missing type field
+      val missingType = createMinimalVariant(Map("connection" -> "a -> b"))
+      Unconnected.apply(missingType) shouldBe None
+      
+      // Create a test case with missing connection field
+      val missingConn = createMinimalVariant(Map("type" -> "port"))
+      Unconnected.apply(missingConn) shouldBe None
+    }
   }
   
   it should "parse parameter connections" in {

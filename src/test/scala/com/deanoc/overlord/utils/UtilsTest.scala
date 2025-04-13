@@ -1,30 +1,31 @@
 package com.deanoc.overlord.utils
 
-import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import java.io.{File, PrintWriter}
 import java.nio.file.{Files, Paths}
-import scala.jdk.CollectionConverters._
 import org.yaml.snakeyaml.Yaml
 
-class UtilsTest extends AnyFunSuite {
+class UtilsTest extends AnyFlatSpec with Matchers with SilentLogger {
 
-  test("toBigInt should convert IntV to BigInt") {
+  "Utils" should "toBigInt should convert IntV to BigInt" in {
     val intVariant = IntV(42)
-    assert(Utils.toBigInt(intVariant) == BigInt(42))
+    Utils.toBigInt(intVariant) shouldEqual BigInt(42)
   }
 
-  test("toBigInt should convert StringV to BigInt with multiplier") {
+  it should "toBigInt should convert StringV to BigInt with multiplier" in {
     val stringVariant = StringV("2kb")
-    assert(Utils.toBigInt(stringVariant) == BigInt(2048))
+    Utils.toBigInt(stringVariant) shouldEqual BigInt(2048)
   }
 
-  test("toVariant should convert String to StringV") {
+  it should "toVariant should convert String to StringV" in {
     val string = "hello"
     val variant = Utils.toVariant(string)
-    assert(variant.isInstanceOf[StringV])
-    assert(variant.asInstanceOf[StringV].value == "hello")
+    variant shouldBe a[StringV]
+    variant.asInstanceOf[StringV].value shouldEqual "hello"
   }
 
-  test("readYaml should parse valid YAML file") {
+  it should "readYaml should parse valid YAML file" in {
     val yamlContent = """key1: value1
 key2: 42
 key3: true"""
@@ -32,151 +33,157 @@ key3: true"""
     Files.write(tempFile, yamlContent.getBytes)
 
     val result = Utils.readYaml(tempFile)
-    assert(result("key1").isInstanceOf[StringV])
-    assert(result("key1").asInstanceOf[StringV].value == "value1")
-    assert(result("key2").isInstanceOf[IntV])
-    assert(result("key2").asInstanceOf[IntV].value == 42)
-    assert(result("key3").isInstanceOf[BooleanV])
-    assert(result("key3").asInstanceOf[BooleanV].value)
+    result("key1") shouldBe a[StringV]
+    result("key1").asInstanceOf[StringV].value shouldEqual "value1"
+    result("key2") shouldBe a[IntV]
+    result("key2").asInstanceOf[IntV].value shouldEqual 42
+    result("key3") shouldBe a[BooleanV]
+    result("key3").asInstanceOf[BooleanV].value shouldEqual true
 
     Files.delete(tempFile)
   }
 
-  test("readYaml should return empty map for invalid file") {
-    val tempFile = Files.createTempFile("test", ".yaml")
-    Files.write(tempFile, "invalid: [".getBytes)
-
-    val result = Utils.readYaml(tempFile)
-    assert(result.isEmpty)
-
-    Files.delete(tempFile)
+  it should "readYaml should return empty map for invalid file" in {
+    withSilentLogs {
+      val tempFile = File.createTempFile("test", ".yaml")
+      tempFile.deleteOnExit()
+      
+      // Write invalid YAML content to the file
+      val writer = new PrintWriter(tempFile)
+      writer.write("invalid: [")
+      writer.close()
+      
+      // Try to parse it and expect empty map
+      val result = Utils.readYaml(tempFile.toPath) // Fix: use toPath method to get a Path object
+      result shouldBe Map.empty[String, Any]
+    }
   }
 
   // Tests for different Variant conversions
-  test("toVariant should convert Java Boolean to BooleanV") {
+  it should "toVariant should convert Java Boolean to BooleanV" in {
     val javaBoolean: java.lang.Boolean = true
     val variant = Utils.toVariant(javaBoolean)
-    assert(variant.isInstanceOf[BooleanV])
-    assert(variant.asInstanceOf[BooleanV].value)
+    variant shouldBe a[BooleanV]
+    variant.asInstanceOf[BooleanV].value shouldEqual true
   }
 
-  test("toVariant should convert Java Double to DoubleV") {
+  it should "toVariant should convert Java Double to DoubleV" in {
     val javaDouble: java.lang.Double = 3.14
     val variant = Utils.toVariant(javaDouble)
-    assert(variant.isInstanceOf[DoubleV])
-    assert(variant.asInstanceOf[DoubleV].value == 3.14)
+    variant shouldBe a[DoubleV]
+    variant.asInstanceOf[DoubleV].value shouldEqual 3.14
   }
 
-  test("toVariant should convert Java Integer to IntV") {
+  it should "toVariant should convert Java Integer to IntV" in {
     val javaInteger: java.lang.Integer = 42
     val variant = Utils.toVariant(javaInteger)
-    assert(variant.isInstanceOf[IntV])
-    assert(variant.asInstanceOf[IntV].value == 42)
+    variant shouldBe a[IntV]
+    variant.asInstanceOf[IntV].value shouldEqual 42
   }
 
-  test("toVariant should convert Java Float to DoubleV") {
+  it should "toVariant should convert Java Float to DoubleV" in {
     val javaFloat: java.lang.Float = 2.71f
     val variant = Utils.toVariant(javaFloat)
-    assert(variant.isInstanceOf[DoubleV])
-    assert(variant.asInstanceOf[DoubleV].value == 2.71f.toDouble)
+    variant shouldBe a[DoubleV]
+    variant.asInstanceOf[DoubleV].value shouldEqual 2.71f.toDouble
   }
 
-  test("toVariant should convert Java Long to BigIntV") {
+  it should "toVariant should convert Java Long to BigIntV" in {
     val javaLong: java.lang.Long = 9876543210L
     val variant = Utils.toVariant(javaLong)
-    assert(variant.isInstanceOf[BigIntV])
-    assert(variant.asInstanceOf[BigIntV].value == BigInt(9876543210L))
+    variant shouldBe a[BigIntV]
+    variant.asInstanceOf[BigIntV].value shouldEqual BigInt(9876543210L)
   }
 
-  test("toVariant should convert Scala BigInt to BigIntV") {
+  it should "toVariant should convert Scala BigInt to BigIntV" in {
     val bigInt = BigInt("123456789012345678901234567890")
     val variant = Utils.toVariant(bigInt)
-    assert(variant.isInstanceOf[BigIntV])
-    assert(variant.asInstanceOf[BigIntV].value == bigInt)
+    variant shouldBe a[BigIntV]
+    variant.asInstanceOf[BigIntV].value shouldEqual bigInt
   }
 
-  test("toVariant should convert BigDecimal to DoubleV") {
+  it should "toVariant should convert BigDecimal to DoubleV" in {
     val bigDecimal = scala.math.BigDecimal("3.14159265358979")
     val variant = Utils.toVariant(bigDecimal)
-    assert(variant.isInstanceOf[DoubleV])
-    assert(variant.asInstanceOf[DoubleV].value == bigDecimal.toDouble)
+    variant shouldBe a[DoubleV]
+    variant.asInstanceOf[DoubleV].value shouldEqual bigDecimal.toDouble
   }
 
-  test("toVariant should handle null values") {
+  it should "toVariant should handle null values" in {
     val nullValue: String = null
     val variant = Utils.toVariant(nullValue)
-    assert(variant.isInstanceOf[StringV])
-    assert(variant.asInstanceOf[StringV].value == "")
+    variant shouldBe a[StringV]
+    variant.asInstanceOf[StringV].value shouldEqual ""
   }
 
   // Tests for collection conversions
-  test("toVariant should convert Java Map to TableV") {
+  it should "toVariant should convert Java Map to TableV" in {
     val javaMap = new java.util.HashMap[String, Any]()
     javaMap.put("key1", "value1")
     javaMap.put("key2", 42)
     
     val variant = Utils.toVariant(javaMap)
-    assert(variant.isInstanceOf[TableV])
+    variant shouldBe a[TableV]
     
     val tableV = variant.asInstanceOf[TableV]
-    assert(tableV.value.size == 2)
-    assert(tableV.value("key1").isInstanceOf[StringV])
-    assert(tableV.value("key1").asInstanceOf[StringV].value == "value1")
-    assert(tableV.value("key2").isInstanceOf[IntV])
-    assert(tableV.value("key2").asInstanceOf[IntV].value == 42)
+    tableV.value.size shouldEqual 2
+    tableV.value("key1") shouldBe a[StringV]
+    tableV.value("key1").asInstanceOf[StringV].value shouldEqual "value1"
+    tableV.value("key2") shouldBe a[IntV]
+    tableV.value("key2").asInstanceOf[IntV].value shouldEqual 42
   }
 
-  test("toVariant should convert Java List to ArrayV") {
+  it should "toVariant should convert Java List to ArrayV" in {
     val javaList = new java.util.ArrayList[Any]()
     javaList.add("element1")
     javaList.add(42)
     javaList.add(true)
     
     val variant = Utils.toVariant(javaList)
-    assert(variant.isInstanceOf[ArrayV])
+    variant shouldBe a[ArrayV]
     
     val arrayV = variant.asInstanceOf[ArrayV]
-    assert(arrayV.value.length == 3)
-    assert(arrayV.value(0).isInstanceOf[StringV])
-    assert(arrayV.value(0).asInstanceOf[StringV].value == "element1")
-    assert(arrayV.value(1).isInstanceOf[IntV])
-    assert(arrayV.value(1).asInstanceOf[IntV].value == 42)
-    assert(arrayV.value(2).isInstanceOf[BooleanV])
-    assert(arrayV.value(2).asInstanceOf[BooleanV].value)
+    arrayV.value.length shouldEqual 3
+    arrayV.value(0) shouldBe a[StringV]
+    arrayV.value(0).asInstanceOf[StringV].value shouldEqual "element1"
+    arrayV.value(1) shouldBe a[IntV]
+    arrayV.value(1).asInstanceOf[IntV].value shouldEqual 42
+    arrayV.value(2) shouldBe a[BooleanV]
+    arrayV.value(2).asInstanceOf[BooleanV].value shouldEqual true
   }
 
-  test("toVariant should convert Scala Map to TableV") {
+  it should "toVariant should convert Scala Map to TableV" in {
     val scalaMap = Map[String, Any]("key1" -> "value1", "key2" -> 42)
     val variant = Utils.toVariant(scalaMap)
     
-    assert(variant.isInstanceOf[TableV])
+    variant shouldBe a[TableV]
     val tableV = variant.asInstanceOf[TableV]
     
-    assert(tableV.value.size == 2)
-    assert(tableV.value("key1").isInstanceOf[StringV])
-    assert(tableV.value("key1").asInstanceOf[StringV].value == "value1")
-    assert(tableV.value("key2").isInstanceOf[IntV])
-    assert(tableV.value("key2").asInstanceOf[IntV].value == 42)
+    tableV.value.size shouldEqual 2
+    tableV.value("key1") shouldBe a[StringV]
+    tableV.value("key1").asInstanceOf[StringV].value shouldEqual "value1"
+    tableV.value("key2") shouldBe a[IntV]
+    tableV.value("key2").asInstanceOf[IntV].value shouldEqual 42
   }
 
-  test("toVariant should convert Scala Seq to ArrayV") {
+  it should "toVariant should convert Scala Seq to ArrayV" in {
     val scalaSeq = Seq[Any]("element1", 42, true)
     val variant = Utils.toVariant(scalaSeq)
     
-    assert(variant.isInstanceOf[ArrayV])
+    variant shouldBe a[ArrayV]
     val arrayV = variant.asInstanceOf[ArrayV]
     
-    assert(arrayV.value.length == 3)
-    assert(arrayV.value(0).isInstanceOf[StringV])
-    assert(arrayV.value(0).asInstanceOf[StringV].value == "element1")
-    assert(arrayV.value(1).isInstanceOf[IntV])
-    assert(arrayV.value(1).asInstanceOf[IntV].value == 42)
-    assert(arrayV.value(2).isInstanceOf[BooleanV])
-    assert(arrayV.value(2).asInstanceOf[BooleanV].value)
+    arrayV.value.length shouldEqual 3
+    arrayV.value(0) shouldBe a[StringV]
+    arrayV.value(0).asInstanceOf[StringV].value shouldEqual "element1"
+    arrayV.value(1) shouldBe a[IntV]
+    arrayV.value(1).asInstanceOf[IntV].value shouldEqual 42
+    arrayV.value(2) shouldBe a[BooleanV]
+    arrayV.value(2).asInstanceOf[BooleanV].value shouldEqual true
   }
 
   // Tests for nested structures
-  test("toVariant should handle nested collections") {
+  it should "toVariant should handle nested collections" in {
     val nestedMap = Map[String, Any](
       "string" -> "value",
       "nested" -> Map[String, Any]("inner" -> 42),
@@ -184,67 +191,67 @@ key3: true"""
     )
     
     val variant = Utils.toVariant(nestedMap)
-    assert(variant.isInstanceOf[TableV])
+    variant shouldBe a[TableV]
     
     val tableV = variant.asInstanceOf[TableV]
-    assert(tableV.value("string").isInstanceOf[StringV])
-    assert(tableV.value("nested").isInstanceOf[TableV])
-    assert(tableV.value("list").isInstanceOf[ArrayV])
+    tableV.value("string") shouldBe a[StringV]
+    tableV.value("nested") shouldBe a[TableV]
+    tableV.value("list") shouldBe a[ArrayV]
     
     val nestedTableV = tableV.value("nested").asInstanceOf[TableV]
-    assert(nestedTableV.value("inner").isInstanceOf[IntV])
-    assert(nestedTableV.value("inner").asInstanceOf[IntV].value == 42)
+    nestedTableV.value("inner") shouldBe a[IntV]
+    nestedTableV.value("inner").asInstanceOf[IntV].value shouldEqual 42
     
     val listV = tableV.value("list").asInstanceOf[ArrayV]
-    assert(listV.value(0).isInstanceOf[IntV])
-    assert(listV.value(1).isInstanceOf[StringV])
-    assert(listV.value(2).isInstanceOf[BooleanV])
+    listV.value(0) shouldBe a[IntV]
+    listV.value(1) shouldBe a[StringV]
+    listV.value(2) shouldBe a[BooleanV]
   }
   
   // Tests for utility methods
-  test("toString should convert variants to strings") {
-    assert(Utils.toString(StringV("test")) == "test")
-    assert(Utils.toString(IntV(42)) == "42")
-    assert(Utils.toString(BigIntV(BigInt("1234567890"))) == "1234567890")
+  it should "toString should convert variants to strings" in {
+    Utils.toString(StringV("test")) shouldEqual "test"
+    Utils.toString(IntV(42)) shouldEqual "42"
+    Utils.toString(BigIntV(BigInt("1234567890"))) shouldEqual "1234567890"
   }
   
-  test("toInt should convert variants to integers") {
-    assert(Utils.toInt(IntV(42)) == 42)
-    assert(Utils.toInt(BigIntV(BigInt(100))) == 100)
+  it should "toInt should convert variants to integers" in {
+    Utils.toInt(IntV(42)) shouldEqual 42
+    Utils.toInt(BigIntV(BigInt(100))) shouldEqual 100
   }
   
-  test("toBoolean should convert BooleanV to boolean") {
-    assert(Utils.toBoolean(BooleanV(true)))
-    assert(!Utils.toBoolean(BooleanV(false)))
+  it should "toBoolean should convert BooleanV to boolean" in {
+    Utils.toBoolean(BooleanV(true)) shouldEqual true
+    Utils.toBoolean(BooleanV(false)) shouldEqual false
   }
   
-  test("toDouble should convert DoubleV to double") {
-    assert(Utils.toDouble(DoubleV(3.14)) == 3.14)
+  it should "toDouble should convert DoubleV to double" in {
+    Utils.toDouble(DoubleV(3.14)) shouldEqual 3.14
   }
   
-  test("toArray should convert ArrayV to Array[Variant]") {
+  it should "toArray should convert ArrayV to Array[Variant]" in {
     val arrayV = ArrayV(Array(StringV("test"), IntV(42)))
     val array = Utils.toArray(arrayV)
     
-    assert(array.length == 2)
-    assert(array(0).isInstanceOf[StringV])
-    assert(array(0).asInstanceOf[StringV].value == "test")
-    assert(array(1).isInstanceOf[IntV])
-    assert(array(1).asInstanceOf[IntV].value == 42)
+    array.length shouldEqual 2
+    array(0) shouldBe a[StringV]
+    array(0).asInstanceOf[StringV].value shouldEqual "test"
+    array(1) shouldBe a[IntV]
+    array(1).asInstanceOf[IntV].value shouldEqual 42
   }
   
-  test("toTable should convert TableV to Map[String, Variant]") {
+  it should "toTable should convert TableV to Map[String, Variant]" in {
     val tableV = TableV(Map("key1" -> StringV("value1"), "key2" -> IntV(42)))
     val table = Utils.toTable(tableV)
     
-    assert(table.size == 2)
-    assert(table("key1").isInstanceOf[StringV])
-    assert(table("key1").asInstanceOf[StringV].value == "value1")
-    assert(table("key2").isInstanceOf[IntV])
-    assert(table("key2").asInstanceOf[IntV].value == 42)
+    table.size shouldEqual 2
+    table("key1") shouldBe a[StringV]
+    table("key1").asInstanceOf[StringV].value shouldEqual "value1"
+    table("key2") shouldBe a[IntV]
+    table("key2").asInstanceOf[IntV].value shouldEqual 42
   }
   
-  test("Variant formatting methods should work properly") {
+  it should "Variant formatting methods should work properly" in {
     val stringV = StringV("test")
     val intV = IntV(42)
     val booleanV = BooleanV(true)
@@ -253,63 +260,63 @@ key3: true"""
     val tableV = TableV(Map("key1" -> StringV("value1"), "key2" -> IntV(42)))
     
     // Test toYamlString
-    assert(stringV.toYamlString == "test")
-    assert(intV.toYamlString == "42")
-    assert(booleanV.toYamlString == "true")
-    assert(doubleV.toYamlString == "3.14")
+    stringV.toYamlString shouldEqual "test"
+    intV.toYamlString shouldEqual "42"
+    booleanV.toYamlString shouldEqual "true"
+    doubleV.toYamlString shouldEqual "3.14"
     
     // Test toCString
-    assert(stringV.toCString == "test")
-    assert(intV.toCString == "42")
-    assert(booleanV.toCString == "TRUE")
-    assert(doubleV.toCString == "3.14")
+    stringV.toCString shouldEqual "test"
+    intV.toCString shouldEqual "42"
+    booleanV.toCString shouldEqual "TRUE"
+    doubleV.toCString shouldEqual "3.14"
   }
 
   // Tests for YAML string representation
-  test("StringV.toYamlString should properly format strings") {
-    assert(StringV("simple").toYamlString === "simple")
-    assert(StringV("with spaces").toYamlString === "with spaces")
-    assert(StringV("special: characters").toYamlString === "\"special: characters\"")
-    assert(StringV("line\nbreak").toYamlString === "\"line\nbreak\"")
-    assert(StringV("").toYamlString === "\"\"")
-    assert(StringV("  ").toYamlString === "\"  \"")
-    assert(StringV("quotes 'single' and \"double\"").toYamlString === "\"quotes 'single' and \\\"double\\\"\"")
+  it should "StringV.toYamlString should properly format strings" in {
+    StringV("simple").toYamlString should === ("simple")
+    StringV("with spaces").toYamlString should === ("with spaces")
+    StringV("special: characters").toYamlString should === ("\"special: characters\"")
+    StringV("line\nbreak").toYamlString should === ("\"line\nbreak\"")
+    StringV("").toYamlString should === ("\"\"")
+    StringV("  ").toYamlString should === ("\"  \"")
+    StringV("quotes 'single' and \"double\"").toYamlString should === ("\"quotes 'single' and \\\"double\\\"\"")
   }
 
-  test("BooleanV.toYamlString should format boolean values") {
-    assert(BooleanV(true).toYamlString === "true")
-    assert(BooleanV(false).toYamlString === "false")
+  it should "BooleanV.toYamlString should format boolean values" in {
+    BooleanV(true).toYamlString should === ("true")
+    BooleanV(false).toYamlString should === ("false")
   }
 
-  test("IntV.toYamlString should format integers") {
-    assert(IntV(42).toYamlString === "42")
-    assert(IntV(-123).toYamlString === "-123")
-    assert(IntV(0).toYamlString === "0")
+  it should "IntV.toYamlString should format integers" in {
+    IntV(42).toYamlString should === ("42")
+    IntV(-123).toYamlString should === ("-123")
+    IntV(0).toYamlString should === ("0")
   }
 
-  test("DoubleV.toYamlString should format floating point numbers") {
-    assert(DoubleV(3.14).toYamlString === "3.14")
-    assert(DoubleV(-2.5).toYamlString === "-2.5")
-    assert(DoubleV(0.0).toYamlString === "0.0")
+  it should "DoubleV.toYamlString should format floating point numbers" in {
+    DoubleV(3.14).toYamlString should === ("3.14")
+    DoubleV(-2.5).toYamlString should === ("-2.5")
+    DoubleV(0.0).toYamlString should === ("0.0")
   }
 
-  test("BigIntV.toYamlString should format big integers") {
-    assert(BigIntV(BigInt("123")).toYamlString === "123")
+  it should "BigIntV.toYamlString should format big integers" in {
+    BigIntV(BigInt("123")).toYamlString should === ("123")
     // Fix the test to match the actual output or use a different approach
     // The test was expecting "9999999999999999999" but got "[-8446744073709551617]"
     // Let's use a BigInt value that will reliably format correctly
     val bigInt = BigInt("9876543210")
-    assert(BigIntV(bigInt).toYamlString === bigInt.toString)
+    BigIntV(bigInt).toYamlString should === (bigInt.toString)
   }
 
-  test("ArrayV.toYamlString should format arrays in YAML format") {
+  it should "ArrayV.toYamlString should format arrays in YAML format" in {
     val simpleArray = ArrayV(Array(IntV(1), IntV(2), IntV(3)))
     val expectedSimpleOutput = 
       """- 1
         |- 2
         |- 3""".stripMargin
     
-    assert(simpleArray.toYamlString === expectedSimpleOutput)
+    simpleArray.toYamlString should === (expectedSimpleOutput)
 
     val complexArray = ArrayV(Array(
       StringV("item1"),
@@ -322,10 +329,10 @@ key3: true"""
         |- 2
         |- key: value""".stripMargin
     
-    assert(complexArray.toYamlString === expectedComplexOutput)
+    complexArray.toYamlString should === (expectedComplexOutput)
   }
 
-  test("TableV.toYamlString should format maps in YAML format") {
+  it should "TableV.toYamlString should format maps in YAML format" in {
     val simpleTable = TableV(Map(
       "name" -> StringV("John"),
       "age" -> IntV(30),
@@ -337,7 +344,7 @@ key3: true"""
         |age: 30
         |developer: true""".stripMargin
     
-    assert(simpleTable.toYamlString === expectedSimpleOutput)
+    simpleTable.toYamlString should === (expectedSimpleOutput)
     
     val nestedTable = TableV(Map(
       "user" -> TableV(Map(
@@ -359,10 +366,10 @@ key3: true"""
         |  - 90
         |  - 78""".stripMargin
     
-    assert(nestedTable.toYamlString === expectedNestedOutput)
+    nestedTable.toYamlString should === (expectedNestedOutput)
   }
 
-  test("Complex nested structure should produce valid YAML") {
+  it should "Complex nested structure should produce valid YAML" in {
     val complex = TableV(Map(
       "config" -> TableV(Map(
         "server" -> TableV(Map(
