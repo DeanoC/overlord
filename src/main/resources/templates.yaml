@@ -1,7 +1,6 @@
 templates:
-  - name: "basic-verilog"
-    repo: "DeanoC/overlord-template-basic-verilog"
-  - name: "bare-metal"
-    repo: "DeanoC/overlord-template-bare-metal"
-  - name: "linux-app"
-    repo: "DeanoC/overlord-template-linux-app"
+  - name: "gateware-blinky"
+    repo: "DeanoC/overlord-template-gateware-blinky"
+  - name: "software-bare-metal"
+    repo: "DeanoC/overlord-template-software-bare-metal"
+

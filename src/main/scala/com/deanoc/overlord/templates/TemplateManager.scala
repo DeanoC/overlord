@@ -13,7 +13,7 @@ import scala.io.Source
   * repositories, and GitHub templates.
   */
 object TemplateManager extends Logging {
-  private val templateBasePath =
+  private var templateBasePath =
     Paths.get(System.getProperty("user.home"), ".overlord", "templates")
 
   // Load templates from YAML file
@@ -40,7 +40,39 @@ object TemplateManager extends Logging {
   }
 
   // Replace hardcoded standardTemplates with dynamic loading
-  private val standardTemplates = loadTemplatesFromYaml()
+  private var standardTemplates = loadTemplatesFromYaml()
+
+  /** Gets the current template base path.
+    *
+    * @return
+    *   The current template base path
+    */
+  def getTemplateBasePath: Path = templateBasePath
+
+  /** Sets the template base path. Primarily used for testing.
+    *
+    * @param path
+    *   The new template base path
+    */
+  def setTemplateBasePath(path: Path): Unit = {
+    templateBasePath = path
+  }
+
+  /** Gets the list of standard templates.
+    *
+    * @return
+    *   A list of tuples containing template name and repo
+    */
+  def getStandardTemplates: List[(String, String)] = standardTemplates
+
+  /** Sets the list of standard templates. Primarily used for testing.
+    *
+    * @param templates
+    *   A list of tuples containing template name and repo
+    */
+  def setStandardTemplates(templates: List[(String, String)]): Unit = {
+    standardTemplates = templates
+  }
 
   /** Creates a new project from a template.
     *
