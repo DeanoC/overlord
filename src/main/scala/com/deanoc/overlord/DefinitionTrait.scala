@@ -2,14 +2,14 @@ package com.deanoc.overlord
 
 import com.deanoc.overlord.actions.ActionsFile
 import com.deanoc.overlord.utils.{Utils, Variant}
-import com.deanoc.overlord.Hardware.{
+import com.deanoc.overlord.hardware.{
   HardwareDefinition,
   Port,
   RegisterBank,
   Registers
 }
-import com.deanoc.overlord.Instances._
-import com.deanoc.overlord.Software.SoftwareDefinition
+import com.deanoc.overlord.instances._
+import com.deanoc.overlord.software.SoftwareDefinition
 import com.deanoc.overlord.Project
 
 import java.nio.file.Path

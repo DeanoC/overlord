@@ -1,10 +1,13 @@
 package com.deanoc.overlord
 
+import scala.language.implicitConversions
+
 import java.nio.file.Path
 
-import com.deanoc.overlord.Connections._
-import com.deanoc.overlord.Instances.{ChipInstance, Container}
-import com.deanoc.overlord.Interfaces.UnconnectedLike
+import com.deanoc.overlord.connections._
+import com.deanoc.overlord.connections.ConnectionDirection
+import com.deanoc.overlord.instances.{ChipInstance, Container}
+import com.deanoc.overlord.interfaces.UnconnectedLike
 import com.deanoc.overlord.Project
 import com.deanoc.overlord.utils._
 object OutputGateware {
@@ -65,7 +68,7 @@ object OutputGateware {
                   ("protocol", StringV(b.busProtocol)),
                   (
                     "supplier",
-                    if (b.direction == FirstToSecondConnection() && isFirst)
+                    if (b.direction == ConnectionDirection.FirstToSecond && isFirst)
                       BooleanV(true)
                     else BooleanV(false)
                   )

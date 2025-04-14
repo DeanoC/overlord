@@ -1,8 +1,9 @@
-package com.deanoc.overlord.Connections
+package com.deanoc.overlord.connections
 
 import com.deanoc.overlord._
+import com.deanoc.overlord.connections.ConnectionDirection
 
-import com.deanoc.overlord.Instances.{ChipInstance, InstanceTrait}
+import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
 
 /** Represents an unconnected clock connection between two components.
   *
@@ -33,13 +34,13 @@ case class UnconnectedClock(
   override def connect(unexpanded: Seq[ChipInstance]): Seq[Connected] = {
     val mo = matchInstances(firstFullName, unexpanded)
     val so = matchInstances(secondFullName, unexpanded)
-
-    val cbp =
+    // Use enum values directly instead of compatibility classes
+    val connectionPriority =
       if (mo.length > 1 || so.length > 1)
-        WildCardConnectionPriority()
-      else ExplicitConnectionPriority()
+        ConnectionPriority.WildCard
+      else ConnectionPriority.Explicit
 
-    for { mloc <- mo; sloc <- so } yield ConnectPortBetween(cbp, mloc, sloc)
+    for { mloc <- mo; sloc <- so } yield ConnectPortBetween(connectionPriority, mloc, sloc)
   }
 
   /** Performs pre-connection checks for the clock connection.

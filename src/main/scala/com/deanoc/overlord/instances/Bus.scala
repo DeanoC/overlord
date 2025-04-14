@@ -1,8 +1,8 @@
-package com.deanoc.overlord.Instances
+package com.deanoc.overlord.instances
 
 import com.deanoc.overlord.utils.Utils.VariantTable
 import com.deanoc.overlord.utils.{ArrayV, BigIntV, Utils, Variant}
-import com.deanoc.overlord.Interfaces.SupplierBusLike
+import com.deanoc.overlord.interfaces.SupplierBusLike
 
 import scala.collection.mutable
 import scala.reflect.ClassTag

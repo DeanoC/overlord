@@ -2,7 +2,7 @@ package com.deanoc.overlord.actions
 
 import com.deanoc.overlord.utils._
 import com.deanoc.overlord.Project
-import com.deanoc.overlord.Instances.{
+import com.deanoc.overlord.instances.{
   InstanceTrait,
   ProgramInstance,
   SoftwareInstance

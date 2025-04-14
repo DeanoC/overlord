@@ -2,8 +2,8 @@ package com.deanoc.overlord.input
 
 import com.deanoc.overlord.utils.Variant
 import com.deanoc.overlord.utils.{TableV, StringV, BigIntV}
-import com.deanoc.overlord.Hardware.{RegisterBank, Registers}
-import com.deanoc.overlord.Instances.{ChipInstance, InstanceTrait}
+import com.deanoc.overlord.hardware.{RegisterBank, Registers}
+import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
 import com.deanoc.overlord.Project
 
 object YamlRegistersParser {

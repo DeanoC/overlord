@@ -1,11 +1,11 @@
-package com.deanoc.overlord.Connections
+package com.deanoc.overlord.connections
 import com.deanoc.overlord._
 
-import com.deanoc.overlord.Hardware.{InOutWireDirection, Port}
-import com.deanoc.overlord.{ConnectionDirection, FirstToSecondConnection}
+import com.deanoc.overlord.hardware.{InOutWireDirection, Port}
+import com.deanoc.overlord.connections.ConnectionDirection
 
-import com.deanoc.overlord.Instances.ChipInstance
-import com.deanoc.overlord.Interfaces.PortsLike
+import com.deanoc.overlord.instances.ChipInstance
+import com.deanoc.overlord.interfaces.PortsLike
 
 /** Represents a group of connected ports between two components.
   *
@@ -27,6 +27,12 @@ case class ConnectedPortGroup(
     direction: ConnectionDirection,
     secondary: InstanceLoc
 ) extends Connected {
+
+    /** The name of this connection */
+  override def connectionName: ConnectionTypes.ConnectionName =
+    ConnectionTypes.ConnectionName(
+      s"${firstFullName}_to_${secondFullName}_PortGroup"
+    )
 
   /** Checks if the connection involves the specified chip instance. */
   override def connectedTo(inst: ChipInstance): Boolean =
@@ -65,13 +71,13 @@ case class ConnectedPortGroup(
       d: ConnectionDirection
   ): Boolean = {
     d match {
-      case FirstToSecondConnection() => (
+      case ConnectionDirection.FirstToSecond => (
         main.instance == s && secondary.instance == e
       )
-      case SecondToFirstConnection() => (
+      case ConnectionDirection.SecondToFirst => (
         main.instance == e && secondary.instance == s
       )
-      case BiDirectionConnection() => (
+      case ConnectionDirection.BiDirectional => (
         (main.instance == s && secondary.instance == e) || (main.instance == e && secondary.instance == s)
       )
     }
@@ -106,6 +112,7 @@ object ConnectedPortGroup {
       sp: Port,
       direction: ConnectionDirection
   ): ConnectedPortGroup = {
+    // Handle wire directions - wires need to be properly directed
     var firstDirection = fp.direction
     var secondDirection = sp.direction
 
@@ -117,9 +124,11 @@ object ConnectedPortGroup {
     val fport = fp.copy(direction = firstDirection)
     val sport = sp.copy(direction = secondDirection)
 
+    // Create instance locations with updated port directions
     val fmloc = InstanceLoc(fi.getOwner, Some(fport), s"$fn.${fp.name}")
     val fsloc = InstanceLoc(si.getOwner, Some(sport), s"$fn.${sp.name}")
 
-    ConnectedPortGroup(GroupConnectionPriority(), fmloc, direction, fsloc)
+    // Create the connected port group with Group priority
+    ConnectedPortGroup(ConnectionPriority.Group, fmloc, direction, fsloc)
   }
 }

@@ -1,22 +1,22 @@
-package com.deanoc.overlord.Instances
+package com.deanoc.overlord.instances
 
 import com.deanoc.overlord.utils.{Utils, Variant}
-import com.deanoc.overlord.Hardware.{Port, RegisterBank, Registers}
+import com.deanoc.overlord.hardware.{Port, RegisterBank, Registers}
 import com.deanoc.overlord.{
   ChipDefinitionTrait,
   GatewareDefinitionTrait,
   HardwareDefinitionTrait,
   QueryInterface
 }
-import com.deanoc.overlord.Interfaces.{
+import com.deanoc.overlord.interfaces.{
   PortsLike,
   RegisterBankLike,
   MultiBusLike,
   RamLike,
   SupplierBusLike
 }
-import com.deanoc.overlord.Interfaces.BusLike
-import com.deanoc.overlord.Interfaces._
+import com.deanoc.overlord.interfaces.BusLike
+import com.deanoc.overlord.interfaces._
 
 import scala.collection.mutable
 import scala.reflect.ClassTag

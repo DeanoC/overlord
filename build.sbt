@@ -49,6 +49,9 @@ lazy val dependencies = Seq(
   // Test libraries
   "org.scalactic" %% "scalactic" % "3.2.17",
   "org.scalatest" %% "scalatest" % "3.2.17" % "test",
+  "org.scalatestplus" %% "mockito-4-11" % "3.2.17.0" % "test",
+  "org.mockito" % "mockito-core" % "4.11.0" % "test",
+  "org.scalatestplus" %% "scalacheck-1-17" % "3.2.17.0" % "test",
 
   // XML handling
   "org.scala-lang.modules" %% "scala-xml" % "2.2.0",
@@ -78,8 +81,8 @@ lazy val overlord = (project in file("."))
     maxErrors := 5,
     scalacOptions ++= Seq(
 //      "-Yexplicit-nulls", // Enable null safety in Scala 3
-      "-feature",
-      "-explain" // Detailed error explanations
+      "-feature"
+//      "-explain" // Detailed error explanations
     )
   )
 

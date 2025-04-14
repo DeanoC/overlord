@@ -4,7 +4,7 @@ import scala.collection.mutable.StringBuilder
 
 import com.deanoc.overlord.utils.{Utils, StringV}
 import com.deanoc.overlord.{Project, PinConstraint, DiffPinConstraint}
-import com.deanoc.overlord.Connections.{
+import com.deanoc.overlord.connections.{
   ConstantParameterType,
   FrequencyParameterType
 }

@@ -1,7 +1,7 @@
-package com.deanoc.overlord.Interfaces
+package com.deanoc.overlord.interfaces
 
 import com.deanoc.overlord.QueryInterface
-import com.deanoc.overlord.Instances.ChipInstance
+import com.deanoc.overlord.instances.ChipInstance
 
 trait ChipLike extends QueryInterface {
   def getOwner: ChipInstance

@@ -1,8 +1,8 @@
 package com.deanoc.overlord.output
 
-import com.deanoc.overlord.Hardware.{BitsDesc, Register}
+import com.deanoc.overlord.hardware.{BitsDesc, Register}
 import com.deanoc.overlord.utils.Utils
-import com.deanoc.overlord.Instances.{ChipInstance, CpuInstance}
+import com.deanoc.overlord.instances.{ChipInstance, CpuInstance}
 import com.deanoc.overlord._
 import com.deanoc.overlord.Project
 

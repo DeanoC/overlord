@@ -1,8 +1,8 @@
 package com.deanoc.overlord
 
-import com.deanoc.overlord.Connections._
-import com.deanoc.overlord.Instances.{ChipInstance, Container, PinGroupInstance}
-
+import com.deanoc.overlord.connections._
+import com.deanoc.overlord.instances.{ChipInstance, Container, PinGroupInstance}
+import com.deanoc.overlord.connections.ConnectionDirection.*
 import scala.collection.mutable
 import scala.language.postfixOps
 import scala.util.boundary, boundary.break
@@ -232,9 +232,9 @@ object DistanceMatrix {
       ei = instancesArray.indexOf(einst)
     ) {
       con.direction match {
-        case FirstToSecondConnection() => neighbours(si) += ei
-        case SecondToFirstConnection() => neighbours(ei) += si
-        case BiDirectionConnection() =>
+        case ConnectionDirection.FirstToSecond => neighbours(si) += ei
+        case ConnectionDirection.SecondToFirst => neighbours(ei) += si
+        case ConnectionDirection.BiDirectional =>
           neighbours(si) += ei
           neighbours(ei) += si
       }

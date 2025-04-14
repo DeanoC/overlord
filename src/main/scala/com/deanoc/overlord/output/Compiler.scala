@@ -4,7 +4,7 @@ import java.nio.file.Path
 import scala.collection.mutable
 
 import com.deanoc.overlord.utils.Utils
-import com.deanoc.overlord.Instances.CpuInstance
+import com.deanoc.overlord.instances.CpuInstance
 import com.deanoc.overlord.{Project, Resources}
 
 object Compiler {

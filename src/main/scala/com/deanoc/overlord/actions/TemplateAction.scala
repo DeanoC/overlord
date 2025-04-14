@@ -4,7 +4,7 @@ import java.nio.file.{Path, Paths}
 
 import com.deanoc.overlord.utils.{Utils, Variant}
 import com.deanoc.overlord.Project
-import com.deanoc.overlord.Instances.{
+import com.deanoc.overlord.instances.{
   InstanceTrait,
   ProgramInstance,
   SoftwareInstance

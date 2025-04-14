@@ -1,7 +1,7 @@
 package com.deanoc.overlord.actions
 
 import com.deanoc.overlord.Project
-import com.deanoc.overlord.Instances.InstanceTrait
+import com.deanoc.overlord.instances.InstanceTrait
 import com.deanoc.overlord.utils.{Variant, ArrayV, Utils}
 
 import java.nio.file.{Path, Paths} // Use java.nio.file.Paths directly

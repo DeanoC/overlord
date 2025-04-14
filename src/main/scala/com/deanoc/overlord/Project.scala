@@ -1,8 +1,8 @@
 package com.deanoc.overlord
 
-import com.deanoc.overlord.Connections._
-import com.deanoc.overlord.Instances._
-import com.deanoc.overlord.Interfaces.{ChipLike, RegisterBankLike}
+import com.deanoc.overlord.connections._
+import com.deanoc.overlord.instances._
+import com.deanoc.overlord.interfaces.{ChipLike, RegisterBankLike}
 import com.deanoc.overlord.utils.{Utils, Variant, ArrayV, TableV, StringV, Logging}
 
 import java.nio.file.{Files, Path, Paths}
@@ -671,7 +671,7 @@ object Project extends Logging {
       // extract connections
       if (parsed.contains("connection")) {
         val connections = Utils.toArray(parsed("connection"))
-        container.mutableUnconnected ++= connections.flatMap(Unconnected(_))
+        container.mutableUnconnected ++= connections.flatMap(ConnectionParser.parseConnection(_))
       }
 
       // bring in wanted prefabs

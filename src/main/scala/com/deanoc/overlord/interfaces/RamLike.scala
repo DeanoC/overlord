@@ -1,4 +1,4 @@
-package com.deanoc.overlord.Interfaces
+package com.deanoc.overlord.interfaces
 
 trait RamLike extends ChipLike {
   // sequence of start and size in bytes with cpu filtering

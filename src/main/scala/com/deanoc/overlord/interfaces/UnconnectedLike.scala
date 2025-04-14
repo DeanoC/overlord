@@ -1,9 +1,9 @@
-package com.deanoc.overlord.Interfaces
+package com.deanoc.overlord.interfaces
 
-import com.deanoc.overlord.ConnectionDirection
+import com.deanoc.overlord.connections.ConnectionDirection
 import com.deanoc.overlord.QueryInterface
-import com.deanoc.overlord.Connections.{Connected, Constant}
-import com.deanoc.overlord.Instances.{ChipInstance, InstanceTrait}
+import com.deanoc.overlord.connections.{Connected, Constant}
+import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
 
 trait UnconnectedLike extends QueryInterface {
   def direction: ConnectionDirection

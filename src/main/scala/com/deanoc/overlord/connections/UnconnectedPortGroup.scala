@@ -1,8 +1,9 @@
-package com.deanoc.overlord.Connections
+package com.deanoc.overlord.connections
 
-import com.deanoc.overlord.Instances.{ChipInstance, InstanceTrait}
-import com.deanoc.overlord.Interfaces.PortsLike
+import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
+import com.deanoc.overlord.interfaces.PortsLike
 import com.deanoc.overlord._
+import com.deanoc.overlord.connections.ConnectionDirection
 
 /**
   * Represents an unconnected port group connection between two components.
@@ -18,19 +19,21 @@ import com.deanoc.overlord._
   * @param secondFullName
   *   The full name of the second component in the connection.
   * @param first_prefix
-  *   The prefix for ports in the first component.
+  *   The prefix for ports in the first component. Default empty string for direct port connections.
   * @param second_prefix
-  *   The prefix for ports in the second component.
+  *   The prefix for ports in the second component. Default empty string for direct port connections.
   * @param excludes
-  *   A sequence of port names to exclude from the connection.
+  *   A sequence of port names to exclude from the connection. Default empty sequence for no exclusions.
+  * @param matchPrefixStripped
+  *   Whether to match ports by stripping prefixes and comparing suffixes. Default true for port groups.
   */
 case class UnconnectedPortGroup(
     firstFullName: String,
     direction: ConnectionDirection,
     secondFullName: String,
-    first_prefix: String,
-    second_prefix: String,
-    excludes: Seq[String]
+    first_prefix: String = "",
+    second_prefix: String = "",
+    excludes: Seq[String] = Seq.empty
 ) extends Unconnected {
 
   /**
@@ -44,16 +47,13 @@ case class UnconnectedPortGroup(
   override def connect(unexpanded: Seq[ChipInstance]): Seq[Connected] = for {
     mloc <- matchInstances(firstFullName, unexpanded)
     sloc <- matchInstances(secondFullName, unexpanded)
-    if mloc.instance.hasInterface[PortsLike]
-    if sloc.instance.hasInterface[PortsLike]
-    mi = mloc.instance.getInterfaceUnwrapped[PortsLike]
-    si = sloc.instance.getInterfaceUnwrapped[PortsLike]
-    fp <- mi.getPortsStartingWith(first_prefix)
-    if firstFullName.contains(fp.name)
-    sp <- si.getPortsStartingWith(second_prefix)
-    if secondFullName.contains(sp.name)
-    if fp.name.stripPrefix(first_prefix) == sp.name.stripPrefix(second_prefix)
-    if !(excludes.contains(fp.name) || excludes.contains(sp.name))
+    mi <- mloc.instance.getInterface[PortsLike].toSeq
+    si <- sloc.instance.getInterface[PortsLike].toSeq
+    fp <- mi.getPortsStartingWith(first_prefix).filter(p => firstFullName.contains(p.name))
+    sp <- si.getPortsStartingWith(second_prefix).filter(p => secondFullName.contains(p.name))
+
+    if (fp.name.stripPrefix(first_prefix) == sp.name.stripPrefix(second_prefix)) &&
+       !excludes.contains(fp.name) && !excludes.contains(sp.name)
   } yield ConnectedPortGroup(mi, fp, mloc.fullName, si, sp, direction)
 
   /**

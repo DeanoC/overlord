@@ -1,11 +1,13 @@
 package com.deanoc.overlord
 
 import com.deanoc.overlord.utils._
-import com.deanoc.overlord.Hardware.{BitsDesc, RegisterList, Registers}
-import com.deanoc.overlord.Connections._
-import com.deanoc.overlord.Instances._
-import com.deanoc.overlord.Interfaces.{RamLike, RegisterBankLike}
+import com.deanoc.overlord.hardware.{BitsDesc, RegisterList, Registers}
+import com.deanoc.overlord.connections._
+import com.deanoc.overlord.connections.ConnectionDirection
+import com.deanoc.overlord.instances._
+import com.deanoc.overlord.interfaces.{RamLike, RegisterBankLike}
 import com.deanoc.overlord.Project
+import com.deanoc.overlord.connections.ConnectedExtensions._
 
 import java.nio.file.{Path, Paths}
 import scala.collection.mutable
@@ -258,20 +260,18 @@ object OutputSoftware {
       mutable.ArrayBuffer[(String, String, ChipInstance, BigInt)]()
 
     // handle cpu system registers
-    if (cpu.hasInterface[RegisterBankLike]) {
-      val rbi = cpu.getInterfaceUnwrapped[RegisterBankLike]
-      for {
-        rb <- rbi.banks
-        if rb.baseAddress == -1
-        if rb.cpus.isEmpty || rb.cpus.contains(cpu.cpuType)
-      } {
-        chipAddresses += ((
-          rb.name,
-          rb.registerListName.split('/').last.split('.').head.toUpperCase(),
-          cpu,
-          rb.baseAddress
-        ))
-      }
+    for {
+      rbi <- cpu.getInterface[RegisterBankLike]
+      rb <- rbi.banks
+      if rb.baseAddress == -1
+      if rb.cpus.isEmpty || rb.cpus.contains(cpu.cpuType)
+    } {
+      chipAddresses += ((
+        rb.name,
+        rb.registerListName.split('/').last.split('.').head.toUpperCase(),
+        cpu,
+        rb.baseAddress
+      ))
     }
 
     distanceMatrix
@@ -284,7 +284,7 @@ object OutputSoftware {
           distanceMatrix.expandedRouteBetween(cpu, ep).map {
             case (src, dst) => {
               val cons = connected.filter(con =>
-                con.connectedBetween(src, dst, FirstToSecondConnection())
+                con.connectedBetween(src, dst, ConnectionDirection.FirstToSecond)
               )
               val hd = cons.head
               // try and swap port group for a parallel bus connection which has info about which bus was used
@@ -302,7 +302,7 @@ object OutputSoftware {
           }
         var hasBus = false
         routeConnections.foreach {
-          case _: ConnectedBus => hasBus = true
+          case bus: ConnectedBus => hasBus = true
           case _               =>
         }
 
@@ -311,16 +311,13 @@ object OutputSoftware {
           routeConnections.foreach { r =>
             r match {
               case bus: ConnectedBus =>
-                if (bus.bus.fixedBaseBusAddress)
-                  address = bus.bus.getBaseAddress
-                else
-                  address += bus.bus.getBaseAddress
+                if (bus.bus.fixedBaseBusAddress) address = bus.bus.getBaseAddress
+                else address += bus.bus.getBaseAddress
               case _ =>
             }
             // only do chips once per cpu
             if (r.second.nonEmpty) {
-              if (r.second.get.instance.hasInterface[RamLike]) {
-                val ram = r.second.get.instance.getInterfaceUnwrapped[RamLike]
+              r.second.get.instance.getInterface[RamLike].foreach { ram =>
                 var index = 0
                 for ((addr, size, fixed, cpus) <- ram.getRanges) {
                   // per process cpu target lists
@@ -330,47 +327,62 @@ object OutputSoftware {
                     index += 1
                   }
                 }
+                true
               }
 
               val other = r.second.get.instance.asInstanceOf[ChipInstance]
-
-              if (
-                (!chipAddresses.exists { case (_, _, o, _) => o == other }) &&
-                other.isVisibleToSoftware &&
-                other.hasInterface[RegisterBankLike]
-              ) {
-                val registerBank = other.getInterfaceUnwrapped[RegisterBankLike]
-                if (other.instanceNumber >= registerBank.maxInstances)
-                  println(s"${other.name}: not enough instances\n")
-                else
-                  for {
-                    rb <- registerBank.banks
-                    if rb.cpus.isEmpty || rb.cpus.contains(cpu.cpuType)
-                  } {
-                    val rbName =
-                      if (rb.name.isEmpty) r.secondFullName else rb.name
-                    val rbInstanceName =
-                      rbName.replace("${index}", other.instanceNumber.toString)
-                    chipAddresses += ((
-                      rbInstanceName,
-                      rb.registerListName
-                        .split('/')
-                        .last
-                        .split('.')
-                        .head
-                        .toUpperCase(),
-                      other,
-                      if (rb.baseAddress == -1) -1
-                      else
-                        address + rb.baseAddress + (rb.addressIncrement * other.instanceNumber)
-                    ))
-                  }
-              }
+              handleConnectedChip(cpu, other, address, chipAddresses)
             }
           }
         }
       })
     (ramRanges, chipAddresses)
+  }
+
+  private def handleConnectedChip(
+      cpu: CpuInstance,
+      other: ChipInstance,
+      address: BigInt,
+      chipAddresses: mutable.ArrayBuffer[(String, String, ChipInstance, BigInt)]
+  ): Unit = {
+    if (
+      !chipAddresses.exists { case (_, _, o, _) => o == other } &&
+      other.isVisibleToSoftware &&
+      other.hasInterface[RegisterBankLike]
+    ) {
+      other.getInterface[RegisterBankLike].foreach { registerBank =>
+        processRegisterBank(cpu, other, registerBank, address, chipAddresses)
+      }
+    }
+  }
+
+  private def processRegisterBank(
+      cpu: CpuInstance,
+      other: ChipInstance,
+      registerBank: RegisterBankLike,
+      address: BigInt,
+      chipAddresses: mutable.ArrayBuffer[(String, String, ChipInstance, BigInt)]
+  ): Boolean = {
+    if (other.instanceNumber >= registerBank.maxInstances) {
+      println(s"${other.name}: not enough instances\n")
+      false
+    } else {
+      registerBank.banks
+        .filter(rb => rb.cpus.isEmpty || rb.cpus.contains(cpu.cpuType))
+        .foreach { rb =>
+          val rbName = if (rb.name.isEmpty) other.name else rb.name
+          val rbInstanceName = rbName.replace("${index}", other.instanceNumber.toString)
+          val calculatedAddress: BigInt = if (rb.baseAddress == -1) BigInt(-1) 
+                       else address + rb.baseAddress + (rb.addressIncrement * other.instanceNumber)
+          chipAddresses += ((
+            rbInstanceName,
+            rb.registerListName.split('/').last.split('.').head.toUpperCase(),
+            other,
+            calculatedAddress
+          ))
+        }
+      true
+    }
   }
 
   /** Generates header files for a given register list. The headers define

@@ -1,10 +1,11 @@
-package com.deanoc.overlord.Connections
+package com.deanoc.overlord.connections
 
 import com.deanoc.overlord.utils.{Utils, Variant}
-import com.deanoc.overlord.Instances.{ChipInstance, InstanceTrait}
-import com.deanoc.overlord.ConnectionDirection
+import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
+import com.deanoc.overlord.connections.ConnectionDirection
 import com.deanoc.overlord._
-import com.deanoc.overlord.Interfaces._
+import com.deanoc.overlord.interfaces._
+import com.deanoc.overlord.connections.ConnectionParser
 
 /**
   * Represents the type of a parameter.
@@ -127,34 +128,7 @@ object UnconnectedParameters {
       secondFullName: String,
       parametersV: Array[Variant]
   ): UnconnectedLike = {
-    val parameters = parametersV.flatMap { v =>
-      val table = Utils.toTable(v)
-      if (!table.contains("name")) {
-        println(
-          s"ERROR: parameter table entry does have a name _ -> $secondFullName"
-        )
-        None
-      } else {
-        val name = Utils.lookupString(table, "name", "NO_NAME")
-        Utils.lookupString(table, "type", "_") match {
-          case "constant" =>
-            Some(Parameter(name, ConstantParameterType(table("value"))))
-          case "frequency" =>
-            Some(
-              Parameter(
-                name,
-                FrequencyParameterType(Utils.toFrequency(table("value")))
-              )
-            )
-          case _ => None
-        }
-      }
-    }
-
-    new UnconnectedParameters(
-      direction,
-      secondFullName,
-      parameters.toIndexedSeq
-    )
+    // Delegate to the ConnectionParser for parsing parameter connections
+    ConnectionParser.parseParametersConnection(direction, secondFullName, parametersV)
   }
 }

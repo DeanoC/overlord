@@ -10,17 +10,17 @@ import scala.util.{Failure, Success, Try}
 import scala.jdk.CollectionConverters.*
 
 sealed trait Variant {
-  def toTomlString: String
+  def toYamlString: String
 
   def toCString: String
 }
 
 case class ArrayV(arr: Array[Variant]) extends Variant {
-  override def toTomlString: String =
-    arr.map(_.toTomlString).mkString("[ ", ", ", " ]")
+  override def toYamlString: String =
+    arr.map(v => s"- ${v.toYamlString.replaceAll("(?m)^", "  ").trim}").mkString("\n")
 
   override def toCString: String = {
-    arr.map(_.toTomlString).mkString("[ ", ", ", " ]")
+    arr.map(_.toYamlString).mkString("[ ", ", ", " ]")
   }
 
   def value: Array[Variant] = arr
@@ -29,7 +29,7 @@ case class ArrayV(arr: Array[Variant]) extends Variant {
 case class BigIntV(bigInt: BigInt) extends Variant {
   def value: BigInt = bigInt
 
-  override def toTomlString: String = {
+  override def toYamlString: String = {
     Try {
       bigInt.toLong
     } match {
@@ -49,7 +49,7 @@ case class BigIntV(bigInt: BigInt) extends Variant {
 }
 
 case class BooleanV(boolean: Boolean) extends Variant {
-  override def toTomlString: String = value.toString
+  override def toYamlString: String = value.toString
 
   override def toCString: String = if (value) "TRUE" else "FALSE"
 
@@ -57,7 +57,7 @@ case class BooleanV(boolean: Boolean) extends Variant {
 }
 
 case class IntV(int: Int) extends Variant {
-  override def toTomlString: String = value.toString
+  override def toYamlString: String = value.toString
 
   override def toCString: String = value.toString
 
@@ -65,10 +65,15 @@ case class IntV(int: Int) extends Variant {
 }
 
 case class TableV(table: Map[String, Variant]) extends Variant {
-  override def toTomlString: String = {
-    value
-      .map { case (k, v) => s"$k = ${v.toString}\n" }
-      .mkString("{ ", ", ", " }")
+  override def toYamlString: String = {
+    value.map { case (k, v) => 
+      val valueStr = v.toYamlString
+      if (v.isInstanceOf[TableV] || v.isInstanceOf[ArrayV]) {
+        s"$k:\n${valueStr.replaceAll("(?m)^", "  ")}"
+      } else {
+        s"$k: $valueStr"
+      }
+    }.mkString("\n")
   }
 
   override def toCString: String = {
@@ -84,13 +89,21 @@ case class TableV(table: Map[String, Variant]) extends Variant {
 case class StringV(string: String) extends Variant {
   def value: String = string
 
-  override def toTomlString: String = s"'$value'"
+  override def toYamlString: String = {
+    if (value.contains("\n") || value.contains("\"") || value.contains("'") || 
+        value.contains(":") || value.contains("{") || value.contains("}") ||
+        value.trim.isEmpty) {
+      "\"" + value.replace("\"", "\\\"") + "\""
+    } else {
+      value
+    }
+  }
 
   override def toCString: String = s"""$value"""
 }
 
 case class DoubleV(dbl: Double) extends Variant {
-  override def toTomlString: String = value.toString
+  override def toYamlString: String = value.toString
 
   override def toCString: String = value.toString
 
@@ -260,14 +273,19 @@ object Utils extends Logging {
         return Map[String, Variant]()
     }
 
+    fromYaml(source)
+  }
+  
+  def fromYaml(yamlContent: String): Map[String, Variant] = {
     val yaml = new Yaml()
     try {
-      val parsed = yaml.load(source).asInstanceOf[java.util.Map[String, Any]]
+      val parsed = yaml.load(yamlContent).asInstanceOf[java.util.Map[String, Any]]
       parsed.asScala.map { case (k, v) => k -> toVariant(v) }.toMap
     } catch {
       case e: Exception =>
         // Log the warning instead of treating it as an error
-        warn(s"Error parsing YAML file $yamlPath: ${e.getMessage}")
+        trace(s"Parsing YAML content: $yamlContent")
+        warn(s"Error parsing YAML content: ${e.getMessage}")
         Map[String, Variant]()
     }
   }
@@ -287,10 +305,19 @@ object Utils extends Logging {
   }
 
   def toVariant(t: Any): Variant = t match {
+    case null                 => StringV("")
     case v: String            => StringV(v)
     case v: java.lang.Boolean => BooleanV(v)
     case v: java.lang.Double  => DoubleV(v)
+    case v: java.lang.Float   => DoubleV(v.toDouble)
     case v: java.lang.Integer => IntV(v)
+    case v: java.lang.Long    => BigIntV(BigInt(v))
+    case v: java.lang.Short   => IntV(v.toInt)
+    case v: java.lang.Byte    => IntV(v.toInt)
+    case v: BigInt            => BigIntV(v)
+    case v: scala.math.BigDecimal => DoubleV(v.toDouble)
+    case v: java.math.BigDecimal  => DoubleV(v.doubleValue())
+    case v: java.math.BigInteger  => BigIntV(BigInt(v))
     case v: java.util.Map[_, _] =>
       TableV(
         v.asInstanceOf[java.util.Map[String, Any]]
@@ -299,6 +326,13 @@ object Utils extends Logging {
           .toMap
       )
     case v: java.util.List[_] => ArrayV(v.asScala.map(toVariant).toArray)
+    case v: scala.collection.Map[_, _] =>
+      TableV(
+        v.asInstanceOf[scala.collection.Map[String, Any]]
+          .map { case (k, v) => k -> toVariant(v) }
+          .toMap
+      )
+    case v: scala.collection.Seq[_] => ArrayV(v.map(toVariant).toArray)
     case _ =>
       throw new IllegalArgumentException(s"Unsupported type: ${t.getClass}")
   }

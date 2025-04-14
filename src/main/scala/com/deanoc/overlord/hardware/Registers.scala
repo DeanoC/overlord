@@ -1,8 +1,8 @@
-package com.deanoc.overlord.Hardware
+package com.deanoc.overlord.hardware
 
 import com.deanoc.overlord.utils.{StringV, Utils, Variant}
 import com.deanoc.overlord.Project
-import com.deanoc.overlord.Instances.InstanceTrait
+import com.deanoc.overlord.instances.InstanceTrait
 
 import java.nio.file.Path
 import scala.collection.mutable

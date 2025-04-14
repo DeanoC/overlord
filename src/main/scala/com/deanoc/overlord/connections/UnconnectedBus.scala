@@ -1,10 +1,12 @@
-package com.deanoc.overlord.Connections
+package com.deanoc.overlord.connections
 
-import com.deanoc.overlord.utils.Utils
-import com.deanoc.overlord.Instances._
+import com.deanoc.overlord.utils.{Utils, Logging}
+import com.deanoc.overlord.instances._
 import com.deanoc.overlord._
+import com.deanoc.overlord.connections.ConnectionDirection
+import com.deanoc.overlord.connections.ConnectionTypes.{BusName, InstanceName}
 
-import com.deanoc.overlord.Interfaces.{
+import com.deanoc.overlord.interfaces.{
   PortsLike,
   RamLike,
   SupplierBusLike,
@@ -36,11 +38,12 @@ case class UnconnectedBus(
     firstFullName: String,
     direction: ConnectionDirection,
     secondFullName: String,
-    busProtocol: String = "default",
-    supplierBusName: String = "",
-    consumerBusName: String = "",
+    busProtocol: BusName = BusName.default,
+    supplierBusName: BusName = BusName.empty,
+    consumerBusName: BusName = BusName.empty,
     silent: Boolean = false
-) extends Unconnected {
+) extends Unconnected
+    with Logging {
 
   /** Performs pre-connection checks for the bus connection.
     *
@@ -48,9 +51,9 @@ case class UnconnectedBus(
     *   A sequence of unexpanded chip instances.
     */
   override def preConnect(unexpanded: Seq[ChipInstance]): Unit = {
-    if (direction == BiDirectionConnection()) {
-      println(
-        s"ERROR: connection between ${firstFullName} and $secondFullName is a undirected bus connection"
+    if (direction == ConnectionDirection.BiDirectional) {
+      error(
+        s"connection between ${firstFullName} and $secondFullName is a undirected bus connection"
       )
       return
     }
@@ -59,18 +62,18 @@ case class UnconnectedBus(
     val so = matchInstances(secondFullName, unexpanded)
 
     if (mo.isEmpty) {
-      if (!silent) println(s"ERROR: $firstFullName instance can't be found");
+      if (!silent) error(s"$firstFullName instance can't be found");
       return
     }
 
     if (so.isEmpty) {
-      if (!silent) println(s"ERROR: $secondFullName instance can't be found");
+      if (!silent) error(s"$secondFullName instance can't be found");
       return
     }
 
     if (mo.length != 1 || so.length != 1) {
-      println(
-        s"ERROR: connection $firstFullName between $secondFullName count error"
+      error(
+        s"connection $firstFullName between $secondFullName count error"
       );
       return
     }
@@ -104,18 +107,17 @@ case class UnconnectedBus(
       bus: SupplierBusLike,
       other: ChipInstance
   ): Unit = {
-    if (other.hasInterface[RamLike]) {
-      val ram = other.getInterfaceUnwrapped[RamLike]
+    other.getInterface[RamLike].exists { ram =>
       if (ram.getRanges.isEmpty) {
-        println(
-          s"ERROR: ram ${other.name} has no ranges, so isn't a valid range"
-        )
-      }
-      ram.getRanges.foreach {
-        case (address, size, _, _) => {
-          if (address == -1) bus.addVariableAddressConsumer(other, size)
-          else bus.addFixedRelativeAddressConsumer(other, address, size)
+        error(s"ram ${other.name} has no ranges, so isn't a valid range")
+        false
+      } else {
+        ram.getRanges.foreach {
+          case (address, size, _, _) =>
+            if (address == -1) bus.addVariableAddressConsumer(other, size)
+            else bus.addFixedRelativeAddressConsumer(other, address, size)
         }
+        true
       }
     }
   }
@@ -152,7 +154,7 @@ case class UnconnectedBus(
 
     if (mo.length != 1 || so.length != 1) {
       if (!silent)
-        println(
+        error(
           s"connection $firstFullName between $secondFullName count error"
         )
       return Seq[ConnectedBetween]()
@@ -169,7 +171,7 @@ case class UnconnectedBus(
 
     val busConnection = Seq[Connected](
       ConnectedBus(
-        GroupConnectionPriority(),
+        ConnectionPriority.Group,
         mainIL,
         direction,
         otherIL,
@@ -178,11 +180,27 @@ case class UnconnectedBus(
       )
     )
 
+    trace(s"bus connection $firstFullName to $secondFullName")
+
     // pure hardware buses require no pre-connecting
     if (mainIL.isHardware && otherIL.isHardware) return busConnection
 
-    val busPorts: PortsLike = bus.getInterfaceUnwrapped[PortsLike]
-    val otherPorts: PortsLike = other.getInterfaceUnwrapped[PortsLike]
+    val busPortsOpt = bus.getInterface[PortsLike]
+    val otherPortsOpt = other.getInterface[PortsLike]
+
+    if (busPortsOpt.isEmpty || otherPortsOpt.isEmpty) {
+      val missingInterfaces = Seq(
+        if (busPortsOpt.isEmpty) Some("bus") else None,
+        if (otherPortsOpt.isEmpty) Some("other") else None
+      ).flatten.mkString(" and ")
+
+      warn(s"$missingInterfaces does not have PortsLike interface, returning empty sequence")
+      return Seq()
+    }
+
+    val busPorts = busPortsOpt.get
+    val otherPorts = otherPortsOpt.get
+
     val busPrefix = bus.getPrefix
     val otherPrefix = Utils.lookupString(other.attributes, "bus_prefix", "bus_")
 
@@ -228,13 +246,13 @@ case class UnconnectedBus(
 
     // check both instance have ports
     if (!mainIL.instance.hasInterface[PortsLike]) {
-      println(
+      error(
         s"$firstFullName doesn't expose a ports interface, so can't be connected to a bus"
       );
       return None
     }
     if (!otherIL.instance.hasInterface[PortsLike]) {
-      println(
+      error(
         s"$secondFullName doesn't expose a ports interface, so can't be connected to a bus"
       );
       return None
@@ -242,37 +260,37 @@ case class UnconnectedBus(
 
     val multiBuses0: (Option[MultiBusLike], Option[MultiBusLike]) =
       direction match {
-        case FirstToSecondConnection() =>
+        case ConnectionDirection.FirstToSecond =>
           (
             mainIL.instance.getInterface[MultiBusLike],
             otherIL.instance.getInterface[MultiBusLike]
           )
-        case SecondToFirstConnection() =>
+        case ConnectionDirection.SecondToFirst =>
           (
             otherIL.instance.getInterface[MultiBusLike],
             mainIL.instance.getInterface[MultiBusLike]
           )
-        case BiDirectionConnection() =>
-          println(
-            s"ERROR: connection between ${firstFullName} and $secondFullName is a undirected bus connection"
+        case ConnectionDirection.BiDirectional =>
+          error(
+            s"connection between ${firstFullName} and $secondFullName is a undirected bus connection"
           )
           return None
       }
     if (multiBuses0._1.isEmpty && multiBuses0._2.isEmpty) {
-      println(
-        s"ERROR: neither ${firstFullName} and $secondFullName has no multi bus interface, so can't be connected as a bus"
+      error(
+        s"neither ${firstFullName} and $secondFullName has no multi bus interface, so can't be connected as a bus"
       )
       return None
     }
 
     val (supplierMultiBusO, consumerMultiBusesO) = multiBuses0
     if (supplierMultiBusO.isEmpty) {
-      println(s"ERROR: Supplier bus connected must always be multi bus like")
+      error(s"Supplier bus connected must always be multi bus like")
       return None
     }
     val supplierMultiBus = supplierMultiBusO.get
     if (supplierMultiBus.numberOfBuses < 1) {
-      println(
+      error(
         s"No buses available on supplier MultiBus so no connection possible"
       );
       return None
@@ -284,43 +302,52 @@ case class UnconnectedBus(
     }
 
     if (
-      direction == SecondToFirstConnection() && !mainIL.instance
+      direction == ConnectionDirection.SecondToFirst && !mainIL.instance
         .isInstanceOf[ChipInstance]
     ) {
-      println(
+      error(
         s"$firstFullName isn't a chip instance, so can't be connected to a bus"
       );
       return None
     } else if (
-      direction == FirstToSecondConnection() && !otherIL.instance
+      direction == ConnectionDirection.FirstToSecond && !otherIL.instance
         .isInstanceOf[ChipInstance]
     ) {
-      println(
+      error(
         s"$secondFullName isn't a chip instance, so can't be connected to a bus"
       );
       return None
     }
 
     val other: ChipInstance =
-      (if (direction == SecondToFirstConnection()) mainIL.instance
+      (if (direction == ConnectionDirection.SecondToFirst) mainIL.instance
        else otherIL.instance).asInstanceOf[ChipInstance]
     // search through suppliers name and protocols for a match
     val supplierBus: SupplierBusLike = {
-      val byName = supplierMultiBus.getFirstSupplierBusByName(supplierBusName)
+      trace(s"looking for bus $supplierBusName and protocol $busProtocol on $firstFullName")
+      
+      // Check if supplierBusName is invalid
+      if (supplierBusName.isEmpty || supplierBusName.toString.trim.isEmpty) {
+        warn(s"$firstFullName has an invalid or empty supplier bus name")
+        return None
+      }
+
+      val byName =
+        supplierMultiBus.getFirstSupplierBusByName(supplierBusName.toString)
       if (byName.nonEmpty) byName.get
       else if (supplierBusName.isEmpty) {
         val byProtocol =
-          supplierMultiBus.getFirstSupplierBusOfProtocol(busProtocol)
+          supplierMultiBus.getFirstSupplierBusOfProtocol(busProtocol.toString)
         if (byProtocol.nonEmpty) byProtocol.get
         else {
-          println(
-            s"ERROR: $firstFullName and $secondFullName are trying to connect but don't have a $busProtocol protocol in common"
+          error(
+            s"$firstFullName and $secondFullName are trying to connect but don't have a $busProtocol protocol in common"
           )
           return None
         }
       } else {
-        println(
-          s"ERROR: $firstFullName and $secondFullName supplioer doesn't have a $supplierBusName named bus"
+        error(
+          s"$firstFullName and $secondFullName supplier doesn't have a $supplierBusName named bus"
         )
         return None
       }
@@ -329,19 +356,21 @@ case class UnconnectedBus(
     // now check the selected supplier bus is supported on the consumer side it is also a multi bus
     if (consumerMultiBusesO.nonEmpty) {
       val consumerMultiBus = consumerMultiBusesO.get
-      val byName = consumerMultiBus.getFirstConsumerBusByName(consumerBusName)
+      trace(s"looking for bus $consumerBusName and protocol $busProtocol on $secondFullName")
+      val byName =
+        consumerMultiBus.getFirstConsumerBusByName(consumerBusName.toString)
       if (byName.isEmpty && busProtocol.nonEmpty) {
         val byProtocol =
-          consumerMultiBus.getFirstConsumerBusOfProtocol(busProtocol)
+          consumerMultiBus.getFirstConsumerBusOfProtocol(busProtocol.toString)
         if (byProtocol.isEmpty) {
-          println(
-            s"ERROR: $firstFullName and $secondFullName are trying to connect but consumer doesn't support $busProtocol protocol"
+          error(
+            s"$firstFullName and $secondFullName are trying to connect but consumer doesn't support $busProtocol protocol"
           )
           return None
         }
       } else if (byName.isEmpty) {
-        println(
-          s"ERROR: $firstFullName and $secondFullName consumer doesn't have a $consumerBusName named bus"
+        error(
+          s"$firstFullName and $secondFullName consumer doesn't have a $consumerBusName named bus"
         )
         return None
       }

@@ -1,6 +1,6 @@
 package com.deanoc.overlord.input
 
-import com.deanoc.overlord.Hardware.BitsDesc
+import com.deanoc.overlord.hardware.BitsDesc
 import com.deanoc.overlord.utils.Logging
 
 import scala.util.parsing.combinator._
