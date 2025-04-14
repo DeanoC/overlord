@@ -6,6 +6,7 @@ import com.deanoc.overlord.cli.{CommandLineParser, CommandExecutor}
 
 import org.slf4j.event.Level
 import scala.sys.process._
+import scopt.OParser
 
 /** Main entry point for the Overlord CLI.
   */
@@ -36,8 +37,8 @@ object Main extends Logging {
         }
 
       case None =>
-        // Parsing failed, show usage message
-        error("Failed to parse command line arguments")
+        // When parsing failed, show usage information and exit with an error code
+        println(OParser.usage(CommandLineParser.createParser()))
         sys.exit(1)
     }
   }

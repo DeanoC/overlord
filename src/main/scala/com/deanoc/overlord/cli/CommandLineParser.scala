@@ -62,7 +62,6 @@ object CommandLineParser extends Logging {
     // CREATE command and subcommands
     val createCommand = cmd("create")
       .action((_, c) => c.copy(command = Some("create")))
-      .text("Create a new project from a template")
       .children(
         // create project subcommand (renamed from from-template)
         cmd("project")
@@ -82,13 +81,17 @@ object CommandLineParser extends Logging {
             opt[String]("out")
               .action((x, c) => c.copy(out = x))
               .text("path where the project should be created")
-          )
+          ),
+
+        // create default-templates subcommand
+        cmd("default-templates")
+          .action((_, c) => c.copy(subCommand = Some("default-templates")))
+          .text("Download standard templates without creating a project")
       )
 
     // GENERATE command and subcommands
     val generateCommand = cmd("generate")
       .action((_, c) => c.copy(command = Some("generate")))
-      .text("Generate various outputs")
       .children(
         // generate test subcommand
         cmd("test")
@@ -127,7 +130,6 @@ object CommandLineParser extends Logging {
     // CLEAN command and subcommands
     val cleanCommand = cmd("clean")
       .action((_, c) => c.copy(command = Some("clean")))
-      .text("Clean generated files")
       .children(
         // clean test subcommand
         cmd("test")
@@ -144,7 +146,6 @@ object CommandLineParser extends Logging {
     // UPDATE command and subcommands
     val updateCommand = cmd("update")
       .action((_, c) => c.copy(command = Some("update")))
-      .text("Update various components")
       .children(
         // update project subcommand
         cmd("project")
@@ -169,7 +170,6 @@ object CommandLineParser extends Logging {
     // TEMPLATE command and subcommands
     val templateCommand = cmd("template")
       .action((_, c) => c.copy(command = Some("template")))
-      .text("Manage templates")
       .children(
         // template list subcommand
         cmd("list")
@@ -320,9 +320,17 @@ object CommandLineParser extends Logging {
   def parse(args: Array[String]): Option[Config] = {
     val initialConfig = Config()
     val isNonInteractive = System.console() == null
+    val parser = createParser()
+
+    // Handle empty arguments case - show help directly
+    if (args.isEmpty || args.contains("--help") || args.contains("-h")) {
+      println(OParser.usage(parser)) // Print usage information
+      sys.exit(0) // Exit gracefully
+      return None
+    }
 
     OParser.parse(
-      createParser(),
+      parser,
       args,
       initialConfig.copy(yes = initialConfig.yes || isNonInteractive)
     )

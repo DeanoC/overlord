@@ -33,6 +33,9 @@ object CommandExecutor extends Logging {
       case (Some("create"), Some("project")) =>
         executeCreateProject(config)
 
+      case (Some("create"), Some("default-templates")) =>
+        executeCreateDefaultTemplates(config)
+
       // GENERATE commands
       case (Some("generate"), Some("test")) =>
         executeGenerateTest(config)
@@ -723,6 +726,72 @@ object CommandExecutor extends Logging {
       path.replaceFirst("~", System.getProperty("user.home"))
     } else {
       path
+    }
+  }
+
+  /** Executes the 'create default-templates' command.
+    *
+    * @param config
+    *   The parsed configuration
+    * @return
+    *   true if successful, false otherwise
+    */
+  private def executeCreateDefaultTemplates(config: Config): Boolean = {
+    info("Downloading standard templates...")
+
+    val templates = TemplateManager.listAvailableTemplates()
+    if (templates.nonEmpty) {
+      info(
+        "Some templates are already installed. The following templates are available:"
+      )
+      templates.foreach { template =>
+        info(s"  $template")
+      }
+
+      val shouldDownload = if (config.yes) {
+        info("Auto-downloading standard templates (-y/--yes specified)...")
+        true
+      } else {
+        print(
+          "Do you want to download or update the standard templates? (y/n): "
+        )
+        val response = scala.io.StdIn.readLine()
+        response != null && (response.trim.toLowerCase == "y" || response.trim.toLowerCase == "yes")
+      }
+
+      if (shouldDownload) {
+        val result = TemplateManager.downloadStandardTemplates(config.yes)
+        if (result) {
+          info("Standard templates have been downloaded successfully.")
+          val updatedTemplates = TemplateManager.listAvailableTemplates()
+          info("Available templates:")
+          updatedTemplates.foreach { template =>
+            info(s"  $template")
+          }
+          return true
+        } else {
+          error("Failed to download some standard templates.")
+          return false
+        }
+      } else {
+        info("Template download skipped.")
+        return true
+      }
+    } else {
+      // No templates installed yet, proceed with download
+      val result = TemplateManager.downloadStandardTemplates(config.yes)
+      if (result) {
+        info("Standard templates have been downloaded successfully.")
+        val updatedTemplates = TemplateManager.listAvailableTemplates()
+        info("Available templates:")
+        updatedTemplates.foreach { template =>
+          info(s"  $template")
+        }
+        return true
+      } else {
+        error("Failed to download standard templates.")
+        return false
+      }
     }
   }
 }
