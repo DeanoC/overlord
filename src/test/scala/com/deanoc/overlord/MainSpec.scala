@@ -39,97 +39,6 @@ class MainSpec extends AnyFunSuite {
     val args = Array(
       "create",
       "project",
-      "example.over",
-      "--out",
-      "./output",
-      "--board",
-      "test-board"
-    )
-    val config = parseWithSuppressedOutput(args).get
-
-    assert(config.command.contains("create"))
-    assert(config.subCommand.contains("project"))
-    assert(config.out == "./output")
-    assert(config.board.contains("test-board"))
-    assert(config.infile.contains("example.over"))
-  }
-
-  test("Option parsing should fail when no infile is provided") {
-    val args =
-      Array("create", "project", "--out", "./output", "--board", "test-board")
-    val result = parseWithSuppressedOutput(args)
-    assert(result.isEmpty)
-  }
-
-  test("Option parsing should fail when no board is provided") {
-    val args = Array("create", "project", "example.over")
-    val result = parseWithSuppressedOutput(args)
-    assert(result.isEmpty)
-  }
-
-  test("Option parsing should correctly handle -y flag") {
-    val args =
-      Array("create", "project", "example.over", "-y", "--board", "test-board")
-    val config = parseWithSuppressedOutput(args).get
-
-    assert(config.yes)
-    assert(config.board.contains("test-board"))
-    assert(config.infile.contains("example.over"))
-  }
-
-  test("Option parsing should correctly handle --yes flag") {
-    val args = Array(
-      "create",
-      "project",
-      "example.over",
-      "--yes",
-      "--board",
-      "test-board"
-    )
-    val config = parseWithSuppressedOutput(args).get
-
-    assert(config.yes)
-    assert(config.board.contains("test-board"))
-    assert(config.infile.contains("example.over"))
-  }
-
-  test(
-    "Option parsing should handle both resource flags and auto download options"
-  ) {
-    val args = Array(
-      "create",
-      "project",
-      "example.over",
-      "--nostdresources",
-      "--resources",
-      "./custom-resources",
-      "--yes",
-      "--board",
-      "test-board"
-    )
-    val config = parseWithSuppressedOutput(args).get
-
-    assert(config.nostdresources)
-    assert(config.resources.contains("./custom-resources"))
-    assert(config.yes)
-    assert(config.board.contains("test-board"))
-    assert(config.infile.contains("example.over"))
-  }
-
-  test("Non-interactive console should set 'yes' option to true") {
-    val args =
-      Array("create", "project", "example.over", "--board", "test-board")
-    val config = parseWithSuppressedOutput(args).get.copy(yes = true)
-
-    assert(config.yes)
-    assert(config.board.contains("test-board"))
-    assert(config.infile.contains("example.over"))
-  }
-
-  test("Option parsing should correctly parse create from-template command") {
-    val args = Array(
-      "create",
-      "from-template",
       "bare-metal",
       "my-project",
       "--out",
@@ -138,7 +47,88 @@ class MainSpec extends AnyFunSuite {
     val config = parseWithSuppressedOutput(args).get
 
     assert(config.command.contains("create"))
-    assert(config.subCommand.contains("from-template"))
+    assert(config.subCommand.contains("project"))
+    assert(config.out == "./output")
+    assert(config.templateName.contains("bare-metal"))
+    assert(config.projectName.contains("my-project"))
+  }
+
+  test("Option parsing should fail when required arguments are missing") {
+    val args = Array("create", "project", "--out", "./output")
+    val result = parseWithSuppressedOutput(args)
+    assert(result.isEmpty)
+  }
+
+  test("Option parsing should correctly handle -y flag") {
+    val args =
+      Array("create", "project", "bare-metal", "my-project", "-y")
+    val config = parseWithSuppressedOutput(args).get
+
+    assert(config.yes)
+    assert(config.templateName.contains("bare-metal"))
+    assert(config.projectName.contains("my-project"))
+  }
+
+  test("Option parsing should correctly handle --yes flag") {
+    val args = Array(
+      "create",
+      "project",
+      "bare-metal",
+      "my-project",
+      "--yes"
+    )
+    val config = parseWithSuppressedOutput(args).get
+
+    assert(config.yes)
+    assert(config.templateName.contains("bare-metal"))
+    assert(config.projectName.contains("my-project"))
+  }
+
+  test(
+    "Option parsing should handle both resource flags and auto download options"
+  ) {
+    val args = Array(
+      "create",
+      "project",
+      "bare-metal",
+      "my-project",
+      "--nostdresources",
+      "--resources",
+      "./custom-resources",
+      "--yes"
+    )
+    val config = parseWithSuppressedOutput(args).get
+
+    assert(config.nostdresources)
+    assert(config.resources.contains("./custom-resources"))
+    assert(config.yes)
+    assert(config.templateName.contains("bare-metal"))
+    assert(config.projectName.contains("my-project"))
+  }
+
+  test("Non-interactive console should set 'yes' option to true") {
+    val args =
+      Array("create", "project", "bare-metal", "my-project")
+    val config = parseWithSuppressedOutput(args).get.copy(yes = true)
+
+    assert(config.yes)
+    assert(config.templateName.contains("bare-metal"))
+    assert(config.projectName.contains("my-project"))
+  }
+
+  test("Option parsing should correctly parse create project command") {
+    val args = Array(
+      "create",
+      "project",
+      "bare-metal",
+      "my-project",
+      "--out",
+      "./output"
+    )
+    val config = parseWithSuppressedOutput(args).get
+
+    assert(config.command.contains("create"))
+    assert(config.subCommand.contains("project"))
     assert(config.templateName.contains("bare-metal"))
     assert(config.projectName.contains("my-project"))
     assert(config.out == "./output")

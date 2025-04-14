@@ -6,23 +6,12 @@ import org.scalatest.matchers.should.Matchers
 class CommandLineParserSpec extends AnyFlatSpec with Matchers {
 
   "CommandLineParser" should "parse create project command" in {
-    val args = Array("create", "project", "test.over", "--board", "tangnano9k")
+    val args = Array("create", "project", "bare-metal", "my-project")
     val config = CommandLineParser.parse(args)
 
     config.isDefined should be(true)
     config.get.command should be(Some("create"))
     config.get.subCommand should be(Some("project"))
-    config.get.infile should be(Some("test.over"))
-    config.get.board should be(Some("tangnano9k"))
-  }
-
-  it should "parse create from-template command" in {
-    val args = Array("create", "from-template", "bare-metal", "my-project")
-    val config = CommandLineParser.parse(args)
-
-    config.isDefined should be(true)
-    config.get.command should be(Some("create"))
-    config.get.subCommand should be(Some("from-template"))
     config.get.templateName should be(Some("bare-metal"))
     config.get.projectName should be(Some("my-project"))
   }
@@ -178,9 +167,8 @@ class CommandLineParserSpec extends AnyFlatSpec with Matchers {
     val args = Array(
       "create",
       "project",
-      "test.over",
-      "--board",
-      "tangnano9k",
+      "bare-metal",
+      "my-project",
       "--out",
       "output-dir",
       "--nostdresources",
@@ -201,8 +189,8 @@ class CommandLineParserSpec extends AnyFlatSpec with Matchers {
     config.isDefined should be(true)
     config.get.command should be(Some("create"))
     config.get.subCommand should be(Some("project"))
-    config.get.infile should be(Some("test.over"))
-    config.get.board should be(Some("tangnano9k"))
+    config.get.templateName should be(Some("bare-metal"))
+    config.get.projectName should be(Some("my-project"))
     config.get.out should be("output-dir")
     config.get.nostdresources should be(true)
     config.get.nostdprefabs should be(true)

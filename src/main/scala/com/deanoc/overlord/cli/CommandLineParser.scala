@@ -62,26 +62,11 @@ object CommandLineParser extends Logging {
     // CREATE command and subcommands
     val createCommand = cmd("create")
       .action((_, c) => c.copy(command = Some("create")))
-      .text("Create a new project or from a template")
+      .text("Create a new project from a template")
       .children(
-        // create project subcommand
+        // create project subcommand (renamed from from-template)
         cmd("project")
           .action((_, c) => c.copy(subCommand = Some("project")))
-          .text("Create a new project from an .over file")
-          .children(
-            arg[String]("<infile>")
-              .required()
-              .action((x, c) => c.copy(infile = Some(x)))
-              .text("filename should be a .over file to use for the project"),
-            opt[String]("board")
-              .required()
-              .action((x, c) => c.copy(board = Some(x)))
-              .text("board definition to use")
-          ),
-
-        // create from-template subcommand
-        cmd("from-template")
-          .action((_, c) => c.copy(subCommand = Some("from-template")))
           .text("Create a new project from a template")
           .children(
             arg[String]("<template-name>")
