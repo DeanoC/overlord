@@ -7,6 +7,8 @@ import com.deanoc.overlord.utils.SilentLogger
 import com.deanoc.overlord.instances.ChipInstance
 import org.scalatestplus.mockito.MockitoSugar
 import scala.language.implicitConversions
+import org.mockito.Mockito.{when, doAnswer}
+import org.mockito.ArgumentMatchers.any
 import com.deanoc.overlord.connections.ConnectionTypesTestExtensions._
 
 class UnconnectedBusSpec
@@ -140,4 +142,5 @@ class UnconnectedBusSpec
     firstToSecond.direction shouldBe ConnectionDirection.FirstToSecond
     secondToFirst.direction shouldBe ConnectionDirection.SecondToFirst
   }
+
 }

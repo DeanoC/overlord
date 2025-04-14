@@ -62,8 +62,8 @@ class ConnectionParserComprehensiveSpec
     val firstToSecondResult = ConnectionParser.parseConnection(firstToSecond)
 
     firstToSecondResult shouldBe defined
-    firstToSecondResult.get shouldBe a[UnconnectedPort]
-    val port1 = firstToSecondResult.get.asInstanceOf[UnconnectedPort]
+    firstToSecondResult.get shouldBe a[UnconnectedPortGroup]
+    val port1 = firstToSecondResult.get.asInstanceOf[UnconnectedPortGroup]
     port1.firstFullName shouldBe "device1"
     (port1.direction == ConnectionDirection.FirstToSecond) shouldBe true
     port1.secondFullName shouldBe "device2"
@@ -73,8 +73,8 @@ class ConnectionParserComprehensiveSpec
     val secondToFirstResult = ConnectionParser.parseConnection(secondToFirst)
 
     secondToFirstResult shouldBe defined
-    secondToFirstResult.get shouldBe a[UnconnectedPort]
-    val port2 = secondToFirstResult.get.asInstanceOf[UnconnectedPort]
+    secondToFirstResult.get shouldBe a[UnconnectedPortGroup]
+    val port2 = secondToFirstResult.get.asInstanceOf[UnconnectedPortGroup]
     port2.firstFullName shouldBe "device1"
     (port2.direction == ConnectionDirection.SecondToFirst) shouldBe true
     port2.secondFullName shouldBe "device2"
@@ -84,8 +84,8 @@ class ConnectionParserComprehensiveSpec
     val biDir1Result = ConnectionParser.parseConnection(biDir1)
 
     biDir1Result shouldBe defined
-    assert(biDir1Result.get.isInstanceOf[UnconnectedPort])
-    val port3 = biDir1Result.get.asInstanceOf[UnconnectedPort]
+    assert(biDir1Result.get.isInstanceOf[UnconnectedPortGroup])
+    val port3 = biDir1Result.get.asInstanceOf[UnconnectedPortGroup]
     port3.firstFullName shouldBe "device1"
     (port3.direction == ConnectionDirection.BiDirectional) shouldBe true
     port3.secondFullName shouldBe "device2"
@@ -95,8 +95,8 @@ class ConnectionParserComprehensiveSpec
     val biDir2Result = ConnectionParser.parseConnection(biDir2)
 
     biDir2Result shouldBe defined
-    assert(biDir2Result.get.isInstanceOf[UnconnectedPort])
-    val port4 = biDir2Result.get.asInstanceOf[UnconnectedPort]
+    assert(biDir2Result.get.isInstanceOf[UnconnectedPortGroup])
+    val port4 = biDir2Result.get.asInstanceOf[UnconnectedPortGroup]
     port4.firstFullName shouldBe "device1"
     (port4.direction == ConnectionDirection.BiDirectional) shouldBe true
     port4.secondFullName shouldBe "device2"
@@ -276,8 +276,8 @@ class ConnectionParserComprehensiveSpec
     val result = ConnectionParser.parseConnection(whitespaceVariant)
 
     result shouldBe defined
-    assert(result.get.isInstanceOf[UnconnectedPort])
-    val port = result.get.asInstanceOf[UnconnectedPort]
+    assert(result.get.isInstanceOf[UnconnectedPortGroup])
+    val port = result.get.asInstanceOf[UnconnectedPortGroup]
     port.firstFullName shouldBe "device1"
     assert(port.direction == ConnectionDirection.FirstToSecond)
     port.secondFullName shouldBe "device2"

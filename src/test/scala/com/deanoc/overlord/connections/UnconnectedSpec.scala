@@ -19,7 +19,7 @@ class UnconnectedSpec extends AnyFlatSpec with Matchers with MockitoSugar with S
       
       // Since ConnectionParser is not easily mockable (static methods),
       // we'll just verify the method returns expected type
-      val result = Unconnected.apply(mockVariant)
+      val result = ConnectionParser.parseConnection(mockVariant)
       
       // For invalid input, it should return None
       result shouldBe None
@@ -28,7 +28,7 @@ class UnconnectedSpec extends AnyFlatSpec with Matchers with MockitoSugar with S
   
   "Concrete implementations of Unconnected" should "have consistent behavior" in {
     // Test with different concrete implementations
-    val port = UnconnectedPort(
+    val port = UnconnectedPortGroup(
       firstFullName = "device1.tx",
       direction = ConnectionDirection.FirstToSecond,
       secondFullName = "device2.rx"

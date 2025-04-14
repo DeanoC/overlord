@@ -273,14 +273,19 @@ object Utils extends Logging {
         return Map[String, Variant]()
     }
 
+    fromYaml(source)
+  }
+  
+  def fromYaml(yamlContent: String): Map[String, Variant] = {
     val yaml = new Yaml()
     try {
-      val parsed = yaml.load(source).asInstanceOf[java.util.Map[String, Any]]
+      val parsed = yaml.load(yamlContent).asInstanceOf[java.util.Map[String, Any]]
       parsed.asScala.map { case (k, v) => k -> toVariant(v) }.toMap
     } catch {
       case e: Exception =>
         // Log the warning instead of treating it as an error
-        warn(s"Error parsing YAML file $yamlPath: ${e.getMessage}")
+        trace(s"Parsing YAML content: $yamlContent")
+        warn(s"Error parsing YAML content: ${e.getMessage}")
         Map[String, Variant]()
     }
   }

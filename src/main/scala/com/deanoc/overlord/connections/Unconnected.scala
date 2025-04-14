@@ -34,7 +34,7 @@ trait Unconnected extends QueryInterface with UnconnectedLike {
   ): Seq[InstanceLoc] = {
     unexpanded.flatMap(c => {
       val (nm, port) = c.getMatchNameAndPort(nameToMatch)
-      if (nm.nonEmpty) Some(InstanceLoc(c, port, nm.get))
+      if (nm.nonEmpty) Some(InstanceLoc(c, Option(port).flatten, nm.get)) // Ensure port is not null
       else
         c match {
           case container: Container =>
@@ -62,21 +62,5 @@ trait Unconnected extends QueryInterface with UnconnectedLike {
   ): ConnectedPortGroup = {
     // Delegate to the ConnectionParser for creating port connections
     ConnectionParser.parsePortConnection(cbp, fil, sil)
-  }
-}
-
-/** Factory object for creating instances of `Unconnected`. */
-object Unconnected {
-
-  /**
-    * Creates an `UnconnectedLike` instance based on the provided connection variant.
-    *
-    * @param connection
-    *   The connection variant.
-    * @return An optional `UnconnectedLike` instance.
-    */
-  def apply(connection: Variant): Option[UnconnectedLike] = {
-    // Delegate to the ConnectionParser for parsing the connection variant
-    ConnectionParser.parseConnection(connection)
   }
 }

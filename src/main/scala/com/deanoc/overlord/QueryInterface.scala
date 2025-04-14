@@ -8,6 +8,4 @@ trait QueryInterface {
 
   def getInterface[T](implicit tag: ClassTag[T]): Option[T] = None
 
-  def getInterfaceUnwrapped[T](implicit tag: ClassTag[T]): T =
-    getInterface[T](tag).get
-}
+  }

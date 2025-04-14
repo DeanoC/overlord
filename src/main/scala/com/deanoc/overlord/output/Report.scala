@@ -12,8 +12,7 @@ import com.deanoc.overlord.instances.{
   CpuInstance
 }
 import com.deanoc.overlord.Project
-
-// Commented imports removed - they're not being used
+import com.deanoc.overlord.connections.ConnectedExtensions._
 
 object Report {
   // private type GraphType = Graph[(String, DefinitionType, NodeStyleTypeTag), DiEdge]

@@ -1,5 +1,7 @@
 package com.deanoc.overlord
 
+import scala.language.implicitConversions
+
 import java.nio.file.Path
 
 import com.deanoc.overlord.connections._

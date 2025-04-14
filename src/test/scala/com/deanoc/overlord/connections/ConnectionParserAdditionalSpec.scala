@@ -71,7 +71,7 @@ class ConnectionParserAdditionalSpec
         ConnectionParser.parseConnection(specialCharsVariant)
       specialCharsResult shouldBe defined
       val specialCharsPort =
-        specialCharsResult.get.asInstanceOf[UnconnectedPort]
+        specialCharsResult.get.asInstanceOf[UnconnectedPortGroup]
       specialCharsPort.firstFullName shouldBe "device@123"
       specialCharsPort.secondFullName shouldBe "device#456"
 
@@ -84,7 +84,7 @@ class ConnectionParserAdditionalSpec
       )
       val pathLikeResult = ConnectionParser.parseConnection(pathLikeVariant)
       pathLikeResult shouldBe defined
-      val pathLikePort = pathLikeResult.get.asInstanceOf[UnconnectedPort]
+      val pathLikePort = pathLikeResult.get.asInstanceOf[UnconnectedPortGroup]
       pathLikePort.firstFullName shouldBe "/path/to/device1"
       pathLikePort.secondFullName shouldBe "/path/to/device2"
     }

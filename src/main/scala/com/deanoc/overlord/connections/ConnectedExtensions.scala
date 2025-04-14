@@ -15,56 +15,58 @@ object ConnectedExtensions:
     /** Gets the name of this connection */
     def name: ConnectionName = connected.connectionName
 
-    /** Gets the first full name of this connection */
-    def firstFullName: String = connected.firstFullName
+    /** Gets the last part of the first name (after the last dot) */
+    def firstLastName: String = 
+      val parts = connected.firstFullName.split('.')
+      parts.lastOption.getOrElse(connected.firstFullName)
 
-    /** Gets the second full name of this connection */
-    def secondFullName: String = connected.secondFullName
+    /** Gets the last part of the second name (after the last dot) */
+    def secondLastName: String = 
+      val parts = connected.secondFullName.split('.')
+      parts.lastOption.getOrElse(connected.secondFullName)
+    
+    /** Gets the first part of the first name (before the first dot) */
+    def firstHeadName: String = 
+      val parts = connected.firstFullName.split('.')
+      parts.headOption.getOrElse(connected.firstFullName)
 
-    /** Gets the direction of this connection */
-    def direction: ConnectionDirection = connected.direction
-
-    /** Gets the priority of this connection */
-    def priority: ConnectionPriority = connected.priority
+    /** Gets the first part of the second name (before the first dot) */
+    def secondHeadName: String = 
+      val parts = connected.secondFullName.split('.')
+      parts.headOption.getOrElse(connected.secondFullName)
 
     /** Checks if this connection is between the specified instances */
     def isBetween(first: InstanceTrait, second: InstanceTrait): Boolean =
-      (connected.firstFullName == first.fullName && connected.secondFullName == second.fullName) ||
-        (connected.firstFullName == second.fullName && connected.secondFullName == first.fullName)
+      (connected.firstFullName.endsWith(first.name) && connected.secondFullName.endsWith(second.name)) ||
+        (connected.firstFullName.endsWith(second.name) && connected.secondFullName.endsWith(first.name))
 
     /** Checks if this connection is between the specified instance names */
     def isBetween(firstName: String, secondName: String): Boolean =
-      (connected.firstFullName == firstName && connected.secondFullName == secondName) ||
-        (connected.firstFullName == secondName && connected.secondFullName == firstName)
+      (connected.firstFullName.endsWith(firstName) && connected.secondFullName.endsWith(secondName)) ||
+        (connected.firstFullName.endsWith(secondName) && connected.secondFullName.endsWith(firstName))
 
     /** Checks if this connection involves the specified instance */
     def involves(instance: InstanceTrait): Boolean =
-      connected.firstFullName == instance.fullName || connected.secondFullName == instance.fullName
+      connected.firstFullName.endsWith(instance.name) || connected.secondFullName.endsWith(instance.name)
 
     /** Checks if this connection involves the specified instance name */
     def involves(instanceName: String): Boolean =
-      connected.firstFullName == instanceName || connected.secondFullName == instanceName
+      connected.firstFullName.endsWith(instanceName) || connected.secondFullName.endsWith(instanceName)
 
     /** Gets the other instance name in this connection */
     def otherName(instanceName: String): Option[String] =
-      if connected.firstFullName == instanceName then
+      if connected.firstFullName.endsWith(instanceName) then
         Some(connected.secondFullName)
-      else if connected.secondFullName == instanceName then
+      else if connected.secondFullName.endsWith(instanceName) then
         Some(connected.firstFullName)
       else None
-
-    /** Gets the other instance in this connection */
-    def otherInstance(instance: InstanceTrait): Option[InstanceTrait] =
-      otherName(instance.fullName).flatMap(name =>
-        instance.project.findInstance(name)
-      )
 
   /** Extension methods for the ConnectedBetween trait */
   extension (connectedBetween: ConnectedBetween)
     /** Checks if this connection is between two chip instances */
     def isChipToChip(instances: Seq[ChipInstance]): Boolean =
       val firstChip =
-        instances.find(_.fullName == connectedBetween.firstFullName)
+        instances.find(chip => connectedBetween.firstFullName.endsWith(chip.name))
       val secondChip =
-        instances.find(_.fullName == connectedBetween.secondFullName)
+        instances.find(chip => connectedBetween.secondFullName.endsWith(chip.name))
       firstChip.isDefined && secondChip.isDefined

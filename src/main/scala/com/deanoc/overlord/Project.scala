@@ -671,7 +671,7 @@ object Project extends Logging {
       // extract connections
       if (parsed.contains("connection")) {
         val connections = Utils.toArray(parsed("connection"))
-        container.mutableUnconnected ++= connections.flatMap(Unconnected(_))
+        container.mutableUnconnected ++= connections.flatMap(ConnectionParser.parseConnection(_))
       }
 
       // bring in wanted prefabs

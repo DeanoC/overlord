@@ -41,12 +41,12 @@ class UnconnectedApplySpec
     val portVariant = createConnectionVariant("port", "device1 -> device2")
 
     // Parse the connection
-    val result = Unconnected.apply(portVariant)
+    val result = ConnectionParser.parseConnection(portVariant)
 
     // Verify the result
     result shouldBe defined
-    result.get shouldBe a[UnconnectedPort]
-    val port = result.get.asInstanceOf[UnconnectedPort]
+    result.get shouldBe a[UnconnectedPortGroup]
+    val port = result.get.asInstanceOf[UnconnectedPortGroup]
     port.firstFullName shouldBe "device1"
     (port.direction == ConnectionDirection.FirstToSecond) shouldBe true
     port.secondFullName shouldBe "device2"
@@ -64,7 +64,7 @@ class UnconnectedApplySpec
     val busVariant = createConnectionVariant("bus", "cpu -> memory", busParams)
 
     // Parse the connection
-    val result = Unconnected.apply(busVariant)
+    val result = ConnectionParser.parseConnection(busVariant)
 
     // Verify the result
     result shouldBe defined
@@ -88,7 +88,7 @@ class UnconnectedApplySpec
     // Create a logical connection variant
     val logicalVariant = createConnectionVariant("logical", "comp1 -> comp2")
 
-    val result = Unconnected.apply(logicalVariant)
+    val result = ConnectionParser.parseConnection(logicalVariant)
 
     result shouldBe defined
     result.get shouldBe a[UnconnectedLogical]
@@ -103,7 +103,7 @@ class UnconnectedApplySpec
     val clockVariant = createConnectionVariant("clock", "clk -> device")
 
     // Parse the connection
-    val result = Unconnected.apply(clockVariant)
+    val result = ConnectionParser.parseConnection(clockVariant)
 
     // Verify the result
     result shouldBe defined
@@ -130,7 +130,7 @@ class UnconnectedApplySpec
       createConnectionVariant("port_group", "uart0 -> uart1", portGroupParams)
 
     // Parse the connection
-    val result = Unconnected.apply(portGroupVariant)
+    val result = ConnectionParser.parseConnection(portGroupVariant)
 
     // Verify the result
     result shouldBe defined
@@ -168,7 +168,7 @@ class UnconnectedApplySpec
     )
 
     // Parse the connection
-    val result = Unconnected.apply(parametersVariant)
+    val result = ConnectionParser.parseConnection(parametersVariant)
 
     // Verify the result
     result shouldBe defined
@@ -182,21 +182,21 @@ class UnconnectedApplySpec
     // Test bi-directional connections
     val biDirectionalVariant =
       createConnectionVariant("port", "device1 <-> device2")
-    val biDirResult = Unconnected.apply(biDirectionalVariant)
+    val biDirResult = ConnectionParser.parseConnection(biDirectionalVariant)
     biDirResult shouldBe defined
     assert(
       biDirResult.get
-        .asInstanceOf[UnconnectedPort]
+        .asInstanceOf[UnconnectedPortGroup]
         .direction == ConnectionDirection.BiDirectional
     )
 
     // Test second-to-first connections
     val reverseVariant = createConnectionVariant("port", "device1 <- device2")
-    val reverseResult = Unconnected.apply(reverseVariant)
+    val reverseResult = ConnectionParser.parseConnection(reverseVariant)
     reverseResult shouldBe defined
     assert(
       reverseResult.get
-        .asInstanceOf[UnconnectedPort]
+        .asInstanceOf[UnconnectedPortGroup]
         .direction == ConnectionDirection.SecondToFirst
     )
   }
@@ -207,13 +207,13 @@ class UnconnectedApplySpec
       val missingTypeMap = new java.util.HashMap[String, Any]()
       missingTypeMap.put("connection", "a -> b")
       val missingType = Utils.toVariant(missingTypeMap)
-      Unconnected.apply(missingType) shouldBe None
+      ConnectionParser.parseConnection(missingType) shouldBe None
 
       // Missing connection field
       val missingConnectionMap = new java.util.HashMap[String, Any]()
       missingConnectionMap.put("type", "port")
       val missingConnection = Utils.toVariant(missingConnectionMap)
-      Unconnected.apply(missingConnection) shouldBe None
+      ConnectionParser.parseConnection(missingConnection) shouldBe None
     }
   }
 
@@ -221,18 +221,18 @@ class UnconnectedApplySpec
     withSilentLogs {
       // Invalid direction symbol
       val invalidDirection = createConnectionVariant("port", "a => b")
-      Unconnected.apply(invalidDirection) shouldBe None
+      ConnectionParser.parseConnection(invalidDirection) shouldBe None
 
       // Invalid parts count
       val invalidParts = createConnectionVariant("port", "a -> b -> c")
-      Unconnected.apply(invalidParts) shouldBe None
+      ConnectionParser.parseConnection(invalidParts) shouldBe None
     }
   }
 
   it should "reject unknown connection types" in {
     withSilentLogs {
       val unknownType = createConnectionVariant("unknown_type", "a -> b")
-      Unconnected.apply(unknownType) shouldBe None
+      ConnectionParser.parseConnection(unknownType) shouldBe None
     }
   }
 
@@ -254,7 +254,7 @@ class UnconnectedApplySpec
       Map("parameters" -> paramsList)
     )
 
-    Unconnected.apply(invalidParams) shouldBe None
+    ConnectionParser.parseConnection(invalidParams) shouldBe None
   }
 
   it should "handle excessive whitespace in connection strings" in {
@@ -262,11 +262,11 @@ class UnconnectedApplySpec
     val withExtraWhitespace =
       createConnectionVariant("port", "  device1    ->      device2  ")
 
-    val result = Unconnected.apply(withExtraWhitespace)
+    val result = ConnectionParser.parseConnection(withExtraWhitespace)
 
     result shouldBe defined
-    result.get shouldBe a[UnconnectedPort]
-    val port = result.get.asInstanceOf[UnconnectedPort]
+    result.get shouldBe a[UnconnectedPortGroup]
+    val port = result.get.asInstanceOf[UnconnectedPortGroup]
     port.firstFullName shouldBe "device1"
     assert(port.direction == ConnectionDirection.FirstToSecond)
     port.secondFullName shouldBe "device2"

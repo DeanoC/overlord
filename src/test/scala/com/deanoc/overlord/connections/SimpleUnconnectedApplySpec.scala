@@ -42,12 +42,12 @@ class SimpleUnconnectedApplySpec
     val variant = Utils.toVariant(map)
 
     // Parse the connection
-    val result = Unconnected.apply(variant)
+    val result = ConnectionParser.parseConnection(variant)
 
     // Verify the result
     result shouldBe defined
-    result.get shouldBe a[UnconnectedPort]
-    val port = result.get.asInstanceOf[UnconnectedPort]
+    result.get shouldBe a[UnconnectedPortGroup]
+    val port = result.get.asInstanceOf[UnconnectedPortGroup]
     port.firstFullName shouldBe "device1"
     assert(port.direction == ConnectionDirection.FirstToSecond)
     port.secondFullName shouldBe "device2"
@@ -66,7 +66,7 @@ class SimpleUnconnectedApplySpec
     val variant = Utils.toVariant(map)
 
     // Parse the connection
-    val result = Unconnected.apply(variant)
+    val result = ConnectionParser.parseConnection(variant)
 
     // Verify the result
     result shouldBe defined
@@ -96,7 +96,7 @@ class SimpleUnconnectedApplySpec
     val variant = Utils.toVariant(map)
 
     // Parse the connection
-    val result = Unconnected.apply(variant)
+    val result = ConnectionParser.parseConnection(variant)
 
     // Verify the result
     result shouldBe defined
@@ -117,7 +117,7 @@ class SimpleUnconnectedApplySpec
     val variant = Utils.toVariant(map)
 
     // Parse the connection
-    val result = Unconnected.apply(variant)
+    val result = ConnectionParser.parseConnection(variant)
 
     // Verify the result
     result shouldBe defined
@@ -134,11 +134,11 @@ class SimpleUnconnectedApplySpec
     biMap.put("type", "port")
     biMap.put("connection", "device1 <-> device2")
 
-    val biResult = Unconnected.apply(Utils.toVariant(biMap))
+    val biResult = ConnectionParser.parseConnection(Utils.toVariant(biMap))
     biResult shouldBe defined
     assert(
       biResult.get
-        .asInstanceOf[UnconnectedPort]
+        .asInstanceOf[UnconnectedPortGroup]
         .direction == ConnectionDirection.BiDirectional
     )
 
@@ -147,11 +147,11 @@ class SimpleUnconnectedApplySpec
     reverseMap.put("type", "port")
     reverseMap.put("connection", "device1 <- device2")
 
-    val reverseResult = Unconnected.apply(Utils.toVariant(reverseMap))
+    val reverseResult = ConnectionParser.parseConnection(Utils.toVariant(reverseMap))
     reverseResult shouldBe defined
     assert(
       reverseResult.get
-        .asInstanceOf[UnconnectedPort]
+        .asInstanceOf[UnconnectedPortGroup]
         .direction == ConnectionDirection.SecondToFirst
     )
   }
@@ -174,7 +174,7 @@ class SimpleUnconnectedApplySpec
     val variant = Utils.toVariant(map)
 
     // Parse the connection
-    val result = Unconnected.apply(variant)
+    val result = ConnectionParser.parseConnection(variant)
 
     // Verify the result
     result shouldBe defined
@@ -191,11 +191,11 @@ class SimpleUnconnectedApplySpec
     withSilentLogs {
       // Create a test case with missing type field
       val missingType = createMinimalVariant(Map("connection" -> "a -> b"))
-      Unconnected.apply(missingType) shouldBe None
+      ConnectionParser.parseConnection(missingType) shouldBe None
 
       // Create a test case with missing connection field
       val missingConn = createMinimalVariant(Map("type" -> "port"))
-      Unconnected.apply(missingConn) shouldBe None
+      ConnectionParser.parseConnection(missingConn) shouldBe None
     }
   }
 
@@ -227,7 +227,7 @@ class SimpleUnconnectedApplySpec
     val variant = Utils.toVariant(map)
 
     // Parse the connection
-    val result = Unconnected.apply(variant)
+    val result = ConnectionParser.parseConnection(variant)
 
     // Verify the result
     result shouldBe defined

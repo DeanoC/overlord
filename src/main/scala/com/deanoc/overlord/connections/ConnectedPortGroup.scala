@@ -28,6 +28,12 @@ case class ConnectedPortGroup(
     secondary: InstanceLoc
 ) extends Connected {
 
+    /** The name of this connection */
+  override def connectionName: ConnectionTypes.ConnectionName =
+    ConnectionTypes.ConnectionName(
+      s"${firstFullName}_to_${secondFullName}_PortGroup"
+    )
+
   /** Checks if the connection involves the specified chip instance. */
   override def connectedTo(inst: ChipInstance): Boolean =
     (main.instance.name == inst.name) || (secondary.instance.name == inst.name)

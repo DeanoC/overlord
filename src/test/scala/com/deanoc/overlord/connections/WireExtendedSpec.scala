@@ -520,11 +520,11 @@ class WireExtendedSpec
 
     // Create a broken Connected with missing first location
     val connected = mock[Connected]
-    // Complete all when() calls before using the mock in other operations
-    doReturn(None).when(connected).first
-    doReturn(Some(instanceLoc)).when(connected).second
-    doReturn(ConnectionPriority.Explicit).when(connected).connectionPriority
-    doReturn(ConnectionDirection.FirstToSecond).when(connected).direction
+    // Use when().thenReturn() pattern for better readability and consistency
+    when(connected.first).thenReturn(None)
+    when(connected.second).thenReturn(Some(instanceLoc))
+    when(connected.connectionPriority).thenReturn(ConnectionPriority.Explicit)
+    when(connected.direction).thenReturn(ConnectionDirection.FirstToSecond)
 
     // Create mock DistanceMatrix
     val dm = createMockDistanceMatrix()
@@ -545,11 +545,11 @@ class WireExtendedSpec
 
     // Create a broken Connected with missing second location
     val connected = mock[Connected]
-    // Use doReturn...when pattern to avoid unfinished stubbing
-    doReturn(Some(instanceLoc)).when(connected).first
-    doReturn(None).when(connected).second
-    doReturn(ConnectionPriority.Explicit).when(connected).connectionPriority
-    doReturn(ConnectionDirection.FirstToSecond).when(connected).direction
+    // Use when().thenReturn() pattern for better readability and consistency
+    when(connected.first).thenReturn(Some(instanceLoc))
+    when(connected.second).thenReturn(None)
+    when(connected.connectionPriority).thenReturn(ConnectionPriority.Explicit)
+    when(connected.direction).thenReturn(ConnectionDirection.FirstToSecond)
 
     // Create mock DistanceMatrix
     val dm = createMockDistanceMatrix()

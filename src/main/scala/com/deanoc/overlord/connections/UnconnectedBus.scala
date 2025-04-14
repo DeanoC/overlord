@@ -107,18 +107,17 @@ case class UnconnectedBus(
       bus: SupplierBusLike,
       other: ChipInstance
   ): Unit = {
-    if (other.hasInterface[RamLike]) {
-      val ram = other.getInterfaceUnwrapped[RamLike]
+    other.getInterface[RamLike].exists { ram =>
       if (ram.getRanges.isEmpty) {
-        error(
-          s"ram ${other.name} has no ranges, so isn't a valid range"
-        )
-      }
-      ram.getRanges.foreach {
-        case (address, size, _, _) => {
-          if (address == -1) bus.addVariableAddressConsumer(other, size)
-          else bus.addFixedRelativeAddressConsumer(other, address, size)
+        error(s"ram ${other.name} has no ranges, so isn't a valid range")
+        false
+      } else {
+        ram.getRanges.foreach {
+          case (address, size, _, _) =>
+            if (address == -1) bus.addVariableAddressConsumer(other, size)
+            else bus.addFixedRelativeAddressConsumer(other, address, size)
         }
+        true
       }
     }
   }
@@ -181,11 +180,27 @@ case class UnconnectedBus(
       )
     )
 
+    trace(s"bus connection $firstFullName to $secondFullName")
+
     // pure hardware buses require no pre-connecting
     if (mainIL.isHardware && otherIL.isHardware) return busConnection
 
-    val busPorts: PortsLike = bus.getInterfaceUnwrapped[PortsLike]
-    val otherPorts: PortsLike = other.getInterfaceUnwrapped[PortsLike]
+    val busPortsOpt = bus.getInterface[PortsLike]
+    val otherPortsOpt = other.getInterface[PortsLike]
+
+    if (busPortsOpt.isEmpty || otherPortsOpt.isEmpty) {
+      val missingInterfaces = Seq(
+        if (busPortsOpt.isEmpty) Some("bus") else None,
+        if (otherPortsOpt.isEmpty) Some("other") else None
+      ).flatten.mkString(" and ")
+
+      warn(s"$missingInterfaces does not have PortsLike interface, returning empty sequence")
+      return Seq()
+    }
+
+    val busPorts = busPortsOpt.get
+    val otherPorts = otherPortsOpt.get
+
     val busPrefix = bus.getPrefix
     val otherPrefix = Utils.lookupString(other.attributes, "bus_prefix", "bus_")
 
@@ -309,6 +324,14 @@ case class UnconnectedBus(
        else otherIL.instance).asInstanceOf[ChipInstance]
     // search through suppliers name and protocols for a match
     val supplierBus: SupplierBusLike = {
+      trace(s"looking for bus $supplierBusName and protocol $busProtocol on $firstFullName")
+      
+      // Check if supplierBusName is invalid
+      if (supplierBusName.isEmpty || supplierBusName.toString.trim.isEmpty) {
+        warn(s"$firstFullName has an invalid or empty supplier bus name")
+        return None
+      }
+
       val byName =
         supplierMultiBus.getFirstSupplierBusByName(supplierBusName.toString)
       if (byName.nonEmpty) byName.get
@@ -324,7 +347,7 @@ case class UnconnectedBus(
         }
       } else {
         error(
-          s"$firstFullName and $secondFullName supplioer doesn't have a $supplierBusName named bus"
+          s"$firstFullName and $secondFullName supplier doesn't have a $supplierBusName named bus"
         )
         return None
       }
@@ -333,6 +356,7 @@ case class UnconnectedBus(
     // now check the selected supplier bus is supported on the consumer side it is also a multi bus
     if (consumerMultiBusesO.nonEmpty) {
       val consumerMultiBus = consumerMultiBusesO.get
+      trace(s"looking for bus $consumerBusName and protocol $busProtocol on $secondFullName")
       val byName =
         consumerMultiBus.getFirstConsumerBusByName(consumerBusName.toString)
       if (byName.isEmpty && busProtocol.nonEmpty) {

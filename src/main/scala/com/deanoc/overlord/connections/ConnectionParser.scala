@@ -96,7 +96,7 @@ object ConnectionParser extends Logging {
     // Create the appropriate connection type based on the "type" field
     conntype match {
       case "port" =>
-        Some(UnconnectedPort(first, dir, secondary))
+        Some(UnconnectedPortGroup(first, dir, secondary))
 
       case "clock" =>
         Some(UnconnectedClock(first, dir, secondary))
