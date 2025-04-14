@@ -33,9 +33,6 @@ object CommandExecutor extends Logging {
       case (Some("create"), Some("project")) =>
         executeCreateProject(config)
 
-      case (Some("create"), Some("from-template")) =>
-        executeCreateFromTemplate(config)
-
       // GENERATE commands
       case (Some("generate"), Some("test")) =>
         executeGenerateTest(config)
@@ -86,70 +83,6 @@ object CommandExecutor extends Logging {
     }
   }
 
-  /** Executes the 'create project' command.
-    *
-    * @param config
-    *   The parsed configuration
-    * @return
-    *   true if successful, false otherwise
-    */
-  private def executeCreateProject(config: Config): Boolean = {
-    val filenameOpt = config.infile
-    val boardOpt = config.board
-
-    if (filenameOpt.isEmpty) {
-      error("Missing required input file")
-      false
-    } else if (boardOpt.isEmpty) {
-      error("Missing required board option")
-      false
-    } else {
-      val filename = filenameOpt.get
-      val board = boardOpt.get
-      val expandedFilename = expandPath(filename)
-
-      if (!Files.exists(Paths.get(expandedFilename))) {
-        error(s"$expandedFilename does not exist")
-        false
-      } else {
-        val filePath = Paths.get(expandedFilename).toAbsolutePath.normalize()
-        val parentDir = filePath.getParent.toAbsolutePath.normalize()
-        System.setProperty("user.dir", parentDir.toString)
-
-        val expandedOut = expandPath(config.out)
-        val out = Paths.get(expandedOut).toAbsolutePath.normalize()
-        Utils.ensureDirectories(out)
-
-        val stdResourcePath = resolveStdResourcePath(config)
-        Resources.setStdResourcePath(stdResourcePath)
-
-        Project.setupPaths(
-          filePath.getParent,
-          Resources.stdResourcePath(),
-          Resources.stdResourcePath(),
-          out
-        )
-
-        if (!ensureResources(config, stdResourcePath)) {
-          false
-        } else {
-          val (chipCatalog, prefabCatalog) =
-            loadCatalogs(config, stdResourcePath)
-          val gameName = filename.split('/').last.split('.').head
-
-          Project(gameName, board, filePath, chipCatalog, prefabCatalog) match {
-            case Some(game) =>
-              output.Project(game)
-              info(s"** Project created at $out **")
-              true
-            case None =>
-              false
-          }
-        }
-      }
-    }
-  }
-
   private def resolveStdResourcePath(config: Config): Path = {
     config.stdresource
       .orElse(config.resources)
@@ -197,14 +130,16 @@ object CommandExecutor extends Logging {
     (chipCatalog, prefabCatalog)
   }
 
-  /** Executes the 'create from-template' command.
+  /** Executes the 'create project' command.
     *
     * @param config
     *   The parsed configuration
     * @return
     *   true if successful, false otherwise
     */
-  private def executeCreateFromTemplate(config: Config): Boolean = {
+  private def executeCreateProject(
+      config: Config
+  ): Boolean = {
     val templateNameOpt = config.templateName
     val projectNameOpt = config.projectName
 
