@@ -14,6 +14,7 @@ import com.deanoc.overlord.output
 import java.nio.file.{Files, Path, Paths}
 import scala.sys.process._
 import scopt.OParser
+import scala.util.control.Breaks.{break, breakable}
 
 /** Executes commands based on the parsed configuration.
   */
@@ -93,100 +94,107 @@ object CommandExecutor extends Logging {
     *   true if successful, false otherwise
     */
   private def executeCreateProject(config: Config): Boolean = {
-    // This is similar to the existing "create" command
-    val filename = config.infile.getOrElse {
+    val filenameOpt = config.infile
+    val boardOpt = config.board
+
+    if (filenameOpt.isEmpty) {
       error("Missing required input file")
-      return false
-    }
-
-    val board = config.board.getOrElse {
+      false
+    } else if (boardOpt.isEmpty) {
       error("Missing required board option")
-      return false
-    }
-
-    // Process the file and create the project
-    try {
+      false
+    } else {
+      val filename = filenameOpt.get
+      val board = boardOpt.get
       val expandedFilename = expandPath(filename)
+
       if (!Files.exists(Paths.get(expandedFilename))) {
         error(s"$expandedFilename does not exist")
-        return false
-      }
-
-      val filePath = Paths.get(expandedFilename).toAbsolutePath.normalize()
-      val parentDir = filePath.getParent.toAbsolutePath.normalize()
-
-      // Change the current working directory to the parent directory of the .over file
-      System.setProperty("user.dir", parentDir.toString)
-
-      // Ensure the output directory is relative to the new working directory
-      val expandedOut = expandPath(config.out)
-      val out = Paths.get(expandedOut).toAbsolutePath.normalize()
-      Utils.ensureDirectories(out)
-
-      val stdResourcePath = config.stdresource
-        .orElse(config.resources)
-        .map(path => Paths.get(expandPath(path)).toAbsolutePath.normalize())
-        .getOrElse(Resources.stdResourcePath())
-      Resources.setStdResourcePath(stdResourcePath)
-
-      Project.setupPaths(
-        filePath.getParent,
-        Resources.stdResourcePath(),
-        Resources.stdResourcePath(),
-        out
-      )
-
-      val resources = config.resources.map { path =>
-        Resources(Paths.get(expandPath(path)))
-      }
-
-      // Ensure standard resources are available
-      if (
-        !config.nostdresources && !ensureStdResources(
-          stdResourcePath,
-          config.yes
-        )
-      ) {
-        return false
-      }
-
-      // Load catalogs
-      val chipCatalog = new DefinitionCatalog
-      val stdResources = if (!config.nostdresources) {
-        val res = Resources(stdResourcePath)
-        chipCatalog.mergeNewDefinition(res.loadCatalogs())
-        res
-      } else {
-        null
-      }
-      resources.foreach(r => chipCatalog.mergeNewDefinition(r.loadCatalogs()))
-
-      val prefabCatalog = new PrefabCatalog
-      if (!config.nostdprefabs && stdResources != null) {
-        prefabCatalog.prefabs ++= stdResources.loadPrefabs()
-      }
-      resources.foreach(r => prefabCatalog.prefabs ++= r.loadPrefabs())
-
-      val gameName = filename.split('/').last.split('.').head
-      val game = Project(
-        gameName,
-        board,
-        filePath,
-        chipCatalog,
-        prefabCatalog
-      ) match {
-        case Some(game) => game
-        case None       => return false
-      }
-
-      output.Project(game)
-      info(s"** Project created at $out **")
-      true
-    } catch {
-      case e: Exception =>
-        error(s"Error creating project: ${e.getMessage}")
         false
+      } else {
+        val filePath = Paths.get(expandedFilename).toAbsolutePath.normalize()
+        val parentDir = filePath.getParent.toAbsolutePath.normalize()
+        System.setProperty("user.dir", parentDir.toString)
+
+        val expandedOut = expandPath(config.out)
+        val out = Paths.get(expandedOut).toAbsolutePath.normalize()
+        Utils.ensureDirectories(out)
+
+        val stdResourcePath = resolveStdResourcePath(config)
+        Resources.setStdResourcePath(stdResourcePath)
+
+        Project.setupPaths(
+          filePath.getParent,
+          Resources.stdResourcePath(),
+          Resources.stdResourcePath(),
+          out
+        )
+
+        if (!ensureResources(config, stdResourcePath)) {
+          false
+        } else {
+          val (chipCatalog, prefabCatalog) =
+            loadCatalogs(config, stdResourcePath)
+          val gameName = filename.split('/').last.split('.').head
+
+          Project(gameName, board, filePath, chipCatalog, prefabCatalog) match {
+            case Some(game) =>
+              output.Project(game)
+              info(s"** Project created at $out **")
+              true
+            case None =>
+              false
+          }
+        }
+      }
     }
+  }
+
+  private def resolveStdResourcePath(config: Config): Path = {
+    config.stdresource
+      .orElse(config.resources)
+      .map(path => Paths.get(expandPath(path)).toAbsolutePath.normalize())
+      .getOrElse(Resources.stdResourcePath())
+  }
+
+  private def ensureResources(
+      config: Config,
+      stdResourcePath: Path
+  ): Boolean = {
+    if (
+      !config.nostdresources && !ensureStdResources(stdResourcePath, config.yes)
+    ) {
+      false
+    } else {
+      true
+    }
+  }
+
+  private def loadCatalogs(
+      config: Config,
+      stdResourcePath: Path
+  ): (DefinitionCatalog, PrefabCatalog) = {
+    val chipCatalog = new DefinitionCatalog
+    val stdResources = if (!config.nostdresources) {
+      val res = Resources(stdResourcePath)
+      chipCatalog.mergeNewDefinition(res.loadCatalogs())
+      res
+    } else {
+      null
+    }
+
+    val resources = config.resources.map { path =>
+      Resources(Paths.get(expandPath(path)))
+    }
+    resources.foreach(r => chipCatalog.mergeNewDefinition(r.loadCatalogs()))
+
+    val prefabCatalog = new PrefabCatalog
+    if (!config.nostdprefabs && stdResources != null) {
+      prefabCatalog.prefabs ++= stdResources.loadPrefabs()
+    }
+    resources.foreach(r => prefabCatalog.prefabs ++= r.loadPrefabs())
+
+    (chipCatalog, prefabCatalog)
   }
 
   /** Executes the 'create from-template' command.
@@ -197,17 +205,23 @@ object CommandExecutor extends Logging {
     *   true if successful, false otherwise
     */
   private def executeCreateFromTemplate(config: Config): Boolean = {
-    val templateName = config.templateName.getOrElse {
-      error("Missing required template name")
-      return false
-    }
+    val templateNameOpt = config.templateName
+    val projectNameOpt = config.projectName
 
-    val projectName = config.projectName.getOrElse {
-      error("Missing required project name")
-      return false
+    (templateNameOpt, projectNameOpt) match {
+      case (Some(templateName), Some(projectName)) =>
+        TemplateManager.createFromTemplate(
+          templateName,
+          projectName,
+          config.out
+        )
+      case (None, _) =>
+        error("Missing required template name")
+        false
+      case (_, None) =>
+        error("Missing required project name")
+        false
     }
-
-    TemplateManager.createFromTemplate(templateName, projectName, config.out)
   }
 
   /** Executes the 'generate test' command.
@@ -218,12 +232,12 @@ object CommandExecutor extends Logging {
     *   true if successful, false otherwise
     */
   private def executeGenerateTest(config: Config): Boolean = {
-    val projectName = config.projectName.getOrElse {
+    config.projectName.fold {
       error("Missing required project name")
-      return false
+      false
+    } { projectName =>
+      TestManager.generateTests(projectName)
     }
-
-    TestManager.generateTests(projectName)
   }
 
   /** Executes the 'generate report' command.
@@ -234,22 +248,23 @@ object CommandExecutor extends Logging {
     *   true if successful, false otherwise
     */
   private def executeGenerateReport(config: Config): Boolean = {
-    val filename = config.infile.getOrElse {
-      error("Missing required input file")
-      return false
-    }
-
-    try {
-      val game = loadProject(config, filename)
-      if (game == null) {
-        return false
-      }
-
-      output.Report(game)
-      true
-    } catch {
-      case e: Exception =>
-        error(s"Error generating report: ${e.getMessage}")
+    config.infile match {
+      case Some(filename) =>
+        try {
+          val game = loadProject(config, filename)
+          if (game != null) {
+            output.Report(game)
+            true
+          } else {
+            false
+          }
+        } catch {
+          case e: Exception =>
+            error(s"Error generating report: ${e.getMessage}")
+            false
+        }
+      case None =>
+        error("Missing required input file")
         false
     }
   }
@@ -262,22 +277,23 @@ object CommandExecutor extends Logging {
     *   true if successful, false otherwise
     */
   private def executeGenerateSvd(config: Config): Boolean = {
-    val filename = config.infile.getOrElse {
-      error("Missing required input file")
-      return false
-    }
-
-    try {
-      val game = loadProject(config, filename)
-      if (game == null) {
-        return false
-      }
-
-      output.Svd(game)
-      true
-    } catch {
-      case e: Exception =>
-        error(s"Error generating SVD: ${e.getMessage}")
+    config.infile match {
+      case Some(filename) =>
+        try {
+          val game = loadProject(config, filename)
+          if (game != null) {
+            output.Svd(game)
+            true
+          } else {
+            false
+          }
+        } catch {
+          case e: Exception =>
+            error(s"Error generating SVD: ${e.getMessage}")
+            false
+        }
+      case None =>
+        error("Missing required input file")
         false
     }
   }
@@ -290,12 +306,12 @@ object CommandExecutor extends Logging {
     *   true if successful, false otherwise
     */
   private def executeCleanTest(config: Config): Boolean = {
-    val projectName = config.projectName.getOrElse {
+    config.projectName.fold {
       error("Missing required project name")
-      return false
+      false
+    } { projectName =>
+      TestManager.cleanTests(projectName)
     }
-
-    TestManager.cleanTests(projectName)
   }
 
   /** Executes the 'update project' command.
@@ -306,22 +322,23 @@ object CommandExecutor extends Logging {
     *   true if successful, false otherwise
     */
   private def executeUpdateProject(config: Config): Boolean = {
-    val filename = config.infile.getOrElse {
-      error("Missing required input file")
-      return false
-    }
-
-    try {
-      val game = loadProject(config, filename)
-      if (game == null) {
-        return false
-      }
-
-      output.UpdateProject(game, config.instance)
-      true
-    } catch {
-      case e: Exception =>
-        error(s"Error updating project: ${e.getMessage}")
+    config.infile match {
+      case Some(filename) =>
+        try {
+          val game = loadProject(config, filename)
+          if (game != null) {
+            output.UpdateProject(game, config.instance)
+            true
+          } else {
+            false
+          }
+        } catch {
+          case e: Exception =>
+            error(s"Error updating project: ${e.getMessage}")
+            false
+        }
+      case None =>
+        error("Missing required input file")
         false
     }
   }
@@ -367,21 +384,23 @@ object CommandExecutor extends Logging {
     *   true if successful, false otherwise
     */
   private def executeTemplateAdd(config: Config): Boolean = {
-    val name = config.templateName.getOrElse {
-      error("Missing required template name")
-      return false
-    }
+    val nameOpt = config.templateName
+    val pathOpt =
+      config.options.get("path").collect { case s: String if s.nonEmpty => s }
 
-    val path = config.options.getOrElse("path", "").toString
-    if (path.isEmpty) {
-      error("Missing required path")
-      return false
+    (nameOpt, pathOpt) match {
+      case (Some(name), Some(path)) =>
+        // This would call the TemplateManager.addLocalTemplate method
+        // For now, we'll just log the action
+        info(s"Adding local template '$name' from path '$path'")
+        true
+      case (None, _) =>
+        error("Missing required template name")
+        false
+      case (_, None) =>
+        error("Missing required path")
+        false
     }
-
-    // This would call the TemplateManager.addLocalTemplate method
-    // For now, we'll just log the action
-    info(s"Adding local template '$name' from path '$path'")
-    true
   }
 
   /** Executes the 'template add-git' command.
@@ -392,22 +411,26 @@ object CommandExecutor extends Logging {
     *   true if successful, false otherwise
     */
   private def executeTemplateAddGit(config: Config): Boolean = {
-    val name = config.templateName.getOrElse {
-      error("Missing required template name")
-      return false
-    }
+    val nameOpt = config.templateName
+    val gitUrlOpt = config.gitUrl
 
-    val gitUrl = config.gitUrl.getOrElse {
-      error("Missing required git URL")
-      return false
+    (nameOpt, gitUrlOpt) match {
+      case (Some(name), Some(gitUrl)) =>
+        // This would call the TemplateManager.addGitTemplate method
+        // For now, we'll just log the action
+        info(
+          s"Adding git template '$name' from URL '$gitUrl'${config.branch
+              .map(b => s" (branch: $b)")
+              .getOrElse("")}"
+        )
+        true
+      case (None, _) =>
+        error("Missing required template name")
+        false
+      case (_, None) =>
+        error("Missing required git URL")
+        false
     }
-
-    // This would call the TemplateManager.addGitTemplate method
-    // For now, we'll just log the action
-    info(
-      s"Adding git template '$name' from URL '$gitUrl'${config.branch.map(b => s" (branch: $b)").getOrElse("")}"
-    )
-    true
   }
 
   /** Executes the 'template add-github' command.
@@ -418,22 +441,26 @@ object CommandExecutor extends Logging {
     *   true if successful, false otherwise
     */
   private def executeTemplateAddGitHub(config: Config): Boolean = {
-    val name = config.templateName.getOrElse {
-      error("Missing required template name")
-      return false
-    }
+    val nameOpt = config.templateName
+    val ownerRepoOpt = config.ownerRepo
 
-    val ownerRepo = config.ownerRepo.getOrElse {
-      error("Missing required owner/repo")
-      return false
+    (nameOpt, ownerRepoOpt) match {
+      case (Some(name), Some(ownerRepo)) =>
+        // This would call the TemplateManager.addGitHubTemplate method
+        // For now, we'll just log the action
+        info(
+          s"Adding GitHub template '$name' from '$ownerRepo'${config.ref
+              .map(r => s" (ref: $r)")
+              .getOrElse("")}"
+        )
+        true
+      case (None, _) =>
+        error("Missing required template name")
+        false
+      case (_, None) =>
+        error("Missing required owner/repo")
+        false
     }
-
-    // This would call the TemplateManager.addGitHubTemplate method
-    // For now, we'll just log the action
-    info(
-      s"Adding GitHub template '$name' from '$ownerRepo'${config.ref.map(r => s" (ref: $r)").getOrElse("")}"
-    )
-    true
   }
 
   /** Executes the 'template remove' command.
@@ -444,15 +471,15 @@ object CommandExecutor extends Logging {
     *   true if successful, false otherwise
     */
   private def executeTemplateRemove(config: Config): Boolean = {
-    val name = config.templateName.getOrElse {
+    config.templateName.fold {
       error("Missing required template name")
-      return false
+      false
+    } { name =>
+      // This would call the TemplateManager.removeTemplate method
+      // For now, we'll just log the action
+      info(s"Removing template '$name'")
+      true
     }
-
-    // This would call the TemplateManager.removeTemplate method
-    // For now, we'll just log the action
-    info(s"Removing template '$name'")
-    true
   }
 
   /** Executes the 'template update' command.
@@ -463,15 +490,15 @@ object CommandExecutor extends Logging {
     *   true if successful, false otherwise
     */
   private def executeTemplateUpdate(config: Config): Boolean = {
-    val name = config.templateName.getOrElse {
+    config.templateName.fold {
       error("Missing required template name")
-      return false
+      false
+    } { name =>
+      // This would call the TemplateManager.updateTemplate method
+      // For now, we'll just log the action
+      info(s"Updating template '$name'")
+      true
     }
-
-    // This would call the TemplateManager.updateTemplate method
-    // For now, we'll just log the action
-    info(s"Updating template '$name'")
-    true
   }
 
   /** Executes the 'template update-all' command.
@@ -507,10 +534,8 @@ object CommandExecutor extends Logging {
     val filePath = Paths.get(expandedFilename).toAbsolutePath.normalize()
     val parentDir = filePath.getParent.toAbsolutePath.normalize()
 
-    // Change the current working directory to the parent directory of the .over file
     System.setProperty("user.dir", parentDir.toString)
 
-    // Ensure the output directory is relative to the new working directory
     val expandedOut = expandPath(config.out)
     val out = Paths.get(expandedOut).toAbsolutePath.normalize()
     Utils.ensureDirectories(out)
