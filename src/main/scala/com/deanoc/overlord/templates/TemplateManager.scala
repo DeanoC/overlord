@@ -1,11 +1,13 @@
 package com.deanoc.overlord.templates
 
 import com.deanoc.overlord.utils.Logging
-
 import java.nio.file.{Files, Path, Paths}
 import scala.sys.process._
 import scala.jdk.CollectionConverters._
 import scala.util.{Try, Success, Failure}
+import java.io.File
+import org.yaml.snakeyaml.Yaml
+import scala.io.Source
 
 /** Manages templates for creating new projects. Supports local templates, git
   * repositories, and GitHub templates.
@@ -13,6 +15,32 @@ import scala.util.{Try, Success, Failure}
 object TemplateManager extends Logging {
   private val templateBasePath =
     Paths.get(System.getProperty("user.home"), ".overlord", "templates")
+
+  // Load templates from YAML file
+  private def loadTemplatesFromYaml(): List[(String, String)] = {
+    val yaml = new Yaml()
+    val inputStream = getClass.getResourceAsStream("/templates.yaml")
+    val source = Source.fromInputStream(inputStream)
+    try {
+      val data = yaml
+        .load(source.mkString)
+        .asInstanceOf[
+          java.util.Map[String, java.util.List[java.util.Map[String, String]]]
+        ]
+      data
+        .get("templates")
+        .asScala
+        .map { template =>
+          (template.get("name"), template.get("repo"))
+        }
+        .toList
+    } finally {
+      source.close()
+    }
+  }
+
+  // Replace hardcoded standardTemplates with dynamic loading
+  private val standardTemplates = loadTemplatesFromYaml()
 
   /** Creates a new project from a template.
     *
@@ -99,6 +127,66 @@ object TemplateManager extends Logging {
         Files.copy(path, targetPath)
       }
     }
+  }
+
+  /** Downloads standard templates from GitHub.
+    *
+    * @param autoYes
+    *   Whether to automatically answer yes to prompts
+    * @return
+    *   true if successful, false otherwise
+    */
+  def downloadStandardTemplates(autoYes: Boolean = false): Boolean = {
+    info("Checking for standard templates...")
+
+    // Ensure the template directory exists
+    if (!Files.exists(templateBasePath)) {
+      try {
+        Files.createDirectories(templateBasePath)
+      } catch {
+        case e: Exception =>
+          error(s"Failed to create template directory: ${e.getMessage}")
+          return false
+      }
+    }
+
+    var success = true
+
+    // Download each standard template
+    standardTemplates.foreach { case (name, repo) =>
+      val templatePath = templateBasePath.resolve(name)
+
+      if (!Files.exists(templatePath)) {
+        info(
+          s"Downloading template '$name' from GitHub repository '$repo'..."
+        )
+
+        val cloneCommand =
+          s"git clone https://github.com/$repo.git ${templatePath.toString}"
+        val cloneResult = cloneCommand.!
+
+        if (cloneResult != 0) {
+          error(s"Failed to download template '$name'")
+          success = false
+        } else {
+          info(s"Template '$name' downloaded successfully")
+        }
+      } else {
+        info(s"Template '$name' already exists, skipping download")
+      }
+    }
+
+    success
+  }
+
+  /** Checks if any templates are installed.
+    *
+    * @return
+    *   true if at least one template is installed, false otherwise
+    */
+  def hasTemplates(): Boolean = {
+    val templates = listAvailableTemplates()
+    templates.nonEmpty
   }
 
   /** Customizes template files with the project name.

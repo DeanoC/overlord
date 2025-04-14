@@ -210,6 +210,38 @@ object CommandExecutor extends Logging {
 
     (templateNameOpt, projectNameOpt) match {
       case (Some(templateName), Some(projectName)) =>
+        // Check if any templates are available
+        if (!TemplateManager.hasTemplates()) {
+          info("No templates available")
+
+          // Ask if the user wants to download standard templates
+          val shouldDownload = if (config.yes) {
+            info("Auto-downloading standard templates (-y/--yes specified)...")
+            true
+          } else {
+            info("Waiting for user input about downloading templates")
+            print(
+              "No templates are installed. Would you like to download a standard set of templates from GitHub? (y/n): "
+            )
+            val response = scala.io.StdIn.readLine()
+            info(s"User response for download: ${
+                if (response == "y") "yes" else "no"
+              }")
+            response != null && (response.trim.toLowerCase == "y" || response.trim.toLowerCase == "yes")
+          }
+
+          if (shouldDownload) {
+            if (!TemplateManager.downloadStandardTemplates(config.yes)) {
+              warn("Failed to download standard templates")
+              return false
+            }
+          } else {
+            info("Template download skipped")
+            return false
+          }
+        }
+
+        // Now try to create the project from the template
         TemplateManager.createFromTemplate(
           templateName,
           projectName,
@@ -366,6 +398,41 @@ object CommandExecutor extends Logging {
 
     if (templates.isEmpty) {
       info("No templates available")
+
+      // Ask if the user wants to download standard templates
+      val shouldDownload = if (config.yes) {
+        info("Auto-downloading standard templates (-y/--yes specified)...")
+        true
+      } else {
+        info("Waiting for user input about downloading templates")
+        print(
+          "Would you like to download a standard set of templates from GitHub? (y/n): "
+        )
+        val response = scala.io.StdIn.readLine()
+        info(
+          s"User response for download: ${if (response == "y") "yes" else "no"}"
+        )
+        response != null && (response.trim.toLowerCase == "y" || response.trim.toLowerCase == "yes")
+      }
+
+      if (shouldDownload) {
+        if (TemplateManager.downloadStandardTemplates(config.yes)) {
+          // List templates again after downloading
+          val updatedTemplates = TemplateManager.listAvailableTemplates()
+          if (updatedTemplates.nonEmpty) {
+            info("Available templates:")
+            updatedTemplates.foreach { template =>
+              info(s"  $template")
+            }
+          } else {
+            warn("Failed to download templates or no templates were downloaded")
+          }
+        } else {
+          warn("Failed to download standard templates")
+        }
+      } else {
+        info("Template download skipped")
+      }
     } else {
       info("Available templates:")
       templates.foreach { template =>
