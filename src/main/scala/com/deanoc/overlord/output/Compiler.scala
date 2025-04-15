@@ -1,11 +1,11 @@
 package com.deanoc.overlord.output
 
-import java.nio.file.Path
+import java.nio.file.{Path, Paths}
 import scala.collection.mutable
 
 import com.deanoc.overlord.utils.Utils
 import com.deanoc.overlord.instances.CpuInstance
-import com.deanoc.overlord.{Project, Resources}
+import com.deanoc.overlord.Project
 
 object Compiler {
   def apply(game: Project, out: Path): Unit = {
@@ -20,8 +20,14 @@ object Compiler {
 
   private def generateMakeCompilersScript(game: Project, out: Path): Boolean = {
     val compilerScriptBuilder = new StringBuilder
+
+    // TODO: remove std resource path here
     compilerScriptBuilder ++= (Utils.readFile(
-      Resources.stdResourcePath().resolve("catalogs/software/make_compilers.sh")
+      Paths
+        .get(System.getProperty("user.home"), "gagameos_stdcatalog")
+        .toAbsolutePath
+        .normalize()
+        .resolve("catalogs/software/make_compilers.sh")
     ) match {
       case Some(script) => script
       case None =>
@@ -55,8 +61,10 @@ object Compiler {
     val (cpuType, triple, gccFlags) = (cpu.cpuType, cpu.triple, cpu.gccFlags)
 
     val template = Utils.readFile(
-      Resources
-        .stdResourcePath()
+      Paths
+        .get(System.getProperty("user.home"), "gagameos_stdcatalog")
+        .toAbsolutePath
+        .normalize()
         .resolve("catalogs/software/toolchain_template.cmake")
     ) match {
       case Some(script) => script
@@ -66,9 +74,12 @@ object Compiler {
     }
 
     // try to read a specialist toolchain file, if none exist use template
-    val specialist = Resources
-      .stdResourcePath()
-      .resolve(s"catalogs/software/toolchain_$cpuType.cmake")
+    val specialist =
+      Paths
+        .get(System.getProperty("user.home"), "gagameos_stdcatalog")
+        .toAbsolutePath
+        .normalize()
+        .resolve(s"catalogs/software/toolchain_$cpuType.cmake")
     val tt = Utils.readFile(specialist) match {
       case Some(s) => s
       case None =>

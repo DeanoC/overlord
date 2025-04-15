@@ -2,9 +2,9 @@ package com.deanoc.overlord.output
 
 import com.deanoc.overlord.utils.Utils
 import com.deanoc.overlord.instances.LibraryInstance
-import com.deanoc.overlord.{Project, Resources}
+import com.deanoc.overlord.Project
 
-import java.nio.file.Path
+import java.nio.file.{Path, Paths}
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
@@ -137,8 +137,10 @@ object Software {
       sb.result()
     )
     Utils.copy(
-      Resources
-        .stdResourcePath()
+      Paths
+        .get(System.getProperty("user.home"), "gagameos_stdcatalog")
+        .toAbsolutePath
+        .normalize()
         .resolve("catalogs/software/library_defines.cmake"),
       out.resolve("library_defines/CMakeLists.txt")
     )
@@ -236,14 +238,20 @@ object Software {
     Utils.writeFile(out.resolve(s"make_programs.sh"), sb.result())
     Utils.setFileExecutable(out.resolve(s"make_programs.sh"))
     Utils.copy(
-      Resources
-        .stdResourcePath()
+      Paths
+        .get(System.getProperty("user.home"), "gagameos_stdcatalog")
+        .toAbsolutePath
+        .normalize()
         .resolve("catalogs/software/gagameos_root.cmake"),
       out.resolve("CMakeLists.txt")
     )
     // workaround for microblaze gcc
     Utils.copy(
-      Resources.stdResourcePath().resolve("catalogs/software/empty-file.ld"),
+      Paths
+        .get(System.getProperty("user.home"), "gagameos_stdcatalog")
+        .toAbsolutePath
+        .normalize()
+        .resolve("catalogs/software/empty-file.ld"),
       out.resolve("empty-file.ld")
     )
 

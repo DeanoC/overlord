@@ -1,7 +1,6 @@
 package com.deanoc.overlord.catalog
 
 import com.deanoc.overlord.utils.Logging
-import com.deanoc.overlord.Resources
 
 import java.nio.file.{Files, Path, Paths}
 import scala.sys.process._
@@ -21,7 +20,11 @@ object CatalogManager extends Logging {
   def updateCatalog(): Boolean = {
     info("Updating catalog from remote repository")
 
-    val stdResourcePath = Resources.stdResourcePath()
+    // TODO: remake catalog manager
+    val stdResourcePath = Paths
+      .get(System.getProperty("user.home"), "gagameos_stdcatalog")
+      .toAbsolutePath
+      .normalize()
 
     // Check if the catalog directory exists
     if (!Files.exists(stdResourcePath)) {

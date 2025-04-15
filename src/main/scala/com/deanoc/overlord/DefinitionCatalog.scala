@@ -135,8 +135,22 @@ object DefinitionCatalog {
       for (defi <- tdef) defs += Definition(defi, defaults)
     }
 
-    if (parsed.contains("include")) {
-      val tincs = Utils.toArray(parsed("include"))
+    if (parsed.contains("includes")) {
+      val includes = Utils.toArray(parsed("includes"))
+      for (include <- includes) {
+        val name = Paths.get(Utils.toString(include))
+        Project.pushCatalogPath(name)
+        val cat = DefinitionCatalog.fromFile(s"${name.getFileName}", defaults)
+        cat match {
+          case Some(value) => defs ++= value
+          case None        =>
+        }
+        Project.popCatalogPath()
+      }
+    }
+
+    if (parsed.contains("catalogs")) {
+      val tincs = Utils.toArray(parsed("catalogs"))
       for (include <- tincs) {
         val table = Utils.toTable(include)
         val name = Paths.get(Utils.toString(table("resource")))

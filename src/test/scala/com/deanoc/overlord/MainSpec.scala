@@ -144,16 +144,11 @@ class MainSpec extends AnyFlatSpec with Matchers {
       "project",
       "bare-metal",
       "my-project",
-      "--nostdresources",
-      "--resources",
-      "./custom-resources",
       "--yes"
     )
     val config = parseWithSuppressedOutput(args)
 
     config shouldBe defined
-    config.get.nostdresources shouldBe true
-    config.get.resources shouldBe Some("./custom-resources")
     config.get.yes shouldBe true
     config.get.templateName shouldBe Some("bare-metal")
     config.get.projectName shouldBe Some("my-project")

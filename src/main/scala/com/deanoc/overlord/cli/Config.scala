@@ -15,9 +15,6 @@ case class Config(
 
     // Common options
     board: Option[String] = None,
-    nostdresources: Boolean = false,
-    nostdprefabs: Boolean = false,
-    resources: Option[String] = None,
     yes: Boolean = false,
     noexit: Boolean = false,
     trace: Option[String] = None,
@@ -28,7 +25,6 @@ case class Config(
     instance: Option[String] = None,
     templateName: Option[String] = None,
     projectName: Option[String] = None,
-    stdresource: Option[String] = None,
 
     // Additional options for git/GitHub integration
     gitUrl: Option[String] = None,

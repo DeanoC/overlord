@@ -1,6 +1,5 @@
 package com.deanoc.overlord.cli
 
-import com.deanoc.overlord.Resources
 import com.deanoc.overlord.utils.Logging
 
 import scopt.OParser
@@ -21,15 +20,6 @@ object CommandLineParser extends Logging {
 
     // Common options that can be used with multiple commands
     val commonOptions = Seq(
-      opt[Unit]("nostdresources")
-        .action((_, c) => c.copy(nostdresources = true))
-        .text("don't use the standard catalog"),
-      opt[Unit]("nostdprefabs")
-        .action((_, c) => c.copy(nostdprefabs = true))
-        .text("don't use the standard prefabs"),
-      opt[String]("resources")
-        .action((x, c) => c.copy(resources = Some(x)))
-        .text("use the specified path as the root of resources"),
       opt[Unit]("yes")
         .abbr("y")
         .action((_, c) => c.copy(yes = true))
@@ -48,11 +38,6 @@ object CommandLineParser extends Logging {
         .action((x, c) => c.copy(debug = Some(x)))
         .text(
           "enable debug logging for comma-separated list of modules (can use short names)"
-        ),
-      opt[String]("stdresource")
-        .action((x, c) => c.copy(stdresource = Some(x)))
-        .text(
-          s"specify the standard resource path {default: ${Resources.stdResourcePath()}}"
         )
     )
 
@@ -267,15 +252,6 @@ object CommandLineParser extends Logging {
       templateCommand,
       help("help").text("prints this usage text"),
       // Add common options at the top level
-      opt[Unit]("nostdresources")
-        .action((_, c) => c.copy(nostdresources = true))
-        .text("don't use the standard catalog"),
-      opt[Unit]("nostdprefabs")
-        .action((_, c) => c.copy(nostdprefabs = true))
-        .text("don't use the standard prefabs"),
-      opt[String]("resources")
-        .action((x, c) => c.copy(resources = Some(x)))
-        .text("use the specified path as the root of resources"),
       opt[Unit]("yes")
         .abbr("y")
         .action((_, c) => c.copy(yes = true))
@@ -294,11 +270,6 @@ object CommandLineParser extends Logging {
         .action((x, c) => c.copy(debug = Some(x)))
         .text(
           "enable debug logging for comma-separated list of modules (can use short names)"
-        ),
-      opt[String]("stdresource")
-        .action((x, c) => c.copy(stdresource = Some(x)))
-        .text(
-          s"specify the standard resource path {default: ${Resources.stdResourcePath()}}"
         )
     )
   }

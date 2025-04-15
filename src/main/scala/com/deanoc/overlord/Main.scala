@@ -93,19 +93,13 @@ object Main extends Logging {
     debug("Configuration after parsing:")
     debug(s"- Command: ${config.command.getOrElse("None")}")
     debug(s"- Subcommand: ${config.subCommand.getOrElse("None")}")
-    debug(s"- Output directory: Uses project file directory")
     debug(s"- Board: ${config.board.getOrElse("None")}")
-    debug(s"- No standard resources: ${config.nostdresources}")
-    debug(s"- No standard prefabs: ${config.nostdprefabs}")
-    debug(s"- Resources path: ${config.resources.getOrElse("None")}")
     debug(s"- Instance: ${config.instance.getOrElse("None")}")
     debug(s"- Auto-yes: ${config.yes}")
     debug(s"- Input file: ${config.infile.getOrElse("None")}")
     debug(s"- Template name: ${config.templateName.getOrElse("None")}")
     debug(s"- Project name: ${config.projectName.getOrElse("None")}")
-    debug(
-      s"- Standard resource path: ${config.stdresource.getOrElse("Default")}"
-    )
+
     debug(s"- No exit on error: ${config.noexit}")
     debug(s"- Trace modules: ${config.trace.getOrElse("None")}")
     debug(s"- Debug modules: ${config.debug.getOrElse("None")}")

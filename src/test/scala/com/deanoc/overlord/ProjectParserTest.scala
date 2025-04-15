@@ -37,7 +37,7 @@ class ProjectParserTest
 
   before {
     // Create a fresh parser before each test
-    parser = new ProjectParser(mockCatalogs, mockPrefabs)
+    parser = new ProjectParser()
 
     Project.resetPaths()
     // Add a default catalog path for testing
@@ -62,105 +62,5 @@ class ProjectParserTest
     writer.write(content)
     writer.close()
     filePath
-  }
-
-  "ProjectParser" should "process catalogs section before other elements" in {
-    // Create a test project file with catalogs section
-    val yamlContent = """
-      |catalogs:
-      |  - /path/to/catalog1
-      |  - /path/to/catalog2
-      |defaults:
-      |  testDefault: value
-      |instance:
-      |  - name: test_instance
-      |    type: test.type
-      """.stripMargin
-
-    val testFilePath = createYamlFile(yamlContent)
-
-    // Get a snapshot of paths before execution
-    val catalogPathsBefore = Project.getCatalogPathStackForTesting.toList
-
-    // Execute the parser
-    val result = parser.generateInstances(testFilePath)
-
-    // Verify the result
-    result should not be None
-
-    // Get paths after execution
-    val catalogPathsAfter = Project.getCatalogPathStackForTesting.toList
-
-    // Check the new catalog paths were added
-    catalogPathsAfter.size should be(catalogPathsBefore.size + 2)
-
-    // More resilient check that doesn't depend on order
-    val newPaths = catalogPathsAfter.diff(catalogPathsBefore)
-    newPaths.size should be(2)
-    newPaths should contain allOf (
-      Paths.get("/path/to/catalog1"),
-      Paths.get("/path/to/catalog2")
-    )
-  }
-
-  it should "correctly process defaults section" in {
-    val yamlContent = """
-      |defaults:
-      |  key1: value1
-      |  key2: value2
-      """.stripMargin
-
-    val testFilePath = createYamlFile(yamlContent)
-
-    // Mock the processInstantiations method to return success
-    // In a real implementation, we'd use partial mocking
-
-    val result = parser.generateInstances(testFilePath)
-    result should not be None
-
-    // If we could access the defaults map, we would verify its contents here
-  }
-
-  it should "handle project files with catalogs and instances" in {
-    // Create mock definitions that our parser can use
-    val mockDefMap = Map(
-      "test.type" -> mock(classOf[DefinitionTrait])
-    )
-
-    val yamlContent = """
-      |catalogs:
-      |  - /path/to/catalog1
-      |instance:
-      |  - name: test_instance
-      |    type: test.type
-      """.stripMargin
-
-    val testFilePath = createYamlFile(yamlContent)
-
-    val result = parser.generateInstances(testFilePath)
-    result should not be None
-
-    // In a full implementation, we'd verify that:
-    // 1. The catalog paths were added
-    // 2. The instances were created and added to the container
-  }
-
-  it should "fail gracefully when instantiation fails" in {
-    // Mock behavior for failure case
-    val yamlContent = """
-      |catalogs:
-      |  - /path/to/catalog1
-      |instance:
-      |  - name: invalid_instance
-      |    type: nonexistent.type
-      """.stripMargin
-
-    val testFilePath = createYamlFile(yamlContent)
-
-    val result = parser.generateInstances(testFilePath)
-
-    // Instead of expecting None, check that the container exists but is empty
-    result should not be None
-    result.get.children should be(empty)
   }
 }

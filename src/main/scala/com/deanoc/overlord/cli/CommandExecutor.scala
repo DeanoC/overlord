@@ -2,7 +2,6 @@ package com.deanoc.overlord.cli
 
 import com.deanoc.overlord.utils.Logging
 import com.deanoc.overlord.utils.Utils
-import com.deanoc.overlord.Resources
 import com.deanoc.overlord.Project
 import com.deanoc.overlord.DefinitionCatalog
 import com.deanoc.overlord.PrefabCatalog
@@ -84,53 +83,6 @@ object CommandExecutor extends Logging {
         error("Unknown command or missing subcommand")
         false
     }
-  }
-
-  private def resolveStdResourcePath(config: Config): Path = {
-    config.stdresource
-      .orElse(config.resources)
-      .map(path => Paths.get(expandPath(path)).toAbsolutePath.normalize())
-      .getOrElse(Resources.stdResourcePath())
-  }
-
-  private def ensureResources(
-      config: Config,
-      stdResourcePath: Path
-  ): Boolean = {
-    if (
-      !config.nostdresources && !ensureStdResources(stdResourcePath, config.yes)
-    ) {
-      false
-    } else {
-      true
-    }
-  }
-
-  private def loadCatalogs(
-      config: Config,
-      stdResourcePath: Path
-  ): (DefinitionCatalog, PrefabCatalog) = {
-    val chipCatalog = new DefinitionCatalog
-    val stdResources = if (!config.nostdresources) {
-      val res = Resources(stdResourcePath)
-      chipCatalog.mergeNewDefinition(res.loadCatalogs())
-      res
-    } else {
-      null
-    }
-
-    val resources = config.resources.map { path =>
-      Resources(Paths.get(expandPath(path)))
-    }
-    resources.foreach(r => chipCatalog.mergeNewDefinition(r.loadCatalogs()))
-
-    val prefabCatalog = new PrefabCatalog
-    if (!config.nostdprefabs && stdResources != null) {
-      prefabCatalog.prefabs ++= stdResources.loadPrefabs()
-    }
-    resources.foreach(r => prefabCatalog.prefabs ++= r.loadPrefabs())
-
-    (chipCatalog, prefabCatalog)
   }
 
   /** Executes the 'create project' command.
@@ -545,60 +497,12 @@ object CommandExecutor extends Logging {
     // Use the project file's directory
     Utils.ensureDirectories(parentDir)
 
-    val stdResourcePath = config.stdresource
-      .orElse(config.resources)
-      .map(path => Paths.get(expandPath(path)).toAbsolutePath.normalize())
-      .getOrElse(Resources.stdResourcePath())
-    Resources.setStdResourcePath(stdResourcePath)
-
-    Project.setupPaths(
-      filePath,
-      Resources.stdResourcePath(),
-      Resources.stdResourcePath()
-      // Removed 4th parameter (out) as per updated method signature
-    )
-
-    val resources = config.resources.map { path =>
-      Resources(Paths.get(expandPath(path)))
-    }
-
-    // Ensure standard resources are available
-    if (
-      !config.nostdresources && !ensureStdResources(stdResourcePath, config.yes)
-    ) {
-      return null
-    }
-
-    // Load catalogs
-    val chipCatalog = new DefinitionCatalog
-    val stdResources = if (!config.nostdresources) {
-      val res = Resources(stdResourcePath)
-      chipCatalog.mergeNewDefinition(res.loadCatalogs())
-      res
-    } else {
-      null
-    }
-    resources.foreach(r => chipCatalog.mergeNewDefinition(r.loadCatalogs()))
-
-    val prefabCatalog = new PrefabCatalog
-    if (!config.nostdprefabs && stdResources != null) {
-      prefabCatalog.prefabs ++= stdResources.loadPrefabs()
-    }
-    resources.foreach(r => prefabCatalog.prefabs ++= r.loadPrefabs())
+    Project.setupPaths(filePath)
 
     val gameName = filename.split('/').last.split('.').head
     val board = config.board.getOrElse("unknown")
 
-    Project(
-      gameName,
-      board,
-      filePath,
-      chipCatalog,
-      prefabCatalog
-    ) match {
-      case Some(game) => game
-      case None       => null
-    }
+    Project(gameName, board, filePath)
   }
 
   /** Ensures that standard resources are available.

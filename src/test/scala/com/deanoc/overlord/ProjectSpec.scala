@@ -11,38 +11,25 @@ class ProjectSpec extends AnyFlatSpec with Matchers {
     val projectFile = tempDir.resolve("project.yaml")
     Files.createFile(projectFile)
 
-    val catalogPath = tempDir.resolve("catalog")
-    val prefabsPath = tempDir.resolve("prefabs")
-    Files.createDirectory(catalogPath)
-    Files.createDirectory(prefabsPath)
-
-    Project.setupPaths(projectFile, catalogPath, prefabsPath)
+    Project.setupPaths(projectFile)
 
     // Verify the output path is set to the project file's directory
     Project.outPath.toAbsolutePath shouldBe projectFile.getParent.toAbsolutePath
 
     // Clean up
     Files.delete(projectFile)
-    Files.delete(catalogPath)
-    Files.delete(prefabsPath)
     Files.delete(tempDir)
   }
 
   it should "use provided directory as output path when no file is specified" in {
     val tempDir = Files.createTempDirectory("project_test")
-    val catalogPath = tempDir.resolve("catalog")
-    val prefabsPath = tempDir.resolve("prefabs")
-    Files.createDirectory(catalogPath)
-    Files.createDirectory(prefabsPath)
 
-    Project.setupPaths(tempDir, catalogPath, prefabsPath)
+    Project.setupPaths(tempDir)
 
     // Verify the output path is set to the provided directory
     Project.outPath.toAbsolutePath shouldBe tempDir.toAbsolutePath
 
     // Clean up
-    Files.delete(catalogPath)
-    Files.delete(prefabsPath)
     Files.delete(tempDir)
   }
 
@@ -51,12 +38,7 @@ class ProjectSpec extends AnyFlatSpec with Matchers {
     val projectFile = tempDir.resolve("project.yaml")
     Files.createFile(projectFile)
 
-    val catalogPath = tempDir.resolve("catalog")
-    val prefabsPath = tempDir.resolve("prefabs")
-    Files.createDirectory(catalogPath)
-    Files.createDirectory(prefabsPath)
-
-    Project.setupPaths(projectFile, catalogPath, prefabsPath)
+    Project.setupPaths(projectFile)
 
     // Push a subdirectory onto the output path stack
     Project.pushOutPath("subdirectory")
@@ -68,8 +50,6 @@ class ProjectSpec extends AnyFlatSpec with Matchers {
     // Clean up
     Project.popOutPath()
     Files.delete(projectFile)
-    Files.delete(catalogPath)
-    Files.delete(prefabsPath)
     Files.delete(tempDir)
   }
 }
