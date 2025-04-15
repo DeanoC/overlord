@@ -452,21 +452,20 @@ object Project extends Logging {
       prefabs: PrefabCatalog
   ) extends Logging {
 
-    val containerStack: mutable.Stack[Container] = mutable.Stack()
-
-    private val defaults = mutable.Map[String, Variant]()
+    private val parser = new ProjectParser(catalogs, prefabs)
 
     def toGame(): Option[Project] = {
-      generateInstances(gamePath)
+      val containerOpt = parser.generateInstances(gamePath)
 
-      if (containerStack.isEmpty) {
+      if (containerOpt.isEmpty) {
         error("Previous Errors mean project cannot be created\n")
         return None
       }
 
       val rootContainer = new MutableContainer
       injectBoard(rootContainer)
-      flattenContainers(rootContainer)
+      flattenContainers(rootContainer, parser.getAllContainers)
+      parser.clearContainers()
 
       resolveSoftwareDependencies(rootContainer)
 
@@ -497,14 +496,15 @@ object Project extends Logging {
       )
     }
 
-    private def flattenContainers(rootContainer: MutableContainer): Unit = {
+    private def flattenContainers(
+        rootContainer: MutableContainer,
+        containers: Seq[Container]
+    ): Unit = {
       // flatten all containers
-      for (c <- containerStack.popAll()) {
+      for (c <- containers) {
         rootContainer.mutableChildren ++= c.children
         rootContainer.mutableUnconnected ++= c.unconnected
       }
-
-      containerStack.clear()
     }
 
     private def outputSoftware(
@@ -543,20 +543,6 @@ object Project extends Logging {
       popOutPath()
     }
 
-    private def generateInstances(path: Path): Boolean = {
-      var newContainer = MutableContainer()
-      containerStack.push(newContainer)
-      val parsed = Utils.readYaml(path)
-      if (parsed.contains("defaults"))
-        defaults ++= Utils.toTable(parsed("defaults"))
-
-      if (!processInstantiations(parsed, newContainer).getOrElse(false)) {
-        // Handle the error appropriately
-        error(s"Instantiation failed")
-        false
-      } else true
-    }
-
     private def injectBoard(rootContainer: MutableContainer) = {
       // pass the board as if it had been a prefab in the main project file
       val boardInsertV = Map[String, Variant](
@@ -578,7 +564,7 @@ object Project extends Logging {
           )
         )
       )
-      processInstantiations(boardInsertV, rootContainer)
+      parser.processInstantiations(boardInsertV, rootContainer)
     }
 
     private def connectAndOutputChips(rootContainer: MutableContainer) = {
@@ -620,88 +606,6 @@ object Project extends Logging {
 
       (connected, allDistanceMatrix, busDistanceMatrix, wires)
 
-    }
-
-    private def processInstantiations(
-        parsed: Map[String, Variant],
-        container: MutableContainer
-    ): Either[String, Boolean] = boundary {
-      // includes
-      if (parsed.contains("include")) {
-        val tincs = Utils.toArray(parsed("include"))
-        for (include <- tincs) {
-          val table = Utils.toTable(include)
-          val incResourceName = Utils.toString(table("resource"))
-          val incResourcePath = Paths.get(incResourceName)
-
-          debug(s"include: $incResourceName at $incResourcePath")
-
-          prefabs.findPrefabInclude(incResourceName) match {
-            case Some(value) =>
-              Project.setInstancePath(value.path)
-              val variants = prefabs.flattenIncludesContents(value.name)
-              processInstantiations(variants, container) match {
-                case Left(error) => break(Left(error))
-                case _           => // continue
-              }
-              Project.popInstancePath()
-            case None =>
-              Utils.readFile(incResourcePath) match {
-                case Some(_) =>
-                  if (!generateInstances(incResourcePath)) {
-                    break(Left("Failed to generate instances"))
-                  }
-                case _ =>
-                  break(
-                    Left(s"Include resource file $incResourceName not found")
-                  )
-              }
-          }
-        }
-      }
-
-      // extract instances
-      if (parsed.contains("instance")) {
-        val instancesWanted = Utils.toArray(parsed("instance"))
-        val instances =
-          instancesWanted.flatMap(v =>
-            Instance(v, defaults.toMap, catalogs) match {
-              case Right(instance) => Some(instance)
-              case Left(err) =>
-                error(s"creating instance: $err")
-                None
-            }
-          )
-        container.mutableChildren ++= instances
-      }
-
-      // extract connections
-      if (parsed.contains("connection")) {
-        val connections = Utils.toArray(parsed("connection"))
-        container.mutableUnconnected ++= connections.flatMap(
-          ConnectionParser.parseConnection(_)
-        )
-      }
-
-      // bring in wanted prefabs
-      if (parsed.contains("prefab")) {
-        val tpfs = Utils.toArray(parsed("prefab"))
-        for (prefab <- tpfs) {
-          val table = Utils.toTable(prefab)
-          val ident = Utils.toString(table("name"))
-          prefabs.findPrefab(ident) match {
-            case Some(pf) =>
-              processInstantiations(pf.stuff, container) match {
-                case Left(err) => break(Left(err))
-                case _         => // continue
-              }
-            case None =>
-              break(Left(s"prefab $ident not found"))
-          }
-        }
-      }
-
-      Right(true)
     }
 
     private def resolveSoftwareDependencies(
