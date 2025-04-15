@@ -730,7 +730,8 @@ object CommandExecutor extends Logging {
 
         try {
           val expandedDestination = expandPath(destination)
-          val destPath = Paths.get(expandedDestination)
+          val destPath =
+            Paths.get(expandedDestination).toAbsolutePath.normalize()
 
           // Ensure the destination directory exists
           if (!Files.exists(destPath)) {
@@ -738,16 +739,23 @@ object CommandExecutor extends Logging {
             Files.createDirectories(destPath)
           }
 
+          // Check if destination is writable
+          if (!Files.isWritable(destPath)) {
+            error(s"Destination directory $expandedDestination is not writable")
+            return false
+          }
+
           // Build the toolchain
           buildGccToolchain(
             triple,
-            expandedDestination,
+            destPath.toString, // Use absolute path to avoid path duplication
             gccVersion,
             binutilsVersion
           )
         } catch {
           case e: Exception =>
             error(s"Failed to build GCC toolchain: ${e.getMessage}")
+            e.printStackTrace() // Print stack trace for better debugging
             false
         }
 
@@ -781,10 +789,29 @@ object CommandExecutor extends Logging {
   ): Boolean = {
     info("Starting toolchain build process...")
 
+    // Create a unique build ID for logging
+    val buildId = java.util.UUID.randomUUID().toString.substring(0, 8)
+    info(s"Build ID: $buildId")
+
     try {
-      // Create a workspace directory for downloads
-      val workspaceDir = Files.createTempDirectory("gcc-workspace-")
-      info(s"Created temporary workspace directory: $workspaceDir")
+      // Ensure destination directory exists and is writable
+      val destPath = Paths.get(destination)
+      if (!Files.exists(destPath)) {
+        info(s"Creating destination directory: $destination")
+        try {
+          Files.createDirectories(destPath)
+        } catch {
+          case e: Exception =>
+            error(s"Failed to create destination directory: ${e.getMessage}")
+            return false
+        }
+      }
+
+      // Check if destination is writable
+      if (!Files.isWritable(destPath)) {
+        error(s"Destination directory $destination is not writable")
+        return false
+      }
 
       // Generate CMake toolchain file
       val toolchainFile = Paths.get(destination, s"${triple}_toolchain.cmake")
@@ -808,23 +835,38 @@ object CommandExecutor extends Logging {
       try {
         Files.deleteIfExists(scriptDestPath)
       } catch {
-        case _: Exception => // Ignore errors when trying to delete
+        case e: Exception =>
+          warn(
+            s"Failed to delete existing script file: ${e.getMessage()}, will try to overwrite"
+          )
       }
 
       // Copy the resource and close the stream properly
+      var destStream: java.io.OutputStream = null
       try {
-        val destStream = Files.newOutputStream(scriptDestPath)
+        destStream = Files.newOutputStream(scriptDestPath)
         val buffer = new Array[Byte](4096)
         var bytesRead = 0
         while ({ bytesRead = scriptResource.read(buffer); bytesRead != -1 }) {
           destStream.write(buffer, 0, bytesRead)
         }
-        destStream.close()
-        scriptResource.close()
       } catch {
         case e: Exception =>
           error(s"Failed to copy script: ${e.getMessage}")
           return false
+      } finally {
+        if (destStream != null) {
+          try {
+            destStream.close()
+          } catch {
+            case _: Exception => // Ignore close errors
+          }
+        }
+        try {
+          scriptResource.close()
+        } catch {
+          case _: Exception => // Ignore close errors
+        }
       }
 
       // Make the script executable
@@ -834,30 +876,95 @@ object CommandExecutor extends Logging {
         return false
       }
 
+      // Check for required tools
+      val requiredTools = Seq("wget", "tar", "make", "gcc", "g++")
+      for (tool <- requiredTools) {
+        val checkCmd = s"which $tool"
+        if (checkCmd.! != 0) {
+          error(
+            s"Required tool '$tool' not found. Please install it and try again."
+          )
+          return false
+        }
+      }
+
       // Define environment variables
       val env = Seq(
         "TARGET" -> triple,
         "GCC_VERSION" -> gccVersion,
         "BINUTILS_VERSION" -> binutilsVersion,
-        "INSTALL_DIR" -> destination
+        "INSTALL_DIR" -> destination,
+        "BUILD_ID" -> buildId,
+        "LANG" -> "C", // Use C locale for consistent output
+        "LC_ALL" -> "C"
       )
+
+      // Check if the destination directory is writable
+      val destDir = new java.io.File(destination)
+      if (!destDir.canWrite) {
+        warn(
+          s"Destination directory $destination may not be writable. The build might fail due to permission issues."
+        )
+      }
 
       // Execute the script with absolute path
       info("Executing GCC build script...")
+
+      // Create a custom process logger that captures all output
+      val outputBuffer = new StringBuilder
+      val processLogger = ProcessLogger(
+        line => {
+          info(s"[build-$buildId] $line")
+          outputBuffer.append(line).append("\n")
+        },
+        line => {
+          // Use warn instead of error to avoid exiting
+          warn(s"[build-error-$buildId] $line")
+          outputBuffer.append(s"ERROR: $line").append("\n")
+        }
+      )
+
       val processBuilder = Process(
         Seq("bash", scriptDestPath.toAbsolutePath.toString),
         new java.io.File(destination),
         env: _*
       )
 
-      val processLogger = ProcessLogger(
-        line => info(s"[build] $line"),
-        line => error(s"[build-error] $line")
-      )
+      val scriptExitCode = processBuilder ! processLogger
 
-      val exitCode = processBuilder ! processLogger
-      if (exitCode != 0) {
-        error(s"Build script exited with code $exitCode")
+      if (scriptExitCode != 0) {
+        warn(s"Build script exited with code $scriptExitCode")
+
+        // Analyze the output to provide more specific error messages
+        val output = outputBuffer.toString
+
+        if (output.contains("Permission denied")) {
+          warn(
+            "The build failed due to permission issues. You may need to run with elevated privileges."
+          )
+        } else if (output.contains("No space left on device")) {
+          warn("The build failed due to insufficient disk space.")
+        } else if (output.contains("Failed to download")) {
+          warn(
+            "The build failed due to download issues. Check your internet connection or try a different version."
+          )
+        } else if (output.contains("command not found")) {
+          warn(
+            "The build failed because a required command was not found. Check that all dependencies are installed."
+          )
+        }
+
+        return false
+      }
+
+      // Verify the toolchain was built successfully by checking for key binaries
+      val gccBinary = Paths.get(destination, "bin", s"$triple-gcc")
+      val gppBinary = Paths.get(destination, "bin", s"$triple-g++")
+
+      if (!Files.exists(gccBinary) || !Files.exists(gppBinary)) {
+        warn(
+          "Toolchain build completed but key binaries are missing. Build may have failed."
+        )
         return false
       }
 
@@ -869,7 +976,8 @@ object CommandExecutor extends Logging {
       true
     } catch {
       case e: Exception =>
-        error(s"Error building toolchain: ${e.getMessage}")
+        warn(s"Error building toolchain: ${e.getMessage}")
+        e.printStackTrace() // Print stack trace for better debugging
         false
     }
   }
@@ -890,25 +998,37 @@ object CommandExecutor extends Logging {
       triple: String,
       gccVersion: String
   ): Boolean = {
+    var templateStream: java.io.InputStream = null
+
     try {
-      val templateStream =
-        getClass.getResourceAsStream("/toolchain_teamplate.cmake")
+      // Try the correct template name first
+      templateStream = getClass.getResourceAsStream("/toolchain_template.cmake")
+
+      // Fall back to the misspelled name if needed
       if (templateStream == null) {
-        error("Could not find toolchain template resource")
+        info("Could not find toolchain_template.cmake, trying alternative name")
+        templateStream =
+          getClass.getResourceAsStream("/toolchain_teamplate.cmake")
+      }
+
+      if (templateStream == null) {
+        error("Could not find any toolchain template resource")
         return false
       }
 
       // Read template content
       val templateContent =
         scala.io.Source.fromInputStream(templateStream).mkString
-      templateStream.close()
 
       // Replace placeholders
       val gccFlags = triple match {
         case t if t.startsWith("arm") =>
           "-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16"
-        case t if t.startsWith("riscv") => "-march=rv32imac -mabi=ilp32"
-        case _                          => ""
+        case t if t.startsWith("riscv32") => "-march=rv32imac -mabi=ilp32"
+        case t if t.startsWith("riscv64") => "-march=rv64imac -mabi=lp64"
+        case t if t.startsWith("x86_64")  => "-m64"
+        case t if t.startsWith("i686")    => "-m32"
+        case _                            => ""
       }
 
       val content = templateContent
@@ -916,13 +1036,29 @@ object CommandExecutor extends Logging {
         .replace("${version}", gccVersion)
         .replace("${GCC_FLAGS}", gccFlags)
 
+      // Ensure parent directories exist
+      val parent = outputPath.getParent
+      if (parent != null && !Files.exists(parent)) {
+        Files.createDirectories(parent)
+      }
+
       // Write to output file
       Files.write(outputPath, content.getBytes)
+      info(s"Successfully generated CMake toolchain file at: $outputPath")
       true
     } catch {
       case e: Exception =>
         error(s"Error generating CMake toolchain file: ${e.getMessage}")
+        e.printStackTrace() // Print stack trace for better debugging
         false
+    } finally {
+      if (templateStream != null) {
+        try {
+          templateStream.close()
+        } catch {
+          case _: Exception => // Ignore close errors
+        }
+      }
     }
   }
 }
