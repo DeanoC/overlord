@@ -5,7 +5,7 @@ import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 import com.deanoc.overlord.utils.{Utils, Variant}
-import com.deanoc.overlord.Project
+import com.deanoc.overlord.Overlord
 
 class DefinitionCatalog {
   type key = DefinitionType
@@ -94,7 +94,7 @@ object DefinitionCatalog {
       fileName: String,
       defaultMap: Map[String, Variant]
   ): Option[Seq[DefinitionTrait]] = {
-    val filePath = Project.catalogPath.resolve(fileName)
+    val filePath = Overlord.catalogPath.resolve(fileName)
 
     // println(s"Reading $fileName catalog")
 
@@ -103,11 +103,11 @@ object DefinitionCatalog {
       return None
     }
 
-    Project.pushCatalogPath(filePath.getParent)
+    Overlord.pushCatalogPath(filePath.getParent)
 
     val source = Utils.readYaml(filePath)
     val result = parse(fileName, source, defaultMap)
-    Project.popCatalogPath()
+    Overlord.popCatalogPath()
     result
   }
 
@@ -139,13 +139,13 @@ object DefinitionCatalog {
       val includes = Utils.toArray(parsed("includes"))
       for (include <- includes) {
         val name = Paths.get(Utils.toString(include))
-        Project.pushCatalogPath(name)
+        Overlord.pushCatalogPath(name)
         val cat = DefinitionCatalog.fromFile(s"${name.getFileName}", defaults)
         cat match {
           case Some(value) => defs ++= value
           case None        =>
         }
-        Project.popCatalogPath()
+        Overlord.popCatalogPath()
       }
     }
 
@@ -154,13 +154,13 @@ object DefinitionCatalog {
       for (include <- tincs) {
         val table = Utils.toTable(include)
         val name = Paths.get(Utils.toString(table("resource")))
-        Project.pushCatalogPath(name)
+        Overlord.pushCatalogPath(name)
         val cat = DefinitionCatalog.fromFile(s"${name.getFileName}", defaults)
         cat match {
           case Some(value) => defs ++= value
           case None        =>
         }
-        Project.popCatalogPath()
+        Overlord.popCatalogPath()
       }
     }
 

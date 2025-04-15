@@ -3,7 +3,7 @@ package com.deanoc.overlord.hardware
 import com.deanoc.overlord.actions.ActionsFile
 import com.deanoc.overlord.utils.{Utils, Variant}
 import com.deanoc.overlord.utils.Utils.VariantTable
-import com.deanoc.overlord.{DefinitionType, Project, GatewareDefinitionTrait}
+import com.deanoc.overlord.{DefinitionType, Overlord, GatewareDefinitionTrait}
 
 import java.nio.file.{Path, Paths}
 
@@ -131,8 +131,8 @@ object GatewareDefinition {
       fileName: String
   ): Either[String, GatewareDefinition] = {
     val fileNameAlone = Paths.get(fileName).getFileName
-    Project.pushCatalogPath(Paths.get(fileName))
-    val yaml = Utils.readYaml(Project.catalogPath.resolve(fileNameAlone))
+    Overlord.pushCatalogPath(Paths.get(fileName))
+    val yaml = Utils.readYaml(Overlord.catalogPath.resolve(fileNameAlone))
     val result = parse(
       defType,
       attributes,
@@ -143,7 +143,7 @@ object GatewareDefinition {
       fileName,
       yaml
     )
-    Project.popCatalogPath()
+    Overlord.popCatalogPath()
     result
   }
 
@@ -202,7 +202,7 @@ object GatewareDefinition {
       Right(
         GatewareDefinition(
           defType,
-          Project.catalogPath,
+          Overlord.catalogPath,
           attributes,
           dependencies,
           ports,

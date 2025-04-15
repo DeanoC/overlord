@@ -1,7 +1,7 @@
 package com.deanoc.overlord
 
 import com.deanoc.overlord.utils.{Logging, ArrayV, Utils, Variant}
-import com.deanoc.overlord.Project
+import com.deanoc.overlord.Overlord
 
 import java.nio.file.Files
 import scala.collection.mutable
@@ -46,7 +46,7 @@ object PrefabCatalog extends Logging {
       fileName: String,
       existing: PrefabCatalog = PrefabCatalog()
   ): PrefabCatalog = {
-    val filePath = Project.instancePath.resolve(fileName)
+    val filePath = Overlord.instancePath.resolve(fileName)
 
     if (!Files.exists(filePath.toAbsolutePath)) {
       info(s"$fileName catalog at $filePath not found")
@@ -56,13 +56,13 @@ object PrefabCatalog extends Logging {
       existing
     } else {
       // Push the file's parent path to the instance path stack.
-      Project.pushInstancePath(filePath.getParent)
+      Overlord.pushInstancePath(filePath.getParent)
       val source = Utils.readYaml(filePath)
 
       // Handle invalid or comment-only files by creating an empty prefab.
       if (source == null) {
         info(s"$fileName is comments only or invalid, creating an empty prefab")
-        Project.popInstancePath()
+        Overlord.popInstancePath()
         existing
       } else {
 
@@ -96,7 +96,7 @@ object PrefabCatalog extends Logging {
         }
         if (stuff.nonEmpty)
           prefabs ++= Seq(
-            Prefab(name, Project.instancePath.toString, stuff, included.toMap)
+            Prefab(name, Overlord.instancePath.toString, stuff, included.toMap)
           )
 
         // Handle cases where no usable data is found.
@@ -106,12 +106,12 @@ object PrefabCatalog extends Logging {
           )
           val name = fileName.replace("/", ".")
           prefabs ++= Seq(
-            Prefab(name, Project.instancePath.toString, Map.empty, Map.empty)
+            Prefab(name, Overlord.instancePath.toString, Map.empty, Map.empty)
           )
         }
 
         // Pop the instance path stack.
-        Project.popInstancePath()
+        Overlord.popInstancePath()
 
         PrefabCatalog(immutable.HashMap(newPrefabs.toSeq: _*))
       }

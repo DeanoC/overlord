@@ -4,17 +4,17 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import java.nio.file.{Files, Path, Paths}
 
-class ProjectSpec extends AnyFlatSpec with Matchers {
+class OverlordSpec extends AnyFlatSpec with Matchers {
 
   "Project" should "use project file's directory as output path" in {
     val tempDir = Files.createTempDirectory("project_test")
     val projectFile = tempDir.resolve("project.yaml")
     Files.createFile(projectFile)
 
-    Project.setupPaths(projectFile)
+    Overlord.setupPaths(projectFile)
 
     // Verify the output path is set to the project file's directory
-    Project.outPath.toAbsolutePath shouldBe projectFile.getParent.toAbsolutePath
+    Overlord.outPath.toAbsolutePath shouldBe projectFile.getParent.toAbsolutePath
 
     // Clean up
     Files.delete(projectFile)
@@ -24,10 +24,10 @@ class ProjectSpec extends AnyFlatSpec with Matchers {
   it should "use provided directory as output path when no file is specified" in {
     val tempDir = Files.createTempDirectory("project_test")
 
-    Project.setupPaths(tempDir)
+    Overlord.setupPaths(tempDir)
 
     // Verify the output path is set to the provided directory
-    Project.outPath.toAbsolutePath shouldBe tempDir.toAbsolutePath
+    Overlord.outPath.toAbsolutePath shouldBe tempDir.toAbsolutePath
 
     // Clean up
     Files.delete(tempDir)
@@ -38,17 +38,17 @@ class ProjectSpec extends AnyFlatSpec with Matchers {
     val projectFile = tempDir.resolve("project.yaml")
     Files.createFile(projectFile)
 
-    Project.setupPaths(projectFile)
+    Overlord.setupPaths(projectFile)
 
     // Push a subdirectory onto the output path stack
-    Project.pushOutPath("subdirectory")
+    Overlord.pushOutPath("subdirectory")
 
     // Verify the output path includes the subdirectory
-    Project.outPath.toAbsolutePath shouldBe
+    Overlord.outPath.toAbsolutePath shouldBe
       projectFile.getParent.resolve("subdirectory").toAbsolutePath
 
     // Clean up
-    Project.popOutPath()
+    Overlord.popOutPath()
     Files.delete(projectFile)
     Files.delete(tempDir)
   }

@@ -12,7 +12,7 @@ import java.nio.file.{Files, Path, Paths}
 import java.io.{File, FileWriter}
 import scala.collection.mutable
 
-class ProjectParserTest
+class OverlordParserTest
     extends AnyFlatSpec
     with Matchers
     with BeforeAndAfter
@@ -39,9 +39,9 @@ class ProjectParserTest
     // Create a fresh parser before each test
     parser = new ProjectParser()
 
-    Project.resetPaths()
+    Overlord.resetPaths()
     // Add a default catalog path for testing
-    Project.pushCatalogPath(tempDir)
+    Overlord.pushCatalogPath(tempDir)
   }
 
   // Helper method to delete directory recursively

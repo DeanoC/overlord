@@ -10,10 +10,12 @@ import com.deanoc.overlord.input.{
   VerilogModuleParser
 }
 import com.deanoc.overlord.hardware.{Port, WireDirection}
-import com.deanoc.overlord.Project
+import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
 
-case class ReadVerilogTopAction(filename: String) extends GatewareAction with Logging {
+case class ReadVerilogTopAction(filename: String)
+    extends GatewareAction
+    with Logging {
 
   override val phase: Int = 2
 
@@ -39,27 +41,36 @@ case class ReadVerilogTopAction(filename: String) extends GatewareAction with Lo
     import scala.util.boundary, boundary.break
 
     // Resolves the filename with macros and parses Verilog modules
-    val expandedName = Project.resolveInstanceMacros(instance, filename)
-    debug(s"Parsing Verilog module from ${expandedName} for instance ${instance.name}")
-    
+    val expandedName = Overlord.resolveInstanceMacros(instance, filename)
+    debug(
+      s"Parsing Verilog module from ${expandedName} for instance ${instance.name}"
+    )
+
     VerilogModuleParser(
-      Project.tryPaths(instance, expandedName),
+      Overlord.tryPaths(instance, expandedName),
       instance.name
     ) match {
       case Right(parsedModules) =>
         boundary {
           // Log all available module names for debugging purposes
-         
+
           // Finds the module matching the instance name or filename
           val module = parsedModules.find(_.name == instance.name).getOrElse {
-            debug(s"Module name '${instance.name}' not found, trying filename-based match")
-            val filenameBasedModuleName = expandedName.split("/").last.replace(".v", "")
+            debug(
+              s"Module name '${instance.name}' not found, trying filename-based match"
+            )
+            val filenameBasedModuleName =
+              expandedName.split("/").last.replace(".v", "")
             parsedModules
               .find(_.name == filenameBasedModuleName)
               .getOrElse {
-                warn(s"No matching module found for ${instance.name}. Tried instance name and '$filenameBasedModuleName'")
-                debug(s"Available modules in $expandedName: [${parsedModules.map(_.name).mkString(", ")}]")
-                 break(())
+                warn(
+                  s"No matching module found for ${instance.name}. Tried instance name and '$filenameBasedModuleName'"
+                )
+                debug(
+                  s"Available modules in $expandedName: [${parsedModules.map(_.name).mkString(", ")}]"
+                )
+                break(())
               }
           }
 
@@ -73,18 +84,20 @@ case class ReadVerilogTopAction(filename: String) extends GatewareAction with Lo
           val parameterKeys = module.module_boundary.collect {
             case p: VerilogParameterKey => p
           }
-          
+
           // Log detected ports and parameters
           debug(s"Detected ${ports.size} ports for ${instance.name}:")
-          ports.foreach(p => 
-            debug(s"  - Port: ${p.name}, Direction: ${p.direction}, Bits: ${p.bits}, Width: ${p.knownWidth}")
+          ports.foreach(p =>
+            debug(
+              s"  - Port: ${p.name}, Direction: ${p.direction}, Bits: ${p.bits}, Width: ${p.knownWidth}"
+            )
           )
-          
-          debug(s"Detected ${parameterKeys.size} parameters for ${instance.name}:")
-          parameterKeys.foreach(p => 
-            debug(s"  - Parameter: ${p.parameter}")
+
+          debug(
+            s"Detected ${parameterKeys.size} parameters for ${instance.name}:"
           )
-          
+          parameterKeys.foreach(p => debug(s"  - Parameter: ${p.parameter}"))
+
           ports.foreach(p =>
             instance.mergePort(
               p.name,

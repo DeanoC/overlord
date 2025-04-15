@@ -2,7 +2,7 @@ package com.deanoc.overlord.cli
 
 import com.deanoc.overlord.utils.Logging
 import com.deanoc.overlord.utils.Utils
-import com.deanoc.overlord.Project
+import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.DefinitionCatalog
 import com.deanoc.overlord.PrefabCatalog
 import com.deanoc.overlord.templates.TemplateManager
@@ -481,7 +481,7 @@ object CommandExecutor extends Logging {
     * @return
     *   The loaded project, or null if loading failed
     */
-  private def loadProject(config: Config, filename: String): Project = {
+  private def loadProject(config: Config, filename: String): Overlord = {
     val expandedFilename = expandPath(filename)
     if (!Files.exists(Paths.get(expandedFilename))) {
       error(s"$expandedFilename does not exist")
@@ -497,12 +497,12 @@ object CommandExecutor extends Logging {
     // Use the project file's directory
     Utils.ensureDirectories(parentDir)
 
-    Project.setupPaths(filePath)
+    Overlord.setupPaths(filePath)
 
     val gameName = filename.split('/').last.split('.').head
     val board = config.board.getOrElse("unknown")
 
-    Project(gameName, board, filePath)
+    Overlord(gameName, board, filePath)
   }
 
   /** Ensures that standard resources are available.

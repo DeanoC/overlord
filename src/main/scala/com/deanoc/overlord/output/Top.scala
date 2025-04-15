@@ -3,12 +3,8 @@ package com.deanoc.overlord.output
 import scala.collection.mutable
 
 import com.deanoc.overlord.utils._
-import com.deanoc.overlord.{Project}
-import com.deanoc.overlord.connections.{
-  ConnectionPriority,
-  InstanceLoc,
-  Wire
-}
+import com.deanoc.overlord.{Overlord}
+import com.deanoc.overlord.connections.{ConnectionPriority, InstanceLoc, Wire}
 import com.deanoc.overlord.instances.{
   ChipInstance,
   ClockInstance,
@@ -16,7 +12,7 @@ import com.deanoc.overlord.instances.{
 }
 
 object Top {
-  def apply(game: Project): Unit = {
+  def apply(game: Overlord): Unit = {
 
     val sb = new mutable.StringBuilder()
 
@@ -70,7 +66,7 @@ object Top {
 
     sb ++= s"""endmodule\n"""
 
-    Utils.writeFile(Project.outPath.resolve(game.name + "_top.v"), sb.result())
+    Utils.writeFile(Overlord.outPath.resolve(game.name + "_top.v"), sb.result())
   }
 
   private def writeTopWires(wires: Seq[Wire]) = {

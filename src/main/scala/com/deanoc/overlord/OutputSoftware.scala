@@ -6,7 +6,7 @@ import com.deanoc.overlord.connections._
 import com.deanoc.overlord.connections.ConnectionDirection
 import com.deanoc.overlord.instances._
 import com.deanoc.overlord.interfaces.{RamLike, RegisterBankLike}
-import com.deanoc.overlord.Project
+import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.connections.ConnectedExtensions._
 
 import java.nio.file.{Path, Paths}
@@ -229,7 +229,7 @@ object OutputSoftware {
     val uniqueRegisterLists = mutable.Set[String]()
 
     for (cpu <- cpus) {
-      val outPath = Project.outPath
+      val outPath = Overlord.outPath
       Utils.ensureDirectories(hwPath(outPath))
 
       val (_, chipAddresses) =
@@ -284,7 +284,8 @@ object OutputSoftware {
           distanceMatrix.expandedRouteBetween(cpu, ep).map {
             case (src, dst) => {
               val cons = connected.filter(con =>
-                con.connectedBetween(src, dst, ConnectionDirection.FirstToSecond)
+                con
+                  .connectedBetween(src, dst, ConnectionDirection.FirstToSecond)
               )
               val hd = cons.head
               // try and swap port group for a parallel bus connection which has info about which bus was used
@@ -303,7 +304,7 @@ object OutputSoftware {
         var hasBus = false
         routeConnections.foreach {
           case bus: ConnectedBus => hasBus = true
-          case _               =>
+          case _                 =>
         }
 
         if (hasBus) {
@@ -311,7 +312,8 @@ object OutputSoftware {
           routeConnections.foreach { r =>
             r match {
               case bus: ConnectedBus =>
-                if (bus.bus.fixedBaseBusAddress) address = bus.bus.getBaseAddress
+                if (bus.bus.fixedBaseBusAddress)
+                  address = bus.bus.getBaseAddress
                 else address += bus.bus.getBaseAddress
               case _ =>
             }
@@ -371,9 +373,12 @@ object OutputSoftware {
         .filter(rb => rb.cpus.isEmpty || rb.cpus.contains(cpu.cpuType))
         .foreach { rb =>
           val rbName = if (rb.name.isEmpty) other.name else rb.name
-          val rbInstanceName = rbName.replace("${index}", other.instanceNumber.toString)
-          val calculatedAddress: BigInt = if (rb.baseAddress == -1) BigInt(-1) 
-                       else address + rb.baseAddress + (rb.addressIncrement * other.instanceNumber)
+          val rbInstanceName =
+            rbName.replace("${index}", other.instanceNumber.toString)
+          val calculatedAddress: BigInt =
+            if (rb.baseAddress == -1) BigInt(-1)
+            else
+              address + rb.baseAddress + (rb.addressIncrement * other.instanceNumber)
           chipAddresses += ((
             rbInstanceName,
             rb.registerListName.split('/').last.split('.').head.toUpperCase(),
@@ -404,7 +409,7 @@ object OutputSoftware {
     sb ++= genRegisterList(s"${uname}_", rl)
 
     Utils.writeFile(
-      filePath(hwPath(Project.outPath), rl.name.replace(".yaml", "")),
+      filePath(hwPath(Overlord.outPath), rl.name.replace(".yaml", "")),
       sb.result()
     )
   }

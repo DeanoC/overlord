@@ -2,7 +2,7 @@ package com.deanoc.overlord.software
 
 import com.deanoc.overlord.actions.ActionsFile
 import com.deanoc.overlord.utils.{StringV, Utils, Variant}
-import com.deanoc.overlord.{DefinitionType, Project, SoftwareDefinitionTrait}
+import com.deanoc.overlord.{DefinitionType, Overlord, SoftwareDefinitionTrait}
 
 import java.nio.file.Path
 
@@ -74,7 +74,7 @@ object SoftwareDefinition {
       dependencies: Seq[String],
       softwarePath: Path
   ): Option[SoftwareDefinition] = {
-    Project.pushCatalogPath(softwarePath)
+    Overlord.pushCatalogPath(softwarePath)
     val result = parse(
       defType,
       path,
@@ -84,7 +84,7 @@ object SoftwareDefinition {
       softwarePath,
       Utils.readYaml(softwarePath)
     )
-    Project.popCatalogPath()
+    Overlord.popCatalogPath()
     result
   }
 

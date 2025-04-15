@@ -1,7 +1,7 @@
 package com.deanoc.overlord.hardware
 
 import com.deanoc.overlord.utils.{StringV, Utils, Variant}
-import com.deanoc.overlord.Project
+import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.instances.InstanceTrait
 
 import java.nio.file.Path
@@ -82,7 +82,7 @@ object Registers {
           Utils.lookupBigInt(item, "register_window_size", -1)
         val cpus = decodeCpusString(Utils.lookupString(item, "cpus", "_"))
 
-        val path: Path = Project.tryPaths(instance, resource)
+        val path: Path = Overlord.tryPaths(instance, resource)
 
         if (path == null) {
           println(s"RegisterBank $name resource $resource path $path not found")

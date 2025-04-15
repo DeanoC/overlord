@@ -5,12 +5,12 @@ import scala.collection.mutable
 import com.deanoc.overlord.utils.Utils
 import com.deanoc.overlord.actions.{CopyAction, SourcesAction}
 import com.deanoc.overlord.instances.{BoardInstance, ChipInstance}
-import com.deanoc.overlord.{Project, GatewareDefinitionTrait}
+import com.deanoc.overlord.{Overlord, GatewareDefinitionTrait}
 
 object Edalize {
-  def apply(game: Project): Unit = {
-    println(s"Creating Edalize script at ${Project.outPath}")
-    Utils.ensureDirectories(Project.outPath)
+  def apply(game: Overlord): Unit = {
+    println(s"Creating Edalize script at ${Overlord.outPath}")
+    Utils.ensureDirectories(Overlord.outPath)
 
     val board =
       if (game.board.nonEmpty) game.board.get

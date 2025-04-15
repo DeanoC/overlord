@@ -6,7 +6,7 @@ import com.deanoc.overlord.{
   DefinitionCatalog,
   DefinitionTrait,
   DefinitionType,
-  Project,
+  Overlord,
   QueryInterface
 }
 import com.deanoc.overlord.software.SoftwareDefinition
@@ -20,7 +20,7 @@ trait InstanceTrait extends QueryInterface {
   val finalParameterTable: mutable.HashMap[String, Variant] = mutable.HashMap()
 
   val name: String
-  val sourcePath: Path = Project.instancePath.toAbsolutePath
+  val sourcePath: Path = Overlord.instancePath.toAbsolutePath
 
   def definition: DefinitionTrait
 
@@ -118,7 +118,7 @@ object Instance {
             case None =>
               definitionFrom(
                 catalogs,
-                Project.projectPath,
+                Overlord.projectPath,
                 table,
                 defType
               ) match {

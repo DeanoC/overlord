@@ -21,7 +21,7 @@ import scala.util.boundary, boundary.break
   * connections, constants, and more. Provides utility methods for managing and
   * interacting with the project structure.
   */
-case class Project(
+case class Overlord(
     name: String,
     children: Seq[InstanceTrait],
     connected: Seq[Connected],
@@ -163,7 +163,7 @@ case class Project(
       .filter(f => distanceMatrix.isConnectedBetween(instance, f.getOwner))
 }
 
-object Project extends Logging {
+object Overlord extends Logging {
   // Stacks for managing paths during project setup and execution.
   private val catalogPathStack: mutable.Stack[Path] = mutable.Stack[Path]()
   private val instancePathStack: mutable.Stack[Path] = mutable.Stack[Path]()
@@ -386,7 +386,7 @@ object Project extends Logging {
       gameName: String,
       board: String,
       gamePath: Path
-  ): Project = boundary {
+  ): Overlord = boundary {
     val parser = new ProjectParser()
 
     val (container, catalog) =
@@ -411,7 +411,7 @@ object Project extends Logging {
     val constants =
       container.unconnected.flatMap(_.collectConstants(instances))
 
-    Project(
+    Overlord(
       gameName,
       instances,
       connected,
@@ -579,17 +579,20 @@ object Project extends Logging {
     val givenPath = Paths.get(resolvePathMacros(instance, resource))
     if (!Files.exists(givenPath)) {
       val instancePath = Paths
-        .get(Project.resolvePathMacros(instance, "${instancePath}/" + resource))
+        .get(
+          Overlord.resolvePathMacros(instance, "${instancePath}/" + resource)
+        )
         .normalize()
       if (!Files.exists(instancePath)) {
         val definitionPath = Paths
           .get(
-            Project.resolvePathMacros(instance, "${definitionPath}/" + resource)
+            Overlord
+              .resolvePathMacros(instance, "${definitionPath}/" + resource)
           )
           .normalize()
         if (!Files.exists(definitionPath)) {
           val outPath = Paths
-            .get(Project.resolvePathMacros(instance, "${outPath}/" + resource))
+            .get(Overlord.resolvePathMacros(instance, "${outPath}/" + resource))
             .normalize()
           if (!Files.exists(outPath)) {
             if (

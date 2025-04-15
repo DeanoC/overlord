@@ -5,10 +5,10 @@ import scala.collection.mutable
 
 import com.deanoc.overlord.utils.Utils
 import com.deanoc.overlord.instances.CpuInstance
-import com.deanoc.overlord.Project
+import com.deanoc.overlord.Overlord
 
 object Compiler {
-  def apply(game: Project, out: Path): Unit = {
+  def apply(game: Overlord, out: Path): Unit = {
     if (game.cpus.isEmpty) return
 
     println(s"Creating Compiler scripts at $out")
@@ -18,7 +18,10 @@ object Compiler {
     game.cpus.foreach(genCMakeToolChains(_, out))
   }
 
-  private def generateMakeCompilersScript(game: Project, out: Path): Boolean = {
+  private def generateMakeCompilersScript(
+      game: Overlord,
+      out: Path
+  ): Boolean = {
     val compilerScriptBuilder = new StringBuilder
 
     // TODO: remove std resource path here

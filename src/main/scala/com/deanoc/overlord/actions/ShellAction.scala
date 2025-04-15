@@ -1,7 +1,7 @@
 package com.deanoc.overlord.actions
 
 import com.deanoc.overlord.utils._
-import com.deanoc.overlord.Project
+import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.instances.InstanceTrait
 
 case class ShellAction(script: String, args: String, phase: Int = 1)
@@ -15,8 +15,8 @@ case class ShellAction(script: String, args: String, phase: Int = 1)
     // Resolve macros in the arguments and execute the bash script
     val result = sys.process
       .Process(
-        Seq("bash", s"$script", Project.resolvePathMacros(instance, s"$args")),
-        Project.catalogPath.toFile
+        Seq("bash", s"$script", Overlord.resolvePathMacros(instance, s"$args")),
+        Overlord.catalogPath.toFile
       )
       .!
 

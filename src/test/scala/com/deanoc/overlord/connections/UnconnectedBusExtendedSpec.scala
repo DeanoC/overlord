@@ -47,7 +47,7 @@ class UnconnectedBusExtendedSpec
     with MockitoSugar
     with SilentLogger {
 
-  Project.setInstancePath("/workspace/")
+  Overlord.setInstancePath("/workspace/")
 
   // Helper method to create an InstanceLoc
   private def createInstanceLoc(
@@ -58,12 +58,15 @@ class UnconnectedBusExtendedSpec
   }
 
   // Helper methods to create CpuDef and RamDef
-  private def createCpuDef(): HardwareDefinitionTrait = new HardwareDefinitionTrait {
-    override val ports: Map[String, com.deanoc.overlord.hardware.Port] = Map()
-    override val maxInstances: Int = 1
-    override val defType: DefinitionType = CpuDefinitionType(Seq("cpu", "riscv", "verilog"))
-    override val attributes: Map[String, Variant] = Utils.fromYaml(
-      """
+  private def createCpuDef(): HardwareDefinitionTrait =
+    new HardwareDefinitionTrait {
+      override val ports: Map[String, com.deanoc.overlord.hardware.Port] = Map()
+      override val maxInstances: Int = 1
+      override val defType: DefinitionType = CpuDefinitionType(
+        Seq("cpu", "riscv", "verilog")
+      )
+      override val attributes: Map[String, Variant] = Utils.fromYaml(
+        """
 buses:
 - base_address: '0xFD00_0000'
   data_width: 32
@@ -87,18 +90,22 @@ ranges:
   size: 128 KiB
       """
       )
-    override def toString(): String = "RiscVCpu"
-    protected val registersV: Seq[com.deanoc.overlord.utils.Variant] = Seq()
-    override val dependencies: Seq[String] = Seq()
-    override val sourcePath: java.nio.file.Path = java.nio.file.Paths.get("path/to/source")
-  }
+      override def toString(): String = "RiscVCpu"
+      protected val registersV: Seq[com.deanoc.overlord.utils.Variant] = Seq()
+      override val dependencies: Seq[String] = Seq()
+      override val sourcePath: java.nio.file.Path =
+        java.nio.file.Paths.get("path/to/source")
+    }
 
-  private def createRamDef(): HardwareDefinitionTrait = new HardwareDefinitionTrait {
-    override val ports: Map[String, com.deanoc.overlord.hardware.Port] = Map()
-    override val maxInstances: Int = 1
-    override val defType: DefinitionType = RamDefinitionType(Seq("ram", "verilog"))
-    override val attributes: Map[String, Variant] = Utils.fromYaml(
-      """
+  private def createRamDef(): HardwareDefinitionTrait =
+    new HardwareDefinitionTrait {
+      override val ports: Map[String, com.deanoc.overlord.hardware.Port] = Map()
+      override val maxInstances: Int = 1
+      override val defType: DefinitionType = RamDefinitionType(
+        Seq("ram", "verilog")
+      )
+      override val attributes: Map[String, Variant] = Utils.fromYaml(
+        """
 buses:
 - base_address: '0xFD00_0000'
   data_width: 32
@@ -107,11 +114,12 @@ buses:
   supplier: false
       """
       )
-    override def toString(): String = "Ram"
-    protected val registersV: Seq[com.deanoc.overlord.utils.Variant] = Seq()
-    override val dependencies: Seq[String] = Seq()
-    override val sourcePath: java.nio.file.Path = java.nio.file.Paths.get("path/to/source")
-  }
+      override def toString(): String = "Ram"
+      protected val registersV: Seq[com.deanoc.overlord.utils.Variant] = Seq()
+      override val dependencies: Seq[String] = Seq()
+      override val sourcePath: java.nio.file.Path =
+        java.nio.file.Paths.get("path/to/source")
+    }
 
   // Test getBus() method with various input combinations
   "UnconnectedBus.getBus" should "find a supplier bus by name when specified" in {
@@ -220,8 +228,8 @@ buses:
       direction = ConnectionDirection.FirstToSecond,
       secondFullName = "ddr",
       busProtocol = "axi4",
-      supplierBusName = "pmu_pmuswitch",
-  )
+      supplierBusName = "pmu_pmuswitch"
+    )
 
     // Test the connection
     val result = bus.connect(Seq(supplierInstance, consumerInstance))
@@ -261,7 +269,7 @@ buses:
   it should "handle SecondToFirst direction correctly" in {
     val cpuDef = createCpuDef()
     val ramDef = createRamDef()
- 
+
     val supplierInstance = CpuInstance("cpu", cpuDef)
     val consumerInstance = RamInstance("memory", ramDef)
 
@@ -291,7 +299,7 @@ buses:
   "UnconnectedBus.finaliseBuses" should "compute consumer addresses correctly" in {
     val cpuDef = createCpuDef()
     val ramDef = createRamDef()
- 
+
     val supplierInstance = CpuInstance("cpu", cpuDef)
     val consumerInstance = RamInstance("memory", ramDef)
     // Create UnconnectedBus with SecondToFirst direction
@@ -314,7 +322,6 @@ buses:
     // The actual verification of computeConsumerAddresses would require more complex mocking
     // which is challenging with Scala's type system and Mockito
   }
-
 
   override def withFixture(test: NoArgTest) = {
     // Force trace-level debugging for all tests

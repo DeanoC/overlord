@@ -8,7 +8,7 @@ import com.deanoc.overlord.connections._
 import com.deanoc.overlord.connections.ConnectionDirection
 import com.deanoc.overlord.instances.{ChipInstance, Container}
 import com.deanoc.overlord.interfaces.UnconnectedLike
-import com.deanoc.overlord.Project
+import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.utils._
 object OutputGateware {
   def apply(
@@ -17,14 +17,14 @@ object OutputGateware {
       constants: Seq[Constant],
       phase: Int
   ): Unit = {
-    Project.pushCatalogPath(gatePath)
+    Overlord.pushCatalogPath(gatePath)
 
     top.children
       .collect { case c: ChipInstance => c }
       .filter(_.isGateware)
       .foreach(executePhase(_, top.unconnected, constants, phase))
 
-    Project.popCatalogPath()
+    Overlord.popCatalogPath()
   }
 
   private def executePhase(
@@ -68,7 +68,9 @@ object OutputGateware {
                   ("protocol", StringV(b.busProtocol)),
                   (
                     "supplier",
-                    if (b.direction == ConnectionDirection.FirstToSecond && isFirst)
+                    if (
+                      b.direction == ConnectionDirection.FirstToSecond && isFirst
+                    )
                       BooleanV(true)
                     else BooleanV(false)
                   )

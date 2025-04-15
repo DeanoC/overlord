@@ -1,7 +1,7 @@
 package com.deanoc.overlord.actions
 
 import com.deanoc.overlord.utils._
-import com.deanoc.overlord.Project
+import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.instances.InstanceTrait
 
 // Represents an action to clone a Git repository
@@ -19,7 +19,7 @@ case class GitCloneAction(url: String) extends Action {
     import scala.sys.process._
 
     // Determine the output path for the cloned repository
-    val path = Project.outPath.resolve(url.split('/').last)
+    val path = Overlord.outPath.resolve(url.split('/').last)
     if (!path.toFile.exists()) {
       // Clone the repository recursively
       val result = s"git clone --recursive $url $path".!

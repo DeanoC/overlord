@@ -3,7 +3,7 @@ package com.deanoc.overlord.actions
 import com.deanoc.overlord.utils._
 import com.deanoc.overlord.input.{VerilogPort, YamlRegistersParser}
 import com.deanoc.overlord.hardware.{Port, WireDirection}
-import com.deanoc.overlord.Project
+import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
 import scala.util.boundary, boundary.break
 
@@ -36,7 +36,7 @@ case class ReadYamlRegistersAction(name: String, filename: String)
       parameters: Map[String, Variant]
   ): Unit = {
     // Resolve macros in the filename based on the instance context.
-    val expandedName = Project.resolveInstanceMacros(instance, filename)
+    val expandedName = Overlord.resolveInstanceMacros(instance, filename)
     // Parse the YAML file to retrieve register definitions.
     YamlRegistersParser(instance, expandedName, instance.name) match {
       case Right(registers) =>
