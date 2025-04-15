@@ -183,7 +183,7 @@ object CommandExecutor extends Logging {
         TemplateManager.createFromTemplate(
           templateName,
           projectName,
-          config.out
+          "." // Use current directory as output path
         )
       case (None, _) =>
         error("Missing required template name")
@@ -541,9 +541,9 @@ object CommandExecutor extends Logging {
 
     System.setProperty("user.dir", parentDir.toString)
 
-    val expandedOut = expandPath(config.out)
-    val out = Paths.get(expandedOut).toAbsolutePath.normalize()
-    Utils.ensureDirectories(out)
+    // Remove reference to config.out
+    // Use the project file's directory
+    Utils.ensureDirectories(parentDir)
 
     val stdResourcePath = config.stdresource
       .orElse(config.resources)
@@ -552,10 +552,10 @@ object CommandExecutor extends Logging {
     Resources.setStdResourcePath(stdResourcePath)
 
     Project.setupPaths(
-      filePath.getParent,
+      filePath,
       Resources.stdResourcePath(),
-      Resources.stdResourcePath(),
-      out
+      Resources.stdResourcePath()
+      // Removed 4th parameter (out) as per updated method signature
     )
 
     val resources = config.resources.map { path =>

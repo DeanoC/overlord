@@ -93,7 +93,7 @@ object Main extends Logging {
     debug("Configuration after parsing:")
     debug(s"- Command: ${config.command.getOrElse("None")}")
     debug(s"- Subcommand: ${config.subCommand.getOrElse("None")}")
-    debug(s"- Output directory: ${config.out}")
+    debug(s"- Output directory: Uses project file directory")
     debug(s"- Board: ${config.board.getOrElse("None")}")
     debug(s"- No standard resources: ${config.nostdresources}")
     debug(s"- No standard prefabs: ${config.nostdprefabs}")

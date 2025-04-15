@@ -21,9 +21,6 @@ object CommandLineParser extends Logging {
 
     // Common options that can be used with multiple commands
     val commonOptions = Seq(
-      opt[String]("out")
-        .action((x, c) => c.copy(out = x))
-        .text("path where generated files should be placed"),
       opt[Unit]("nostdresources")
         .action((_, c) => c.copy(nostdresources = true))
         .text("don't use the standard catalog"),
@@ -77,10 +74,9 @@ object CommandLineParser extends Logging {
             arg[String]("<project-name>")
               .required()
               .action((x, c) => c.copy(projectName = Some(x)))
-              .text("name of the project to create"),
-            opt[String]("out")
-              .action((x, c) => c.copy(out = x))
-              .text("path where the project should be created")
+              .text(
+                "name of the project to create (will be created in the same directory as the project YAML file)"
+              )
           ),
 
         // create default-templates subcommand
@@ -271,9 +267,6 @@ object CommandLineParser extends Logging {
       templateCommand,
       help("help").text("prints this usage text"),
       // Add common options at the top level
-      opt[String]("out")
-        .action((x, c) => c.copy(out = x))
-        .text("path where generated files should be placed"),
       opt[Unit]("nostdresources")
         .action((_, c) => c.copy(nostdresources = true))
         .text("don't use the standard catalog"),

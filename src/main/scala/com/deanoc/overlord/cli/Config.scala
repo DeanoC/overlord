@@ -14,7 +14,6 @@ case class Config(
     subCommand: Option[String] = None,
 
     // Common options
-    out: String = ".",
     board: Option[String] = None,
     nostdresources: Boolean = false,
     nostdprefabs: Boolean = false,

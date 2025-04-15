@@ -3,7 +3,14 @@ package com.deanoc.overlord
 import com.deanoc.overlord.connections._
 import com.deanoc.overlord.instances._
 import com.deanoc.overlord.interfaces.{ChipLike, RegisterBankLike}
-import com.deanoc.overlord.utils.{Utils, Variant, ArrayV, TableV, StringV, Logging}
+import com.deanoc.overlord.utils.{
+  Utils,
+  Variant,
+  ArrayV,
+  TableV,
+  StringV,
+  Logging
+}
 
 import java.nio.file.{Files, Path, Paths}
 import scala.collection.mutable
@@ -173,16 +180,17 @@ object Project extends Logging {
     *   The path to the catalog directory.
     * @param prefabsPath
     *   The path to the prefabs directory.
-    * @param outPath
-    *   The path to the output directory.
     */
   def setupPaths(
       projectPath: Path,
       catalogPath: Path,
-      prefabsPath: Path,
-      outPath: Path
+      prefabsPath: Path
   ): Unit = {
     baseProjectPath = projectPath.toAbsolutePath
+
+    // Use the project file's directory as the output location
+    val projectDir =
+      if (projectPath.toFile.isFile) projectPath.getParent else projectPath
 
     catalogPathStack.clear()
     catalogPathStack.push(catalogPath)
@@ -193,8 +201,8 @@ object Project extends Logging {
     instancePathStack.push(prefabsPath)
 
     outPathStack.clear()
-    outPathStack.push(outPath)
-    outPathStack.push(outPath)
+    outPathStack.push(projectDir)
+    outPathStack.push(projectDir)
   }
 
   /** Retrieves the base project path.
@@ -385,8 +393,7 @@ object Project extends Logging {
     for (i <- 0 until catalogs.catalogs.size) {
       for (j <- i + 1 until catalogs.catalogs.size) {
         if ((keyArray(i).ident == keyArray(j).ident)) {
-          warn(s"Duplicate definition name ${keyArray(i).ident} detected"
-          )
+          warn(s"Duplicate definition name ${keyArray(i).ident} detected")
         }
       }
     }
@@ -671,7 +678,9 @@ object Project extends Logging {
       // extract connections
       if (parsed.contains("connection")) {
         val connections = Utils.toArray(parsed("connection"))
-        container.mutableUnconnected ++= connections.flatMap(ConnectionParser.parseConnection(_))
+        container.mutableUnconnected ++= connections.flatMap(
+          ConnectionParser.parseConnection(_)
+        )
       }
 
       // bring in wanted prefabs
@@ -684,7 +693,7 @@ object Project extends Logging {
             case Some(pf) =>
               processInstantiations(pf.stuff, container) match {
                 case Left(err) => break(Left(err))
-                case _           => // continue
+                case _         => // continue
               }
             case None =>
               break(Left(s"prefab $ident not found"))
@@ -743,7 +752,8 @@ object Project extends Logging {
                     found = true
                   case Left(err) =>
                     error(
-                      s"Failed to create instance for software dependency $n: $err in ${defi.defType.ident.mkString(".")}"
+                      s"Failed to create instance for software dependency $n: $err in ${defi.defType.ident
+                          .mkString(".")}"
                     )
                 }
               case None =>

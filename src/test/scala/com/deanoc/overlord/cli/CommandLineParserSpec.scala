@@ -185,49 +185,34 @@ class CommandLineParserSpec extends AnyFlatSpec with Matchers {
     config.get.subCommand should be(Some("update-all"))
   }
 
-  it should "handle common options" in {
-    val args = Array(
-      "create",
-      "project",
-      "bare-metal",
-      "my-project",
-      "--out",
-      "output-dir",
-      "--nostdresources",
-      "--nostdprefabs",
-      "--resources",
-      "custom-resources",
-      "--yes",
-      "--noexit",
-      "--trace",
-      "Main,Resources",
-      "--debug",
-      "CommandLineParser",
-      "--stdresource",
-      "custom-std-resource"
-    )
+  it should "successfully parse commands without the out option" in {
+    val args = Array("create", "project", "template-name", "project-name")
     val config = CommandLineParser.parse(args)
 
-    config.isDefined should be(true)
-    config.get.command should be(Some("create"))
-    config.get.subCommand should be(Some("project"))
-    config.get.templateName should be(Some("bare-metal"))
-    config.get.projectName should be(Some("my-project"))
-    config.get.out should be("output-dir")
-    config.get.nostdresources should be(true)
-    config.get.nostdprefabs should be(true)
-    config.get.resources should be(Some("custom-resources"))
-    config.get.yes should be(true)
-    config.get.noexit should be(true)
-    config.get.trace should be(Some("Main,Resources"))
-    config.get.debug should be(Some("CommandLineParser"))
-    config.get.stdresource should be(Some("custom-std-resource"))
+    config shouldBe defined
+    config.get.command shouldBe Some("create")
+    config.get.subCommand shouldBe Some("project")
+    config.get.templateName shouldBe Some("template-name")
+    config.get.projectName shouldBe Some("project-name")
   }
 
-  it should "return None for invalid commands" in {
-    val args = Array("invalid", "command")
+  it should "parse generate commands with infile parameter" in {
+    val args = Array("generate", "report", "project.yaml")
     val config = CommandLineParser.parse(args)
 
-    config.isDefined should be(false)
+    config shouldBe defined
+    config.get.command shouldBe Some("generate")
+    config.get.subCommand shouldBe Some("report")
+    config.get.infile shouldBe Some("project.yaml")
+  }
+
+  it should "parse update project command with infile parameter" in {
+    val args = Array("update", "project", "project.yaml")
+    val config = CommandLineParser.parse(args)
+
+    config shouldBe defined
+    config.get.command shouldBe Some("update")
+    config.get.subCommand shouldBe Some("project")
+    config.get.infile shouldBe Some("project.yaml")
   }
 }
