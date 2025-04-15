@@ -240,7 +240,9 @@ object TemplateManager extends Logging {
         fileName.endsWith(".over") ||
         fileName.endsWith(".scala") ||
         fileName.endsWith(".md") ||
-        fileName == "build.sbt"
+        fileName == "build.sbt" ||
+        fileName.endsWith(".yaml") ||
+        fileName.endsWith(".yml")
       })
       .toList
 

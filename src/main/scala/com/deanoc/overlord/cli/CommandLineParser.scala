@@ -112,7 +112,7 @@ object CommandLineParser extends Logging {
             arg[String]("<infile>")
               .required()
               .action((x, c) => c.copy(infile = Some(x)))
-              .text("filename should be a .over file to use for the project")
+              .text("filename should be a .yaml file to use for the project")
           ),
 
         // generate svd subcommand
@@ -123,7 +123,7 @@ object CommandLineParser extends Logging {
             arg[String]("<infile>")
               .required()
               .action((x, c) => c.copy(infile = Some(x)))
-              .text("filename should be a .over file to use for the project")
+              .text("filename should be a .yaml file to use for the project")
           )
       )
 
@@ -155,7 +155,7 @@ object CommandLineParser extends Logging {
             arg[String]("<infile>")
               .required()
               .action((x, c) => c.copy(infile = Some(x)))
-              .text("filename should be a .over file to use for the project"),
+              .text("filename should be a .yaml file to use for the project"),
             opt[String]("instance")
               .action((x, c) => c.copy(instance = Some(x)))
               .text("specify the instance to update")

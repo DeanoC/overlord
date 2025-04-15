@@ -55,7 +55,7 @@ To debug Overlord in Visual Studio Code, you can use the following `launch.json`
       "buildTarget": "overlord",
       "args": [
         "create",
-        "~/overlord/overlord_template_project/template_project.over",
+        "~/overlord/overlord_template_project/template_project.yaml",
         "--out",
         "~/overlord/overlord_template_project/",
         "--board",
@@ -66,7 +66,7 @@ To debug Overlord in Visual Studio Code, you can use the following `launch.json`
 }
 ```
 
-This configuration assumes you are using the Metals extension for Scala in Visual Studio Code. Replace `tangnano9k` and `template_project.over` with your specific board and `.over` file.
+This configuration assumes you are using the Metals extension for Scala in Visual Studio Code. Replace `tangnano9k` and `template_project.yaml` with your specific board and `.yaml` file.
 
 ## Documentation
 

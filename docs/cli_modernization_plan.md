@@ -165,7 +165,7 @@ val parser: OParser[_, Config] = {
           arg[String]("<infile>")
             .required()
             .action((x, c) => c.copy(options = c.options + ("infile" -> x)))
-            .text("filename should be a .over file to use for the project"),
+            .text("filename should be a .yaml file to use for the project"),
           opt[String]("board")
             .required()
             .action((x, c) => c.copy(options = c.options + ("board" -> x)))

@@ -27,23 +27,23 @@ class CommandLineParserSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "parse generate report command" in {
-    val args = Array("generate", "report", "test.over")
+    val args = Array("generate", "report", "test.yaml")
     val config = CommandLineParser.parse(args)
 
     config.isDefined should be(true)
     config.get.command should be(Some("generate"))
     config.get.subCommand should be(Some("report"))
-    config.get.infile should be(Some("test.over"))
+    config.get.infile should be(Some("test.yaml"))
   }
 
   it should "parse generate svd command" in {
-    val args = Array("generate", "svd", "test.over")
+    val args = Array("generate", "svd", "test.yaml")
     val config = CommandLineParser.parse(args)
 
     config.isDefined should be(true)
     config.get.command should be(Some("generate"))
     config.get.subCommand should be(Some("svd"))
-    config.get.infile should be(Some("test.over"))
+    config.get.infile should be(Some("test.yaml"))
   }
 
   it should "parse clean test command" in {
@@ -57,14 +57,36 @@ class CommandLineParserSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "parse update project command" in {
-    val args = Array("update", "project", "test.over", "--instance", "cpu0")
+    val args = Array("update", "project", "test.yaml", "--instance", "cpu0")
     val config = CommandLineParser.parse(args)
 
     config.isDefined should be(true)
     config.get.command should be(Some("update"))
     config.get.subCommand should be(Some("project"))
-    config.get.infile should be(Some("test.over"))
+    config.get.infile should be(Some("test.yaml"))
     config.get.instance should be(Some("cpu0"))
+  }
+
+  it should "parse update project command with yaml extension" in {
+    val args = Array("update", "project", "test.yaml", "--instance", "cpu0")
+    val config = CommandLineParser.parse(args)
+
+    config.isDefined should be(true)
+    config.get.command should be(Some("update"))
+    config.get.subCommand should be(Some("project"))
+    config.get.infile should be(Some("test.yaml"))
+    config.get.instance should be(Some("cpu0"))
+  }
+
+  // Make sure the parser doesn't still reference .over files
+  it should "parse generate commands with yaml extension consistently" in {
+    val args = Array("generate", "svd", "system.yaml")
+    val config = CommandLineParser.parse(args)
+
+    config.isDefined should be(true)
+    config.get.command should be(Some("generate"))
+    config.get.subCommand should be(Some("svd"))
+    config.get.infile should be(Some("system.yaml"))
   }
 
   it should "parse update catalog command" in {

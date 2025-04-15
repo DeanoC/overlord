@@ -30,7 +30,7 @@ Templates are stored in the `~/.overlord/templates` directory. Each template is 
 │           └── com/
 │               └── {{project-name}}/
 │                   └── MainSpec.scala         # Test file
-└── {{project-name}}.over      # Overlord project file
+└── {{project-name}}.yaml      # Overlord project file
 ```
 
 ### Example: Linux-App Template
@@ -59,7 +59,7 @@ Templates are stored in the `~/.overlord/templates` directory. Each template is 
 │           └── com/
 │               └── {{project-name}}/
 │                   └── MainSpec.scala         # Test file
-└── {{project-name}}.over      # Overlord project file
+└── {{project-name}}.yaml      # Overlord project file
 ```
 
 ## Template Placeholders
@@ -137,7 +137,7 @@ object Main extends LazyLogging {
 }
 ```
 
-### {{project-name}}.over
+### {{project-name}}.yaml
 
 ```yaml
 # {{project_name}} Overlord Project File
