@@ -91,47 +91,58 @@ object Instance {
       defaults: Map[String, Variant],
       catalogs: DefinitionCatalog
   ): Either[String, InstanceTrait] = {
+    try {
+      if (parsed == null) {
+        return Left("Instance definition is null")
+      }
 
-    val table = Utils.toTable(parsed)
+      val table = Utils.toTable(parsed)
 
-    if (!table.contains("type")) {
-      Left(s"$parsed doesn't have a type")
-    } else {
-      val defTypeString = Utils.toString(table("type"))
-      val name = Utils.lookupString(table, "name", defTypeString)
+      if (!table.contains("type")) {
+        Left(s"$parsed doesn't have a type")
+      } else {
+        val defTypeString = Utils.toString(table("type"))
+        val name = Utils.lookupString(table, "name", defTypeString)
 
-      val attribs: Map[String, Variant] = defaults ++ table.filter(_._1 match {
-        case "type" | "name" => false
-        case _               => true
-      })
+        val attribs: Map[String, Variant] =
+          defaults ++ table.filter(_._1 match {
+            case "type" | "name" => false
+            case _               => true
+          })
 
-      val defType = DefinitionType(defTypeString)
+        val defType = DefinitionType(defTypeString)
 
-      for {
-        definition <- catalogs.findDefinition(defType) match {
-          case Some(d) => Right(d)
-          case None =>
-            definitionFrom(
-              catalogs,
-              Project.projectPath,
-              table,
-              defType
-            ) match {
-              case Right(value) => Right(value)
-              case Left(error) =>
-                Left(
-                  s"No definition found or could be created for $name $defType: $error"
-                )
-            }
-        }
-        instance <- definition.createInstance(name, attribs) match {
-          case Right(i: InstanceTrait) => Right(i)
-          case Left(error) =>
-            Left(
-              s"Failed to create instance for $name with definition $defType: $error"
-            )
-        }
-      } yield instance
+        for {
+          definition <- catalogs.findDefinition(defType) match {
+            case Some(d) => Right(d)
+            case None =>
+              definitionFrom(
+                catalogs,
+                Project.projectPath,
+                table,
+                defType
+              ) match {
+                case Right(value) => Right(value)
+                case Left(error) =>
+                  Left(
+                    s"No definition found or could be created for $name $defType: $error"
+                  )
+              }
+          }
+          instance <- definition.createInstance(name, attribs) match {
+            case Right(i: InstanceTrait) => Right(i)
+            case Left(error) =>
+              Left(
+                s"Failed to create instance for $name with definition $defType: $error"
+              )
+          }
+        } yield instance
+      }
+    } catch {
+      case e: MatchError =>
+        Left(s"Invalid instance format: ${e.getMessage()}")
+      case e: Exception =>
+        Left(s"Error creating instance: ${e.getMessage()}")
     }
   }
 

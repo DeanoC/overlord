@@ -171,6 +171,19 @@ object Project extends Logging {
 
   private var baseProjectPath: Path = Paths.get("")
 
+  /** For testing purposes only: Get the current catalog path stack.
+    *
+    * @return
+    *   The current catalog path stack
+    */
+  def getCatalogPathStackForTesting: mutable.Stack[Path] = catalogPathStack
+
+  def resetPaths(): Unit = {
+    catalogPathStack.clear()
+    instancePathStack.clear()
+    outPathStack.clear()
+  }
+
   /** Sets up the paths for the project, including catalog, prefab, and output
     * paths.
     *
@@ -225,7 +238,10 @@ object Project extends Logging {
     *   The new catalog path to push.
     */
   def pushCatalogPath(path: Path): Unit = {
-    val potDPath = catalogPath.resolve(path)
+    val potDPath =
+      if (catalogPathStack.isEmpty) path
+      else catalogPath.resolve(path)
+
     if (potDPath.toFile.isFile) catalogPathStack.push(potDPath.getParent)
     else catalogPathStack.push(potDPath)
   }

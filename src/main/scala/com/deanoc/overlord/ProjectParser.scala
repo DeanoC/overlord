@@ -37,6 +37,16 @@ class ProjectParser(
     containerStack.push(newContainer)
     val parsed = Utils.readYaml(path)
 
+    // Process catalogs first before any other operations
+    if (parsed.contains("catalogs")) {
+      val catalogsArray = Utils.toArray(parsed("catalogs"))
+      for (catalog <- catalogsArray) {
+        val catalogPath = Utils.toString(catalog)
+        debug(s"Adding catalog from project file: $catalogPath")
+        Project.pushCatalogPath(catalogPath)
+      }
+    }
+
     if (parsed.contains("defaults"))
       defaults ++= Utils.toTable(parsed("defaults"))
 
