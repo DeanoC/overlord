@@ -67,7 +67,40 @@ object CommandLineParser extends Logging {
         // create default-templates subcommand
         cmd("default-templates")
           .action((_, c) => c.copy(subCommand = Some("default-templates")))
-          .text("Download standard templates without creating a project")
+          .text("Download standard templates without creating a project"),
+
+        // create gcc-toolchain subcommand
+        cmd("gcc-toolchain")
+          .action((_, c) => c.copy(subCommand = Some("gcc-toolchain")))
+          .text("Create a GCC cross-compilation toolchain")
+          .children(
+            arg[String]("<triple>")
+              .required()
+              .action((x, c) => {
+                c.options += ("triple" -> x)
+                c
+              })
+              .text("target triple (e.g., arm-none-eabi, riscv64-unknown-elf)"),
+            arg[String]("<destination>")
+              .required()
+              .action((x, c) => {
+                c.options += ("destination" -> x)
+                c
+              })
+              .text("directory where the toolchain will be installed"),
+            opt[String]("gcc-version")
+              .action((x, c) => {
+                c.options += ("gcc-version" -> x)
+                c
+              })
+              .text("GCC version to use (default: 10.2.0)"),
+            opt[String]("binutils-version")
+              .action((x, c) => {
+                c.options += ("binutils-version" -> x)
+                c
+              })
+              .text("binutils version to use (default: 2.35)")
+          )
       )
 
     // GENERATE command and subcommands

@@ -35,6 +35,9 @@ object CommandExecutor extends Logging {
       case (Some("create"), Some("default-templates")) =>
         executeCreateDefaultTemplates(config)
 
+      case (Some("create"), Some("gcc-toolchain")) =>
+        executeCreateGccToolchain(config)
+
       // GENERATE commands
       case (Some("generate"), Some("test")) =>
         executeGenerateTest(config)
@@ -696,6 +699,230 @@ object CommandExecutor extends Logging {
         error("Failed to download standard templates.")
         return false
       }
+    }
+  }
+
+  /** Executes the 'create gcc-toolchain' command.
+    *
+    * @param config
+    *   The parsed configuration
+    * @return
+    *   true if successful, false otherwise
+    */
+  private def executeCreateGccToolchain(config: Config): Boolean = {
+    val tripleOpt = config.options.get("triple").collect {
+      case s: String if s.nonEmpty => s
+    }
+    val destinationOpt = config.options.get("destination").collect {
+      case s: String if s.nonEmpty => s
+    }
+
+    val gccVersion = config.options.getOrElse("gcc-version", "13.2.0").toString
+    val binutilsVersion =
+      config.options.getOrElse("binutils-version", "2.42").toString
+
+    (tripleOpt, destinationOpt) match {
+      case (Some(triple), Some(destination)) =>
+        info(s"Building GCC toolchain for target triple '$triple'")
+        info(s"Using GCC version: $gccVersion")
+        info(s"Using binutils version: $binutilsVersion")
+        info(s"Installing to: $destination")
+
+        try {
+          val expandedDestination = expandPath(destination)
+          val destPath = Paths.get(expandedDestination)
+
+          // Ensure the destination directory exists
+          if (!Files.exists(destPath)) {
+            info(s"Creating destination directory: $expandedDestination")
+            Files.createDirectories(destPath)
+          }
+
+          // Build the toolchain
+          buildGccToolchain(
+            triple,
+            expandedDestination,
+            gccVersion,
+            binutilsVersion
+          )
+        } catch {
+          case e: Exception =>
+            error(s"Failed to build GCC toolchain: ${e.getMessage}")
+            false
+        }
+
+      case (None, _) =>
+        error("Missing required argument: triple")
+        false
+      case (_, None) =>
+        error("Missing required argument: destination")
+        false
+    }
+  }
+
+  /** Builds a GCC toolchain using the create_gcc.sh script.
+    *
+    * @param triple
+    *   The target triple (e.g., arm-none-eabi)
+    * @param destination
+    *   Where to install the toolchain
+    * @param gccVersion
+    *   The GCC version to use
+    * @param binutilsVersion
+    *   The binutils version to use
+    * @return
+    *   true if successful, false otherwise
+    */
+  private def buildGccToolchain(
+      triple: String,
+      destination: String,
+      gccVersion: String,
+      binutilsVersion: String
+  ): Boolean = {
+    info("Starting toolchain build process...")
+
+    try {
+      // Create a workspace directory for downloads
+      val workspaceDir = Files.createTempDirectory("gcc-workspace-")
+      info(s"Created temporary workspace directory: $workspaceDir")
+
+      // Generate CMake toolchain file
+      val toolchainFile = Paths.get(destination, s"${triple}_toolchain.cmake")
+      if (!generateCMakeToolchainFile(toolchainFile, triple, gccVersion)) {
+        warn("Failed to generate CMake toolchain file, continuing with build")
+      } else {
+        info(s"Generated CMake toolchain file at: $toolchainFile")
+      }
+
+      // Copy the script to the destination folder
+      val scriptResource = getClass.getResourceAsStream("/create_gcc.sh")
+      if (scriptResource == null) {
+        error("Could not find create_gcc.sh resource")
+        return false
+      }
+
+      val scriptDestPath = Paths.get(destination, "create_gcc.sh")
+      info(s"Copying build script to: $scriptDestPath")
+
+      // Make sure we don't have an existing file
+      try {
+        Files.deleteIfExists(scriptDestPath)
+      } catch {
+        case _: Exception => // Ignore errors when trying to delete
+      }
+
+      // Copy the resource and close the stream properly
+      try {
+        val destStream = Files.newOutputStream(scriptDestPath)
+        val buffer = new Array[Byte](4096)
+        var bytesRead = 0
+        while ({ bytesRead = scriptResource.read(buffer); bytesRead != -1 }) {
+          destStream.write(buffer, 0, bytesRead)
+        }
+        destStream.close()
+        scriptResource.close()
+      } catch {
+        case e: Exception =>
+          error(s"Failed to copy script: ${e.getMessage}")
+          return false
+      }
+
+      // Make the script executable
+      val execCmd = s"chmod +x ${scriptDestPath.toAbsolutePath}"
+      if (execCmd.! != 0) {
+        error("Failed to make script executable")
+        return false
+      }
+
+      // Define environment variables
+      val env = Seq(
+        "TARGET" -> triple,
+        "GCC_VERSION" -> gccVersion,
+        "BINUTILS_VERSION" -> binutilsVersion,
+        "INSTALL_DIR" -> destination
+      )
+
+      // Execute the script with absolute path
+      info("Executing GCC build script...")
+      val processBuilder = Process(
+        Seq("bash", scriptDestPath.toAbsolutePath.toString),
+        new java.io.File(destination),
+        env: _*
+      )
+
+      val processLogger = ProcessLogger(
+        line => info(s"[build] $line"),
+        line => error(s"[build-error] $line")
+      )
+
+      val exitCode = processBuilder ! processLogger
+      if (exitCode != 0) {
+        error(s"Build script exited with code $exitCode")
+        return false
+      }
+
+      info(s"GCC toolchain built successfully and installed to $destination")
+      info(s"CMake toolchain file available at: $toolchainFile")
+      info(
+        s"To use this toolchain with CMake, add: -DCMAKE_TOOLCHAIN_FILE=$toolchainFile"
+      )
+      true
+    } catch {
+      case e: Exception =>
+        error(s"Error building toolchain: ${e.getMessage}")
+        false
+    }
+  }
+
+  /** Generates a CMake toolchain file based on the template.
+    *
+    * @param outputPath
+    *   Path where the toolchain file should be written
+    * @param triple
+    *   The target triple
+    * @param gccVersion
+    *   The GCC version
+    * @return
+    *   true if successful, false otherwise
+    */
+  private def generateCMakeToolchainFile(
+      outputPath: Path,
+      triple: String,
+      gccVersion: String
+  ): Boolean = {
+    try {
+      val templateStream =
+        getClass.getResourceAsStream("/toolchain_teamplate.cmake")
+      if (templateStream == null) {
+        error("Could not find toolchain template resource")
+        return false
+      }
+
+      // Read template content
+      val templateContent =
+        scala.io.Source.fromInputStream(templateStream).mkString
+      templateStream.close()
+
+      // Replace placeholders
+      val gccFlags = triple match {
+        case t if t.startsWith("arm") =>
+          "-mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16"
+        case t if t.startsWith("riscv") => "-march=rv32imac -mabi=ilp32"
+        case _                          => ""
+      }
+
+      val content = templateContent
+        .replace("${triple}", triple)
+        .replace("${version}", gccVersion)
+        .replace("${GCC_FLAGS}", gccFlags)
+
+      // Write to output file
+      Files.write(outputPath, content.getBytes)
+      true
+    } catch {
+      case e: Exception =>
+        error(s"Error generating CMake toolchain file: ${e.getMessage}")
+        false
     }
   }
 }
