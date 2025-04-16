@@ -7,6 +7,7 @@ import java.nio.file.Files
 import scala.collection.mutable
 import scala.collection.immutable
 import scala.util.boundary, boundary.break
+import sys.process._
 
 // Represents a Prefab with its name, path, associated data (stuff), and included prefabs.
 case class Prefab(
@@ -75,7 +76,14 @@ object PrefabCatalog extends Logging {
           val includes = Utils.lookupArray(source, "includes")
           var prefabCatalog =
             for (prefab <- includes)
-              yield PrefabCatalog.fromFile(Utils.toString(prefab))
+              yield {
+                val name = Utils.toString(prefab)
+                if (name.startsWith("https://") && name.endsWith(".git")) {
+                  PrefabCatalog.fromURL(name)
+                } else {
+                  PrefabCatalog.fromFile(name)
+                }
+              }
 
           newPrefabs = prefabCatalog.foldLeft(newPrefabs)((acc, catalog) =>
             acc ++ catalog.prefabs
@@ -116,5 +124,31 @@ object PrefabCatalog extends Logging {
         PrefabCatalog(immutable.HashMap(newPrefabs.toSeq: _*))
       }
     }
+  }
+
+  def fromURL(url: String): PrefabCatalog = {
+    val catalogsDir = Overlord.projectPath.resolve("catalogs")
+    if (!Files.exists(catalogsDir)) {
+      Files.createDirectories(catalogsDir)
+    }
+
+    val cloneCommand = s"git clone $url ${catalogsDir.toAbsolutePath}".!
+    if (cloneCommand != 0) {
+      error(s"Failed to clone repository from $url")
+      return PrefabCatalog()
+    }
+
+    val cloneFolderName = url.split('/').last.replaceAll(".git$", "")
+    val prefabFile = catalogsDir.resolve(cloneFolderName).resolve("prefab.yaml")
+    if (!Files.exists(prefabFile)) {
+      error(s"No prefab.yaml file found in the cloned repository at $prefabFile")
+      return PrefabCatalog()
+    }
+
+    val source = Utils.readYaml(prefabFile)
+    Overlord.pushInstancePath(catalogsDir.resolve(cloneFolderName))
+    val prefabs = PrefabCatalog.fromFile(prefabFile.toString)
+    Overlord.popInstancePath()
+    prefabs
   }
 }

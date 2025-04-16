@@ -30,6 +30,13 @@ class ProjectParser() extends Logging {
     containerStack.push(newContainer)
 
     val parsed = Utils.readYaml(path) ++ insertBoard(board)
+    val boards = parseBoards(parsed)
+    if (!boards.contains(board)) {
+      error(
+        s"The board $board is not supported by this project. The boards supported are $boards"
+      )
+      return None
+    }
     val defaults = parseDefaults(parsed)
     val catalogs = parseCatalogs(parsed, defaults)
     val prefabs = parsePrefabs(parsed)
@@ -61,7 +68,11 @@ class ProjectParser() extends Logging {
 
       val result = (for (catalog <- catalogsArray) yield {
         val name = Utils.toString(catalog)
-        DefinitionCatalog.fromFile(s"$name", defaults)
+        if (name.startsWith("https://") && name.endsWith(".git")) {
+          DefinitionCatalog.fromURL(name, defaults)
+        } else {
+          DefinitionCatalog.fromFile(name, defaults)
+        }
       }).flatten.flatten.map(f => f.defType -> f).toMap
 
       catalogs.mergeNewDefinition(result)
@@ -75,8 +86,14 @@ class ProjectParser() extends Logging {
     // Process prefab paths defined in the project file
     if (parsed.contains("prefabs")) {
       val prefabCatalog =
-        for (prefab <- Utils.toArray(parsed("prefabs")))
-          yield PrefabCatalog.fromFile(Utils.toString(prefab))
+        for (prefab <- Utils.toArray(parsed("prefabs"))) yield {
+          val name = Utils.toString(prefab)
+          if (name.startsWith("https://") && name.endsWith(".git")) {
+            PrefabCatalog.fromURL(name)
+          } else {
+            PrefabCatalog.fromFile(name)
+          }
+        }
 
       prefabCatalog.foldLeft(PrefabCatalog())((acc, catalog) =>
         PrefabCatalog(acc.prefabs ++ catalog.prefabs)
@@ -112,6 +129,12 @@ class ProjectParser() extends Logging {
         )
       )
     )
+  }
+
+  def parseBoards(parsed: Map[String, Variant]): Seq[String] = {
+    if (parsed.contains("boards")) {
+      Utils.toArray(parsed("boards")).toIndexedSeq.map(Utils.toString)
+    } else Seq.empty
   }
 
   /** Processes instantiations from parsed YAML data.
