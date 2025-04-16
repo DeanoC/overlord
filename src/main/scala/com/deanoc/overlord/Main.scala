@@ -7,6 +7,8 @@ import com.deanoc.overlord.cli.{CommandLineParser, CommandExecutor}
 import org.slf4j.event.Level
 import scala.sys.process._
 import scopt.OParser
+import java.io.{ByteArrayOutputStream, PrintStream}
+import com.deanoc.overlord.utils.ModuleLogger.exitApplication
 
 /** Main entry point for the Overlord CLI.
   */
@@ -18,29 +20,87 @@ object Main extends Logging {
     *   Command line arguments
     */
   def main(args: Array[String]): Unit = {
-    // Parse command line arguments
-    CommandLineParser.parse(args) match {
-      case Some(config) =>
-        // Configure ModuleLogger to exit on error (or not) based on command line option
-        ModuleLogger.setExitOnError(!config.noexit)
-
-        // Configure logging
-        configureLogging(config)
-
-        // Debug log the parsed configuration
-        logConfigDetails(config)
-
-        // Execute the command
-        val success = CommandExecutor.execute(config)
-        if (!success) {
-          sys.exit(1)
+    // Simple CLI dispatch for help output
+    args.toList match {
+      case "help" :: cmd :: sub :: _ =>
+        println(com.deanoc.overlord.cli.HelpTextManager.getSubcommandHelp(cmd, sub))
+      case "help" :: cmd :: Nil =>
+        println(com.deanoc.overlord.cli.HelpTextManager.getCommandHelp(cmd))
+      case "help" :: Nil =>
+        println(com.deanoc.overlord.cli.HelpTextManager.getGlobalHelp())
+      case Nil =>
+        println(com.deanoc.overlord.cli.HelpTextManager.getGlobalHelp())
+      case _ =>
+        println(s"DEBUG: Processing command: ${args.mkString(" ")}")
+        
+        // Temporarily redirect System.err to suppress default error messages
+        val originalErr = System.err
+        val nullOutputStream = new java.io.OutputStream() {
+          override def write(b: Int): Unit = {}
+          override def write(b: Array[Byte]): Unit = {}
+          override def write(b: Array[Byte], off: Int, len: Int): Unit = {}
         }
-
-      case None =>
-        // When parsing failed, show usage information and exit with an error code
-        println(OParser.usage(CommandLineParser.createParser()))
-        sys.exit(1)
+        val nullPrintStream = new java.io.PrintStream(nullOutputStream)
+        System.setErr(nullPrintStream)
+        
+        try {
+          com.deanoc.overlord.cli.CommandLineParser.parse(args) match {
+            case Some(config) =>
+              // Restore System.err before executing command
+              System.setErr(originalErr)
+              println(s"DEBUG: Parsed config: $config")
+              println(s"DEBUG: Command: ${config.command}, Subcommand: ${config.subCommand}")
+              println(s"DEBUG: Options: ${config.options}")
+              if (!com.deanoc.overlord.cli.CommandLineParser.validateAndDisplayHelp(config)) {
+                sys.exit(1)
+              }
+              val success = com.deanoc.overlord.cli.CommandExecutor.execute(config)
+              if (!success) sys.exit(1)
+            case None =>
+              // Command parsing failed, try to extract command and subcommand for focused help
+              val partialConfig = extractPartialConfig(args)
+              println(s"DEBUG: Parsing failed. Extracted partial config: $partialConfig")
+              // Restore System.err before printing our custom help
+              System.setErr(originalErr)
+              println(com.deanoc.overlord.cli.HelpTextManager.getFocusedUsage(partialConfig))
+              sys.exit(1)
+          }
+        } finally {
+          // Ensure System.err is restored even if an exception occurs
+          System.setErr(originalErr)
+        }
     }
+  }
+  
+  /** Extracts a partial Config from command line arguments when parsing fails.
+    * This allows us to provide more focused help messages.
+    *
+    * @param args
+    *   Command line arguments
+    * @return
+    *   A Config object with command and subCommand fields populated if possible
+    */
+  private def extractPartialConfig(args: Array[String]): com.deanoc.overlord.cli.Config = {
+    val config = com.deanoc.overlord.cli.Config()
+    
+    if (args.length > 0) {
+      // First argument is likely the command
+      val command = args(0)
+      val updatedConfig = config.copy(command = Some(command))
+      
+      if (args.length > 1) {
+        // Second argument might be a subcommand
+        val potentialSubcommand = args(1)
+        // Only treat it as a subcommand if it doesn't start with a dash (which would indicate an option)
+        if (!potentialSubcommand.startsWith("-")) {
+          return updatedConfig.copy(subCommand = Some(potentialSubcommand))
+        }
+      }
+      
+      return updatedConfig
+    }
+    
+    config
   }
 
   /** Configures logging based on the configuration.
@@ -81,41 +141,6 @@ object Main extends Logging {
     // Set debug logging for specific modules if requested
     config.debug.foreach { debugModules =>
       configureModuleLogLevels(debugModules, Level.DEBUG)
-    }
-  }
-
-  /** Logs the details of the configuration for debugging.
-    *
-    * @param config
-    *   The parsed configuration
-    */
-  private def logConfigDetails(config: com.deanoc.overlord.cli.Config): Unit = {
-    debug("Configuration after parsing:")
-    debug(s"- Command: ${config.command.getOrElse("None")}")
-    debug(s"- Subcommand: ${config.subCommand.getOrElse("None")}")
-    debug(s"- Board: ${config.board.getOrElse("None")}")
-    debug(s"- Instance: ${config.instance.getOrElse("None")}")
-    debug(s"- Auto-yes: ${config.yes}")
-    debug(s"- Input file: ${config.infile.getOrElse("None")}")
-    debug(s"- Template name: ${config.templateName.getOrElse("None")}")
-    debug(s"- Project name: ${config.projectName.getOrElse("None")}")
-
-    debug(s"- No exit on error: ${config.noexit}")
-    debug(s"- Trace modules: ${config.trace.getOrElse("None")}")
-    debug(s"- Debug modules: ${config.debug.getOrElse("None")}")
-
-    // Log git/GitHub options if present
-    config.gitUrl.foreach(url => debug(s"- Git URL: $url"))
-    config.branch.foreach(branch => debug(s"- Branch: $branch"))
-    config.ownerRepo.foreach(ownerRepo => debug(s"- Owner/Repo: $ownerRepo"))
-    config.ref.foreach(ref => debug(s"- Ref: $ref"))
-
-    // Log additional options
-    if (config.options.nonEmpty) {
-      debug("- Additional options:")
-      config.options.foreach { case (key, value) =>
-        debug(s"  - $key: $value")
-      }
     }
   }
 }

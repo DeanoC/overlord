@@ -93,6 +93,9 @@ lazy val overlord = (project in file("."))
       Seq(dest)
     }.taskValue
 
+// Ensure the main Scala source directory is included
+Compile / unmanagedSourceDirectories += baseDirectory.value / "src" / "main" / "scala"
+
 // Configure sbt to recognize the test directory
 Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oD")
 // Ensure Main is not executed during tests

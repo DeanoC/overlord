@@ -19,6 +19,23 @@ import scala.util.control.Breaks.{break, breakable}
   */
 object CommandExecutor extends Logging {
 
+  /** Helper method to extract common arguments from options map to dedicated Config fields
+    * This ensures compatibility with code that expects dedicated fields rather than options map entries
+    */
+  private def extractOptionsToFields(config: Config): Config = {
+    // Create a copy of the config with fields populated from options map
+    config.copy(
+      templateName = config.options.get("template-name").map(_.toString).orElse(config.templateName),
+      projectName = config.options.get("project-name").map(_.toString).orElse(config.projectName),
+      inFile = config.options.get("infile").map(_.toString).orElse(config.inFile),
+      boardName = config.options.get("board").map(_.toString).orElse(config.boardName),
+      destination = config.options.get("destination").map(_.toString).orElse(config.destination),
+      gccVersion = config.options.get("gcc-version").map(_.toString).orElse(config.gccVersion),
+      binutilsVersion = config.options.get("binutils-version").map(_.toString)
+      // Add other fields as needed
+    )
+  }
+
   /** Executes a command based on the configuration.
     *
     * @param config
@@ -27,59 +44,90 @@ object CommandExecutor extends Logging {
     *   true if successful, false otherwise
     */
   def execute(config: Config): Boolean = {
-    (config.command, config.subCommand) match {
+    // Extract commonly used arguments from options map for convenience
+    val configWithExtractedOptions = extractOptionsToFields(config)
+    
+    (configWithExtractedOptions.command, configWithExtractedOptions.subCommand) match {
       // CREATE commands
       case (Some("create"), Some("project")) =>
-        executeCreateProject(config)
+        executeCreateProject(configWithExtractedOptions)
 
       case (Some("create"), Some("default-templates")) =>
-        executeCreateDefaultTemplates(config)
+        executeCreateDefaultTemplates(configWithExtractedOptions)
 
       case (Some("create"), Some("gcc-toolchain")) =>
-        executeCreateGccToolchain(config)
+        executeCreateGccToolchain(configWithExtractedOptions)
+        
+      // Handle invalid subcommand for create
+      case (Some("create"), Some(invalidSubcmd)) =>
+        CommandLineParser.bufferedPrintln(HelpTextManager.getInvalidSubcommandHelp("create", invalidSubcmd))
+        false
 
       // GENERATE commands
       case (Some("generate"), Some("test")) =>
-        executeGenerateTest(config)
+        executeGenerateTest(configWithExtractedOptions)
 
       case (Some("generate"), Some("report")) =>
-        executeGenerateReport(config)
+        executeGenerateReport(configWithExtractedOptions)
 
       case (Some("generate"), Some("svd")) =>
-        executeGenerateSvd(config)
+        executeGenerateSvd(configWithExtractedOptions)
+        
+      // Handle invalid subcommand for generate
+      case (Some("generate"), Some(invalidSubcmd)) =>
+        CommandLineParser.bufferedPrintln(HelpTextManager.getInvalidSubcommandHelp("generate", invalidSubcmd))
+        false
 
       // CLEAN commands
       case (Some("clean"), Some("test")) =>
-        executeCleanTest(config)
+        executeCleanTest(configWithExtractedOptions)
+        
+      // Handle invalid subcommand for clean
+      case (Some("clean"), Some(invalidSubcmd)) =>
+        val helpText = HelpTextManager.getInvalidSubcommandHelp("clean", invalidSubcmd)
+        print(helpText)
+        false
 
       // UPDATE commands
       case (Some("update"), Some("project")) =>
-        executeUpdateProject(config)
+        executeUpdateProject(configWithExtractedOptions)
 
       case (Some("update"), Some("catalog")) =>
-        executeUpdateCatalog(config)
+        executeUpdateCatalog(configWithExtractedOptions)
+        
+      // Handle invalid subcommand for update
+      case (Some("update"), Some(invalidSubcmd)) =>
+        val helpText = HelpTextManager.getInvalidSubcommandHelp("update", invalidSubcmd)
+        print(helpText)
+        false
 
       // TEMPLATE commands
       case (Some("template"), Some("list")) =>
-        executeTemplateList(config)
+        executeTemplateList(configWithExtractedOptions)
 
       case (Some("template"), Some("add")) =>
-        executeTemplateAdd(config)
+        executeTemplateAdd(configWithExtractedOptions)
 
       case (Some("template"), Some("add-git")) =>
-        executeTemplateAddGit(config)
+        executeTemplateAddGit(configWithExtractedOptions)
 
       case (Some("template"), Some("add-github")) =>
-        executeTemplateAddGitHub(config)
+        executeTemplateAddGitHub(configWithExtractedOptions)
 
       case (Some("template"), Some("remove")) =>
-        executeTemplateRemove(config)
+        executeTemplateRemove(configWithExtractedOptions)
 
       case (Some("template"), Some("update")) =>
-        executeTemplateUpdate(config)
+        executeTemplateUpdate(configWithExtractedOptions)
 
       case (Some("template"), Some("update-all")) =>
-        executeTemplateUpdateAll(config)
+        executeTemplateUpdateAll(configWithExtractedOptions)
+        
+      // Handle invalid subcommand for template
+      case (Some("template"), Some(invalidSubcmd)) =>
+        val helpText = HelpTextManager.getInvalidSubcommandHelp("template", invalidSubcmd)
+        print(helpText)
+        false
 
       // HELP command
       case (Some("help"), _) =>
@@ -87,13 +135,26 @@ object CommandExecutor extends Logging {
         val subcommandOpt = config.options.get("help-subcommand").map(_.toString)
         (commandOpt, subcommandOpt) match {
           case (None, _) =>
-            println(HelpTextManager.getGlobalHelp())
+            val helpText = HelpTextManager.getGlobalHelp()
+            print(helpText)
           case (Some(cmd), None) =>
-            println(HelpTextManager.getCommandHelp(cmd))
+            val helpText = HelpTextManager.getCommandHelp(cmd)
+            print(helpText)
           case (Some(cmd), Some(sub)) =>
-            println(HelpTextManager.getSubcommandHelp(cmd, sub))
+            val helpText = HelpTextManager.getSubcommandHelp(cmd, sub)
+            print(helpText)
         }
         true
+
+      // Handle valid command with missing subcommand
+      case (Some(cmd), None) if CommandLineParser.commandExists(cmd) =>
+        CommandLineParser.bufferedPrintln(HelpTextManager.getCommandHelp(cmd))
+        false
+        
+      // Handle invalid command
+      case (Some(cmd), _) if !CommandLineParser.commandExists(cmd) =>
+        println(HelpTextManager.getInvalidCommandHelp(cmd))
+        false
 
       // Unknown command combination or missing subcommand/args
       case _ =>
@@ -187,7 +248,7 @@ object CommandExecutor extends Logging {
     *   true if successful, false otherwise
     */
   private def executeGenerateReport(config: Config): Boolean = {
-    config.infile match {
+    config.inFile match {
       case Some(filename) =>
         try {
           val game = loadProject(config, filename)
@@ -216,7 +277,7 @@ object CommandExecutor extends Logging {
     *   true if successful, false otherwise
     */
   private def executeGenerateSvd(config: Config): Boolean = {
-    config.infile match {
+    config.inFile match {
       case Some(filename) =>
         try {
           val game = loadProject(config, filename)
@@ -261,12 +322,13 @@ object CommandExecutor extends Logging {
     *   true if successful, false otherwise
     */
   private def executeUpdateProject(config: Config): Boolean = {
-    config.infile match {
+    config.inFile match {
       case Some(filename) =>
         try {
           val game = loadProject(config, filename)
           if (game != null) {
-            output.UpdateProject(game, config.instance)
+            val instance = config.options.get("instance").map(_.toString)
+            output.UpdateProject(game, instance)
             true
           } else {
             false
@@ -386,16 +448,15 @@ object CommandExecutor extends Logging {
     */
   private def executeTemplateAddGit(config: Config): Boolean = {
     val nameOpt = config.templateName
-    val gitUrlOpt = config.gitUrl
+    val gitUrlOpt = config.options.get("git-url").map(_.toString)
 
     (nameOpt, gitUrlOpt) match {
       case (Some(name), Some(gitUrl)) =>
         // This would call the TemplateManager.addGitTemplate method
         // For now, we'll just log the action
+        val branch = config.options.get("branch").map(_.toString)
         info(
-          s"Adding git template '$name' from URL '$gitUrl'${config.branch
-              .map(b => s" (branch: $b)")
-              .getOrElse("")}"
+          s"Adding git template '$name' from URL '$gitUrl'${branch.map(b => s" (branch: $b)").getOrElse("")}"
         )
         true
       case (None, _) =>
@@ -416,16 +477,15 @@ object CommandExecutor extends Logging {
     */
   private def executeTemplateAddGitHub(config: Config): Boolean = {
     val nameOpt = config.templateName
-    val ownerRepoOpt = config.ownerRepo
+    val ownerRepoOpt = config.options.get("owner/repo").map(_.toString)
 
     (nameOpt, ownerRepoOpt) match {
       case (Some(name), Some(ownerRepo)) =>
         // This would call the TemplateManager.addGitHubTemplate method
         // For now, we'll just log the action
+        val ref = config.options.get("ref").map(_.toString)
         info(
-          s"Adding GitHub template '$name' from '$ownerRepo'${config.ref
-              .map(r => s" (ref: $r)")
-              .getOrElse("")}"
+          s"Adding GitHub template '$name' from '$ownerRepo'${ref.map(r => s" (ref: $r)").getOrElse("")}"
         )
         true
       case (None, _) =>
@@ -517,7 +577,7 @@ object CommandExecutor extends Logging {
     Overlord.setupPaths(filePath)
 
     val gameName = filename.split('/').last.split('.').head
-    val board = config.board.getOrElse("unknown")
+    val board = config.boardName.getOrElse("unknown")
 
     Overlord(gameName, board, filePath)
   }
@@ -729,11 +789,10 @@ object CommandExecutor extends Logging {
     }
     val destinationOpt = config.options.get("destination").collect {
       case s: String if s.nonEmpty => s
-    }
+    }.orElse(config.destination)
 
-    val gccVersion = config.options.getOrElse("gcc-version", "13.2.0").toString
-    val binutilsVersion =
-      config.options.getOrElse("binutils-version", "2.42").toString
+    val gccVersion = config.gccVersion.getOrElse("13.2.0")
+    val binutilsVersion = config.options.getOrElse("binutils-version", "2.42").toString
 
     (tripleOpt, destinationOpt) match {
       case (Some(triple), Some(destination)) =>
@@ -773,11 +832,9 @@ object CommandExecutor extends Logging {
             false
         }
 
-      case (None, _) =>
-        error("Missing required argument: triple")
-        false
-      case (_, None) =>
-        error("Missing required argument: destination")
+      case (None, _) | (_, None) =>
+        // Display ONLY the focused help text for the gcc-toolchain command
+        println(HelpTextManager.getSubcommandHelp("create", "gcc-toolchain"))
         false
     }
   }

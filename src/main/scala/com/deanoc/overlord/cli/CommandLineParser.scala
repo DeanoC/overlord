@@ -2,357 +2,612 @@ package com.deanoc.overlord.cli
 
 import com.deanoc.overlord.utils.Logging
 
-import scopt.OParser
+// --- CLI Metadata Model ---
+
+sealed trait CLIElement
+case class CLICommand(
+  name: String,
+  description: String,
+  longDescription: Option[String] = None,
+  subcommands: List[CLISubcommand] = Nil,
+  options: List[CLIOption] = Nil,
+  arguments: List[CLIArgument] = Nil,
+  examples: List[String] = Nil
+) extends CLIElement
+
+case class CLISubcommand(
+  name: String,
+  description: String,
+  longDescription: Option[String] = None,
+  options: List[CLIOption] = Nil,
+  arguments: List[CLIArgument] = Nil,
+  examples: List[String] = Nil
+) extends CLIElement
+
+case class CLIOption(
+  name: String,
+  short: Option[String],
+  description: String,
+  required: Boolean = false
+) extends CLIElement
+
+case class CLIArgument(
+  name: String,
+  description: String,
+  required: Boolean = true
+) extends CLIElement
 
 /** Parser for the Overlord CLI commands. Implements a hierarchical command
   * structure similar to git.
   */
 object CommandLineParser extends Logging {
 
-  /** Creates the command line parser.
-    *
-    * @return
-    *   The parser
-    */
-  def createParser(): OParser[_, Config] = {
-    val builder = OParser.builder[Config]
+  import scopt.OParser
+
+  // Common/global options available to all commands
+  val commonOptions: List[CLIOption] = List(
+    CLIOption("yes", Some("y"), "Automatically agree (e.g., download resource files without prompting)", required = false),
+    CLIOption("noexit", None, "Disable automatic exit on error logs", required = false),
+    CLIOption("trace", None, "Enable trace logging for comma-separated list of modules (can use short names)", required = false),
+    CLIOption("debug", None, "Enable debug logging for comma-separated list of modules (can use short names)", required = false)
+  )
+
+  // Generate scopt OParser from CLI metadata
+  def toOParser: OParser[_, Config] = {
+    val builder = scopt.OParser.builder[Config]
     import builder._
 
-    // Common options that can be used with multiple commands
-    val commonOptions = Seq(
-      opt[Unit]("yes")
-        .abbr("y")
-        .action((_, c) => c.copy(yes = true))
-        .text(
-          "automatically agree (e.g., download resource files without prompting)"
-        ),
-      opt[Unit]("noexit")
-        .action((_, c) => c.copy(noexit = true))
-        .text("disable automatic exit on error logs"),
-      opt[String]("trace")
-        .action((x, c) => c.copy(trace = Some(x)))
-        .text(
-          "enable trace logging for comma-separated list of modules (can use short names)"
-        ),
-      opt[String]("debug")
-        .action((x, c) => c.copy(debug = Some(x)))
-        .text(
-          "enable debug logging for comma-separated list of modules (can use short names)"
-        )
-    )
+    // Helper to convert CLIOption to scopt opt
+    def optDef(opt: CLIOption) = {
+      val base = builder.opt[String](opt.name)
+        .optional()
+        .text(opt.description)
+      val withShort = opt.short match {
+        case Some(s) => base.abbr(s)
+        case None    => base
+      }
+      withShort
+    }
 
-    // CREATE command and subcommands
-    val createCommand = cmd("create")
-      .action((_, c) => c.copy(command = Some("create")))
-      .children(
-        // create project subcommand (renamed from from-template)
-        cmd("project")
-          .action((_, c) => c.copy(subCommand = Some("project")))
-          .text("Create a new project from a template")
-          .children(
-            arg[String]("<template-name>")
-              .required()
-              .action((x, c) => c.copy(templateName = Some(x)))
-              .text(
-                "name of the template to use (e.g., bare-metal, linux-app)"
-              ),
-            arg[String]("<project-name>")
-              .required()
-              .action((x, c) => c.copy(projectName = Some(x)))
-              .text(
-                "name of the project to create (will be created in the same directory as the project YAML file)"
-              )
-          ),
-
-        // create default-templates subcommand
-        cmd("default-templates")
-          .action((_, c) => c.copy(subCommand = Some("default-templates")))
-          .text("Download standard templates without creating a project"),
-
-        // create gcc-toolchain subcommand
-        cmd("gcc-toolchain")
-          .action((_, c) => c.copy(subCommand = Some("gcc-toolchain")))
-          .text("Create a GCC cross-compilation toolchain")
-          .children(
-            arg[String]("<triple>")
-              .required()
-              .action((x, c) => {
-                c.options += ("triple" -> x)
-                c
-              })
-              .text("target triple (e.g., arm-none-eabi, riscv64-unknown-elf)"),
-            arg[String]("<destination>")
-              .required()
-              .action((x, c) => {
-                c.options += ("destination" -> x)
-                c
-              })
-              .text("directory where the toolchain will be installed"),
-            opt[String]("gcc-version")
-              .action((x, c) => {
-                c.options += ("gcc-version" -> x)
-                c
-              })
-              .text("GCC version to use (default: 10.2.0)"),
-            opt[String]("binutils-version")
-              .action((x, c) => {
-                c.options += ("binutils-version" -> x)
-                c
-              })
-              .text("binutils version to use (default: 2.35)")
-          )
-      )
-
-    // GENERATE command and subcommands
-    val generateCommand = cmd("generate")
-      .action((_, c) => c.copy(command = Some("generate")))
-      .children(
-        // generate test subcommand
-        cmd("test")
-          .action((_, c) => c.copy(subCommand = Some("test")))
-          .text("Generate test files for a project")
-          .children(
-            arg[String]("<project-name>")
-              .required()
-              .action((x, c) => c.copy(projectName = Some(x)))
-              .text("name of the project to generate tests for")
-          ),
-
-        // generate report subcommand
-        cmd("report")
-          .action((_, c) => c.copy(subCommand = Some("report")))
-          .text("Generate a report about the project structure")
-          .children(
-            arg[String]("<infile>")
-              .required()
-              .action((x, c) => c.copy(infile = Some(x)))
-              .text("filename should be a .yaml file to use for the project")
-          ),
-
-        // generate svd subcommand
-        cmd("svd")
-          .action((_, c) => c.copy(subCommand = Some("svd")))
-          .text("Generate a CMSIS-SVD file")
-          .children(
-            arg[String]("<infile>")
-              .required()
-              .action((x, c) => c.copy(infile = Some(x)))
-              .text("filename should be a .yaml file to use for the project")
-          )
-      )
-
-    // CLEAN command and subcommands
-    val cleanCommand = cmd("clean")
-      .action((_, c) => c.copy(command = Some("clean")))
-      .children(
-        // clean test subcommand
-        cmd("test")
-          .action((_, c) => c.copy(subCommand = Some("test")))
-          .text("Clean test files for a project")
-          .children(
-            arg[String]("<project-name>")
-              .required()
-              .action((x, c) => c.copy(projectName = Some(x)))
-              .text("name of the project to clean tests for")
-          )
-      )
-
-    // UPDATE command and subcommands
-    val updateCommand = cmd("update")
-      .action((_, c) => c.copy(command = Some("update")))
-      .children(
-        // update project subcommand
-        cmd("project")
-          .action((_, c) => c.copy(subCommand = Some("project")))
-          .text("Update an existing project")
-          .children(
-            arg[String]("<infile>")
-              .required()
-              .action((x, c) => c.copy(infile = Some(x)))
-              .text("filename should be a .yaml file to use for the project"),
-            opt[String]("instance")
-              .action((x, c) => c.copy(instance = Some(x)))
-              .text("specify the instance to update")
-          ),
-
-        // update catalog subcommand
-        cmd("catalog")
-          .action((_, c) => c.copy(subCommand = Some("catalog")))
-          .text("Update the catalog from the remote repository")
-      )
-
-    // TEMPLATE command and subcommands
-    val templateCommand = cmd("template")
-      .action((_, c) => c.copy(command = Some("template")))
-      .children(
-        // template list subcommand
-        cmd("list")
-          .action((_, c) => c.copy(subCommand = Some("list")))
-          .text("List all available templates"),
-
-        // template add subcommand
-        cmd("add")
-          .action((_, c) => c.copy(subCommand = Some("add")))
-          .text("Add a local template")
-          .children(
-            arg[String]("<name>")
-              .required()
-              .action((x, c) => c.copy(templateName = Some(x)))
-              .text("name of the template"),
-            arg[String]("<path>")
-              .required()
-              .action((x, c) => {
-                c.options += ("path" -> x)
-                c
-              })
-              .text("path to the template directory")
-          ),
-
-        // template add-git subcommand
-        cmd("add-git")
-          .action((_, c) => c.copy(subCommand = Some("add-git")))
-          .text("Add a template from a git repository")
-          .children(
-            arg[String]("<name>")
-              .required()
-              .action((x, c) => c.copy(templateName = Some(x)))
-              .text("name of the template"),
-            arg[String]("<git-url>")
-              .required()
-              .action((x, c) => c.copy(gitUrl = Some(x)))
-              .text("URL of the git repository"),
-            opt[String]("branch")
-              .action((x, c) => c.copy(branch = Some(x)))
-              .text("branch to use (default: main)")
-          ),
-
-        // template add-github subcommand
-        cmd("add-github")
-          .action((_, c) => c.copy(subCommand = Some("add-github")))
-          .text("Add a template from GitHub")
-          .children(
-            arg[String]("<name>")
-              .required()
-              .action((x, c) => c.copy(templateName = Some(x)))
-              .text("name of the template"),
-            arg[String]("<owner/repo>")
-              .required()
-              .action((x, c) => c.copy(ownerRepo = Some(x)))
-              .text("GitHub repository in the format 'owner/repo'"),
-            opt[String]("ref")
-              .action((x, c) => c.copy(ref = Some(x)))
-              .text(
-                "reference to use (tag, branch, or commit hash, default: main)"
-              )
-          ),
-
-        // template remove subcommand
-        cmd("remove")
-          .action((_, c) => c.copy(subCommand = Some("remove")))
-          .text("Remove a template")
-          .children(
-            arg[String]("<name>")
-              .required()
-              .action((x, c) => c.copy(templateName = Some(x)))
-              .text("name of the template to remove")
-          ),
-
-        // template update subcommand
-        cmd("update")
-          .action((_, c) => c.copy(subCommand = Some("update")))
-          .text("Update a template from its source")
-          .children(
-            arg[String]("<name>")
-              .required()
-              .action((x, c) => c.copy(templateName = Some(x)))
-              .text("name of the template to update")
-          ),
-
-        // template update-all subcommand
-        cmd("update-all")
-          .action((_, c) => c.copy(subCommand = Some("update-all")))
-          .text("Update all templates from their sources")
-      )
-
-        // Help command as per enhanced design
-        val helpCommand = cmd("help")
-          .action((_, c) => c.copy(command = Some("help")))
-          .text("Display help for a specific command")
-          .children(
-            arg[String]("<command>")
-              .optional()
-              .action((x, c) => c.copy(options = c.options.clone().addOne(("help-command", x))))
-              .text("Command to get help for"),
-            arg[String]("<subcommand>")
-              .optional()
-              .action((x, c) => c.copy(options = c.options.clone().addOne(("help-subcommand", x))))
-              .text("Subcommand to get help for")
-          )
-    
-        // Combine all commands and options
-        OParser.sequence(
-          programName("overlord"),
-          head("overlord", "1.0"),
-          createCommand,
-          generateCommand,
-          cleanCommand,
-          updateCommand,
-          templateCommand,
-          helpCommand,
-          // Add common options at the top level
-          opt[Unit]("yes")
-            .abbr("y")
-            .action((_, c) => c.copy(yes = true))
-            .text(
-              "automatically agree (e.g., download resource files without prompting)"
-            ),
-          opt[Unit]("noexit")
-            .action((_, c) => c.copy(noexit = true))
-            .text("disable automatic exit on error logs"),
-          opt[String]("trace")
-            .action((x, c) => c.copy(trace = Some(x)))
-            .text(
-              "enable trace logging for comma-separated list of modules (can use short names)"
-            ),
-          opt[String]("debug")
-            .action((x, c) => c.copy(debug = Some(x)))
-            .text(
-              "enable debug logging for comma-separated list of modules (can use short names)"
+    // Build a flat command structure with explicit command and subcommand handling
+    val commandParsers = allCommandMetas.map { cmdMeta =>
+      val cmdParser = cmd(cmdMeta.name)
+        .text(cmdMeta.description)
+        .action((_, c) => c.copy(command = Some(cmdMeta.name)))
+        .children(
+          cmdMeta.arguments.map { arg =>
+            val baseArg = if (arg.required)
+              builder.arg[String](s"<${arg.name}>").required().text(arg.description)
+            else
+              builder.arg[String](s"<${arg.name}>").optional().text(arg.description)
+            
+            baseArg.action((value, config) =>
+              config.copy(options = config.options.concat(Map(arg.name -> value)))
             )
+          } ++
+          cmdMeta.options.map(optDef) ++
+          commonOptions.map(optDef) ++
+          cmdMeta.subcommands.map { sub =>
+            cmd(sub.name)
+              .text(sub.description)
+              .action((_, c) => c.copy(command = Some(cmdMeta.name), subCommand = Some(sub.name)))
+              .children(
+                sub.arguments.map { arg =>
+                  val baseArg = if (arg.required)
+                    builder.arg[String](s"<${arg.name}>").required().text(arg.description)
+                  else
+                    builder.arg[String](s"<${arg.name}>").optional().text(arg.description)
+                  
+                  baseArg.action((value, config) =>
+                    config.copy(options = config.options.concat(Map(arg.name -> value)))
+                  )
+                } ++
+                sub.options.map(optDef) ++
+                commonOptions.map(optDef): _*
+              )
+          }: _*
         )
+      cmdParser
+    }
+
+    OParser.sequence(
+      programName("overlord"),
+      commandParsers: _*
+    )
   }
 
-  /** Parses command line arguments.
-    *
-    * @param args
-    *   The command line arguments
-    * @return
-    *   Some(config) if parsing was successful, None otherwise
-    */
+  // Parse command line arguments using the generated OParser
   def parse(args: Array[String]): Option[Config] = {
-    val initialConfig = Config()
-    val isNonInteractive = System.console() == null
-    val parser = createParser()
-
-    // Enhanced help/usage handling
-    if (args.isEmpty || args.contains("--help") || args.contains("-h")) {
-      println(HelpTextManager.getGlobalHelp())
-      sys.exit(0)
-      return None
+    // Debug parsing attempt
+    debug(s"Processing command: ${args.mkString(" ")}")
+    
+    // Use the scopt OParser to parse the arguments
+    val result = OParser.parse(toOParser, args, Config())
+    
+    result.flatMap { config =>
+      debug(s"Parsing partial config: $config")
+      
+      // Validate the parsed configuration
+      if (config.command.isDefined) {
+        val cmd = config.command.get
+        
+        if (config.subCommand.isDefined) {
+          val subcmd = config.subCommand.get
+          
+          if (commandExists(cmd) && subcommandExists(cmd, subcmd)) {
+            // Validate required arguments for the subcommand
+            val (requiredArgs, _) = getArgsAndOptions(cmd, Some(subcmd))
+            validateRequiredArguments(config, requiredArgs) match {
+              case Some(errorMsg) =>
+                error(errorMsg)
+                None
+              case None => Some(config)
+            }
+          } else {
+            error(s"Invalid command/subcommand combination: $cmd $subcmd")
+            None
+          }
+        } else {
+          // Validate required arguments for the command
+          val (requiredArgs, _) = getArgsAndOptions(cmd)
+          validateRequiredArguments(config, requiredArgs) match {
+            case Some(errorMsg) =>
+              error(errorMsg)
+              None
+            case None => Some(config)
+          }
+        }
+      } else {
+        Some(config)  // No command specified, return as is
+      }
     }
-
-    OParser.parse(
-      parser,
-      args,
-      initialConfig.copy(yes = initialConfig.yes || isNonInteractive)
-    ) match {
-      case Some(config) =>
-        Some(config)
-      case None =>
-        // On parse failure, show focused usage if possible
-        val partialConfig = initialConfig // Could be improved with partial parsing
-        println(HelpTextManager.getFocusedUsage(partialConfig))
-        None
+  }
+  
+  // Validate that all required arguments are present
+  def validateRequiredArguments(config: Config, args: List[CLIArgument]): Option[String] = {
+    val requiredArgs = args.filter(_.required)
+    val missingArgs = requiredArgs.filterNot(arg => config.options.contains(arg.name))
+    
+    if (missingArgs.nonEmpty) {
+      val msgList = missingArgs.map(arg => s"Missing argument <${arg.name}>")
+      Some(msgList.mkString("\n"))
+    } else {
+      None
     }
+  }
+  
+  // Display help for a specific command and subcommand
+  def showHelp(command: String, subcommand: Option[String] = None): Unit = {
+    val cmdMeta = allCommandMetas.find(_.name == command)
+    
+    cmdMeta.foreach { meta =>
+      subcommand match {
+        case Some(subcmd) =>
+          meta.subcommands.find(_.name == subcmd).foreach { submeta =>
+            println(s"Command: $command $subcmd\n")
+            println("DESCRIPTION:")
+            submeta.longDescription.orElse(Some(submeta.description)).foreach { desc =>
+              println(s"  $desc\n")
+            }
+            
+            println("USAGE:")
+            val argsStr = submeta.arguments.map(arg => s"<${arg.name}>").mkString(" ")
+            println(s"  overlord $command $subcmd $argsStr [options]\n")
+            
+            if (submeta.arguments.nonEmpty) {
+              println("ARGUMENTS:")
+              submeta.arguments.foreach { arg =>
+                val reqStr = if (arg.required) "(required)" else "(optional)"
+                println(s"  <${arg.name}>  ${arg.description} $reqStr")
+              }
+              println()
+            }
+            
+            val allOptions = submeta.options ++ commonOptions
+            if (allOptions.nonEmpty) {
+              println("OPTIONS:")
+              allOptions.foreach { opt =>
+                val shortStr = opt.short.map(s => s"-$s, ").getOrElse("")
+                println(s"  $shortStr--${opt.name} ${opt.description}")
+              }
+              println()
+            }
+            
+            if (submeta.examples.nonEmpty) {
+              println("EXAMPLES:")
+              submeta.examples.foreach { example =>
+                println(s"  $example")
+              }
+            }
+          }
+          
+        case None =>
+          println(s"Command: $command\n")
+          println("DESCRIPTION:")
+          meta.longDescription.orElse(Some(meta.description)).foreach { desc =>
+            println(s"  $desc\n")
+          }
+          
+          if (meta.subcommands.nonEmpty) {
+            println("SUBCOMMANDS:")
+            meta.subcommands.foreach { sub =>
+              println(s"  ${sub.name}  ${sub.description}")
+            }
+            println()
+          }
+          
+          if (meta.arguments.nonEmpty) {
+            println("ARGUMENTS:")
+            meta.arguments.foreach { arg =>
+              val reqStr = if (arg.required) "(required)" else "(optional)"
+              println(s"  <${arg.name}>  ${arg.description} $reqStr")
+            }
+            println()
+          }
+          
+          val allOptions = meta.options ++ commonOptions
+          if (allOptions.nonEmpty) {
+            println("OPTIONS:")
+            allOptions.foreach { opt =>
+              val shortStr = opt.short.map(s => s"-$s, ").getOrElse("")
+              println(s"  $shortStr--${opt.name} ${opt.description}")
+            }
+            println()
+          }
+          
+          if (meta.examples.nonEmpty) {
+            println("EXAMPLES:")
+            meta.examples.foreach { example =>
+              println(s"  $example")
+            }
+          }
+      }
+    }
+  }
+
+  // "create" command and subcommands
+  val createCommandMeta = CLICommand(
+    name = "create",
+    description = "Create a new project or from a template.",
+    longDescription = Some(
+      """Create a new project or from a template. This command allows you to create
+projects either from scratch using a YAML configuration file or from
+predefined templates."""
+    ),
+    subcommands = List(
+      CLISubcommand(
+        name = "project",
+        description = "Create a new project from a template",
+        longDescription = Some(
+          """Create a new project from a .yaml file. This command creates a new project
+directory using the specified YAML configuration file."""
+        ),
+        arguments = List(
+          CLIArgument("template-name", "name of the template to use (e.g., bare-metal, linux-app)", required = true),
+          CLIArgument("project-name", "name of the project to create (will be created in the same directory as the project YAML file)", required = true)
+        ),
+        examples = List("overlord create project my-project.yaml --board arty-a7")
+      ),
+      CLISubcommand(
+        name = "default-templates",
+        description = "Download standard templates without creating a project",
+        examples = List("overlord create default-templates")
+      ),
+      CLISubcommand(
+        name = "gcc-toolchain",
+        description = "Create a GCC cross-compilation toolchain",
+        longDescription = Some("Create a GCC cross-compilation toolchain."),
+        arguments = List(
+          CLIArgument("triple", "target triple (e.g., arm-none-eabi, riscv64-unknown-elf)", required = true),
+          CLIArgument("destination", "directory where the toolchain will be installed", required = true)
+        ),
+        options = List(
+          CLIOption("gcc-version", None, "GCC version to use (default: 10.2.0)", required = false),
+          CLIOption("binutils-version", None, "binutils version to use (default: 2.35)", required = false)
+        ),
+        examples = List("overlord create gcc-toolchain arm-none-eabi /opt/toolchains/arm --gcc-version 10.2.0 --binutils-version 2.35")
+      )
+    ),
+    examples = List(
+      "overlord create project my-project.yaml --board arty-a7",
+      "overlord create from-template bare-metal my-new-project"
+    )
+  )
+
+  // "generate" command and subcommands
+  val generateCommandMeta = CLICommand(
+    name = "generate",
+    description = "Generate various outputs (tests, reports, SVD files).",
+    subcommands = List(
+      CLISubcommand(
+        name = "test",
+        description = "Generate test files for a project",
+        arguments = List(
+          CLIArgument("project-name", "name of the project to generate tests for", required = true)
+        )
+      ),
+      CLISubcommand(
+        name = "report",
+        description = "Generate a report about the project structure",
+        arguments = List(
+          CLIArgument("infile", "filename should be a .yaml file to use for the project", required = true)
+        )
+      ),
+      CLISubcommand(
+        name = "svd",
+        description = "Generate a CMSIS-SVD file",
+        arguments = List(
+          CLIArgument("infile", "filename should be a .yaml file to use for the project", required = true)
+        )
+      )
+    )
+  )
+
+  // "clean" command and subcommands
+  val cleanCommandMeta = CLICommand(
+    name = "clean",
+    description = "Clean generated files.",
+    subcommands = List(
+      CLISubcommand(
+        name = "test",
+        description = "Clean test files for a project",
+        arguments = List(
+          CLIArgument("project-name", "name of the project to clean tests for", required = true)
+        )
+      )
+    )
+  )
+
+  // "update" command and subcommands
+  val updateCommandMeta = CLICommand(
+    name = "update",
+    description = "Update projects or catalog.",
+    subcommands = List(
+      CLISubcommand(
+        name = "project",
+        description = "Update an existing project",
+        arguments = List(
+          CLIArgument("infile", "filename should be a .yaml file to use for the project", required = true)
+        ),
+        options = List(
+          CLIOption("instance", None, "specify the instance to update", required = false)
+        )
+      ),
+      CLISubcommand(
+        name = "catalog",
+        description = "Update the catalog from the remote repository"
+      )
+    )
+  )
+
+  // "template" command and subcommands
+  val templateCommandMeta = CLICommand(
+    name = "template",
+    description = "Manage project templates.",
+    subcommands = List(
+      CLISubcommand(
+        name = "list",
+        description = "List all available templates"
+      ),
+      CLISubcommand(
+        name = "add",
+        description = "Add a local template",
+        arguments = List(
+          CLIArgument("name", "name of the template", required = true),
+          CLIArgument("path", "path to the template directory", required = true)
+        )
+      ),
+      CLISubcommand(
+        name = "add-git",
+        description = "Add a template from a git repository",
+        arguments = List(
+          CLIArgument("name", "name of the template", required = true),
+          CLIArgument("git-url", "URL of the git repository", required = true)
+        ),
+        options = List(
+          CLIOption("branch", None, "branch to use (default: main)", required = false)
+        )
+      ),
+      CLISubcommand(
+        name = "add-github",
+        description = "Add a template from GitHub",
+        arguments = List(
+          CLIArgument("name", "name of the template", required = true),
+          CLIArgument("owner/repo", "GitHub repository in the format 'owner/repo'", required = true)
+        ),
+        options = List(
+          CLIOption("ref", None, "reference to use (tag, branch, or commit hash, default: main)", required = false)
+        )
+      ),
+      CLISubcommand(
+        name = "remove",
+        description = "Remove a template",
+        arguments = List(
+          CLIArgument("name", "name of the template to remove", required = true)
+        )
+      ),
+      CLISubcommand(
+        name = "update",
+        description = "Update a template from its source",
+        arguments = List(
+          CLIArgument("name", "name of the template to update", required = true)
+        )
+      ),
+      CLISubcommand(
+        name = "update-all",
+        description = "Update all templates from their sources"
+      )
+    )
+  )
+
+  // "help" command
+  val helpCommandMeta = CLICommand(
+    name = "help",
+    description = "Display help for a specific command",
+    arguments = List(
+      CLIArgument("command", "Command to get help for", required = false),
+      CLIArgument("subcommand", "Subcommand to get help for", required = false)
+    )
+  )
+
+  // List of all top-level commands (metadata)
+  val allCommandMetas: List[CLICommand] = List(
+    createCommandMeta,
+    generateCommandMeta,
+    cleanCommandMeta,
+    updateCommandMeta,
+    templateCommandMeta,
+    helpCommandMeta
+  )
+
+  // --- Metadata-based utility functions for help system ---
+
+  def getAllCommands: List[(String, String)] =
+    allCommandMetas.map(cmd => (cmd.name, cmd.description))
+
+  def getSubcommandsFor(command: String): List[(String, String)] =
+    allCommandMetas.find(_.name == command).map(_.subcommands.map(sc => (sc.name, sc.description))).getOrElse(Nil)
+
+  def getArgsAndOptions(command: String, subcommand: Option[String] = None): (List[CLIArgument], List[CLIOption]) = {
+    allCommandMetas.find(_.name == command) match {
+      case Some(cmdMeta) =>
+        subcommand match {
+          case Some(sub) =>
+            cmdMeta.subcommands.find(_.name == sub) match {
+              case Some(subMeta) =>
+                (subMeta.arguments, subMeta.options)
+              case None => (Nil, Nil)
+            }
+          case None =>
+            (cmdMeta.arguments, cmdMeta.options)
+        }
+      case None => (Nil, Nil)
+    }
+  }
+  
+  // Check if a command exists
+  def commandExists(command: String): Boolean = {
+    allCommandMetas.exists(_.name == command)
+  }
+  
+  // Check if a subcommand exists for a given command
+  def subcommandExists(command: String, subcommand: String): Boolean = {
+    allCommandMetas.find(_.name == command) match {
+      case Some(cmdMeta) => cmdMeta.subcommands.exists(_.name == subcommand)
+      case None => false
+    }
+  }
+  
+  // Find the closest matching subcommand for a given command
+  def findClosestSubcommand(command: String, subcommand: String): Option[String] = {
+    allCommandMetas.find(_.name == command) match {
+      case Some(cmdMeta) =>
+        val subcommands = cmdMeta.subcommands.map(_.name)
+        if (subcommands.isEmpty) {
+          None
+        } else {
+          // Find the closest match using Levenshtein distance
+          val distances = subcommands.map(s => (s, levenshteinDistance(s, subcommand)))
+          val closest = distances.minBy(_._2)
+          // Only suggest if the distance is reasonable (less than half the length of the subcommand)
+          if (closest._2 <= subcommand.length / 2) {
+            Some(closest._1)
+          } else {
+            None
+          }
+        }
+      case None => None
+    }
+  }
+  
+  // Calculate Levenshtein distance between two strings
+  private def levenshteinDistance(s1: String, s2: String): Int = {
+    val dist = Array.tabulate(s2.length + 1, s1.length + 1) { (j, i) =>
+      if (j == 0) i else if (i == 0) j else 0
+    }
+    
+    for (j <- 1 to s2.length; i <- 1 to s1.length) {
+      dist(j)(i) = if (s2(j - 1) == s1(i - 1)) {
+        dist(j - 1)(i - 1)
+      } else {
+        math.min(math.min(dist(j - 1)(i) + 1, dist(j)(i - 1) + 1), dist(j - 1)(i - 1) + 1)
+      }
+    }
+    
+    dist(s2.length)(s1.length)
+  }
+
+  /**
+   * Validates the configuration and displays help or errors if needed.
+   * This method should be called before `CommandExecutor.execute`.
+   *
+   * @param config The parsed configuration
+   * @return true if the configuration is valid, false otherwise
+   */
+  def validateAndDisplayHelp(config: Config): Boolean = {
+    (config.command, config.subCommand) match {
+      case (Some(cmd), Some(subcmd)) if commandExists(cmd) && subcommandExists(cmd, subcmd) =>
+        val (requiredArgs, _) = getArgsAndOptions(cmd, Some(subcmd))
+        validateRequiredArguments(config, requiredArgs) match {
+          case Some(_) =>
+            bufferedPrintln(HelpTextManager.getSubcommandHelp(cmd, subcmd))
+            false
+          case None => true
+        }
+
+      case (Some(cmd), None) if commandExists(cmd) =>
+        val cmdMeta = allCommandMetas.find(_.name == cmd).get
+        if (cmdMeta.subcommands.nonEmpty) {
+          // Command requires a subcommand but none was supplied
+          bufferedPrintln(HelpTextManager.getCommandHelp(cmd))
+          false
+        } else {
+          val (requiredArgs, _) = getArgsAndOptions(cmd)
+          validateRequiredArguments(config, requiredArgs) match {
+            case Some(_) =>
+              bufferedPrintln(HelpTextManager.getCommandHelp(cmd))
+              false // Return false if required arguments are missing
+            case None => true // Return true if all required arguments are present
+          }
+        }
+
+      case (Some(cmd), _) if !commandExists(cmd) =>
+        bufferedPrintln(HelpTextManager.getInvalidCommandHelp(cmd))
+        false
+
+      case (Some(cmd), Some(subcmd)) =>
+        bufferedPrintln(HelpTextManager.getInvalidSubcommandHelp(cmd, subcmd))
+        false
+
+      case (Some("help"), _) =>
+        bufferedPrintln(HelpTextManager.getGlobalHelp())
+        false
+
+      case _ =>
+        bufferedPrintln(HelpTextManager.getGlobalHelp())
+        false
+    }
+  }
+
+  private var printBuffer: StringBuilder = new StringBuilder
+
+  /**
+   * Custom print function that captures output to a buffer and also prints to the terminal.
+   */
+  def bufferedPrintln(message: String): Unit = {
+    printBuffer.append(message).append("\n")
+    println(message)
+  }
+
+  /**
+   * Retrieve the current contents of the print buffer.
+   */
+  def getPrintBuffer: String = printBuffer.toString
+
+  /**
+   * Clear the print buffer.
+   */
+  def clearPrintBuffer(): Unit = {
+    printBuffer.clear()
   }
 }

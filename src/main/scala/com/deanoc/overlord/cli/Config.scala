@@ -1,37 +1,46 @@
 package com.deanoc.overlord.cli
 
-import java.nio.file.Path
-import scala.collection.mutable
-
-/** Configuration class for the Overlord CLI. Supports a hierarchical command
-  * structure with primary and secondary commands.
-  */
+/** Configuration parsed from command line arguments */
 case class Config(
-    // Primary command (create, generate, clean, update, template)
-    command: Option[String] = None,
-
-    // Secondary command (project, from-template, test, report, svd, catalog, etc.)
-    subCommand: Option[String] = None,
-
-    // Common options
-    board: Option[String] = None,
-    yes: Boolean = false,
-    noexit: Boolean = false,
-    trace: Option[String] = None,
-    debug: Option[String] = None,
-
-    // Command-specific options
-    infile: Option[String] = None,
-    instance: Option[String] = None,
-    templateName: Option[String] = None,
-    projectName: Option[String] = None,
-
-    // Additional options for git/GitHub integration
-    gitUrl: Option[String] = None,
-    branch: Option[String] = None,
-    ownerRepo: Option[String] = None,
-    ref: Option[String] = None,
-
-    // Generic options map for additional parameters
-    options: mutable.Map[String, Any] = mutable.Map.empty
-)
+  // Main command and subcommand
+  command: Option[String] = None,
+  subCommand: Option[String] = None,
+  
+  // Input file
+  inFile: Option[String] = None,
+  
+  // Common flags
+  yes: Boolean = false,
+  noExit: Boolean = false,
+  
+  // Logging
+  trace: Option[String] = None,
+  debug: Option[String] = None,
+  
+  // Project options
+  projectName: Option[String] = None,
+  templateName: Option[String] = None,
+  boardName: Option[String] = None,
+  destination: Option[String] = None,
+  
+  // GCC toolchain options
+  gccVersion: Option[String] = None,
+  binutilsVersion: Option[String] = None,
+  
+  // Dynamic options map to handle all other options and arguments
+  options: Map[String, String] = Map()
+) {
+  // Helper methods to access common options
+  def getOption(name: String): Option[String] = options.get(name)
+  
+  def getRequiredOption(name: String): Either[String, String] = 
+    options.get(name).toRight(s"Missing required argument: $name")
+  
+  // Pretty string representation for debugging
+  override def toString: String = {
+    val cmdStr = command.getOrElse("None")
+    val subcmdStr = subCommand.getOrElse("None")
+    val optsStr = options.mkString(",")
+    s"Config(command=$cmdStr, subCommand=$subcmdStr, options=$optsStr)"
+  }
+}
