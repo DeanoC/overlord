@@ -1,5 +1,3 @@
-get_filename_component(COMPILER_PATH ${CMAKE_CURRENT_LIST_DIR} REALPATH)
-
 set(GCC_VERSION ${version})
 set(CMAKE_SYSTEM_NAME ${triple}_BARE_METAL)
 

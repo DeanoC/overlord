@@ -855,7 +855,7 @@ object CommandExecutor extends Logging {
       val scriptPath = extractedScriptPath.toAbsolutePath.toString
 
       // Run the script directly without changing directory
-      val cmd = Seq("bash", scriptPath, triple, destination)
+      val cmd = Seq("bash", scriptPath, triple, destination, "--gcc-version", gccVersion, "--binutils-version", binutilsVersion)
       info(s"Running: ${cmd.mkString(" ")}")
 
       val processLogger = ProcessLogger(
@@ -918,13 +918,6 @@ object CommandExecutor extends Logging {
       // Try the correct template name first
       templateStream = getClass.getResourceAsStream("/toolchain_template.cmake")
 
-      // Fall back to the misspelled name if needed
-      if (templateStream == null) {
-        info("Could not find toolchain_template.cmake, trying alternative name")
-        templateStream =
-          getClass.getResourceAsStream("/toolchain_teamplate.cmake")
-      }
-
       if (templateStream == null) {
         error("Could not find any toolchain template resource")
         return false
@@ -945,13 +938,18 @@ object CommandExecutor extends Logging {
         case _                            => ""
       }
 
-      val content = templateContent
+      val replacedContent = templateContent
         .replace("${triple}", triple)
         .replace("${version}", gccVersion)
         .replace("${GCC_FLAGS}", gccFlags)
 
-      // Ensure parent directories exist
+      // Prepend set(COMPILER_PATH ...) line
       val parent = outputPath.getParent
+      val absInstallPath = if (parent != null) parent.toAbsolutePath.toString else ""
+      val compilerPathLine = s"""set(COMPILER_PATH "$absInstallPath")\n"""
+      val content = compilerPathLine + replacedContent
+
+      // Ensure parent directories exist
       if (parent != null && !Files.exists(parent)) {
         Files.createDirectories(parent)
       }

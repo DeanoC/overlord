@@ -48,6 +48,30 @@ clean_build() {
   info "Cleaned build environment. Kept downloaded tarballs."
 }
 
+# Dependency check: Ensure all required build tools are present
+required_tools=(make gcc g++ flex bison gawk makeinfo)
+missing_tools=()
+
+for tool in "${required_tools[@]}"; do
+  if ! command -v "$tool" &>/dev/null; then
+    missing_tools+=("$tool")
+  fi
+done
+
+if [ "${#missing_tools[@]}" -ne 0 ]; then
+  echo "Error: The following required tools are missing for building GCC/binutils:"
+  for tool in "${missing_tools[@]}"; do
+    if [ "$tool" = "makeinfo" ]; then
+      echo "  - makeinfo (provided by the texinfo package)"
+    else
+      echo "  - $tool"
+    fi
+  done
+  echo ""
+  echo "Please install the missing packages and try again."
+  exit 1
+fi
+
 # Parse arguments - First check for the clean command
 if [[ "$1" == "clean" ]]; then
   if [[ -z "$2" ]]; then
@@ -64,6 +88,8 @@ if [[ "$1" == "--help" || "$1" == "-h" || -z "$1" ]]; then
   echo "       $0 clean <install-dir>  # Clean build environment"
   echo ""
   echo "Options:"
+  echo "  --gcc-version <version>      Specify GCC version to build (default: 13.2.0)"
+  echo "  --binutils-version <version> Specify binutils version to build (default: 2.42)"
   echo "  --use-local-tarballs <dir>   Use tarballs from the specified directory instead of downloading"
   echo "  --skip-download              Skip downloading tarballs (assumes they are already in the tarballs directory)"
   echo "  --help, -h                   Show this help message"
@@ -84,11 +110,27 @@ TARGET_TRIPLE="$1"
 INSTALL_DIR="$2"
 LOCAL_TARBALLS_DIR=""
 SKIP_DOWNLOAD=false
+USER_GCC_VERSION=""
+USER_BINUTILS_VERSION=""
 
 # Parse additional options
 shift 2
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --gcc-version)
+      if [[ -z "$2" ]]; then
+        die "Option --gcc-version requires a version argument"
+      fi
+      USER_GCC_VERSION="$2"
+      shift 2
+      ;;
+    --binutils-version)
+      if [[ -z "$2" ]]; then
+        die "Option --binutils-version requires a version argument"
+      fi
+      USER_BINUTILS_VERSION="$2"
+      shift 2
+      ;;
     --use-local-tarballs)
       if [[ -z "$2" ]]; then
         die "Option --use-local-tarballs requires a directory argument"
@@ -105,6 +147,8 @@ while [[ $# -gt 0 ]]; do
       echo "       $0 clean <install-dir>  # Clean build environment"
       echo ""
       echo "Options:"
+      echo "  --gcc-version <version>      Specify GCC version to build (default: 13.2.0)"
+      echo "  --binutils-version <version> Specify binutils version to build (default: 2.42)"
       echo "  --use-local-tarballs <dir>   Use tarballs from the specified directory instead of downloading"
       echo "  --skip-download              Skip downloading tarballs (assumes they are already in the tarballs directory)"
       echo "  --help, -h                   Show this help message"
@@ -120,6 +164,13 @@ done
 
 BINUTILS_VERSION="2.42"
 GCC_VERSION="13.2.0"
+# Override with user-supplied versions if provided
+if [[ -n "$USER_GCC_VERSION" ]]; then
+  GCC_VERSION="$USER_GCC_VERSION"
+fi
+if [[ -n "$USER_BINUTILS_VERSION" ]]; then
+  BINUTILS_VERSION="$USER_BINUTILS_VERSION"
+fi
 BINUTILS_TARBALL="binutils-${BINUTILS_VERSION}.tar.xz"
 GCC_TARBALL="gcc-${GCC_VERSION}.tar.xz"
 
@@ -337,5 +388,4 @@ else
   echo "See $TEST_LOG for details."
   exit 1
 fi
-
 info "Done."
