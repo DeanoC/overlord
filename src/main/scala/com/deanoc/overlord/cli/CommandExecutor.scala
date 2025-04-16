@@ -823,8 +823,36 @@ object CommandExecutor extends Logging {
 
       // Run the build_baremetal_toolchain.sh script
       // Use absolute path to the script in the overlord project directory
-      val scriptPath =
-        "/workspaces/overlord/scripts/build_baremetal_toolchain.sh"
+      // Extract build_baremetal_toolchain.sh from resources to destination
+      val scriptResource = getClass.getClassLoader.getResourceAsStream("build_baremetal_toolchain.sh")
+      if (scriptResource == null) {
+        error("Could not find build_baremetal_toolchain.sh in resources.")
+        return false
+      }
+      val extractedScriptPath = Paths.get(destination, "build_baremetal_toolchain.sh")
+      try {
+        Files.copy(
+          scriptResource,
+          extractedScriptPath,
+          java.nio.file.StandardCopyOption.REPLACE_EXISTING
+        )
+      } catch {
+        case e: Exception =>
+          error(s"Failed to extract build_baremetal_toolchain.sh: ${e.getMessage}")
+          return false
+      }
+      // Set executable permissions
+      try {
+        import java.nio.file.attribute.PosixFilePermissions
+        Files.setPosixFilePermissions(
+          extractedScriptPath,
+          PosixFilePermissions.fromString("rwxr-xr-x")
+        )
+      } catch {
+        case e: Exception =>
+          warn(s"Could not set executable permissions on script: ${e.getMessage}")
+      }
+      val scriptPath = extractedScriptPath.toAbsolutePath.toString
 
       // Run the script directly without changing directory
       val cmd = Seq("bash", scriptPath, triple, destination)
