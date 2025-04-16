@@ -768,7 +768,7 @@ object CommandExecutor extends Logging {
     }
   }
 
-  /** Builds a GCC toolchain using the create_gcc.sh script.
+  /** Builds a GCC toolchain.
     *
     * @param triple
     *   The target triple (e.g., arm-none-eabi)
@@ -779,7 +779,7 @@ object CommandExecutor extends Logging {
     * @param binutilsVersion
     *   The binutils version to use
     * @return
-    *   true if successful, false otherwise
+    *   true if successful, false otherwis
     */
   private def buildGccToolchain(
       triple: String,
@@ -821,139 +821,25 @@ object CommandExecutor extends Logging {
         info(s"Generated CMake toolchain file at: $toolchainFile")
       }
 
-      // Copy the script to the destination folder
-      val scriptResource = getClass.getResourceAsStream("/create_gcc.sh")
-      if (scriptResource == null) {
-        error("Could not find create_gcc.sh resource")
-        return false
-      }
+      // Run the build_baremetal_toolchain.sh script
+      // Use absolute path to the script in the overlord project directory
+      val scriptPath =
+        "/workspaces/overlord/scripts/build_baremetal_toolchain.sh"
 
-      val scriptDestPath = Paths.get(destination, "create_gcc.sh")
-      info(s"Copying build script to: $scriptDestPath")
+      // Run the script directly without changing directory
+      val cmd = Seq("bash", scriptPath, triple, destination)
+      info(s"Running: ${cmd.mkString(" ")}")
 
-      // Make sure we don't have an existing file
-      try {
-        Files.deleteIfExists(scriptDestPath)
-      } catch {
-        case e: Exception =>
-          warn(
-            s"Failed to delete existing script file: ${e.getMessage()}, will try to overwrite"
-          )
-      }
-
-      // Copy the resource and close the stream properly
-      var destStream: java.io.OutputStream = null
-      try {
-        destStream = Files.newOutputStream(scriptDestPath)
-        val buffer = new Array[Byte](4096)
-        var bytesRead = 0
-        while ({ bytesRead = scriptResource.read(buffer); bytesRead != -1 }) {
-          destStream.write(buffer, 0, bytesRead)
-        }
-      } catch {
-        case e: Exception =>
-          error(s"Failed to copy script: ${e.getMessage}")
-          return false
-      } finally {
-        if (destStream != null) {
-          try {
-            destStream.close()
-          } catch {
-            case _: Exception => // Ignore close errors
-          }
-        }
-        try {
-          scriptResource.close()
-        } catch {
-          case _: Exception => // Ignore close errors
-        }
-      }
-
-      // Make the script executable
-      val execCmd = s"chmod +x ${scriptDestPath.toAbsolutePath}"
-      if (execCmd.! != 0) {
-        error("Failed to make script executable")
-        return false
-      }
-
-      // Check for required tools
-      val requiredTools = Seq("wget", "tar", "make", "gcc", "g++")
-      for (tool <- requiredTools) {
-        val checkCmd = s"which $tool"
-        if (checkCmd.! != 0) {
-          error(
-            s"Required tool '$tool' not found. Please install it and try again."
-          )
-          return false
-        }
-      }
-
-      // Define environment variables
-      val env = Seq(
-        "TARGET" -> triple,
-        "GCC_VERSION" -> gccVersion,
-        "BINUTILS_VERSION" -> binutilsVersion,
-        "INSTALL_DIR" -> destination,
-        "BUILD_ID" -> buildId,
-        "LANG" -> "C", // Use C locale for consistent output
-        "LC_ALL" -> "C"
-      )
-
-      // Check if the destination directory is writable
-      val destDir = new java.io.File(destination)
-      if (!destDir.canWrite) {
-        warn(
-          s"Destination directory $destination may not be writable. The build might fail due to permission issues."
-        )
-      }
-
-      // Execute the script with absolute path
-      info("Executing GCC build script...")
-
-      // Create a custom process logger that captures all output
-      val outputBuffer = new StringBuilder
       val processLogger = ProcessLogger(
-        line => {
-          info(s"[build-$buildId] $line")
-          outputBuffer.append(line).append("\n")
-        },
-        line => {
-          // Use warn instead of error to avoid exiting
-          warn(s"[build-error-$buildId] $line")
-          outputBuffer.append(s"ERROR: $line").append("\n")
-        }
+        (out: String) => info(out),
+        (err: String) => warn(err)
       )
 
-      val processBuilder = Process(
-        Seq("bash", scriptDestPath.toAbsolutePath.toString),
-        new java.io.File(destination),
-        env: _*
-      )
+      // Execute in the current directory, not in the destination
+      val exitCode = cmd.!(processLogger)
 
-      val scriptExitCode = processBuilder ! processLogger
-
-      if (scriptExitCode != 0) {
-        warn(s"Build script exited with code $scriptExitCode")
-
-        // Analyze the output to provide more specific error messages
-        val output = outputBuffer.toString
-
-        if (output.contains("Permission denied")) {
-          warn(
-            "The build failed due to permission issues. You may need to run with elevated privileges."
-          )
-        } else if (output.contains("No space left on device")) {
-          warn("The build failed due to insufficient disk space.")
-        } else if (output.contains("Failed to download")) {
-          warn(
-            "The build failed due to download issues. Check your internet connection or try a different version."
-          )
-        } else if (output.contains("command not found")) {
-          warn(
-            "The build failed because a required command was not found. Check that all dependencies are installed."
-          )
-        }
-
+      if (exitCode != 0) {
+        error(s"Toolchain build script failed with exit code $exitCode")
         return false
       }
 
