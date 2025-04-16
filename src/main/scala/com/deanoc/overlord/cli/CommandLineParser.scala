@@ -274,37 +274,52 @@ object CommandLineParser extends Logging {
           .text("Update all templates from their sources")
       )
 
-    // Combine all commands and options
-    OParser.sequence(
-      programName("overlord"),
-      head("overlord", "1.0"),
-      createCommand,
-      generateCommand,
-      cleanCommand,
-      updateCommand,
-      templateCommand,
-      help("help").text("prints this usage text"),
-      // Add common options at the top level
-      opt[Unit]("yes")
-        .abbr("y")
-        .action((_, c) => c.copy(yes = true))
-        .text(
-          "automatically agree (e.g., download resource files without prompting)"
-        ),
-      opt[Unit]("noexit")
-        .action((_, c) => c.copy(noexit = true))
-        .text("disable automatic exit on error logs"),
-      opt[String]("trace")
-        .action((x, c) => c.copy(trace = Some(x)))
-        .text(
-          "enable trace logging for comma-separated list of modules (can use short names)"
-        ),
-      opt[String]("debug")
-        .action((x, c) => c.copy(debug = Some(x)))
-        .text(
-          "enable debug logging for comma-separated list of modules (can use short names)"
+        // Help command as per enhanced design
+        val helpCommand = cmd("help")
+          .action((_, c) => c.copy(command = Some("help")))
+          .text("Display help for a specific command")
+          .children(
+            arg[String]("<command>")
+              .optional()
+              .action((x, c) => c.copy(options = c.options.clone().addOne(("help-command", x))))
+              .text("Command to get help for"),
+            arg[String]("<subcommand>")
+              .optional()
+              .action((x, c) => c.copy(options = c.options.clone().addOne(("help-subcommand", x))))
+              .text("Subcommand to get help for")
+          )
+    
+        // Combine all commands and options
+        OParser.sequence(
+          programName("overlord"),
+          head("overlord", "1.0"),
+          createCommand,
+          generateCommand,
+          cleanCommand,
+          updateCommand,
+          templateCommand,
+          helpCommand,
+          // Add common options at the top level
+          opt[Unit]("yes")
+            .abbr("y")
+            .action((_, c) => c.copy(yes = true))
+            .text(
+              "automatically agree (e.g., download resource files without prompting)"
+            ),
+          opt[Unit]("noexit")
+            .action((_, c) => c.copy(noexit = true))
+            .text("disable automatic exit on error logs"),
+          opt[String]("trace")
+            .action((x, c) => c.copy(trace = Some(x)))
+            .text(
+              "enable trace logging for comma-separated list of modules (can use short names)"
+            ),
+          opt[String]("debug")
+            .action((x, c) => c.copy(debug = Some(x)))
+            .text(
+              "enable debug logging for comma-separated list of modules (can use short names)"
+            )
         )
-    )
   }
 
   /** Parses command line arguments.
@@ -319,10 +334,10 @@ object CommandLineParser extends Logging {
     val isNonInteractive = System.console() == null
     val parser = createParser()
 
-    // Handle empty arguments case - show help directly
+    // Enhanced help/usage handling
     if (args.isEmpty || args.contains("--help") || args.contains("-h")) {
-      println(OParser.usage(parser)) // Print usage information
-      sys.exit(0) // Exit gracefully
+      println(HelpTextManager.getGlobalHelp())
+      sys.exit(0)
       return None
     }
 
@@ -330,6 +345,14 @@ object CommandLineParser extends Logging {
       parser,
       args,
       initialConfig.copy(yes = initialConfig.yes || isNonInteractive)
-    )
+    ) match {
+      case Some(config) =>
+        Some(config)
+      case None =>
+        // On parse failure, show focused usage if possible
+        val partialConfig = initialConfig // Could be improved with partial parsing
+        println(HelpTextManager.getFocusedUsage(partialConfig))
+        None
+    }
   }
 }

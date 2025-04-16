@@ -81,9 +81,23 @@ object CommandExecutor extends Logging {
       case (Some("template"), Some("update-all")) =>
         executeTemplateUpdateAll(config)
 
-      // Unknown command combination
+      // HELP command
+      case (Some("help"), _) =>
+        val commandOpt = config.options.get("help-command").map(_.toString)
+        val subcommandOpt = config.options.get("help-subcommand").map(_.toString)
+        (commandOpt, subcommandOpt) match {
+          case (None, _) =>
+            println(HelpTextManager.getGlobalHelp())
+          case (Some(cmd), None) =>
+            println(HelpTextManager.getCommandHelp(cmd))
+          case (Some(cmd), Some(sub)) =>
+            println(HelpTextManager.getSubcommandHelp(cmd, sub))
+        }
+        true
+
+      // Unknown command combination or missing subcommand/args
       case _ =>
-        error("Unknown command or missing subcommand")
+        println(HelpTextManager.getFocusedUsage(config))
         false
     }
   }
