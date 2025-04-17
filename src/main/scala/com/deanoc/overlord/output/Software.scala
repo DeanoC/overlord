@@ -2,20 +2,20 @@ package com.deanoc.overlord.output
 
 import com.deanoc.overlord.utils.Utils
 import com.deanoc.overlord.instances.LibraryInstance
-import com.deanoc.overlord.{Project, Resources}
+import com.deanoc.overlord.Overlord
 
-import java.nio.file.Path
+import java.nio.file.{Path, Paths}
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 object Software {
   private val cpuRegEx = "\\s*,\\s*".r
 
-  def apply(game: Project): Unit = {
+  def apply(game: Overlord): Unit = {
     if (game.cpus.isEmpty) return
-    println(s"Creating Software at ${Project.outPath}")
+    println(s"Creating Software at ${Overlord.outPath}")
 
-    val out = Project.outPath
+    val out = Overlord.outPath
 
     Utils.ensureDirectories(out)
     Utils.ensureDirectories(out.resolve("programs_host"))
@@ -52,7 +52,7 @@ object Software {
 
   def tmp_program_path(out: Path): Path = out.resolve("tmp")
 
-  private def relocateTmpSoftware(game: Project, out: Path): Unit = {
+  private def relocateTmpSoftware(game: Overlord, out: Path): Unit = {
     Utils.deleteDirectories(out.resolve("libs"))
 
     // move from the tmp folder to its real place
@@ -137,8 +137,10 @@ object Software {
       sb.result()
     )
     Utils.copy(
-      Resources
-        .stdResourcePath()
+      Paths
+        .get(System.getProperty("user.home"), "gagameos_stdcatalog")
+        .toAbsolutePath
+        .normalize()
         .resolve("catalogs/software/library_defines.cmake"),
       out.resolve("library_defines/CMakeLists.txt")
     )
@@ -187,7 +189,7 @@ object Software {
   }
 
   private def genScripts(
-      game: Project,
+      game: Overlord,
       out: Path,
       programPaths: Seq[Path],
       programPathExists: Seq[Boolean]
@@ -236,14 +238,20 @@ object Software {
     Utils.writeFile(out.resolve(s"make_programs.sh"), sb.result())
     Utils.setFileExecutable(out.resolve(s"make_programs.sh"))
     Utils.copy(
-      Resources
-        .stdResourcePath()
+      Paths
+        .get(System.getProperty("user.home"), "gagameos_stdcatalog")
+        .toAbsolutePath
+        .normalize()
         .resolve("catalogs/software/gagameos_root.cmake"),
       out.resolve("CMakeLists.txt")
     )
     // workaround for microblaze gcc
     Utils.copy(
-      Resources.stdResourcePath().resolve("catalogs/software/empty-file.ld"),
+      Paths
+        .get(System.getProperty("user.home"), "gagameos_stdcatalog")
+        .toAbsolutePath
+        .normalize()
+        .resolve("catalogs/software/empty-file.ld"),
       out.resolve("empty-file.ld")
     )
 

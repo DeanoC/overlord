@@ -20,4 +20,9 @@
 6. **File:** `src/main/scala/output/Top.scala` (Line 42)
    - Comment: "TODO:"
 
+7. Fix all uses of       Paths
+        .get(System.getProperty("user.home"), "gagameos_stdcatalog")
+        .toAbsolutePath
+        .normalize()
+
 This document lists all the TODOs found in the codebase for easier tracking and resolution.

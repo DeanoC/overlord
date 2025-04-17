@@ -83,8 +83,18 @@ lazy val overlord = (project in file("."))
 //      "-Yexplicit-nulls", // Enable null safety in Scala 3
       "-feature"
 //      "-explain" // Detailed error explanations
-    )
+    ),
   )
+    // Ensure build_baremetal_toolchain.sh in resources is always up to date with scripts/
+    Compile / resourceGenerators += Def.task {
+      val src = baseDirectory.value / "scripts" / "build_baremetal_toolchain.sh"
+      val dest = (Compile / resourceManaged).value / "build_baremetal_toolchain.sh"
+      IO.copyFile(src, dest)
+      Seq(dest)
+    }.taskValue
+
+// Ensure the main Scala source directory is included
+Compile / unmanagedSourceDirectories += baseDirectory.value / "src" / "main" / "scala"
 
 // Configure sbt to recognize the test directory
 Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oD")

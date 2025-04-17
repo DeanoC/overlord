@@ -3,11 +3,14 @@ package com.deanoc.overlord
 import java.nio.file.{Files, Path, Paths}
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
+import sys.process._
 
 import com.deanoc.overlord.utils.{Utils, Variant}
-import com.deanoc.overlord.Project
+import com.deanoc.overlord.utils.Logging
 
-class DefinitionCatalog {
+import com.deanoc.overlord.Overlord
+
+class DefinitionCatalog extends Logging {
   type key = DefinitionType
   type value = DefinitionTrait
   type keyStore = mutable.HashMap[key, value]
@@ -15,9 +18,9 @@ class DefinitionCatalog {
   val catalogs: keyStore = mutable.HashMap()
 
   def printDefinitionCatalogs(): Unit = {
-    println("Definition Catalogs:")
+    info("Definition Catalogs:")
     for { k <- catalogs.keys } {
-      println(s"k  ${k.ident.mkString(".")} ${k.getClass}")
+      info(s"k  ${k.ident.mkString(".")} ${k.getClass}")
     }
   }
   def findDefinition(name: String): Option[value] = {
@@ -80,8 +83,8 @@ class DefinitionCatalog {
     // check for duplicates
     for (i <- catalogs.keys) {
       if (incoming.contains(i)) {
-        println(
-          s"WARN: Duplicate definition name ${i.ident.mkString(".")} detected"
+        warn(
+          s"Duplicate definition name ${i.ident.mkString(".")} detected"
         )
       }
     }
@@ -89,26 +92,58 @@ class DefinitionCatalog {
   }
 }
 
-object DefinitionCatalog {
+object DefinitionCatalog extends Logging {
   def fromFile(
       fileName: String,
       defaultMap: Map[String, Variant]
   ): Option[Seq[DefinitionTrait]] = {
-    val filePath = Project.catalogPath.resolve(fileName)
+    val filePath = Overlord.catalogPath.resolve(fileName)
 
     // println(s"Reading $fileName catalog")
 
     if (!Files.exists(filePath.toAbsolutePath)) {
-      println(s"$fileName catalog at $filePath not found")
+      error(s"$fileName catalog at $filePath not found")
       return None
     }
 
-    Project.pushCatalogPath(filePath.getParent)
+    Overlord.pushCatalogPath(filePath.getParent)
 
     val source = Utils.readYaml(filePath)
     val result = parse(fileName, source, defaultMap)
-    Project.popCatalogPath()
+    Overlord.popCatalogPath()
     result
+  }
+
+  def fromURL(
+      url: String,
+      defaultMap: Map[String, Variant]
+  ): Option[Seq[DefinitionTrait]] = {
+    val catalogsDir = Overlord.projectPath.resolve("catalogs")
+    if (!Files.exists(catalogsDir)) {
+      Files.createDirectories(catalogsDir)
+    }
+
+    val cloneCommand = s"git clone $url ${catalogsDir.toAbsolutePath}".!
+    if (cloneCommand != 0) {
+      error(s"Failed to clone repository from $url")
+      return None
+    }
+
+    val cloneFolderName = url.split('/').last.replaceAll(".git$", "")
+    val catalogFile =
+      catalogsDir.resolve(cloneFolderName).resolve("catalog.yaml")
+    if (!Files.exists(catalogFile)) {
+      error(
+        s"No catalog.yaml file found in the cloned repository at $catalogFile"
+      )
+      return None
+    }
+
+    val source = Utils.readYaml(catalogFile)
+    Overlord.pushCatalogPath(catalogsDir.resolve(cloneFolderName))
+    val parsed = parse(s"$cloneFolderName/catalog.yaml", source, defaultMap)
+    Overlord.popCatalogPath()
+    parsed
   }
 
   private def parse(
@@ -118,9 +153,7 @@ object DefinitionCatalog {
   ): Option[Seq[DefinitionTrait]] = {
 
     if (parsed.contains("instance")) {
-      println(
-        s"$name contains an Instance which are not allowed in definitions"
-      )
+      error(s"$name contains an Instance which are not allowed in definitions")
       return None
     };
 
@@ -135,18 +168,38 @@ object DefinitionCatalog {
       for (defi <- tdef) defs += Definition(defi, defaults)
     }
 
-    if (parsed.contains("include")) {
-      val tincs = Utils.toArray(parsed("include"))
+    if (parsed.contains("includes")) {
+      val includes = Utils.toArray(parsed("includes"))
+      for (include <- includes) {
+        val name = Utils.toString(include)
+        val cat =
+          if (name.startsWith("https://") && name.endsWith(".git")) {
+            DefinitionCatalog.fromURL(name, defaults)
+          } else {
+            Overlord.pushCatalogPath(Paths.get(name))
+            DefinitionCatalog.fromFile(name, defaults)
+            Overlord.popCatalogPath()
+          }
+        cat match {
+          case Some(value) => defs ++= value
+          case None => warn(s"Failed to load catalog for resource: $name")
+          case _ => warn(s"Unexpected case encountered while loading catalog for resource: $name")
+        }
+      }
+    }
+
+    if (parsed.contains("catalogs")) {
+      val tincs = Utils.toArray(parsed("catalogs"))
       for (include <- tincs) {
         val table = Utils.toTable(include)
         val name = Paths.get(Utils.toString(table("resource")))
-        Project.pushCatalogPath(name)
+        Overlord.pushCatalogPath(name)
         val cat = DefinitionCatalog.fromFile(s"${name.getFileName}", defaults)
         cat match {
           case Some(value) => defs ++= value
           case None        =>
         }
-        Project.popCatalogPath()
+        Overlord.popCatalogPath()
       }
     }
 
@@ -154,7 +207,15 @@ object DefinitionCatalog {
       val resources = Utils.lookupArray(parsed, "resources")
       for (resource <- resources) {
         val name = Utils.toString(resource)
-        val cat = DefinitionCatalog.fromFile(s"$name", defaults)
+        val cat =
+          if (name.startsWith("https://") && name.endsWith(".git")) {
+            DefinitionCatalog.fromURL(name, defaults)
+          } else {
+            Overlord.pushCatalogPath(Paths.get(name))
+            val parsed = DefinitionCatalog.fromFile(s"$name", defaults)
+            Overlord.popCatalogPath()
+            parsed
+          }
         cat match {
           case Some(value) => defs ++= value
           case None        =>
@@ -165,7 +226,7 @@ object DefinitionCatalog {
     for (i <- 0 until identArray.length)
       for (j <- i + 1 until identArray.length) {
         if (identArray(i) == identArray(j)) {
-          println(s"WARN ${identArray(i)} already exists in catalog")
+          warn(s"${identArray(i)} already exists in catalog")
         }
       }
 

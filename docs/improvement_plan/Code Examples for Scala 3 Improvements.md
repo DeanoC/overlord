@@ -46,9 +46,9 @@ def apply(
   } else {
     // Extract the filename from the "source" field, handling different data types
     process("source") match {
-      case s: StringV => 
+      case s: StringV =>
         Right(ReadYamlRegistersAction(name, s.value))
-      case t: TableV if t.value.contains("file") => 
+      case t: TableV if t.value.contains("file") =>
         Right(ReadYamlRegistersAction(name, Utils.toString(t.value("file"))))
       case _ =>
         Left("Read Yaml Register source field is malformed")
@@ -59,10 +59,10 @@ def apply(
 // Usage example
 def createAction(name: String, process: Map[String, Variant]): Unit = {
   ReadYamlRegistersAction(name, process) match {
-    case Right(action) => 
+    case Right(action) =>
       // Use the action
       println(s"Created action: ${action.name}")
-    case Left(error) => 
+    case Left(error) =>
       // Handle the error
       println(s"Error creating action: $error")
   }
@@ -109,7 +109,7 @@ trait InstanceTrait extends QueryInterface {
   // Use immutable Map instead of mutable HashMap
   def attributes: Map[String, Variant]
   def finalParameters: Map[String, Variant]
-  
+
   val name: String
   val sourcePath: Path = Project.instancePath.toAbsolutePath
 
@@ -117,7 +117,7 @@ trait InstanceTrait extends QueryInterface {
 
   // Return a new instance with merged attributes instead of mutating
   def withMergedAttributes(attribs: Map[String, Variant]): InstanceTrait
-  
+
   // Helper method for merging a single attribute
   def withMergedAttribute(attribs: Map[String, Variant], key: String): InstanceTrait = {
     if (attribs.contains(key)) {
@@ -136,12 +136,12 @@ case class ChipInstance(
   attributes: Map[String, Variant],
   finalParameters: Map[String, Variant] = Map.empty
 ) extends InstanceTrait {
-  
+
   // Implementation that returns a new instance with merged attributes
   def withMergedAttributes(attribs: Map[String, Variant]): ChipInstance = {
     copy(attributes = attributes ++ attribs)
   }
-  
+
   // Other methods...
 }
 ```
@@ -177,9 +177,9 @@ def execute(
     parameters: Map[String, Variant]
 ): Unit = {
   instance match {
-    case chipInstance: ChipInstance => 
+    case chipInstance: ChipInstance =>
       execute(chipInstance, parameters)
-    case _ => 
+    case _ =>
       println(s"${instance.name} is not a chip but is being processed by a gateware action")
   }
 }
@@ -262,7 +262,7 @@ object Main {
       OParser.sequence(
         programName("overlord"),
         head("overlord", "1.0"),
-        
+
         // Commands
         cmd("create")
           .action((_, c) => c.copy(mode = "create"))
@@ -276,7 +276,7 @@ object Main {
         cmd("svd")
           .action((_, c) => c.copy(mode = "svd"))
           .text("produce a CMSIS-SVD file on its own"),
-          
+
         // Options
         opt[String]('o', "out")
           .action((x, c) => c.copy(outPath = x))
@@ -300,12 +300,12 @@ object Main {
         opt[Unit]('y', "yes")
           .action((_, c) => c.copy(autoAgree = true))
           .text("automatically agree (i.e. automatically download resource files without prompting)"),
-          
+
         // Arguments
         arg[String]("<filename>")
           .required()
           .action((x, c) => c.copy(infile = x))
-          .text("a .over file to use for the project")
+          .text("a .yaml file to use for the project")
       )
     }
 
@@ -319,7 +319,7 @@ object Main {
         sys.exit(1)
     }
   }
-  
+
   private def runWithConfig(config: OverlordConfig): Unit = {
     // Implementation using the parsed config
     val filename = config.infile
@@ -327,7 +327,7 @@ object Main {
       println(s"Error: $filename does not exist")
       sys.exit(1)
     }
-    
+
     // Rest of the implementation...
   }
 }
@@ -354,7 +354,7 @@ Improved implementation with Scala 3 enums:
 // Define an enum for action types
 enum ActionType:
   case ReadYamlRegisters, ShellAction, GitClone, Template, Copy, Python, SoftSource
-  
+
   // Add a method to get a string representation
   def asString: String = this match
     case ReadYamlRegisters => "ReadYamlRegisters"
@@ -381,11 +381,11 @@ object ActionType:
 val actionType = ActionType.ReadYamlRegisters
 // Type-safe pattern matching
 actionType match
-  case ActionType.ReadYamlRegisters => 
+  case ActionType.ReadYamlRegisters =>
     // Do something
-  case ActionType.ShellAction => 
+  case ActionType.ShellAction =>
     // Do something else
-  case _ => 
+  case _ =>
     // Handle other cases
 ```
 
@@ -396,10 +396,10 @@ actionType match
 extension (path: Path)
   def resolveAndNormalize(other: String): Path =
     path.resolve(other).normalize()
-  
+
   def isValidGitRepo: Boolean =
     Files.exists(path.resolve(".git")) && Files.isDirectory(path.resolve(".git"))
-    
+
   def ensureDirectories(): Path =
     Files.createDirectories(path)
     path
@@ -421,7 +421,7 @@ object DomainTypes:
   object BoardName:
     def apply(name: String): BoardName = name
     extension (b: BoardName) def value: String = b
-    
+
   opaque type InstanceName = String
   object InstanceName:
     def apply(name: String): InstanceName = name
@@ -504,7 +504,7 @@ class YamlRegistersParser extends RegistersParser:
 // Default implementation for backward compatibility
 object YamlRegistersParser:
   private val defaultParser = new YamlRegistersParser()
-  
+
   def apply(
       instance: InstanceTrait,
       filename: String,
@@ -513,25 +513,25 @@ object YamlRegistersParser:
 
 // Modified ReadYamlRegistersAction with dependency injection
 class ReadYamlRegistersAction(
-    name: String, 
+    name: String,
     filename: String,
     parser: RegistersParser = new YamlRegistersParser() // Default implementation
 ) extends GatewareAction {
-  
+
   override val phase: Int = 2
-  
+
   def execute(
       instance: InstanceTrait,
       parameters: Map[String, Variant]
   ): Unit = {
     instance match {
-      case chipInstance: ChipInstance => 
+      case chipInstance: ChipInstance =>
         execute(chipInstance, parameters)
-      case _ => 
+      case _ =>
         println(s"${instance.name} is not a chip but is being processed by a gateware action")
     }
   }
-  
+
   override def execute(
       instance: ChipInstance,
       parameters: Map[String, Variant]
@@ -579,9 +579,9 @@ import com.typesafe.scalalogging.Logger
 
 case class ShellAction(script: String, args: String, phase: Int = 1)
     extends Action {
-  
+
   private val logger = Logger[ShellAction]
-  
+
   override def execute(
       instance: InstanceTrait,
       parameters: Map[String, Variant]
@@ -590,7 +590,7 @@ case class ShellAction(script: String, args: String, phase: Int = 1)
 
     val resolvedArgs = Project.resolvePathMacros(instance, s"$args")
     logger.debug(s"Executing bash script: $script with args: $resolvedArgs")
-    
+
     // Resolve macros in the arguments and execute the bash script
     val result = sys.process
       .Process(
@@ -627,8 +627,7 @@ src/main/scala/
       ├── ShellAction.scala
       ├── SoftSourceAction.scala
       ├── SourcesAction.scala
-      ├── TemplateAction.scala
-      └── YamlAction.scala
+      └── TemplateAction.scala
 ```
 
 Improved structure:
@@ -669,50 +668,50 @@ import org.mockito.Mockito._
 import org.mockito.ArgumentMatchers._
 
 class ReadYamlRegistersActionSpec extends AnyFlatSpec with Matchers {
-  
+
   "ReadYamlRegistersAction.apply" should "return None when source field is missing" in {
     // Setup
     val name = "testAction"
     val process = Map[String, Variant]()
-    
+
     // Execute
     val result = ReadYamlRegistersAction(name, process)
-    
+
     // Verify
     result shouldBe None
   }
-  
+
   it should "return Some(ReadYamlRegistersAction) when source is a StringV" in {
     // Setup
     val name = "testAction"
     val filename = "test.yaml"
     val process = Map[String, Variant]("source" -> StringV(filename))
-    
+
     // Execute
     val result = ReadYamlRegistersAction(name, process)
-    
+
     // Verify
     result shouldBe defined
     result.get.name shouldBe name
     result.get.filename shouldBe filename
   }
-  
+
   "ReadYamlRegistersAction.execute" should "add registers to the instance" in {
     // Setup
     val name = "testAction"
     val filename = "test.yaml"
     val action = ReadYamlRegistersAction(name, filename)
-    
+
     val mockInstance = mock(classOf[ChipInstance])
     val mockRegisterBanks = mock(classOf[mutable.Buffer[RegisterBank]])
     when(mockInstance.name).thenReturn("testInstance")
     when(mockInstance.instanceRegisterBanks).thenReturn(mockRegisterBanks)
-    
+
     val parameters = Map[String, Variant]()
-    
+
     // Execute
     action.execute(mockInstance, parameters)
-    
+
     // Verify
     verify(mockRegisterBanks).++=(any[Seq[RegisterBank]])
   }
@@ -726,7 +725,7 @@ class ReadYamlRegistersActionSpec extends AnyFlatSpec with Matchers {
 ```scala
 /**
  * Represents an action to read YAML-defined registers and associate them with a chip instance.
- * 
+ *
  * This action parses a YAML file containing register definitions and adds them to the
  * register banks of a chip instance. It is typically used during the hardware definition
  * phase of a project.
@@ -737,7 +736,7 @@ class ReadYamlRegistersActionSpec extends AnyFlatSpec with Matchers {
 case class ReadYamlRegistersAction(name: String, filename: String)
     extends GatewareAction {
 
-  /** 
+  /**
    * The execution phase for this action.
    * Phase 2 indicates that this action should be executed after basic initialization
    * but before final output generation.
@@ -759,9 +758,9 @@ case class ReadYamlRegistersAction(name: String, filename: String)
       parameters: Map[String, Variant]
   ): Unit = {
     instance match {
-      case chipInstance: ChipInstance => 
+      case chipInstance: ChipInstance =>
         execute(chipInstance, parameters)
-      case _ => 
+      case _ =>
         println(s"${instance.name} is not a chip but is being processed by a gateware action")
     }
   }
@@ -790,7 +789,7 @@ case class ReadYamlRegistersAction(name: String, filename: String)
 
 /**
  * Companion object for ReadYamlRegistersAction.
- * 
+ *
  * Provides factory methods to create ReadYamlRegistersAction instances from
  * process definitions.
  */

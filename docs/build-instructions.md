@@ -49,3 +49,16 @@ Follow these steps to set up and build the Overlord project on a Linux system.
    ```
 
 You can now use the `overlord` command as described in the documentation.
+
+## Embedded Resources
+
+### Baremetal Toolchain Script
+
+The `build_baremetal_toolchain.sh` script (used for creating GCC toolchains) is now embedded as a resource in the Overlord JAR file:
+
+- During the build process, the script is automatically copied from the `scripts/` directory into the JAR resources.
+- At runtime, when you run the `overlord create gcc-toolchain` command, the application extracts the script from its internal resources and executes it.
+- Users no longer need to have the `scripts/` directory present on their system.
+- The build process ensures the embedded resource is always up to date with the source script.
+
+This change simplifies distribution and ensures all users have access to the latest version of the script without manual updates.

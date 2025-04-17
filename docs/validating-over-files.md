@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This guide provides tips and techniques for testing and validating your Overlord project files (.over) to ensure they work correctly with the Overlord.Project system.
+This guide provides tips and techniques for testing and validating your Overlord project files (.yaml) to ensure they work correctly with the Overlord.Project system.
 
 ## Validation Methods
 
@@ -11,7 +11,7 @@ This guide provides tips and techniques for testing and validating your Overlord
 The Overlord framework includes a "report" command that analyzes your project file and generates a summary of instances, connections, and potential issues:
 
 ```bash
-sbt "run report path/to/your/project.over"
+sbt "run report path/to/your/project.yaml"
 ```
 
 This command provides an overview of your project structure without generating output files, making it useful for quick validation.
@@ -52,7 +52,7 @@ Build your project file incrementally:
 
 To test specific component configurations without creating a full project:
 
-1. Create a minimal test.over file that includes only the component you want to test
+1. Create a minimal test.yaml file that includes only the component you want to test
 2. Use a simplified board definition if possible
 3. Run with the report command to validate the configuration
 
@@ -84,10 +84,10 @@ After project generation, examine the generated files in the output directory:
 
 ### Manual YAML Validation
 
-Use a YAML validator to ensure your .over file has valid YAML syntax before processing it with Overlord:
+Use a YAML validator to ensure your .yaml file has valid YAML syntax before processing it with Overlord:
 
 ```bash
-python -c 'import yaml; yaml.safe_load(open("your_project.over"))'
+python -c 'import yaml; yaml.safe_load(open("your_project.yaml"))'
 ```
 
 ## Advanced Validation
@@ -96,7 +96,7 @@ python -c 'import yaml; yaml.safe_load(open("your_project.over"))'
 
 For validating hardware aspects of your project:
 
-1. Generate the project with `sbt "run create path/to/your/project.over"`
+1. Generate the project with `sbt "run create path/to/your/project.yaml"`
 2. Check the generated Verilog/VHDL in the output directory
 3. Use simulation tools to validate hardware behavior
 
@@ -110,8 +110,6 @@ For validating software aspects:
 
 ## Versioning and Backup
 
-Always version control your .over files and create backups before making substantial changes. This allows you to revert to a working configuration if needed.
+Always version control your .yaml files and create backups before making substantial changes. This allows you to revert to a working configuration if needed.
 
-## Conclusion
-
-Proper testing and validation of .over files ensures your Overlord projects will build correctly and function as expected. Start with small, incremental changes, and use the available validation tools to catch issues early in the development process.
+Proper testing and validation of .yaml files ensures your Overlord projects will build correctly and function as expected. Start with small, incremental changes, and use the available validation tools to catch issues early in the development process.

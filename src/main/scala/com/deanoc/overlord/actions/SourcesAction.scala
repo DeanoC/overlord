@@ -1,7 +1,7 @@
 package com.deanoc.overlord.actions
 
 import com.deanoc.overlord.utils._
-import com.deanoc.overlord.Project
+import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.instances.InstanceTrait
 
 // Represents an action to handle source files with a specific filename and language.
@@ -19,7 +19,7 @@ case class SourcesAction(filename: String, language: String) extends Action {
       parameters: Map[String, Variant]
   ): Unit = {
     // Attempt to resolve the source file path using the project paths.
-    val srcNamePath = Project.tryPaths(instance, filename)
+    val srcNamePath = Overlord.tryPaths(instance, filename)
     val srcAbsPath = srcNamePath.toAbsolutePath
 
     // Check if the resolved file exists, and log a message if it doesn't.

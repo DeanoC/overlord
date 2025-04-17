@@ -1,7 +1,7 @@
 package com.deanoc.overlord.actions
 
 import com.deanoc.overlord.utils._
-import com.deanoc.overlord.Project
+import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.instances.InstanceTrait
 
 // Represents an SBT action with parameters for the main Scala file, arguments, and source path.
@@ -19,9 +19,9 @@ case class SbtAction(mainScala: String, args: String, srcPath: String)
     import scala.language.postfixOps
 
     // Resolves the absolute path of the source directory.
-    val srcAbsPath = Project.tryPaths(instance, srcPath)
+    val srcAbsPath = Overlord.tryPaths(instance, srcPath)
     // Resolves the output path for the modified files.
-    val moddedOutPath = Project.outPath.resolve(instance.name)
+    val moddedOutPath = Overlord.outPath.resolve(instance.name)
 
     // Ensures the output directory exists.
     Utils.ensureDirectories(moddedOutPath)
@@ -33,7 +33,7 @@ case class SbtAction(mainScala: String, args: String, srcPath: String)
     )
 
     // Resolves macros in the arguments string.
-    val proargs = Project.resolvePathMacros(instance, args)
+    val proargs = Overlord.resolvePathMacros(instance, args)
 
     // Executes the SBT process with the resolved arguments in the output directory.
     val result =
@@ -71,7 +71,7 @@ object SbtAction {
         val args = Utils.toString(process("args"))
 
         // Creates a sequence of SbtAction instances with the extracted parameters.
-        Right(Seq(SbtAction(mainScala, args, Project.catalogPath.toString)))
+        Right(Seq(SbtAction(mainScala, args, Overlord.catalogPath.toString)))
       } catch {
         case e: Exception =>
           Left(s"Error processing SBT action in $name: ${e.getMessage}")

@@ -3,14 +3,14 @@ package com.deanoc.overlord.output
 import scala.collection.mutable.StringBuilder
 
 import com.deanoc.overlord.utils.{Utils, StringV}
-import com.deanoc.overlord.{Project, PinConstraint, DiffPinConstraint}
+import com.deanoc.overlord.{Overlord, PinConstraint, DiffPinConstraint}
 import com.deanoc.overlord.connections.{
   ConstantParameterType,
   FrequencyParameterType
 }
 
 object Xdc {
-  def apply(game: Project): Unit = {
+  def apply(game: Overlord): Unit = {
     val sb = new StringBuilder
 
     sb ++= "set_property CFGBVS VCCO [current_design]\n"
@@ -101,7 +101,7 @@ object Xdc {
         )} $periodTxt $waveformTxt [$pinOrPortTxt]\n"""
     }
 
-    Utils.writeFile(Project.outPath.resolve(s"${game.name}.xdc"), sb.result())
+    Utils.writeFile(Overlord.outPath.resolve(s"${game.name}.xdc"), sb.result())
   }
 
   private def sanatizeIdent(in: String): String = {

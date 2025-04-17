@@ -10,6 +10,9 @@
 		{
 			"name": "gagameos_stdcatalog",
 			"path": "../gagameos_stdcatalog"
+		},
+		{
+			"path": "../bl616check"
 		}
 	],
 	"settings": {

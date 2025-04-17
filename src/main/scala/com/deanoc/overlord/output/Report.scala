@@ -11,7 +11,7 @@ import com.deanoc.overlord.instances.{
   Container,
   CpuInstance
 }
-import com.deanoc.overlord.Project
+import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.connections.ConnectedExtensions._
 
 object Report {
@@ -44,7 +44,7 @@ object Report {
   // private val switchEdgeDotAttribs  = Seq(DotAttr("style", "dashed"), DotAttr("color", "red"))
   // private val defaultEdgeDotAttribs = Seq(DotAttr("color", "black"))
 
-  def apply(game: Project): Unit = {
+  def apply(game: Overlord): Unit = {
 
     val sb = new mutable.StringBuilder
     val cpus = game.cpus
@@ -107,12 +107,12 @@ object Report {
 
     sb ++= game.busDistanceMatrix.debugPrint
 
-    Utils.writeFile(Project.outPath.resolve("report.txt"), sb.result())
+    Utils.writeFile(Overlord.outPath.resolve("report.txt"), sb.result())
 
 //		outputDotGraph(game)
   }
 
-  private def reportInstances(game: Project): String = {
+  private def reportInstances(game: Overlord): String = {
     game.children.map(reportInstance(_)).mkString("")
   }
 

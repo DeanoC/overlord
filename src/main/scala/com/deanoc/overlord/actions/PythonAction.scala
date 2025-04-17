@@ -1,7 +1,7 @@
 package com.deanoc.overlord.actions
 
 import com.deanoc.overlord.utils._
-import com.deanoc.overlord.Project
+import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.instances.InstanceTrait
 
 // Represents an action to execute a Python script with arguments
@@ -23,9 +23,9 @@ case class PythonAction(script: String, args: String) extends Action {
         Seq(
           "python3",
           s"$script",
-          Project.resolvePathMacros(instance, s"$args")
+          Overlord.resolvePathMacros(instance, s"$args")
         ),
-        Project.catalogPath.toFile
+        Overlord.catalogPath.toFile
       )
       .!
 

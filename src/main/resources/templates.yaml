@@ -1,0 +1,6 @@
+templates:
+  - name: "gateware-blinky"
+    repo: "DeanoC/overlord-template-gateware-blinky"
+  - name: "software-bare-metal"
+    repo: "DeanoC/overlord-template-software-bare-metal"
+

@@ -3,7 +3,7 @@ package com.deanoc.overlord.actions
 import java.nio.file.{Path, Paths}
 
 import com.deanoc.overlord.utils.{Utils, Variant}
-import com.deanoc.overlord.Project
+import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.instances.{
   InstanceTrait,
   ProgramInstance,
@@ -77,12 +77,12 @@ case class TemplateAction(
           else si.folder
         } else si.folder
 
-        Project.outPath
+        Overlord.outPath
           .resolve(folder)
           .resolve(si.name.replace('.', '_'))
           .resolve(ofn)
       case _ =>
-        Project.outPath.resolve(ofn)
+        Overlord.outPath.resolve(ofn)
     }
     Utils.ensureDirectories(oPath.getParent)
     Utils.writeFile(oPath, sourceString)
@@ -167,7 +167,7 @@ object TemplateAction {
               TemplateAction(
                 phase,
                 cpus,
-                Project.catalogPath,
+                Overlord.catalogPath,
                 inFilename,
                 outFilename
               )

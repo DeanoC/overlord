@@ -1,6 +1,6 @@
 package com.deanoc.overlord.actions
 
-import com.deanoc.overlord.Project
+import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.instances.InstanceTrait
 import com.deanoc.overlord.utils.{Variant, ArrayV, Utils}
 
@@ -25,12 +25,13 @@ case class CopyAction(filename: String, language: String, srcPath: String)
     val fn = filename.split('/').last
 
     // Resolves the absolute source path using project macros
-    val srcAbsPath = Project.projectPath
-      .resolve(Project.resolvePathMacros(instance, srcPath))
+    val srcAbsPath = Overlord.projectPath
+      .resolve(Overlord.resolvePathMacros(instance, srcPath))
       .toAbsolutePath
 
     // Constructs the absolute destination path
-    dstAbsPath = Project.outPath.resolve(s"${instance.name}/$fn").toAbsolutePath
+    dstAbsPath =
+      Overlord.outPath.resolve(s"${instance.name}/$fn").toAbsolutePath
 
     // Ensures that the destination directory exists
     Utils.ensureDirectories(dstAbsPath.getParent)

@@ -1,16 +1,16 @@
-# Overlord Project File Format (.over)
+# Overlord Project File Format (.yaml)
 
 ## Introduction
 
-The Overlord framework uses YAML-based configuration files with the `.over` extension to define projects, components, and their connections. These files are the main input for the Overlord.Project class and define how your hardware and software components are instantiated, configured, and connected.
+The Overlord framework uses YAML-based configuration files with the `.yaml` extension to define projects, components, and their connections. These files are the main input for the Overlord.Project class and define how your hardware and software components are instantiated, configured, and connected.
 
 ## File Format
 
-Overlord project files are written in YAML and can have either a `.over` or `.yaml` extension. The framework includes a utility script `convert_toml_to_yaml.py` that can convert TOML files to YAML if you prefer writing in TOML.
+Overlord project files are written in YAML and have the `.yaml` extension. The framework includes a utility script `convert_toml_to_yaml.py` that can convert TOML files to YAML if you prefer writing in TOML.
 
 ## Main Sections
 
-A typical `.over` file consists of the following main sections:
+A typical `.yaml` file consists of the following main sections:
 
 ### 1. Defaults
 
@@ -24,12 +24,12 @@ defaults:
 
 ### 2. Include
 
-Allows including other `.over` files to promote modularity and reuse.
+Allows including other `.yaml` files to promote modularity and reuse.
 
 ```yaml
 include:
-  - resource: path/to/another/file.over
-  - resource: another/include.over
+  - resource: path/to/another/file.yaml
+  - resource: another/include.yaml
 ```
 
 ### 3. Instance
@@ -97,14 +97,14 @@ defaults:
 
 # Include other configuration files
 include:
-  - resource: components/peripherals.over
+  - resource: components/peripherals.yaml
 
 # Define instances
 instance:
   - name: cpu0
     type: cpu.riscv
     clockFrequency: 200000000  # Override default
-  
+
   - name: ram0
     type: memory.ram
     size: 0x10000  # 64KB
@@ -117,7 +117,7 @@ instance:
 connection:
   - first: cpu0.data_bus
     second: ram0.bus
-  
+
   - first: cpu0.peripheral_bus
     second: uart0.bus
 
@@ -156,7 +156,7 @@ Software components can declare dependencies on other components, which the Proj
 
 ## File Processing
 
-The Project class processes `.over` files through the following steps:
+The Project class processes `.yaml` files through the following steps:
 
 1. Read the YAML structure using `Utils.readYaml()`
 2. Process includes and imports recursively

@@ -1,7 +1,7 @@
 package com.deanoc.overlord.actions
 
 import com.deanoc.overlord.utils._
-import com.deanoc.overlord.Project
+import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.instances.InstanceTrait
 
 import scala.collection.mutable
@@ -39,12 +39,12 @@ case class YamlAction(parameterKeys: Seq[String], filename: String)
       })
 
     // Resolve the output path and ensure directories exist.
-    val moddedOutPath = Project.outPath.resolve(
-      Project.resolvePathMacros(instance, instance.name)
+    val moddedOutPath = Overlord.outPath.resolve(
+      Overlord.resolvePathMacros(instance, instance.name)
     )
 
     val dstAbsPath =
-      moddedOutPath.resolve(Project.resolvePathMacros(instance, filename))
+      moddedOutPath.resolve(Overlord.resolvePathMacros(instance, filename))
     Utils.ensureDirectories(dstAbsPath.getParent)
 
     // Write the formatted YAML content to the file.

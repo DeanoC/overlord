@@ -1,6 +1,6 @@
 package com.deanoc.overlord.output
 
-import com.deanoc.overlord.Project as OverlordProject
+import com.deanoc.overlord.Overlord as OverlordProject
 
 // This object is responsible for generating the actual project file structure
 // based on the provided overlord.Project instance. It organizes the output

@@ -10,7 +10,7 @@ import com.deanoc.overlord.hardware.{
 }
 import com.deanoc.overlord.instances._
 import com.deanoc.overlord.software.SoftwareDefinition
-import com.deanoc.overlord.Project
+import com.deanoc.overlord.Overlord
 
 import java.nio.file.Path
 import scala.sys.exit
@@ -30,7 +30,7 @@ trait DefinitionTrait {
 object Definition {
   def apply(defi: Variant, defaults: Map[String, Variant]): DefinitionTrait = {
 
-    val path = Project.catalogPath
+    val path = Overlord.catalogPath
 
     val table = Utils.mergeAintoB(Utils.toTable(defi), defaults)
     val deftype = DefinitionType(Utils.toString(table("type"))) match {

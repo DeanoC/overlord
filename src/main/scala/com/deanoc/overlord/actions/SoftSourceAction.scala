@@ -1,7 +1,7 @@
 package com.deanoc.overlord.actions
 
 import com.deanoc.overlord.utils._
-import com.deanoc.overlord.Project
+import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.instances.{
   InstanceTrait,
   ProgramInstance,
@@ -53,12 +53,12 @@ case class SoftSourceAction(
           else si.folder
         } else si.folder
 
-        Project.outPath
+        Overlord.outPath
           .resolve(folder)
           .resolve(si.name.replace('.', '_'))
           .resolve(ofn)
       case _ =>
-        Project.outPath.resolve(ofn)
+        Overlord.outPath.resolve(ofn)
     }
 
     // Ensure the output directory exists
@@ -139,7 +139,7 @@ object SoftSourceAction {
               SoftSourceAction(
                 phase,
                 cpus,
-                Project.catalogPath,
+                Overlord.catalogPath,
                 inFilename,
                 outFilename
               )

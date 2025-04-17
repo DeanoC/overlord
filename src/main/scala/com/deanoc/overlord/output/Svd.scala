@@ -4,14 +4,14 @@ import com.deanoc.overlord.hardware.{BitsDesc, Register}
 import com.deanoc.overlord.utils.Utils
 import com.deanoc.overlord.instances.{ChipInstance, CpuInstance}
 import com.deanoc.overlord._
-import com.deanoc.overlord.Project
+import com.deanoc.overlord.Overlord
 
 import java.nio.file.{Path, Paths}
 import scala.collection.mutable
 import scala.xml.PrettyPrinter
 
 object Svd {
-  def apply(game: Project): Unit = {
+  def apply(game: Overlord): Unit = {
 
     val cpus =
       for (cpu <- game.cpus)
@@ -45,7 +45,7 @@ object Svd {
       </device>
     // @formatter:on
 
-    val out = Project.outPath
+    val out = Overlord.outPath
     Utils.ensureDirectories(out)
 
     // copy etc/CMSIS-SVD.xsd

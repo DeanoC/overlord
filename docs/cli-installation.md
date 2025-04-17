@@ -121,16 +121,13 @@ After installation, you can use the `overlord` command from anywhere on your sys
 overlord
 
 # Create a new project
-overlord create --board <board_name> --out <output_directory> <filename.over>
+overlord create --board <board_name> --out <output_directory> <filename.yaml>
 
-# Update an existing project
-overlord update --board <board_name> --out <output_directory> <filename.over>
+overlord update --board <board_name> --out <output_directory> <filename.yaml>
 
-# Generate a report
-overlord report --board <board_name> <filename.over>
+overlord report --board <board_name> <filename.yaml>
 
-# Generate SVD file
-overlord svd --board <board_name> <filename.over>
+overlord svd --board <board_name> <filename.yaml>
 ```
 
 ## Troubleshooting
