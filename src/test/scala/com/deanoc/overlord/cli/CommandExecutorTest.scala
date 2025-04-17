@@ -25,7 +25,7 @@ class CommandExecutorTest extends AnyFlatSpec with Matchers {
   }
 
   // Helper function to test help output for a command or subcommand
-  def testHelpOutput(command: String, subcommand: Option[String], options: Map[String, String] = Map()): Unit = {
+  def testHelpOutput(command: String, subcommand: Option[String], options: Map[String, String] = Map(), expectedReturnValue: Boolean = false): Unit = {
     val actual = withOutputCapture {
       val config = Config(
         command = Some(command),
@@ -33,7 +33,7 @@ class CommandExecutorTest extends AnyFlatSpec with Matchers {
         options = options
       )
 
-      CommandLineParser.validateAndDisplayHelp(config, false) shouldBe false
+      CommandLineParser.validateAndDisplayHelp(config, false) shouldBe expectedReturnValue
     }
 
     // Ensure the buffer is not empty
