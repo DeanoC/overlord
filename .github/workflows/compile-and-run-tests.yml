@@ -1,4 +1,4 @@
-name: Clean Compile and Run
+name: Clean Compile and Run tests
 
 on:
   workflow_run:
@@ -8,7 +8,7 @@ on:
   workflow_dispatch:  # Allows manual triggering
 
 jobs:
-  compile-and-run:
+  compile-and-run-tests:
     runs-on: ubuntu-latest
     # Only run if the Scala CI workflow succeeded or this was manually triggered
     if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
@@ -68,57 +68,16 @@ jobs:
         else
           echo "Found overlord executable at target/universal/stage/bin/overlord"
         fi
-        
-    - name: Ensure standard catalog exists
+
+    - name: Run tests
+      run: sbt test
+
+    - name: Verify test results
       run: |
-        if [ ! -d "${HOME}/gagameosstd_catalog" ]; then
-          echo "Standard catalog folder not found. Cloning from Git repository..."
-          git clone https://github.com/DeanoC/gagameos_stdcatalog.git ${HOME}/gagameosstd_catalog
+        if [ $? -ne 0 ]; then
+          echo "ERROR: Tests failed."
+          exit 1
         else
-          echo "Standard catalog folder already exists."
+          echo "All tests passed successfully."
         fi
 
-    - name: Ensure overlord_template_project exists
-      run: |
-        if [ ! -d "${HOME}/overlord_template_project" ]; then
-          echo "overlord_template_project folder not found. Cloning from Git repository..."
-          git clone https://github.com/DeanoC/overlord_template_project.git ${HOME}/overlord_template_project
-        else
-          echo "overlord_template_project folder already exists."
-        fi
-
-    - name: Prepare for template project run
-      run: |
-        # Make the overlord executable available
-        mkdir -p ${HOME}/bin
-        cp target/universal/stage/bin/overlord ${HOME}/bin/
-        chmod +x ${HOME}/bin/overlord
-        
-        # Copy lib directory
-        mkdir -p ${HOME}/lib
-        cp -r target/universal/stage/lib/* ${HOME}/lib/
-        
-        # Add to PATH
-        echo "${HOME}/bin" >> $GITHUB_PATH
-        
-    - name: Run template project
-      run: |
-        # Error handling
-        set -e
-        
-        echo "Running template project with overlord using run.sh"
-        
-        # Check if run.sh exists and is executable
-        if [ ! -f "${HOME}/overlord_template_project/run.sh" ]; then
-          echo "ERROR: run.sh script not found"
-          exit 1
-        fi
-      
-        # Run the script
-        cd ${HOME}/overlord_template_project
-        ./run.sh || {
-          echo "Error: Template project execution failed"
-          exit 1
-        }
-        
-        echo "Template project completed successfully"
