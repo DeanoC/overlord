@@ -30,9 +30,7 @@ object Main extends Logging {
         println(com.deanoc.overlord.cli.HelpTextManager.getGlobalHelp())
       case Nil =>
         println(com.deanoc.overlord.cli.HelpTextManager.getGlobalHelp())
-      case _ =>
-        println(s"DEBUG: Processing command: ${args.mkString(" ")}")
-        
+      case _ =>        
         // Temporarily redirect System.err to suppress default error messages
         val originalErr = System.err
         val nullOutputStream = new java.io.OutputStream() {
@@ -48,9 +46,6 @@ object Main extends Logging {
             case Some(config) =>
               // Restore System.err before executing command
               System.setErr(originalErr)
-              println(s"DEBUG: Parsed config: $config")
-              println(s"DEBUG: Command: ${config.command}, Subcommand: ${config.subCommand}")
-              println(s"DEBUG: Options: ${config.options}")
               if (!com.deanoc.overlord.cli.CommandLineParser.validateAndDisplayHelp(config)) {
                 sys.exit(1)
               }
@@ -59,7 +54,6 @@ object Main extends Logging {
             case None =>
               // Command parsing failed, try to extract command and subcommand for focused help
               val partialConfig = extractPartialConfig(args)
-              println(s"DEBUG: Parsing failed. Extracted partial config: $partialConfig")
               // Restore System.err before printing our custom help
               System.setErr(originalErr)
               println(com.deanoc.overlord.cli.HelpTextManager.getFocusedUsage(partialConfig))

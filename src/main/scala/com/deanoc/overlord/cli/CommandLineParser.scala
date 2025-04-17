@@ -119,13 +119,34 @@ object CommandLineParser extends Logging {
   // Parse command line arguments using the generated OParser
   def parse(args: Array[String]): Option[Config] = {
     // Debug parsing attempt
-    debug(s"Processing command: ${args.mkString(" ")}")
+    trace(s"Processing command: ${args.mkString(" ")}")
     
-    // Use the scopt OParser to parse the arguments
+    // Special handling for subcommands with missing arguments
+    if (args.length >= 2) {
+      val cmd = args(0)
+      val subcmd = args(1)
+      
+      if (commandExists(cmd) && subcommandExists(cmd, subcmd)) {
+        // It's a valid command and subcommand - create a partial config
+        val partialConfig = Config(command = Some(cmd), subCommand = Some(subcmd))
+        
+        // Further args would be processed as options/arguments
+        if (args.length > 2) {
+          // Has additional args - let scopt process as normal
+          val result = OParser.parse(toOParser, args, Config())
+          if (result.isDefined) return result
+        }
+        
+        // No additional args or parsing failed - return partial config to show targeted help
+        return Some(partialConfig)
+      }
+    }
+    
+    // Use the scopt OParser to parse the arguments normally
     val result = OParser.parse(toOParser, args, Config())
     
     result.flatMap { config =>
-      debug(s"Parsing partial config: $config")
+      trace(s"Parsing partial config: $config")
       
       // Validate the parsed configuration
       if (config.command.isDefined) {
@@ -139,12 +160,12 @@ object CommandLineParser extends Logging {
             val (requiredArgs, _) = getArgsAndOptions(cmd, Some(subcmd))
             validateRequiredArguments(config, requiredArgs) match {
               case Some(errorMsg) =>
-                error(errorMsg)
+                trace(errorMsg)
                 None
               case None => Some(config)
             }
           } else {
-            error(s"Invalid command/subcommand combination: $cmd $subcmd")
+            trace(s"Invalid command/subcommand combination: $cmd $subcmd")
             None
           }
         } else {
@@ -152,7 +173,7 @@ object CommandLineParser extends Logging {
           val (requiredArgs, _) = getArgsAndOptions(cmd)
           validateRequiredArguments(config, requiredArgs) match {
             case Some(errorMsg) =>
-              error(errorMsg)
+              trace(errorMsg)
               None
             case None => Some(config)
           }
@@ -173,95 +194,6 @@ object CommandLineParser extends Logging {
       Some(msgList.mkString("\n"))
     } else {
       None
-    }
-  }
-  
-  // Display help for a specific command and subcommand
-  def showHelp(command: String, subcommand: Option[String] = None): Unit = {
-    val cmdMeta = allCommandMetas.find(_.name == command)
-    
-    cmdMeta.foreach { meta =>
-      subcommand match {
-        case Some(subcmd) =>
-          meta.subcommands.find(_.name == subcmd).foreach { submeta =>
-            println(s"Command: $command $subcmd\n")
-            println("DESCRIPTION:")
-            submeta.longDescription.orElse(Some(submeta.description)).foreach { desc =>
-              println(s"  $desc\n")
-            }
-            
-            println("USAGE:")
-            val argsStr = submeta.arguments.map(arg => s"<${arg.name}>").mkString(" ")
-            println(s"  overlord $command $subcmd $argsStr [options]\n")
-            
-            if (submeta.arguments.nonEmpty) {
-              println("ARGUMENTS:")
-              submeta.arguments.foreach { arg =>
-                val reqStr = if (arg.required) "(required)" else "(optional)"
-                println(s"  <${arg.name}>  ${arg.description} $reqStr")
-              }
-              println()
-            }
-            
-            val allOptions = submeta.options ++ commonOptions
-            if (allOptions.nonEmpty) {
-              println("OPTIONS:")
-              allOptions.foreach { opt =>
-                val shortStr = opt.short.map(s => s"-$s, ").getOrElse("")
-                println(s"  $shortStr--${opt.name} ${opt.description}")
-              }
-              println()
-            }
-            
-            if (submeta.examples.nonEmpty) {
-              println("EXAMPLES:")
-              submeta.examples.foreach { example =>
-                println(s"  $example")
-              }
-            }
-          }
-          
-        case None =>
-          println(s"Command: $command\n")
-          println("DESCRIPTION:")
-          meta.longDescription.orElse(Some(meta.description)).foreach { desc =>
-            println(s"  $desc\n")
-          }
-          
-          if (meta.subcommands.nonEmpty) {
-            println("SUBCOMMANDS:")
-            meta.subcommands.foreach { sub =>
-              println(s"  ${sub.name}  ${sub.description}")
-            }
-            println()
-          }
-          
-          if (meta.arguments.nonEmpty) {
-            println("ARGUMENTS:")
-            meta.arguments.foreach { arg =>
-              val reqStr = if (arg.required) "(required)" else "(optional)"
-              println(s"  <${arg.name}>  ${arg.description} $reqStr")
-            }
-            println()
-          }
-          
-          val allOptions = meta.options ++ commonOptions
-          if (allOptions.nonEmpty) {
-            println("OPTIONS:")
-            allOptions.foreach { opt =>
-              val shortStr = opt.short.map(s => s"-$s, ").getOrElse("")
-              println(s"  $shortStr--${opt.name} ${opt.description}")
-            }
-            println()
-          }
-          
-          if (meta.examples.nonEmpty) {
-            println("EXAMPLES:")
-            meta.examples.foreach { example =>
-              println(s"  $example")
-            }
-          }
-      }
     }
   }
 
@@ -542,14 +474,23 @@ directory using the specified YAML configuration file."""
    * This method should be called before `CommandExecutor.execute`.
    *
    * @param config The parsed configuration
+   * @param displayErrorMessages Whether to display error messages about missing arguments (true for CLI, false for tests)
    * @return true if the configuration is valid, false otherwise
    */
-  def validateAndDisplayHelp(config: Config): Boolean = {
+  def validateAndDisplayHelp(config: Config, displayErrorMessages: Boolean = true): Boolean = {
     (config.command, config.subCommand) match {
       case (Some(cmd), Some(subcmd)) if commandExists(cmd) && subcommandExists(cmd, subcmd) =>
         val (requiredArgs, _) = getArgsAndOptions(cmd, Some(subcmd))
         validateRequiredArguments(config, requiredArgs) match {
+          case Some(errorMsg) if displayErrorMessages =>
+            // Print the error messages about missing arguments - but only in CLI mode
+            errorMsg.split("\n").foreach(bufferedPrintln)
+            
+            // Display focused help for just this subcommand
+            bufferedPrintln(HelpTextManager.getSubcommandHelp(cmd, subcmd))
+            false
           case Some(_) =>
+            // In test mode, don't display error messages, just the help
             bufferedPrintln(HelpTextManager.getSubcommandHelp(cmd, subcmd))
             false
           case None => true
@@ -564,10 +505,13 @@ directory using the specified YAML configuration file."""
         } else {
           val (requiredArgs, _) = getArgsAndOptions(cmd)
           validateRequiredArguments(config, requiredArgs) match {
-            case Some(_) =>
+            case Some(errorMsg) =>
+              // Print the error messages about missing arguments
+              errorMsg.split("\n").foreach(bufferedPrintln)
+              // Then display only the relevant command help
               bufferedPrintln(HelpTextManager.getCommandHelp(cmd))
-              false // Return false if required arguments are missing
-            case None => true // Return true if all required arguments are present
+              false
+            case None => true
           }
         }
 

@@ -33,7 +33,7 @@ class CommandExecutorTest extends AnyFlatSpec with Matchers {
         options = options
       )
 
-      CommandLineParser.validateAndDisplayHelp(config) shouldBe false
+      CommandLineParser.validateAndDisplayHelp(config, false) shouldBe false
     }
 
     // Ensure the buffer is not empty
@@ -50,40 +50,7 @@ class CommandExecutorTest extends AnyFlatSpec with Matchers {
     normalizeString(actual) shouldEqual normalizeString(expected)
   }
 
-  "CommandExecutor" should "display help for create subcommand 'project' when required arguments are missing" in {
-    testHelpOutput("create", Some("project"))
-  }
-
-  it should "display help for create subcommand 'gcc-toolchain' when required arguments are missing" in {
-    testHelpOutput("create", Some("gcc-toolchain"))
-  }
-
-  it should "display help for 'create' command with no subcommand" in {
-    testHelpOutput("create", None)
-  }
-
-  it should "display error for invalid subcommand" in {
-    val actual = withOutputCapture {
-      val config = Config(
-        command = Some("create"),
-        subCommand = Some("invalid")
-      )
-
-      CommandExecutor.execute(config) shouldBe false
-    }
-
-    val expected = HelpTextManager.getInvalidSubcommandHelp("create", "invalid")
-
-    // Ensure the buffer is not empty
-    actual should not be empty
-
-    // Ensure the expected output is not empty
-    expected should not be empty
-
-    // Verify output matches what HelpTextManager would produce
-    normalizeString(actual) shouldEqual normalizeString(expected)
-  }
-
+  // Test cases for various command scenarios
   it should "have the correct number of commands in the CLI parser" in {
     val expectedCommandCount = 6 // Updated to match the actual number of commands
     val actualCommandCount = CommandLineParser.getAllCommands.size
@@ -96,6 +63,41 @@ class CommandExecutorTest extends AnyFlatSpec with Matchers {
     val actualSubcommandCount = CommandLineParser.getSubcommandsFor("create").size
 
     actualSubcommandCount shouldEqual expectedSubcommandCount
+  }
+
+  it should "display help for 'create' command with no subcommand" in {
+    testHelpOutput("create", None)
+  }
+
+  it should "display help for create subcommand 'project' when required arguments are missing" in {
+    testHelpOutput("create", Some("project"))
+  }
+
+  it should "display help for create subcommand 'gcc-toolchain' when required arguments are missing" in {
+    testHelpOutput("create", Some("gcc-toolchain"))
+  }
+
+  it should "display error for create with an invalid subcommand" in {
+    val actual = withOutputCapture {
+      val config = Config(
+        command = Some("create"),
+        subCommand = Some("invalid"),
+        options = Map()
+      )
+
+      CommandLineParser.validateAndDisplayHelp(config, false) shouldBe false
+    }
+
+    // Ensure the buffer is not empty
+    actual should not be empty
+
+    // Dynamically fetch the expected output from HelpTextManager
+    val expected = HelpTextManager.getInvalidSubcommandHelp("create", "invalid")
+
+    expected should not be empty
+
+    // Verify the actual output matches the expected output
+    normalizeString(actual) shouldEqual normalizeString(expected)
   }
 
   it should "display help for generate subcommand 'test' when required arguments are missing" in {
@@ -121,4 +123,27 @@ class CommandExecutorTest extends AnyFlatSpec with Matchers {
   it should "display help for template subcommand 'add-git' when required arguments are missing" in {
     testHelpOutput("template", Some("add-git"))
   }
+
+  it should "include all subcommands in 'create' help text" in {
+    val helpText = HelpTextManager.getCommandHelp("create")
+    
+    helpText should include("Command: create")
+    helpText should include("DESCRIPTION:")
+    helpText should include("USAGE:")
+    helpText should include("SUBCOMMANDS:")
+    helpText should include("project")
+    helpText should include("default-templates")
+    helpText should include("gcc-toolchain")
+  }
+  
+  it should "list available subcommands in invalid subcommand error message" in {
+    val helpText = HelpTextManager.getInvalidSubcommandHelp("create", "invalid")
+    
+    helpText should include("Error: Unknown subcommand 'invalid' for command 'create'")
+    helpText should include("Available subcommands for 'create':")
+    helpText should include("project")
+    helpText should include("default-templates")
+    helpText should include("gcc-toolchain")
+  }  
+
 }

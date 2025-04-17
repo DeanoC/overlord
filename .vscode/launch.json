@@ -12,13 +12,9 @@
       "buildTarget": "overlord",
       "args": [
         "create",
-        "../overlord_template_project/template_project.over",
-        "--out",
-        "../overlord_template_project/",
+        "project",
         "--board",
         "tangnano9k",
-        "--stdresource",
-        "../gagameos_stdcatalog"
       ],
       "jvmOptions": []
     }
