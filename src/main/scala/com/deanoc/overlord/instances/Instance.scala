@@ -10,7 +10,15 @@ import com.deanoc.overlord.{
   QueryInterface
 }
 import com.deanoc.overlord.software.SoftwareDefinition
-import com.deanoc.overlord.utils.{ArrayV, BigIntV, BooleanV, DoubleV, IntV, StringV, TableV}
+import com.deanoc.overlord.utils.{
+  ArrayV,
+  BigIntV,
+  BooleanV,
+  DoubleV,
+  IntV,
+  StringV,
+  TableV
+}
 
 import java.nio.file.Path
 import scala.collection.mutable
@@ -107,7 +115,7 @@ object Instance {
 
       val definitionResult = catalogs.findDefinition(defType) match {
         case Some(d) => Right(d)
-        case None =>
+        case None    =>
           // Update the call to definitionFrom to pass the InstanceConfig
           definitionFrom(
             catalogs,
@@ -122,12 +130,14 @@ object Instance {
               )
           }
       }
-      
+
       definitionResult.flatMap { definition =>
         // Convert Map[String, Variant] to Option[Map[String, Any]]
         // by extracting the underlying values from Variant objects
-        val attribsAsAny = Some(attribs.map { case (k, v) => k -> variantToAny(v) })
-        
+        val attribsAsAny = Some(attribs.map { case (k, v) =>
+          k -> variantToAny(v)
+        })
+
         definition.createInstance(name, attribsAsAny) match {
           case Right(i: InstanceTrait) => Right(i)
           case Left(error) =>
@@ -160,10 +170,10 @@ object Instance {
 
     if (configMap.contains("gateware")) {
       // Convert configMap to Option[Map[String, Any]] for the new HardwareDefinition.apply
-      val configAsAny = Some(configMap.map { 
-        case (k, v) => k -> variantToAny(v)
+      val configAsAny = Some(configMap.map { case (k, v) =>
+        k -> variantToAny(v)
       })
-      
+
       HardwareDefinition(defType, configAsAny, path) match {
         case Right(value) =>
           catalogs.catalogs += (defType -> value)
@@ -173,10 +183,10 @@ object Instance {
       }
     } else if (configMap.contains("software")) {
       // Convert configMap to Option[Map[String, Any]] for the new SoftwareDefinition.apply
-      val configAsAny = Some(configMap.map { 
-        case (k, v) => k -> variantToAny(v)
+      val configAsAny = Some(configMap.map { case (k, v) =>
+        k -> variantToAny(v)
       })
-      
+
       SoftwareDefinition(defType, configAsAny, path) match {
         case Right(value) =>
           catalogs.catalogs += (defType -> value)
@@ -188,16 +198,16 @@ object Instance {
       Left(s"$defType not found in any catalogs")
     }
   }
-  
+
   // Helper method to convert Variant to Any
   def variantToAny(variant: Variant): Any = variant match {
-    case StringV(value) => value
-    case IntV(value) => value
+    case StringV(value)  => value
+    case IntV(value)     => value
     case BooleanV(value) => value
-    case BigIntV(value) => value
-    case DoubleV(value) => value
-    case ArrayV(value) => value.map(variantToAny).toSeq
-    case TableV(value) => value.map { case (k, v) => k -> variantToAny(v) }
-    case _ => variant.toString
+    case BigIntV(value)  => value
+    case DoubleV(value)  => value
+    case ArrayV(value)   => value.map(variantToAny).toSeq
+    case TableV(value)   => value.map { case (k, v) => k -> variantToAny(v) }
+    case null => throw new IllegalArgumentException("Variant is null")
   }
 }

@@ -39,17 +39,19 @@ object ConnectionParser extends Logging {
       case "fake"     => Some(ConnectionPriority.Fake)
       case _          => None
 
-  /** Parses a connection configuration and creates the appropriate UnconnectedLike
-    * instance.
+  /** Parses a connection configuration and creates the appropriate
+    * UnconnectedLike instance.
     *
     * @param config
     *   The connection configuration to parse.
     * @return
     *   An optional UnconnectedLike instance based on the parsed connection.
     */
-  def parseConnectionConfig(config: ConnectionConfig): Option[UnconnectedLike] = {
+  def parseConnectionConfig(
+      config: ConnectionConfig
+  ): Option[UnconnectedLike] = {
     val cons = config.connection
-    
+
     // More robust parsing of connection string that handles extra whitespace
     // First, identify which connection operator is present
     val connectionPattern = "(.+?)\\s*(<->|<>|->|<-)\\s*(.+)".r
@@ -97,7 +99,13 @@ object ConnectionParser extends Logging {
         if (first != "_") None
         else
           // Inject the ParametersConnectionConfig
-          Some(parseParametersConnectionConfig(dir, secondary, paramsConfig.parameters))
+          Some(
+            parseParametersConnectionConfig(
+              dir,
+              secondary,
+              paramsConfig.parameters
+            )
+          )
 
       case portGroupConfig: PortGroupConnectionConfig =>
         // Inject the PortGroupConnectionConfig
@@ -116,14 +124,14 @@ object ConnectionParser extends Logging {
         error(s"Constant connections not yet implemented")
         None
 
-      case _ =>
+      case null =>
         error(s"${config.`type`} is an unknown connection type")
         None
     }
   }
-  
+
   // Helper methods to create unconnected instances with injected configuration
-  
+
   private def createUnconnectedPortGroup(
       first: String,
       dir: ConnectionDirection,
@@ -132,7 +140,7 @@ object ConnectionParser extends Logging {
   ): UnconnectedPortGroup = {
     UnconnectedPortGroup(first, dir, secondary)
   }
-  
+
   private def createUnconnectedPortGroup(
       first: String,
       dir: ConnectionDirection,
@@ -148,7 +156,7 @@ object ConnectionParser extends Logging {
       config.excludes.map(_.toSeq).getOrElse(Seq.empty)
     )
   }
-  
+
   private def createUnconnectedClock(
       first: String,
       dir: ConnectionDirection,
@@ -157,7 +165,7 @@ object ConnectionParser extends Logging {
   ): UnconnectedClock = {
     UnconnectedClock(first, dir, secondary)
   }
-  
+
   private def createUnconnectedLogical(
       first: String,
       dir: ConnectionDirection,
@@ -348,7 +356,9 @@ object ConnectionParser extends Logging {
     * @return
     *   A sequence of UnconnectedLike instances.
     */
-  def parseConnections(configs: List[ConnectionConfig]): Seq[UnconnectedLike] = {
+  def parseConnections(
+      configs: List[ConnectionConfig]
+  ): Seq[UnconnectedLike] = {
     configs.flatMap(parseConnectionConfig)
   }
 

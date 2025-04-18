@@ -14,6 +14,7 @@ import com.deanoc.overlord.utils.{Variant, TableV}
 import com.deanoc.overlord.DefinitionType
 import com.deanoc.overlord.connections.ConnectionTypes._
 import com.deanoc.overlord.instances.{CpuInstance, RamInstance}
+import com.deanoc.overlord.config.{CpuConfig, RamConfig, MemoryRangeConfig}
 
 // Helper methods for testing
 object UnconnectedBusExtendedTestHelpers {
@@ -125,8 +126,23 @@ buses:
   "UnconnectedBus.getBus" should "find a supplier bus by name when specified" in {
     val cpuDef = createCpuDef()
     val ramDef = createRamDef()
-    val supplierInstance = CpuInstance("cpu", cpuDef)
-    val consumerInstance = RamInstance("memory", ramDef)
+    val supplierInstance = CpuInstance(
+      "cpu",
+      cpuDef,
+      CpuConfig(core_count = 1, triple = "riscv32-unknown-elf")
+    ).toOption.get
+    val consumerInstance = RamInstance(
+      "memory",
+      ramDef,
+      RamConfig(ranges =
+        List(
+          MemoryRangeConfig(
+            address = "0x10000000",
+            size = "0x1000"
+          )
+        )
+      )
+    ).toOption.get
 
     // Create UnconnectedBus with SecondToFirst direction
     val bus = UnconnectedBus(
@@ -153,8 +169,23 @@ buses:
   it should "return an empty sequence if no bus connection possible" in {
     val cpuDef = createCpuDef()
     val ramDef = createRamDef()
-    val supplierInstance = CpuInstance("cpu", cpuDef)
-    val consumerInstance = RamInstance("memory", ramDef)
+    val supplierInstance = CpuInstance(
+      "cpu",
+      cpuDef,
+      CpuConfig(core_count = 1, triple = "riscv32-unknown-elf")
+    ).toOption.get
+    val consumerInstance = RamInstance(
+      "memory",
+      ramDef,
+      RamConfig(ranges =
+        List(
+          MemoryRangeConfig(
+            address = "0x10000000",
+            size = "0x1000"
+          )
+        )
+      )
+    ).toOption.get
 
     // Create UnconnectedBus with SecondToFirst direction
     val bus = UnconnectedBus(
@@ -175,7 +206,11 @@ buses:
 
   it should "handle missing instances gracefully" in {
     val cpuDef = createCpuDef()
-    val instance = CpuInstance("device1", cpuDef)
+    val instance = CpuInstance(
+      "device1",
+      cpuDef,
+      CpuConfig(core_count = 1, triple = "riscv32-unknown-elf")
+    ).toOption.get
 
     // Create UnconnectedBus with non-existent second instance
     val bus = UnconnectedBus(
@@ -196,8 +231,23 @@ buses:
   it should "handle bidirectional connections correctly" in {
     val cpuDef = createCpuDef()
     val ramDef = createRamDef()
-    val instance1 = CpuInstance("device1", cpuDef)
-    val instance2 = RamInstance("device2", ramDef)
+    val instance1 = CpuInstance(
+      "device1",
+      cpuDef,
+      CpuConfig(core_count = 1, triple = "riscv32-unknown-elf")
+    ).toOption.get
+    val instance2 = RamInstance(
+      "device2",
+      ramDef,
+      RamConfig(ranges =
+        List(
+          MemoryRangeConfig(
+            address = "0x10000000",
+            size = "0x1000"
+          )
+        )
+      )
+    ).toOption.get
 
     // Create UnconnectedBus with bidirectional connection
     val bus = UnconnectedBus(
@@ -219,8 +269,23 @@ buses:
   "UnconnectedBus.connect" should "create correct connections for hardware instances" in {
     val cpuDef = createCpuDef()
     val ramDef = createRamDef()
-    val supplierInstance = CpuInstance("fpga", cpuDef)
-    val consumerInstance = RamInstance("ddr", ramDef)
+    val supplierInstance = CpuInstance(
+      "fpga",
+      cpuDef,
+      CpuConfig(core_count = 1, triple = "riscv32-unknown-elf")
+    ).toOption.get
+    val consumerInstance = RamInstance(
+      "ddr",
+      ramDef,
+      RamConfig(ranges =
+        List(
+          MemoryRangeConfig(
+            address = "0x10000000",
+            size = "0x1000"
+          )
+        )
+      )
+    ).toOption.get
 
     // Create UnconnectedBus
     val bus = UnconnectedBus(
@@ -248,7 +313,11 @@ buses:
   it should "handle silent mode correctly" in {
     val cpuDef = createCpuDef()
     // Create test instances
-    val supplierInstance = CpuInstance("fpga", cpuDef)
+    val supplierInstance = CpuInstance(
+      "fpga",
+      cpuDef,
+      CpuConfig(core_count = 1, triple = "riscv32-unknown-elf")
+    ).toOption.get
 
     // Create UnconnectedBus with silent mode
     val silentBus = UnconnectedBus(
@@ -270,8 +339,23 @@ buses:
     val cpuDef = createCpuDef()
     val ramDef = createRamDef()
 
-    val supplierInstance = CpuInstance("cpu", cpuDef)
-    val consumerInstance = RamInstance("memory", ramDef)
+    val supplierInstance = CpuInstance(
+      "cpu",
+      cpuDef,
+      CpuConfig(core_count = 1, triple = "riscv32-unknown-elf")
+    ).toOption.get
+    val consumerInstance = RamInstance(
+      "memory",
+      ramDef,
+      RamConfig(ranges =
+        List(
+          MemoryRangeConfig(
+            address = "0x10000000",
+            size = "0x1000"
+          )
+        )
+      )
+    ).toOption.get
 
     // Create UnconnectedBus with SecondToFirst direction
     val bus = UnconnectedBus(
@@ -300,8 +384,24 @@ buses:
     val cpuDef = createCpuDef()
     val ramDef = createRamDef()
 
-    val supplierInstance = CpuInstance("cpu", cpuDef)
-    val consumerInstance = RamInstance("memory", ramDef)
+    val supplierInstance = CpuInstance(
+      "cpu",
+      cpuDef,
+      CpuConfig(core_count = 1, triple = "riscv32-unknown-elf")
+    ).toOption.get
+    val consumerInstance = RamInstance(
+      "memory",
+      ramDef,
+      RamConfig(ranges =
+        List(
+          MemoryRangeConfig(
+            address = "0x10000000",
+            size = "0x1000"
+          )
+        )
+      )
+    ).toOption.get
+
     // Create UnconnectedBus with SecondToFirst direction
     val bus = UnconnectedBus(
       firstFullName = "memory",
