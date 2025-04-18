@@ -10,11 +10,13 @@ case class SocInstance(name: String, definition: ChipDefinitionTrait)
 
 object SocInstance {
   def apply(
-      ident: String,
+      name: String, // Keep name as it's part of InstanceTrait
       definition: ChipDefinitionTrait,
-      attribs: Map[String, Variant]
+      config: Map[String, Any] // Accept generic Map[String, Any] for config
   ): Either[String, SocInstance] = {
-    val chip = SocInstance(ident, definition)
+    val chip = SocInstance(name, definition)
+    // Convert the Map[String, Any] config to Map[String, Variant] for merging
+    val attribs = config.map { case (k, v) => k -> com.deanoc.overlord.utils.Utils.toVariant(v) }
     chip.mergeAllAttributes(attribs)
     Right(chip)
   }

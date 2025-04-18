@@ -68,7 +68,13 @@ lazy val dependencies = Seq(
   // Add SnakeYAML dependency for YAML parsing
   "org.yaml" % "snakeyaml" % "2.0",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5",
-  "ch.qos.logback" % "logback-classic" % "1.4.11"
+  "ch.qos.logback" % "logback-classic" % "1.4.11",
+
+  // Circe and circe-yaml for type-safe YAML decoding
+  "io.circe" %% "circe-core" % "0.14.6",
+  "io.circe" %% "circe-generic" % "0.14.6", // Needed for automatic case class derivation
+  "io.circe" %% "circe-parser" % "0.14.6", // Needed for parsing JSON/YAML strings
+  "io.circe" %% "circe-yaml" % "0.14.1" // Use a compatible version
 )
 
 // Main project (Scala 3)

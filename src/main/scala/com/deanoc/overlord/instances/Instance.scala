@@ -10,6 +10,7 @@ import com.deanoc.overlord.{
   QueryInterface
 }
 import com.deanoc.overlord.software.SoftwareDefinition
+import com.deanoc.overlord.utils.{ArrayV, BigIntV, BooleanV, DoubleV, IntV, StringV, TableV}
 
 import java.nio.file.Path
 import scala.collection.mutable
@@ -87,90 +88,116 @@ trait InstanceTrait extends QueryInterface {
 
 object Instance {
   def apply(
-      parsed: Variant,
+      config: com.deanoc.overlord.config.InstanceConfig, // Change parameter type
       defaults: Map[String, Variant],
       catalogs: DefinitionCatalog
   ): Either[String, InstanceTrait] = {
     try {
-      if (parsed == null) {
-        return Left("Instance definition is null")
-      }
+      // Extract directly from config
+      val defTypeString = config.`type`
+      val name = config.name // Use name from config
 
-      val table = Utils.toTable(parsed)
+      // Adjust attribs creation to use config.config
+      val attribs: Map[String, Variant] =
+        defaults ++ config.config.getOrElse(Map()).map { case (k, v) =>
+          k -> Utils.toVariant(v) // Convert Any to Variant
+        }
 
-      if (!table.contains("type")) {
-        Left(s"$parsed doesn't have a type")
-      } else {
-        val defTypeString = Utils.toString(table("type"))
-        val name = Utils.lookupString(table, "name", defTypeString)
+      val defType = DefinitionType(defTypeString)
 
-        val attribs: Map[String, Variant] =
-          defaults ++ table.filter(_._1 match {
-            case "type" | "name" => false
-            case _               => true
-          })
-
-        val defType = DefinitionType(defTypeString)
-
-        for {
-          definition <- catalogs.findDefinition(defType) match {
-            case Some(d) => Right(d)
-            case None =>
-              definitionFrom(
-                catalogs,
-                Overlord.projectPath,
-                table,
-                defType
-              ) match {
-                case Right(value) => Right(value)
-                case Left(error) =>
-                  Left(
-                    s"No definition found or could be created for $name $defType: $error"
-                  )
-              }
-          }
-          instance <- definition.createInstance(name, attribs) match {
-            case Right(i: InstanceTrait) => Right(i)
+      val definitionResult = catalogs.findDefinition(defType) match {
+        case Some(d) => Right(d)
+        case None =>
+          // Update the call to definitionFrom to pass the InstanceConfig
+          definitionFrom(
+            catalogs,
+            Overlord.projectPath,
+            config, // Pass InstanceConfig
+            defType
+          ) match {
+            case Right(value) => Right(value)
             case Left(error) =>
               Left(
-                s"Failed to create instance for $name with definition $defType: $error"
+                s"No definition found or could be created for $name $defType: $error"
               )
           }
-        } yield instance
+      }
+      
+      definitionResult.flatMap { definition =>
+        // Convert Map[String, Variant] to Option[Map[String, Any]]
+        // by extracting the underlying values from Variant objects
+        val attribsAsAny = Some(attribs.map { case (k, v) => k -> variantToAny(v) })
+        
+        definition.createInstance(name, attribsAsAny) match {
+          case Right(i: InstanceTrait) => Right(i)
+          case Left(error) =>
+            Left(
+              s"Failed to create instance for $name with definition $defType: $error"
+            )
+        }
       }
     } catch {
       case e: MatchError =>
+        // This catch might need adjustment as the input format changes
         Left(s"Invalid instance format: ${e.getMessage()}")
       case e: Exception =>
         Left(s"Error creating instance: ${e.getMessage()}")
     }
   }
 
-  private def definitionFrom(
+  // Refactor definitionFrom to accept InstanceConfig and make it public
+  def definitionFrom(
       catalogs: DefinitionCatalog,
       path: Path,
-      table: Map[String, Variant],
+      instanceConfig: com.deanoc.overlord.config.InstanceConfig, // Change parameter type
       defType: DefinitionType
   ): Either[String, DefinitionTrait] = {
 
-    if (table.contains("gateware")) {
-      HardwareDefinition(table, path) match {
+    // Access the config map within the InstanceConfig
+    val configMap = instanceConfig.config.getOrElse(Map()).map { case (k, v) =>
+      k -> Utils.toVariant(v) // Convert Any to Variant
+    }
+
+    if (configMap.contains("gateware")) {
+      // Convert configMap to Option[Map[String, Any]] for the new HardwareDefinition.apply
+      val configAsAny = Some(configMap.map { 
+        case (k, v) => k -> variantToAny(v)
+      })
+      
+      HardwareDefinition(defType, configAsAny, path) match {
         case Right(value) =>
           catalogs.catalogs += (defType -> value)
           Right(value)
         case Left(error) =>
           Left(s"$defType gateware was invalid: $error")
       }
-    } else if (table.contains("software")) {
-      SoftwareDefinition(table, path) match {
-        case Some(value) =>
+    } else if (configMap.contains("software")) {
+      // Convert configMap to Option[Map[String, Any]] for the new SoftwareDefinition.apply
+      val configAsAny = Some(configMap.map { 
+        case (k, v) => k -> variantToAny(v)
+      })
+      
+      SoftwareDefinition(defType, configAsAny, path) match {
+        case Right(value) =>
           catalogs.catalogs += (defType -> value)
           Right(value)
-        case None =>
-          Left(s"$defType software was invalid")
+        case Left(error) =>
+          Left(s"$defType software was invalid: $error")
       }
     } else {
       Left(s"$defType not found in any catalogs")
     }
+  }
+  
+  // Helper method to convert Variant to Any
+  def variantToAny(variant: Variant): Any = variant match {
+    case StringV(value) => value
+    case IntV(value) => value
+    case BooleanV(value) => value
+    case BigIntV(value) => value
+    case DoubleV(value) => value
+    case ArrayV(value) => value.map(variantToAny).toSeq
+    case TableV(value) => value.map { case (k, v) => k -> variantToAny(v) }
+    case _ => variant.toString
   }
 }

@@ -5,27 +5,26 @@ import com.deanoc.overlord.SoftwareDefinitionTrait
 
 case class ProgramInstance(
     name: String,
-    override val definition: SoftwareDefinitionTrait
+    override val definition: SoftwareDefinitionTrait,
+    config: com.deanoc.overlord.config.ProgramConfig // Store the specific config
 ) extends SoftwareInstance {
   override val folder = "programs"
+  // Dependencies are now available via config.dependencies
 }
 
 object ProgramInstance {
   def apply(
-      ident: String,
+      name: String, // Keep name as it's part of InstanceTrait
       definition: SoftwareDefinitionTrait,
-      attribs: Map[String, Variant]
+      config: com.deanoc.overlord.config.ProgramConfig // Accept ProgramConfig
   ): Either[String, ProgramInstance] = {
-
-    if (
-      !attribs.contains("name") &&
-      !definition.attributes.contains("name")
-    ) {
-      Left(f"Programs must have a name attribute")
-    } else {
-      val sw = ProgramInstance(ident, definition)
-      sw.mergeAllAttributes(attribs)
+    try {
+      // Create the ProgramInstance, passing the config
+      val sw = new ProgramInstance(name, definition, config)
       Right(sw)
+    } catch {
+      case e: Exception =>
+        Left(s"Error creating ProgramInstance: ${e.getMessage}")
     }
   }
 }

@@ -11,11 +11,13 @@ case class OtherInstance(name: String, definition: ChipDefinitionTrait)
 
 object OtherInstance {
   def apply(
-      ident: String,
+      name: String, // Keep name as it's part of InstanceTrait
       definition: ChipDefinitionTrait,
-      attribs: Map[String, Variant]
+      config: Map[String, Any] // Accept generic Map[String, Any] for config
   ): Either[String, OtherInstance] = {
-    val other = OtherInstance(ident, definition)
+    val other = OtherInstance(name, definition)
+    // Convert the Map[String, Any] config to Map[String, Variant] for merging
+    val attribs = config.map { case (k, v) => k -> com.deanoc.overlord.utils.Utils.toVariant(v) }
     other.mergeAllAttributes(attribs)
     Right(other)
   }

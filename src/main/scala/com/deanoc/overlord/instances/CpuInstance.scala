@@ -9,11 +9,11 @@ import scala.reflect.ClassTag
 
 case class CpuInstance(
     name: String,
-    override val definition: ChipDefinitionTrait
+    override val definition: ChipDefinitionTrait,
+    config: com.deanoc.overlord.config.CpuConfig // Store the specific config
 ) extends ChipInstance
     with MultiBusLike {
-  lazy val triple: String =
-    Utils.lookupString(attributes, key = "triple", or = "ERR-ERR-ERR")
+  lazy val triple: String = config.triple // Use triple from the specific config
   lazy val maxAtomicWidth: Int =
     Utils.lookupInt(attributes, "max_atomic_width", 0)
 
@@ -21,7 +21,7 @@ case class CpuInstance(
   lazy val maxBitOpTypeWidth: Int =
     Utils.lookupInt(attributes, "max_bitop_type_width", 32)
   lazy val sanitizedTriple: String = triple.replace("-", "_")
-  lazy val cpuCount: Int = Utils.lookupInt(attributes, "core_count", 1)
+  lazy val cpuCount: Int = config.core_count // Use core_count from the specific config
   lazy val host: Boolean = definition.defType.ident.last == "host"
   lazy val cpuType: String =
     if (host) "host" else definition.defType.ident(1) // cpu.$CpuType.blah.blash
@@ -88,14 +88,17 @@ case class CpuInstance(
 
 object CpuInstance {
   def apply(
-      ident: String,
+      name: String, // Keep name as it's part of InstanceTrait
       definition: ChipDefinitionTrait,
-      attribs: Map[String, Variant]
+      config: com.deanoc.overlord.config.CpuConfig // Accept CpuConfig
   ): Either[String, CpuInstance] = {
-
-    val cpu = CpuInstance(ident, definition)
-    cpu.mergeAllAttributes(attribs)
-
-    Right(cpu)
+    try {
+      // Create the CpuInstance, passing the config
+      val cpu = new CpuInstance(name, definition, config)
+      Right(cpu)
+    } catch {
+      case e: Exception =>
+        Left(s"Error creating CpuInstance: ${e.getMessage}")
+    }
   }
 }

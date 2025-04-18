@@ -33,18 +33,24 @@ object OutputGateware {
       constants: Seq[Constant],
       phase: Int
   ): Unit = {
-
+    // Get the gateware definition with explicit type casting
     val gateware = instance.definition.asInstanceOf[GatewareDefinitionTrait]
+    
+    // Get the actions from the gateware definition
     val actions = gateware.actionsFile.actions
 
-    val parameters = gateware.parameters ++ extractParameters(
+    // Extract parameters with explicit dependency injection
+    val parameters = extractParameters(
       instance,
       unconnections,
-      constants
+      constants,
+      gateware.parameters
     )
 
+    // Add parameters to the instance's parameter table
     instance.finalParameterTable.addAll(for ((k, v) <- parameters) yield k -> v)
 
+    // Execute actions for the current phase with explicit dependency injection
     for { action <- actions.filter(_.phase == phase) }
       action.execute(instance, instance.finalParameterTable.toMap)
   }
@@ -52,8 +58,9 @@ object OutputGateware {
   private def extractParameters(
       instance: ChipInstance,
       unconnections: Seq[UnconnectedLike],
-      constants: Seq[Constant]
-  ) = {
+      constants: Seq[Constant],
+      gatewareParameters: Map[String, Variant]
+  ): Map[String, Variant] = {
     val busParameters = Map[String, Variant](
       "buses" -> ArrayV(
         unconnections

@@ -28,40 +28,78 @@ object OutputSoftware {
       instance: SoftwareInstance,
       constants: Seq[Constant]
   ): Unit = {
+    // Get the software definition with explicit dependency injection
     val software = instance.definition
+    
+    // Get the actions from the software definition
     val actions = software.actionsFile.actions
 
+    // Filter actions for phase 1
     for (action <- actions.filter(_.phase == 1)) {
-      val conParameters = constants
-        .collect { case cc: Constant => cc }
-        .map(c => {
-          val name =
-            if (c.parameter.name.isEmpty) c.instance.name else c.parameter.name
-          c.parameter.parameterType match {
-            case ConstantParameterType(value) =>
-              Map[String, Variant](name -> value)
-            case FrequencyParameterType(freq) =>
-              Map[String, Variant](name -> DoubleV(freq))
-          }
-        })
-        .fold(Map[String, Variant]())((o, n) => o ++ n)
+      // Extract constant parameters with explicit dependency injection
+      val conParameters = extractConstantParameters(constants)
 
-      val instanceSpecificParameters = instance match {
-        case _ => Map[String, Variant]()
-      }
+      // Get instance-specific parameters based on the instance type
+      val instanceSpecificParameters = getInstanceSpecificParameters(instance)
 
-      val parameters =
-        software.parameters ++ conParameters ++ instanceSpecificParameters
+      // Combine all parameters with explicit dependency injection
+      val parameters = combineParameters(
+        software.parameters,
+        conParameters,
+        instanceSpecificParameters
+      )
 
+      // Merge attributes into the instance
       instance.mergeAllAttributes(parameters)
 
+      // Add parameters to the instance's parameter table
       instance.finalParameterTable.addAll(
         for ((k, v) <- parameters) yield k -> v
       )
 
+      // Execute the action with explicit dependency injection
       action.execute(instance, instance.finalParameterTable.toMap)
     }
-
+  }
+  
+  // Helper method to extract parameters from constants
+  private def extractConstantParameters(constants: Seq[Constant]): Map[String, Variant] = {
+    constants
+      .collect { case cc: Constant => cc }
+      .map(c => {
+        val name =
+          if (c.parameter.name.isEmpty) c.instance.name else c.parameter.name
+        c.parameter.parameterType match {
+          case ConstantParameterType(value) =>
+            Map[String, Variant](name -> value)
+          case FrequencyParameterType(freq) =>
+            Map[String, Variant](name -> DoubleV(freq))
+        }
+      })
+      .fold(Map[String, Variant]())((o, n) => o ++ n)
+  }
+  
+  // Helper method to get instance-specific parameters
+  private def getInstanceSpecificParameters(instance: SoftwareInstance): Map[String, Variant] = {
+    instance match {
+      case programInstance: ProgramInstance =>
+        // Extract program-specific parameters if needed
+        Map[String, Variant]()
+      case libraryInstance: LibraryInstance =>
+        // Extract library-specific parameters if needed
+        Map[String, Variant]()
+      case _ =>
+        Map[String, Variant]()
+    }
+  }
+  
+  // Helper method to combine parameters
+  private def combineParameters(
+      softwareParams: Map[String, Variant],
+      constantParams: Map[String, Variant],
+      instanceParams: Map[String, Variant]
+  ): Map[String, Variant] = {
+    softwareParams ++ constantParams ++ instanceParams
   }
 
   def cpuSpecificActions(
@@ -103,17 +141,33 @@ object OutputSoftware {
       cpus: Seq[CpuInstance],
       keywordsPerCpu: Array[Map[String, Variant]]
   ): Unit = {
+    // Get the actions from the software definition with explicit dependency injection
     val actions = instance.definition.actionsFile.actions
 
+    // Filter actions for phase 2
     for (action <- actions.filter(_.phase == 2)) {
-      for (iCpu <- cpus.indices)
-        action.execute(
+      // Execute the action for each CPU with explicit dependency injection
+      for (iCpu <- cpus.indices) {
+        // Create CPU-specific parameters with explicit dependency injection
+        val cpuParameters = createCpuSpecificParameters(
           instance,
-          keywordsPerCpu(iCpu) + ("${name}" -> StringV(
-            instance.name
-          )) ++ instance.finalParameterTable.toMap
+          keywordsPerCpu(iCpu),
+          instance.finalParameterTable.toMap
         )
+        
+        // Execute the action with explicit dependency injection
+        action.execute(instance, cpuParameters)
+      }
     }
+  }
+  
+  // Helper method to create CPU-specific parameters
+  private def createCpuSpecificParameters(
+      instance: SoftwareInstance,
+      cpuKeywords: Map[String, Variant],
+      instanceParameters: Map[String, Variant]
+  ): Map[String, Variant] = {
+    cpuKeywords + ("${name}" -> StringV(instance.name)) ++ instanceParameters
   }
 
   /** Generates a memory map for a specific CPU based on its connections and

@@ -2,7 +2,7 @@ package com.deanoc.overlord.connections
 
 import com.deanoc.overlord._
 import com.deanoc.overlord.connections.ConnectionDirection
-import com.deanoc.overlord.utils.{Utils, Variant, Logging}
+import com.deanoc.overlord.utils.{Utils, Variant, Logging, StringV}
 import com.deanoc.overlord.hardware.{
   Port,
   BitsDesc,
@@ -17,6 +17,8 @@ import com.deanoc.overlord.instances.{
   PinGroupInstance
 }
 import com.deanoc.overlord.connections.ConnectionTypes.{BusName}
+import com.deanoc.overlord.config._
+import io.circe.{Json, JsonObject}
 
 /** Module containing parsers for various connection types.
   */
@@ -36,6 +38,134 @@ object ConnectionParser extends Logging {
       case "wildcard" => Some(ConnectionPriority.WildCard)
       case "fake"     => Some(ConnectionPriority.Fake)
       case _          => None
+
+  /** Parses a connection configuration and creates the appropriate UnconnectedLike
+    * instance.
+    *
+    * @param config
+    *   The connection configuration to parse.
+    * @return
+    *   An optional UnconnectedLike instance based on the parsed connection.
+    */
+  def parseConnectionConfig(config: ConnectionConfig): Option[UnconnectedLike] = {
+    val cons = config.connection
+    
+    // More robust parsing of connection string that handles extra whitespace
+    // First, identify which connection operator is present
+    val connectionPattern = "(.+?)\\s*(<->|<>|->|<-)\\s*(.+)".r
+
+    val (first, dirSymbol, secondary) = cons match {
+      case connectionPattern(left, op, right) =>
+        // Check that the right side doesn't contain any more operators
+        if (
+          right.contains("->") || right
+            .contains("<-") || right.contains("<>") || right.contains("<->")
+        ) {
+          error(
+            s"${config.`type`} has an invalid connection field with multiple operators: $cons"
+          )
+          return None
+        }
+        (left.trim, op, right.trim)
+      case _ =>
+        error(s"${config.`type`} has an invalid connection field: $cons")
+        return None
+    }
+
+    // Parse the connection direction from the identified symbol
+    val dir = dirSymbol match {
+      case "->"         => ConnectionDirection.FirstToSecond
+      case "<->" | "<>" => ConnectionDirection.BiDirectional
+      case "<-"         => ConnectionDirection.SecondToFirst
+      case _ =>
+        error(s"${config.`type`} has an invalid connection $dirSymbol : $cons")
+        return None
+    }
+
+    // Create the appropriate connection type based on the configuration type
+    // Use dependency injection by passing the specific configuration object
+    config match {
+      case portConfig: PortConnectionConfig =>
+        // Inject the PortConnectionConfig
+        Some(createUnconnectedPortGroup(first, dir, secondary, portConfig))
+
+      case clockConfig: ClockConnectionConfig =>
+        // Inject the ClockConnectionConfig
+        Some(createUnconnectedClock(first, dir, secondary, clockConfig))
+
+      case paramsConfig: ParametersConnectionConfig =>
+        if (first != "_") None
+        else
+          // Inject the ParametersConnectionConfig
+          Some(parseParametersConnectionConfig(dir, secondary, paramsConfig.parameters))
+
+      case portGroupConfig: PortGroupConnectionConfig =>
+        // Inject the PortGroupConnectionConfig
+        Some(createUnconnectedPortGroup(first, dir, secondary, portGroupConfig))
+
+      case busConfig: BusConnectionConfig =>
+        // Inject the BusConnectionConfig
+        Some(parseBusConnectionConfig(first, dir, secondary, busConfig))
+
+      case logicalConfig: LogicalConnectionConfig =>
+        // Inject the LogicalConnectionConfig
+        Some(createUnconnectedLogical(first, dir, secondary, logicalConfig))
+
+      case constantConfig: ConstantConnectionConfig =>
+        // Handle constant connections if needed
+        error(s"Constant connections not yet implemented")
+        None
+
+      case _ =>
+        error(s"${config.`type`} is an unknown connection type")
+        None
+    }
+  }
+  
+  // Helper methods to create unconnected instances with injected configuration
+  
+  private def createUnconnectedPortGroup(
+      first: String,
+      dir: ConnectionDirection,
+      secondary: String,
+      config: PortConnectionConfig
+  ): UnconnectedPortGroup = {
+    UnconnectedPortGroup(first, dir, secondary)
+  }
+  
+  private def createUnconnectedPortGroup(
+      first: String,
+      dir: ConnectionDirection,
+      secondary: String,
+      config: PortGroupConnectionConfig
+  ): UnconnectedPortGroup = {
+    UnconnectedPortGroup(
+      first,
+      dir,
+      secondary,
+      config.first_prefix.getOrElse(""),
+      config.second_prefix.getOrElse(""),
+      config.excludes.map(_.toSeq).getOrElse(Seq.empty)
+    )
+  }
+  
+  private def createUnconnectedClock(
+      first: String,
+      dir: ConnectionDirection,
+      secondary: String,
+      config: ClockConnectionConfig
+  ): UnconnectedClock = {
+    UnconnectedClock(first, dir, secondary)
+  }
+  
+  private def createUnconnectedLogical(
+      first: String,
+      dir: ConnectionDirection,
+      secondary: String,
+      config: LogicalConnectionConfig
+  ): UnconnectedLogical = {
+    UnconnectedLogical(first, dir, secondary)
+  }
 
   /** Parses a connection variant and creates the appropriate UnconnectedLike
     * instance.
@@ -177,6 +307,51 @@ object ConnectionParser extends Logging {
     )
   }
 
+  /** Parses a bus connection from the BusConnectionConfig.
+    *
+    * @param first
+    *   The name of the first component in the connection.
+    * @param dir
+    *   The direction of the connection.
+    * @param secondary
+    *   The name of the second component in the connection.
+    * @param config
+    *   The bus connection configuration.
+    * @return
+    *   An UnconnectedBus instance.
+    */
+  @annotation.targetName("parseBusConnectionConfigFromConfig")
+  private def parseBusConnectionConfig(
+      first: String,
+      dir: ConnectionDirection,
+      secondary: String,
+      config: BusConnectionConfig
+  ): UnconnectedBus = {
+    val supplierBusName = config.bus_name.getOrElse("")
+    val consumerBusName = config.consumer_bus_name.getOrElse(supplierBusName)
+
+    UnconnectedBus(
+      first,
+      dir,
+      secondary,
+      BusName.apply(config.bus_protocol.getOrElse("internal")),
+      BusName.apply(supplierBusName),
+      BusName.apply(consumerBusName),
+      config.silent.getOrElse(false)
+    )
+  }
+
+  /** Parses connections from a list of connection configurations.
+    *
+    * @param configs
+    *   The list of connection configurations to parse.
+    * @return
+    *   A sequence of UnconnectedLike instances.
+    */
+  def parseConnections(configs: List[ConnectionConfig]): Seq[UnconnectedLike] = {
+    configs.flatMap(parseConnectionConfig)
+  }
+
   /** Parses a parameters connection from the parameters array.
     *
     * @param direction
@@ -237,6 +412,47 @@ object ConnectionParser extends Logging {
 
     // Create and return the UnconnectedParameters instance
     new UnconnectedParameters(direction, secondFullName, parameters)
+  }
+
+  /** Parses a parameters connection from the parameters configuration.
+    *
+    * @param direction
+    *   The direction of the connection.
+    * @param secondFullName
+    *   The name of the instance associated with the parameters.
+    * @param parameters
+    *   A list of parameter configurations.
+    * @return
+    *   An UnconnectedParameters instance.
+    */
+  @annotation.targetName("parseParametersConnectionConfigFromConfig")
+  def parseParametersConnectionConfig(
+      direction: ConnectionDirection,
+      secondFullName: String,
+      parameters: List[ParameterConfig]
+  ): UnconnectedParameters = {
+    val parsedParameters = parameters.flatMap { param =>
+      val name = param.name
+      val paramType = param.`type`.getOrElse("") match {
+        case "frequency" =>
+          // Extract frequency value from Json
+          val freqStr = param.value.asString.getOrElse("")
+          // Convert to a Variant using Utils.stringToVariant
+          val freqVariant = Utils.stringToVariant(freqStr)
+          val freq = Utils.toFrequency(freqVariant)
+          FrequencyParameterType(freq)
+        case _ =>
+          // Use the Json value directly as a string
+          val valueStr = param.value.asString.getOrElse(param.value.toString)
+          // Convert to a Variant using Utils.stringToVariant
+          val valueVariant = Utils.stringToVariant(valueStr)
+          ConstantParameterType(valueVariant)
+      }
+      Some(Parameter(name, paramType))
+    }
+
+    // Create and return the UnconnectedParameters instance
+    new UnconnectedParameters(direction, secondFullName, parsedParameters)
   }
 
   /** Parses a port connection between two instances.

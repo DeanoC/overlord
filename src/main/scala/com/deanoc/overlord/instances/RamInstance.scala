@@ -8,7 +8,8 @@ import scala.reflect.ClassTag
 
 case class RamInstance(
     name: String,
-    override val definition: ChipDefinitionTrait
+    override val definition: ChipDefinitionTrait,
+    config: com.deanoc.overlord.config.RamConfig // Store the specific config
 ) extends ChipInstance
     with RamLike {
   private val cpuRegEx = "\\s*,\\s*".r
@@ -17,21 +18,17 @@ case class RamInstance(
     if (cpus == "_") Seq() else cpuRegEx.split(cpus).toSeq.map(_.toLowerCase())
 
   private lazy val ranges: Seq[(BigInt, BigInt, Boolean, Seq[String])] = {
-    if (!attributes.contains("ranges")) Seq()
-    else
-      Utils.toArray(attributes("ranges")).toIndexedSeq.map { b =>
-        (
-          Utils.lookupBigInt(Utils.toTable(b), "address", 0),
-          Utils.lookupBigInt(Utils.toTable(b), "size", 0),
-          Utils.lookupBoolean(Utils.toTable(b), "fixed_address", false),
-          decodeCpusString(
-            Utils.lookupString(Utils.toTable(b), key = "cpus", "_")
-          )
-        )
-      }
+    config.ranges.map { rangeConfig =>
+      (
+        BigInt(rangeConfig.address.stripPrefix("0x"), 16), // Convert hex string to BigInt
+        BigInt(rangeConfig.size.stripPrefix("0x"), 16), // Convert hex string to BigInt
+        false, // fixed_address is not in RamConfig, default to false
+        Seq() // cpus is not in RamConfig, default to empty sequence
+      )
+    }
   }
 
-  override def isVisibleToSoftware: Boolean = true
+  override def isVisibleToSoftware: Boolean = true // isVisibleToSoftware is not in RamConfig, keep default
 
   override def getInterface[T](implicit tag: ClassTag[T]): Option[T] = {
     val RamLike_ = classOf[RamLike]
@@ -47,19 +44,17 @@ case class RamInstance(
 
 object RamInstance {
   def apply(
-      ident: String,
+      name: String, // Keep name as it's part of InstanceTrait
       definition: ChipDefinitionTrait,
-      attribs: Map[String, Variant]
+      config: com.deanoc.overlord.config.RamConfig // Accept RamConfig
   ): Either[String, RamInstance] = {
-    if (
-      (!definition.attributes
-        .contains("ranges")) && (!attribs.contains("ranges"))
-    ) {
-      Left(s"ERROR: ram ${ident} has no ranges, so isn't a valid range")
-    } else {
-      val ram = RamInstance(ident, definition)
-      ram.mergeAllAttributes(attribs)
+    try {
+      // Create the RamInstance, passing the config
+      val ram = new RamInstance(name, definition, config)
       Right(ram)
+    } catch {
+      case e: Exception =>
+        Left(s"Error creating RamInstance: ${e.getMessage}")
     }
   }
 }

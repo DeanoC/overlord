@@ -18,54 +18,88 @@ case class SoftwareDefinition(
 
 object SoftwareDefinition {
   def apply(
-      table: Map[String, Variant],
+      defType: DefinitionType, // Accept DefinitionType directly
+      config: Option[Map[String, Any]], // Accept Option[Map[String, Any]] for config
       path: Path
-  ): Option[SoftwareDefinition] = {
-    if (!table.contains("type")) {
-      return None
+  ): Either[String, SoftwareDefinitionTrait] = {
+    // Convert config Option[Map[String, Any]] to Map[String, Variant]
+    val configMap: Map[String, Variant] = config.getOrElse(Map()).map { case (k, v) =>
+      k -> Utils.toVariant(v) // Convert Any to Variant
     }
 
-    val defTypeName = Utils.toString(table("type"))
-
-    val software = if (!table.contains("software")) {
-      val name = defTypeName.split('.')
-      s"${name.last}/${name.last}.yaml"
+    // Extract the name from the defType or config
+    val defTypeParts = defType.ident
+    val name = if (!configMap.contains("name")) {
+      // Use the last part of the identifier sequence
+      defTypeParts.lastOption.getOrElse("unknown")
     } else {
-      Utils.toString(table("software"))
-    }
-    val name = if (!table.contains("name")) {
-      val name = defTypeName.split('.')
-      s"${name.last}"
-    } else {
-      Utils.toString(table("name"))
+      Utils.toString(configMap("name"))
     }
 
-    val dependencies: Seq[String] = if (table.contains("depends")) {
-      val depends = Utils.toArray(table("depends"))
+    // Determine the software path
+    val software = if (!configMap.contains("software")) {
+      // Use the last part of the identifier sequence
+      val lastPart = defTypeParts.lastOption.getOrElse("unknown")
+      s"$lastPart/$lastPart.yaml"
+    } else {
+      Utils.toString(configMap("software"))
+    }
+
+    // Extract dependencies
+    val dependencies: Seq[String] = if (configMap.contains("depends")) {
+      val depends = Utils.toArray(configMap("depends"))
       depends.map(Utils.toString).toSeq
     } else {
       Seq()
     }
 
-    val attribs = table.filter(a =>
+    // Filter attributes
+    val attribs = configMap.filter(a =>
       a._1 match {
         case "type" | "software" | "name" | "depends" => false
         case _                                        => true
       }
     ) ++ Map[String, Variant]("name" -> StringV(name))
 
-    Some(
+    // Resolve the software path and create the definition
+    val softwarePath = path.resolve(software)
+    
+    // Push catalog path, read YAML, and parse
+    Overlord.pushCatalogPath(softwarePath)
+    val parsed = Utils.readYaml(softwarePath)
+    
+    // Create actions file
+    val actionsFile = ActionsFile.createActionsFile(name, parsed)
+    
+    if (actionsFile.isEmpty) {
+      Overlord.popCatalogPath()
+      return Left(s"Software actions file $name invalid")
+    }
+    
+    // Extract parameters
+    val parameters =
+      if (parsed.contains("parameters"))
+        Utils.toTable(parsed("parameters"))
+      else Map[String, Variant]()
+    
+    // Create the SoftwareDefinition
+    val result = Right(
       SoftwareDefinition(
-        DefinitionType(defTypeName),
+        defType,
         path,
         attribs,
-        defTypeName,
+        parameters,
         dependencies,
-        path.resolve(software)
-      ).get
+        softwarePath,
+        actionsFile.get
+      )
     )
+    
+    Overlord.popCatalogPath()
+    result
   }
 
+  // Keep the existing apply method for backward compatibility
   def apply(
       defType: DefinitionType,
       path: Path,
@@ -121,5 +155,4 @@ object SoftwareDefinition {
       )
     )
   }
-
 }

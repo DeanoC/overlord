@@ -2,7 +2,7 @@ package com.deanoc.overlord
 
 import com.deanoc.overlord.utils._
 import com.deanoc.overlord.utils.Logging
-import com.deanoc.overlord.cli.{CommandLineParser, CommandExecutor}
+import com.deanoc.overlord.cli.{CommandLineParser, CommandExecutor, Config}
 
 import org.slf4j.event.Level
 import scala.sys.process._
@@ -74,8 +74,8 @@ object Main extends Logging {
     * @return
     *   A Config object with command and subCommand fields populated if possible
     */
-  private def extractPartialConfig(args: Array[String]): com.deanoc.overlord.cli.Config = {
-    val config = com.deanoc.overlord.cli.Config()
+  private def extractPartialConfig(args: Array[String]): Config = {
+    val config = Config()
     
     if (args.length > 0) {
       // First argument is likely the command
@@ -102,7 +102,7 @@ object Main extends Logging {
     * @param config
     *   The parsed configuration
     */
-  private def configureLogging(config: com.deanoc.overlord.cli.Config): Unit = {
+  private def configureLogging(config: Config): Unit = {
     // Helper function to process module names and set log levels
     def configureModuleLogLevels(modulesList: String, level: Level): Unit = {
       val moduleNames = modulesList.split(',').map(_.trim).filter(_.nonEmpty)

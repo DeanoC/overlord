@@ -387,30 +387,37 @@ object Overlord extends Logging {
       board: String,
       gamePath: Path
   ): Overlord = boundary {
+    // Create a ProjectParser with explicit dependency injection
     val parser = new ProjectParser()
 
+    // Parse the project file and get the container and catalog
     val (container, catalog) =
       parser.parseProjectFile(gamePath, board).getOrElse {
-        error(s"Failed to parse project file: $gamePath")
+        this.error(s"Failed to parse project file: $gamePath")
         boundary.break(null)
       }
 
+    // Resolve software dependencies with explicit dependency injection
     resolveSoftwareDependencies(container, catalog)
 
-    // connect everything
+    // Connect everything with explicit dependency injection
     val (connected, distanceMatrix, busDistanceMatrix, wires) =
       connectAndOutputChips(container)
+    
+    // Output software with explicit dependency injection
     outputSoftware(container, board, connected, busDistanceMatrix)
 
-    // get chips (hardware or gateware)
+    // Get chips (hardware or gateware)
     val instances = container.children.collect {
       case i: ChipInstance     => i
       case s: SoftwareInstance => s
     }
 
+    // Collect constants with explicit dependency injection
     val constants =
       container.unconnected.flatMap(_.collectConstants(instances))
 
+    // Create the Overlord instance with explicit dependency injection
     Overlord(
       gameName,
       instances,
@@ -420,7 +427,6 @@ object Overlord extends Logging {
       busDistanceMatrix,
       wires
     )
-
   }
 
   private def flattenContainers(
@@ -516,16 +522,17 @@ object Overlord extends Logging {
       rootContainer: MutableContainer,
       catalogs: DefinitionCatalog
   ): Unit = {
-    // add all instances, so we can check for software dependencies (including drivers for hardware)
+    // Add all instances, so we can check for software dependencies (including drivers for hardware)
     val depSet: mutable.Set[InstanceTrait] =
       rootContainer.children.to(mutable.Set)
 
-    // push all there dependencies onto stack
+    // Push all dependencies onto stack
     val depStack = mutable.Stack[String]()
     depSet.foreach(_.definition.dependencies.foreach(depStack.push))
+    
     while (depStack.nonEmpty) {
       val n = depStack.pop()
-      // if already exists ignore (and we can assume all children have already are/been on the stack
+      // If already exists ignore (and we can assume all children have already are/been on the stack)
       if (!depSet.exists(_.definition.defType.ident.tail.mkString(".") == n)) {
         val defs = {
           val si = n.split('.')
@@ -547,7 +554,11 @@ object Overlord extends Logging {
         ) {
           catalogs.findDefinition(d) match {
             case Some(defi) =>
-              val result = defi.createInstance(n, Map[String, Variant]())
+              // Create appropriate configuration based on definition type
+              val config = createConfigForDefinition(defi.defType, n)
+              
+              // Create instance with explicit configuration injection
+              val result = defi.createInstance(n, Some(config))
               result match {
                 case Right(inst) =>
                   assert(inst.isInstanceOf[SoftwareInstance])
@@ -557,17 +568,29 @@ object Overlord extends Logging {
                     .filterNot(d => depStack.contains(d))
                     .foreach(depStack.push)
                   found = true
-                case Left(err) =>
-                  error(
-                    s"Failed to create instance for software dependency $n: $err in ${defi.defType.ident
-                        .mkString(".")}"
-                  )
+                case Left(errorMessage) =>
+                  this.error(s"Failed to create instance for software dependency $n: $errorMessage in ${defi.defType.ident.mkString(".")}")
               }
             case None =>
           }
         }
-        if (!found) error(s"Software dependency $n not found")
+        if (!found) this.error(s"Software dependency $n not found")
       }
+    }
+  }
+  
+  // Helper method to create appropriate configuration based on definition type
+  private def createConfigForDefinition(defType: DefinitionType, name: String): Map[String, Any] = {
+    defType match {
+      case _: LibraryDefinitionType =>
+        // Create LibraryConfig with empty dependencies
+        Map("dependencies" -> List.empty[String])
+      case _: ProgramDefinitionType =>
+        // Create ProgramConfig with empty dependencies
+        Map("dependencies" -> List.empty[String])
+      case _ =>
+        // Default empty config
+        Map.empty[String, Any]
     }
   }
 

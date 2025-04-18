@@ -13,11 +13,13 @@ case class StorageInstance(name: String, private val defi: ChipDefinitionTrait)
 
 object StorageInstance {
   def apply(
-      ident: String,
+      name: String, // Keep name as it's part of InstanceTrait
       definition: ChipDefinitionTrait,
-      attribs: Map[String, Variant]
+      config: Map[String, Any] // Accept generic Map[String, Any] for config
   ): Either[String, StorageInstance] = {
-    val storage = StorageInstance(ident, definition)
+    val storage = StorageInstance(name, definition)
+    // Convert the Map[String, Any] config to Map[String, Variant] for merging
+    val attribs = config.map { case (k, v) => k -> com.deanoc.overlord.utils.Utils.toVariant(v) }
     storage.mergeAllAttributes(attribs)
     Right(storage)
   }

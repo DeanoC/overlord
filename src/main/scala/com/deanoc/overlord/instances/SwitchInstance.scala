@@ -8,11 +8,13 @@ case class SwitchInstance(name: String, definition: ChipDefinitionTrait)
 
 object SwitchInstance {
   def apply(
-      ident: String,
+      name: String, // Keep name as it's part of InstanceTrait
       definition: ChipDefinitionTrait,
-      attribs: Map[String, Variant]
+      config: Map[String, Any] // Accept generic Map[String, Any] for config
   ): Either[String, SwitchInstance] = {
-    val chip = SwitchInstance(ident, definition)
+    val chip = SwitchInstance(name, definition)
+    // Convert the Map[String, Any] config to Map[String, Variant] for merging
+    val attribs = config.map { case (k, v) => k -> com.deanoc.overlord.utils.Utils.toVariant(v) }
     chip.mergeAllAttributes(attribs)
     Right(chip)
   }
