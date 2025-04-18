@@ -5,46 +5,54 @@ A YAML Prefab file defines a reusable component in the Overlord system. Below is
 ## Structure of a YAML Prefab
 
 ```yaml
-resources:               # (Optional) A list of resources used by the prefab.
-  - resource1
-  - resource2
-include:                # (Optional) A list of included prefabs.
-  - resource: included_prefab1
-  - resource: included_prefab2
+catalogs:               # (Optional) A list of resources used by the prefab.
+  - type: local
+    path: /home/deano/catalog.yaml
+  - type: fetch
+    URL: https://gagameos.com/gagameos_base_catalog
+  - type: git
+    URL: https://github.com/DeanoC/bl616.git
+prefabs:                # (Optional) A list of included prefabs.
+  - included_prefab1
+    included_prefab2
 instance:               # (Optional) A list of instances defined in the prefab.
   - name: instance1
     type: a.type.name
   - name: instance2
     type: b.type.name
 connection:             # (Optional) A list of connections between instances.
-  - bus_name: busA
+  - name: busA
     connection: A -> B
     type: bus
-  - bus_name: busB
+  - name: busB
     connection: B -> C
     type: logical
 ```
 
 ## Explanation of Items
 
-### `resources` (Optional)
-- **Description**: A list of other prefabs used by the prefab.
+### `catalogs` (Optional)
+- **Description**: A list of other catalogs used by the prefab.
 - **Type**: List
 - **Example**:
   ```yaml
-  resource:
-    - resource1
-    - resource2
+  catelogs:
+    - type: local
+      path: /home/deano/catalog.yaml
+    - type: fetch
+      URL: https://gagameos.com/gagameos_base_catalog
+    - type: git
+      URL: https://github.com/DeanoC/bl616.git
   ```
 
-### `include` (Optional)
+### `prefabs` (Optional)
 - **Description**: A list of other prefabs included as if they were in this prefab.
 - **Type**: List
 - **Example**:
   ```yaml
   include:
-    - resource: included_prefab1
-    - resource: included_prefab2
+    - included_prefab1
+      included_prefab2
   ```
 
 ### `instance` (Optional)
