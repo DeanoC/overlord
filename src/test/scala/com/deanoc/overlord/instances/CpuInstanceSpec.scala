@@ -27,14 +27,18 @@ class CpuInstanceSpec
 
     // Set up the mock definition
     when(mockDefinition.defType).thenReturn(mockDefType)
-    when(mockDefType.ident).thenReturn(Array("cpu", "riscv", "core"))
+    when(mockDefType.ident).thenReturn(Seq("cpu", "riscv", "core"))
 
     // Create attributes map for the definition
+    // Add required CPU-specific attributes that may be missing
     val attributes = Map[String, Variant](
       "width" -> Utils.toVariant(32),
       "max_atomic_width" -> Utils.toVariant(64),
       "max_bitop_type_width" -> Utils.toVariant(32),
-      "gcc_flags" -> Utils.toVariant("-march=rv32imac")
+      "gcc_flags" -> Utils.toVariant("-march=rv32imac"),
+      "stack_size" -> Utils.toVariant("0x1000"), // Add stack size
+      "heap_size" -> Utils.toVariant("0x2000"), // Add heap size
+      "cpu_type" -> Utils.toVariant("riscv") // Explicit CPU type
     )
     when(mockDefinition.attributes).thenReturn(attributes)
 
@@ -46,6 +50,13 @@ class CpuInstanceSpec
 
     // Create the CpuInstance with the injected configuration
     val cpuInstanceResult = CpuInstance("test_cpu", mockDefinition, cpuConfig)
+
+    // Print the error message if there is one
+    if (cpuInstanceResult.isLeft) {
+      println(
+        s"Error creating CpuInstance: ${cpuInstanceResult.left.toOption.get}"
+      )
+    }
 
     // Verify the result is Right and contains a CpuInstance
     cpuInstanceResult.isRight shouldBe true
@@ -76,10 +87,15 @@ class CpuInstanceSpec
 
     // Set up the mock definition for a host CPU
     when(mockDefinition.defType).thenReturn(mockDefType)
-    when(mockDefType.ident).thenReturn(Array("cpu", "x86", "host"))
+    when(mockDefType.ident).thenReturn(Seq("cpu", "x86", "host"))
 
-    // Create a minimal attributes map
-    val attributes = Map[String, Variant]()
+    // Create a minimal attributes map with necessary fields
+    val attributes = Map[String, Variant](
+      "width" -> Utils.toVariant(64), // Add CPU width
+      "stack_size" -> Utils.toVariant("0x2000"), // Add stack size
+      "heap_size" -> Utils.toVariant("0x4000"), // Add heap size
+      "cpu_type" -> Utils.toVariant("host") // Explicit CPU type
+    )
     when(mockDefinition.attributes).thenReturn(attributes)
 
     // Create a type-safe CpuConfig
@@ -90,6 +106,13 @@ class CpuInstanceSpec
 
     // Create the CpuInstance with the injected configuration
     val cpuInstanceResult = CpuInstance("host_cpu", mockDefinition, cpuConfig)
+
+    // Print the error message if there is one
+    if (cpuInstanceResult.isLeft) {
+      println(
+        s"Error creating host CpuInstance: ${cpuInstanceResult.left.toOption.get}"
+      )
+    }
 
     // Verify the result is Right and contains a CpuInstance
     cpuInstanceResult.isRight shouldBe true
@@ -107,10 +130,10 @@ class CpuInstanceSpec
 
     // Set up the mock definition
     when(mockDefinition.defType).thenReturn(mockDefType)
-    when(mockDefType.ident).thenReturn(Array("cpu", "arm", "cortex"))
+    when(mockDefType.ident).thenReturn(Seq("cpu", "arm", "cortex"))
 
-    // Create a bus specification in the attributes
-    val busSpec1 = Utils.toVariant(
+    // Instead of an Array of Variant objects, use a Seq/List of Maps
+    val busSpecs = List(
       Map(
         "name" -> "data_bus",
         "supplier" -> true,
@@ -120,10 +143,7 @@ class CpuInstanceSpec
         "data_width" -> 32,
         "address_width" -> 32,
         "fixed_base_address" -> false
-      )
-    )
-
-    val busSpec2 = Utils.toVariant(
+      ),
       Map(
         "name" -> "instruction_bus",
         "supplier" -> true,
@@ -136,11 +156,16 @@ class CpuInstanceSpec
       )
     )
 
-    val busesArray = Utils.toVariant(Array(busSpec1, busSpec2))
+    val busesArray = Utils.toVariant(busSpecs)
 
     val attributes = Map[String, Variant](
-      "buses" -> busesArray
+      "buses" -> busesArray,
+      "width" -> Utils.toVariant(32), // Add CPU width
+      "stack_size" -> Utils.toVariant("0x1000"), // Add stack size
+      "heap_size" -> Utils.toVariant("0x2000"), // Add heap size
+      "cpu_type" -> Utils.toVariant("arm") // Explicit CPU type
     )
+
     when(mockDefinition.attributes).thenReturn(attributes)
 
     // Create a type-safe CpuConfig
@@ -151,6 +176,13 @@ class CpuInstanceSpec
 
     // Create the CpuInstance with the injected configuration
     val cpuInstanceResult = CpuInstance("arm_cpu", mockDefinition, cpuConfig)
+
+    // Print the error message if there is one
+    if (cpuInstanceResult.isLeft) {
+      println(
+        s"Error creating CpuInstance with buses: ${cpuInstanceResult.left.toOption.get}"
+      )
+    }
 
     // Verify the result is Right and contains a CpuInstance
     cpuInstanceResult.isRight shouldBe true

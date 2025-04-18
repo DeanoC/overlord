@@ -27,7 +27,7 @@ class RamInstanceSpec
 
     // Set up the mock definition
     when(mockDefinition.defType).thenReturn(mockDefType)
-    when(mockDefType.ident).thenReturn(Array("ram", "sram"))
+    when(mockDefType.ident).thenReturn(Seq("ram", "sram"))
 
     // Create attributes map for the definition
     val attributes = Map[String, Variant]()
@@ -92,7 +92,7 @@ class RamInstanceSpec
 
     // Set up the mock definition
     when(mockDefinition.defType).thenReturn(mockDefType)
-    when(mockDefType.ident).thenReturn(Array("ram", "dram"))
+    when(mockDefType.ident).thenReturn(Seq("ram", "dram"))
 
     // Create a bus specification in the attributes
     val busSpec = Utils.toVariant(
@@ -158,7 +158,7 @@ class RamInstanceSpec
 
     // Set up the mock definition
     when(mockDefinition.defType).thenReturn(mockDefType)
-    when(mockDefType.ident).thenReturn(Array("ram", "sram"))
+    when(mockDefType.ident).thenReturn(Seq("ram", "sram"))
 
     // Create attributes map for the definition
     val attributes = Map[String, Variant]()
