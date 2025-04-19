@@ -11,3 +11,4 @@ null
 /.bsp/sbt.json
 release/
 logs/
+.env
