@@ -318,6 +318,8 @@ object Utils extends Logging {
     case v: scala.math.BigDecimal => DoubleV(v.toDouble)
     case v: java.math.BigDecimal  => DoubleV(v.doubleValue())
     case v: java.math.BigInteger  => BigIntV(BigInt(v))
+    case v: TableV =>
+      v // Return the TableV instance as it is already a Variant
     case v: java.util.Map[_, _] =>
       TableV(
         v.asInstanceOf[java.util.Map[String, Any]]
@@ -325,15 +327,16 @@ object Utils extends Logging {
           .map { case (k, v) => k -> toVariant(v) }
           .toMap
       )
-    case v: java.util.List[_] => ArrayV(v.asScala.map(toVariant).toArray)
     case v: scala.collection.Map[_, _] =>
       TableV(
         v.asInstanceOf[scala.collection.Map[String, Any]]
           .map { case (k, v) => k -> toVariant(v) }
           .toMap
       )
+    case v: java.util.List[_] => ArrayV(v.asScala.map(toVariant).toArray)
     case v: scala.collection.Seq[_] => ArrayV(v.map(toVariant).toArray)
     case _ =>
+      error(s"Unsupported type encountered in toVariant: ${t.getClass}")
       throw new IllegalArgumentException(s"Unsupported type: ${t.getClass}")
   }
 

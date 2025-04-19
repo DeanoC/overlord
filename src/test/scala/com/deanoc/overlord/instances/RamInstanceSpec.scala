@@ -20,6 +20,11 @@ class RamInstanceSpec
     with MockitoSugar
     with SilentLogger {
 
+  override def withFixture(test: NoArgTest) = {
+    Overlord.setInstancePath("test_instance") // Push to instanceStack
+    super.withFixture(test)
+  }
+
   "RamInstance" should "be created with type-safe configuration" in {
     // Create a mock ChipDefinitionTrait
     val mockDefinition = mock[ChipDefinitionTrait]
@@ -106,7 +111,7 @@ class RamInstanceSpec
       )
     )
 
-    val busesArray = Utils.toVariant(Array(busSpec))
+    val busesArray = Utils.toVariant(Seq(busSpec))
 
     val attributes = Map[String, Variant](
       "buses" -> busesArray
@@ -203,7 +208,7 @@ class RamInstanceSpec
 
     // Set up the mock definition
     when(mockDefinition.defType).thenReturn(mockDefType)
-    when(mockDefType.ident).thenReturn(Array("ram", "sram"))
+    when(mockDefType.ident).thenReturn(Seq("ram", "sram"))
 
     // Create attributes map for the definition
     val attributes = Map[String, Variant]()

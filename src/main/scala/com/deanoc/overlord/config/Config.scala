@@ -271,11 +271,11 @@ object PrefabFileConfig {
 
 // Represents the top-level structure of the project YAML file
 case class ProjectFileConfig(
-  boards: Option[List[String]] = None,
-  defaults: Option[Map[String, Any]] = None, // Flexible for various default types
-  instance: Option[List[InstanceConfig]] = None,
-  connections: Option[List[ConnectionConfig]] = None,
-  prefab: Option[List[PrefabConfig]] = None
+  boards: List[String] = List.empty,
+  defaults: Map[String, Any] = Map.empty, // Flexible for various default types
+  instances: List[InstanceConfig] = List.empty,
+  connections: List[ConnectionConfig] = List.empty,
+  prefabs: List[PrefabConfig] = List.empty
 )
 object ProjectFileConfig {
   import CustomDecoders._
@@ -286,7 +286,7 @@ object ProjectFileConfig {
 case class DefinitionConfig(
   name: String,
   `type`: String, // Use backticks for type as it's a Scala keyword
-  config: Option[Map[String, Any]] = None // Flexible for various config types
+  config: Map[String, Any] = Map.empty // Flexible for various config types
   // TODO: Add other definition fields if necessary based on Definition.scala
 )
 object DefinitionConfig {
@@ -296,9 +296,9 @@ object DefinitionConfig {
 
 // Represents the top-level structure of a catalog YAML file
 case class CatalogFileConfig(
-  defaults: Option[Map[String, Any]] = None, // Flexible for various default types
-  catalogs: Option[List[CatalogSourceConfig]] = None, // Assuming catalogs are defined by a source config
-  definition: Option[List[DefinitionConfig]] = None
+  defaults: Map[String, Any] = Map.empty, // Flexible for various default types
+  catalogs: List[CatalogSourceConfig] = List.empty, // Assuming catalogs are defined by a source config
+  definitions: List[DefinitionConfig] = List.empty, // List of definitions
 )
 object CatalogFileConfig {
   import CustomDecoders._

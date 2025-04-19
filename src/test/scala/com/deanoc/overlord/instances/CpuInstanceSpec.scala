@@ -20,6 +20,11 @@ class CpuInstanceSpec
     with MockitoSugar
     with SilentLogger {
 
+  override def withFixture(test: NoArgTest) = {
+    Overlord.setInstancePath("test_instance") // Push to instanceStack
+    super.withFixture(test)
+  }
+
   "CpuInstance" should "be created with type-safe configuration" in {
     // Create a mock ChipDefinitionTrait
     val mockDefinition = mock[ChipDefinitionTrait]

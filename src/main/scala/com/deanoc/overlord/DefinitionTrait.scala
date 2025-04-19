@@ -72,8 +72,7 @@ object Definition {
         case (k, v: ArrayV)   => k -> v.value.toSeq
         case (k, v: TableV)   => k -> v.value
       }
-      val configMap = config.config.getOrElse(Map())
-      Some(defaultsAsAny ++ configMap)
+      defaultsAsAny ++ config.config
     }
 
     defType match {

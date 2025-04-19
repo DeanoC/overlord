@@ -19,10 +19,10 @@ import com.deanoc.overlord.utils.{
   StringV,
   TableV
 }
+import com.deanoc.overlord.config.InstanceConfig
 
 import java.nio.file.Path
 import scala.collection.mutable
-
 trait InstanceTrait extends QueryInterface {
   lazy val attributes: mutable.HashMap[String, Variant] =
     mutable.HashMap[String, Variant](definition.attributes.toSeq: _*)
@@ -96,7 +96,7 @@ trait InstanceTrait extends QueryInterface {
 
 object Instance {
   def apply(
-      config: com.deanoc.overlord.config.InstanceConfig, // Change parameter type
+      config: InstanceConfig, // Change parameter type
       defaults: Map[String, Variant],
       catalogs: DefinitionCatalog
   ): Either[String, InstanceTrait] = {
@@ -169,10 +169,10 @@ object Instance {
     }
 
     if (configMap.contains("gateware")) {
-      // Convert configMap to Option[Map[String, Any]] for the new HardwareDefinition.apply
-      val configAsAny = Some(configMap.map { case (k, v) =>
+      // Convert configMap to Map[String, Any] for the new HardwareDefinition.apply
+      val configAsAny = configMap.map { case (k, v) =>
         k -> variantToAny(v)
-      })
+      }
 
       HardwareDefinition(defType, configAsAny, path) match {
         case Right(value) =>
@@ -182,10 +182,10 @@ object Instance {
           Left(s"$defType gateware was invalid: $error")
       }
     } else if (configMap.contains("software")) {
-      // Convert configMap to Option[Map[String, Any]] for the new SoftwareDefinition.apply
-      val configAsAny = Some(configMap.map { case (k, v) =>
+      // Convert configMap to Map[String, Any] for the new SoftwareDefinition.apply
+      val configAsAny = configMap.map { case (k, v) =>
         k -> variantToAny(v)
-      })
+      }
 
       SoftwareDefinition(defType, configAsAny, path) match {
         case Right(value) =>

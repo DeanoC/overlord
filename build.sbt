@@ -65,8 +65,6 @@ lazy val dependencies = Seq(
   // Command line handling
   "com.github.scopt" %% "scopt" % "4.1.0",
 
-  // Add SnakeYAML dependency for YAML parsing
-  "org.yaml" % "snakeyaml" % "2.0",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.9.5",
   "ch.qos.logback" % "logback-classic" % "1.4.11",
 

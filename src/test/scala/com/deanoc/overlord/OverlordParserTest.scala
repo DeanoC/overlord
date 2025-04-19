@@ -12,6 +12,8 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import org.mockito.ArgumentMatchers.{any, eq => mockitoEq}
 import io.circe.parser._
+import io.circe.parser.{parse => jsonParse}
+import io.circe.yaml.parser.{parse => yamlParse}
 import io.circe.{Json, Decoder}
 
 import java.nio.file.{Files, Path, Paths}
@@ -75,46 +77,42 @@ class OverlordParserTest
       defaults:
         version: 1
         author: "Test Author"
-      definition:
+      definitions:
         - type: hardware.chip.test_chip
-          ident: test_chip_1
-          description: "A test chip definition"
-          parameters:
-            param1: value1
+          name: test_chip_1
         - type: software.program.test_program
-          ident: test_program_1
+          name: test_program_1
           description: "A test program definition"
-          source: src/test_program.c
+          source: src/test_program.c      
+      catalogs: []
     """.stripMargin
-
-    // Create a test file with the YAML content
-    val filePath = createYamlFile(yamlContent, "test_catalog.yaml")
     
     // Parse the YAML content into a CatalogFileConfig using circe
-    val parsedJson = parse(yamlContent).getOrElse(Json.Null)
-    val catalogConfig = parsedJson.as[CatalogFileConfig].getOrElse(CatalogFileConfig())
+    val parsedYaml = yamlParse(yamlContent).getOrElse(Json.Null)
+    parsedYaml should not be Json.Null
+
+    val catalogConfig = parsedYaml.as[CatalogFileConfig].getOrElse(CatalogFileConfig())
     
     // Assert that parsing was successful and the top-level structure is as expected
     catalogConfig.defaults should not be empty
-    catalogConfig.definition should not be empty
+    catalogConfig.definitions should not be empty
+    catalogConfig.catalogs shouldBe empty
     
     // Extract and assert the defaults
-    val defaults = catalogConfig.defaults.get
-    defaults should have size 2
-    defaults.get("version") shouldBe Some("1")
-    defaults.get("author") shouldBe Some("Test Author")
+    catalogConfig.defaults should have size 2
+    catalogConfig.defaults.get("version") shouldBe Some("1")
+    catalogConfig.defaults.get("author") shouldBe Some("Test Author")
     
     // Extract and assert the definitions
-    val definitions = catalogConfig.definition.get
-    definitions should have size 2
+    catalogConfig.definitions should have size 2
     
     // Assert the content of the first definition entry (chip)
-    val chipDefinition = definitions(0)
+    val chipDefinition = catalogConfig.definitions(0)
     chipDefinition.`type` shouldBe "hardware.chip.test_chip"
     chipDefinition.name shouldBe "test_chip_1"
     
     // Assert the content of the second definition entry (program)
-    val programDefinition = definitions(1)
+    val programDefinition = catalogConfig.definitions(1)
     programDefinition.`type` shouldBe "software.program.test_program"
     programDefinition.name shouldBe "test_program_1"
     
@@ -132,7 +130,7 @@ class OverlordParserTest
   
   "parseProjectFile with type-safe config" should "correctly parse project file and extract instance data" in {
     val yamlContent = """
-      instance:
+      instances:
         - name: cpu1
           type: hardware.cpu.riscv
           config:
@@ -154,19 +152,20 @@ class OverlordParserTest
     val filePath = createYamlFile(yamlContent, "test_project.yaml")
     
     // Parse the YAML content into a ProjectFileConfig using circe
-    val parsedJson = parse(yamlContent).getOrElse(Json.Null)
-    val projectConfig = parsedJson.as[ProjectFileConfig].getOrElse(ProjectFileConfig())
+    val parsedYaml = yamlParse(yamlContent).getOrElse(Json.Null)
+    parsedYaml should not be Json.Null
+
+    val projectConfig = parsedYaml.as[ProjectFileConfig].getOrElse(ProjectFileConfig())
     
     // Assert that parsing was successful and the top-level structure is as expected
-    projectConfig.instance should not be empty
+    projectConfig.instances should not be empty
     projectConfig.connections should not be empty
     
     // Extract and assert the instances
-    val instances = projectConfig.instance.get
-    instances should have size 2
+    projectConfig.instances should have size 2
     
     // Assert the content of the first instance (CPU)
-    val cpuInstance = instances(0)
+    val cpuInstance =  projectConfig.instances(0)
     cpuInstance.name shouldBe "cpu1"
     cpuInstance.`type` shouldBe "hardware.cpu.riscv"
     cpuInstance.config should not be empty
@@ -187,16 +186,15 @@ class OverlordParserTest
     cpuConfig.triple shouldBe "riscv32-unknown-elf"
     
     // Assert the content of the second instance (RAM)
-    val ramInstance = instances(1)
+    val ramInstance = projectConfig.instances(1)
     ramInstance.name shouldBe "ram1"
     ramInstance.`type` shouldBe "hardware.ram.sram"
     
     // Extract and assert the connections
-    val connections = projectConfig.connections.get
-    connections should have size 1
+    projectConfig.connections should have size 1
     
     // Assert the content of the connection
-    val busConnection = connections(0).asInstanceOf[BusConnectionConfig]
+    val busConnection = projectConfig.connections(0).asInstanceOf[BusConnectionConfig]
     busConnection.`type` shouldBe "bus"
     busConnection.connection shouldBe "cpu1 -> ram1"
     busConnection.bus_protocol shouldBe Some("axi")

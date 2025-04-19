@@ -16,14 +16,14 @@ case class Prefab(
     name: String,
     path: String,
     config: PrefabFileConfig,
-    includes: Map[String, Prefab] = Map.empty
+    prefabs: Map[String, Prefab] = Map.empty
 )
 
 // Documentation: How to Create a Prefab
 // A Prefab represents a reusable component with a name, path, configuration, and included prefabs. To create a prefab:
 // 1. Define a unique name for the prefab.
 // 2. Specify the path where the prefab is located.
-// 3. Provide a PrefabFileConfig containing instances, connections, resources, and includes.
+// 3. Provide a PrefabFileConfig containing instances, connections, resources, and prefabs.
 // 4. Optionally, include other prefabs by providing a map of included prefab names to Prefab objects.
 // 5. Use the PrefabCatalog class to manage and retrieve prefabs.
 

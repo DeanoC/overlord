@@ -19,11 +19,10 @@ case class SoftwareDefinition(
 object SoftwareDefinition {
   def apply(
       defType: DefinitionType, // Accept DefinitionType directly
-      config: Option[Map[String, Any]], // Accept Option[Map[String, Any]] for config
+      config: Map[String, Any], // Accept Option[Map[String, Any]] for config
       path: Path
   ): Either[String, SoftwareDefinitionTrait] = {
-    // Convert config Option[Map[String, Any]] to Map[String, Variant]
-    val configMap: Map[String, Variant] = config.getOrElse(Map()).map { case (k, v) =>
+    val configMap: Map[String, Variant] = config.map { case (k, v) =>
       k -> Utils.toVariant(v) // Convert Any to Variant
     }
 

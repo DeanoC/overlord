@@ -87,18 +87,18 @@ class ProjectParserSpec extends AnyFlatSpec with Matchers with MockitoSugar with
       val yamlContent = """
         instance:
           - name: cpu1
-            type: hardware.cpu.riscv
+            type: cpu.riscv.test
             config:
               core_count: 2
               triple: "riscv32-unknown-elf"
           - name: ram1
-            type: hardware.ram.sram
+            type: ram.sram.test
             config:
               ranges:
                 - address: "0x10000000"
                   size: "0x1000"
           - name: clock1
-            type: hardware.clock.oscillator
+            type: other.clock.oscillator
             config:
               frequency: "100MHz"
         connections:
@@ -116,14 +116,12 @@ class ProjectParserSpec extends AnyFlatSpec with Matchers with MockitoSugar with
       val projectConfig = parsedJson.as[ProjectFileConfig].getOrElse(ProjectFileConfig())
       
       // Verify the parsed configuration
-      projectConfig.instance should not be empty
+      projectConfig.instances should not be empty
       projectConfig.connections should not be empty
       
-      val instances = projectConfig.instance.get
-      instances should have size 3
+      projectConfig.instances should have size 3
       
-      val connections = projectConfig.connections.get
-      connections should have size 2
+      projectConfig.connections should have size 2
       
       // Create type-safe configurations for each instance
       val cpuConfig = CpuConfig(
@@ -165,8 +163,8 @@ class ProjectParserSpec extends AnyFlatSpec with Matchers with MockitoSugar with
       clockInstance.frequency shouldBe "100MHz"
       
       // Create connections using the type-safe configurations
-      val busConnection = connections(0).asInstanceOf[BusConnectionConfig]
-      val clockConnection = connections(1).asInstanceOf[ClockConnectionConfig]
+      val busConnection = projectConfig.connections(0).asInstanceOf[BusConnectionConfig]
+      val clockConnection = projectConfig.connections(1).asInstanceOf[ClockConnectionConfig]
       
       // Parse the connections
       val parsedBusConnection = ConnectionParser.parseConnectionConfig(busConnection)
@@ -247,12 +245,11 @@ class ProjectParserSpec extends AnyFlatSpec with Matchers with MockitoSugar with
       val projectConfig = parsedJson.as[ProjectFileConfig].getOrElse(ProjectFileConfig())
       
       // Verify the parsed configuration
-      projectConfig.instance should not be empty
+      projectConfig.instances should not be empty
       
-      val instances = projectConfig.instance.get
-      instances should have size 1
+      projectConfig.instances should have size 1
       
-      val boardInstance = instances(0)
+      val boardInstance = projectConfig.instances(0)
       boardInstance.name shouldBe "fpga_board"
       boardInstance.`type` shouldBe "hardware.board.fpga"
       boardInstance.config should not be empty

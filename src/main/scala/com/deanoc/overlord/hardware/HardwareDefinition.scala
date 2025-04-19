@@ -48,7 +48,7 @@ object HardwareDefinition {
     * @param defType
     *   The type of the definition.
     * @param config
-    *   The optional configuration map for the definition.
+    *   The configuration map for the definition.
     * @param path
     *   The source path of the definition.
     * @return
@@ -57,11 +57,10 @@ object HardwareDefinition {
     */
   def apply(
       defType: DefinitionType, // Accept DefinitionType directly
-      config: Option[Map[String, Any]], // Accept Option[Map[String, Any]] for config
+      config: Map[String, Any], // Accept Option[Map[String, Any]] for config
       path: Path
   ): Either[String, ChipDefinitionTrait] = {
-    // Convert config Option[Map[String, Any]] to Map[String, Variant]
-    val configMap: Map[String, Variant] = config.getOrElse(Map()).map { case (k, v) =>
+    val configMap: Map[String, Variant] = config.map { case (k, v) =>
       k -> Utils.toVariant(v) // Convert Any to Variant
     }
 

@@ -33,40 +33,31 @@ object CatalogLoader extends Logging {
   ): Seq[DefinitionTrait] = boundary {
 
     // parse out any defaults updating the default table
-    val defaults =
-      parsedConfig.defaults match {
-        case Some(catalogDefaults) =>
-          // For now, just use the defaultMap as is
-          // We'll convert to Variant when needed
-          defaultMap
-        case None => defaultMap
-      }
+    // TODO: For now, just use the defaultMap as is
+    // We'll convert to Variant when needed
+    val defaults = defaultMap
 
     // if we reference any catalogs, process them
-    parsedConfig.catalogs.foreach { catalogs =>
-      for (catSourceConfig <- catalogs) {
+    parsedConfig.catalogs.foreach { catSourceConfig =>
         processCatalogSource(catSourceConfig, defaults)
-      }
     }
 
     // process any definitions
     val defs = mutable.ArrayBuffer[DefinitionTrait]()
-    parsedConfig.definition.foreach { definitions =>
-      for (definitionConfig <- definitions) {
-        // Call the refactored Definition.apply which now takes DefinitionConfig
-        // Convert defaults to Map[String, Variant]
-        val defaultsAsVariant = defaults.map { case (k, v) =>
-          k -> Utils.toVariant(v)
-        }.toMap
-        Definition(definitionConfig, defaultsAsVariant) match {
-          case Right(defn: DefinitionTrait) => defs += defn
-          case Left(errorMsg)               =>
-            // Use the string version of error to avoid ambiguity
-            this.error(
-              s"Error creating definition ${definitionConfig.name}: $errorMsg",
-              null
-            )
-        }
+    parsedConfig.definitions.foreach { definitionConfig =>
+      // Call the refactored Definition.apply which now takes DefinitionConfig
+      // Convert defaults to Map[String, Variant]
+      val defaultsAsVariant = defaults.map { case (k, v) =>
+        k -> Utils.toVariant(v)
+      }.toMap
+      Definition(definitionConfig, defaultsAsVariant) match {
+        case Right(defn: DefinitionTrait) => defs += defn
+        case Left(errorMsg)               =>
+          // Use the string version of error to avoid ambiguity
+          this.error(
+            s"Error creating definition ${definitionConfig.name}: $errorMsg",
+            null
+          )
       }
     }
 
@@ -204,8 +195,7 @@ object CatalogLoader extends Logging {
     var prefabCatalog = new PrefabCatalog()
 
     // Process prefabs from the project file
-    parsedConfig.prefab.foreach { prefabConfigs =>
-      for (prefabConfig <- prefabConfigs) {
+    parsedConfig.prefabs.foreach { prefabConfig =>
         val prefabName = prefabConfig.name
         val prefabPath = findPrefabPath(prefabName)
 
@@ -243,7 +233,6 @@ object CatalogLoader extends Logging {
               }
           }
         }
-      }
     }
 
     Right(prefabCatalog)
