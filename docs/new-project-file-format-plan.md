@@ -1,54 +1,86 @@
-# Overlord Project File Format (.yaml)
+# Overlord Project/Component File Format (.yaml)
 
 ## Introduction
 
-The Overlord framework uses YAML-based configuration files with the `.yaml` extension to define projects, components, and their connections. These files are the main input for the Overlord.Project class and define how your hardware and software components are instantiated, configured, and connected.
+The Overlord framework uses YAML-based configuration files with the `.yaml` extension to define projects, components, and their connections. These files are the primary input for the Overlord.Project class and define how hardware and software components are instantiated, configured, and connected.
+
+Projects can consist of subprojects known as components, creating a hierarchical structure. A top-level component is considered a Project. Structurally they are the same, allowing reuse and composition as projects grow larger.
 
 ## File Format
 
-Overlord project files are written in YAML and have the `.yaml` extension. 
+Overlord project files are written in YAML and have the `.yaml` extension.
 
 ## Main Sections
 
 A typical `.yaml` file consists of the following main sections:
 
-### 1. Boards
+### 1. Info/Description
 
-Optional section listing board names or identifiers used in the project.
+Projects can have an info section, but it is not required.
+
+Components *must* have an info section with at least a name, which is how this component will be instantiated. If the name doesn't start with "component.", this prefix will be assumed.
 
 ```yaml
-boards:
-  - "board_name_1"
-  - "board_name_2"
+info:
+  name: "deano.testproject"
+  version: "1.0.0"
+  author: "Your Name"
+  description: "Project description"
 ```
 
-### 2. Defaults
+### 2. Catalogs
+
+Catalogs contain sets of definitions that can be used to create instances within this project. Catalogs can include their own catalogs.
+  
+```yaml
+catalogs:
+  - type: "git"
+    url: "https://github.com/example/hardware-catalog.git"
+  - type: "local"
+    path: "/path/to/local/catalog"
+  - type: "fetch"
+    url: "https://example.com/api/catalog"
+```
+
+### 3. Components
+
+References pre-configured instances and connections that can be added to a project with a single name. Components are structurally the same as Projects but require an info.name, which allows parts to be reused.
+
+```yaml
+components:
+  - type: local
+    path: /home/deano/local_prefab.yaml
+  - type: fetch
+    url: https://gagameos.com/gagameos_base_prefab.yaml
+  - type: git
+    url: https://github.com/DeanoC/bl616.git
+```
+
+### 4. Defaults
 
 Optional section for specifying default values that will be applied to instances if specific values are not provided.
 
 ```yaml
 defaults:
-  project_version: "1.0.0"
-  author: "Your Name"
-  description: "Project description"
   target_frequency: "100MHz"
 ```
 
-### 3. Instances
+### 5. Instances
 
-Defines hardware or software components to be instantiated in the project.
+Defines components to be instantiated in the project.
+They can be definitions included from catalogs, project components, or 'one-shot' instances with embedded definitions.
 
 ```yaml
 instances:
   - name: instanceName
-    type: component.type  # e.g., hardware.cpu.riscv, hardware.ram.ddr4, etc.
+    type: component.type  # e.g., cpu.riscv.test, ram.ddr4.test, component.deano.testproject etc.
     config:
       # Optional parameters for the instance
       parameter1: value1
       parameter2: value2
 ```
 
-### 4. Connections
+### 6. Connections
 
 Defines connections between instances, such as buses, signals, or other interfaces. Connections have a `type` and a `connection` string, along with type-specific parameters.
 
@@ -94,24 +126,16 @@ connections:
     value: "constant_value"
 ```
 
-### 5. Prefabs
-
-References preconfigured component templates from prefab catalogs.
-
-```yaml
-prefabs:
-  - name: prefabName  # e.g., networking_stack
-```
-
 ## Processing Order
 
 The Overlord.Project class processes these sections in a specific order:
 
-1. Process `boards` section.
-2. Process `defaults` section.
-3. Process `instances` sections to create component instances.
-4. Process `connections` sections to connect those instances.
-5. Process `prefabs` sections to include predefined configurations.
+1. Process `info` section
+2. Process `defaults` section
+3. Process `catalogs` section
+4. Process `instances` sections to create component instances
+5. Process `connections` sections to connect those instances
+6. Process `components` section
 
 ## Special Macros
 
@@ -125,46 +149,63 @@ When defining paths or other string values, you can use special macros that will
 
 ## Example
 
-Here's an example of an Overlord project file based on the test content:
+Here's an example of an Overlord project file:
 
 ```yaml
-# List of board names or identifiers
-boards:
-  - "arty_a7_35t"
-  - "zcu102"
+# Project information
+info:
+  name: "example.soc"
+  version: "1.0.0"
+  author: "Overlord Development Team"
+  description: "Example SoC design with RISC-V cores"
+
+# External catalog sources
+catalogs:
+  - type: "git"
+    url: "https://github.com/example/hardware-catalog.git"
+  - type: "local"
+    path: "/path/to/local/catalog"
+  - type: "fetch"
+    url: "https://example.com/api/catalog"
+
+# Referenced components
+components:
+  - type: local
+    path: /home/deano/local_prefab.yaml
+  - type: fetch
+    url: https://gagameos.com/gagameos_base_prefab.yaml
+  - type: git
+    url: https://github.com/DeanoC/bl616.git
 
 # Default settings for the project
 defaults:
-  project_version: "1.0.0"
-  author: "Overlord Development Team"
-  description: "Example SoC design with RISC-V cores"
   target_frequency: "100MHz"
 
 # Hardware and software instances
 instances:
   # CPU instances
   - name: "cpu0"
-    type: "hardware.cpu.riscv"
+    type: "cpu.riscv.test"
     config:
       core_count: 4
       triple: "riscv64-unknown-elf"
 
   - name: "cpu1"
-    type: "hardware.cpu.arm"
+    type: "cpu.arm.test"
     config:
       core_count: 2
       triple: "aarch64-none-elf"
 
   # Memory instances
   - name: "main_memory"
-    type: "hardware.ram.ddr4"
+    type: "ram.ddr4.test"
     config:
       ranges:
         - address: "0x80000000"
           size: "0x40000000"
 
   - name: "sram0"
-    type: "hardware.ram.sram"
+    type: "ram.sram.test"
     config:
       ranges:
         - address: "0x00100000"
@@ -172,15 +213,19 @@ instances:
 
   # Clock instance
   - name: "system_clock"
-    type: "hardware.clock"
+    type: "clock.test.100mhz"
     config:
       frequency: "100MHz"
 
   # IO instance
   - name: "uart0"
-    type: "hardware.io.uart"
+    type: "io.uart.test"
     config:
       visible_to_software: true
+
+  # component instance
+  - name: "sub_module"
+    type: "component.zynqps7.test"
 
 # Connections between instances
 connections:
@@ -227,27 +272,7 @@ connections:
   - type: "constant"
     connection: "cpu0.vector_base"
     value: "0x00000000"
-
-# Prefabs to include
-prefabs:
-  - name: "networking_stack"
-  - name: "graphics_subsystem"
-  - name: "audio_interface"
 ```
-
-## Board Specification
-
-Each project must specify a board, which is automatically injected as if it had been a prefab in the main project file. The board definition provides critical information about the physical hardware platform.
-
-## Output and Paths
-
-The Project class manages several stacks of paths:
-
-- `catalogPathStack` - For finding component definitions
-- `instancePathStack` - For finding instance configurations
-- `outPathStack` - For placing generated output files
-
-These path stacks help the framework locate resources and organize outputs while processing nested includes and hierarchical components.
 
 ## Advanced Features
 
@@ -255,30 +280,13 @@ These path stacks help the framework locate resources and organize outputs while
 
 Constants can be defined in the file and used throughout the project. They are collected from unconnected elements and made available to components.
 
-### Distance Matrix
-
-The framework computes a "distance matrix" between components to understand their connectivity topology. This is used for routing and software generation.
-
 ### Software Dependencies
 
 Software components can declare dependencies on other components, which the Project class resolves automatically. This ensures all necessary drivers and libraries are included.
 
-## File Processing
-
-The Project class processes `.yaml` files through the following steps:
-
-1. Read the YAML structure using `Utils.readYaml()`
-2. Process includes and imports recursively
-3. Create instances based on definitions from catalogs
-4. Establish connections between instances
-5. Resolve software dependencies
-6. Generate hardware configuration
-7. Generate software components
-
 ## Best Practices
 
-1. Use includes to organize complex projects into smaller, manageable files
-2. Use prefabs for common configurations
-3. Group related instances and connections in the same file
-4. Use meaningful names that reflect the function of components
-5. Document your configuration with comments
+1. Use catalogs and component to organize complex projects into smaller, manageable files
+2. Group related instances and connections in the same file
+3. Use meaningful names that reflect the function of components
+4. Document your configuration with comments
