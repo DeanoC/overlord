@@ -1,0 +1,3 @@
+package com.deanoc.overlord.definitions
+
+trait HardwareDefinitionTrait extends ChipDefinitionTrait
