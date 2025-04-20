@@ -1,0 +1,120 @@
+# Project information
+info:
+  name: "example.soc"
+  version: "1.0.0"
+  author: "Overlord Development Team"
+  description: "Example SoC design with RISC-V cores"
+
+# External catalog sources
+catalogs:
+  - type: "git"
+    url: "https://github.com/example/hardware-catalog.git"
+  - type: "local"
+    path: "/path/to/local/catalog"
+  - type: "fetch"
+    url: "https://example.com/api/catalog"
+
+# Referenced components
+components:
+  - type: local
+    path: /home/deano/local_prefab.yaml
+  - type: fetch
+    url: https://gagameos.com/gagameos_base_prefab.yaml
+  - type: git
+    url: https://github.com/DeanoC/bl616.git
+
+# Default settings for the project
+defaults:
+  target_frequency: "100MHz"
+
+# Hardware and software instances
+instances:
+  # CPU instances
+  - name: "cpu0"
+    type: "cpu.riscv.test"
+    config:
+      core_count: 4
+      triple: "riscv64-unknown-elf"
+
+  - name: "cpu1"
+    type: "cpu.arm.test"
+    config:
+      core_count: 2
+      triple: "aarch64-none-elf"
+
+  # Memory instances
+  - name: "main_memory"
+    type: "ram.ddr4.test"
+    config:
+      ranges:
+        - address: "0x80000000"
+          size: "0x40000000"
+
+  - name: "sram0"
+    type: "ram.sram.test"
+    config:
+      ranges:
+        - address: "0x00100000"
+          size: "0x00010000"
+
+  # Clock instance
+  - name: "system_clock"
+    type: "clock.test.100mhz"
+    config:
+      frequency: "100MHz"
+
+  # IO instance
+  - name: "uart0"
+    type: "io.uart.test"
+    config:
+      visible_to_software: true
+
+  # component instance
+  - name: "sub_module"
+    type: "component.zynqps7.test"
+
+# Connections between instances
+connections:
+  # Bus connections
+  - type: "bus"
+    connection: "cpu0 -> main_memory"
+    bus_protocol: "axi4"
+    bus_name: "cpu0_mem_bus"
+
+  - type: "bus"
+    connection: "cpu1 -> sram0"
+    bus_protocol: "axi4-lite"
+    silent: true
+
+  # Port connections
+  - type: "port"
+    connection: "uart0.tx -> board.uart_tx"
+
+  # Port group connections
+  - type: "port_group"
+    connection: "cpu0.gpio -> board.leds"
+    first_prefix: "gpio_"
+    excludes: ["gpio_3", "gpio_4"]
+
+  # Clock connections
+  - type: "clock"
+    connection: "system_clock -> cpu0.clk"
+
+  # Logical connections
+  - type: "logical"
+    connection: "cpu0.reset -> board.reset_button"
+
+  # Parameters connections
+  - type: "parameters"
+    connection: "cpu0 -> cpu1"
+    parameters:
+      - name: "cache_size"
+        value: 8192
+        type: "integer"
+      - name: "debug_mode"
+        value: true
+
+  # Constant connections
+  - type: "constant"
+    connection: "cpu0.vector_base"
+    value: "0x00000000"

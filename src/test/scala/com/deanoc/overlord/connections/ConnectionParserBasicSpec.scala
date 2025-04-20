@@ -52,30 +52,6 @@ class ConnectionParserBasicSpec
     )
   }
 
-  /** Helper method to create a test BusConnectionConfig for connection testing.
-    *
-    * @param connection
-    *   The connection string (e.g., "device1 -> device2")
-    * @param busProtocol
-    *   The bus protocol (e.g., "axi")
-    * @param busName
-    *   The bus name (optional)
-    * @return
-    *   A BusConnectionConfig containing the connection information
-    */
-  private def createBusConfig(
-      connection: String,
-      busProtocol: String = "internal",
-      busName: Option[String] = None
-  ): BusConnectionConfig = {
-    BusConnectionConfig(
-      connection = connection,
-      `type` = "bus",
-      bus_protocol = Some(busProtocol),
-      bus_name = busName
-    )
-  }
-
   "ConnectionParser.parseConnectionConfig" should "correctly parse a first-to-second connection" in {
     // Create a type-safe config with the connection string
     val config = createPortConfig("device1 -> device2")
@@ -142,7 +118,13 @@ class ConnectionParserBasicSpec
 
   it should "handle different connection types correctly" in {
     // Bus connection
-    val busConfig = createBusConfig("device1 -> device2", "axi")
+    val busConfig = BusConnectionConfig(
+      connection = "device1 -> device2",
+      `type` = "bus",
+      bus_name = "data_bus",
+      bus_width = 32,
+      bus_protocol = "axi"
+    )
     val busResult = ConnectionParser.parseConnectionConfig(busConfig)
 
     busResult shouldBe defined

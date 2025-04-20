@@ -1,6 +1,6 @@
 package com.deanoc.overlord
 
-import com.deanoc.overlord.config.{InfoConfig, ProjectFileConfig}
+import com.deanoc.overlord.config.{InfoConfig, ComponentFileConfig}
 import com.deanoc.overlord.utils.Logging
 import com.deanoc.overlord.instances.MutableContainer
 import java.nio.file.Path
@@ -20,7 +20,7 @@ import scala.util.boundary
 case class Component(
   name: String,
   path: String,
-  config: ProjectFileConfig,
+  config: ComponentFileConfig,
   info: InfoConfig,
   container: MutableContainer,
   catalog: DefinitionCatalog,
@@ -105,10 +105,10 @@ object Component extends Logging {
       }
     
     // Create a Component from the parsed data
-    val parsedConfig: Either[io.circe.Error, ProjectFileConfig] = for {
+    val parsedConfig: Either[io.circe.Error, ComponentFileConfig] = for {
       yamlString <- Right(scala.io.Source.fromFile(gamePath.toFile).mkString)
       json <- io.circe.yaml.parser.parse(yamlString)
-      config <- json.as[ProjectFileConfig]
+      config <- json.as[ComponentFileConfig]
     } yield config
     
     parsedConfig match {

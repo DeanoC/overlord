@@ -20,14 +20,14 @@
     },
     {
       "type": "scala",
-      "name": "Debug RamInstanceSpec",
+      "name": "Debug",
       "request": "launch",
       "mainClass": "org.scalatest.tools.Runner",
       "args": [
         "-R",
         "src/test/scala",
         "-s",
-        "com.deanoc.overlord.instances.CpuInstanceSpec",
+        "com.deanoc.overlord.ComponentParserTest",
         "-o"
       ]
     }

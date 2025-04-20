@@ -335,14 +335,14 @@ object ConnectionParser extends Logging {
       secondary: String,
       config: BusConnectionConfig
   ): UnconnectedBus = {
-    val supplierBusName = config.bus_name.getOrElse("")
+    val supplierBusName = config.bus_name
     val consumerBusName = config.consumer_bus_name.getOrElse(supplierBusName)
 
     UnconnectedBus(
       first,
       dir,
       secondary,
-      BusName.apply(config.bus_protocol.getOrElse("internal")),
+      BusName.apply(config.bus_protocol),
       BusName.apply(supplierBusName),
       BusName.apply(consumerBusName),
       config.silent.getOrElse(false)

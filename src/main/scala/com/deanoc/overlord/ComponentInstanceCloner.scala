@@ -3,7 +3,7 @@ package com.deanoc.overlord
 import com.deanoc.overlord.instances.{InstanceTrait, MutableContainer}
 import com.deanoc.overlord.connections.Connected
 import com.deanoc.overlord.utils.{Logging, NamespaceUtils}
-import com.deanoc.overlord.config.{InstanceConfig, ProjectFileConfig, ConnectionConfig}
+import com.deanoc.overlord.config.{InstanceConfig, ComponentFileConfig, ConnectionConfig}
 
 /**
  * Utility class for cloning instances and connections.

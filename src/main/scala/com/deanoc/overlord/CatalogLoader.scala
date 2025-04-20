@@ -8,8 +8,8 @@ import com.deanoc.overlord.utils.{
 import com.deanoc.overlord.config.{
   CatalogFileConfig,
   DefinitionConfig,
-  CatalogSourceConfig,
-  ProjectFileConfig
+  SourceConfig,
+  ComponentFileConfig
 } // Import catalog config case classes
 
 import java.nio.file.{Files, Path, Paths}
@@ -76,7 +76,7 @@ object CatalogLoader extends Logging {
   }
 
   private def processCatalogSource(
-      sourceConfig: CatalogSourceConfig,
+      sourceConfig: SourceConfig,
       defaultMap: Map[String, Any]
   ): Seq[DefinitionTrait] = boundary {
 
@@ -189,10 +189,11 @@ object CatalogLoader extends Logging {
 
   def parsePrefabCatalog(
       name: String,
-      parsedConfig: ProjectFileConfig, // Prefabs contain project-like structure
+      parsedConfig: ComponentFileConfig, // Prefabs contain project-like structure
       defaultMap: Map[String, Any]
   ): Either[String, PrefabCatalog] = {
-
+    Left("Prefab catalog parsing is being REMOVED.")
+    /*
     var prefabCatalog = new PrefabCatalog()
 
     // Process prefabs from the project file
@@ -236,7 +237,7 @@ object CatalogLoader extends Logging {
         }
     }
 
-    Right(prefabCatalog)
+    Right(prefabCatalog)*/
   }
 
   // Helper method to find the path of a prefab by its name

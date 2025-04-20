@@ -31,8 +31,9 @@ class ConnectionParserConfigSpec
       BusConnectionConfig(
         connection = "cpu -> ram",
         `type` = "bus",
-        bus_protocol = Some("axi"),
-        bus_name = Some("data_bus")
+        bus_name = "data_bus",
+        bus_width = 32,
+        bus_protocol = "axi"
       ),
       ClockConnectionConfig(
         connection = "clock -> device",
@@ -69,8 +70,9 @@ class ConnectionParserConfigSpec
     val busConfig = BusConnectionConfig(
       connection = "cpu -> ram",
       `type` = "bus",
-      bus_protocol = Some("axi"),
-      bus_name = Some("data_bus"),
+      bus_protocol = "axi",
+      bus_width = 32,
+      bus_name = "data_bus",
       consumer_bus_name = Some("mem_bus"),
       silent = Some(true)
     )
@@ -261,9 +263,10 @@ class ConnectionParserConfigSpec
     val busConfig = BusConnectionConfig(
       connection = "cpu -> ram",
       `type` = "bus",
-      bus_protocol = Some("axi4"),
-      bus_name = Some("master_bus"),
-      consumer_bus_name = Some("slave_bus"),
+      bus_protocol = "axi4",
+      bus_width = 64,
+      bus_name = "supplier_bus",
+      consumer_bus_name = Some("consumer_bus"),
       silent = Some(true)
     )
 
@@ -308,7 +311,7 @@ class ConnectionParserConfigSpec
     val busConfig = BusConnectionConfig(
       connection = "cpu -> ram",
       `type` = "bus",
-      bus_name = Some("data_bus")
+      bus_name = "data_bus",
     )
 
     // Parse the bus connection

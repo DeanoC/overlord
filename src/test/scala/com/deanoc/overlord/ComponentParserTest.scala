@@ -34,189 +34,10 @@ class ComponentParserTest
   // Create temp directory for test files - shared across all tests
   var tempDir: Path = _
 
-  val catalogYamlContent = """
-  # Default values applicable to all definitions
-  defaults:
-    active: true
-    version: "1.0"
-    author: "Overlord Team"
-    description: "Example catalog file"
-  
-  # External catalog sources
-  catalogs:
-    - type: "git"
-      url: "https://github.com/example/hardware-catalog.git"
-    - type: "local"
-      path: "/path/to/local/catalog"
-    - type: "fetch"
-      url: "https://example.com/api/catalog"
-  
-  # Hardware component definitions
-  definitions:
-    - name: "Cortex-A53"
-      type: "cpu"
-      config:
-        core_count: 4
-        triple: "aarch64-none-elf"
-    
-    - name: "MainMemory"
-      type: "ram"
-      config:
-        ranges:
-          - address: "0x80000000"
-            size: "0x40000000"
-          - address: "0xC0000000" 
-            size: "0x20000000"
-    
-    - name: "SystemClock"
-      type: "clock"
-      config:
-        frequency: "100MHz"
-    
-    - name: "GPIO"
-      type: "io"
-      config:
-        visible_to_software: true
-    
-    - name: "ControlPins"
-      type: "pingroup"
-      config:
-        pins: ["reset", "boot", "power"]
-        direction: "output"
-      """.stripMargin
-
-
-  val projectYamlContent = """
-# List of board names or identifiers
-boards:
-  - "arty_a7_35t"
-  - "zcu102"
-
-# Default settings for the project
-defaults:
-  project_version: "1.0.0"
-  author: "Overlord Development Team"
-  description: "Example SoC design with RISC-V cores"
-  target_frequency: "100MHz"
-
-# Hardware and software instances
-instances:
-  # CPU instances
-  - name: "cpu0"
-    type: "hardware.cpu.riscv"
-    config:
-      core_count: 4
-      triple: "riscv64-unknown-elf"
-  
-  - name: "cpu1"
-    type: "hardware.cpu.arm"
-    config:
-      core_count: 2
-      triple: "aarch64-none-elf"
-  
-  # Memory instances
-  - name: "main_memory"
-    type: "hardware.ram.ddr4"
-    config:
-      ranges:
-        - address: "0x80000000"
-          size: "0x40000000"
-  
-  - name: "sram0"
-    type: "hardware.ram.sram"
-    config:
-      ranges:
-        - address: "0x00100000"
-          size: "0x00010000"
-  
-  # Clock instance
-  - name: "system_clock"
-    type: "hardware.clock"
-    config:
-      frequency: "100MHz"
-  
-  # IO instance
-  - name: "uart0"
-    type: "hardware.io.uart"
-    config:
-      visible_to_software: true
-
-# Connections between instances
-connections:
-  # Bus connections
-  - type: "bus"
-    connection: "cpu0 -> main_memory"
-    bus_protocol: "axi4"
-    bus_name: "cpu0_mem_bus"
-  
-  - type: "bus"
-    connection: "cpu1 -> sram0"
-    bus_protocol: "axi4-lite"
-    silent: true
-  
-  # Port connections
-  - type: "port"
-    connection: "uart0.tx -> board.uart_tx"
-  
-  # Port group connections
-  - type: "port_group"
-    connection: "cpu0.gpio -> board.leds"
-    first_prefix: "gpio_"
-    excludes: ["gpio_3", "gpio_4"]
-  
-  # Clock connections
-  - type: "clock"
-    connection: "system_clock -> cpu0.clk"
-  
-  # Logical connections
-  - type: "logical"
-    connection: "cpu0.reset -> board.reset_button"
-  
-  # Parameters connections
-  - type: "parameters"
-    connection: "cpu0 -> cpu1"
-    parameters:
-      - name: "cache_size"
-        value: 8192
-        type: "integer"
-      - name: "debug_mode"
-        value: true
-  
-  # Constant connections
-  - type: "constant"
-    connection: "cpu0.vector_base"
-    value: "0x00000000"
-
-# Prefabs to include
-prefabs:
-  - name: "networking_stack"
-  - name: "graphics_subsystem"
-  - name: "audio_interface"
-  """.stripMargin
-
-  // Helper method to create a test YAML file
-  def createYamlFile(
-      content: String,
-      fileName: String
-  ): Path = {
-    val filePath = tempDir.resolve(fileName)
-    val writer = new FileWriter(filePath.toFile)
-    writer.write(content)
-    writer.close()
-    filePath
-  }
-
   override def beforeAll(): Unit = {
     // Create temp directory once before all tests
     tempDir = Files.createTempDirectory("overlord_test_")
     // create a valid catalog file for testing
-    createYamlFile(catalogYamlContent, "test_catalog.yaml")
-    createYamlFile(projectYamlContent, "test_project.yaml")
-  }
-
-  override def afterAll(): Unit = {
-    // Clean up temp directory once after all tests are done
-    deleteRecursively(tempDir.toFile)
   }
 
   before {
@@ -228,17 +49,10 @@ prefabs:
     Overlord.pushCatalogPath(tempDir)
   }
 
-  // Helper method to delete directory recursively
-  def deleteRecursively(file: File): Unit = {
-    if (file.isDirectory) {
-      file.listFiles.foreach(deleteRecursively)
-    }
-    file.delete()
-  }
-
-
   "parseDefinitionCatalog with type-safe config" should "correctly parse catalog file and extract definition data" in {
-   
+    val catalogFilePath = Paths.get("src/test/resources/test_catalog.yaml")
+    val catalogYamlContent = new String(Files.readAllBytes(catalogFilePath))
+
     // Parse the YAML content into a CatalogFileConfig using circe
     val parsedYaml = yamlParse(catalogYamlContent).getOrElse(Json.Null)
     parsedYaml should not be Json.Null
@@ -298,108 +112,179 @@ prefabs:
     catalogConfig.catalogs(2).`type` shouldBe "fetch"
     catalogConfig.catalogs(2).url shouldBe Some("https://example.com/api/catalog")
     
-    // The remaining code can stay the same or be updated based on your requirements
     val defType = DefinitionType.apply(cpuDefinition.`type`)
     defType.ident should contain("cpu")
     
-    // Create a mock definition using the configuration
     val mockDef = mock(classOf[HardwareDefinitionTrait])
     when(mockDef.defType).thenReturn(defType)
     
-    // Verify the mock definition
     mockDef.defType.ident should contain("cpu")
   }
-  
-  "parseProjectFile with type-safe config" should "correctly parse project file and extract instance data" in {
-        
+
+  "Parse Project File" should "correctly parse project file with new format" in {
+    val projectFilePath = Paths.get("src/test/resources/test_project.yaml")
+    val projectYamlContent = new String(Files.readAllBytes(projectFilePath))
+
     // Parse the YAML content into a ProjectFileConfig using circe
     val parsedYaml = yamlParse(projectYamlContent).getOrElse(Json.Null)
     parsedYaml should not be Json.Null
 
-    val projectConfig = parsedYaml.as[ProjectFileConfig].getOrElse(ProjectFileConfig(info = InfoConfig()))
-    
+    val projectConfig = parsedYaml.as[ComponentFileConfig] match {
+        case Right(config) => config
+        case Left(error) => 
+          fail(s"Failed to parse project file: ${error.message}, at path: ${error.history}")
+      }
     // Assert that parsing was successful and the top-level structure is as expected
-    projectConfig.instances should not be empty
+    projectConfig.info should not be null
+    projectConfig.components should not be empty
     projectConfig.connections should not be empty
-    projectConfig.boards should not be empty
-    projectConfig.prefabs should not be empty
-    projectConfig.defaults should not be empty
     
-    // Extract and assert the boards
-    projectConfig.boards should have size 2
-    projectConfig.boards should contain ("arty_a7_35t")
-    projectConfig.boards should contain ("zcu102")
+    // Verify project info
+    projectConfig.info.name shouldBe "example.soc"
+    projectConfig.info.version should not be None
+    projectConfig.info.author should not be None
+    projectConfig.info.description should not be None
+
+    projectConfig.info.version.get shouldBe "1.0.0"
+    projectConfig.info.description.get shouldBe "Example SoC design with RISC-V cores"
+    projectConfig.info.author.get shouldBe "Overlord Development Team"
     
-    // Extract and assert the defaults
-    projectConfig.defaults should have size 4
-    projectConfig.defaults.get("project_version") shouldBe Some("1.0.0")
-    projectConfig.defaults.get("author") shouldBe Some("Overlord Development Team")
+    // Verify components
+    projectConfig.components should have size 3
     
-    // Extract and assert the instances
-    projectConfig.instances should have size 6
+    // Check component entries
+    val localComponent = projectConfig.components.find(_.`type` == "local").get
+    localComponent.path shouldBe Some("/home/deano/local_prefab.yaml")
     
-    // Assert the content of the first instance (CPU0)
-    val cpuInstance = projectConfig.instances(0)
-    cpuInstance.name shouldBe "cpu0"
-    cpuInstance.`type` shouldBe "hardware.cpu.riscv"
-    cpuInstance.config should not be empty
+    val fetchComponent = projectConfig.components.find(_.`type` == "fetch").get
+    fetchComponent.url shouldBe Some("https://gagameos.com/gagameos_base_prefab.yaml")
     
-    // Extract the CPU config from the generic config map
-    val cpuConfigMap = cpuInstance.config.get
-    cpuConfigMap.get("core_count") shouldBe Some("4")
-    cpuConfigMap.get("triple") shouldBe Some("riscv64-unknown-elf")
+    val gitComponent = projectConfig.components.find(_.`type` == "git").get
+    gitComponent.url shouldBe Some("https://github.com/DeanoC/bl616.git")
     
-    // Create a type-safe CpuConfig from the generic config
-    val cpuConfig = CpuConfig(
-      core_count = cpuConfigMap.get("core_count").map(_.toString.toInt).getOrElse(1),
-      triple = cpuConfigMap.get("triple").map(_.toString).getOrElse("")
-    )
+    // Verify catalogs
+    projectConfig.catalogs should have size 3
+    projectConfig.catalogs(0).`type` shouldBe "git"
+    projectConfig.catalogs(0).url shouldBe Some("https://github.com/example/hardware-catalog.git")
+    projectConfig.catalogs(1).`type` shouldBe "local"
+    projectConfig.catalogs(1).path shouldBe Some("/path/to/local/catalog")
+    projectConfig.catalogs(2).`type` shouldBe "fetch"
+    projectConfig.catalogs(2).url shouldBe Some("https://example.com/api/catalog")
     
-    // Verify the type-safe config
-    cpuConfig.core_count shouldBe 4
-    cpuConfig.triple shouldBe "riscv64-unknown-elf"
+    // Verify defaults
+    projectConfig.defaults should have size 1
+    projectConfig.defaults.get("target_frequency") shouldBe Some("100MHz")
     
-    // Assert the content of the memory instance
-    val ramInstance = projectConfig.instances(2)
-    ramInstance.name shouldBe "main_memory"
-    ramInstance.`type` shouldBe "hardware.ram.ddr4"
-    ramInstance.config should not be empty
+    // Verify instances
+    projectConfig.instances should have size 7
     
-    // Assert the content of the IO instance
-    val ioInstance = projectConfig.instances(5)
-    ioInstance.name shouldBe "uart0" 
-    ioInstance.`type` shouldBe "hardware.io.uart"
-    ioInstance.config.get.get("visible_to_software") shouldBe Some("true")
+    // Check CPU instances
+    val cpu0Instance = projectConfig.instances.find(_.name == "cpu0").get
+    cpu0Instance.`type` shouldBe "cpu.riscv.test"
+    cpu0Instance.config.get("core_count") shouldBe "4"
+    cpu0Instance.config.get("triple") shouldBe "riscv64-unknown-elf"
     
-    // Extract and assert the connections
+    val cpu1Instance = projectConfig.instances.find(_.name == "cpu1").get
+    cpu1Instance.`type` shouldBe "cpu.arm.test"
+    cpu1Instance.config.get("core_count") shouldBe "2"
+    cpu1Instance.config.get("triple") shouldBe "aarch64-none-elf"
+    
+    // Check memory instances
+    val mainMemoryInstance = projectConfig.instances.find(_.name == "main_memory").get
+    mainMemoryInstance.`type` shouldBe "ram.ddr4.test"
+    
+    val sramInstance = projectConfig.instances.find(_.name == "sram0").get
+    sramInstance.`type` shouldBe "ram.sram.test"
+    
+    // Check clock instance
+    val clockInstance = projectConfig.instances.find(_.name == "system_clock").get
+    clockInstance.`type` shouldBe "clock.test.100mhz"
+    clockInstance.config.get("frequency") shouldBe "100MHz"
+    
+    // Check IO instance
+    val uartInstance = projectConfig.instances.find(_.name == "uart0").get
+    uartInstance.`type` shouldBe "io.uart.test"
+    uartInstance.config.get("visible_to_software").toString shouldBe "true"
+    
+    // Check component instance
+    val subModuleInstance = projectConfig.instances.find(_.name == "sub_module").get
+    subModuleInstance.`type` shouldBe "component.zynqps7.test"
+    
+    // Check connections
     projectConfig.connections should have size 8
     
-    // Assert the content of the first bus connection
-    val busConnection = projectConfig.connections(0).asInstanceOf[BusConnectionConfig]
-    busConnection.`type` shouldBe "bus"
-    busConnection.connection shouldBe "cpu0 -> main_memory"
-    busConnection.bus_protocol shouldBe Some("axi4")
-    busConnection.bus_name shouldBe Some("cpu0_mem_bus")
+    // Check bus connections
+    val cpuToMemBus = projectConfig.connections.collect {
+      case bus: BusConnectionConfig if bus.connection == "cpu0 -> main_memory" => bus
+    }.headOption.getOrElse(fail("Bus connection from cpu0 to main_memory not found"))
     
-    // Assert the content of the port connection
-    val portConnection = projectConfig.connections(2).asInstanceOf[PortConnectionConfig]
-    portConnection.`type` shouldBe "port"
-    portConnection.connection shouldBe "uart0.tx -> board.uart_tx"
+    cpuToMemBus.bus_protocol shouldBe "axi4"
+    cpuToMemBus.bus_name shouldBe "cpu0_mem_bus"
     
-    // Assert the content of the parameters connection
-    val paramsConnection = projectConfig.connections(6).asInstanceOf[ParametersConnectionConfig]
-    paramsConnection.`type` shouldBe "parameters"
-    paramsConnection.connection shouldBe "cpu0 -> cpu1"
+    val cpu1ToSramBus = projectConfig.connections.collect {
+      case bus: BusConnectionConfig if bus.connection == "cpu1 -> sram0" => bus
+    }.headOption.getOrElse(fail("Bus connection from cpu1 to sram0 not found"))
+    
+    cpu1ToSramBus.bus_protocol shouldBe "axi4-lite"
+    // Check that silent option exists and is true
+    cpu1ToSramBus.silent shouldBe Some(true)
+    
+    // Check port connection
+    val uartTxConnection = projectConfig.connections.find(_.isInstanceOf[PortConnectionConfig])
+      .map(_.asInstanceOf[PortConnectionConfig])
+      .find(_.connection == "uart0.tx -> board.uart_tx").get
+    
+    // Check port group connection
+    val gpioConnection = projectConfig.connections.find(_.isInstanceOf[PortGroupConnectionConfig])
+      .map(_.asInstanceOf[PortGroupConnectionConfig])
+      .find(_.connection == "cpu0.gpio -> board.leds").get
+    
+    // Check that first_prefix option exists and has the correct value
+    gpioConnection.first_prefix shouldBe Some("gpio_")
+    
+    // Check that excludes option exists
+    gpioConnection.excludes should not be None
+    // Then check the contents of the excludes list
+    gpioConnection.excludes.get should contain("gpio_3")
+    gpioConnection.excludes.get should contain("gpio_4")
+    
+    // Check clock connection
+    val clockConnection = projectConfig.connections.find(_.isInstanceOf[ClockConnectionConfig])
+      .map(_.asInstanceOf[ClockConnectionConfig])
+      .find(_.connection == "system_clock -> cpu0.clk").get
+    
+    // Check logical connection
+    val logicalConnection = projectConfig.connections.find(_.isInstanceOf[LogicalConnectionConfig])
+      .map(_.asInstanceOf[LogicalConnectionConfig])
+      .find(_.connection == "cpu0.reset -> board.reset_button").get
+    
+    // Check parameters connection
+    val paramsConnection = projectConfig.connections.find(_.isInstanceOf[ParametersConnectionConfig])
+      .map(_.asInstanceOf[ParametersConnectionConfig])
+      .find(_.connection == "cpu0 -> cpu1").get
+    
     paramsConnection.parameters should have size 2
-    paramsConnection.parameters(0).name shouldBe "cache_size"
     
-    // Assert the prefabs
-    projectConfig.prefabs should have size 3
-    projectConfig.prefabs(0).name shouldBe "networking_stack"
-    projectConfig.prefabs(1).name shouldBe "graphics_subsystem"
-    projectConfig.prefabs(2).name shouldBe "audio_interface"
+    val cacheParam = paramsConnection.parameters.find(_.name == "cache_size").get
+    // Use asNumber to convert the Json value to a string and then to an integer
+    cacheParam.value.isNumber shouldBe true
+    cacheParam.value.asNumber.get.toInt shouldBe Some(8192)
+    // Check that type option exists and has the correct value
+    cacheParam.`type` shouldBe Some("integer")
+    
+    val debugParam = paramsConnection.parameters.find(_.name == "debug_mode").get
+    // Use asBoolean to convert Json value to a boolean
+    debugParam.value.asBoolean shouldBe Some(true)
+    
+    // Check constant connection
+    val constantConnection = projectConfig.connections.find(_.isInstanceOf[ConstantConnectionConfig])
+      .map(_.asInstanceOf[ConstantConnectionConfig])
+      .find(_.connection == "cpu0.vector_base").get
+    
+    // Check that value option exists and has the correct value
+    constantConnection.value.map(_.asString) shouldBe Some(Some("0x00000000"))
   }
-  
+
   // For backward compatibility, also test the old YAML parsing method
   "parseDefinitionCatalog YAML parsing" should "correctly parse YAML content and extract definition data" in {
     val yamlContent = """

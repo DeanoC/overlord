@@ -1,0 +1,48 @@
+# Default values applicable to all definitions
+defaults:
+  active: true
+  version: "1.0"
+  author: "Overlord Team"
+  description: "Example catalog file"
+
+# External catalog sources
+catalogs:
+  - type: "git"
+    url: "https://github.com/example/hardware-catalog.git"
+  - type: "local"
+    path: "/path/to/local/catalog"
+  - type: "fetch"
+    url: "https://example.com/api/catalog"
+
+# Hardware component definitions
+definitions:
+  - name: "Cortex-A53"
+    type: "cpu"
+    config:
+      core_count: 4
+      triple: "aarch64-none-elf"
+  
+  - name: "MainMemory"
+    type: "ram"
+    config:
+      ranges:
+        - address: "0x80000000"
+          size: "0x40000000"
+        - address: "0xC0000000" 
+          size: "0x20000000"
+  
+  - name: "SystemClock"
+    type: "clock"
+    config:
+      frequency: "100MHz"
+  
+  - name: "GPIO"
+    type: "io"
+    config:
+      visible_to_software: true
+  
+  - name: "ControlPins"
+    type: "pingroup"
+    config:
+      pins: ["reset", "boot", "power"]
+      direction: "output"

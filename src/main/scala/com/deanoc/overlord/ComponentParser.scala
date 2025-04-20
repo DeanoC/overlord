@@ -3,7 +3,7 @@ package com.deanoc.overlord
 import com.deanoc.overlord.connections._
 import com.deanoc.overlord.instances._
 import com.deanoc.overlord.utils.{Logging, Utils, NamespaceUtils}
-import com.deanoc.overlord.config.{ProjectFileConfig, InstanceConfig, PrefabConfig, ConnectionConfig, InfoConfig, ComponentConfig} // Import specific config case classes
+import com.deanoc.overlord.config.{ComponentFileConfig, InstanceConfig, PrefabConfig, ConnectionConfig, InfoConfig, SourceConfig} // Import specific config case classes
 import com.deanoc.overlord.definitions.{DefinitionType, ComponentDefinition}
 
 import java.nio.file.Path
@@ -25,10 +25,10 @@ class ComponentParser() extends Logging {
     val newContainer = MutableContainer()
     containerStack.push(newContainer)
 
-    val parsedConfig: Either[io.circe.Error, ProjectFileConfig] = for {
+    val parsedConfig: Either[io.circe.Error, ComponentFileConfig] = for {
       yamlString <- Right(scala.io.Source.fromFile(path.toFile).mkString)
       json <- parser.parse(yamlString)
-      config <- json.as[ProjectFileConfig]
+      config <- json.as[ComponentFileConfig]
     } yield config
 
     parsedConfig match {
@@ -54,20 +54,11 @@ class ComponentParser() extends Logging {
           }
         }
         
-        // For backward compatibility, handle board if specified
         if (board.nonEmpty) {
-          val boards = parseBoards(parsed)
-          if (!boards.contains(board)) {
-            error(
-              s"The board $board is not supported by this project. The boards supported are $boards"
-            )
-            return None
-          }
-
-          // instances and prefabs from board are added to parsed
+          // TODO: new board selection mechanism
           val mergedParsed = parsed.copy(
-            instances = parsed.instances ++ List(InstanceConfig(name = board, `type` = s"board.$board")),
-            prefabs = parsed.prefabs ++ List(PrefabConfig(name = s"boards.$board"))
+            instances = parsed.instances
+            // ++ List(InstanceConfig(name = board, `type` = s"board.$board")),
           )
 
           // Process prefabs using the new type-safe configuration
@@ -108,7 +99,7 @@ class ComponentParser() extends Logging {
    * @param defaults The default values to use
    */
   private def processComponent(
-    componentConfig: ComponentConfig,
+    componentConfig: SourceConfig,
     catalog: DefinitionCatalog,
     defaults: Map[String, Any]
   ): Unit = {
@@ -139,25 +130,10 @@ class ComponentParser() extends Logging {
 
 
   // Updated to accept ProjectFileConfig
-  def parseDefaults(parsed: ProjectFileConfig): Map[String, Any] = {
+  def parseDefaults(parsed: ComponentFileConfig): Map[String, Any] = {
     parsed.defaults
   }
 
-
-  // Updated to accept ProjectFileConfig
-  def parseBoards(parsed: ProjectFileConfig): Seq[String] = {
-    parsed.boards
-  }
-
-  /** Processes instantiations from parsed YAML data.
-    *
-    * @param parsed
-    *   The parsed YAML data as a map. // TODO: Update to ProjectFileConfig
-    * @param container
-    *   The container to which instances should be added.
-    * @return
-    *   Either a success value or an error message.
-    */
   /** Processes instantiations from parsed YAML data.
     *
     * @param parsed
@@ -168,7 +144,7 @@ class ComponentParser() extends Logging {
     *   Either a success value or an error message.
     */
   def processInstantiations(
-      parsed: ProjectFileConfig,
+      parsed: ComponentFileConfig,
       catalog: DefinitionCatalog,
       prefabs: PrefabCatalog,
       defaults: Map[String, Any],
