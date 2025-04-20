@@ -25,70 +25,86 @@ class ComponentParser() extends Logging {
     val newContainer = MutableContainer()
     containerStack.push(newContainer)
 
-    val parsedConfig: Either[io.circe.Error, ComponentFileConfig] = for {
-      yamlString <- Right(scala.io.Source.fromFile(path.toFile).mkString)
-      json <- parser.parse(yamlString)
-      config <- json.as[ComponentFileConfig]
-    } yield config
+    val parsed: ComponentFileConfig = {
+      val yamlString = scala.util.Try(scala.io.Source.fromFile(path.toFile).mkString) match {
+        case scala.util.Success(content) => content
+        case scala.util.Failure(exception) => 
+          error(s"Failed to read file $path: ${exception.getMessage}")
+          return None
+      }
+      
+      val json = parser.parse(yamlString) match {
+        case Right(parsedJson) => parsedJson
+        case Left(err) =>
+          error(s"Failed to parse YAML to JSON from $path: ${err.getMessage}")
+          return None
+      }
 
-    parsedConfig match {
-      case Left(err) =>
-        error(s"Failed to parse project file $path: $err")
-        None
-      case Right(parsed) =>
-        // Initialize the definition catalog
-        var definitionCatalog = new DefinitionCatalog
-        
-        // Process catalogs section
-        if (parsed.catalogs.nonEmpty) {
-          info(s"Processing ${parsed.catalogs.size} catalogs")
-          // TODO: Implement catalog processing
-          // This will be implemented in a future task
-        }
-        
-        // Process components section
-        if (parsed.components.nonEmpty) {
-          info(s"Processing ${parsed.components.size} components")
-          parsed.components.foreach { componentConfig =>
-            processComponent(componentConfig, definitionCatalog, parsed.defaults)
-          }
-        }
-        
-        if (board.nonEmpty) {
-          // TODO: new board selection mechanism
-          val mergedParsed = parsed.copy(
-            instances = parsed.instances
-            // ++ List(InstanceConfig(name = board, `type` = s"board.$board")),
-          )
-
-          // Process prefabs using the new type-safe configuration
-          val prefabCatalogResult = CatalogLoader.parsePrefabCatalog("project", mergedParsed, mergedParsed.defaults)
-          
-          val prefabCatalog = prefabCatalogResult match {
-            case Left(err) =>
-              error(s"Error processing prefabs: $err")
-              PrefabCatalog()
-            case Right(catalog) => catalog
-          }
-
-          newContainer.mutableChildren ++= processInstantiations(
-            mergedParsed,
-            definitionCatalog,
-            prefabCatalog,
-            parsed.defaults
-          )
-        } else {
-          // Process instances directly without board-specific handling
-          newContainer.mutableChildren ++= processInstantiations(
-            parsed,
-            definitionCatalog,
-            PrefabCatalog(), // Empty prefab catalog when not using boards
-            parsed.defaults
-          )
-        }
-        
-        Some((newContainer, definitionCatalog))
+      json.as[ComponentFileConfig] match {
+        case Right(config) => config
+        case Left(err) =>
+          error(s"Failed to decode JSON to ComponentFileConfig from $path: ${err.message}")
+          return None
+      }
     }
+
+    var definitionCatalog = new DefinitionCatalog
+
+    // Process the info section
+    info(s"Processing info section: $parsed.info")
+    processInfo(parsed.info)
+
+    // Process the defaults section
+    val defaults: Map[String, Any] = parsed.defaults
+    info(s"Processing defaults section: $defaults")
+    processDefaults(defaults)
+    
+    // Process catalogs section
+    if (parsed.catalogs.nonEmpty) {
+      info(s"Processing ${parsed.catalogs.size} catalogs")
+      parsed.catalogs.foreach { catalog =>
+        processCatalog(catalog, definitionCatalog)
+      }
+    }
+
+    // Process components section
+    if (parsed.components.nonEmpty) {
+      info(s"Processing ${parsed.components.size} components")
+      parsed.components.foreach { componentConfig =>
+        processComponent(componentConfig, definitionCatalog, parsed.defaults)
+      }
+    }
+      
+    // Process instances section
+    if(parsed.instances.nonEmpty) {
+      info(s"Processing ${parsed.instances.size} instances")
+      // Process instances and connections
+      newContainer.mutableChildren ++= processInstantiations(
+        parsed,
+        definitionCatalog,
+        parsed.defaults
+      )
+    }
+
+    // Process connections section
+    if (parsed.connections.nonEmpty) {
+      info(s"Processing ${parsed.connections.size} connections")
+      processConnections(parsed.connections, newContainer, definitionCatalog)
+    }
+     
+    Some((newContainer, definitionCatalog))
+  }
+  
+  /**
+   * Processes information from the info section of a component file.
+   *
+   * @param infoConfig The info configuration to process
+   * @param container The container to update with info data
+   */
+  private def processInfo(
+    infoConfig: InfoConfig
+  ): Unit = {
+    info(s"Processing info: ${infoConfig.name}")
   }
   
   /**
@@ -146,7 +162,6 @@ class ComponentParser() extends Logging {
   def processInstantiations(
       parsed: ComponentFileConfig,
       catalog: DefinitionCatalog,
-      prefabs: PrefabCatalog,
       defaults: Map[String, Any],
   ): Seq[InstanceTrait] = {
     // extract instances
@@ -210,51 +225,53 @@ class ComponentParser() extends Logging {
         }
     }
 
-    // Process prefabs (for backward compatibility)
-    if (prefabs.prefabs.nonEmpty) {
-      info(s"Processing ${prefabs.prefabs.size} prefabs")
-      // TODO: Implement prefab processing
-      // This will be implemented in a future task
-    }
-
     instances
   }
-    // extract connections
-    // TODO: Update ConnectionParser.parseConnection to accept ConnectionConfig
-    // For now, we'll skip connection processing until ConnectionParser is updated
-    // This is a temporary measure to allow compilation and testing of instance creation
-    // container.mutableUnconnected ++= connections.flatMap(
-    //   connectionConfig => {
-    //     // This will be implemented in a future step
-    //     None
-    //   }
-    // )
-/* TODO prefab
-    // Process prefabs using the new type-safe configuration
-    parsed.prefabs.foreach { prefabConfig =>
-        val ident = prefabConfig.name
-        prefabs.findPrefab(ident) match {
-          case Some(pf) =>
-            // The prefab's configuration is already in the type-safe PrefabFileConfig format
-            // Create a ProjectFileConfig from the PrefabFileConfig
-            val prefabProjectConfig = ProjectFileConfig(
-              instances = pf.config.instances.toList,
-              connections = pf.config.connection.getOrElse(List.empty),
-              defaults = defaults // Use the same defaults as the parent
-            )
-            
-            // Process the prefab's instances and connections
-            instances ++= processInstantiations(
-              prefabProjectConfig,
-              catalog,
-              prefabs,
-              defaults
-            ) 
-          case None =>
-            error(s"Prefab $ident not found")
-        }
-      }
-  }*/
+
+  /**
+   * Processes connection configurations and adds them to the container.
+   *
+   * @param connections The list of connection configurations to process
+   * @param container The container to which connections should be added
+   * @param definitionCatalog The definition catalog for resolving references
+   */
+  private def processConnections(
+    connections: List[ConnectionConfig],
+    container: MutableContainer,
+    definitionCatalog: DefinitionCatalog
+  ): Unit = {
+    // TODO: Implement connection processing logic
+    info(s"Processing ${connections.size} connections")
+    
+    // For now, we'll just log the connection information
+//    connections.foreach { connectionConfig =>
+//     info(s"Connection: ${connectionConfig.from} -> ${connectionConfig.to}")
+//    }
+  }
+
+  /**
+   * Processes default values from the component file.
+   *
+   * @param defaults The map of default values to process
+   */
+  private def processDefaults(defaults: Map[String, Any]): Unit = {
+    // TODO: Implement defaults processing logic
+    info(s"Default values provided: ${defaults.size}")
+  }
+
+  /**
+   * Processes a catalog and adds its definitions to the definition catalog.
+   *
+   * @param catalog The catalog to process
+   * @param definitionCatalog The definition catalog to update
+   */
+  private def processCatalog(
+    catalog: SourceConfig,
+    definitionCatalog: DefinitionCatalog
+  ): Unit = {
+    // TODO: Implement catalog processing logic
+    info(s"Processing catalog: ${catalog.`type`}")
+  }
 
   /** Gets all containers from the stack.
     *

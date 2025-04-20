@@ -293,6 +293,18 @@ object PrefabFileConfig {
   implicit val decoder: Decoder[PrefabFileConfig] = deriveDecoder[PrefabFileConfig]
 }
 
+// Represents a single definition within a file
+case class DefinitionConfig(
+  name: String,
+  `type`: String, // Use backticks for type as it's a Scala keyword
+  config: Map[String, Any] = Map.empty // Flexible for various config types
+  // TODO: Add other definition fields if necessary based on Definition.scala
+)
+object DefinitionConfig {
+  import CustomDecoders._
+  implicit val decoder: Decoder[DefinitionConfig] = deriveDecoder[DefinitionConfig]
+}
+
 case class SourceConfig(
   `type`: String, // Use backticks for type as it's a Scala keyword
   url: Option[String] = None, // For git and fetch types
@@ -320,23 +332,13 @@ case class ComponentFileConfig(
   defaults: Map[String, Any] = Map.empty,
   instances: List[InstanceConfig] = List.empty,
   connections: List[ConnectionConfig] = List.empty,
+  definitions: List[DefinitionConfig] = List.empty // List of definitions
 )
 object ComponentFileConfig {
   import CustomDecoders._
   implicit val decoder: Decoder[ComponentFileConfig] = deriveDecoder[ComponentFileConfig]
 }
 
-// Represents a single definition within a catalog file
-case class DefinitionConfig(
-  name: String,
-  `type`: String, // Use backticks for type as it's a Scala keyword
-  config: Map[String, Any] = Map.empty // Flexible for various config types
-  // TODO: Add other definition fields if necessary based on Definition.scala
-)
-object DefinitionConfig {
-  import CustomDecoders._
-  implicit val decoder: Decoder[DefinitionConfig] = deriveDecoder[DefinitionConfig]
-}
 
 // Represents the top-level structure of a catalog YAML file
 case class CatalogFileConfig(

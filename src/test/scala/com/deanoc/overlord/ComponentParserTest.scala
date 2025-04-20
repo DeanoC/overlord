@@ -175,6 +175,25 @@ class ComponentParserTest
     projectConfig.defaults should have size 1
     projectConfig.defaults.get("target_frequency") shouldBe Some("100MHz")
     
+    // Verify definitions
+    projectConfig.definitions should have size 3
+    
+    // Check CPU definition
+    val cpuDefinition = projectConfig.definitions.find(_.name == "Cortex-A53").get
+    cpuDefinition.`type` shouldBe "cpu.arm.a53"
+    cpuDefinition.config.get("core_count") shouldBe Some("4")
+    cpuDefinition.config.get("triple") shouldBe Some("aarch64-none-elf")
+    
+    // Check RAM definition
+    val ramDefinition = projectConfig.definitions.find(_.name == "MainMemory").get
+    ramDefinition.`type` shouldBe "ram.sram.main"
+    ramDefinition.config.get("ranges") should not be None
+    
+    // Check clock definition
+    val clockDefinition = projectConfig.definitions.find(_.name == "SystemClock").get
+    clockDefinition.`type` shouldBe "clock.system.100mhz"
+    clockDefinition.config.get("frequency") shouldBe Some("100MHz")
+    
     // Verify instances
     projectConfig.instances should have size 7
     

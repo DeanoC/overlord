@@ -123,7 +123,29 @@ connections:
     connection: "instanceName.parameter_name"
     value: "constant_value"
 ```
-
+### 7. Definitions
+```yaml
+definitions:
+  - name: "Cortex-A53"
+    type: "cpu"
+    config:
+      core_count: 4
+      triple: "aarch64-none-elf"
+  
+  - name: "MainMemory"
+    type: "ram"
+    config:
+      ranges:
+        - address: "0x80000000"
+          size: "0x40000000"
+        - address: "0xC0000000" 
+          size: "0x20000000"
+  
+  - name: "SystemClock"
+    type: "clock"
+    config:
+      frequency: "100MHz"
+```
 ## Processing Order
 
 The Overlord.Project class processes these sections in a specific order:
@@ -131,9 +153,10 @@ The Overlord.Project class processes these sections in a specific order:
 1. Process `info` section
 2. Process `defaults` section
 3. Process `catalogs` section
-4. Process `instances` sections to create component instances
-5. Process `connections` sections to connect those instances
-6. Process `components` section
+4. Process `definitions` section
+5. Process `instances` sections to create component instances
+6. Process `connections` sections to connect those instances
+7. Process `components` section
 
 ## Special Macros
 
@@ -270,6 +293,27 @@ connections:
   - type: "constant"
     connection: "cpu0.vector_base"
     value: "0x00000000"
+
+definitions:
+  - name: "Cortex-A53"
+    type: "cpu.arm.a53"
+    config:
+      core_count: 4
+      triple: "aarch64-none-elf"
+  
+  - name: "MainMemory"
+    type: "ram.sram.main"
+    config:
+      ranges:
+        - address: "0x80000000"
+          size: "0x40000000"
+        - address: "0xC0000000" 
+          size: "0x20000000"
+  
+  - name: "SystemClock"
+    type: "clock.system.100mhz"
+    config:
+      frequency: "100MHz"    
 ```
 
 ## Advanced Features
