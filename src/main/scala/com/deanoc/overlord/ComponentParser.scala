@@ -2,15 +2,15 @@ package com.deanoc.overlord
 
 import com.deanoc.overlord.connections._
 import com.deanoc.overlord.instances._
-import com.deanoc.overlord.utils.{Logging, Utils}
-import com.deanoc.overlord.config.{ProjectFileConfig, InstanceConfig, PrefabConfig, ConnectionConfig} // Import specific config case classes
+import com.deanoc.overlord.utils.{Logging, Utils, NamespaceUtils}
+import com.deanoc.overlord.config.{ProjectFileConfig, InstanceConfig, PrefabConfig, ConnectionConfig, InfoConfig, ComponentConfig} // Import specific config case classes
+import com.deanoc.overlord.definitions.{DefinitionType, ComponentDefinition}
 
 import java.nio.file.Path
 import scala.collection.mutable
 import scala.util.boundary, boundary.break
 import io.circe.yaml.parser
 import io.circe.Decoder // Import Decoder explicitly
-import com.deanoc.overlord.definitions.DefinitionType
 
 /** Handles parsing of project files for the Overlord system. Responsible for
   * processing instantiations, includes, prefabs, and connections.
@@ -20,7 +20,7 @@ class ComponentParser() extends Logging {
 
   def parseComponentFile(
       path: Path,
-      board: String
+      board: String = ""
   ): Option[(MutableContainer, DefinitionCatalog)] = {
     val newContainer = MutableContainer()
     containerStack.push(newContainer)
@@ -36,47 +36,105 @@ class ComponentParser() extends Logging {
         error(s"Failed to parse project file $path: $err")
         None
       case Right(parsed) =>
-        val boards = parseBoards(parsed)
-        if (!boards.contains(board)) {
-          error(
-            s"The board $board is not supported by this project. The boards supported are $boards"
-          )
-          return None
-        }
-
-        // instances and prefabs from board are added to parsed
-        val mergedParsed = parsed.copy(
-          instances = parsed.instances ++ List(InstanceConfig(name = board, `type` = s"board.$board")),
-          prefabs = parsed.prefabs ++ List(PrefabConfig(name = s"boards.$board"))
-        )
-
+        // Initialize the definition catalog
         var definitionCatalog = new DefinitionCatalog
-        // TODO: Update CatalogLoader.parseDefinitionCatalog to accept ProjectFileConfig or relevant parts
-        // For now, keeping the old call, which will need to be refactored later.
-        // definitionCatalog.mergeNewDfinition(CatalogLoader.parseDefinitionCatalog("project", parsed, parsed.defaults.getOrElse(Map.empty).mapValues(Utils.toVariant)))
-
-        // Process prefabs using the new type-safe configuration
-        val prefabCatalogResult = CatalogLoader.parsePrefabCatalog("project", mergedParsed, mergedParsed.defaults)
         
-        val prefabCatalog = prefabCatalogResult match {
-          case Left(err) =>
-            error(s"Error processing prefabs: $err")
-            PrefabCatalog()
-          case Right(catalog) => catalog
+        // Process catalogs section
+        if (parsed.catalogs.nonEmpty) {
+          info(s"Processing ${parsed.catalogs.size} catalogs")
+          // TODO: Implement catalog processing
+          // This will be implemented in a future task
         }
         
-        val catalogs = definitionCatalog
-        val prefabs = prefabCatalog
+        // Process components section
+        if (parsed.components.nonEmpty) {
+          info(s"Processing ${parsed.components.size} components")
+          parsed.components.foreach { componentConfig =>
+            processComponent(componentConfig, definitionCatalog, parsed.defaults)
+          }
+        }
+        
+        // For backward compatibility, handle board if specified
+        if (board.nonEmpty) {
+          val boards = parseBoards(parsed)
+          if (!boards.contains(board)) {
+            error(
+              s"The board $board is not supported by this project. The boards supported are $boards"
+            )
+            return None
+          }
 
-        newContainer.mutableChildren ++= processInstantiations(
-          mergedParsed,
-          definitionCatalog,
-          prefabCatalog,
-          parsed.defaults
-        ) 
+          // instances and prefabs from board are added to parsed
+          val mergedParsed = parsed.copy(
+            instances = parsed.instances ++ List(InstanceConfig(name = board, `type` = s"board.$board")),
+            prefabs = parsed.prefabs ++ List(PrefabConfig(name = s"boards.$board"))
+          )
+
+          // Process prefabs using the new type-safe configuration
+          val prefabCatalogResult = CatalogLoader.parsePrefabCatalog("project", mergedParsed, mergedParsed.defaults)
+          
+          val prefabCatalog = prefabCatalogResult match {
+            case Left(err) =>
+              error(s"Error processing prefabs: $err")
+              PrefabCatalog()
+            case Right(catalog) => catalog
+          }
+
+          newContainer.mutableChildren ++= processInstantiations(
+            mergedParsed,
+            definitionCatalog,
+            prefabCatalog,
+            parsed.defaults
+          )
+        } else {
+          // Process instances directly without board-specific handling
+          newContainer.mutableChildren ++= processInstantiations(
+            parsed,
+            definitionCatalog,
+            PrefabCatalog(), // Empty prefab catalog when not using boards
+            parsed.defaults
+          )
+        }
         
         Some((newContainer, definitionCatalog))
     }
+  }
+  
+  /**
+   * Processes a component configuration and registers it as a Component type definition.
+   *
+   * @param componentConfig The component configuration to process
+   * @param catalog The definition catalog to register the component in
+   * @param defaults The default values to use
+   */
+  private def processComponent(
+    componentConfig: ComponentConfig,
+    catalog: DefinitionCatalog,
+    defaults: Map[String, Any]
+  ): Unit = {
+    // Get the component path
+    val componentPath = componentConfig.path match {
+      case Some(path) => java.nio.file.Paths.get(path)
+      case None =>
+        error(s"Component ${componentConfig.`type`} has no path specified")
+        return
+    }
+    
+    // Load the component
+    val componentName = componentConfig.`type`
+    info(s"Loading component $componentName from $componentPath")
+    
+    // Create a Component from the project file
+    val component = Component.fromProjectFile(componentName, "", componentPath) match {
+      case Some(comp) => comp
+      case None =>
+        error(s"Failed to load component $componentName from $componentPath")
+        return
+    }
+    
+    // Register the component as a Component type definition
+    catalog.addComponentDefinition(component)
+    info(s"Registered component $componentName as a Component type definition")
   }
 
 
@@ -116,7 +174,7 @@ class ComponentParser() extends Logging {
       defaults: Map[String, Any],
   ): Seq[InstanceTrait] = {
     // extract instances
-    var instances = parsed.instances.map { instanceConfig => {
+    var instances = parsed.instances.flatMap { instanceConfig =>
         // Convert defaults to Variant map for backward compatibility
         val defaultsAsVariant = defaults.map { case (k, v) => k -> Utils.toVariant(v) }.toMap
         
@@ -131,19 +189,57 @@ class ComponentParser() extends Logging {
         
         definitionResult match {
           case Right(definition) =>
-            // Create the instance with the specific configuration
-            definition.createInstance(instanceConfig.name, instanceConfig.config) match {
-              case Right(inst) => Some(inst)
-              case Left(errorMsg) =>
-                this.error(s"Failed to create instance ${instanceConfig.name}: $errorMsg", null)
-                None
+            // Check if this is a Component type definition
+            definition match {
+              case componentDef: ComponentDefinition =>
+                // This is a Component type definition, so we need to clone its instances and connections
+                info(s"Creating instance ${instanceConfig.name} from component definition ${componentDef.name}")
+                
+                // Create a ComponentInstanceCloner to handle cloning
+                val cloner = new ComponentInstanceCloner()
+                
+                // Try to create an instance from the component definition
+                componentDef.createInstance(instanceConfig.name, instanceConfig.config) match {
+                  case Right(inst) =>
+                    // If successful, return the instance
+                    Seq(inst)
+                  case Left(errorMsg) =>
+                    // If failed, log the error and fall back to cloning instances directly
+                    this.warn(s"Failed to create component instance ${instanceConfig.name}: $errorMsg")
+                    this.info(s"Falling back to direct instance cloning")
+                    
+                    // Clone the component's instances with proper namespacing
+                    val clonedInstances = cloner.cloneInstances(
+                      instanceConfig.name,
+                      componentDef.component,
+                      instanceConfig.config
+                    )
+                    
+                    // Return the cloned instances
+                    clonedInstances
+                }
+                
+              case _ =>
+                // This is a regular definition, so create the instance normally
+                definition.createInstance(instanceConfig.name, instanceConfig.config) match {
+                  case Right(inst) => Seq(inst)
+                  case Left(errorMsg) =>
+                    this.error(s"Failed to create instance ${instanceConfig.name}: $errorMsg", null)
+                    Seq.empty
+                }
             }
           case Left(errorMsg) =>
             this.error(s"Failed to find or create definition for ${instanceConfig.name}: $errorMsg", null)
-            None
+            Seq.empty
         }
-      }
-    }.collect { case Some(inst) => inst }
+    }
+
+    // Process prefabs (for backward compatibility)
+    if (prefabs.prefabs.nonEmpty) {
+      info(s"Processing ${prefabs.prefabs.size} prefabs")
+      // TODO: Implement prefab processing
+      // This will be implemented in a future task
+    }
 
     instances
   }

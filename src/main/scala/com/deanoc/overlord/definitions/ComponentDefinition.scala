@@ -49,14 +49,24 @@ class ComponentDefinition(
     name: String,
     instanceConfig: Option[Map[String, Any]]
   ): Either[String, InstanceTrait] = {
-    // Placeholder implementation
-    // In future phases, this will:
-    // 1. Clone all instances from the component's project
-    // 2. Clone all connections from the component's project
-    // 3. Apply proper namespacing to the cloned instances and connections
-    // 4. Return a container instance representing the component
-    
-    Left("Component instantiation not yet implemented")
+    try {
+      // Create a ComponentInstanceCloner to handle cloning
+      val cloner = new com.deanoc.overlord.ComponentInstanceCloner()
+      
+      // Create a new container to hold the cloned instances and connections
+      val container = cloner.cloneComponentToNewContainer(name, component, instanceConfig)
+      
+      // Return the container as the component instance
+      // Since we can't create a Container directly (it's a trait),
+      // we'll return the MutableContainer we created
+      
+      // For now, we'll return a placeholder error since we need to create a proper instance
+      // that implements InstanceTrait, not just Container
+      Left("Component instantiation not yet fully implemented - container created but cannot be returned as InstanceTrait")
+    } catch {
+      case e: Exception =>
+        Left(s"Failed to create component instance: ${e.getMessage}")
+    }
   }
   
   /**
