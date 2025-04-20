@@ -1,4 +1,4 @@
-package com.deanoc.overlord.software
+package com.deanoc.overlord.definitions
 
 import com.deanoc.overlord.actions.ActionsFile
 import com.deanoc.overlord.utils.{StringV, Utils, Variant}

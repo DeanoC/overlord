@@ -5,7 +5,6 @@ import com.deanoc.overlord.definitions.{
   HardwareDefinition,
   DefinitionType
 }
-import com.deanoc.overlord.software.SoftwareDefinition
 import com.deanoc.overlord.utils.{
   Variant,
   ArrayV,

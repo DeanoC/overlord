@@ -12,7 +12,7 @@ import com.deanoc.overlord.definitions.{
   DefinitionTrait,
   DefinitionType
 }
-import com.deanoc.overlord.software.SoftwareDefinition
+import com.deanoc.overlord.definitions.SoftwareDefinition
 import com.deanoc.overlord.utils.{
   ArrayV,
   BigIntV,
