@@ -95,7 +95,7 @@ object Component extends Logging {
       gamePath: Path
   ): Option[Component] = boundary {
     // Create a ProjectParser with explicit dependency injection
-    val parser = new ProjectParser()
+    val parser = new ComponentParser()
 
     // Parse the project file and get the container and catalog
     val (container, catalog) =

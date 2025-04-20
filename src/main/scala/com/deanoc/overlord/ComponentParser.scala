@@ -14,7 +14,7 @@ import io.circe.Decoder // Import Decoder explicitly
 /** Handles parsing of project files for the Overlord system. Responsible for
   * processing instantiations, includes, prefabs, and connections.
   */
-class ProjectParser() extends Logging {
+class ComponentParser() extends Logging {
   private val containerStack: mutable.Stack[MutableContainer] = mutable.Stack()
 
   def parseProjectFile(

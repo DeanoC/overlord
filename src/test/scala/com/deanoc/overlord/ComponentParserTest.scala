@@ -1,6 +1,6 @@
 package com.deanoc.overlord
 
-import com.deanoc.overlord.{CatalogLoader, Definition, DefinitionType, DefinitionTrait, HardwareDefinitionTrait, SoftwareDefinitionTrait}
+import com.deanoc.overlord.{CatalogLoader, ComponentParser, Definition, DefinitionType, DefinitionTrait, HardwareDefinitionTrait, SoftwareDefinitionTrait}
 
 import com.deanoc.overlord.utils._ // Import all members from utils
 import com.deanoc.overlord.config._
@@ -20,7 +20,7 @@ import java.nio.file.{Files, Path, Paths}
 import java.io.{File, FileWriter}
 import scala.collection.mutable
 
-class OverlordParserTest
+class ComponentParserTest
     extends AnyFlatSpec
     with Matchers
     with BeforeAndAfter
@@ -28,7 +28,7 @@ class OverlordParserTest
   // Mock objects
   val mockCatalogs = mock(classOf[DefinitionCatalog])
   val mockPrefabs = mock(classOf[PrefabCatalog])
-  var parser: ProjectParser = _
+  var parser: ComponentParser = _
 
   // Create temp directory for test files - shared across all tests
   var tempDir: Path = _
@@ -220,7 +220,7 @@ prefabs:
 
   before {
     // Create a fresh parser before each test
-    parser = new ProjectParser()
+    parser = new ComponentParser()
 
     Overlord.resetPaths()
     // Add a default catalog path for testing
