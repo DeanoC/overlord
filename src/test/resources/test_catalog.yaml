@@ -1,9 +1,6 @@
 # Default values applicable to all definitions
 defaults:
-  active: true
-  version: "1.0"
-  author: "Overlord Team"
-  description: "Example catalog file"
+  core_count: 1
 
 # External catalog sources
 catalogs:

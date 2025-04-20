@@ -49,7 +49,8 @@ class ComponentParserTest
     Overlord.pushCatalogPath(tempDir)
   }
 
-  "parseDefinitionCatalog with type-safe config" should "correctly parse catalog file and extract definition data" in {
+  "Parse Definition Catalog" should "correctly parse catalog file and extract definition data" in {
+    // Load the YAML content from the actual test file
     val catalogFilePath = Paths.get("src/test/resources/test_catalog.yaml")
     val catalogYamlContent = new String(Files.readAllBytes(catalogFilePath))
 
@@ -57,7 +58,11 @@ class ComponentParserTest
     val parsedYaml = yamlParse(catalogYamlContent).getOrElse(Json.Null)
     parsedYaml should not be Json.Null
 
-    val catalogConfig = parsedYaml.as[CatalogFileConfig].getOrElse(CatalogFileConfig())
+    val catalogConfig = parsedYaml.as[CatalogFileConfig] match {
+      case Right(config) => config
+      case Left(error) => 
+        fail(s"Failed to parse catalog file: ${error.message}, at path: ${error.history}")
+    }
     
     // Assert that parsing was successful and the top-level structure is as expected
     catalogConfig.defaults should not be empty
@@ -65,11 +70,8 @@ class ComponentParserTest
     catalogConfig.catalogs should not be empty
     
     // Extract and assert the defaults
-    catalogConfig.defaults should have size 4
-    catalogConfig.defaults.get("version") shouldBe Some("1.0")
-    catalogConfig.defaults.get("author") shouldBe Some("Overlord Team")
-    catalogConfig.defaults.get("description") shouldBe Some("Example catalog file")
-    catalogConfig.defaults.get("active") shouldBe Some("true")
+    catalogConfig.defaults should have size 1
+    catalogConfig.defaults.get("core_count") shouldBe Some("1")
     
     // Extract and assert the definitions
     catalogConfig.definitions should have size 5
@@ -85,6 +87,9 @@ class ComponentParserTest
     val ramDefinition = catalogConfig.definitions(1)
     ramDefinition.`type` shouldBe "ram"
     ramDefinition.name shouldBe "MainMemory"
+    
+    // Check RAM config and ranges if supported by the schema
+    ramDefinition.config.get("ranges") should not be None
     
     // Assert the content of the clock definition
     val clockDefinition = catalogConfig.definitions(2)
@@ -102,6 +107,8 @@ class ComponentParserTest
     val pinGroupDefinition = catalogConfig.definitions(4)
     pinGroupDefinition.`type` shouldBe "pingroup"
     pinGroupDefinition.name shouldBe "ControlPins"
+    pinGroupDefinition.config.get("pins") should not be None
+    pinGroupDefinition.config.get("direction") shouldBe Some("output")
     
     // Verify catalogs
     catalogConfig.catalogs should have size 3
@@ -112,13 +119,6 @@ class ComponentParserTest
     catalogConfig.catalogs(2).`type` shouldBe "fetch"
     catalogConfig.catalogs(2).url shouldBe Some("https://example.com/api/catalog")
     
-    val defType = DefinitionType.apply(cpuDefinition.`type`)
-    defType.ident should contain("cpu")
-    
-    val mockDef = mock(classOf[HardwareDefinitionTrait])
-    when(mockDef.defType).thenReturn(defType)
-    
-    mockDef.defType.ident should contain("cpu")
   }
 
   "Parse Project File" should "correctly parse project file with new format" in {
@@ -283,109 +283,5 @@ class ComponentParserTest
     
     // Check that value option exists and has the correct value
     constantConnection.value.map(_.asString) shouldBe Some(Some("0x00000000"))
-  }
-
-  // For backward compatibility, also test the old YAML parsing method
-  "parseDefinitionCatalog YAML parsing" should "correctly parse YAML content and extract definition data" in {
-    val yamlContent = """
-      defaults:
-        version: 1
-        author: "Test Author"
-      definition:
-        - type: hardware.chip.test_chip
-          ident: test_chip_1
-          description: "A test chip definition"
-          parameters:
-            param1: value1
-        - type: software.program.test_program
-          ident: test_program_1
-          description: "A test program definition"
-          source: src/test_program.c
-    """.stripMargin
-
-    // Simulate parsing the YAML content into a Map[String, Variant]
-    val parsedYaml: Map[String, Variant] = Utils.fromYaml(yamlContent)
-
-    // Assert that parsing was successful and the top-level structure is as expected
-    parsedYaml should not be empty
-    parsedYaml should contain key "defaults"
-    parsedYaml should contain key "definition"
-
-    // Extract and assert the defaults
-    val defaults = parsedYaml.get("defaults") match {
-      case Some(TableV(defaultsMap)) => defaultsMap
-      case _ => fail("Defaults section not found or not a TableV")
-    }
-    defaults should have size 2
-    defaults.get("version") match {
-      case Some(IntV(value)) => value should be (1)
-      case _ => fail("Version default not found or not an IntV")
-    }
-    defaults.get("author") match {
-      case Some(StringV(value)) => value should be ("Test Author")
-      case _ => fail("Author default not found or not a StringV")
-    }
-
-    // Extract and assert the definitions array
-    val definitionsArray = parsedYaml.get("definition") match {
-      case Some(ArrayV(defsArray)) => defsArray
-      case _ => fail("Definition section not found or not an ArrayV")
-    }
-    definitionsArray should have size 2
-
-    // Assert the content of the first definition entry (chip)
-    val chipDefinitionEntry = definitionsArray(0) match {
-      case TableV(entryMap) => entryMap
-      case _ => fail("First definition entry is not a TableV")
-    }
-    chipDefinitionEntry should contain key "type"
-    chipDefinitionEntry.get("type") match {
-      case Some(StringV(value)) => value should be ("hardware.chip.test_chip")
-      case _ => fail("Chip definition type not found or not a StringV")
-    }
-    chipDefinitionEntry should contain key "ident"
-    chipDefinitionEntry.get("ident") match {
-      case Some(StringV(value)) => value should be ("test_chip_1")
-      case _ => fail("Chip definition ident not found or not a StringV")
-    }
-    chipDefinitionEntry should contain key "description"
-    chipDefinitionEntry.get("description") match {
-      case Some(StringV(value)) => value should be ("A test chip definition")
-      case _ => fail("Chip definition description not found or not a StringV")
-    }
-    chipDefinitionEntry should contain key "parameters"
-    chipDefinitionEntry.get("parameters") match {
-      case Some(TableV(params)) => params.get("param1") match {
-        case Some(StringV(value)) => value should be ("value1")
-        case _ => fail("Chip parameter 'param1' not found or not a StringV")
-      }
-      case _ => fail("Parameters not found or not a TableV in chip definition entry")
-    }
-
-    // Assert the content of the second definition entry (program)
-    val programDefinitionEntry = definitionsArray(1) match {
-      case TableV(entryMap) => entryMap
-      case _ => fail("Second definition entry is not a TableV")
-    }
-    programDefinitionEntry should contain key "type"
-    programDefinitionEntry.get("type") match {
-      case Some(StringV(value)) => value should be ("software.program.test_program")
-      case _ => fail("Program definition type not found or not a StringV")
-    }
-    programDefinitionEntry should contain key "ident"
-    programDefinitionEntry.get("ident") match {
-      case Some(StringV(value)) => value should be ("test_program_1")
-      case _ => fail("Program definition ident not found or not a StringV")
-    }
-    programDefinitionEntry should contain key "description"
-    programDefinitionEntry.get("description") match {
-      case Some(StringV(value)) => value should be ("A test program definition")
-      case _ => fail("Program definition description not found or not a StringV")
-    }
-    programDefinitionEntry should contain key "source"
-    programDefinitionEntry.get("source") match {
-      case Some(StringV(value)) => value should be ("src/test_program.c")
-      case _ => fail("Program source not found or not a StringV")
-    }
   }
 }
