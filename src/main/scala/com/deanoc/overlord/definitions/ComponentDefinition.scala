@@ -22,7 +22,7 @@ class ComponentDefinition(
   /**
    * The type of this definition
    */
-  override val defType: DefinitionType = ComponentDefinitionType(Seq("component"))
+  override val defType: DefinitionType = DefinitionType.ComponentDefinition(name.split('.').toSeq)
   
   /**
    * The attributes of this definition

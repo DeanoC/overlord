@@ -12,7 +12,7 @@ import com.deanoc.overlord.utils.{
   Logging
 }
 import com.deanoc.overlord.definitions.{GatewareDefinitionTrait, SoftwareDefinitionTrait}
-import com.deanoc.overlord.definitions.{DefinitionType, LibraryDefinitionType, ProgramDefinitionType}
+import com.deanoc.overlord.definitions.DefinitionType
 
 import java.nio.file.{Files, Path, Paths}
 import scala.collection.mutable
@@ -539,12 +539,12 @@ object Overlord extends Logging {
         val defs = {
           val si = n.split('.')
           if (si.isEmpty) Seq()
-          else if (si(0) == "library") Seq(LibraryDefinitionType(si.toSeq))
-          else if (si(0) == "program") Seq(ProgramDefinitionType(si.toSeq))
+          else if (si(0) == "library") Seq(DefinitionType.LibraryDefinition(si.toSeq))
+          else if (si(0) == "program") Seq(DefinitionType.ProgramDefinition(si.toSeq))
           else
             Seq(
-              LibraryDefinitionType(si.prepended("library").toSeq),
-              ProgramDefinitionType(si.prepended("program").toSeq)
+              DefinitionType.LibraryDefinition(si.prepended("library").toSeq),
+              DefinitionType.ProgramDefinition(si.prepended("program").toSeq)
             )
         }
 
@@ -584,10 +584,10 @@ object Overlord extends Logging {
   // Helper method to create appropriate configuration based on definition type
   private def createConfigForDefinition(defType: DefinitionType, name: String): Map[String, Any] = {
     defType match {
-      case _: LibraryDefinitionType =>
+      case _: DefinitionType.LibraryDefinition =>
         // Create LibraryConfig with empty dependencies
         Map("dependencies" -> List.empty[String])
-      case _: ProgramDefinitionType =>
+      case _: DefinitionType.ProgramDefinition =>
         // Create ProgramConfig with empty dependencies
         Map("dependencies" -> List.empty[String])
       case _ =>

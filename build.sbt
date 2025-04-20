@@ -105,7 +105,6 @@ lazy val overlord = (project in file("."))
     scalaVersion := scala3Version,
     commonSettings,
     libraryDependencies := dependencies,
-    maxErrors := 5,
     scalacOptions ++= Seq(
 //      "-Yexplicit-nulls", // Enable null safety in Scala 3
       "-feature"

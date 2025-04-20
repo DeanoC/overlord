@@ -10,19 +10,13 @@ import com.deanoc.overlord._
 import scala.language.implicitConversions
 import com.deanoc.overlord.connections.ConnectionTypesTestExtensions._
 import com.deanoc.overlord.utils.{SilentLogger, Logging, ModuleLogger, Utils}
-import com.deanoc.overlord.utils.{Variant, TableV}
+import com.deanoc.overlord.utils.{Variant, TableV, BigIntV}
 import com.deanoc.overlord.definitions._
 import com.deanoc.overlord.connections.ConnectionTypes._
-import com.deanoc.overlord.instances.{CpuInstance, RamInstance}
+// Import the new enum-based DefinitionType
+import com.deanoc.overlord.definitions.DefinitionType
+import com.deanoc.overlord.instances.{CpuInstance, RamInstance, ChipInstance, InstanceTrait}
 import com.deanoc.overlord.config.{CpuConfig, RamConfig, MemoryRangeConfig}
-
-// Helper methods for testing
-object UnconnectedBusExtendedTestHelpers {
-  implicit class BusNameTestOps(name: BusName) {
-    def value: String = name.toString
-  }
-}
-import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
 import com.deanoc.overlord.connections.InstanceLoc
 import com.deanoc.overlord.interfaces._
 import com.deanoc.overlord.hardware.{
@@ -31,10 +25,8 @@ import com.deanoc.overlord.hardware.{
   InWireDirection,
   OutWireDirection
 }
-import com.deanoc.overlord.utils.{Variant, BigIntV}
 
 import scala.collection.mutable
-import scala.reflect.ClassTag
 import scala.reflect.ClassTag
 import com.deanoc.overlord.definitions.HardwareDefinitionTrait
 
@@ -62,9 +54,9 @@ class UnconnectedBusExtendedSpec
   // Helper methods to create CpuDef and RamDef
   private def createCpuDef(): HardwareDefinitionTrait =
     new HardwareDefinitionTrait {
-      override val ports: Map[String, com.deanoc.overlord.hardware.Port] = Map()
+      override val ports: Map[String, Port] = Map()
       override val maxInstances: Int = 1
-      override val defType: DefinitionType = CpuDefinitionType(
+      override val defType: DefinitionType = DefinitionType.CpuDefinition(
         Seq("cpu", "riscv", "verilog")
       )
       override val attributes: Map[String, Variant] = Utils.fromYaml(
@@ -93,7 +85,7 @@ ranges:
       """
       )
       override def toString(): String = "RiscVCpu"
-      protected val registersV: Seq[com.deanoc.overlord.utils.Variant] = Seq()
+      protected val registersV: Seq[Variant] = Seq()
       override val dependencies: Seq[String] = Seq()
       override val sourcePath: java.nio.file.Path =
         java.nio.file.Paths.get("path/to/source")
@@ -101,9 +93,9 @@ ranges:
 
   private def createRamDef(): HardwareDefinitionTrait =
     new HardwareDefinitionTrait {
-      override val ports: Map[String, com.deanoc.overlord.hardware.Port] = Map()
+      override val ports: Map[String, Port] = Map()
       override val maxInstances: Int = 1
-      override val defType: DefinitionType = RamDefinitionType(
+      override val defType: DefinitionType = DefinitionType.RamDefinition(
         Seq("ram", "verilog")
       )
       override val attributes: Map[String, Variant] = Utils.fromYaml(
@@ -117,7 +109,7 @@ buses:
       """
       )
       override def toString(): String = "Ram"
-      protected val registersV: Seq[com.deanoc.overlord.utils.Variant] = Seq()
+      protected val registersV: Seq[Variant] = Seq()
       override val dependencies: Seq[String] = Seq()
       override val sourcePath: java.nio.file.Path =
         java.nio.file.Paths.get("path/to/source")

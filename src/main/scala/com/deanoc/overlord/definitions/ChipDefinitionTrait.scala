@@ -19,7 +19,7 @@ trait ChipDefinitionTrait extends DefinitionTrait {
       instanceConfig: Option[Map[String, Any]]
   ): Either[String, InstanceTrait] = {
     defType match {
-      case _: RamDefinitionType =>
+      case _: DefinitionType.RamDefinition =>
         instanceConfig match {
           case Some(configMap) =>
             // Attempt to decode the config map into RamConfig
@@ -37,9 +37,9 @@ trait ChipDefinitionTrait extends DefinitionTrait {
                 )
             }
           case None =>
-            Left(s"RamDefinitionType instance $name requires configuration")
+            Left(s"Ram definition instance $name requires configuration")
         }
-      case _: CpuDefinitionType =>
+      case _: DefinitionType.CpuDefinition =>
         instanceConfig match {
           case Some(configMap) =>
             decode[CpuConfig](
@@ -56,9 +56,9 @@ trait ChipDefinitionTrait extends DefinitionTrait {
                 )
             }
           case None =>
-            Left(s"CpuDefinitionType instance $name requires configuration")
+            Left(s"CPU definition instance $name requires configuration")
         }
-      case _: IoDefinitionType =>
+      case _: DefinitionType.IoDefinition =>
         instanceConfig match {
           case Some(configMap) =>
             decode[IoConfig](
@@ -75,9 +75,9 @@ trait ChipDefinitionTrait extends DefinitionTrait {
                 )
             }
           case None =>
-            Left(s"IoDefinitionType instance $name requires configuration")
+            Left(s"IO definition instance $name requires configuration")
         }
-      case _: PinGroupDefinitionType =>
+      case _: DefinitionType.PinGroupDefinition =>
         instanceConfig match {
           case Some(configMap) =>
             decode[PinGroupConfig](
@@ -99,10 +99,10 @@ trait ChipDefinitionTrait extends DefinitionTrait {
             }
           case None =>
             Left(
-              s"PinGroupDefinitionType instance $name requires configuration"
+              s"Pin group definition instance $name requires configuration"
             )
         }
-      case _: ClockDefinitionType =>
+      case _: DefinitionType.ClockDefinition =>
         instanceConfig match {
           case Some(configMap) =>
             decode[ClockConfig](
@@ -119,9 +119,9 @@ trait ChipDefinitionTrait extends DefinitionTrait {
                 )
             }
           case None =>
-            Left(s"ClockDefinitionType instance $name requires configuration")
+            Left(s"Clock definition instance $name requires configuration")
         }
-      case _: BoardDefinitionType =>
+      case _: DefinitionType.BoardDefinition =>
         instanceConfig match {
           case Some(configMap) =>
             decode[BoardConfig](
@@ -139,9 +139,9 @@ trait ChipDefinitionTrait extends DefinitionTrait {
                 )
             }
           case None =>
-            Left(s"BoardDefinitionType instance $name requires configuration")
+            Left(s"Board definition instance $name requires configuration")
         }
-      case _: GraphicDefinitionType => {
+      case _: DefinitionType.GraphicDefinition => {
         val graphic = GraphicInstance(name, this)
         val attribs = instanceConfig.getOrElse(Map[String, Any]()).map {
           case (k, v) => k -> com.deanoc.overlord.utils.Utils.toVariant(v)
@@ -149,7 +149,7 @@ trait ChipDefinitionTrait extends DefinitionTrait {
         graphic.mergeAllAttributes(attribs)
         Right(graphic)
       }
-      case _: StorageDefinitionType => {
+      case _: DefinitionType.StorageDefinition => {
         val storage = StorageInstance(name, this)
         val attribs = instanceConfig.getOrElse(Map[String, Any]()).map {
           case (k, v) => k -> com.deanoc.overlord.utils.Utils.toVariant(v)
@@ -157,7 +157,7 @@ trait ChipDefinitionTrait extends DefinitionTrait {
         storage.mergeAllAttributes(attribs)
         Right(storage)
       }
-      case _: NetDefinitionType => {
+      case _: DefinitionType.NetDefinition => {
         val net = NetInstance(name, this)
         val attribs = instanceConfig.getOrElse(Map[String, Any]()).map {
           case (k, v) => k -> com.deanoc.overlord.utils.Utils.toVariant(v)
@@ -165,7 +165,7 @@ trait ChipDefinitionTrait extends DefinitionTrait {
         net.mergeAllAttributes(attribs)
         Right(net)
       }
-      case _: SocDefinitionType => {
+      case _: DefinitionType.SocDefinition => {
         val soc = SocInstance(name, this)
         val attribs = instanceConfig.getOrElse(Map[String, Any]()).map {
           case (k, v) => k -> com.deanoc.overlord.utils.Utils.toVariant(v)
@@ -173,7 +173,7 @@ trait ChipDefinitionTrait extends DefinitionTrait {
         soc.mergeAllAttributes(attribs)
         Right(soc)
       }
-      case _: SwitchDefinitionType => {
+      case _: DefinitionType.SwitchDefinition => {
         val sw = SwitchInstance(name, this)
         val attribs = instanceConfig.getOrElse(Map[String, Any]()).map {
           case (k, v) => k -> com.deanoc.overlord.utils.Utils.toVariant(v)
@@ -181,7 +181,7 @@ trait ChipDefinitionTrait extends DefinitionTrait {
         sw.mergeAllAttributes(attribs)
         Right(sw)
       }
-      case _: OtherDefinitionType => {
+      case _: DefinitionType.OtherDefinition => {
         val other = OtherInstance(name, this)
         val attribs = instanceConfig.getOrElse(Map[String, Any]()).map {
           case (k, v) => k -> com.deanoc.overlord.utils.Utils.toVariant(v)

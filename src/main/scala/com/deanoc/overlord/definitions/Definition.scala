@@ -3,13 +3,7 @@ package com.deanoc.overlord.definitions
 import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.definitions.{
   HardwareDefinition,
-  DefinitionType,
-  ChipDefinitionType,
-  SoftwareDefinitionType,
-  PinGroupDefinitionType,
-  ClockDefinitionType,
-  BoardDefinitionType,
-  ComponentDefinitionType
+  DefinitionType
 }
 import com.deanoc.overlord.software.SoftwareDefinition
 import com.deanoc.overlord.utils.{
@@ -54,17 +48,31 @@ object Definition {
     }
 
     defType match {
-      case dt: ChipDefinitionType =>
+      // Chip definitions
+      case _: DefinitionType.RamDefinition | _: DefinitionType.CpuDefinition |
+           _: DefinitionType.GraphicDefinition | _: DefinitionType.StorageDefinition |
+           _: DefinitionType.NetDefinition | _: DefinitionType.IoDefinition |
+           _: DefinitionType.OtherDefinition | _: DefinitionType.SocDefinition |
+           _: DefinitionType.SwitchDefinition =>
         HardwareDefinition(defType, mergedConfig, path)
-      case dt: SoftwareDefinitionType =>
+      
+      // Software definitions
+      case _: DefinitionType.ProgramDefinition | _: DefinitionType.LibraryDefinition =>
         SoftwareDefinition(defType, mergedConfig, path)
-      case dt: PinGroupDefinitionType =>
+      
+      // Port definitions
+      case _: DefinitionType.PinGroupDefinition =>
         HardwareDefinition(defType, mergedConfig, path)
-      case dt: ClockDefinitionType =>
+      case _: DefinitionType.ClockDefinition =>
         HardwareDefinition(defType, mergedConfig, path)
-      case dt: BoardDefinitionType =>
+      
+      // Board definition
+      case _: DefinitionType.BoardDefinition =>
         HardwareDefinition(defType, mergedConfig, path)
-      case dt: ComponentDefinitionType =>  Left(s"ComponentDefinitionType are NOT defined this way")
+      
+      // Component definition
+      case _: DefinitionType.ComponentDefinition =>
+        Left(s"Component definitions are NOT defined this way")
       case null => Left(s"Unknown definition type: ${config.`type`}")
     }
   }

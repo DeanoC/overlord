@@ -19,7 +19,7 @@ trait SoftwareDefinitionTrait extends DefinitionTrait {
       instanceConfig: Option[Map[String, Any]]
   ): Either[String, InstanceTrait] = {
     defType match {
-      case _: LibraryDefinitionType =>
+      case _: DefinitionType.LibraryDefinition =>
         instanceConfig match {
           case Some(configMap) =>
             decode[LibraryConfig](
@@ -36,9 +36,9 @@ trait SoftwareDefinitionTrait extends DefinitionTrait {
                 )
             }
           case None =>
-            Left(s"LibraryDefinitionType instance $name requires configuration")
+            Left(s"Library definition instance $name requires configuration")
         }
-      case _: ProgramDefinitionType =>
+      case _: DefinitionType.ProgramDefinition =>
         instanceConfig match {
           case Some(configMap) =>
             decode[ProgramConfig](
@@ -55,7 +55,7 @@ trait SoftwareDefinitionTrait extends DefinitionTrait {
                 )
             }
           case None =>
-            Left(s"ProgramDefinitionType instance $name requires configuration")
+            Left(s"Program definition instance $name requires configuration")
         }
       case _ => Left(s"$defType is invalid for software")
     }
