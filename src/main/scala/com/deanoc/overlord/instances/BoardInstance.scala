@@ -153,7 +153,7 @@ object BoardInstance {
         )
         
         // Create a DefinitionConfig with the Any values
-        val clockDefConfig = com.deanoc.overlord.config.DefinitionConfig(
+        val clockDefConfig = com.deanoc.overlord.config.OtherDefinitionConfig(
           boardClockConfig.name,
           boardClockConfig.name,
           clockConfigMap
@@ -204,7 +204,7 @@ object BoardInstance {
                 }.toMap
                 
                 // Create a DefinitionConfig with the Any values
-                val pingroupDefConfig = com.deanoc.overlord.config.DefinitionConfig(
+                val pingroupDefConfig = com.deanoc.overlord.config.OtherDefinitionConfig(
                   name,
                   s"pingroup.$name",
                   pingroupConfigMap
@@ -237,7 +237,7 @@ object BoardInstance {
                     }.toMap
                     
                     // Create a DefinitionConfig with the Any values
-                    val pingroupDefConfig = com.deanoc.overlord.config.DefinitionConfig(
+                    val pingroupDefConfig = com.deanoc.overlord.config.OtherDefinitionConfig(
                       name,
                       s"pingroup.$name",
                       pingroupConfigMap

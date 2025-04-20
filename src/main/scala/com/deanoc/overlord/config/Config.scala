@@ -367,13 +367,57 @@ object PrefabFileConfig {
 }
 
 // Represents a single definition within a file
-case class DefinitionConfig(
-  name: String,
-  `type`: String, // Use backticks for type as it's a Scala keyword
-  config: Map[String, Any] = Map.empty // Flexible for various config types
-  // TODO: Add other definition fields if necessary based on Definition.scala
-)
+sealed trait DefinitionConfig {
+  def name: String
+  def `type`: String // Use backticks for type as it's a Scala keyword
+  def config: Map[String, Any] // Flexible for various config types
+}
+
 object DefinitionConfig {
+  implicit val decoder: Decoder[DefinitionConfig] = (c: HCursor) => {
+    for {
+      ft <- c.downField("type").as[String]
+      typeField <- Right(ft.split('.').headOption.getOrElse(""))
+      result <- typeField match {
+        case "ram" => c.as[RamDefinitionConfig]
+        case "cpu" => c.as[CpuDefinitionConfig]
+        case _ => c.as[OtherDefinitionConfig]
+      }
+    } yield result
+  }}
+
+case class RamDefinitionConfig(
+  name: String,
+  `type`: String,
+  config: Map[String, Any],
+  ram_config: RamConfig
+) extends DefinitionConfig
+object RamDefinitionConfig {
   import CustomDecoders._
-  implicit val decoder: Decoder[DefinitionConfig] = deriveDecoder[DefinitionConfig]
+  implicit val decoder: Decoder[RamDefinitionConfig] = deriveDecoder[RamDefinitionConfig]
+}
+
+case class CpuDefinitionConfig(
+  name: String,
+  `type`: String,
+  config: Map[String, Any],
+  val gateware: Option[String],
+  val triple: String,
+  val core_count: Option[Int],
+) extends DefinitionConfig
+
+object CpuDefinitionConfig {
+  import CustomDecoders._
+  implicit val decoder: Decoder[CpuDefinitionConfig] = deriveDecoder[CpuDefinitionConfig]
+}
+
+case class OtherDefinitionConfig(
+  name: String,
+  `type`: String,
+  config: Map[String, Any],
+) extends DefinitionConfig
+
+object OtherDefinitionConfig {
+  import CustomDecoders._
+  implicit val decoder: Decoder[OtherDefinitionConfig] = deriveDecoder[OtherDefinitionConfig]
 }
