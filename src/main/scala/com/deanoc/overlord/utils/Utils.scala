@@ -318,7 +318,22 @@ object Utils extends Logging {
     json.as[T] match {
       case Right(config) => Right(config)
       case Left(err) =>
-        Left(s"Failed to decode JSON to ${implicitly[Decoder[T]].getClass.getSimpleName} from $filePath: ${err.message}")
+        val errorDetails = err match {
+          case decodingFailure: io.circe.DecodingFailure =>
+            val historyPath = decodingFailure.history.map {
+              case io.circe.CursorOp.DownField(field) => s"Field: '$field'"
+              case io.circe.CursorOp.DownArray        => "Array element"
+              case other                              => other.toString
+            }.mkString(" -> ")
+            s"""
+               |Decoding Failure:
+               |  Message: ${decodingFailure.message}
+               |  History: $historyPath
+               |""".stripMargin.trim
+          case null =>
+            s"Unexpected error: null"
+        }
+        Left(s"Failed to decode JSON to ${implicitly[Decoder[T]].getClass.getSimpleName} from $filePath:\n$errorDetails")
     }
   }
 

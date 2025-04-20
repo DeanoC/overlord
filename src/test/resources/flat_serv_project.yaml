@@ -1,0 +1,29 @@
+# Overlord Project YAML File
+
+info:
+  name: "new.project"
+  version: "1.0.0"
+  author: ""
+  description: ""
+
+definitions:
+- name: "vexriscv_smallest"
+  config: {}
+  type: cpu.riscv32im.vexriscv_smallest
+  gateware: vexriscv/vexriscv_smallest.yaml
+  supplier_prefix:
+  - dBus_
+  - iBus_
+  triple: riscv32-none-elf
+  width: 32
+
+catalogs: []
+
+components: []
+
+defaults: {}
+
+instances: []
+
+connections: []
+

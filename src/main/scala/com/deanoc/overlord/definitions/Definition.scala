@@ -1,10 +1,7 @@
 package com.deanoc.overlord.definitions
 
 import com.deanoc.overlord.Overlord
-import com.deanoc.overlord.definitions.{
-  HardwareDefinition,
-  DefinitionType
-}
+import com.deanoc.overlord.definitions.{HardwareDefinition, DefinitionType}
 import com.deanoc.overlord.utils.{
   Variant,
   ArrayV,
@@ -25,7 +22,7 @@ object Definition {
   ): Either[String, DefinitionTrait] = {
 
     val path = Overlord.catalogPath
-    val defType = DefinitionType(config.`type`)
+    val `type` = DefinitionType(config.`type`)
 
     // Apply defaults to config.config if needed
     // This is a simplified approach - in a more complete implementation,
@@ -46,29 +43,31 @@ object Definition {
       defaultsAsAny ++ config.config
     }
 
-    defType match {
+    `type` match {
       // Chip definitions
       case _: DefinitionType.RamDefinition | _: DefinitionType.CpuDefinition |
-           _: DefinitionType.GraphicDefinition | _: DefinitionType.StorageDefinition |
-           _: DefinitionType.NetDefinition | _: DefinitionType.IoDefinition |
-           _: DefinitionType.OtherDefinition | _: DefinitionType.SocDefinition |
-           _: DefinitionType.SwitchDefinition =>
-        HardwareDefinition(defType, mergedConfig, path)
-      
+          _: DefinitionType.GraphicDefinition |
+          _: DefinitionType.StorageDefinition |
+          _: DefinitionType.NetDefinition | _: DefinitionType.IoDefinition |
+          _: DefinitionType.OtherDefinition | _: DefinitionType.SocDefinition |
+          _: DefinitionType.SwitchDefinition =>
+        HardwareDefinition(`type`, mergedConfig, path)
+
       // Software definitions
-      case _: DefinitionType.ProgramDefinition | _: DefinitionType.LibraryDefinition =>
-        SoftwareDefinition(defType, mergedConfig, path)
-      
+      case _: DefinitionType.ProgramDefinition |
+          _: DefinitionType.LibraryDefinition =>
+        SoftwareDefinition(`type`, mergedConfig, path)
+
       // Port definitions
       case _: DefinitionType.PinGroupDefinition =>
-        HardwareDefinition(defType, mergedConfig, path)
+        HardwareDefinition(`type`, mergedConfig, path)
       case _: DefinitionType.ClockDefinition =>
-        HardwareDefinition(defType, mergedConfig, path)
-      
+        HardwareDefinition(`type`, mergedConfig, path)
+
       // Board definition
       case _: DefinitionType.BoardDefinition =>
-        HardwareDefinition(defType, mergedConfig, path)
-      
+        HardwareDefinition(`type`, mergedConfig, path)
+
       // Component definition
       case _: DefinitionType.ComponentDefinition =>
         Left(s"Component definitions are NOT defined this way")

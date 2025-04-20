@@ -27,7 +27,7 @@
         "-R",
         "src/test/scala",
         "-s",
-        "com.deanoc.overlord.ComponentParserTest",
+        "com.deanoc.overlord.ComponentAdvancedTest",
         "-o"
       ]
     }
