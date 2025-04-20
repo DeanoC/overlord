@@ -428,7 +428,7 @@ The core functionality phase focuses on implementing the main features of the ne
 
 **Tasks:**
 1. Update the ComponentParser class:
-   - Update parseProjectFile to process the new sections
+   - Update parseComponentFile to process the new sections
    - Update processInstantiations to handle Component type definitions
    - Add methods for cloning instances and connections with namespacing
 

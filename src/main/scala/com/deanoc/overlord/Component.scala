@@ -99,7 +99,7 @@ object Component extends Logging {
 
     // Parse the project file and get the container and catalog
     val (container, catalog) =
-      parser.parseProjectFile(gamePath, board).getOrElse {
+      parser.parseComponentFile(gamePath, board).getOrElse {
         this.error(s"Failed to parse project file: $gamePath")
         boundary.break(None)
       }

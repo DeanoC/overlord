@@ -18,7 +18,7 @@ import com.deanoc.overlord.definitions.DefinitionType
 class ComponentParser() extends Logging {
   private val containerStack: mutable.Stack[MutableContainer] = mutable.Stack()
 
-  def parseProjectFile(
+  def parseComponentFile(
       path: Path,
       board: String
   ): Option[(MutableContainer, DefinitionCatalog)] = {
