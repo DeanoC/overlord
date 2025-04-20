@@ -156,28 +156,30 @@ object ConnectionConfig {
 case class BusConnectionConfig(
   connection: String,
   `type`: String,
-  bus_name: String = "",
-  bus_width: Int = 0,
-  bus_protocol: String = "",
+  bus_name: String,
+  bus_width: Int,
+  bus_protocol: String,
 
-  consumer_bus_name: Option[String] = None,
-  silent: Option[Boolean] = None
+  supplier_bus_name: String,
+  consumer_bus_name: String,
+  silent: Boolean
 ) extends ConnectionConfig
 
 object BusConnectionConfig {
   import CirceDefaults._
 
   implicit val decoder: Decoder[BusConnectionConfig] = 
-    Decoder.instance { c =>
+    Decoder.instance { d =>
       for {
-        connection <- c.downField("connection").as[String]
-        `type` <- c.downField("type").as[String]
-        busName <- withDefault(c, "bus_name", "")
-        busWidth <- withDefault(c, "bus_width", 0)
-        busProtocol <- withDefault(c, "bus_protocol", "")
-        consumerBusName <- withDefaultOption[String](c, "consumer_bus_name")
-        silent <- withDefaultOption[Boolean](c, "silent")
-      } yield BusConnectionConfig(connection, `type`, busName, busWidth, busProtocol, consumerBusName, silent)
+        c <- d.downField("connection").as[String]
+        t <- d.downField("type").as[String]
+        bn <- withDefault(d, "bus_name", "")
+        bw <- withDefault(d, "bus_width", 32)
+        bp <- withDefault(d, "bus_protocol", "internal")
+        sn <- withDefault(d, "supplier_bus_name", bn)
+        cn <- withDefault(d, "consumer_bus_name", bn)
+        ss <- withDefault(d, "silent", false)
+      } yield BusConnectionConfig(c, t, bn, bw, bp, sn, cn, ss)
     }
 }
 
@@ -281,6 +283,77 @@ object PrefabConfig {
   implicit val decoder: Decoder[PrefabConfig] = deriveDecoder[PrefabConfig]
 }
 
+case class SourceConfig(
+  `type`: String, // Use backticks for type as it's a Scala keyword
+  url: Option[String] = None, // For git and fetch types
+  path: Option[String] = None // For local type
+)
+
+object SourceConfig {
+  implicit val decoder: Decoder[SourceConfig] = deriveDecoder[SourceConfig]
+}
+
+case class InfoConfig(
+  name: String = "",
+  version: Option[String] = None,
+  author: Option[String] = None,
+  description: Option[String] = None
+)
+object InfoConfig {
+  implicit val decoder: Decoder[InfoConfig] = deriveDecoder[InfoConfig]
+}
+
+// Common trait for catalog/component file configuration
+trait FileConfigBase {
+  def defaults: Map[String, Any]
+  def catalogs: List[SourceConfig]
+  def definitions: List[DefinitionConfig]
+}
+
+// Represents the top-level structure of a catalog YAML file
+case class CatalogFileConfig(
+  defaults: Map[String, Any] = Map.empty,
+  catalogs: List[SourceConfig] = List.empty,
+  definitions: List[DefinitionConfig] = List.empty
+) extends FileConfigBase
+
+object CatalogFileConfig {
+  import CustomDecoders._
+  implicit val decoder: Decoder[CatalogFileConfig] = deriveDecoder[CatalogFileConfig]
+}
+
+// Represents the top-level structure of the project YAML file
+case class ComponentFileConfig(
+  info: InfoConfig,
+  components: List[SourceConfig] = List.empty,
+  instances: List[InstanceConfig] = List.empty,
+  connections: List[ConnectionConfig] = List.empty,
+  defaults: Map[String, Any] = Map.empty,
+  catalogs: List[SourceConfig] = List.empty,
+  definitions: List[DefinitionConfig] = List.empty
+) extends FileConfigBase
+
+object ComponentFileConfig {
+  import CustomDecoders._
+  
+  // Custom decoder that handles the structure
+  implicit val decoder: Decoder[ComponentFileConfig] = new Decoder[ComponentFileConfig] {
+    def apply(c: HCursor): Decoder.Result[ComponentFileConfig] = {
+      for {
+        info <- c.downField("info").as[InfoConfig]
+        components <- c.downField("components").as[Option[List[SourceConfig]]].map(_.getOrElse(List.empty))
+        instances <- c.downField("instances").as[Option[List[InstanceConfig]]].map(_.getOrElse(List.empty))
+        connections <- c.downField("connections").as[Option[List[ConnectionConfig]]].map(_.getOrElse(List.empty))
+        defaults <- c.downField("defaults").as[Option[Map[String, Any]]].map(_.getOrElse(Map.empty))
+        catalogs <- c.downField("catalogs").as[Option[List[SourceConfig]]].map(_.getOrElse(List.empty))
+        definitions <- c.downField("definitions").as[Option[List[DefinitionConfig]]].map(_.getOrElse(List.empty))
+      } yield ComponentFileConfig(
+        info, components, instances, connections, defaults, catalogs, definitions
+      )
+    }
+  }
+}
+
 // Represents the top-level structure of a prefab file
 case class PrefabFileConfig(
   resources: Option[List[String]] = None,
@@ -303,50 +376,4 @@ case class DefinitionConfig(
 object DefinitionConfig {
   import CustomDecoders._
   implicit val decoder: Decoder[DefinitionConfig] = deriveDecoder[DefinitionConfig]
-}
-
-case class SourceConfig(
-  `type`: String, // Use backticks for type as it's a Scala keyword
-  url: Option[String] = None, // For git and fetch types
-  path: Option[String] = None // For local type
-)
-
-object SourceConfig {
-  implicit val decoder: Decoder[SourceConfig] = deriveDecoder[SourceConfig]
-}
-case class InfoConfig(
-  name: String = "",
-  version: Option[String] = None,
-  author: Option[String] = None,
-  description: Option[String] = None
-)
-object InfoConfig {
-  implicit val decoder: Decoder[InfoConfig] = deriveDecoder[InfoConfig]
-}
-
-// Represents the top-level structure of the project YAML file
-case class ComponentFileConfig(
-  info: InfoConfig,
-  catalogs: List[SourceConfig] = List.empty,
-  components: List[SourceConfig] = List.empty,
-  defaults: Map[String, Any] = Map.empty,
-  instances: List[InstanceConfig] = List.empty,
-  connections: List[ConnectionConfig] = List.empty,
-  definitions: List[DefinitionConfig] = List.empty // List of definitions
-)
-object ComponentFileConfig {
-  import CustomDecoders._
-  implicit val decoder: Decoder[ComponentFileConfig] = deriveDecoder[ComponentFileConfig]
-}
-
-
-// Represents the top-level structure of a catalog YAML file
-case class CatalogFileConfig(
-  defaults: Map[String, Any] = Map.empty, // Flexible for various default types
-  catalogs: List[SourceConfig] = List.empty, // Assuming catalogs are defined by a source config
-  definitions: List[DefinitionConfig] = List.empty // List of definitions
-)
-object CatalogFileConfig {
-  import CustomDecoders._
-  implicit val decoder: Decoder[CatalogFileConfig] = deriveDecoder[CatalogFileConfig]
 }

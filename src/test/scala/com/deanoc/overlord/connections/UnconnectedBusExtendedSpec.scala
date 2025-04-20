@@ -8,7 +8,6 @@ import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito.withSettings
 import com.deanoc.overlord._
 import scala.language.implicitConversions
-import com.deanoc.overlord.connections.ConnectionTypesTestExtensions._
 import com.deanoc.overlord.utils.{SilentLogger, Logging, ModuleLogger, Utils}
 import com.deanoc.overlord.utils.{Variant, TableV, BigIntV}
 import com.deanoc.overlord.definitions._
@@ -144,7 +143,8 @@ buses:
       secondFullName = "cpu",
       busProtocol = "axi4",
       supplierBusName = "pmu_pmuswitch",
-      consumerBusName = "pmu_pmuswitch"
+      consumerBusName = "pmu_pmuswitch",
+      silent = false
     )
 
     // Test the connection

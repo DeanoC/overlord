@@ -5,7 +5,6 @@ import org.scalatest.matchers.should.Matchers
 import com.deanoc.overlord._
 import com.deanoc.overlord.utils.{Utils, Variant, SilentLogger}
 import scala.language.implicitConversions
-import com.deanoc.overlord.connections.ConnectionTypesTestExtensions._
 
 class SimpleUnconnectedApplySpec
     extends AnyFlatSpec
@@ -75,15 +74,9 @@ class SimpleUnconnectedApplySpec
     bus.firstFullName shouldBe "cpu"
     assert(bus.direction == ConnectionDirection.FirstToSecond)
     bus.secondFullName shouldBe "memory"
-    ConnectionTypesTestExtensions.assertBusNameEquals(bus.busProtocol, "axi4")
-    ConnectionTypesTestExtensions.assertBusNameEquals(
-      bus.supplierBusName,
-      "main_bus"
-    )
-    ConnectionTypesTestExtensions.assertBusNameEquals(
-      bus.consumerBusName,
-      "mem_bus"
-    )
+    bus.busProtocol.value shouldBe "axi4"
+    bus.supplierBusName.value shouldBe "main_bus"
+    bus.consumerBusName.value shouldBe "mem_bus"
   }
 
   it should "parse logical connections" in {

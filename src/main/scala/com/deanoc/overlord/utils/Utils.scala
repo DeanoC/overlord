@@ -1,5 +1,7 @@
 package com.deanoc.overlord.utils
 
+import io.circe.{Decoder, Json} // Import Decoder and Json explicitly
+import io.circe.yaml.parser // Import parser for YAML parsing
 import org.yaml.snakeyaml.Yaml
 
 import java.io._
@@ -287,6 +289,36 @@ object Utils extends Logging {
         trace(s"Parsing YAML content: $yamlContent")
         warn(s"Error parsing YAML content: ${e.getMessage}")
         Map[String, Variant]()
+    }
+  }
+
+  def loadAndParseYamlFile[T](
+      filePath: Path
+  )(implicit decoder: Decoder[T]): Either[String, T] = {
+    if (!Files.exists(filePath.toAbsolutePath)) {
+      return Left(s"Local catalog file not found at $filePath")
+    }
+
+    if (Files.size(filePath.toAbsolutePath) == 0) {
+      return Left(s"Local catalog file is empty: $filePath")
+    }
+
+    val yamlString = scala.util.Try(scala.io.Source.fromFile(filePath.toFile).mkString) match {
+      case scala.util.Success(content) => content
+      case scala.util.Failure(exception) =>
+        return Left(s"Failed to read file $filePath.toAbsolutePath: ${exception.getMessage}")
+    }
+
+    val json = parser.parse(yamlString) match {
+      case Right(parsedJson) => parsedJson
+      case Left(err) =>
+        return Left(s"Failed to parse YAML to JSON from $filePath: ${err.getMessage}")
+    }
+
+    json.as[T] match {
+      case Right(config) => Right(config)
+      case Left(err) =>
+        Left(s"Failed to decode JSON to ${implicitly[Decoder[T]].getClass.getSimpleName} from $filePath: ${err.message}")
     }
   }
 

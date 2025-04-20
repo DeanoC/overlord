@@ -24,7 +24,11 @@ class UnconnectedBusAdditionalSpec
     val bus = UnconnectedBus(
       firstFullName = "device1",
       direction = ConnectionDirection.FirstToSecond,
-      secondFullName = "device2"
+      secondFullName = "device2",
+      busProtocol = "axi4",
+      supplierBusName = "bus1",
+      consumerBusName = "bus2",
+      silent = false
     )
 
     withSilentLogs {
@@ -38,7 +42,11 @@ class UnconnectedBusAdditionalSpec
     val bus = UnconnectedBus(
       firstFullName = "device1",
       direction = ConnectionDirection.FirstToSecond,
-      secondFullName = "device2"
+      secondFullName = "device2",
+      busProtocol = "axi4",
+      supplierBusName = "bus1",
+      consumerBusName = "bus2",
+      silent = false
     )
 
     withSilentLogs {
@@ -52,6 +60,9 @@ class UnconnectedBusAdditionalSpec
       firstFullName = "device1",
       direction = ConnectionDirection.FirstToSecond,
       secondFullName = "device2",
+      busProtocol = "axi4",
+      supplierBusName = "bus1",
+      consumerBusName = "bus2",
       silent = true
     )
 
@@ -65,41 +76,35 @@ class UnconnectedBusAdditionalSpec
     val firstToSecond = UnconnectedBus(
       firstFullName = "cpu",
       direction = ConnectionDirection.FirstToSecond,
-      secondFullName = "memory"
+      secondFullName = "memory",
+      busProtocol = "axi4",
+      supplierBusName = "bus1",
+      consumerBusName = "bus2",
+      silent = true
     )
 
     val secondToFirst = UnconnectedBus(
       firstFullName = "memory",
       direction = ConnectionDirection.SecondToFirst,
-      secondFullName = "cpu"
+      secondFullName = "cpu",
+      busProtocol = "axi4",
+      supplierBusName = "bus1",
+      consumerBusName = "bus2",
+      silent = true
     )
 
     val bidirectional = UnconnectedBus(
       firstFullName = "device1",
       direction = ConnectionDirection.BiDirectional,
-      secondFullName = "device2"
+      secondFullName = "device2",
+      busProtocol = "axi4",
+      supplierBusName = "bus1",
+      consumerBusName = "bus2",
+      silent = true
     )
 
     firstToSecond.direction shouldBe ConnectionDirection.FirstToSecond
     secondToFirst.direction shouldBe ConnectionDirection.SecondToFirst
     bidirectional.direction shouldBe ConnectionDirection.BiDirectional
-  }
-
-  it should "use the correct bus protocol" in {
-    val withProtocol = UnconnectedBus(
-      firstFullName = "cpu",
-      direction = ConnectionDirection.FirstToSecond,
-      secondFullName = "memory",
-      busProtocol = "axi4"
-    )
-
-    val defaultProtocol = UnconnectedBus(
-      firstFullName = "cpu",
-      direction = ConnectionDirection.FirstToSecond,
-      secondFullName = "memory"
-    )
-
-    withProtocol.busProtocol.toString shouldBe "axi4"
-    defaultProtocol.busProtocol.toString shouldBe "default"
   }
 }

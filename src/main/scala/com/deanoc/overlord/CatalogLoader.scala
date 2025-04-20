@@ -1,80 +1,57 @@
 package com.deanoc.overlord
 
-import com.deanoc.overlord.utils.{
-  Logging,
-  Utils,
-  Variant
-} // Import Utils and Variant
+import com.deanoc.overlord.utils.{Logging, Utils, Variant} // Import Utils
 import com.deanoc.overlord.config.{
   CatalogFileConfig,
   DefinitionConfig,
   SourceConfig,
-  ComponentFileConfig
-} // Import catalog config case classes
+  ComponentFileConfig,
+  FileConfigBase
+} // Added FileConfigBase to imports
 
 import java.nio.file.{Files, Path, Paths}
 import sys.process._
 import scala.collection.mutable
 import scala.collection.immutable.HashMap
 import scala.util.boundary, boundary.break
-import io.circe.yaml.parser
-import io.circe.Decoder // Import Decoder explicitly
-import io.circe.generic.auto._ // Automatic derivation for case classes (for nested structures)
 import definitions.{Definition, DefinitionTrait}
 
 object CatalogLoader extends Logging {
+  // This is the main entry point for loading catalogs
+  def processParsedCatalog(
+      parsed: FileConfigBase,
+      filePath: Path,
+      currentDefaults: Map[String, Any]
+  ): Seq[DefinitionTrait] = {
 
-  def parseDefinitionCatalog(
-      name: String,
-      parsedConfig: CatalogFileConfig,
-      defaultMap: Map[
-        String,
-        Any
-      ] // Changed to Any as defaults can be various types
-  ): Seq[DefinitionTrait] = boundary {
+    val defaults = currentDefaults ++ parsed.defaults.map { case (k, v) =>
+      k -> Utils.toVariant(v)
+    }.toMap
 
-    // parse out any defaults updating the default table
-    // TODO: For now, just use the defaultMap as is
-    // We'll convert to Variant when needed
-    val defaults = defaultMap
-
-    // if we reference any catalogs, process them
-    parsedConfig.catalogs.foreach { catSourceConfig =>
-        processCatalogSource(catSourceConfig, defaults)
+    parsed.catalogs.foreach { catSourceConfig =>
+      Overlord.pushCatalogPath(filePath.getParent)
+      processCatalogSource(catSourceConfig, defaults)
+      Overlord.popCatalogPath()
     }
 
-    // process any definitions
     val defs = mutable.ArrayBuffer[DefinitionTrait]()
-    parsedConfig.definitions.foreach { definitionConfig =>
-      // Call the refactored Definition.apply which now takes DefinitionConfig
-      // Convert defaults to Map[String, Variant]
+    parsed.definitions.foreach { definitionConfig =>
       val defaultsAsVariant = defaults.map { case (k, v) =>
         k -> Utils.toVariant(v)
       }.toMap
       Definition(definitionConfig, defaultsAsVariant) match {
         case Right(defn: DefinitionTrait) => defs += defn
-        case Left(errorMsg)               =>
-          // Use the string version of error to avoid ambiguity
+        case Left(errorMsg) =>
           this.error(
             s"Error creating definition ${definitionConfig.name}: $errorMsg",
             null
           )
       }
     }
-
-    // final duplication check (should have been done during processing)
-    // TODO: Update duplication check to work with DefinitionConfig
-    // val identArray = defs.map(_.defType.ident.mkString(".")).toArray
-    // for (i <- 0 until identArray.length)
-    //   for (j <- i + 1 until identArray.length) {
-    //     if (identArray(i) == identArray(j)) {
-    //       warn(s"${identArray(i)} already exists in catalog")
-    //     }
-    //   }
-
     defs.toSeq
   }
 
+  // This method processes the catalog source configuration
   private def processCatalogSource(
       sourceConfig: SourceConfig,
       defaultMap: Map[String, Any]
@@ -147,51 +124,30 @@ object CatalogLoader extends Logging {
     boundary.break(Seq.empty)
   }
 
+
   private def loadFromFile(
       fileName: String,
       defaultMap: Map[String, Any]
-  ): Seq[DefinitionTrait] = boundary {
-    val filePath = Overlord.projectPath.resolve(
-      fileName
-    ) // Assuming local paths are relative to project root
+  ): Seq[DefinitionTrait] = {
+    val filePath = Overlord.projectPath.resolve(fileName)
 
-    if (!Files.exists(filePath.toAbsolutePath)) {
-      error(s"Local catalog file not found at $filePath")
-      boundary.break(Seq.empty)
-    }
-
-    if (Files.size(filePath.toAbsolutePath) == 0) {
-      info(s"Local catalog file is empty: $filePath")
-      boundary.break(Seq.empty)
-    }
-
-    val parsedConfig: Either[io.circe.Error, CatalogFileConfig] = for {
-      yamlString <- Right(scala.io.Source.fromFile(filePath.toFile).mkString)
-      json <- parser.parse(yamlString)
-      config <- json.as[CatalogFileConfig]
-    } yield config
-
-    parsedConfig match {
-      case Left(err) =>
-        error(s"Failed to parse catalog file $filePath: $err")
-        boundary.break(Seq.empty)
+    Utils.loadAndParseYamlFile[CatalogFileConfig](filePath) match {
+      case Left(errorMsg) =>
+        error(errorMsg)
+        Seq.empty
       case Right(parsed) =>
-        Overlord.pushCatalogPath(filePath.getParent)
-        val result = parseDefinitionCatalog(
-          filePath.toString,
-          parsed,
-          defaultMap
-        ) // parsed is already CatalogFileConfig
-        Overlord.popCatalogPath()
-        result.toSeq
+        processParsedCatalog(parsed, filePath, defaultMap)
     }
   }
 
   def parsePrefabCatalog(
       name: String,
-      parsedConfig: ComponentFileConfig, // Prefabs contain project-like structure
+      parsedConfig: ComponentFileConfig, // Can now also use parseDefinitionCatalog with this
       defaultMap: Map[String, Any]
   ): Either[String, PrefabCatalog] = {
+    // Now we could potentially reuse parseDefinitionCatalog here with parsedConfig
+    // since ComponentFileConfig also implements FileConfigBase
+
     Left("Prefab catalog parsing is being REMOVED.")
     /*
     var prefabCatalog = new PrefabCatalog()
@@ -244,27 +200,20 @@ object CatalogLoader extends Logging {
   private def findPrefabPath(prefabName: String): Option[Path] = {
     // First, check in the current catalog path
     val currentPath = Overlord.catalogPath
-    val prefabPath = currentPath.resolve(s"$prefabName.yaml")
+    val prefabFile = s"$prefabName.yaml"
+    val prefabPath = currentPath.resolve(prefabFile)
 
     if (Files.exists(prefabPath)) {
-      return Some(prefabPath)
+      Some(prefabPath)
+    } else {
+      // Then, check in the standard prefab directories
+      val prefabDirs = List(
+        Overlord.projectPath.resolve("prefabs"),
+        Overlord.projectPath.resolve("boards")
+      )
+
+      prefabDirs.find(dir => Files.exists(dir) && Files.exists(dir.resolve(prefabFile)))
+        .map(_.resolve(prefabFile))
     }
-
-    // Then, check in the standard prefab directories
-    val prefabDirs = List(
-      Overlord.projectPath.resolve("prefabs"),
-      Overlord.projectPath.resolve("boards")
-    )
-
-    for (dir <- prefabDirs) {
-      if (Files.exists(dir)) {
-        val path = dir.resolve(s"$prefabName.yaml")
-        if (Files.exists(path)) {
-          return Some(path)
-        }
-      }
-    }
-
-    None
   }
 }

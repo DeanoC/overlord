@@ -38,9 +38,9 @@ case class UnconnectedBus(
     firstFullName: String,
     direction: ConnectionDirection,
     secondFullName: String,
-    busProtocol: BusName = BusName.default,
-    supplierBusName: BusName = BusName.empty,
-    consumerBusName: BusName = BusName.empty,
+    busProtocol: BusName = BusName(""),
+    supplierBusName: BusName = BusName(""),
+    consumerBusName: BusName = BusName(""),
     silent: Boolean = false
 ) extends Unconnected
     with Logging {

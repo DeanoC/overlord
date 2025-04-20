@@ -123,8 +123,10 @@ class ConnectionParserBasicSpec
       `type` = "bus",
       bus_name = "data_bus",
       bus_width = 32,
-      bus_protocol = "axi"
-    )
+      bus_protocol = "axi",
+      supplier_bus_name = "data_bus",
+      consumer_bus_name = "data_bus",
+      silent = false  )
     val busResult = ConnectionParser.parseConnectionConfig(busConfig)
 
     busResult shouldBe defined

@@ -25,27 +25,11 @@ class ComponentParser() extends Logging {
     val newContainer = MutableContainer()
     containerStack.push(newContainer)
 
-    val parsed: ComponentFileConfig = {
-      val yamlString = scala.util.Try(scala.io.Source.fromFile(path.toFile).mkString) match {
-        case scala.util.Success(content) => content
-        case scala.util.Failure(exception) => 
-          error(s"Failed to read file $path: ${exception.getMessage}")
-          return None
-      }
-      
-      val json = parser.parse(yamlString) match {
-        case Right(parsedJson) => parsedJson
-        case Left(err) =>
-          error(s"Failed to parse YAML to JSON from $path: ${err.getMessage}")
-          return None
-      }
-
-      json.as[ComponentFileConfig] match {
-        case Right(config) => config
-        case Left(err) =>
-          error(s"Failed to decode JSON to ComponentFileConfig from $path: ${err.message}")
-          return None
-      }
+    val parsed = Utils.loadAndParseYamlFile[ComponentFileConfig](path) match {
+      case Right(parsed) => parsed
+      case Left(errorMsg) =>
+        error(errorMsg)
+        return None
     }
 
     var definitionCatalog = new DefinitionCatalog
@@ -54,18 +38,10 @@ class ComponentParser() extends Logging {
     info(s"Processing info section: $parsed.info")
     processInfo(parsed.info)
 
-    // Process the defaults section
-    val defaults: Map[String, Any] = parsed.defaults
-    info(s"Processing defaults section: $defaults")
-    processDefaults(defaults)
-    
-    // Process catalogs section
-    if (parsed.catalogs.nonEmpty) {
-      info(s"Processing ${parsed.catalogs.size} catalogs")
-      parsed.catalogs.foreach { catalog =>
-        processCatalog(catalog, definitionCatalog)
-      }
-    }
+    // Process the catalog parts of the file    
+    definitionCatalog.mergeNewDefinition(
+      CatalogLoader.processParsedCatalog(parsed, path, Map.empty)
+    )
 
     // Process components section
     if (parsed.components.nonEmpty) {
@@ -142,12 +118,6 @@ class ComponentParser() extends Logging {
     // Register the component as a Component type definition
     catalog.addComponentDefinition(component)
     info(s"Registered component $componentName as a Component type definition")
-  }
-
-
-  // Updated to accept ProjectFileConfig
-  def parseDefaults(parsed: ComponentFileConfig): Map[String, Any] = {
-    parsed.defaults
   }
 
   /** Processes instantiations from parsed YAML data.
@@ -249,29 +219,7 @@ class ComponentParser() extends Logging {
 //    }
   }
 
-  /**
-   * Processes default values from the component file.
-   *
-   * @param defaults The map of default values to process
-   */
-  private def processDefaults(defaults: Map[String, Any]): Unit = {
-    // TODO: Implement defaults processing logic
-    info(s"Default values provided: ${defaults.size}")
-  }
 
-  /**
-   * Processes a catalog and adds its definitions to the definition catalog.
-   *
-   * @param catalog The catalog to process
-   * @param definitionCatalog The definition catalog to update
-   */
-  private def processCatalog(
-    catalog: SourceConfig,
-    definitionCatalog: DefinitionCatalog
-  ): Unit = {
-    // TODO: Implement catalog processing logic
-    info(s"Processing catalog: ${catalog.`type`}")
-  }
 
   /** Gets all containers from the stack.
     *

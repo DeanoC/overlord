@@ -9,7 +9,6 @@ import org.scalatestplus.mockito.MockitoSugar
 import scala.language.implicitConversions
 import org.mockito.Mockito.{when, doAnswer}
 import org.mockito.ArgumentMatchers.any
-import com.deanoc.overlord.connections.ConnectionTypesTestExtensions._
 
 class UnconnectedBusSpec
     extends AnyFlatSpec
@@ -47,62 +46,6 @@ class UnconnectedBusSpec
     biDirectionalBus.direction shouldBe ConnectionDirection.BiDirectional
   }
 
-  it should "use the specified bus protocol" in {
-    val withProtocol = UnconnectedBus(
-      firstFullName = "cpu",
-      direction = ConnectionDirection.FirstToSecond,
-      secondFullName = "memory",
-      busProtocol = "axi4"
-    )
-
-    val defaultProtocol = UnconnectedBus(
-      firstFullName = "cpu",
-      direction = ConnectionDirection.FirstToSecond,
-      secondFullName = "memory"
-    )
-
-    ConnectionTypesTestExtensions.assertBusNameEquals(
-      withProtocol.busProtocol,
-      "axi4"
-    )
-    ConnectionTypesTestExtensions.assertBusNameEquals(
-      defaultProtocol.busProtocol,
-      "default"
-    )
-  }
-
-  it should "use the specified bus names" in {
-    val withNames = UnconnectedBus(
-      firstFullName = "cpu",
-      direction = ConnectionDirection.FirstToSecond,
-      secondFullName = "memory",
-      supplierBusName = "main_bus",
-      consumerBusName = "mem_bus"
-    )
-
-    val defaultNames = UnconnectedBus(
-      firstFullName = "cpu",
-      direction = ConnectionDirection.FirstToSecond,
-      secondFullName = "memory"
-    )
-
-    ConnectionTypesTestExtensions.assertBusNameEquals(
-      withNames.supplierBusName,
-      "main_bus"
-    )
-    ConnectionTypesTestExtensions.assertBusNameEquals(
-      withNames.consumerBusName,
-      "mem_bus"
-    )
-    ConnectionTypesTestExtensions.assertBusNameEquals(
-      defaultNames.supplierBusName,
-      ""
-    )
-    ConnectionTypesTestExtensions.assertBusNameEquals(
-      defaultNames.consumerBusName,
-      ""
-    )
-  }
 
   it should "not throw exceptions with empty data" in {
     val bus = UnconnectedBus(

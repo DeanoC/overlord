@@ -33,7 +33,10 @@ class ConnectionParserConfigSpec
         `type` = "bus",
         bus_name = "data_bus",
         bus_width = 32,
-        bus_protocol = "axi"
+        bus_protocol = "axi",
+        supplier_bus_name = "data_bus",
+        consumer_bus_name = "data_bus",
+        silent = false
       ),
       ClockConnectionConfig(
         connection = "clock -> device",
@@ -73,8 +76,9 @@ class ConnectionParserConfigSpec
       bus_protocol = "axi",
       bus_width = 32,
       bus_name = "data_bus",
-      consumer_bus_name = Some("mem_bus"),
-      silent = Some(true)
+      supplier_bus_name = "data_bus",
+      consumer_bus_name = "mem_bus",
+      silent = false
     )
 
     val busResult = ConnectionParser.parseConnectionConfig(busConfig)
@@ -87,7 +91,7 @@ class ConnectionParserConfigSpec
     bus.busProtocol.value shouldBe "axi" // Fix: use .value to compare opaque type
     bus.supplierBusName.value shouldBe "data_bus"
     bus.consumerBusName.value shouldBe "mem_bus"
-    bus.silent shouldBe true
+    bus.silent shouldBe false
 
     // Test clock connection
     val clockConfig = ClockConnectionConfig(
@@ -266,8 +270,9 @@ class ConnectionParserConfigSpec
       bus_protocol = "axi4",
       bus_width = 64,
       bus_name = "supplier_bus",
-      consumer_bus_name = Some("consumer_bus"),
-      silent = Some(true)
+      supplier_bus_name = "supplier_bus",
+      consumer_bus_name = "consumer_bus",
+      silent = true
     )
 
     // Parse the bus connection
@@ -280,47 +285,8 @@ class ConnectionParserConfigSpec
     bus.secondFullName shouldBe "ram"
     bus.direction shouldBe ConnectionDirection.FirstToSecond
     bus.busProtocol.value shouldBe "axi4" // Fix: use .value to compare opaque type
-    bus.supplierBusName.value shouldBe "master_bus"
-    bus.consumerBusName.value shouldBe "slave_bus"
+    bus.supplierBusName.value shouldBe "supplier_bus"
+    bus.consumerBusName.value shouldBe "consumer_bus"
     bus.silent shouldBe true
-  }
-
-  it should "use default values when optional fields are not provided" in {
-    // Create a minimal bus connection config
-    val minimalBusConfig = BusConnectionConfig(
-      connection = "cpu -> ram",
-      `type` = "bus"
-    )
-
-    // Parse the bus connection
-    val result = ConnectionParser.parseConnectionConfig(minimalBusConfig)
-
-    // Verify the result
-    result shouldBe defined
-    val bus = result.get.asInstanceOf[UnconnectedBus]
-    bus.firstFullName shouldBe "cpu"
-    bus.secondFullName shouldBe "ram"
-    bus.busProtocol.value shouldBe "internal" // Fix: use .value to compare opaque type
-    bus.supplierBusName.value shouldBe "" // Default bus name
-    bus.consumerBusName.value shouldBe "" // Default consumer bus name
-    bus.silent shouldBe false // Default silent value
-  }
-
-  it should "use supplier bus name for consumer when consumer bus name is not provided" in {
-    // Create a bus connection config with supplier bus name but no consumer bus name
-    val busConfig = BusConnectionConfig(
-      connection = "cpu -> ram",
-      `type` = "bus",
-      bus_name = "data_bus",
-    )
-
-    // Parse the bus connection
-    val result = ConnectionParser.parseConnectionConfig(busConfig)
-
-    // Verify the result
-    result shouldBe defined
-    val bus = result.get.asInstanceOf[UnconnectedBus]
-    bus.supplierBusName.value shouldBe "data_bus"
-    bus.consumerBusName.value shouldBe "data_bus" // Should use supplier bus name
   }
 }

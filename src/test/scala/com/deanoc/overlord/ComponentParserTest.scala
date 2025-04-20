@@ -246,7 +246,7 @@ class ComponentParserTest
     
     cpu1ToSramBus.bus_protocol shouldBe "axi4-lite"
     // Check that silent option exists and is true
-    cpu1ToSramBus.silent shouldBe Some(true)
+    cpu1ToSramBus.silent shouldBe true 
     
     // Check port connection
     val uartTxConnection = projectConfig.connections.find(_.isInstanceOf[PortConnectionConfig])
