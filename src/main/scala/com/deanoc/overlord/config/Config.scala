@@ -269,12 +269,36 @@ object PrefabFileConfig {
   implicit val decoder: Decoder[PrefabFileConfig] = deriveDecoder[PrefabFileConfig]
 }
 
+case class InfoConfig(
+  name: String = "",
+  version: Option[String] = None,
+  author: Option[String] = None,
+  description: Option[String] = None
+)
+object InfoConfig {
+  implicit val decoder: Decoder[InfoConfig] = deriveDecoder[InfoConfig]
+}
+
+// Represents a component in the components section.
+case class ComponentConfig(
+  `type`: String,
+  path: Option[String] = None,
+  url: Option[String] = None
+)
+object ComponentConfig {
+  implicit val decoder: Decoder[ComponentConfig] = deriveDecoder[ComponentConfig]
+}
+
 // Represents the top-level structure of the project YAML file
 case class ProjectFileConfig(
-  boards: List[String] = List.empty,
-  defaults: Map[String, Any] = Map.empty, // Flexible for various default types
+  info: InfoConfig,
+  catalogs: List[CatalogSourceConfig] = List.empty,
+  components: List[ComponentConfig] = List.empty,
+  defaults: Map[String, Any] = Map.empty,
   instances: List[InstanceConfig] = List.empty,
   connections: List[ConnectionConfig] = List.empty,
+  // Legacy fields maintained for backward compatibility
+  boards: List[String] = List.empty,
   prefabs: List[PrefabConfig] = List.empty
 )
 object ProjectFileConfig {
@@ -298,7 +322,7 @@ object DefinitionConfig {
 case class CatalogFileConfig(
   defaults: Map[String, Any] = Map.empty, // Flexible for various default types
   catalogs: List[CatalogSourceConfig] = List.empty, // Assuming catalogs are defined by a source config
-  definitions: List[DefinitionConfig] = List.empty, // List of definitions
+  definitions: List[DefinitionConfig] = List.empty // List of definitions
 )
 object CatalogFileConfig {
   import CustomDecoders._

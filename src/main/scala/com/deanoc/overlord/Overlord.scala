@@ -387,15 +387,15 @@ object Overlord extends Logging {
       board: String,
       gamePath: Path
   ): Overlord = boundary {
-    // Create a ProjectParser with explicit dependency injection
-    val parser = new ProjectParser()
+    // Create a Component from the project file
+    val component = Component.fromProjectFile(gameName, board, gamePath).getOrElse {
+      this.error(s"Failed to create component from project file: $gamePath")
+      boundary.break(null)
+    }
 
-    // Parse the project file and get the container and catalog
-    val (container, catalog) =
-      parser.parseProjectFile(gamePath, board).getOrElse {
-        this.error(s"Failed to parse project file: $gamePath")
-        boundary.break(null)
-      }
+    // Get the container and catalog from the component
+    val container = component.getContainer
+    val catalog = component.getCatalog
 
     // Resolve software dependencies with explicit dependency injection
     resolveSoftwareDependencies(container, catalog)

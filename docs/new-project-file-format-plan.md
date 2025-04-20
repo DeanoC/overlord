@@ -16,9 +16,7 @@ A typical `.yaml` file consists of the following main sections:
 
 ### 1. Info/Description
 
-Projects can have an info section, but it is not required.
-
-Components *must* have an info section with at least a name, which is how this component will be instantiated. If the name doesn't start with "component.", this prefix will be assumed.
+Project and Components *must* have an info section with at least a name, which is how this component will be instantiated. If the name doesn't start with "component.", this prefix will be assumed.
 
 ```yaml
 info:

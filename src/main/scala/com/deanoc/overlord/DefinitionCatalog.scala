@@ -7,6 +7,7 @@ import sys.process._
 
 import com.deanoc.overlord.utils.{Utils, Variant}
 import com.deanoc.overlord.utils.Logging
+import com.deanoc.overlord.definitions.ComponentDefinition
 
 import com.deanoc.overlord.Overlord
 
@@ -29,7 +30,7 @@ class DefinitionCatalog extends Logging {
 
     for {
       k <- catalogs.keys
-      if k.getClass == classOf[DefinitionType]
+      if (k.isInstanceOf[DefinitionType])
       if k.ident.length >= ident.length
     } {
       var curMatch = 0
@@ -54,7 +55,7 @@ class DefinitionCatalog extends Logging {
 
     for {
       k <- catalogs.keys
-      if k.getClass == defType.getClass
+      if (k.isInstanceOf[DefinitionType])
       if k.ident.length >= defType.ident.length
     } {
       var curMatch = 0
@@ -95,5 +96,17 @@ class DefinitionCatalog extends Logging {
       }
     }
     catalogs ++= withType
+  }
+  
+  /**
+   * Adds a ComponentDefinition to the catalog.
+   *
+   * @param component The Component to create a ComponentDefinition from
+   * @return This DefinitionCatalog with the ComponentDefinition added
+   */
+  def addComponentDefinition(component: Component): DefinitionCatalog = {
+    val componentDef = ComponentDefinition(component)
+    catalogs += (componentDef.defType -> componentDef)
+    this
   }
 }

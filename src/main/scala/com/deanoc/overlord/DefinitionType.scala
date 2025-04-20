@@ -40,6 +40,8 @@ case class ProgramDefinitionType(ident: Seq[String])
 case class LibraryDefinitionType(ident: Seq[String])
     extends SoftwareDefinitionType
 
+case class ComponentDefinitionType(ident: Seq[String]) extends DefinitionType
+
 object DefinitionType {
   def apply(in: String): DefinitionType = {
     val defTypeName = in.split('.')
@@ -65,6 +67,7 @@ object DefinitionType {
 
       case "program" => ProgramDefinitionType(tt)
       case "library" => LibraryDefinitionType(tt)
+      case "component" => ComponentDefinitionType(tt)
       case _ =>
         println(s"${defTypeName.head} unknown definition type\n")
         OtherDefinitionType(tt)
