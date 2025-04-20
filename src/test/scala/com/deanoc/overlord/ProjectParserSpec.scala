@@ -113,7 +113,7 @@ class ProjectParserSpec extends AnyFlatSpec with Matchers with MockitoSugar with
       
       // Parse the project file into a ProjectFileConfig using circe
       val parsedJson = parse(yamlContent).getOrElse(Json.Null)
-      val projectConfig = parsedJson.as[ProjectFileConfig].getOrElse(ProjectFileConfig())
+      val projectConfig = parsedJson.as[ProjectFileConfig].getOrElse(ProjectFileConfig(info = InfoConfig()))
       
       // Verify the parsed configuration
       projectConfig.instances should not be empty
@@ -242,7 +242,7 @@ class ProjectParserSpec extends AnyFlatSpec with Matchers with MockitoSugar with
       
       // Parse the project file into a ProjectFileConfig using circe
       val parsedJson = parse(yamlContent).getOrElse(Json.Null)
-      val projectConfig = parsedJson.as[ProjectFileConfig].getOrElse(ProjectFileConfig())
+      val projectConfig = parsedJson.as[ProjectFileConfig].getOrElse(ProjectFileConfig(info = InfoConfig()))
       
       // Verify the parsed configuration
       projectConfig.instances should not be empty

@@ -315,7 +315,7 @@ prefabs:
     val parsedYaml = yamlParse(projectYamlContent).getOrElse(Json.Null)
     parsedYaml should not be Json.Null
 
-    val projectConfig = parsedYaml.as[ProjectFileConfig].getOrElse(ProjectFileConfig())
+    val projectConfig = parsedYaml.as[ProjectFileConfig].getOrElse(ProjectFileConfig(info = InfoConfig()))
     
     // Assert that parsing was successful and the top-level structure is as expected
     projectConfig.instances should not be empty

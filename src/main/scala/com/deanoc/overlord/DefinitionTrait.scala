@@ -86,6 +86,7 @@ object Definition {
         HardwareDefinition(defType, mergedConfig, path)
       case dt: BoardDefinitionType =>
         HardwareDefinition(defType, mergedConfig, path)
+      case dt: ComponentDefinitionType =>  Left(s"ComponentDefinitionType are NOT defined this way")
       case null => Left(s"Unknown definition type: ${config.`type`}")
     }
   }
