@@ -9,14 +9,13 @@ import com.deanoc.overlord.utils.{Utils, Variant, SilentLogger}
 import com.deanoc.overlord.config._
 import com.deanoc.overlord.instances._
 import com.deanoc.overlord.connections._
-import com.deanoc.overlord.hardware.HardwareDefinition
-import com.deanoc.overlord.software.SoftwareDefinition
 import com.deanoc.overlord.interfaces.RamLike
 import io.circe.parser._
 import io.circe.Json
 
 import java.nio.file.{Files, Path, Paths}
 import java.io.{File, FileWriter}
+import definitions.ChipDefinitionTrait
 
 /**
  * Test suite for the ProjectParser with type-safe configuration classes.
@@ -71,9 +70,9 @@ class ProjectParserSpec extends AnyFlatSpec with Matchers with MockitoSugar with
       val mockClockDef = mock[ChipDefinitionTrait]
       
       // Set up the mock definitions
-      val cpuDefType = DefinitionType.apply("hardware.cpu.riscv")
-      val ramDefType = DefinitionType.apply("hardware.ram.sram")
-      val clockDefType = DefinitionType.apply("hardware.clock.oscillator")
+      val cpuDefType = definitions.DefinitionType.apply("hardware.cpu.riscv")
+      val ramDefType = definitions.DefinitionType.apply("hardware.ram.sram")
+      val clockDefType = definitions.DefinitionType.apply("hardware.clock.oscillator")
       
       when(mockCpuDef.defType).thenReturn(cpuDefType)
       when(mockRamDef.defType).thenReturn(ramDefType)
@@ -220,7 +219,7 @@ class ProjectParserSpec extends AnyFlatSpec with Matchers with MockitoSugar with
       val mockBoardDef = mock[ChipDefinitionTrait]
       
       // Set up the mock definition
-      val boardDefType = DefinitionType.apply("hardware.board.fpga")
+      val boardDefType = definitions.DefinitionType.apply("hardware.board.fpga")
       when(mockBoardDef.defType).thenReturn(boardDefType)
       when(mockBoardDef.attributes).thenReturn(Map[String, Variant]())
       

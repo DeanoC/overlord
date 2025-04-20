@@ -8,6 +8,7 @@ import com.deanoc.overlord._
 import com.deanoc.overlord.utils.{Utils, Variant, SilentLogger}
 import com.deanoc.overlord.config.{RamConfig, MemoryRangeConfig}
 import com.deanoc.overlord.interfaces.{RamLike, BusLike}
+import com.deanoc.overlord.definitions._
 
 /** Test suite for the RamInstance class.
   *

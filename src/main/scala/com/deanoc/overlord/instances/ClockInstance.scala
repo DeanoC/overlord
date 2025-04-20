@@ -1,7 +1,7 @@
 package com.deanoc.overlord.instances
 
 import com.deanoc.overlord.utils._
-import com.deanoc.overlord.ChipDefinitionTrait
+import com.deanoc.overlord.definitions.ChipDefinitionTrait
 
 case class ClockInstance(
     name: String,

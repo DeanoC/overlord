@@ -1,8 +1,5 @@
 package com.deanoc.overlord.definitions
 
-import com.deanoc.overlord.DefinitionTrait
-import com.deanoc.overlord.DefinitionType
-import com.deanoc.overlord.ComponentDefinitionType
 import com.deanoc.overlord.Component
 import com.deanoc.overlord.instances.{InstanceTrait}
 import com.deanoc.overlord.connections.Connected

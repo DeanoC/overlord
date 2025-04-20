@@ -1,4 +1,4 @@
-package com.deanoc.overlord
+package com.deanoc.overlord.definitions
 
 sealed trait DefinitionType {
   val ident: Seq[String]

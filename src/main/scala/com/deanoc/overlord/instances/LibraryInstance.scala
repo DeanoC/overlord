@@ -1,7 +1,7 @@
 package com.deanoc.overlord.instances
 
 import com.deanoc.overlord.utils.Variant
-import com.deanoc.overlord.SoftwareDefinitionTrait
+import com.deanoc.overlord.definitions.SoftwareDefinitionTrait
 
 case class LibraryInstance(
     override val name: String,

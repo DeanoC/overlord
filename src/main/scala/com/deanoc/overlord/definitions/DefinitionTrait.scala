@@ -1,13 +1,13 @@
-package com.deanoc.overlord
+package com.deanoc.overlord.definitions
 
 import com.deanoc.overlord.actions.ActionsFile
 import com.deanoc.overlord.utils.{Utils, Variant}
 import com.deanoc.overlord.hardware.{
-  HardwareDefinition,
   Port,
   RegisterBank,
   Registers
 }
+import com.deanoc.overlord.definitions.HardwareDefinition
 import com.deanoc.overlord.instances._
 import com.deanoc.overlord.software.SoftwareDefinition
 import com.deanoc.overlord.Overlord

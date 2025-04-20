@@ -10,6 +10,7 @@ import scala.collection.mutable
 import scala.util.boundary, boundary.break
 import io.circe.yaml.parser
 import io.circe.Decoder // Import Decoder explicitly
+import com.deanoc.overlord.definitions.DefinitionType
 
 /** Handles parsing of project files for the Overlord system. Responsible for
   * processing instantiations, includes, prefabs, and connections.

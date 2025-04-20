@@ -21,6 +21,7 @@ import com.deanoc.overlord.hardware.{
   OutWireDirection,
   InOutWireDirection
 }
+import com.deanoc.overlord.definitions.ChipDefinitionTrait
 
 /** Additional test suite for Wire class focusing on:
   *   1. Testing wire creation from different connection types 2. Testing

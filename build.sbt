@@ -26,6 +26,29 @@ Linux / packageName := "overlord"
 // Native packager settings
 executableScriptName := "overlord"
 
+// JVM memory configuration to address GC warnings
+Universal / javaOptions ++= Seq(
+  "-Xmx2G",
+  "-XX:+UseG1GC",
+  "-XX:MaxGCPauseMillis=200"
+)
+
+// Fork JVM for both run and test to apply these settings
+fork := true
+run / javaOptions ++= Seq(
+  "-Xmx2G", 
+  "-XX:+UseG1GC",
+  "-XX:MaxGCPauseMillis=200",
+  "-XX:+HeapDumpOnOutOfMemoryError"
+)
+
+Test / fork := true
+Test / javaOptions ++= Seq(
+  "-Xmx2G",
+  "-XX:+UseG1GC",
+  "-XX:MaxGCPauseMillis=200"
+)
+
 // Packaging workflow notes:
 // - 'sbt stage' will compile and prepare the application in target/universal/stage/
 // - 'sbt universal:packageBin' creates a zip package (includes compilation)

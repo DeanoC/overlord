@@ -8,6 +8,7 @@ import com.deanoc.overlord._
 import com.deanoc.overlord.utils.{Utils, Variant, SilentLogger}
 import com.deanoc.overlord.config.CpuConfig
 import com.deanoc.overlord.interfaces.{MultiBusLike, SupplierBusLike, BusLike}
+import com.deanoc.overlord.definitions._
 
 /** Test suite for the CpuInstance class.
   *

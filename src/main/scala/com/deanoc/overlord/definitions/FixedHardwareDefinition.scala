@@ -1,6 +1,5 @@
 package com.deanoc.overlord.definitions
 
-import com.deanoc.overlord.{DefinitionType, HardwareDefinitionTrait}
 import com.deanoc.overlord.hardware.Port
 import com.deanoc.overlord.utils.Variant
 

@@ -23,6 +23,7 @@ import com.deanoc.overlord.hardware.{
   InOutWireDirection
 }
 import com.deanoc.overlord.interfaces.SupplierBusLike
+import com.deanoc.overlord.definitions.ChipDefinitionTrait
 
 /** Extended test suite for Wire class focusing on:
   *   1. Testing wire creation from different connection types 2. Testing

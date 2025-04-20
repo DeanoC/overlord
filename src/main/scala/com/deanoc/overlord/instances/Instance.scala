@@ -1,13 +1,16 @@
 package com.deanoc.overlord.instances
 
 import com.deanoc.overlord.utils.{Utils, Variant}
-import com.deanoc.overlord.hardware.{HardwareDefinition, Port}
+import com.deanoc.overlord.hardware.{Port}
+import com.deanoc.overlord.definitions.HardwareDefinition
 import com.deanoc.overlord.{
   DefinitionCatalog,
-  DefinitionTrait,
-  DefinitionType,
   Overlord,
   QueryInterface
+}
+import com.deanoc.overlord.definitions.{
+  DefinitionTrait,
+  DefinitionType
 }
 import com.deanoc.overlord.software.SoftwareDefinition
 import com.deanoc.overlord.utils.{

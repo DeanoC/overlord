@@ -11,7 +11,7 @@ import scala.language.implicitConversions
 import com.deanoc.overlord.connections.ConnectionTypesTestExtensions._
 import com.deanoc.overlord.utils.{SilentLogger, Logging, ModuleLogger, Utils}
 import com.deanoc.overlord.utils.{Variant, TableV}
-import com.deanoc.overlord.DefinitionType
+import com.deanoc.overlord.definitions._
 import com.deanoc.overlord.connections.ConnectionTypes._
 import com.deanoc.overlord.instances.{CpuInstance, RamInstance}
 import com.deanoc.overlord.config.{CpuConfig, RamConfig, MemoryRangeConfig}
@@ -36,6 +36,7 @@ import com.deanoc.overlord.utils.{Variant, BigIntV}
 import scala.collection.mutable
 import scala.reflect.ClassTag
 import scala.reflect.ClassTag
+import com.deanoc.overlord.definitions.HardwareDefinitionTrait
 
 /** Extended test suite for UnconnectedBus class focusing on:
   *   1. Testing the `getBus()` method with various input combinations 2.

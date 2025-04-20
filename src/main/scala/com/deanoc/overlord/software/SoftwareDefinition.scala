@@ -2,7 +2,9 @@ package com.deanoc.overlord.software
 
 import com.deanoc.overlord.actions.ActionsFile
 import com.deanoc.overlord.utils.{StringV, Utils, Variant}
-import com.deanoc.overlord.{DefinitionType, Overlord, SoftwareDefinitionTrait}
+import com.deanoc.overlord.Overlord
+import com.deanoc.overlord.definitions.DefinitionType
+import com.deanoc.overlord.definitions.SoftwareDefinitionTrait
 
 import java.nio.file.Path
 

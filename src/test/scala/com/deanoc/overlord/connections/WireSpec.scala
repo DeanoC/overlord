@@ -11,6 +11,7 @@ import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait, PinGroupInsta
 import org.mockito.Mockito._
 import org.mockito.Mockito
 import scala.collection.mutable
+import com.deanoc.overlord.definitions.ChipDefinitionTrait
 
 /**
  * Test suite for the Wire class and Wires object.

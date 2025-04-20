@@ -335,11 +335,13 @@ The following existing components will need to be modified:
    - Add info, catalogs, and components fields
    - Remove boards field
    - Update decoder to handle the new fields
+   - Rename to ComponentFileConfig
 
 2. **ProjectParser**: Update to handle the new file format.
    - Update parseProjectFile to process the new sections
    - Update processInstantiations to handle Component type definitions
    - Add methods for cloning instances and connections with namespacing
+   - rename to ComponentParser
 
 3. **CatalogLoader**: Update to register projects as Component type definitions.
    - Add registerProjectAsComponent method
@@ -425,7 +427,7 @@ The foundation phase focuses on setting up the basic structure for the new file 
 The core functionality phase focuses on implementing the main features of the new file format.
 
 **Tasks:**
-1. Update the ProjectParser class:
+1. Update the ComponentParser class:
    - Update parseProjectFile to process the new sections
    - Update processInstantiations to handle Component type definitions
    - Add methods for cloning instances and connections with namespacing
@@ -443,7 +445,7 @@ The core functionality phase focuses on implementing the main features of the ne
    - Update processCatalogSource to register projects as Component type definitions
 
 **Deliverables:**
-- Updated ProjectParser class
+- Updated ComponentParser class
 - NamespaceUtils class
 - ComponentInstanceCloner class
 - Updated CatalogLoader class

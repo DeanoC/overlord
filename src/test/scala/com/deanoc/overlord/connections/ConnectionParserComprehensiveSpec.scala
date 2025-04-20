@@ -21,6 +21,7 @@ import com.deanoc.overlord.instances.{
 }
 import org.mockito.Mockito._
 import com.deanoc.overlord.connections.TestUtils._
+import com.deanoc.overlord.definitions.{GatewareDefinitionTrait, HardwareDefinitionTrait}
 
 /** Comprehensive test suite for the ConnectionParser object. This test suite
   * focuses on all aspects of the ConnectionParser's functionality to establish

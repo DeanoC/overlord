@@ -3,11 +3,9 @@ package com.deanoc.overlord.instances
 import com.deanoc.overlord.utils.{Utils, Variant}
 import com.deanoc.overlord.hardware.{Port, RegisterBank, Registers}
 import com.deanoc.overlord.{
-  ChipDefinitionTrait,
-  GatewareDefinitionTrait,
-  HardwareDefinitionTrait,
   QueryInterface
 }
+import com.deanoc.overlord.definitions.{ChipDefinitionTrait, GatewareDefinitionTrait, HardwareDefinitionTrait}
 import com.deanoc.overlord.interfaces.{
   PortsLike,
   RegisterBankLike,

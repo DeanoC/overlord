@@ -2,7 +2,7 @@ package com.deanoc.overlord.instances
 
 import com.deanoc.overlord.utils._
 import com.deanoc.overlord.interfaces.UnconnectedLike
-import com.deanoc.overlord.{ChipDefinitionTrait, Definition}
+import com.deanoc.overlord.definitions.{ChipDefinitionTrait, Definition}
 import com.deanoc.overlord.instances.Instance.variantToAny
 import scala.util.boundary, boundary.break
 

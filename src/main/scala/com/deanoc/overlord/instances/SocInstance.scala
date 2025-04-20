@@ -1,7 +1,7 @@
 package com.deanoc.overlord.instances
 
 import com.deanoc.overlord.utils.Variant
-import com.deanoc.overlord.ChipDefinitionTrait
+import com.deanoc.overlord.definitions.ChipDefinitionTrait
 
 case class SocInstance(name: String, definition: ChipDefinitionTrait)
     extends ChipInstance {

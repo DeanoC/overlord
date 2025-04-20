@@ -1,11 +1,9 @@
-package com.deanoc.overlord.hardware
+package com.deanoc.overlord.definitions
 
-import com.deanoc.overlord.utils.{Utils, Variant}
-import com.deanoc.overlord.{
-  ChipDefinitionTrait,
-  DefinitionType
-}
-import com.deanoc.overlord.definitions.FixedHardwareDefinition
+import com.deanoc.overlord.utils.Utils
+import com.deanoc.overlord.utils.Variant
+
+import com.deanoc.overlord.hardware.{Port, Ports}
 
 import java.nio.file.Path
 

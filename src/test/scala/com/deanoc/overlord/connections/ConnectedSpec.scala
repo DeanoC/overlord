@@ -10,6 +10,7 @@ import com.deanoc.overlord.hardware.{Port, BitsDesc, InWireDirection, OutWireDir
 import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait, PinGroupInstance, ClockInstance}
 import org.mockito.Mockito._
 import org.mockito.Mockito
+import com.deanoc.overlord.definitions.ChipDefinitionTrait
 
 /**
  * Test suite for the Connected trait and its implementations.

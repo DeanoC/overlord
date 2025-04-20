@@ -5,7 +5,8 @@ import scala.collection.mutable
 import com.deanoc.overlord.utils.Utils
 import com.deanoc.overlord.actions.{CopyAction, SourcesAction}
 import com.deanoc.overlord.instances.{BoardInstance, ChipInstance}
-import com.deanoc.overlord.{Overlord, GatewareDefinitionTrait}
+import com.deanoc.overlord.Overlord
+import com.deanoc.overlord.definitions.GatewareDefinitionTrait
 
 object Edalize {
   def apply(game: Overlord): Unit = {

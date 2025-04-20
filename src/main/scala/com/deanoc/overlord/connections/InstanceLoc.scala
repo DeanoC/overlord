@@ -1,11 +1,11 @@
 package com.deanoc.overlord.connections
 
-import com.deanoc.overlord.{HardwareDefinitionTrait, GatewareDefinitionTrait, SoftwareDefinitionTrait}
+import com.deanoc.overlord.definitions.{HardwareDefinitionTrait, GatewareDefinitionTrait, SoftwareDefinitionTrait}
 import com.deanoc.overlord.instances.{PinGroupInstance, ClockInstance}
 
 import com.deanoc.overlord.instances.InstanceTrait
 import com.deanoc.overlord.hardware.Port
-import com.deanoc.overlord.DefinitionTrait
+import com.deanoc.overlord.definitions.DefinitionTrait
 
 /** Represents a location in the connection system, combining an instance, an
   * optional port, and a fully qualified name.

@@ -11,6 +11,8 @@ import com.deanoc.overlord.utils.{
   StringV,
   Logging
 }
+import com.deanoc.overlord.definitions.{GatewareDefinitionTrait, SoftwareDefinitionTrait}
+import com.deanoc.overlord.definitions.{DefinitionType, LibraryDefinitionType, ProgramDefinitionType}
 
 import java.nio.file.{Files, Path, Paths}
 import scala.collection.mutable

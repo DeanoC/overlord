@@ -1,7 +1,7 @@
 package com.deanoc.overlord.instances
 
 import com.deanoc.overlord.utils.{Utils, Variant}
-import com.deanoc.overlord.ChipDefinitionTrait
+import com.deanoc.overlord.definitions.ChipDefinitionTrait
 import com.deanoc.overlord.interfaces.RamLike
 
 import scala.reflect.ClassTag

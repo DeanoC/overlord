@@ -10,6 +10,8 @@ import com.deanoc.overlord.utils.Logging
 import com.deanoc.overlord.definitions.ComponentDefinition
 
 import com.deanoc.overlord.Overlord
+import definitions.DefinitionTrait
+import definitions.DefinitionType
 
 class DefinitionCatalog extends Logging {
   type key = DefinitionType

@@ -20,6 +20,7 @@ import scala.util.boundary, boundary.break
 import io.circe.yaml.parser
 import io.circe.Decoder // Import Decoder explicitly
 import io.circe.generic.auto._ // Automatic derivation for case classes (for nested structures)
+import definitions.{Definition, DefinitionTrait}
 
 object CatalogLoader extends Logging {
 

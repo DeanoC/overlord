@@ -2,13 +2,14 @@ package com.deanoc.overlord.connections
 
 import com.deanoc.overlord.hardware.Port
 import com.deanoc.overlord.connections.ConnectionDirection
-import com.deanoc.overlord.{
+import com.deanoc.overlord.definitions.{ 
   DefinitionTrait,
   GatewareDefinitionTrait,
   HardwareDefinitionTrait,
-  QueryInterface,
   SoftwareDefinitionTrait
 }
+import com.deanoc.overlord.QueryInterface
+
 import com.deanoc.overlord.instances.{
   ChipInstance,
   ClockInstance,

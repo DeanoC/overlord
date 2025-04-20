@@ -15,6 +15,7 @@ import com.deanoc.overlord.hardware.{
 import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
 import org.mockito.Mockito._
 import com.deanoc.overlord.connections.ConnectedExtensions._
+import com.deanoc.overlord.definitions.HardwareDefinitionTrait
 
 /** Test suite for the ConnectedLogical class. This test suite focuses on
   * establishing a baseline for the behavior of logical connections before

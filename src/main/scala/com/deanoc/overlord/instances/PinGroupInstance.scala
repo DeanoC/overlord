@@ -3,11 +3,11 @@ package com.deanoc.overlord.instances
 import com.deanoc.overlord.hardware.{BitsDesc, Port, WireDirection}
 import com.deanoc.overlord.utils.Variant
 import com.deanoc.overlord.{
-  ChipDefinitionTrait,
   DiffPinConstraint,
   PinConstraint,
   PinConstraintType
 }
+import com.deanoc.overlord.definitions.ChipDefinitionTrait
 import com.deanoc.overlord.utils.Utils
 
 import scala.collection.mutable

@@ -10,6 +10,7 @@ import com.deanoc.overlord.instances.{ChipInstance, Container}
 import com.deanoc.overlord.interfaces.UnconnectedLike
 import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.utils._
+import definitions.GatewareDefinitionTrait
 object OutputGateware {
   def apply(
       top: Container,
