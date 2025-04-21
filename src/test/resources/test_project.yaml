@@ -32,42 +32,36 @@ instances:
   # CPU instances
   - name: "cpu0"
     type: "cpu.riscv.test"
-    config:
-      core_count: 4
-      triple: "riscv64-unknown-elf"
+    core_count: 4
+    triple: "riscv64-unknown-elf"
 
   - name: "cpu1"
     type: "cpu.arm.test"
-    config:
-      core_count: 2
-      triple: "aarch64-none-elf"
+    core_count: 2
+    triple: "aarch64-none-elf"
 
   # Memory instances
   - name: "main_memory"
     type: "ram.ddr4.test"
-    config:
-      ranges:
-        - address: "0x80000000"
-          size: "0x40000000"
+    ranges:
+      - address: "0x80000000"
+        size: "0x40000000"
 
   - name: "sram0"
     type: "ram.sram.test"
-    config:
-      ranges:
-        - address: "0x00100000"
-          size: "0x00010000"
+    ranges:
+      - address: "0x00100000"
+        size: "0x00010000"
 
   # Clock instance
   - name: "system_clock"
     type: "clock.test.100mhz"
-    config:
-      frequency: "100MHz"
+    frequency: "100MHz"
 
   # IO instance
   - name: "uart0"
     type: "io.uart.test"
-    config:
-      visible_to_software: true
+    visible_to_software: true
 
   # component instance
   - name: "sub_module"
@@ -122,20 +116,17 @@ connections:
 definitions:
   - name: "Cortex-A53"
     type: "cpu.arm.a53"
-    config:
-      core_count: 4
-      triple: "aarch64-none-elf"
+    core_count: 4
+    triple: "aarch64-none-elf"
   
   - name: "MainMemory"
     type: "ram.sram.main"
-    config:
-      ranges:
-        - address: "0x80000000"
-          size: "0x40000000"
-        - address: "0xC0000000" 
-          size: "0x20000000"
+    ranges:
+      - address: "0x80000000"
+        size: "0x40000000"
+      - address: "0xC0000000" 
+        size: "0x20000000"
   
   - name: "SystemClock"
     type: "clock.system.100mhz"
-    config:
-      frequency: "100MHz"    
+    frequency: "100MHz"    

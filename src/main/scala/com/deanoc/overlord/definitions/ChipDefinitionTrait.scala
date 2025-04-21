@@ -5,11 +5,11 @@ import com.deanoc.overlord.instances._
 import com.deanoc.overlord.utils.Variant
 import com.deanoc.overlord.config._
 import io.circe.parser.decode
+import com.deanoc.overlord.config.DefinitionConfig
 
 trait ChipDefinitionTrait extends DefinitionTrait {
   val ports: Map[String, Port]
   val maxInstances: Int
-  val attributes: Map[String, Variant]
   protected val registersV: Seq[Variant]
   var registers: Seq[RegisterBank] = Seq()
 
@@ -20,34 +20,20 @@ trait ChipDefinitionTrait extends DefinitionTrait {
   ): Either[String, InstanceTrait] = {
     defType match {
       case _: DefinitionType.RamDefinition =>
-        // Attempt to decode the config map into RamConfig
-        decode[RamConfig](
-          Definition.anyToJson(instanceConfig).noSpaces
-        ) match {
-          case Right(ramConfig) =>
-            RamInstance(name, this, ramConfig).asInstanceOf[Either[
-              String,
-              InstanceTrait
-            ]]
-          case Left(error) =>
-            Left(
-              s"Failed to decode RamConfig for instance $name: ${error.getMessage}"
-            )
+        val ram = new RamInstance(name, this)
+        val attribs = instanceConfig.map {
+          case (k, v) => k -> com.deanoc.overlord.utils.Utils.toVariant(v)
         }
+        ram.mergeAllAttributes(attribs)
+        Right(ram)
       case _: DefinitionType.CpuDefinition =>
-        decode[CpuConfig](
-          Definition.anyToJson(instanceConfig).noSpaces
-        ) match {
-          case Right(cpuConfig) =>
-            CpuInstance(name, this, cpuConfig).asInstanceOf[Either[
-              String,
-              InstanceTrait
-            ]]
-          case Left(error) =>
-            Left(
-              s"Failed to decode CpuConfig for instance $name: ${error.getMessage}"
-            )
+        val cpu = new CpuInstance(name, this)
+        val attribs = instanceConfig.map {
+          case (k, v) => k -> com.deanoc.overlord.utils.Utils.toVariant(v)
         }
+        cpu.mergeAllAttributes(attribs)
+        Right(cpu)
+
       case _: DefinitionType.IoDefinition =>
         decode[IoConfig](
           Definition.anyToJson(instanceConfig).noSpaces

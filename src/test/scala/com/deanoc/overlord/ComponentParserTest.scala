@@ -28,7 +28,6 @@ class ComponentParserTest
     with BeforeAndAfterAll {
   // Mock objects
   val mockCatalogs = mock(classOf[DefinitionCatalog])
-  val mockPrefabs = mock(classOf[PrefabCatalog])
   var parser: ComponentParser = _
 
   // Create temp directory for test files - shared across all tests
@@ -80,8 +79,14 @@ class ComponentParserTest
     val cpuDefinition = catalogConfig.definitions(0)
     cpuDefinition.`type` shouldBe "cpu"
     cpuDefinition.name shouldBe "Cortex-A53"
-    cpuDefinition.attributes.get("core_count") shouldBe Some("4")
-    cpuDefinition.attributes.get("triple") shouldBe Some("aarch64-none-elf")
+    
+    // Cast to the specific CPU definition type to access CPU-specific fields
+    cpuDefinition match {
+      case cpu: CpuDefinitionConfig =>
+        cpu.core_count shouldBe Some(4)
+        cpu.triple shouldBe "aarch64-none-elf"
+      case _ => fail("Expected CPU definition to be of type CpuDefinitionConfig")
+    }
     
     // Assert the content of the RAM definition
     val ramDefinition = catalogConfig.definitions(1)
@@ -89,7 +94,12 @@ class ComponentParserTest
     ramDefinition.name shouldBe "MainMemory"
     
     // Check RAM config and ranges if supported by the schema
-    ramDefinition.attributes.get("ranges") should not be None
+    ramDefinition match {
+      case ram: RamDefinitionConfig =>
+        ram.ram_config.ranges should not be empty
+      case _ =>
+        ramDefinition.attributes.get("ranges") should not be None
+    }
     
     // Assert the content of the clock definition
     val clockDefinition = catalogConfig.definitions(2)

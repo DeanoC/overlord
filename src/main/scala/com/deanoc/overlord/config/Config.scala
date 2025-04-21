@@ -22,23 +22,6 @@ object MemoryRangeConfig {
   implicit val decoder: Decoder[MemoryRangeConfig] = deriveDecoder[MemoryRangeConfig]
 }
 
-// Represents the configuration for a RAM definition
-case class RamConfig(
-  ranges: List[MemoryRangeConfig]
-)
-object RamConfig {
-  implicit val decoder: Decoder[RamConfig] = deriveDecoder[RamConfig]
-}
-
-// Represents the configuration for a CPU definition
-case class CpuConfig(
-  core_count: Int,
-  triple: String
-)
-object CpuConfig {
-  implicit val decoder: Decoder[CpuConfig] = deriveDecoder[CpuConfig]
-}
-
 // Represents the configuration for an IO definition
 case class IoConfig(
   visible_to_software: Boolean
@@ -119,147 +102,6 @@ object CustomDecoders {
   }
 }
 
-// Represents a single instance in the project file
-case class InstanceConfig(
-  name: String,
-  `type`: String, // Use backticks for type as it's a Scala keyword
-  attributes: Map[String, Any] = Map.empty, 
-)
-object InstanceConfig {
-  import CustomDecoders._
-  implicit val decoder: Decoder[InstanceConfig] = deriveDecoder[InstanceConfig]
-}
-
-// Base trait for all connection configurations
-sealed trait ConnectionConfig {
-  def `type`: String
-  def connection: String
-}
-object ConnectionConfig {
-  implicit val decoder: Decoder[ConnectionConfig] = (c: HCursor) => {
-    for {
-      connType <- c.downField("type").as[String]
-      result <- connType match {
-        case "bus" => c.as[BusConnectionConfig]
-        case "port" => c.as[PortConnectionConfig]
-        case "port_group" => c.as[PortGroupConnectionConfig]
-        case "clock" => c.as[ClockConnectionConfig]
-        case "logical" => c.as[LogicalConnectionConfig]
-        case "parameters" => c.as[ParametersConnectionConfig]
-        case "constant" => c.as[ConstantConnectionConfig]
-        case _ => Left(io.circe.DecodingFailure(s"Unknown connection type: $connType", c.history))
-      }
-    } yield result
-  }
-}
-
-// Represents a bus connection in the YAML
-case class BusConnectionConfig(
-  connection: String,
-  `type`: String,
-  bus_name: String,
-  bus_width: Int,
-  bus_protocol: String,
-
-  supplier_bus_name: String,
-  consumer_bus_name: String,
-  silent: Boolean
-) extends ConnectionConfig
-
-object BusConnectionConfig {
-  import CirceDefaults._
-
-  implicit val decoder: Decoder[BusConnectionConfig] = 
-    Decoder.instance { d =>
-      for {
-        c <- d.downField("connection").as[String]
-        t <- d.downField("type").as[String]
-        bn <- withDefault(d, "bus_name", "")
-        bw <- withDefault(d, "bus_width", 32)
-        bp <- withDefault(d, "bus_protocol", "internal")
-        sn <- withDefault(d, "supplier_bus_name", bn)
-        cn <- withDefault(d, "consumer_bus_name", bn)
-        ss <- withDefault(d, "silent", false)
-      } yield BusConnectionConfig(c, t, bn, bw, bp, sn, cn, ss)
-    }
-}
-
-// Represents a port connection in the YAML
-case class PortConnectionConfig(
-  connection: String,
-  `type`: String
-) extends ConnectionConfig
-
-object PortConnectionConfig {
-  implicit val decoder: Decoder[PortConnectionConfig] = deriveDecoder[PortConnectionConfig]
-}
-
-// Represents a port group connection in the YAML
-case class PortGroupConnectionConfig(
-  connection: String,
-  `type`: String,
-  first_prefix: Option[String] = None,
-  second_prefix: Option[String] = None,
-  excludes: Option[List[String]] = None
-) extends ConnectionConfig
-
-object PortGroupConnectionConfig {
-  implicit val decoder: Decoder[PortGroupConnectionConfig] = deriveDecoder[PortGroupConnectionConfig]
-}
-
-// Represents a clock connection in the YAML
-case class ClockConnectionConfig(
-  connection: String,
-  `type`: String
-) extends ConnectionConfig
-
-object ClockConnectionConfig {
-  implicit val decoder: Decoder[ClockConnectionConfig] = deriveDecoder[ClockConnectionConfig]
-}
-
-// Represents a logical connection in the YAML
-case class LogicalConnectionConfig(
-  connection: String,
-  `type`: String
-) extends ConnectionConfig
-
-object LogicalConnectionConfig {
-  implicit val decoder: Decoder[LogicalConnectionConfig] = deriveDecoder[LogicalConnectionConfig]
-}
-
-// Represents a parameters connection in the YAML
-case class ParametersConnectionConfig(
-  connection: String,
-  `type`: String,
-  parameters: List[ParameterConfig]
-) extends ConnectionConfig
-
-object ParametersConnectionConfig {
-  implicit val decoder: Decoder[ParametersConnectionConfig] = deriveDecoder[ParametersConnectionConfig]
-}
-
-// Represents a parameter in a parameters connection
-case class ParameterConfig(
-  name: String,
-  value: Json,
-  `type`: Option[String] = None
-)
-
-object ParameterConfig {
-  implicit val decoder: Decoder[ParameterConfig] = deriveDecoder[ParameterConfig]
-}
-
-// Represents a constant connection in the YAML
-case class ConstantConnectionConfig(
-  connection: String,
-  `type`: String,
-  value: Option[Json] = None
-) extends ConnectionConfig
-
-object ConstantConnectionConfig {
-  implicit val decoder: Decoder[ConstantConnectionConfig] = deriveDecoder[ConstantConnectionConfig]
-}
-
 // Represents a resource in a prefab
 case class PrefabResourceConfig(
   resource: String
@@ -284,14 +126,63 @@ object PrefabConfig {
   implicit val decoder: Decoder[PrefabConfig] = deriveDecoder[PrefabConfig]
 }
 
+// Define an enum for source types
+sealed trait SourceType
+object SourceType {
+  case object Git extends SourceType
+  case object Local extends SourceType
+  case object Fetch extends SourceType
+  case object Inline extends SourceType
+
+  def fromString(str: String): Option[SourceType] = str.toLowerCase match {
+    case "git" => Some(Git)
+    case "local" => Some(Local)
+    case "fetch" => Some(Fetch)
+    case "inline" => Some(Inline)
+    case _ => None
+  }
+  
+  def toString(sourceType: SourceType): String = sourceType match {
+    case Git => "git"
+    case Local => "local"
+    case Fetch => "fetch"
+    case Inline => "inline"
+  }
+  
+  implicit val decoder: Decoder[SourceType] = Decoder.decodeString.emap { str =>
+    fromString(str).toRight(s"Invalid source type: $str")
+  }
+}
+
 case class SourceConfig(
-  `type`: String, // Use backticks for type as it's a Scala keyword
-  url: Option[String] = None, // For git and fetch types
-  path: Option[String] = None // For local type
+  `type`: SourceType,
+  url: Option[String] = None,                 // For git and fetch types
+  path: Option[String] = None,                // For local type
+  inline: Option[Map[String, Any]] = None,    // For inline type
 )
 
 object SourceConfig {
-  implicit val decoder: Decoder[SourceConfig] = deriveDecoder[SourceConfig]
+  implicit val decoder: Decoder[SourceConfig] = new Decoder[SourceConfig] {
+    def apply(c: HCursor): Decoder.Result[SourceConfig] = {
+      for {
+        t <- c.downField("type").as[SourceType]
+        u = t match {
+          case SourceType.Git | SourceType.Local => c.downField("url").as[String].toOption
+          case _ => None
+        }
+        p = t match {
+          case SourceType.Fetch => c.downField("url").as[String].toOption
+          case _ => None
+        }
+        i = t match {
+          case SourceType.Inline => c.downField("url").as[Map[String, Json]].map(_.map { 
+            case (k, v) => k -> v.noSpaces 
+          }).toOption
+          case _ => None
+        }
+      } yield SourceConfig(t, u, p, i)
+    }
+  }
 }
 
 case class InfoConfig(
@@ -352,110 +243,5 @@ object ComponentFileConfig {
         info, components, instances, connections, defaults, catalogs, definitions
       )
     }
-  }
-}
-
-// Represents the top-level structure of a prefab file
-case class PrefabFileConfig(
-  resources: Option[List[String]] = None,
-  include: Option[List[PrefabIncludeConfig]] = None,
-  instance: Option[List[InstanceConfig]] = None,
-  connection: Option[List[ConnectionConfig]] = None
-)
-object PrefabFileConfig {
-  import CustomDecoders._
-  implicit val decoder: Decoder[PrefabFileConfig] = deriveDecoder[PrefabFileConfig]
-}
-
-// Represents a single definition within a file
-sealed trait DefinitionConfig {
-  def name: String
-  def `type`: String // Use backticks for type as it's a Scala keyword
-  def attributes: Map[String, Any]
-}
-
-
-object DefinitionConfig {
-  import CustomDecoders._
-  
-  implicit val decoder: Decoder[DefinitionConfig] = (c: HCursor) => {
-    for {
-      ft <- c.downField("type").as[String]
-      typeField <- Right(ft.split('.').headOption.getOrElse(""))
-      result <- typeField match {
-        case "ram" => c.as[RamDefinitionConfig]
-        case "cpu" => c.as[CpuDefinitionConfig]
-        case _ => c.as[OtherDefinitionConfig]
-      }
-    } yield result
-  }
-}
-
-case class RamDefinitionConfig(
-  name: String,
-  `type`: String,
-  config: Map[String, Any] = Map.empty,
-  ram_config: RamConfig,
-  attributes: Map[String, Any] = Map.empty
-) extends DefinitionConfig
-
-object RamDefinitionConfig {
-  import CustomDecoders._
-  
-  implicit val decoder: Decoder[RamDefinitionConfig] = (c: HCursor) => {
-    for {
-      name <- c.downField("name").as[String]
-      typeVal <- c.downField("type").as[String]
-      config <- c.downField("config").as[Option[Map[String, Any]]].map(_.getOrElse(Map.empty))
-      ramConfig <- c.downField("ram_config").as[RamConfig]
-      // Extract any additional fields not explicitly defined in the case class
-      attributes = ReflectionHelper.extractUnhandledFields[RamDefinitionConfig](c)
-    } yield RamDefinitionConfig(name, typeVal, config, ramConfig, attributes)
-  }
-}
-
-case class CpuDefinitionConfig(
-  name: String,
-  `type`: String,
-  config: Map[String, Any] = Map.empty,
-  triple: String,
-  core_count: Option[Int] = None,
-  attributes: Map[String, Any] = Map.empty
-) extends DefinitionConfig
-
-object CpuDefinitionConfig {
-  import CustomDecoders._
-  
-  implicit val decoder: Decoder[CpuDefinitionConfig] = (c: HCursor) => {
-    for {
-      name <- c.downField("name").as[String]
-      typeVal <- c.downField("type").as[String]
-      config <- c.downField("config").as[Option[Map[String, Any]]].map(_.getOrElse(Map.empty))
-      triple <- c.downField("triple").as[String]
-      coreCount <- c.downField("core_count").as[Option[Int]]
-      // Extract any additional fields not explicitly defined in the case class
-      attributes = ReflectionHelper.extractUnhandledFields[CpuDefinitionConfig](c)
-    } yield CpuDefinitionConfig(name, typeVal, config, triple, coreCount, attributes)
-  }
-}
-
-case class OtherDefinitionConfig(
-  name: String,
-  `type`: String,
-  config: Map[String, Any] = Map.empty,
-  attributes: Map[String, Any] = Map.empty
-) extends DefinitionConfig
-
-object OtherDefinitionConfig {
-  import CustomDecoders._
-  
-  implicit val decoder: Decoder[OtherDefinitionConfig] = (c: HCursor) => {
-    for {
-      name <- c.downField("name").as[String]
-      typeVal <- c.downField("type").as[String]
-      config <- c.downField("config").as[Option[Map[String, Any]]].map(_.getOrElse(Map.empty))
-      // Extract any additional fields not explicitly defined in the case class
-      attributes = ReflectionHelper.extractUnhandledFields[OtherDefinitionConfig](c)
-    } yield OtherDefinitionConfig(name, typeVal, config, attributes)
   }
 }

@@ -2,18 +2,22 @@ package com.deanoc.overlord.instances
 
 import com.deanoc.overlord.utils.{Utils, Variant}
 import com.deanoc.overlord.definitions.ChipDefinitionTrait
+import com.deanoc.overlord.config.CpuDefinitionConfig
+
 import com.deanoc.overlord.interfaces.{MultiBusLike, SupplierBusLike}
 import com.deanoc.overlord.interfaces.BusLike
 
 import scala.reflect.ClassTag
+import com.deanoc.overlord.utils.Logging
 
 case class CpuInstance(
     name: String,
-    override val definition: ChipDefinitionTrait,
-    config: com.deanoc.overlord.config.CpuConfig // Store the specific config
+    override val definition: ChipDefinitionTrait
 ) extends ChipInstance
     with MultiBusLike {
-  lazy val triple: String = config.triple // Use triple from the specific config
+
+  lazy val cpuConfig = definition.config.asInstanceOf[CpuDefinitionConfig]
+  lazy val triple: String = cpuConfig.triple // Use triple from the specific config
   lazy val maxAtomicWidth: Int =
     Utils.lookupInt(attributes, "max_atomic_width", 0)
 
@@ -21,13 +25,13 @@ case class CpuInstance(
   lazy val maxBitOpTypeWidth: Int =
     Utils.lookupInt(attributes, "max_bitop_type_width", 32)
   lazy val sanitizedTriple: String = triple.replace("-", "_")
-  lazy val cpuCount: Int = config.core_count // Use core_count from the specific config
+  lazy val cpuCount: Int = cpuConfig.core_count // Use core_count from the specific config
   lazy val host: Boolean = definition.defType.ident.last == "host"
   lazy val cpuType: String =
     if (host) "host" else definition.defType.ident(1) // cpu.$CpuType.blah.blash
   lazy val gccFlags: String = Utils.lookupString(attributes, "gcc_flags", "")
   private val busSpecs: Seq[BusSpec] = {
-    val attrs = definition.attributes
+    val attrs = definition.config.attributesAsVariant
     if (!attrs.contains("buses")) Seq()
     else {
       // Using explicit toIndexedSeq instead of implicit conversion
@@ -49,7 +53,7 @@ case class CpuInstance(
     }
   }
   private val buses: Seq[Bus] =
-    busSpecs.map(Bus(this, name, definition.attributes, _))
+    busSpecs.map(Bus(this, name, definition.config.attributesAsVariant, _))
 
   override def getInterface[T](implicit tag: ClassTag[T]): Option[T] = {
     val MultiBusLike_ = classOf[MultiBusLike]
@@ -84,21 +88,4 @@ case class CpuInstance(
   ): Option[BusLike] =
     buses.find(b => b.spec.protocol == protocol && !b.spec.supplier)
 
-}
-
-object CpuInstance {
-  def apply(
-      name: String, // Keep name as it's part of InstanceTrait
-      definition: ChipDefinitionTrait,
-      config: com.deanoc.overlord.config.CpuConfig // Accept CpuConfig
-  ): Either[String, CpuInstance] = {
-    try {
-      // Create the CpuInstance, passing the config
-      val cpu = new CpuInstance(name, definition, config)
-      Right(cpu)
-    } catch {
-      case e: Exception =>
-        Left(s"Error creating CpuInstance: ${e.getMessage}")
-    }
-  }
 }

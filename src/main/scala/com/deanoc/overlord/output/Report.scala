@@ -55,8 +55,8 @@ object Report {
     sb ++= f"------------------%n"
     for (cput <- cpuTypes) {
       val chipType = cput.defType.ident.mkString
-      val arch = Utils.lookupString(cput.attributes, "arch", "UNKNOWN")
-      val bw = Utils.lookupInt(cput.attributes, "width", 32)
+      val arch = Utils.lookupString(cput.config.attributesAsVariant, "arch", "UNKNOWN")
+      val bw = Utils.lookupInt(cput.config.attributesAsVariant, "width", 32)
 
       val coreCount = cpus.filter(_.definition == cput).map(_.cpuCount).sum
 

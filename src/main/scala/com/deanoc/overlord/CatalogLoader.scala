@@ -15,6 +15,7 @@ import scala.collection.mutable
 import scala.collection.immutable.HashMap
 import scala.util.boundary, boundary.break
 import definitions.{Definition, DefinitionTrait}
+import config.SourceType
 
 object CatalogLoader extends Logging {
   // This is the main entry point for loading catalogs
@@ -57,27 +58,10 @@ object CatalogLoader extends Logging {
       defaultMap: Map[String, Any]
   ): Seq[DefinitionTrait] = boundary {
 
-    val sourceType = sourceConfig.`type`
-    val contentPath = sourceType match {
-      case "git" | "fetch" =>
-        sourceConfig.url.getOrElse {
-          error(s"Catalog source of type '$sourceType' missing 'url'")
-          boundary.break(Seq.empty)
-        }
-      case "local" =>
-        sourceConfig.path.getOrElse {
-          error(s"Catalog source of type '$sourceType' missing 'path'")
-          boundary.break(Seq.empty)
-        }
-      case _ =>
-        error(s"Unknown catalog source type: $sourceType")
-        boundary.break(Seq.empty)
-    }
-
-    sourceType match {
-      case "git"   => loadFromGit(contentPath, defaultMap)
-      case "fetch" => loadFromUrl(contentPath, defaultMap)
-      case "local" => loadFromFile(contentPath, defaultMap)
+    sourceConfig.`type` match {
+      case SourceType.Git   => loadFromGit(sourceConfig.url.get, defaultMap)
+      case SourceType.Fetch => loadFromUrl(sourceConfig.url.get, defaultMap)
+      case SourceType.Local => loadFromFile(sourceConfig.path.get, defaultMap)
       case _       => Seq.empty // Already handled above
     }
   }
@@ -139,7 +123,7 @@ object CatalogLoader extends Logging {
         processParsedCatalog(parsed, filePath, defaultMap)
     }
   }
-
+/*
   def parsePrefabCatalog(
       name: String,
       parsedConfig: ComponentFileConfig, // Can now also use parseDefinitionCatalog with this
@@ -149,7 +133,7 @@ object CatalogLoader extends Logging {
     // since ComponentFileConfig also implements FileConfigBase
 
     Left("Prefab catalog parsing is being REMOVED.")
-    /*
+    
     var prefabCatalog = new PrefabCatalog()
 
     // Process prefabs from the project file
@@ -193,7 +177,7 @@ object CatalogLoader extends Logging {
         }
     }
 
-    Right(prefabCatalog)*/
+    Right(prefabCatalog)
   }
 
   // Helper method to find the path of a prefab by its name
@@ -216,4 +200,5 @@ object CatalogLoader extends Logging {
         .map(_.resolve(prefabFile))
     }
   }
+*/
 }

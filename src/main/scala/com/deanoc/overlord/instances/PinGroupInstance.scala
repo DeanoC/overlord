@@ -36,8 +36,8 @@ object PinGroupInstance {
       // Other attributes like standard, pullup, etc., are assumed to be
       // part of the definition's attributes or handled elsewhere.
       
-      val standard = Utils.lookupString(definition.attributes, "standard", "LVCMOS33")
-      val pullup = Utils.lookupBoolean(definition.attributes, "pullup", false) // Assuming a single pullup value for the group
+      val standard = Utils.lookupString(definition.config.attributesAsVariant, "standard", "LVCMOS33")
+      val pullup = Utils.lookupBoolean(definition.config.attributesAsVariant, "pullup", false) // Assuming a single pullup value for the group
   
       val pinNames = config.pins
       val pullups = List.fill(pinNames.length)(pullup)

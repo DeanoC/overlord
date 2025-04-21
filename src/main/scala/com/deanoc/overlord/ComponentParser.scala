@@ -108,7 +108,7 @@ class ComponentParser() extends Logging {
     info(s"Loading component $componentName from $componentPath")
     
     // Create a Component from the project file
-    val component = Component.fromProjectFile(componentName, "", componentPath) match {
+    val component = Component.fromProjectFile(componentName.toString(), "", componentPath) match {
       case Some(comp) => comp
       case None =>
         error(s"Failed to load component $componentName from $componentPath")
@@ -143,9 +143,10 @@ class ComponentParser() extends Logging {
         val defType = DefinitionType(instanceConfig.`type`)
         val definitionResult = catalog.findDefinition(defType) match {
           case Some(definition) => Right(definition)
-          case None =>
-            // Try to create a one shot definition if not found
-            Instance.definitionFrom(catalog, Overlord.projectPath, instanceConfig, defType)
+          case None =>      
+            // TODO: one shot definitions
+            Left(s"No definition found or could be created (TODO: one shot definitions) for ${instanceConfig.name} $defType")
+
         }
         
         definitionResult match {

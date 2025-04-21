@@ -28,7 +28,7 @@ import java.nio.file.Path
 import scala.collection.mutable
 trait InstanceTrait extends QueryInterface {
   lazy val attributes: mutable.HashMap[String, Variant] =
-    mutable.HashMap[String, Variant](definition.attributes.toSeq: _*)
+    mutable.HashMap[String, Variant](definition.config.attributesAsVariant.toSeq: _*)
   val finalParameterTable: mutable.HashMap[String, Variant] = mutable.HashMap()
 
   val name: String
@@ -116,22 +116,10 @@ object Instance {
 
       val defType = DefinitionType(defTypeString)
 
+      // TODO: one shot definitions
       val definitionResult = catalogs.findDefinition(defType) match {
         case Some(d) => Right(d)
-        case None    =>
-          // Update the call to definitionFrom to pass the InstanceConfig
-          definitionFrom(
-            catalogs,
-            Overlord.projectPath,
-            config, // Pass InstanceConfig
-            defType
-          ) match {
-            case Right(value) => Right(value)
-            case Left(error) =>
-              Left(
-                s"No definition found or could be created for $name $defType: $error"
-              )
-          }
+        case None    => Left(s"No definition found or could be created for $name $defType (TODO: one shot definitions)")
       }
 
       definitionResult.flatMap { definition =>
@@ -155,50 +143,6 @@ object Instance {
         Left(s"Invalid instance format: ${e.getMessage()}")
       case e: Exception =>
         Left(s"Error creating instance: ${e.getMessage()}")
-    }
-  }
-
-  // Refactor definitionFrom to accept InstanceConfig and make it public
-  def definitionFrom(
-      catalogs: DefinitionCatalog,
-      path: Path,
-      instanceConfig: com.deanoc.overlord.config.InstanceConfig, // Change parameter type
-      defType: DefinitionType
-  ): Either[String, DefinitionTrait] = {
-
-    // Access the config map within the InstanceConfig
-    val configMap = instanceConfig.attributes.map { case (k, v) =>
-      k -> Utils.toVariant(v) // Convert Any to Variant
-    }
-
-    if (configMap.contains("gateware")) {
-      // Convert configMap to Map[String, Any] for the new HardwareDefinition.apply
-      val configAsAny = configMap.map { case (k, v) =>
-        k -> variantToAny(v)
-      }
-
-      HardwareDefinition(defType, configAsAny, path) match {
-        case Right(value) =>
-          catalogs.catalogs += (defType -> value)
-          Right(value)
-        case Left(error) =>
-          Left(s"$defType gateware was invalid: $error")
-      }
-    } else if (configMap.contains("software")) {
-      // Convert configMap to Map[String, Any] for the new SoftwareDefinition.apply
-      val configAsAny = configMap.map { case (k, v) =>
-        k -> variantToAny(v)
-      }
-
-      SoftwareDefinition(defType, configAsAny, path) match {
-        case Right(value) =>
-          catalogs.catalogs += (defType -> value)
-          Right(value)
-        case Left(error) =>
-          Left(s"$defType software was invalid: $error")
-      }
-    } else {
-      Left(s"$defType not found in any catalogs")
     }
   }
 

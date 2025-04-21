@@ -4,6 +4,7 @@ import com.deanoc.overlord.Component
 import com.deanoc.overlord.instances.{InstanceTrait}
 import com.deanoc.overlord.connections.Connected
 import java.nio.file.Path
+import com.deanoc.overlord.config.DefinitionConfig
 
 /**
  * Represents a component definition in the Overlord framework.
@@ -15,6 +16,7 @@ import java.nio.file.Path
  */
 class ComponentDefinition(
   val name: String,
+  val config: DefinitionConfig,
   val component: Component,
   val sourcePath: Path
 ) extends DefinitionTrait {
@@ -27,7 +29,7 @@ class ComponentDefinition(
   /**
    * The attributes of this definition
    */
-  override val attributes: Map[String, com.deanoc.overlord.utils.Variant] = Map.empty
+
   
   /**
    * The dependencies of this definition
@@ -109,6 +111,7 @@ object ComponentDefinition {
   def apply(component: Component): ComponentDefinition = {
     new ComponentDefinition(
       name = component.name,
+      config = component.config.asInstanceOf[DefinitionConfig],
       component = component,
       sourcePath = java.nio.file.Paths.get(component.path)
     )

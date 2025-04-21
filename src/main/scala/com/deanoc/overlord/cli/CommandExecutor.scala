@@ -4,7 +4,6 @@ import com.deanoc.overlord.utils.Logging
 import com.deanoc.overlord.utils.Utils
 import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.DefinitionCatalog
-import com.deanoc.overlord.PrefabCatalog
 import com.deanoc.overlord.templates.TemplateManager
 import com.deanoc.overlord.test.TestManager
 import com.deanoc.overlord.catalog.CatalogManager

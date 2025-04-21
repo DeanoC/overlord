@@ -5,6 +5,7 @@ import com.deanoc.overlord.utils.{StringV, Utils, Variant}
 import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.definitions.DefinitionType
 import com.deanoc.overlord.definitions.SoftwareDefinitionTrait
+import com.deanoc.overlord.config.DefinitionConfig
 
 import java.nio.file.Path
 
@@ -15,16 +16,20 @@ case class SoftwareDefinition(
     parameters: Map[String, Variant],
     dependencies: Seq[String],
     actionsFilePath: Path,
-    actionsFile: ActionsFile
+    actionsFile: ActionsFile,
+    config: DefinitionConfig // Added config field
 ) extends SoftwareDefinitionTrait {}
 
 object SoftwareDefinition {
   def apply(
-      defType: DefinitionType, // Accept DefinitionType directly
-      config: Map[String, Any], // Accept Option[Map[String, Any]] for config
+      defType: DefinitionType,
+      config: DefinitionConfig,
       path: Path
   ): Either[String, SoftwareDefinitionTrait] = {
-    val configMap: Map[String, Variant] = config.map { case (k, v) =>
+
+    val attributes: Map[String, Any] = config.attributes
+
+    val configMap: Map[String, Variant] = attributes.map { case (k, v) =>
       k -> Utils.toVariant(v) // Convert Any to Variant
     }
 
@@ -83,7 +88,6 @@ object SoftwareDefinition {
         Utils.toTable(parsed("parameters"))
       else Map[String, Variant]()
     
-    // Create the SoftwareDefinition
     val result = Right(
       SoftwareDefinition(
         defType,
@@ -92,68 +96,12 @@ object SoftwareDefinition {
         parameters,
         dependencies,
         softwarePath,
-        actionsFile.get
+        actionsFile.get,
+        config
       )
     )
     
     Overlord.popCatalogPath()
     result
-  }
-
-  // Keep the existing apply method for backward compatibility
-  def apply(
-      defType: DefinitionType,
-      path: Path,
-      attributes: Map[String, Variant],
-      name: String,
-      dependencies: Seq[String],
-      softwarePath: Path
-  ): Option[SoftwareDefinition] = {
-    Overlord.pushCatalogPath(softwarePath)
-    val result = parse(
-      defType,
-      path,
-      attributes,
-      name,
-      dependencies,
-      softwarePath,
-      Utils.readYaml(softwarePath)
-    )
-    Overlord.popCatalogPath()
-    result
-  }
-
-  private def parse(
-      defType: DefinitionType,
-      path: Path,
-      attributes: Map[String, Variant],
-      name: String,
-      dependencies: Seq[String],
-      softwarePath: Path,
-      parsed: Map[String, Variant]
-  ): Option[SoftwareDefinition] = {
-    val actionsFile = ActionsFile.createActionsFile(name, parsed)
-
-    if (actionsFile.isEmpty) {
-      println(s"Software actions file $name invalid\n")
-      return None
-    }
-
-    val parameters =
-      if (parsed.contains("parameters"))
-        Utils.toTable(parsed("parameters"))
-      else Map[String, Variant]()
-
-    Some(
-      SoftwareDefinition(
-        defType,
-        path,
-        attributes,
-        parameters,
-        dependencies,
-        softwarePath,
-        actionsFile.get
-      )
-    )
   }
 }

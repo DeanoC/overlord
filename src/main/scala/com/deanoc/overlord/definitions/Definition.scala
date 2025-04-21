@@ -17,17 +17,14 @@ import io.circe.{Json, JsonObject}
 
 object Definition {
   def apply(
-      config: com.deanoc.overlord.config.DefinitionConfig,
+      config: DefinitionConfig,
       defaults: Map[String, Variant]
   ): Either[String, DefinitionTrait] = {
 
     val path = Overlord.catalogPath
     val `type` = DefinitionType(config.`type`)
 
-    // Apply defaults to config.config if needed
-    // This is a simplified approach - in a more complete implementation,
-    // we would merge defaults into config.config in a type-safe way
-    val mergedConfig = if (defaults.isEmpty) {
+    val mergedAttributes = if (defaults.isEmpty) {
       config.attributes
     } else {
       // Convert defaults to Map[String, Any] and merge with config.config
@@ -42,6 +39,9 @@ object Definition {
       }
       defaultsAsAny ++ config.attributes
     }
+    
+    // Use the withAttributes method to create a new instance with updated attributes
+    val configWithDefaults = config.withAttributes(mergedAttributes)
 
     `type` match {
       // Chip definitions
@@ -51,22 +51,22 @@ object Definition {
           _: DefinitionType.NetDefinition | _: DefinitionType.IoDefinition |
           _: DefinitionType.OtherDefinition | _: DefinitionType.SocDefinition |
           _: DefinitionType.SwitchDefinition =>
-        HardwareDefinition(`type`, mergedConfig, path)
+        HardwareDefinition(`type`, configWithDefaults, path)
 
       // Software definitions
       case _: DefinitionType.ProgramDefinition |
           _: DefinitionType.LibraryDefinition =>
-        SoftwareDefinition(`type`, mergedConfig, path)
+        SoftwareDefinition(`type`, configWithDefaults, path)
 
       // Port definitions
       case _: DefinitionType.PinGroupDefinition =>
-        HardwareDefinition(`type`, mergedConfig, path)
+        HardwareDefinition(`type`, configWithDefaults, path)
       case _: DefinitionType.ClockDefinition =>
-        HardwareDefinition(`type`, mergedConfig, path)
+        HardwareDefinition(`type`, configWithDefaults, path)
 
       // Board definition
       case _: DefinitionType.BoardDefinition =>
-        HardwareDefinition(`type`, mergedConfig, path)
+        HardwareDefinition(`type`, configWithDefaults, path)
 
       // Component definition
       case _: DefinitionType.ComponentDefinition =>

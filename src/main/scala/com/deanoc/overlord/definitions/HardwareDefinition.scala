@@ -4,6 +4,7 @@ import com.deanoc.overlord.utils.Utils
 import com.deanoc.overlord.utils.Variant
 
 import com.deanoc.overlord.hardware.{Port, Ports}
+import com.deanoc.overlord.config.DefinitionConfig
 
 import java.nio.file.Path
 
@@ -26,10 +27,10 @@ object HardwareDefinition {
     */
   def apply(
       defType: DefinitionType, // Accept DefinitionType directly
-      config: Map[String, Any], // Accept Option[Map[String, Any]] for config
+      config: DefinitionConfig,
       path: Path
   ): Either[String, ChipDefinitionTrait] = {
-    val configMap: Map[String, Variant] = config.map { case (k, v) =>
+    val configMap: Map[String, Variant] = config.attributes.map { case (k, v) =>
       k -> Utils.toVariant(v) // Convert Any to Variant
     }
 
@@ -80,7 +81,7 @@ object HardwareDefinition {
       // Call the second GatewareDefinition.apply method with the correct parameter order
       GatewareDefinition(
         defType, // Pass defType directly
-        attribs,
+        config,
         dependencies,
         ports,
         registers,
@@ -97,7 +98,7 @@ object HardwareDefinition {
         FixedHardwareDefinition(
           defType, // Pass defType directly
           path,
-          attribs,
+          config,
           dependencies,
           ports,
           mi,

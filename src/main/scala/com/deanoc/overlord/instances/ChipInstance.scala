@@ -79,7 +79,7 @@ trait ChipInstance
         })
   }
   private val buses: Seq[Bus] =
-    busSpecs.map(Bus(this, name, definition.attributes, _))
+    busSpecs.map(Bus(this, name, definition.config.attributesAsVariant, _)) 
 
   def isGateware: Boolean = definition.isInstanceOf[GatewareDefinitionTrait]
 
@@ -89,7 +89,7 @@ trait ChipInstance
 
   def isVisibleToSoftware: Boolean = hasRegisters || Utils.lookupBoolean(
     attributes,
-    "visable_to_software",
+    "visible_to_software",
     or = false
   )
 

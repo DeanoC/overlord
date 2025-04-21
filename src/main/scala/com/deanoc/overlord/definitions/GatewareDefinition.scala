@@ -5,6 +5,7 @@ import com.deanoc.overlord.hardware.{Port, Ports}
 import com.deanoc.overlord.utils.{Utils, Variant}
 import com.deanoc.overlord.utils.Utils.VariantTable
 import com.deanoc.overlord.{Overlord}
+import com.deanoc.overlord.config.DefinitionConfig
 
 import java.nio.file.{Path, Paths}
 
@@ -32,7 +33,7 @@ import java.nio.file.{Path, Paths}
 case class GatewareDefinition(
     defType: DefinitionType,
     sourcePath: Path,
-    attributes: Map[String, Variant],
+    config: DefinitionConfig,
     dependencies: Seq[String],
     ports: Map[String, Port],
     maxInstances: Int = 1,
@@ -54,7 +55,7 @@ object GatewareDefinition {
     *   An Either containing the GatewareDefinition if valid, or an error
     *   message if invalid.
     */
-  def apply(table: VariantTable): Either[String, GatewareDefinition] = {
+  /*def apply(table: VariantTable): Either[String, GatewareDefinition] = {
     if (!table.contains("gateware"))
       return Left("Table does not contain a 'gateware' field")
 
@@ -97,7 +98,7 @@ object GatewareDefinition {
       Utils.toString(table("gateware")),
       table
     )
-  }
+  }*/
 
   /** Creates a GatewareDefinition by parsing a file and combining it with
     * provided metadata.
@@ -122,7 +123,7 @@ object GatewareDefinition {
     */
   def apply(
       defType: DefinitionType,
-      attributes: Map[String, Variant],
+      config: DefinitionConfig,
       dependencies: Seq[String],
       ports: Map[String, Port],
       registers: Seq[Variant],
@@ -134,7 +135,7 @@ object GatewareDefinition {
     val yaml = Utils.readYaml(Overlord.catalogPath.resolve(fileNameAlone))
     val result = parse(
       defType,
-      attributes,
+      config,
       dependencies,
       ports,
       registers,
@@ -171,7 +172,7 @@ object GatewareDefinition {
     */
   private def parse(
       defType: DefinitionType,
-      attributes: Map[String, Variant],
+      config: DefinitionConfig,
       dependencies: Seq[String],
       iports: Map[String, Port],
       registers: Seq[Variant],
@@ -202,7 +203,7 @@ object GatewareDefinition {
         GatewareDefinition(
           defType,
           Overlord.catalogPath,
-          attributes,
+          config,
           dependencies,
           ports,
           1,

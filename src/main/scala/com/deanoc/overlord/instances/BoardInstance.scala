@@ -87,8 +87,8 @@ object BoardInstance {
         // This part might need further refinement based on the actual structure of BoardConfig and definition attributes.
         // If board_family and board_device are moved to BoardConfig, update this logic.
         if (
-          !definition.attributes.contains("board_family") ||
-          !definition.attributes.contains("board_device")
+          !definition.config.attributes.contains("board_family") ||
+          !definition.config.attributes.contains("board_device")
         ) {
           Left(
             s"$name Xilinx board definition requires a board_family AND " +
@@ -97,8 +97,8 @@ object BoardInstance {
         } else {
           Right(
             XilinxBoard(
-              Utils.toString(definition.attributes("board_family")),
-              Utils.toString(definition.attributes("board_device"))
+              Utils.toString(definition.config.attributesAsVariant("board_family")),
+              Utils.toString(definition.config.attributesAsVariant("board_device"))
             )
           )
         }
@@ -107,8 +107,8 @@ object BoardInstance {
       case "Gowin" =>
         // Similar assumption as Xilinx regarding board_family and board_device
         if (
-          !definition.attributes.contains("board_family") ||
-          !definition.attributes.contains("board_device")
+          !definition.config.attributes.contains("board_family") ||
+          !definition.config.attributes.contains("board_device")
         ) {
           Left(
             s"$name Gowin board definition requires a board_family AND " +
@@ -117,8 +117,8 @@ object BoardInstance {
         } else {
           Right(
             GowinBoard(
-              Utils.toString(definition.attributes("board_family")),
-              Utils.toString(definition.attributes("board_device"))
+              Utils.toString(definition.config.attributesAsVariant("board_family")),
+              Utils.toString(definition.config.attributesAsVariant("board_device"))
             )
           )
         }
@@ -132,6 +132,8 @@ object BoardInstance {
 
     val boardType = boardTypeResult.toOption.get
 
+    Left("Not implemented yet")
+    /*
     // Clocks are now directly available in config.clocks
     val clocksResult = config.clocks.foldLeft[Either[String, Seq[InstanceTrait]]](Right(Seq.empty)) {
       case (Left(error), _) => Left(error)
@@ -152,8 +154,7 @@ object BoardInstance {
           "frequency" -> boardClockConfig.frequency
         )
         
-        // Create a DefinitionConfig with the Any values
-        val clockDefConfig = com.deanoc.overlord.config.OtherDefinitionConfig(
+        val clockDefConfig = OtherDefinitionConfig(
           boardClockConfig.name,
           boardClockConfig.name,
           clockConfigMap
@@ -273,5 +274,6 @@ object BoardInstance {
         children = clocks ++ pingroups
       )
     )
+      */
   }
 }
