@@ -8,6 +8,7 @@ import com.deanoc.overlord.definitions.SoftwareDefinitionTrait
 import com.deanoc.overlord.config.DefinitionConfig
 
 import java.nio.file.Path
+import com.deanoc.overlord.config.ConfigPaths
 
 case class SoftwareDefinition(
     defType: DefinitionType,
@@ -71,7 +72,7 @@ object SoftwareDefinition {
     val softwarePath = path.resolve(software)
     
     // Push catalog path, read YAML, and parse
-    Overlord.pushCatalogPath(softwarePath)
+    ConfigPaths.pushCatalogPath(softwarePath)
     val result = Left("Software definition TODO")
     //    val result = Utils.loadAndParseYamlFile[GatewareDefinition](Overlord.catalogPath.resolve(fileNameAlone))
 /*    
@@ -102,7 +103,7 @@ object SoftwareDefinition {
       )
     )
   */  
-    Overlord.popCatalogPath()
+    ConfigPaths.popCatalogPath()
     result
   }
 }

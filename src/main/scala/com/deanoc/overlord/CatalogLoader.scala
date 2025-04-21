@@ -16,31 +16,19 @@ import scala.collection.immutable.HashMap
 import scala.util.boundary, boundary.break
 import definitions.{Definition, DefinitionTrait}
 import config.SourceType
+import com.deanoc.overlord.config.ConfigPaths
 
 object CatalogLoader extends Logging {
   // This is the main entry point for loading catalogs
-  def processParsedCatalog(
-      parsed: FileConfigBase,
-      filePath: Path,
-      currentDefaults: Map[String, Any]
-  ): Seq[DefinitionTrait] = {
-
-    val defaults = currentDefaults ++ parsed.defaults.map { case (k, v) =>
-      k -> Utils.toVariant(v)
-    }.toMap
+  def processParsedCatalog(parsed: FileConfigBase): Seq[DefinitionTrait] = {
 
     parsed.catalogs.foreach { catSourceConfig =>
-      Overlord.pushCatalogPath(filePath.getParent)
-      processCatalogSource(catSourceConfig, defaults)
-      Overlord.popCatalogPath()
+      processCatalogSource(catSourceConfig)
     }
 
     val defs = mutable.ArrayBuffer[DefinitionTrait]()
     parsed.definitions.foreach { definitionConfig =>
-      val defaultsAsVariant = defaults.map { case (k, v) =>
-        k -> Utils.toVariant(v)
-      }.toMap
-      Definition(definitionConfig, defaultsAsVariant) match {
+      Definition(definitionConfig) match {
         case Right(defn: DefinitionTrait) => defs += defn
         case Left(errorMsg) =>
           this.error(
@@ -54,14 +42,13 @@ object CatalogLoader extends Logging {
 
   // This method processes the catalog source configuration
   private def processCatalogSource(
-      sourceConfig: SourceConfig,
-      defaultMap: Map[String, Any]
+      sourceConfig: SourceConfig
   ): Seq[DefinitionTrait] = boundary {
 
     sourceConfig.`type` match {
-      case SourceType.Git   => loadFromGit(sourceConfig.url.get, defaultMap)
-      case SourceType.Fetch => loadFromUrl(sourceConfig.url.get, defaultMap)
-      case SourceType.Local => loadFromFile(sourceConfig.path.get, defaultMap)
+      case SourceType.Git   => loadFromGit(sourceConfig.url.get)
+      case SourceType.Fetch => loadFromUrl(sourceConfig.url.get)
+      case SourceType.Local => loadFromFile(sourceConfig.path.get)
       case SourceType.Inline => sourceConfig.inline match {
         case Some(inlineMap) =>
           inlineMap.collect {
@@ -76,10 +63,9 @@ object CatalogLoader extends Logging {
   }
 
   private def loadFromGit(
-      url: String,
-      defaultMap: Map[String, Any]
+      url: String
   ): Seq[DefinitionTrait] = boundary {
-    val catalogsDir = Overlord.projectPath.resolve("catalogs")
+    val catalogsDir = ConfigPaths.projectPath.resolve("catalogs")
     if (!Files.exists(catalogsDir)) {
       Files.createDirectories(catalogsDir)
     }
@@ -101,7 +87,7 @@ object CatalogLoader extends Logging {
 
     val definitionCatalogFile = repoPath.resolve("catalog.yaml")
     if (Files.exists(definitionCatalogFile)) {
-      loadFromFile(definitionCatalogFile.toString, defaultMap)
+      loadFromFile(definitionCatalogFile.toString)
     } else {
       error(s"No catalog.yaml found in cloned repository at $repoPath")
       Seq.empty
@@ -109,8 +95,7 @@ object CatalogLoader extends Logging {
   }
 
   private def loadFromUrl(
-      url: String,
-      defaultMap: Map[String, Any]
+      url: String
   ): Seq[DefinitionTrait] = boundary {
     // TODO: Implement fetching from URL (non-git)
     error(s"Fetching from URL is not yet implemented: $url")
@@ -118,10 +103,9 @@ object CatalogLoader extends Logging {
   }
 
   private def loadFromFile(
-      fileName: String,
-      defaultMap: Map[String, Any]
+      fileName: String
   ): Seq[DefinitionTrait] = {
-    val filePath = Overlord.projectPath.resolve(fileName)
+    val filePath = ConfigPaths.projectPath.resolve(fileName)
 
     val yamlString = Utils.loadFileToParse(filePath)
     yamlString match {
@@ -134,7 +118,7 @@ object CatalogLoader extends Logging {
             error(errorMsg)
             Seq.empty
           case Right(parsed) =>
-            processParsedCatalog(parsed, filePath, defaultMap)
+            processParsedCatalog(parsed)
         }
     }
   }

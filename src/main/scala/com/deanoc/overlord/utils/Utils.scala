@@ -302,7 +302,7 @@ object Utils extends Logging {
     }
   }
 
-  def loadFileToParse[T](
+  def loadFileToParse(
     filePath: Path
   ) : Either[String, String] = { // Error string or contents
     if (!Files.exists(filePath.toAbsolutePath)) {

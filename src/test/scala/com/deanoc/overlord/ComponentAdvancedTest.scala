@@ -35,22 +35,17 @@ class ComponentAdvancedTest
     tempDir = Files.createTempDirectory("overlord_advanced_test_")
   }
 
-  before {
-    Overlord.resetPaths()
-    // Add a default catalog path for testing
-    Overlord.pushCatalogPath(tempDir)
-  }
-
   "Component" should "load flat_serv_project.yaml correctly" in {
     // Use Java resources stream to load the file as it will be packaged in the JAR
     val resourceStream = getClass.getClassLoader.getResourceAsStream("flat_serv_project.yaml")
     val sourceFilePath = tempDir.resolve("flat_serv_project.yaml")
     Files.copy(resourceStream, sourceFilePath, java.nio.file.StandardCopyOption.REPLACE_EXISTING)
 
-    // Use Component.fromProjectFile to load it
-    val component = Component.fromProjectFile("TestGame", "TestBoard", sourceFilePath)
-
-    // Assert that the component is loaded successfully
-    component should not be empty
+    // Use Component.fromTopLevelComponentFile to load it
+    try {
+      val component = Component.fromTopLevelComponentFile("TestGame", "TestBoard", sourceFilePath)
+    } finally {
+      fail("Test failed: flat_serv_project.yaml not loaded correctly")
+    }
   }
 }

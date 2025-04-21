@@ -5,6 +5,10 @@ import com.deanoc.overlord.utils.Logging
 import com.deanoc.overlord.instances.MutableContainer
 import java.nio.file.Path
 import scala.util.boundary
+import com.deanoc.overlord.connections.ConnectionTypes.ConnectionName.from
+import com.deanoc.overlord.config.Defaults
+import com.deanoc.overlord.config.ConfigPaths
+import com.deanoc.overlord.utils.Utils
 
 /**
  * Represents a component in the Overlord system.
@@ -81,50 +85,62 @@ case class Component(
  * Companion object for Component class.
  */
 object Component extends Logging {
+
+  def fromTopLevelComponentFile(
+      name: String,
+      board: String,
+      projectPath: Path
+  ): Component = boundary {
+
+    // set up some things as we are the top level component
+    Defaults.clear()
+    Defaults.addExclude("name")
+    ConfigPaths.setupPaths(projectPath)
+
+    fromComponentFile(name, board, projectPath)
+  }
+
   /**
-   * Creates a Component from a project file.
+   * Creates a Component from a component file.
    *
    * @param name The name of the component
    * @param board The board name
    * @param gamePath The path to the project file
    * @return An Option containing the Component if parsing was successful, None otherwise
    */
-  def fromProjectFile(
+  def fromComponentFile(
       name: String,
       board: String,
       gamePath: Path
-  ): Option[Component] = boundary {
-    // Create a ProjectParser with explicit dependency injection
+  ): Component = {
+    // Create a ComponentParser with explicit dependency injection
     val parser = new ComponentParser()
 
-    // Parse the project file and get the container and catalog
-    val (container, catalog) =
-      parser.parseComponentFile(gamePath, board).getOrElse {
-        this.error(s"Failed to parse project file: $gamePath")
-        boundary.break(None)
-      }
-    
-    // Create a Component from the parsed data
-    val parsedConfig: Either[io.circe.Error, ComponentFileConfig] = for {
-      yamlString <- Right(scala.io.Source.fromFile(gamePath.toFile).mkString)
-      json <- io.circe.yaml.parser.parse(yamlString)
-      config <- json.as[ComponentFileConfig]
-    } yield config
-    
-    parsedConfig match {
-      case Left(err) =>
-        this.error(s"Failed to parse project file $gamePath: $err")
-        boundary.break(None)
-      case Right(config) =>
-        Some(Component(
-          name = name,
-          path = gamePath.toString,
-          config = config,
-          info = config.info,
-          container = container,
-          catalog = catalog,
-          components = Map.empty // Components will be populated in a future task
-        ))
+    val yamlString = Utils.loadFileToParse(gamePath) match {
+      case Right(content) => content
+      case Left(error) =>
+        this.error(s"Failed to load file $gamePath: $error")
+        throw new RuntimeException(s"Failed to load file $gamePath: $error")
     }
-  }
+    val config = {
+      Utils.parseYaml[ComponentFileConfig](yamlString) match {
+        case Right(config) =>
+          config
+        case Left(error) =>
+          this.error(s"Failed to parse YAML content: $error")
+          throw new RuntimeException(s"Failed to load file $gamePath: $error")
+        }
+    }
+    val (container, catalog) = parser.parseComponentFileConfig(config)
+
+    Component(
+      name = name,
+      path = gamePath.toString,
+      config = config,
+      info = config.info,
+      container = container,
+      catalog = catalog,
+      components = Map.empty // Components will be populated in a future task
+     )
+  } 
 }

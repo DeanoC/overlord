@@ -11,6 +11,7 @@ import com.deanoc.overlord.interfaces.UnconnectedLike
 import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.utils._
 import definitions.GatewareDefinitionTrait
+import com.deanoc.overlord.config.ConfigPaths
 object OutputGateware {
   def apply(
       top: Container,
@@ -18,14 +19,14 @@ object OutputGateware {
       constants: Seq[Constant],
       phase: Int
   ): Unit = {
-    Overlord.pushCatalogPath(gatePath)
+    ConfigPaths.pushCatalogPath(gatePath)
 
     top.children
       .collect { case c: ChipInstance => c }
       .filter(_.isGateware)
       .foreach(executePhase(_, top.unconnected, constants, phase))
 
-    Overlord.popCatalogPath()
+    ConfigPaths.popCatalogPath()
   }
 
   private def executePhase(

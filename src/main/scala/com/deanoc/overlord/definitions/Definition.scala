@@ -17,18 +17,17 @@ import io.circe.{Json, JsonObject}
 
 object Definition {
   def apply(
-      config: DefinitionConfig,
-      defaults: Map[String, Variant]
+      config: DefinitionConfig
   ): Either[String, DefinitionTrait] = {
 
     val path = Overlord.catalogPath
     val `type` = DefinitionType(config.`type`)
 
-    val mergedAttributes = if (defaults.isEmpty) {
+    val mergedAttributes = if (Defaults.isEmpty) {
       config.attributes
     } else {
       // Convert defaults to Map[String, Any] and merge with config.config
-      val defaultsAsAny = defaults.map {
+      val defaultsAsAny = Defaults.flatten.map {
         case (k, v: StringV)  => k -> v.value
         case (k, v: IntV)     => k -> v.value
         case (k, v: BooleanV) => k -> v.value

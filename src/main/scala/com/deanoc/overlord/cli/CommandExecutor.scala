@@ -565,20 +565,13 @@ object CommandExecutor extends Logging {
     }
 
     val filePath = Paths.get(expandedFilename).toAbsolutePath.normalize()
+
     val parentDir = filePath.getParent.toAbsolutePath.normalize()
-
-    System.setProperty("user.dir", parentDir.toString)
-
-    // Remove reference to config.out
-    // Use the project file's directory
     Utils.ensureDirectories(parentDir)
 
-    Overlord.setupPaths(filePath)
-
-    val gameName = filename.split('/').last.split('.').head
     val board = config.boardName.getOrElse("unknown")
 
-    Overlord(gameName, board, filePath)
+    Overlord(filename.split('/').last.split('.').head, board, filePath)
   }
 
   /** Ensures that standard resources are available.

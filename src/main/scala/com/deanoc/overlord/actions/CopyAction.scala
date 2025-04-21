@@ -5,6 +5,7 @@ import com.deanoc.overlord.instances.InstanceTrait
 import com.deanoc.overlord.utils.{Variant, ArrayV, Utils}
 
 import java.nio.file.{Path, Paths} // Use java.nio.file.Paths directly
+import com.deanoc.overlord.config.ConfigPaths
 
 // Represents an action to copy a file from a source path to a destination path
 case class CopyAction(filename: String, language: String, srcPath: String)
@@ -25,7 +26,7 @@ case class CopyAction(filename: String, language: String, srcPath: String)
     val fn = filename.split('/').last
 
     // Resolves the absolute source path using project macros
-    val srcAbsPath = Overlord.projectPath
+    val srcAbsPath = ConfigPaths.projectPath
       .resolve(Overlord.resolvePathMacros(instance, srcPath))
       .toAbsolutePath
 

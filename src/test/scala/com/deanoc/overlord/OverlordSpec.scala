@@ -3,6 +3,7 @@ package com.deanoc.overlord
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import java.nio.file.{Files, Path, Paths}
+import com.deanoc.overlord.config.ConfigPaths
 
 class OverlordSpec extends AnyFlatSpec with Matchers {
 
@@ -11,10 +12,10 @@ class OverlordSpec extends AnyFlatSpec with Matchers {
     val projectFile = tempDir.resolve("project.yaml")
     Files.createFile(projectFile)
 
-    Overlord.setupPaths(projectFile)
+    ConfigPaths.setupPaths(projectFile)
 
     // Verify the output path is set to the project file's directory
-    Overlord.outPath.toAbsolutePath shouldBe projectFile.getParent.toAbsolutePath
+    ConfigPaths.outPath.toAbsolutePath shouldBe projectFile.getParent.toAbsolutePath
 
     // Clean up
     Files.delete(projectFile)
@@ -24,7 +25,7 @@ class OverlordSpec extends AnyFlatSpec with Matchers {
   it should "use provided directory as output path when no file is specified" in {
     val tempDir = Files.createTempDirectory("project_test")
 
-    Overlord.setupPaths(tempDir)
+    ConfigPaths.setupPaths(tempDir)
 
     // Verify the output path is set to the provided directory
     Overlord.outPath.toAbsolutePath shouldBe tempDir.toAbsolutePath
@@ -38,17 +39,17 @@ class OverlordSpec extends AnyFlatSpec with Matchers {
     val projectFile = tempDir.resolve("project.yaml")
     Files.createFile(projectFile)
 
-    Overlord.setupPaths(projectFile)
+    ConfigPaths.setupPaths(projectFile)
 
     // Push a subdirectory onto the output path stack
-    Overlord.pushOutPath("subdirectory")
+    ConfigPaths.pushOutPath("subdirectory")
 
     // Verify the output path includes the subdirectory
-    Overlord.outPath.toAbsolutePath shouldBe
+    ConfigPaths.outPath.toAbsolutePath shouldBe
       projectFile.getParent.resolve("subdirectory").toAbsolutePath
 
     // Clean up
-    Overlord.popOutPath()
+    ConfigPaths.popOutPath()
     Files.delete(projectFile)
     Files.delete(tempDir)
   }

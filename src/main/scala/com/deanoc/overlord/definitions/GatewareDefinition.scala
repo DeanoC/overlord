@@ -8,6 +8,7 @@ import com.deanoc.overlord.{Overlord}
 import com.deanoc.overlord.config.DefinitionConfig
 
 import java.nio.file.{Path, Paths}
+import com.deanoc.overlord.config.ConfigPaths
 
 /** Represents a gateware definition with associated metadata, ports, registers, and parameters.
   *
@@ -131,10 +132,10 @@ object GatewareDefinition {
       fileName: String
   ): Either[String, GatewareDefinition] = {
     val fileNameAlone = Paths.get(fileName).getFileName
-    Overlord.pushCatalogPath(Paths.get(fileName))
+    ConfigPaths.pushCatalogPath(Paths.get(fileName))
     val result = Left("Gateware definition TODO")
 //    val result = Utils.loadAndParseYamlFile[GatewareDefinition](Overlord.catalogPath.resolve(fileNameAlone))
-    Overlord.popCatalogPath()
+    ConfigPaths.popCatalogPath()
     result
   }
 

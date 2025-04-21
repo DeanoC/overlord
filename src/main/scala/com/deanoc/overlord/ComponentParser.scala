@@ -18,19 +18,10 @@ import io.circe.Decoder // Import Decoder explicitly
 class ComponentParser() extends Logging {
   private val containerStack: mutable.Stack[MutableContainer] = mutable.Stack()
 
-  def parseComponentFile(
-      path: Path,
-      board: String = ""
-  ): Option[(MutableContainer, DefinitionCatalog)] = {
+  def parseComponentFileConfig(parsed:ComponentFileConfig)
+  : (MutableContainer, DefinitionCatalog) = {
     val newContainer = MutableContainer()
     containerStack.push(newContainer)
-
-    val parsed = Utils.loadAndParseYamlFile[ComponentFileConfig](path) match {
-      case Right(parsed) => parsed
-      case Left(errorMsg) =>
-        error(errorMsg)
-        return None
-    }
 
     var definitionCatalog = new DefinitionCatalog
 
@@ -40,7 +31,7 @@ class ComponentParser() extends Logging {
 
     // Process the catalog parts of the file    
     definitionCatalog.mergeNewDefinition(
-      CatalogLoader.processParsedCatalog(parsed, path, Map.empty)
+      CatalogLoader.processParsedCatalog(parsed)
     )
 
     // Process components section
@@ -68,7 +59,7 @@ class ComponentParser() extends Logging {
       processConnections(parsed.connections, newContainer, definitionCatalog)
     }
      
-    Some((newContainer, definitionCatalog))
+    (newContainer, definitionCatalog)
   }
   
   /**
@@ -108,12 +99,7 @@ class ComponentParser() extends Logging {
     info(s"Loading component $componentName from $componentPath")
     
     // Create a Component from the project file
-    val component = Component.fromProjectFile(componentName.toString(), "", componentPath) match {
-      case Some(comp) => comp
-      case None =>
-        error(s"Failed to load component $componentName from $componentPath")
-        return
-    }
+    val component = Component.fromComponentFile(componentName.toString(), "", componentPath)
     
     // Register the component as a Component type definition
     catalog.addComponentDefinition(component)

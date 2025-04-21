@@ -43,9 +43,9 @@ class ComponentParserTest
     // Create a fresh parser before each test
     parser = new ComponentParser()
 
-    Overlord.resetPaths()
+    ConfigPaths.resetPaths()
     // Add a default catalog path for testing
-    Overlord.pushCatalogPath(tempDir)
+    ConfigPaths.pushCatalogPath(tempDir)
   }
 
   "Parse Definition Catalog" should "correctly parse catalog file and extract definition data" in {

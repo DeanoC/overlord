@@ -1,5 +1,7 @@
 package com.deanoc.overlord
 
+import java.nio.file.{Path, Paths, Files}
+import com.deanoc.overlord.config.ConfigPaths
 import com.deanoc.overlord.connections._
 import com.deanoc.overlord.instances._
 import com.deanoc.overlord.interfaces.{ChipLike, RegisterBankLike}
@@ -14,7 +16,6 @@ import com.deanoc.overlord.utils.{
 import com.deanoc.overlord.definitions.{GatewareDefinitionTrait, SoftwareDefinitionTrait}
 import com.deanoc.overlord.definitions.DefinitionType
 
-import java.nio.file.{Files, Path, Paths}
 import scala.collection.mutable
 import scala.reflect.ClassTag
 import scala.util.boundary, boundary.break
@@ -166,165 +167,28 @@ case class Overlord(
 }
 
 object Overlord extends Logging {
-  // Stacks for managing paths during project setup and execution.
-  private val catalogPathStack: mutable.Stack[Path] = mutable.Stack[Path]()
-  private val instancePathStack: mutable.Stack[Path] = mutable.Stack[Path]()
-  private val outPathStack: mutable.Stack[Path] = mutable.Stack[Path]()
-
-  private var baseProjectPath: Path = Paths.get("")
-
   /** For testing purposes only: Get the current catalog path stack.
     *
     * @return
     *   The current catalog path stack
     */
-  def getCatalogPathStackForTesting: mutable.Stack[Path] = catalogPathStack
+  def getCatalogPathStackForTesting = ConfigPaths.getCatalogPathStackForTesting
 
-  def resetPaths(): Unit = {
-    catalogPathStack.clear()
-    instancePathStack.clear()
-    outPathStack.clear()
-  }
+  def catalogPath: Path               = ConfigPaths.catalogPath
 
-  /** Sets up the paths for the project, including catalog, prefab, and output
-    * paths.
-    *
-    * @param projectPath
-    *   The base path of the project.
-    * @param catalogPath
-    *   The path to the catalog directory.
-    * @param prefabsPath
-    *   The path to the prefabs directory.
-    */
-  def setupPaths(
-      projectPath: Path
-  ): Unit = {
-    baseProjectPath = projectPath.toAbsolutePath
+  def setInstancePath(p: String): Unit= ConfigPaths.setInstancePath(p)
+  def setInstancePath(p: Path): Unit  = ConfigPaths.setInstancePath(p)
+  def pushInstancePath(p: String): Unit= ConfigPaths.pushInstancePath(p)
+  def pushInstancePath(p: Path): Unit = ConfigPaths.pushInstancePath(p)
+  def instancePath: Path              = ConfigPaths.instancePath
 
-    // Use the project file's directory as the output location
-    val projectDir =
-      if (projectPath.toFile.isFile) projectPath.getParent else projectPath
+  def pushOutPath(p: String): Unit    = ConfigPaths.pushOutPath(p)
+  def pushOutPath(p: Path): Unit      = ConfigPaths.pushOutPath(p)
+  def outPath: Path                   = ConfigPaths.outPath
 
-    catalogPathStack.clear()
-
-    instancePathStack.clear()
-
-    outPathStack.clear()
-    outPathStack.push(projectDir)
-  }
-
-  /** Retrieves the base project path.
-    *
-    * @return
-    *   The base project path.
-    */
-  def projectPath: Path = baseProjectPath
-
-  /** Pushes a new catalog path onto the stack.
-    *
-    * @param path
-    *   The new catalog path to push.
-    */
-  def pushCatalogPath(path: String): Unit = pushCatalogPath(Paths.get(path))
-
-  /** Pushes a new catalog path onto the stack.
-    *
-    * @param path
-    *   The new catalog path to push.
-    */
-  def pushCatalogPath(path: Path): Unit = {
-    val potDPath =
-      if (catalogPathStack.isEmpty) path
-      else catalogPath.resolve(path)
-
-    if (potDPath.toFile.isFile) catalogPathStack.push(potDPath.getParent)
-    else catalogPathStack.push(potDPath)
-  }
-
-  /** Retrieves the current catalog path from the stack.
-    *
-    * @return
-    *   The current catalog path.
-    */
-  def catalogPath: Path = catalogPathStack.top
-
-  /** Sets the instance path.
-    *
-    * @param path
-    *   The new instance path to set.
-    */
-  def setInstancePath(path: String): Unit = setInstancePath(Paths.get(path))
-
-  /** Sets the instance path.
-    *
-    * @param path
-    *   The new instance path to set.
-    */
-  def setInstancePath(path: Path): Unit = {
-    instancePathStack.push(path)
-  }
-
-  /** Pushes a new instance path onto the stack.
-    *
-    * @param path
-    *   The new instance path to push.
-    */
-  def pushInstancePath(path: String): Unit = pushInstancePath(Paths.get(path))
-
-  /** Pushes a new instance path onto the stack.
-    *
-    * @param path
-    *   The new instance path to push.
-    */
-  def pushInstancePath(path: Path): Unit = {
-    val potIPath = instancePath.resolve(path)
-    if (potIPath.toFile.isFile) instancePathStack.push(potIPath.getParent)
-    else instancePathStack.push(potIPath)
-  }
-
-  /** Retrieves the current instance path from the stack.
-    *
-    * @return
-    *   The current instance path.
-    */
-  def instancePath: Path = instancePathStack.top
-
-  /** Pushes a new output path onto the stack.
-    *
-    * @param path
-    *   The new output path to push.
-    */
-  def pushOutPath(path: String): Unit = pushOutPath(Paths.get(path))
-
-  /** Pushes a new output path onto the stack.
-    *
-    * @param path
-    *   The new output path to push.
-    */
-  def pushOutPath(path: Path): Unit = {
-    val potOPath = outPath.resolve(path)
-    if (potOPath.toFile.isFile) outPathStack.push(potOPath.getParent)
-    else outPathStack.push(potOPath)
-  }
-
-  /** Retrieves the current output path from the stack.
-    *
-    * @return
-    *   The current output path.
-    */
-  def outPath: Path = outPathStack.top
-
-  /** Pops the top catalog path from the stack.
-    */
-  def popCatalogPath(): Unit = catalogPathStack.pop()
-
-  /** Pops the top instance path from the stack.
-    */
-  def popInstancePath(): Unit = instancePathStack.pop()
-
-  /** Pops the top output path from the stack.
-    */
-  def popOutPath(): Unit = outPathStack.pop()
+  def popCatalogPath(): Unit          = ConfigPaths.popCatalogPath()
+  def popInstancePath(): Unit         = ConfigPaths.popInstancePath()
+  def popOutPath(): Unit              = ConfigPaths.popOutPath()
 
   /** Resolves instance-specific macros in a given string.
     *
@@ -354,7 +218,7 @@ object Overlord extends Logging {
     */
   def resolvePathMacros(instance: InstanceTrait, inString: String): String = {
     resolveInstanceMacros(instance, inString)
-      .replace("${projectPath}", projectPath.toString)
+      .replace("${projectPath}", ConfigPaths.toString)
       .replace("${definitionPath}", instance.definition.sourcePath.toString)
       .replace("${outPath}", outPath.toString)
       .replace("${instancePath}", instance.sourcePath.toString)
@@ -385,16 +249,13 @@ object Overlord extends Logging {
     *   An optional Project instance.
     */
   def apply(
-      gameName: String,
+      projectName: String,
       board: String,
-      gamePath: Path
+      projectPath: Path
   ): Overlord = boundary {
-    // Create a Component from the project file
-    val component = Component.fromProjectFile(gameName, board, gamePath).getOrElse {
-      this.error(s"Failed to create component from project file: $gamePath")
-      boundary.break(null)
-    }
 
+    // Create a Component from the project file
+    val component = Component.fromTopLevelComponentFile(projectName, board, projectPath)
     // Get the container and catalog from the component
     val container = component.getContainer
     val catalog = component.getCatalog
@@ -421,7 +282,7 @@ object Overlord extends Logging {
 
     // Create the Overlord instance with explicit dependency injection
     Overlord(
-      gameName,
+      projectName,
       instances,
       connected,
       constants,
