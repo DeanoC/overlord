@@ -132,17 +132,8 @@ object GatewareDefinition {
   ): Either[String, GatewareDefinition] = {
     val fileNameAlone = Paths.get(fileName).getFileName
     Overlord.pushCatalogPath(Paths.get(fileName))
-    val yaml = Utils.readYaml(Overlord.catalogPath.resolve(fileNameAlone))
-    val result = parse(
-      defType,
-      config,
-      dependencies,
-      ports,
-      registers,
-      parameters,
-      fileName,
-      yaml
-    )
+    val result = Left("Gateware definition TODO")
+//    val result = Utils.loadAndParseYamlFile[GatewareDefinition](Overlord.catalogPath.resolve(fileNameAlone))
     Overlord.popCatalogPath()
     result
   }

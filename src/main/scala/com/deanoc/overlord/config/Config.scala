@@ -167,16 +167,16 @@ object SourceConfig {
       for {
         t <- c.downField("type").as[SourceType]
         u = t match {
-          case SourceType.Git | SourceType.Local => c.downField("url").as[String].toOption
+          case SourceType.Git | SourceType.Fetch => c.downField("url").as[String].toOption
           case _ => None
         }
         p = t match {
-          case SourceType.Fetch => c.downField("url").as[String].toOption
+          case SourceType.Local => c.downField("path").as[String].toOption
           case _ => None
         }
         i = t match {
-          case SourceType.Inline => c.downField("url").as[Map[String, Json]].map(_.map { 
-            case (k, v) => k -> v.noSpaces 
+          case SourceType.Inline => c.downField("inline").as[Map[String, Json]].map(_.map {
+            case (k, v) => k -> v.noSpaces
           }).toOption
           case _ => None
         }

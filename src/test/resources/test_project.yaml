@@ -17,11 +17,11 @@ catalogs:
 # Referenced components
 components:
   - type: local
-    path: /home/deano/local_prefab.yaml
+    path: "/home/deano/local_prefab.yaml"
   - type: fetch
-    url: https://gagameos.com/gagameos_base_prefab.yaml
+    url: "https://gagameos.com/gagameos_base_prefab.yaml"
   - type: git
-    url: https://github.com/DeanoC/bl616.git
+    url: "https://github.com/DeanoC/bl616.git"
 
 # Default settings for the project
 defaults:
@@ -129,4 +129,4 @@ definitions:
   
   - name: "SystemClock"
     type: "clock.system.100mhz"
-    frequency: "100MHz"    
+    frequency: "100MHz"

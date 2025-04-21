@@ -89,6 +89,9 @@ object Registers {
           break(Seq())
         }
 
+        break(Seq())
+/* 
+
         val source = Utils.readYaml(path)
         yamls += ((resource, source))
 
@@ -117,7 +120,8 @@ object Registers {
               )
             )
           }
-      }
+          */
+        }
     }
     registerBanks.flatten
   }

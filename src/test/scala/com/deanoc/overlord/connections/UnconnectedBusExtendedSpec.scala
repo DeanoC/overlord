@@ -15,7 +15,7 @@ import com.deanoc.overlord.connections.ConnectionTypes._
 // Import the new enum-based DefinitionType
 import com.deanoc.overlord.definitions.DefinitionType
 import com.deanoc.overlord.instances.{CpuInstance, RamInstance, ChipInstance, InstanceTrait}
-import com.deanoc.overlord.config.{CpuConfig, RamConfig, MemoryRangeConfig}
+import com.deanoc.overlord.config.{DefinitionConfig, MemoryRangeConfig}
 import com.deanoc.overlord.connections.InstanceLoc
 import com.deanoc.overlord.interfaces._
 import com.deanoc.overlord.hardware.{
@@ -28,6 +28,7 @@ import com.deanoc.overlord.hardware.{
 import scala.collection.mutable
 import scala.reflect.ClassTag
 import com.deanoc.overlord.definitions.HardwareDefinitionTrait
+import scala.util.Failure
 
 /** Extended test suite for UnconnectedBus class focusing on:
   *   1. Testing the `getBus()` method with various input combinations 2.
@@ -51,15 +52,11 @@ class UnconnectedBusExtendedSpec
   }
 
   // Helper methods to create CpuDef and RamDef
-  private def createCpuDef(): HardwareDefinitionTrait =
-    new HardwareDefinitionTrait {
-      override val ports: Map[String, Port] = Map()
-      override val maxInstances: Int = 1
-      override val defType: DefinitionType = DefinitionType.CpuDefinition(
-        Seq("cpu", "riscv", "verilog")
-      )
-      override val attributes: Map[String, Variant] = Utils.fromYaml(
-        """
+  private def createCpuDef(): FixedHardwareDefinition = {
+    val defType = DefinitionType.CpuDefinition(Seq("cpu", "riscv", "verilog"))
+    val sourcePath = java.nio.file.Paths.get("path/to/source")
+    val config = Utils.parseYamlString[DefinitionConfig](
+      """
 buses:
 - base_address: '0xFD00_0000'
   data_width: 32
@@ -69,36 +66,24 @@ buses:
 core_count: 1
 max_atomic_width: 32
 max_bitop_type_width: 32
-registers: []
 triple: riscv-none-elf
 type: cpu.pmu.zynqps8
 width: 32
-registers:
-- base_address: '0x02D4_0000'
-  cpus: PMU
-  name: PMU_IOMODULE
-  resource: registers/pmu_iomodule.yaml
-ranges:
-- address: '0x02DC_0000'
-  size: 128 KiB
       """
-      )
-      override def toString(): String = "RiscVCpu"
-      protected val registersV: Seq[Variant] = Seq()
-      override val dependencies: Seq[String] = Seq()
-      override val sourcePath: java.nio.file.Path =
-        java.nio.file.Paths.get("path/to/source")
-    }
+    ).getOrElse(throw new RuntimeException("Failed to parse CPU definition config")).asInstanceOf[DefinitionConfig]
+    val dependencies = Seq.empty[String]
+    val ports = Map.empty[String, Port]
+    val maxInstances = 1
+    val registersV = Seq.empty[Variant]
 
-  private def createRamDef(): HardwareDefinitionTrait =
-    new HardwareDefinitionTrait {
-      override val ports: Map[String, Port] = Map()
-      override val maxInstances: Int = 1
-      override val defType: DefinitionType = DefinitionType.RamDefinition(
-        Seq("ram", "verilog")
-      )
-      override val attributes: Map[String, Variant] = Utils.fromYaml(
-        """
+    new FixedHardwareDefinition(defType, sourcePath, config, dependencies, ports, maxInstances, registersV)
+  }
+
+  private def createRamDef(): FixedHardwareDefinition = {
+    val defType = DefinitionType.RamDefinition(Seq("ram", "verilog"))
+    val sourcePath = java.nio.file.Paths.get("path/to/source")
+    val config = Utils.parseYamlString[DefinitionConfig](
+      """
 buses:
 - base_address: '0xFD00_0000'
   data_width: 32
@@ -106,13 +91,14 @@ buses:
   name: pmu_pmuswitch
   supplier: false
       """
-      )
-      override def toString(): String = "Ram"
-      protected val registersV: Seq[Variant] = Seq()
-      override val dependencies: Seq[String] = Seq()
-      override val sourcePath: java.nio.file.Path =
-        java.nio.file.Paths.get("path/to/source")
-    }
+    ).getOrElse(throw new RuntimeException("Failed to parse RAM definition config")).asInstanceOf[DefinitionConfig]
+    val dependencies = Seq.empty[String]
+    val ports = Map.empty[String, Port]
+    val maxInstances = 1
+    val registersV = Seq.empty[Variant]
+
+    new FixedHardwareDefinition(defType, sourcePath, config, dependencies, ports, maxInstances, registersV)
+  }
 
   // Test getBus() method with various input combinations
   "UnconnectedBus.getBus" should "find a supplier bus by name when specified" in {
@@ -120,21 +106,12 @@ buses:
     val ramDef = createRamDef()
     val supplierInstance = CpuInstance(
       "cpu",
-      cpuDef,
-      CpuConfig(core_count = 1, triple = "riscv32-unknown-elf")
-    ).toOption.get
+      cpuDef
+    )
     val consumerInstance = RamInstance(
       "memory",
-      ramDef,
-      RamConfig(ranges =
-        List(
-          MemoryRangeConfig(
-            address = "0x10000000",
-            size = "0x1000"
-          )
-        )
-      )
-    ).toOption.get
+      ramDef
+    )
 
     // Create UnconnectedBus with SecondToFirst direction
     val bus = UnconnectedBus(
@@ -164,21 +141,12 @@ buses:
     val ramDef = createRamDef()
     val supplierInstance = CpuInstance(
       "cpu",
-      cpuDef,
-      CpuConfig(core_count = 1, triple = "riscv32-unknown-elf")
-    ).toOption.get
+      cpuDef
+    )
     val consumerInstance = RamInstance(
       "memory",
-      ramDef,
-      RamConfig(ranges =
-        List(
-          MemoryRangeConfig(
-            address = "0x10000000",
-            size = "0x1000"
-          )
-        )
-      )
-    ).toOption.get
+      ramDef
+    )
 
     // Create UnconnectedBus with SecondToFirst direction
     val bus = UnconnectedBus(
@@ -201,9 +169,8 @@ buses:
     val cpuDef = createCpuDef()
     val instance = CpuInstance(
       "device1",
-      cpuDef,
-      CpuConfig(core_count = 1, triple = "riscv32-unknown-elf")
-    ).toOption.get
+      cpuDef
+    )
 
     // Create UnconnectedBus with non-existent second instance
     val bus = UnconnectedBus(
@@ -226,21 +193,12 @@ buses:
     val ramDef = createRamDef()
     val instance1 = CpuInstance(
       "device1",
-      cpuDef,
-      CpuConfig(core_count = 1, triple = "riscv32-unknown-elf")
-    ).toOption.get
+      cpuDef
+    )
     val instance2 = RamInstance(
       "device2",
-      ramDef,
-      RamConfig(ranges =
-        List(
-          MemoryRangeConfig(
-            address = "0x10000000",
-            size = "0x1000"
-          )
-        )
-      )
-    ).toOption.get
+      ramDef
+    )
 
     // Create UnconnectedBus with bidirectional connection
     val bus = UnconnectedBus(
@@ -264,21 +222,12 @@ buses:
     val ramDef = createRamDef()
     val supplierInstance = CpuInstance(
       "fpga",
-      cpuDef,
-      CpuConfig(core_count = 1, triple = "riscv32-unknown-elf")
-    ).toOption.get
+      cpuDef
+    )
     val consumerInstance = RamInstance(
       "ddr",
-      ramDef,
-      RamConfig(ranges =
-        List(
-          MemoryRangeConfig(
-            address = "0x10000000",
-            size = "0x1000"
-          )
-        )
-      )
-    ).toOption.get
+      ramDef
+    )
 
     // Create UnconnectedBus
     val bus = UnconnectedBus(
@@ -308,9 +257,8 @@ buses:
     // Create test instances
     val supplierInstance = CpuInstance(
       "fpga",
-      cpuDef,
-      CpuConfig(core_count = 1, triple = "riscv32-unknown-elf")
-    ).toOption.get
+      cpuDef
+    )
 
     // Create UnconnectedBus with silent mode
     val silentBus = UnconnectedBus(
@@ -334,21 +282,12 @@ buses:
 
     val supplierInstance = CpuInstance(
       "cpu",
-      cpuDef,
-      CpuConfig(core_count = 1, triple = "riscv32-unknown-elf")
-    ).toOption.get
+      cpuDef
+    )
     val consumerInstance = RamInstance(
       "memory",
-      ramDef,
-      RamConfig(ranges =
-        List(
-          MemoryRangeConfig(
-            address = "0x10000000",
-            size = "0x1000"
-          )
-        )
-      )
-    ).toOption.get
+      ramDef
+    )
 
     // Create UnconnectedBus with SecondToFirst direction
     val bus = UnconnectedBus(
@@ -379,21 +318,12 @@ buses:
 
     val supplierInstance = CpuInstance(
       "cpu",
-      cpuDef,
-      CpuConfig(core_count = 1, triple = "riscv32-unknown-elf")
-    ).toOption.get
+      cpuDef
+    )
     val consumerInstance = RamInstance(
       "memory",
-      ramDef,
-      RamConfig(ranges =
-        List(
-          MemoryRangeConfig(
-            address = "0x10000000",
-            size = "0x1000"
-          )
-        )
-      )
-    ).toOption.get
+      ramDef
+    )
 
     // Create UnconnectedBus with SecondToFirst direction
     val bus = UnconnectedBus(

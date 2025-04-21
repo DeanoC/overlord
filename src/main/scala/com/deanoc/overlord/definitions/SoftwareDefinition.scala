@@ -72,8 +72,9 @@ object SoftwareDefinition {
     
     // Push catalog path, read YAML, and parse
     Overlord.pushCatalogPath(softwarePath)
-    val parsed = Utils.readYaml(softwarePath)
-    
+    val result = Left("Software definition TODO")
+    //    val result = Utils.loadAndParseYamlFile[GatewareDefinition](Overlord.catalogPath.resolve(fileNameAlone))
+/*    
     // Create actions file
     val actionsFile = ActionsFile.createActionsFile(name, parsed)
     
@@ -100,7 +101,7 @@ object SoftwareDefinition {
         config
       )
     )
-    
+  */  
     Overlord.popCatalogPath()
     result
   }

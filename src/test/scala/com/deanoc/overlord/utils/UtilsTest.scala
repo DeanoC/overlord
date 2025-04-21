@@ -32,7 +32,7 @@ key3: true"""
     val tempFile = Files.createTempFile("test", ".yaml")
     Files.write(tempFile, yamlContent.getBytes)
 
-    val result = Utils.readYaml(tempFile)
+    val result = Utils.loadAndParseYamlFile[Map[String, String]](tempFile).getOrElse(throw new RuntimeException("Failed to parse YAML file"))
     result("key1") shouldBe a[StringV]
     result("key1").asInstanceOf[StringV].value shouldEqual "value1"
     result("key2") shouldBe a[IntV]
@@ -54,7 +54,7 @@ key3: true"""
       writer.close()
       
       // Try to parse it and expect empty map
-      val result = Utils.readYaml(tempFile.toPath) // Fix: use toPath method to get a Path object
+      val result = Utils.loadAndParseYamlFile[Map[String, String]](tempFile.toPath).getOrElse(throw new RuntimeException("Failed to parse YAML file")) // Fix: use toPath method to get a Path object
       result shouldBe Map.empty[String, Any]
     }
   }

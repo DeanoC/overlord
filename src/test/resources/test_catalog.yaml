@@ -20,12 +20,11 @@ definitions:
   
   - name: "MainMemory"
     type: "ram"
-    ram_config:
-      ranges:
-        - address: "0x80000000"
-          size: "0x40000000"
-        - address: "0xC0000000" 
-          size: "0x20000000"
+    ranges:
+      - address: "0x80000000"
+        size: "0x40000000"
+      - address: "0xC0000000"
+        size: "0x20000000"
   
   - name: "SystemClock"
     type: "clock"
