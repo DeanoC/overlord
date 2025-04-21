@@ -39,7 +39,13 @@ object DefinitionConfig {
 }
 
 sealed trait HardwareDefinitionConfig extends DefinitionConfig {
-  val gatewareConfig: Option[SourceConfig]
+  val gateware: Option[SourceConfig]
+  val ports: Option[List[String]]
+  val registers: Option[List[String]]
+  val drivers: Option[List[String]]
+  val max_instances: Option[Int]
+  val supplier_prefix: Option[String]
+  val width: Option[Int]
 } 
 
 sealed trait SoftwareDefinitionConfig extends DefinitionConfig {
@@ -49,7 +55,13 @@ case class RamDefinitionConfig(
   name: String,
   `type`: String,
   ranges: List[MemoryRangeConfig],
-  gatewareConfig: Option[SourceConfig] = None,
+  gateware: Option[SourceConfig] = None,
+  ports: Option[List[String]] = None,
+  registers: Option[List[String]] = None,
+  drivers: Option[List[String]] = None,
+  max_instances: Option[Int] = None,
+  supplier_prefix: Option[String] = None,
+  width: Option[Int] = None,
   attributes: Map[String, Any] = Map.empty
 ) extends HardwareDefinitionConfig {
   def withAttributes(newAttributes: Map[String, Any]): DefinitionConfig = 
@@ -64,9 +76,15 @@ object RamDefinitionConfig {
       name <- c.downField("name").as[String]
       typeVal <- c.downField("type").as[String]
       ranges <- c.downField("ranges").as[List[MemoryRangeConfig]]
-      gatewareConfig = c.downField("gateware").as[SourceConfig].toOption
+      ports = c.downField("ports").as[Option[List[String]]].toOption.flatten
+      registers = c.downField("registers").as[Option[List[String]]].toOption.flatten
+      drivers = c.downField("drivers").as[Option[List[String]]].toOption.flatten
+      maxInstances = c.downField("max_instances").as[Option[Int]].toOption.flatten
+      gateware = c.downField("gateware").as[SourceConfig].toOption
+      supplierPrefix = c.downField("supplier_prefix").as[Option[String]].toOption.flatten
+      width = c.downField("width").as[Option[Int]].toOption.flatten
       attributes = ReflectionHelper.extractUnhandledFields[RamDefinitionConfig](c)
-    } yield RamDefinitionConfig(name, typeVal, ranges, gatewareConfig, attributes)
+    } yield RamDefinitionConfig(name, typeVal, ranges, gateware, ports, registers, drivers, maxInstances, supplierPrefix, width, attributes)
   }
 }
 
@@ -75,7 +93,13 @@ case class CpuDefinitionConfig(
   `type`: String,
   triple: String,
   core_count: Int = 1,
-  gatewareConfig: Option[SourceConfig] = None,
+  gateware: Option[SourceConfig] = None,
+  ports: Option[List[String]] = None,
+  registers: Option[List[String]] = None,
+  drivers: Option[List[String]] = None,
+  max_instances: Option[Int] = None,
+  supplier_prefix: Option[String] = None,
+  width: Option[Int] = None,
   attributes: Map[String, Any] = Map.empty
 ) extends HardwareDefinitionConfig {
   def withAttributes(newAttributes: Map[String, Any]): DefinitionConfig = 
@@ -91,16 +115,28 @@ object CpuDefinitionConfig {
       typeVal <- c.downField("type").as[String]
       triple <- c.downField("triple").as[String]
       coreCount <- withDefault(c, "core_count", 1)
-      gatewareConfig = c.downField("gateware").as[SourceConfig].toOption
+      gateware = c.downField("gateware").as[SourceConfig].toOption
+      ports = c.downField("ports").as[Option[List[String]]].toOption.flatten
+      registers = c.downField("registers").as[Option[List[String]]].toOption.flatten
+      drivers = c.downField("drivers").as[Option[List[String]]].toOption.flatten
+      maxInstances = c.downField("max_instances").as[Option[Int]].toOption.flatten
+      supplierPrefix = c.downField("supplier_prefix").as[Option[String]].toOption.flatten
+      width = c.downField("width").as[Option[Int]].toOption.flatten
       attributes = ReflectionHelper.extractUnhandledFields[CpuDefinitionConfig](c)
-    } yield CpuDefinitionConfig(name, typeVal, triple, coreCount, gatewareConfig, attributes)
+    } yield CpuDefinitionConfig(name, typeVal, triple, coreCount, gateware, ports, registers, drivers, maxInstances, supplierPrefix, width, attributes)
   }
 }
 
 case class OtherDefinitionConfig(
   name: String,
   `type`: String,
-  gatewareConfig: Option[SourceConfig] = None,
+  gateware: Option[SourceConfig] = None,
+  ports: Option[List[String]] = None,
+  registers: Option[List[String]] = None,
+  drivers: Option[List[String]] = None,
+  max_instances: Option[Int] = None,
+  supplier_prefix: Option[String] = None,
+  width: Option[Int] = None,
   attributes: Map[String, Any] = Map.empty
 ) extends HardwareDefinitionConfig {
   def withAttributes(newAttributes: Map[String, Any]): DefinitionConfig = 
@@ -114,8 +150,14 @@ object OtherDefinitionConfig {
     for {
       name <- c.downField("name").as[String]
       typeVal <- c.downField("type").as[String]
-      gatewareConfig = c.downField("gateware").as[SourceConfig].toOption
+      gateware = c.downField("gateware").as[SourceConfig].toOption
+      ports = c.downField("ports").as[Option[List[String]]].toOption.flatten
+      registers = c.downField("registers").as[Option[List[String]]].toOption.flatten
+      drivers = c.downField("drivers").as[Option[List[String]]].toOption.flatten
+      maxInstances = c.downField("max_instances").as[Option[Int]].toOption.flatten
+      supplierPrefix = c.downField("supplier_prefix").as[Option[String]].toOption.flatten
+      width = c.downField("width").as[Option[Int]].toOption.flatten
       attributes = ReflectionHelper.extractUnhandledFields[OtherDefinitionConfig](c)
-    } yield OtherDefinitionConfig(name, typeVal, gatewareConfig, attributes)
+    } yield OtherDefinitionConfig(name, typeVal, gateware, ports, registers, drivers, maxInstances, supplierPrefix, width, attributes)
   }
 }

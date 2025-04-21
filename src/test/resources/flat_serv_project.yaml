@@ -9,12 +9,15 @@ info:
 definitions:
 - name: "vexriscv_smallest"
   type: cpu.riscv32im.vexriscv_smallest
+  ports:
+  registers:
+  drivers:
+  max_instances: 1
   gateware: 
     type: "inline"
     inline:
       test: "test.v"
-      parameters: []
-  
+      parameters: [] 
   supplier_prefix:
   - dBus_
   - iBus_

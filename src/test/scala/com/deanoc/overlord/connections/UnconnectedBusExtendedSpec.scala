@@ -15,7 +15,7 @@ import com.deanoc.overlord.connections.ConnectionTypes._
 // Import the new enum-based DefinitionType
 import com.deanoc.overlord.definitions.DefinitionType
 import com.deanoc.overlord.instances.{CpuInstance, RamInstance, ChipInstance, InstanceTrait}
-import com.deanoc.overlord.config.{DefinitionConfig, MemoryRangeConfig}
+import com.deanoc.overlord.config.{CpuDefinitionConfig, RamDefinitionConfig, MemoryRangeConfig}
 import com.deanoc.overlord.connections.InstanceLoc
 import com.deanoc.overlord.interfaces._
 import com.deanoc.overlord.hardware.{
@@ -55,7 +55,7 @@ class UnconnectedBusExtendedSpec
   private def createCpuDef(): FixedHardwareDefinition = {
     val defType = DefinitionType.CpuDefinition(Seq("cpu", "riscv", "verilog"))
     val sourcePath = java.nio.file.Paths.get("path/to/source")
-    val config = Utils.parseYaml[DefinitionConfig](
+    val config = Utils.parseYaml[CpuDefinitionConfig](
       """
 buses:
 - base_address: '0xFD00_0000'
@@ -70,7 +70,7 @@ triple: riscv-none-elf
 type: cpu.pmu.zynqps8
 width: 32
       """
-    ).getOrElse(throw new RuntimeException("Failed to parse CPU definition config")).asInstanceOf[DefinitionConfig]
+    ).getOrElse(throw new RuntimeException("Failed to parse CPU definition config")).asInstanceOf[CpuDefinitionConfig]
     val dependencies = Seq.empty[String]
     val ports = Map.empty[String, Port]
     val maxInstances = 1
@@ -82,7 +82,7 @@ width: 32
   private def createRamDef(): FixedHardwareDefinition = {
     val defType = DefinitionType.RamDefinition(Seq("ram", "verilog"))
     val sourcePath = java.nio.file.Paths.get("path/to/source")
-    val config = Utils.parseYaml[DefinitionConfig](
+    val config = Utils.parseYaml[RamDefinitionConfig](
       """
 buses:
 - base_address: '0xFD00_0000'
@@ -91,7 +91,7 @@ buses:
   name: pmu_pmuswitch
   supplier: false
       """
-    ).getOrElse(throw new RuntimeException("Failed to parse RAM definition config")).asInstanceOf[DefinitionConfig]
+    ).getOrElse(throw new RuntimeException("Failed to parse RAM definition config")).asInstanceOf[RamDefinitionConfig]
     val dependencies = Seq.empty[String]
     val ports = Map.empty[String, Port]
     val maxInstances = 1

@@ -2,7 +2,7 @@ package com.deanoc.overlord.definitions
 
 import com.deanoc.overlord.hardware.Port
 import com.deanoc.overlord.utils.Variant
-import com.deanoc.overlord.config.DefinitionConfig
+import com.deanoc.overlord.config.HardwareDefinitionConfig
 import java.nio.file.Path
 
 /** Represents a hardware definition with associated metadata, ports, and
@@ -26,7 +26,7 @@ import java.nio.file.Path
 case class FixedHardwareDefinition(
     defType: DefinitionType,
     sourcePath: Path,
-    val config: DefinitionConfig,
+    val config: HardwareDefinitionConfig,
     dependencies: Seq[String],
     ports: Map[String, Port],
     maxInstances: Int,

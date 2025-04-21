@@ -67,8 +67,8 @@ object HardwareDefinition {
     }
     
     // Check if the definition contains gateware-specific information in the config map
-    if(config.gatewareConfig.isDefined) {
-      SourceLoader.loadSource[GatewareConfig, GatewareConfig](config.gatewareConfig.get) match {
+    if(config.gateware.isDefined) {
+      SourceLoader.loadSource[GatewareConfig, GatewareConfig](config.gateware.get) match {
         case Right(gw) =>
           // Extract parameters for the gateware from config map
           val parameters: Map[String, Variant] =
