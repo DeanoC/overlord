@@ -8,7 +8,9 @@ import scala.util.boundary
 import com.deanoc.overlord.connections.ConnectionTypes.ConnectionName.from
 import com.deanoc.overlord.config.Defaults
 import com.deanoc.overlord.config.ConfigPaths
+import com.deanoc.overlord.config.SourceConfig
 import com.deanoc.overlord.utils.Utils
+import com.deanoc.overlord.config.SourceType
 
 /**
  * Represents a component in the Overlord system.
@@ -97,7 +99,9 @@ object Component extends Logging {
     Defaults.addExclude("name")
     ConfigPaths.setupPaths(projectPath)
 
-    fromComponentFile(name, board, projectPath)
+    val sc = SourceConfig(`type` = SourceType.Local, path = Some(projectPath.toString()) )
+
+    fromComponentFile(name, board, sc, projectPath)
   }
 
   /**
@@ -111,25 +115,17 @@ object Component extends Logging {
   def fromComponentFile(
       name: String,
       board: String,
+      source: SourceConfig,
       gamePath: Path
   ): Component = {
     // Create a ComponentParser with explicit dependency injection
     val parser = new ComponentParser()
 
-    val yamlString = Utils.loadFileToParse(gamePath) match {
-      case Right(content) => content
+    val config = SourceLoader.loadSource[ComponentFileConfig, ComponentFileConfig](source) match {
+      case Right(c) => c
       case Left(error) =>
-        this.error(s"Failed to load file $gamePath: $error")
-        throw new RuntimeException(s"Failed to load file $gamePath: $error")
-    }
-    val config = {
-      Utils.parseYaml[ComponentFileConfig](yamlString) match {
-        case Right(config) =>
-          config
-        case Left(error) =>
-          this.error(s"Failed to parse YAML content: $error")
-          throw new RuntimeException(s"Failed to load file $gamePath: $error")
-        }
+        this.error(s"Failed to load source: $error")
+        throw new RuntimeException(s"Failed to load source: $error")
     }
     val (container, catalog) = parser.parseComponentFileConfig(config)
 

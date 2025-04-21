@@ -99,11 +99,11 @@ class ComponentParser() extends Logging {
     info(s"Loading component $componentName from $componentPath")
     
     // Create a Component from the project file
-    val component = Component.fromComponentFile(componentName.toString(), "", componentPath)
+    //val component = Component.fromComponentFile(componentName.toString(), "", componentPath)
     
     // Register the component as a Component type definition
-    catalog.addComponentDefinition(component)
-    info(s"Registered component $componentName as a Component type definition")
+    //catalog.addComponentDefinition(component)
+    //info(s"Registered component $componentName as a Component type definition")
   }
 
   /** Processes instantiations from parsed YAML data.
