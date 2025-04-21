@@ -47,7 +47,7 @@ class ComponentDefinition(
    */
   override def createInstance(
     name: String,
-    instanceConfig: Option[Map[String, Any]]
+    instanceConfig: Map[String, Any]
   ): Either[String, InstanceTrait] = {
     try {
       // Create a ComponentInstanceCloner to handle cloning

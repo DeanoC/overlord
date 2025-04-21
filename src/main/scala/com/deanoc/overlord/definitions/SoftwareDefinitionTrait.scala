@@ -16,46 +16,36 @@ trait SoftwareDefinitionTrait extends DefinitionTrait {
   // Modified to accept Option[Map[String, Any]] for instance-specific config
   def createInstance(
       name: String,
-      instanceConfig: Option[Map[String, Any]]
+      instanceConfig: Map[String, Any]
   ): Either[String, InstanceTrait] = {
     defType match {
       case _: DefinitionType.LibraryDefinition =>
-        instanceConfig match {
-          case Some(configMap) =>
-            decode[LibraryConfig](
-              Definition.anyToJson(configMap).noSpaces
-            ) match {
-              case Right(libraryConfig) =>
-                LibraryInstance(name, this, libraryConfig).asInstanceOf[Either[
-                  String,
-                  InstanceTrait
-                ]]
-              case Left(error) =>
-                Left(
-                  s"Failed to decode LibraryConfig for instance $name: ${error.getMessage}"
-                )
-            }
-          case None =>
-            Left(s"Library definition instance $name requires configuration")
+        decode[LibraryConfig](
+          Definition.anyToJson(instanceConfig).noSpaces
+        ) match {
+          case Right(libraryConfig) =>
+            LibraryInstance(name, this, libraryConfig).asInstanceOf[Either[
+              String,
+              InstanceTrait
+            ]]
+          case Left(error) =>
+            Left(
+              s"Failed to decode LibraryConfig for instance $name: ${error.getMessage}"
+            )
         }
       case _: DefinitionType.ProgramDefinition =>
-        instanceConfig match {
-          case Some(configMap) =>
-            decode[ProgramConfig](
-              Definition.anyToJson(configMap).noSpaces
-            ) match {
-              case Right(programConfig) =>
-                ProgramInstance(name, this, programConfig).asInstanceOf[Either[
-                  String,
-                  InstanceTrait
-                ]]
-              case Left(error) =>
-                Left(
-                  s"Failed to decode ProgramConfig for instance $name: ${error.getMessage}"
-                )
-            }
-          case None =>
-            Left(s"Program definition instance $name requires configuration")
+        decode[ProgramConfig](
+          Definition.anyToJson(instanceConfig).noSpaces
+        ) match {
+          case Right(programConfig) =>
+            ProgramInstance(name, this, programConfig).asInstanceOf[Either[
+              String,
+              InstanceTrait
+            ]]
+          case Left(error) =>
+            Left(
+              s"Failed to decode ProgramConfig for instance $name: ${error.getMessage}"
+            )
         }
       case _ => Left(s"$defType is invalid for software")
     }

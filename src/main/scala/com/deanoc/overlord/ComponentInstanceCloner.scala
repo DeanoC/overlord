@@ -23,7 +23,7 @@ class ComponentInstanceCloner extends Logging {
   def cloneInstances(
     namespace: String,
     component: Component,
-    instanceConfig: Option[Map[String, Any]] = None
+    instanceConfig: Map[String, Any]
   ): Seq[InstanceTrait] = {
     // Get all instances from the component
     val instances = component.getContainer.children
@@ -33,17 +33,8 @@ class ComponentInstanceCloner extends Logging {
       // Apply namespace to the instance
       val namespacedInstance = NamespaceUtils.namespaceInstance(namespace, instance)
       
-      // Apply any additional configuration from instanceConfig
-      instanceConfig match {
-        case Some(config) =>
-          // In the current implementation, we can't directly apply configuration to an existing instance
-          // This is a placeholder that will need to be implemented based on the actual instance types
-          warn(s"Applying configuration to instance ${namespacedInstance.name} not yet implemented")
-          namespacedInstance
-        case None =>
-          // No additional configuration to apply
-          namespacedInstance
-      }
+      warn(s"Applying configuration to instance ${namespacedInstance.name} not yet implemented")
+      namespacedInstance
     }
   }
   
@@ -80,7 +71,7 @@ class ComponentInstanceCloner extends Logging {
     namespace: String,
     component: Component,
     container: MutableContainer,
-    instanceConfig: Option[Map[String, Any]] = None
+    instanceConfig: Map[String, Any]
   ): MutableContainer = {
     // Clone instances with proper namespacing
     val clonedInstances = cloneInstances(namespace, component, instanceConfig)
@@ -111,7 +102,7 @@ class ComponentInstanceCloner extends Logging {
   def cloneComponentToNewContainer(
     namespace: String,
     component: Component,
-    instanceConfig: Option[Map[String, Any]] = None
+    instanceConfig: Map[String, Any]
   ): MutableContainer = {
     // Create a new container
     val container = new MutableContainer()

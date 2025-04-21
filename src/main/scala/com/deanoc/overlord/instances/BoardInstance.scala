@@ -162,8 +162,7 @@ object BoardInstance {
         Definition(clockDefConfig, Map()) match {
           case Right(clockDefinition) =>
             // Pass the same config map as Option[Map[String, Any]]
-            val clockConfigAsAny = Some(clockConfigMap)
-            clockDefinition.createInstance(boardClockConfig.name, clockConfigAsAny).asInstanceOf[Either[String, InstanceTrait]] match {
+            clockDefinition.createInstance(boardClockConfig.name, clockConfigMap).asInstanceOf[Either[String, InstanceTrait]] match {
               case Right(instance: InstanceTrait) =>
                 Right(clocksAcc :+ instance)
               case Left(error) => Left(s"Error creating clock ${boardClockConfig.name}: $error")
@@ -212,9 +211,7 @@ object BoardInstance {
                 
                 Definition(pingroupDefConfig, Map()) match {
                   case Right(pingroupDefinition) =>
-                    // Pass the same config map as Option[Map[String, Any]]
-                    val pingroupConfigAsAny = Some(pingroupConfigMap)
-                    pingroupDefinition.createInstance(s"$name", pingroupConfigAsAny).asInstanceOf[Either[String, InstanceTrait]] match {
+                    pingroupDefinition.createInstance(s"$name", pingroupConfigMap).asInstanceOf[Either[String, InstanceTrait]] match {
                       case Right(instance: InstanceTrait) => Right(pingroupsAcc :+ instance)
                       case Left(error) => Left(s"Error creating pingroup $name: $error")
                     }
@@ -245,9 +242,7 @@ object BoardInstance {
                     
                     Definition(pingroupDefConfig, Map()) match {
                       case Right(pingroupDefinition) =>
-                        // Pass the same config map as Option[Map[String, Any]]
-                        val pingroupConfigAsAny = Some(pingroupConfigMap)
-                        pingroupDefinition.createInstance(s"$name", pingroupConfigAsAny).asInstanceOf[Either[String, InstanceTrait]] match {
+                        pingroupDefinition.createInstance(s"$name", pingroupConfigMap).asInstanceOf[Either[String, InstanceTrait]] match {
                           case Right(instance: InstanceTrait) => Right(acc :+ instance)
                           case Left(error) =>
                             Left(s"Error creating pingroup $name: $error")

@@ -10,6 +10,12 @@ import scala.collection.compat.immutable.LazyList
 import scala.collection.mutable
 import scala.util.{Failure, Success, Try}
 import scala.jdk.CollectionConverters.*
+import io.circe.HCursor
+
+// Import Scala 3 reflection
+import scala.quoted.*
+import scala.compiletime.{constValue, erasedValue}
+import scala.deriving.Mirror
 
 sealed trait Variant {
   def toYamlString: String
@@ -496,6 +502,47 @@ object Utils extends Logging {
     if (file.exists && !file.delete) {
       error(s"Unable to delete ${file.getAbsolutePath}")
       throw new Exception(s"Unable to delete ${file.getAbsolutePath}")
+    }
+  }
+  
+  // Helper object for field extraction operations
+  object ReflectionHelper {
+    import java.lang.reflect.Field
+    
+    // Use Java reflection to get field names from any class (works with both regular and case classes)
+    def getClassFieldNames[T: scala.reflect.ClassTag]: Set[String] = {
+      val clazz = implicitly[scala.reflect.ClassTag[T]].runtimeClass
+      
+      // Get all declared fields using Java reflection
+      val allFields = clazz.getDeclaredFields
+        .filterNot(_.getName.contains("$")) // Filter out synthetic fields
+        .map(_.getName)
+        .toSet
+      
+      // Filter out known non-parameter fields that Scala compiler adds
+      allFields.filterNot(name => 
+        name == "hashCode" || 
+        name == "toString" || 
+        name == "equals" || 
+        name == "copy" || 
+        name.startsWith("copy$default") || 
+        name.startsWith("apply") || 
+        name.startsWith("unapply"))
+    }
+    
+    // This method extracts unhandled fields from JSON using reflection
+    def extractUnhandledFields[T: scala.reflect.ClassTag](cursor: HCursor): Map[String, Any] = {
+      val knownFields = getClassFieldNames[T]
+      cursor.value.asObject.map { obj =>
+        obj.toMap.collect {
+          case (key, value) if !knownFields.contains(key) =>
+            key -> (value.asString.orElse(value.asBoolean.map(_.toString))
+                   .orElse(value.asNumber.map(_.toString))
+                   .orElse(value.asArray.map(_.toString))
+                   .orElse(value.asObject.map(_.toString))
+                   .getOrElse(value.toString))
+        }
+      }.getOrElse(Map.empty)
     }
   }
 

@@ -80,8 +80,8 @@ class ComponentParserTest
     val cpuDefinition = catalogConfig.definitions(0)
     cpuDefinition.`type` shouldBe "cpu"
     cpuDefinition.name shouldBe "Cortex-A53"
-    cpuDefinition.config.get("core_count") shouldBe Some("4")
-    cpuDefinition.config.get("triple") shouldBe Some("aarch64-none-elf")
+    cpuDefinition.attributes.get("core_count") shouldBe Some("4")
+    cpuDefinition.attributes.get("triple") shouldBe Some("aarch64-none-elf")
     
     // Assert the content of the RAM definition
     val ramDefinition = catalogConfig.definitions(1)
@@ -89,26 +89,26 @@ class ComponentParserTest
     ramDefinition.name shouldBe "MainMemory"
     
     // Check RAM config and ranges if supported by the schema
-    ramDefinition.config.get("ranges") should not be None
+    ramDefinition.attributes.get("ranges") should not be None
     
     // Assert the content of the clock definition
     val clockDefinition = catalogConfig.definitions(2)
     clockDefinition.`type` shouldBe "clock"
     clockDefinition.name shouldBe "SystemClock"
-    clockDefinition.config.get("frequency") shouldBe Some("100MHz")
+    clockDefinition.attributes.get("frequency") shouldBe Some("100MHz")
     
     // Assert the content of the IO definition
     val ioDefinition = catalogConfig.definitions(3)
     ioDefinition.`type` shouldBe "io"
     ioDefinition.name shouldBe "GPIO"
-    ioDefinition.config.get("visible_to_software") shouldBe Some("true")
+    ioDefinition.attributes.get("visible_to_software") shouldBe Some("true")
     
     // Assert the content of the pingroup definition
     val pinGroupDefinition = catalogConfig.definitions(4)
     pinGroupDefinition.`type` shouldBe "pingroup"
     pinGroupDefinition.name shouldBe "ControlPins"
-    pinGroupDefinition.config.get("pins") should not be None
-    pinGroupDefinition.config.get("direction") shouldBe Some("output")
+    pinGroupDefinition.attributes.get("pins") should not be None
+    pinGroupDefinition.attributes.get("direction") shouldBe Some("output")
     
     // Verify catalogs
     catalogConfig.catalogs should have size 3
@@ -181,18 +181,18 @@ class ComponentParserTest
     // Check CPU definition
     val cpuDefinition = projectConfig.definitions.find(_.name == "Cortex-A53").get
     cpuDefinition.`type` shouldBe "cpu.arm.a53"
-    cpuDefinition.config.get("core_count") shouldBe Some("4")
-    cpuDefinition.config.get("triple") shouldBe Some("aarch64-none-elf")
+    cpuDefinition.attributes.get("core_count") shouldBe Some("4")
+    cpuDefinition.attributes.get("triple") shouldBe Some("aarch64-none-elf")
     
     // Check RAM definition
     val ramDefinition = projectConfig.definitions.find(_.name == "MainMemory").get
     ramDefinition.`type` shouldBe "ram.sram.main"
-    ramDefinition.config.get("ranges") should not be None
+    ramDefinition.attributes.get("ranges") should not be None
     
     // Check clock definition
     val clockDefinition = projectConfig.definitions.find(_.name == "SystemClock").get
     clockDefinition.`type` shouldBe "clock.system.100mhz"
-    clockDefinition.config.get("frequency") shouldBe Some("100MHz")
+    clockDefinition.attributes.get("frequency") shouldBe Some("100MHz")
     
     // Verify instances
     projectConfig.instances should have size 7
@@ -200,13 +200,13 @@ class ComponentParserTest
     // Check CPU instances
     val cpu0Instance = projectConfig.instances.find(_.name == "cpu0").get
     cpu0Instance.`type` shouldBe "cpu.riscv.test"
-    cpu0Instance.config.get("core_count") shouldBe "4"
-    cpu0Instance.config.get("triple") shouldBe "riscv64-unknown-elf"
+    cpu0Instance.attributes.get("core_count").map(_.toString) shouldBe Some("4")
+    cpu0Instance.attributes.get("triple").map(_.toString) shouldBe Some("riscv64-unknown-elf")
     
     val cpu1Instance = projectConfig.instances.find(_.name == "cpu1").get
     cpu1Instance.`type` shouldBe "cpu.arm.test"
-    cpu1Instance.config.get("core_count") shouldBe "2"
-    cpu1Instance.config.get("triple") shouldBe "aarch64-none-elf"
+    cpu1Instance.attributes.get("core_count").map(_.toString) shouldBe Some("2")
+    cpu1Instance.attributes.get("triple").map(_.toString) shouldBe Some("aarch64-none-elf")
     
     // Check memory instances
     val mainMemoryInstance = projectConfig.instances.find(_.name == "main_memory").get
@@ -218,13 +218,13 @@ class ComponentParserTest
     // Check clock instance
     val clockInstance = projectConfig.instances.find(_.name == "system_clock").get
     clockInstance.`type` shouldBe "clock.test.100mhz"
-    clockInstance.config.get("frequency") shouldBe "100MHz"
+    clockInstance.attributes.get("frequency").map(_.toString) shouldBe Some("100MHz")
     
     // Check IO instance
     val uartInstance = projectConfig.instances.find(_.name == "uart0").get
     uartInstance.`type` shouldBe "io.uart.test"
-    uartInstance.config.get("visible_to_software").toString shouldBe "true"
-    
+    uartInstance.attributes.get("visible_to_software").map(_.toString) shouldBe Some("true")
+
     // Check component instance
     val subModuleInstance = projectConfig.instances.find(_.name == "sub_module").get
     subModuleInstance.`type` shouldBe "component.zynqps7.test"

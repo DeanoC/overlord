@@ -14,6 +14,6 @@ trait DefinitionTrait {
   // Modified to accept Option[Map[String, Any]] for instance-specific config
   def createInstance(
       name: String,
-      instanceConfig: Option[Map[String, Any]]
+      instanceConfig: Map[String, Any]
   ): Either[String, InstanceTrait]
 }

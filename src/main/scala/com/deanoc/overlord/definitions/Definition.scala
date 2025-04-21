@@ -28,7 +28,7 @@ object Definition {
     // This is a simplified approach - in a more complete implementation,
     // we would merge defaults into config.config in a type-safe way
     val mergedConfig = if (defaults.isEmpty) {
-      config.config
+      config.attributes
     } else {
       // Convert defaults to Map[String, Any] and merge with config.config
       val defaultsAsAny = defaults.map {
@@ -40,7 +40,7 @@ object Definition {
         case (k, v: ArrayV)   => k -> v.value.toSeq
         case (k, v: TableV)   => k -> v.value
       }
-      defaultsAsAny ++ config.config
+      defaultsAsAny ++ config.attributes
     }
 
     `type` match {

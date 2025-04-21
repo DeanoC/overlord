@@ -2,7 +2,8 @@ package com.deanoc.overlord.config
 
 import io.circe.{Decoder, Json, HCursor}
 import io.circe.generic.semiauto._
-  
+import com.deanoc.overlord.utils.Utils.ReflectionHelper
+
 object CirceDefaults {
   def withDefault[T](cursor: HCursor, field: String, default: T)(implicit decoder: Decoder[T]): Decoder.Result[T] = {
     cursor.downField(field).as[T].orElse(Right(default))
@@ -122,7 +123,7 @@ object CustomDecoders {
 case class InstanceConfig(
   name: String,
   `type`: String, // Use backticks for type as it's a Scala keyword
-  config: Option[Map[String, Any]] = None // Flexible for various config types
+  attributes: Map[String, Any] = Map.empty, 
 )
 object InstanceConfig {
   import CustomDecoders._
@@ -370,10 +371,13 @@ object PrefabFileConfig {
 sealed trait DefinitionConfig {
   def name: String
   def `type`: String // Use backticks for type as it's a Scala keyword
-  def config: Map[String, Any] // Flexible for various config types
+  def attributes: Map[String, Any]
 }
 
+
 object DefinitionConfig {
+  import CustomDecoders._
+  
   implicit val decoder: Decoder[DefinitionConfig] = (c: HCursor) => {
     for {
       ft <- c.downField("type").as[String]
@@ -384,40 +388,74 @@ object DefinitionConfig {
         case _ => c.as[OtherDefinitionConfig]
       }
     } yield result
-  }}
+  }
+}
 
 case class RamDefinitionConfig(
   name: String,
   `type`: String,
-  config: Map[String, Any],
-  ram_config: RamConfig
+  config: Map[String, Any] = Map.empty,
+  ram_config: RamConfig,
+  attributes: Map[String, Any] = Map.empty
 ) extends DefinitionConfig
+
 object RamDefinitionConfig {
   import CustomDecoders._
-  implicit val decoder: Decoder[RamDefinitionConfig] = deriveDecoder[RamDefinitionConfig]
+  
+  implicit val decoder: Decoder[RamDefinitionConfig] = (c: HCursor) => {
+    for {
+      name <- c.downField("name").as[String]
+      typeVal <- c.downField("type").as[String]
+      config <- c.downField("config").as[Option[Map[String, Any]]].map(_.getOrElse(Map.empty))
+      ramConfig <- c.downField("ram_config").as[RamConfig]
+      // Extract any additional fields not explicitly defined in the case class
+      attributes = ReflectionHelper.extractUnhandledFields[RamDefinitionConfig](c)
+    } yield RamDefinitionConfig(name, typeVal, config, ramConfig, attributes)
+  }
 }
 
 case class CpuDefinitionConfig(
   name: String,
   `type`: String,
-  config: Map[String, Any],
-  val gateware: Option[String],
-  val triple: String,
-  val core_count: Option[Int],
+  config: Map[String, Any] = Map.empty,
+  triple: String,
+  core_count: Option[Int] = None,
+  attributes: Map[String, Any] = Map.empty
 ) extends DefinitionConfig
 
 object CpuDefinitionConfig {
   import CustomDecoders._
-  implicit val decoder: Decoder[CpuDefinitionConfig] = deriveDecoder[CpuDefinitionConfig]
+  
+  implicit val decoder: Decoder[CpuDefinitionConfig] = (c: HCursor) => {
+    for {
+      name <- c.downField("name").as[String]
+      typeVal <- c.downField("type").as[String]
+      config <- c.downField("config").as[Option[Map[String, Any]]].map(_.getOrElse(Map.empty))
+      triple <- c.downField("triple").as[String]
+      coreCount <- c.downField("core_count").as[Option[Int]]
+      // Extract any additional fields not explicitly defined in the case class
+      attributes = ReflectionHelper.extractUnhandledFields[CpuDefinitionConfig](c)
+    } yield CpuDefinitionConfig(name, typeVal, config, triple, coreCount, attributes)
+  }
 }
 
 case class OtherDefinitionConfig(
   name: String,
   `type`: String,
-  config: Map[String, Any],
+  config: Map[String, Any] = Map.empty,
+  attributes: Map[String, Any] = Map.empty
 ) extends DefinitionConfig
 
 object OtherDefinitionConfig {
   import CustomDecoders._
-  implicit val decoder: Decoder[OtherDefinitionConfig] = deriveDecoder[OtherDefinitionConfig]
+  
+  implicit val decoder: Decoder[OtherDefinitionConfig] = (c: HCursor) => {
+    for {
+      name <- c.downField("name").as[String]
+      typeVal <- c.downField("type").as[String]
+      config <- c.downField("config").as[Option[Map[String, Any]]].map(_.getOrElse(Map.empty))
+      // Extract any additional fields not explicitly defined in the case class
+      attributes = ReflectionHelper.extractUnhandledFields[OtherDefinitionConfig](c)
+    } yield OtherDefinitionConfig(name, typeVal, config, attributes)
+  }
 }

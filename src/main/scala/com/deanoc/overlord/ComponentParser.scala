@@ -160,7 +160,7 @@ class ComponentParser() extends Logging {
                 val cloner = new ComponentInstanceCloner()
                 
                 // Try to create an instance from the component definition
-                componentDef.createInstance(instanceConfig.name, instanceConfig.config) match {
+                componentDef.createInstance(instanceConfig.name, instanceConfig.attributes) match {
                   case Right(inst) =>
                     // If successful, return the instance
                     Seq(inst)
@@ -173,7 +173,7 @@ class ComponentParser() extends Logging {
                     val clonedInstances = cloner.cloneInstances(
                       instanceConfig.name,
                       componentDef.component,
-                      instanceConfig.config
+                      instanceConfig.attributes
                     )
                     
                     // Return the cloned instances
@@ -182,7 +182,7 @@ class ComponentParser() extends Logging {
                 
               case _ =>
                 // This is a regular definition, so create the instance normally
-                definition.createInstance(instanceConfig.name, instanceConfig.config) match {
+                definition.createInstance(instanceConfig.name, instanceConfig.attributes) match {
                   case Right(inst) => Seq(inst)
                   case Left(errorMsg) =>
                     this.error(s"Failed to create instance ${instanceConfig.name}: $errorMsg", null)

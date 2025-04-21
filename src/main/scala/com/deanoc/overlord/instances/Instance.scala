@@ -110,7 +110,7 @@ object Instance {
 
       // Adjust attribs creation to use config.config
       val attribs: Map[String, Variant] =
-        defaults ++ config.config.getOrElse(Map()).map { case (k, v) =>
+        defaults ++ config.attributes.map { case (k, v) =>
           k -> Utils.toVariant(v) // Convert Any to Variant
         }
 
@@ -137,9 +137,9 @@ object Instance {
       definitionResult.flatMap { definition =>
         // Convert Map[String, Variant] to Option[Map[String, Any]]
         // by extracting the underlying values from Variant objects
-        val attribsAsAny = Some(attribs.map { case (k, v) =>
+        val attribsAsAny = attribs.map { case (k, v) =>
           k -> variantToAny(v)
-        })
+        }
 
         definition.createInstance(name, attribsAsAny) match {
           case Right(i: InstanceTrait) => Right(i)
@@ -167,7 +167,7 @@ object Instance {
   ): Either[String, DefinitionTrait] = {
 
     // Access the config map within the InstanceConfig
-    val configMap = instanceConfig.config.getOrElse(Map()).map { case (k, v) =>
+    val configMap = instanceConfig.attributes.map { case (k, v) =>
       k -> Utils.toVariant(v) // Convert Any to Variant
     }
 

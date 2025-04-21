@@ -560,7 +560,7 @@ object Overlord extends Logging {
               val config = createConfigForDefinition(defi.defType, n)
               
               // Create instance with explicit configuration injection
-              val result = defi.createInstance(n, Some(config))
+              val result = defi.createInstance(n, config)
               result match {
                 case Right(inst) =>
                   assert(inst.isInstanceOf[SoftwareInstance])
