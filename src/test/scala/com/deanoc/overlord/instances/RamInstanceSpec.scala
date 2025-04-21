@@ -114,7 +114,7 @@ class RamInstanceSpec
       "buses" -> busesArray,
       "ranges" -> ranges
     )
-    when(mockConfig.attributes).thenReturn(attributes)
+    when(mockConfig.attributesAsVariant).thenReturn(attributes)
 
     // Create the RamInstance
     val ramInstance = RamInstance(
@@ -148,24 +148,25 @@ class RamInstanceSpec
     when(mockDefinition.config).thenReturn(mockConfig)
 
     // Create ranges for the memory config
-    val ranges = Utils.toVariant(List(
-      Map(
-        "address" -> "0x10000000",
-        "size" -> "0x1000"
+    val ranges = List(
+      MemoryRangeConfig(
+        address = "0x10000000",
+        size = "0x1000"
       ),
-      Map(
-        "address" -> "0x20000000",
-        "size" -> "0x2000"
+      MemoryRangeConfig(
+        address = "0x20000000",
+        size = "0x2000"
       ),
-      Map(
-        "address" -> "0x30000000",
-        "size" -> "0x3000"
+      MemoryRangeConfig(
+        address = "0x30000000",
+        size = "0x3000"
       )
-    ))
-    val attributes = Map[String, Variant](
-      "ranges" -> ranges
     )
+    val attributes = Map[String, Variant]()
     when(mockConfig.attributes).thenReturn(attributes)
+    when(mockConfig.attributesAsVariant).thenReturn(attributes)
+    when(mockConfig.ranges).thenReturn(ranges)
+     
 
     // Create the RamInstance
     val ramInstance = RamInstance(
@@ -190,10 +191,10 @@ class RamInstanceSpec
     when(mockDefinition.config).thenReturn(mockConfig)
 
     // Create attributes map with empty ranges
-    val attributes = Map[String, Variant](
-      "ranges" -> Utils.toVariant(List())
-    )
-    when(mockConfig.attributes).thenReturn(attributes)
+    val ranges = List[MemoryRangeConfig]();
+    val attributes = Map[String, Variant]()
+    when(mockConfig.attributesAsVariant).thenReturn(attributes)
+    when(mockConfig.ranges).thenReturn(ranges)
 
     // Create the RamInstance
     val ramInstance = RamInstance(
