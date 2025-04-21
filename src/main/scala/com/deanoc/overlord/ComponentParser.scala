@@ -26,8 +26,8 @@ class ComponentParser() extends Logging {
     var definitionCatalog = new DefinitionCatalog
 
     // Process the info section
-    info(s"Processing info section: $parsed.info")
-    processInfo(parsed.info)
+    //info(s"Processing info section: $parsed.info")
+    //processInfo(parsed.info)
 
     // Process the catalog parts of the file    
     definitionCatalog.mergeNewDefinition(

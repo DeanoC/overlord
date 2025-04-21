@@ -129,9 +129,9 @@ object SourceType {
 
 case class SourceConfig(
   `type`: SourceType,
-  url: Option[String] = None,                 // For git and fetch types
-  path: Option[String] = None,                // For local type
-  inline: Option[Map[String, Any]] = None,    // For inline type
+  url: Option[String] = None,
+  path: Option[String] = None,
+  inline: Option[Json] = None,
 )
 
 object SourceConfig {
@@ -141,17 +141,15 @@ object SourceConfig {
         t <- c.downField("type").as[SourceType]
         u = t match {
           case SourceType.Git | SourceType.Fetch => c.downField("url").as[String].toOption
-          case _ => None
+          case _                                 => None
         }
         p = t match {
           case SourceType.Local => c.downField("path").as[String].toOption
-          case _ => None
+          case _                => None
         }
         i = t match {
-          case SourceType.Inline => c.downField("inline").as[Map[String, Json]].map(_.map {
-            case (k, v) => k -> v.noSpaces
-          }).toOption
-          case _ => None
+          case SourceType.Inline => c.downField("inline").as[Json].toOption
+          case _                 => None
         }
       } yield SourceConfig(t, u, p, i)
     }
@@ -167,6 +165,37 @@ case class InfoConfig(
 object InfoConfig {
   implicit val decoder: Decoder[InfoConfig] = deriveDecoder[InfoConfig]
 }
+
+// configuration specific to gateware
+case class GatewareConfig(
+  test: String = "",
+  parameters: Map[String, Any] = Map.empty,
+)
+ 
+object GatewareConfig {
+  implicit val decoder: Decoder[GatewareConfig] = new Decoder[GatewareConfig] {
+    def apply(c: HCursor): Decoder.Result[GatewareConfig] = {
+      for {
+        test <- c.downField("test").as[String]
+        parameters <- {
+          val p = c.downField("parameters")
+          // try as object → Map, else if array → empty Map, else default empty
+          p.as[Map[String, Json]]
+            .map(_.map { case (k, v) =>
+              k -> (v.asString
+                .orElse(v.asBoolean.map(_.toString))
+                .orElse(v.asNumber.map(_.toString))
+                .orElse(v.asArray.map(_.toString))
+                .orElse(v.asObject.map(_.toString))
+                .getOrElse(v.toString))
+            })
+            .orElse(p.as[List[Json]].map(_ => Map.empty[String, Any]))
+            .orElse(Right(Map.empty[String, Any]))
+        }
+      } yield GatewareConfig(test, parameters)
+    }
+  }
+} 
 
 // Common trait for catalog/component file configuration
 trait FileConfigBase {

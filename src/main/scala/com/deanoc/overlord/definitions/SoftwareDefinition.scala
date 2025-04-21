@@ -9,6 +9,7 @@ import com.deanoc.overlord.config.DefinitionConfig
 
 import java.nio.file.Path
 import com.deanoc.overlord.config.ConfigPaths
+import com.deanoc.overlord.config.SoftwareDefinitionConfig
 
 case class SoftwareDefinition(
     defType: DefinitionType,
@@ -24,7 +25,7 @@ case class SoftwareDefinition(
 object SoftwareDefinition {
   def apply(
       defType: DefinitionType,
-      config: DefinitionConfig,
+      config: SoftwareDefinitionConfig,
       path: Path
   ): Either[String, SoftwareDefinitionTrait] = {
 

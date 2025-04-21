@@ -7,6 +7,9 @@ import com.deanoc.overlord.hardware.{Port, Ports}
 import com.deanoc.overlord.config.DefinitionConfig
 
 import java.nio.file.Path
+import com.deanoc.overlord.config.HardwareDefinitionConfig
+import com.deanoc.overlord.SourceLoader
+import com.deanoc.overlord.config.GatewareConfig
 
 /** Companion object for HardwareDefinition. Provides methods to create
   * ChipDefinitionTrait instances from input data.
@@ -27,7 +30,7 @@ object HardwareDefinition {
     */
   def apply(
       defType: DefinitionType, // Accept DefinitionType directly
-      config: DefinitionConfig,
+      config: HardwareDefinitionConfig,
       path: Path
   ): Either[String, ChipDefinitionTrait] = {
     val configMap: Map[String, Variant] = config.attributes.map { case (k, v) =>
@@ -62,33 +65,36 @@ object HardwareDefinition {
     } else {
       Seq()
     }
-
+    
     // Check if the definition contains gateware-specific information in the config map
-    if (configMap.contains("gateware")) {
-
-      // Extract parameters for the gateware from config map
-      val parameters: Map[String, Variant] =
-        if (configMap.contains("parameters")) {
-          val params = Utils.toArray(configMap("parameters"))
-          (for (p <- params) yield {
-            val entry = Utils.toTable(p)
-            Utils.lookupString(entry, "name", "NO_NAME") -> entry("value")
-          }).toMap
-        } else Map[String, Variant]()
-
-      // Create a GatewareDefinition object
-      val gw = configMap("gateware")
-      // Call the second GatewareDefinition.apply method with the correct parameter order
-      GatewareDefinition(
-        defType, // Pass defType directly
-        config,
-        dependencies,
-        ports,
-        registers,
-        parameters,
-        Utils.toString(gw)
-      )
-
+    if(config.gatewareConfig.isDefined) {
+      SourceLoader.loadSource[GatewareConfig, GatewareConfig](config.gatewareConfig.get) match {
+        case Right(gw) =>
+          // Extract parameters for the gateware from config map
+          val parameters: Map[String, Variant] =
+            if (configMap.contains("parameters")) {
+              val params = Utils.toArray(configMap("parameters"))
+              (for (p <- params) yield {
+                val entry = Utils.toTable(p)
+                Utils.lookupString(entry, "name", "NO_NAME") -> entry("value")
+              }).toMap
+            } else Map[String, Variant]()
+    
+          // Create a GatewareDefinition object
+          val gw = configMap("gateware")
+          // Call the second GatewareDefinition.apply method with the correct parameter order
+          GatewareDefinition(
+            defType, // Pass defType directly
+            config,
+            dependencies,
+            ports,
+            registers,
+            parameters,
+            Utils.toString(gw)
+          )
+        case Left(e) => Left(e)
+      }
+  
     } else {
       // Handle hardware definitions by extracting the maximum instances allowed from config map
       val mi = Utils.lookupInt(configMap, "max_instances", 1)

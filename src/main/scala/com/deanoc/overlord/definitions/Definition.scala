@@ -50,22 +50,22 @@ object Definition {
           _: DefinitionType.NetDefinition | _: DefinitionType.IoDefinition |
           _: DefinitionType.OtherDefinition | _: DefinitionType.SocDefinition |
           _: DefinitionType.SwitchDefinition =>
-        HardwareDefinition(`type`, configWithDefaults, path)
+        HardwareDefinition(`type`, configWithDefaults.asInstanceOf[HardwareDefinitionConfig], path)
 
       // Software definitions
       case _: DefinitionType.ProgramDefinition |
           _: DefinitionType.LibraryDefinition =>
-        SoftwareDefinition(`type`, configWithDefaults, path)
+        SoftwareDefinition(`type`, configWithDefaults.asInstanceOf[SoftwareDefinitionConfig], path)
 
       // Port definitions
       case _: DefinitionType.PinGroupDefinition =>
-        HardwareDefinition(`type`, configWithDefaults, path)
+        HardwareDefinition(`type`, configWithDefaults.asInstanceOf[HardwareDefinitionConfig], path)
       case _: DefinitionType.ClockDefinition =>
-        HardwareDefinition(`type`, configWithDefaults, path)
+        HardwareDefinition(`type`, configWithDefaults.asInstanceOf[HardwareDefinitionConfig], path)
 
       // Board definition
       case _: DefinitionType.BoardDefinition =>
-        HardwareDefinition(`type`, configWithDefaults, path)
+        HardwareDefinition(`type`, configWithDefaults.asInstanceOf[HardwareDefinitionConfig], path)
 
       // Component definition
       case _: DefinitionType.ComponentDefinition =>

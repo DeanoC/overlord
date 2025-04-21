@@ -8,9 +8,13 @@ info:
 
 definitions:
 - name: "vexriscv_smallest"
-  config: {}
   type: cpu.riscv32im.vexriscv_smallest
-  gateware: vexriscv/vexriscv_smallest.yaml
+  gateware: 
+    type: "inline"
+    inline:
+      test: "test.v"
+      parameters: []
+  
   supplier_prefix:
   - dBus_
   - iBus_

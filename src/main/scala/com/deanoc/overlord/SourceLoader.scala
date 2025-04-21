@@ -102,9 +102,7 @@ object SourceLoader extends Logging {
    *         depends on the SourceType: String for Git, Fetch, Local;
    *         Map[String, Any] for Inline.
    */
-  def loadSource[L: io.circe.Decoder, T](
-      sourceConfig: SourceConfig
-  ): Either[String, T] = {
+  def loadSource[L: io.circe.Decoder, T](sourceConfig: SourceConfig): Either[String, T] = {
     sourceConfig.`type` match {
       case SourceType.Git =>
         sourceConfig.url match {
@@ -129,8 +127,13 @@ object SourceLoader extends Logging {
         }
       case SourceType.Inline =>
         sourceConfig.inline match {
-          case Some(inlineMap) => Right(inlineMap.values.toSeq.asInstanceOf[T])
-          case None => Left("Inline source type requires an inline map.")
+          case Some(inlineJson) =>
+            implicitly[io.circe.Decoder[L]].decodeJson(inlineJson) match {
+              case Right(parsed) => Right(parsed.asInstanceOf[T])
+              case Left(err)     => Left(s"Failed to decode inline content: ${err.getMessage}")
+            }
+          case None =>
+            Left("Inline source type requires an inline JSON block.")
         }
       case null => Left(s"Unknown source type: ${SourceType.toString(sourceConfig.`type`)}")
     }
