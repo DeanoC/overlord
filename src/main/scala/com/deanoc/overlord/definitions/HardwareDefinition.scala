@@ -33,61 +33,37 @@ object HardwareDefinition {
       config: HardwareDefinitionConfig,
       path: Path
   ): Either[String, ChipDefinitionTrait] = {
-    val configMap: Map[String, Variant] = config.attributes.map { case (k, v) =>
-      k -> Utils.toVariant(v) // Convert Any to Variant
-    }
-    // Extract register definitions from config map
-    val registers: Seq[Variant] = Utils.lookupArray(configMap, "registers").toSeq
-
-    // Extract port definitions from config map if available
-    val ports = {
-      if (configMap.contains("ports"))
-        Ports(Utils.toArray(configMap("ports"))).map(t => t.name -> t).toMap
-      else Map[String, Port]()
-    }
 
     // Extract driver dependencies from config map
-    val dependencies: Seq[String] = if (configMap.contains("drivers")) {
+    val dependencies: Seq[String] = Seq()
+    /* TODO drivers
+    if (configMap.contains("drivers")) {
       // Convert driver entries to a sequence of strings
       val depends = Utils.toArray(configMap("drivers"))
       depends.map(Utils.toString).toSeq
     } else {
       Seq()
-    }
+    }*/
     
     // Check if the definition contains gateware-specific information in the config map
     if(config.gateware.isDefined) {
       SourceLoader.loadSource[GatewareConfig, GatewareConfig](config.gateware.get) match {
         case Right(gw) =>
-          // Extract parameters for the gateware from config map
-          val parameters: Map[String, Variant] =
-            if (configMap.contains("parameters")) {
-              val params = Utils.toArray(configMap("parameters"))
-              (for (p <- params) yield {
-                val entry = Utils.toTable(p)
-                Utils.lookupString(entry, "name", "NO_NAME") -> entry("value")
-              }).toMap
-            } else Map[String, Variant]()
-    
-          // Create a GatewareDefinition object
-          val gw = configMap("gateware")
-          // Call the second GatewareDefinition.apply method with the correct parameter order
-          GatewareDefinition(
+          Right(GatewareDefinition(
             defType, // Pass defType directly
+            path,
             config,
             dependencies,
-            ports,
-            registers,
-            parameters,
-            Utils.toString(gw)
-          )
+            Map.empty,
+            1,
+            registersV = Seq(),
+            gatewareConfig = gw
+          ))
+    
         case Left(e) => Left(e)
       }
   
     } else {
-      // Handle hardware definitions by extracting the maximum instances allowed from config map
-      val mi = Utils.lookupInt(configMap, "max_instances", 1)
-
       // Create a FixedHardwareDefinition object
       Right(
         FixedHardwareDefinition(
@@ -95,9 +71,9 @@ object HardwareDefinition {
           path,
           config,
           dependencies,
-          ports,
-          mi,
-          registers
+          Map.empty,
+          config.max_instances.getOrElse(1),
+          Seq()
         )
       )
     }

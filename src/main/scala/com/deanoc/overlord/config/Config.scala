@@ -3,6 +3,8 @@ package com.deanoc.overlord.config
 import io.circe.{Decoder, Json, HCursor}
 import io.circe.generic.semiauto._
 import com.deanoc.overlord.utils.Utils.ReflectionHelper
+import scala.collection.mutable
+import com.deanoc.overlord.config.CirceDefaults.withDefault
 
 object CirceDefaults {
   def withDefault[T](cursor: HCursor, field: String, default: T)(implicit decoder: Decoder[T]): Decoder.Result[T] = {
@@ -13,75 +15,49 @@ object CirceDefaults {
     cursor.downField(field).as[Option[T]].orElse(Right(None))
   }
 }
-import scala.collection.mutable
 
 // Represents a memory range within a RAM definition
 case class MemoryRangeConfig(
   address: String, // Assuming address is represented as a hex string in YAML
   size: String     // Assuming size is represented as a hex string in YAML
-)
-object MemoryRangeConfig {
-  implicit val decoder: Decoder[MemoryRangeConfig] = deriveDecoder[MemoryRangeConfig]
-}
-
+) derives Decoder
 // Represents the configuration for an IO definition
 case class IoConfig(
   visible_to_software: Boolean
-)
-object IoConfig {
-  implicit val decoder: Decoder[IoConfig] = deriveDecoder[IoConfig]
-}
+) derives Decoder
 
 // Represents the configuration for a PinGroup definition
 case class PinGroupConfig(
   pins: List[String],
   direction: String // Assuming direction is a string like "input" or "output"
-)
-object PinGroupConfig {
-  implicit val decoder: Decoder[PinGroupConfig] = deriveDecoder[PinGroupConfig]
-}
+) derives Decoder
 
 // Represents the configuration for a Clock definition
 case class ClockConfig(
   frequency: String // Assuming frequency is a string like "100MHz"
-)
-object ClockConfig {
-  implicit val decoder: Decoder[ClockConfig] = deriveDecoder[ClockConfig]
-}
+) derives Decoder
 
 // Represents the configuration for a Program definition
 case class ProgramConfig(
   dependencies: List[String]
-)
-object ProgramConfig {
-  implicit val decoder: Decoder[ProgramConfig] = deriveDecoder[ProgramConfig]
-}
+) derives Decoder
 
 // Represents the configuration for a Library definition
 case class LibraryConfig(
   dependencies: List[String]
-)
-object LibraryConfig {
-  implicit val decoder: Decoder[LibraryConfig] = deriveDecoder[LibraryConfig]
-}
+) derives Decoder
 
 // Represents a clock within a Board definition
 case class BoardClockConfig(
   name: String,
   frequency: String // Assuming frequency is a string like "100MHz"
-)
-object BoardClockConfig {
-  implicit val decoder: Decoder[BoardClockConfig] = deriveDecoder[BoardClockConfig]
-}
+) derives Decoder
 
 // Represents the configuration for a Board definition
 case class BoardConfig(
   board_type: String,
   clocks: List[BoardClockConfig]
-)
-object BoardConfig {
-  implicit val decoder: Decoder[BoardConfig] = deriveDecoder[BoardConfig]
-}
+) derives Decoder
 
 // Custom decoder for Map[String, Any]
 object CustomDecoders {
@@ -161,11 +137,7 @@ case class FieldConfig(
   `type`: String, // Access type: raz/rw/ro/wo/mixed
   shortdesc: Option[String] = None, // Brief functional description
   longdesc: Option[String] = None // Detailed technical documentation
-)
-
-object FieldConfig {
-  implicit val decoder: Decoder[FieldConfig] = deriveDecoder[FieldConfig]
-}
+) derives Decoder
 
 case class RegisterConfig(
   default: String, // Power-on value (e.g., "0x00000000")
@@ -175,32 +147,20 @@ case class RegisterConfig(
   offset: String, // Address offset from bank base
   `type`: String, // Access type: mixed/rw/ro/wo
   width: String // Bit width (e.g., "32")
-)
+) derives Decoder
 
-object RegisterConfig {
-  implicit val decoder: Decoder[RegisterConfig] = new Decoder[RegisterConfig] {
-    def apply(c: HCursor): Decoder.Result[RegisterConfig] = {
-      for {
-        default <- c.downField("default").as[String]
-        description <- c.downField("description").as[String]
-        field <- c.downField("field").as[List[FieldConfig]]
-        name <- c.downField("name").as[String]
-        offset <- c.downField("offset").as[String]
-        `type` <- c.downField("type").as[String]
-        width <- c.downField("width").as[String]
-      } yield RegisterConfig(default, description, field, name, offset, `type`, width)
-    }
-  }
-}
+case class PortConfig(
+  name: String,
+  width: String,
+  direction: String
+) derives Decoder
+
 case class InfoConfig(
   name: String = "",
   version: Option[String] = None,
   author: Option[String] = None,
   description: Option[String] = None
-)
-object InfoConfig {
-  implicit val decoder: Decoder[InfoConfig] = deriveDecoder[InfoConfig]
-}
+) derives Decoder
 
 // configuration specific to gateware
 case class GatewareConfig(
@@ -209,25 +169,13 @@ case class GatewareConfig(
 )
  
 object GatewareConfig {
+  import CustomDecoders._
+
   implicit val decoder: Decoder[GatewareConfig] = new Decoder[GatewareConfig] {
     def apply(c: HCursor): Decoder.Result[GatewareConfig] = {
       for {
         test <- c.downField("test").as[String]
-        parameters <- {
-          val p = c.downField("parameters")
-          // try as object → Map, else if array → empty Map, else default empty
-          p.as[Map[String, Json]]
-            .map(_.map { case (k, v) =>
-              k -> (v.asString
-                .orElse(v.asBoolean.map(_.toString))
-                .orElse(v.asNumber.map(_.toString))
-                .orElse(v.asArray.map(_.toString))
-                .orElse(v.asObject.map(_.toString))
-                .getOrElse(v.toString))
-            })
-            .orElse(p.as[List[Json]].map(_ => Map.empty[String, Any]))
-            .orElse(Right(Map.empty[String, Any]))
-        }
+        parameters <- withDefault(c, "parameters", Map.empty[String, Any])
       } yield GatewareConfig(test, parameters)
     }
   }
@@ -249,7 +197,16 @@ case class CatalogFileConfig(
 
 object CatalogFileConfig {
   import CustomDecoders._
-  implicit val decoder: Decoder[CatalogFileConfig] = deriveDecoder[CatalogFileConfig]
+
+  implicit val decoder: Decoder[CatalogFileConfig] = new Decoder[CatalogFileConfig] {
+    def apply(c: HCursor): Decoder.Result[CatalogFileConfig] = {
+      for {
+        defaults <- c.downField("defaults").as[Option[Map[String, Any]]].map(_.getOrElse(Map.empty))
+        catalogs <- c.downField("catalogs").as[Option[List[SourceConfig]]].map(_.getOrElse(List.empty))
+        definitions <- c.downField("definitions").as[Option[List[DefinitionConfig]]].map(_.getOrElse(List.empty))
+      } yield CatalogFileConfig(defaults, catalogs, definitions)
+    }
+  }
 }
 
 // Represents the top-level structure of the project YAML file

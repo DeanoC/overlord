@@ -116,7 +116,10 @@ trait Logging extends LazyLogging {
   
   def error(message: => String): Unit = {
     if (ModuleLogger.isLevelEnabled(moduleName, Level.ERROR)) {
-      logger.error(message)
+      val stackTraceElement = Thread.currentThread().getStackTrace()(3) // Get the caller's stack trace element
+      val fileAndLine = s"${stackTraceElement.getFileName}:${stackTraceElement.getLineNumber}"
+      logger.error(s"$message (at $fileAndLine)")
+      
       // Even in silent mode, we should respect exit on error
       if (!ModuleLogger.isSilentMode()) {
         ModuleLogger.exitApplication()
@@ -152,7 +155,10 @@ trait Logging extends LazyLogging {
   
   def error(message: => String, arg: Any): Unit = {
     if (ModuleLogger.isLevelEnabled(moduleName, Level.ERROR)) {
-      logger.error(message, arg)
+      val stackTraceElement = Thread.currentThread().getStackTrace()(3) // Get the caller's stack trace element
+      val fileAndLine = s"${stackTraceElement.getFileName}:${stackTraceElement.getLineNumber}"
+      logger.error(s"$message (at $fileAndLine)", arg)
+      
       // Even in silent mode, we should respect exit on error
       if (!ModuleLogger.isSilentMode()) {
         ModuleLogger.exitApplication()

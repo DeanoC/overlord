@@ -39,13 +39,31 @@ object DefinitionConfig {
 
 sealed trait HardwareDefinitionConfig extends DefinitionConfig {
   val gateware: Option[SourceConfig]
-  val ports: Option[List[String]]
+  val ports: Option[List[PortConfig]]
   val registers: Option[List[SourceConfig]]
   val drivers: Option[List[String]]
   val max_instances: Option[Int]
-  val supplier_prefix: Option[String]
+  val supplier_prefix: Option[List[String]]
   val width: Option[Int]
-} 
+}
+
+object HardwareDefinitionConfig {
+  import CustomDecoders._
+
+  // Helper method to decode common fields
+  def decodeCommonFields(c: HCursor): Decoder.Result[(Option[SourceConfig], Option[List[PortConfig]], Option[List[SourceConfig]], Option[List[String]], Option[Int], Option[List[String]], Option[Int], Map[String, Any])] = {
+    for {
+      gateware <- c.downField("gateware").as[Option[SourceConfig]]
+      ports <- c.downField("ports").as[Option[List[PortConfig]]]
+      registers <- c.downField("registers").as[Option[List[SourceConfig]]]
+      drivers <- c.downField("drivers").as[Option[List[String]]]
+      maxInstances <- c.downField("max_instances").as[Option[Int]]
+      supplierPrefix <- c.downField("supplier_prefix").as[Option[List[String]]]
+      width <- c.downField("width").as[Option[Int]]
+      attributes = ReflectionHelper.extractUnhandledFields[HardwareDefinitionConfig](c)
+    } yield (gateware, ports, registers, drivers, maxInstances, supplierPrefix, width, attributes)
+  }
+}
 
 sealed trait SoftwareDefinitionConfig extends DefinitionConfig {
 }
@@ -54,11 +72,11 @@ case class RamDefinitionConfig(
   `type`: String,
   ranges: List[MemoryRangeConfig],
   gateware: Option[SourceConfig] = None,
-  ports: Option[List[String]] = None,
+  ports: Option[List[PortConfig]] = None,
   registers: Option[List[SourceConfig]] = None,
   drivers: Option[List[String]] = None,
   max_instances: Option[Int] = None,
-  supplier_prefix: Option[String] = None,
+  supplier_prefix: Option[List[String]] = None,
   width: Option[Int] = None,
   attributes: Map[String, Any] = Map.empty
 ) extends HardwareDefinitionConfig {
@@ -68,20 +86,24 @@ case class RamDefinitionConfig(
 
 object RamDefinitionConfig {
   import CustomDecoders._
-  
+
   implicit val decoder: Decoder[RamDefinitionConfig] = (c: HCursor) => {
     for {
       typeVal <- c.downField("type").as[String]
       ranges <- c.downField("ranges").as[List[MemoryRangeConfig]]
-      ports = c.downField("ports").as[Option[List[String]]].toOption.flatten
-      registers = c.downField("registers").as[Option[List[SourceConfig]]].toOption.flatten
-      drivers = c.downField("drivers").as[Option[List[String]]].toOption.flatten
-      maxInstances = c.downField("max_instances").as[Option[Int]].toOption.flatten
-      gateware = c.downField("gateware").as[SourceConfig].toOption
-      supplierPrefix = c.downField("supplier_prefix").as[Option[String]].toOption.flatten
-      width = c.downField("width").as[Option[Int]].toOption.flatten
-      attributes = ReflectionHelper.extractUnhandledFields[RamDefinitionConfig](c)
-    } yield RamDefinitionConfig(typeVal, ranges, gateware, ports, registers, drivers, maxInstances, supplierPrefix, width, attributes)
+      commonFields <- HardwareDefinitionConfig.decodeCommonFields(c)
+    } yield RamDefinitionConfig(
+      `type` = typeVal,
+      ranges = ranges,
+      gateware = commonFields._1,
+      ports = commonFields._2,
+      registers = commonFields._3,
+      drivers = commonFields._4,
+      max_instances = commonFields._5,
+      supplier_prefix = commonFields._6,
+      width = commonFields._7,
+      attributes = commonFields._8
+    )
   }
 }
 
@@ -90,11 +112,11 @@ case class CpuDefinitionConfig(
   triple: String,
   core_count: Int = 1,
   gateware: Option[SourceConfig] = None,
-  ports: Option[List[String]] = None,
+  ports: Option[List[PortConfig]] = None,
   registers: Option[List[SourceConfig]] = None,
   drivers: Option[List[String]] = None,
   max_instances: Option[Int] = None,
-  supplier_prefix: Option[String] = None,
+  supplier_prefix: Option[List[String]] = None,
   width: Option[Int] = None,
   attributes: Map[String, Any] = Map.empty
 ) extends HardwareDefinitionConfig {
@@ -104,53 +126,60 @@ case class CpuDefinitionConfig(
 
 object CpuDefinitionConfig {
   import CustomDecoders._
-  
+
   implicit val decoder: Decoder[CpuDefinitionConfig] = (c: HCursor) => {
     for {
       typeVal <- c.downField("type").as[String]
       triple <- c.downField("triple").as[String]
       coreCount <- withDefault(c, "core_count", 1)
-      gateware = c.downField("gateware").as[SourceConfig].toOption
-      ports = c.downField("ports").as[Option[List[String]]].toOption.flatten
-      registers = c.downField("registers").as[Option[List[SourceConfig]]].toOption.flatten
-      drivers = c.downField("drivers").as[Option[List[String]]].toOption.flatten
-      maxInstances = c.downField("max_instances").as[Option[Int]].toOption.flatten
-      supplierPrefix = c.downField("supplier_prefix").as[Option[String]].toOption.flatten
-      width = c.downField("width").as[Option[Int]].toOption.flatten
-      attributes = ReflectionHelper.extractUnhandledFields[CpuDefinitionConfig](c)
-    } yield CpuDefinitionConfig(typeVal, triple, coreCount, gateware, ports, registers, drivers, maxInstances, supplierPrefix, width, attributes)
+      commonFields <- HardwareDefinitionConfig.decodeCommonFields(c)
+    } yield CpuDefinitionConfig(
+      `type` = typeVal,
+      triple = triple,
+      core_count = coreCount,
+      gateware = commonFields._1,
+      ports = commonFields._2,
+      registers = commonFields._3,
+      drivers = commonFields._4,
+      max_instances = commonFields._5,
+      supplier_prefix = commonFields._6,
+      width = commonFields._7,
+      attributes = commonFields._8
+    )
   }
 }
 
 case class OtherDefinitionConfig(
   `type`: String,
   gateware: Option[SourceConfig] = None,
-  ports: Option[List[String]] = None,
+  ports: Option[List[PortConfig]] = None,
   registers: Option[List[SourceConfig]] = None,
   drivers: Option[List[String]] = None,
   max_instances: Option[Int] = None,
-  supplier_prefix: Option[String] = None,
+  supplier_prefix: Option[List[String]] = None,
   width: Option[Int] = None,
   attributes: Map[String, Any] = Map.empty
 ) extends HardwareDefinitionConfig {
   def withAttributes(newAttributes: Map[String, Any]): DefinitionConfig = 
     copy(attributes = newAttributes)
 }
-
 object OtherDefinitionConfig {
   import CustomDecoders._
-  
+
   implicit val decoder: Decoder[OtherDefinitionConfig] = (c: HCursor) => {
     for {
       typeVal <- c.downField("type").as[String]
-      gateware = c.downField("gateware").as[SourceConfig].toOption
-      ports = c.downField("ports").as[Option[List[String]]].toOption.flatten
-      registers = c.downField("registers").as[Option[List[SourceConfig]]].toOption.flatten
-      drivers = c.downField("drivers").as[Option[List[String]]].toOption.flatten
-      maxInstances = c.downField("max_instances").as[Option[Int]].toOption.flatten
-      supplierPrefix = c.downField("supplier_prefix").as[Option[String]].toOption.flatten
-      width = c.downField("width").as[Option[Int]].toOption.flatten
-      attributes = ReflectionHelper.extractUnhandledFields[OtherDefinitionConfig](c)
-    } yield OtherDefinitionConfig(typeVal, gateware, ports, registers, drivers, maxInstances, supplierPrefix, width, attributes)
+      commonFields <- HardwareDefinitionConfig.decodeCommonFields(c)
+    } yield OtherDefinitionConfig(
+      `type` = typeVal,
+      gateware = commonFields._1,
+      ports = commonFields._2,
+      registers = commonFields._3,
+      drivers = commonFields._4,
+      max_instances = commonFields._5,
+      supplier_prefix = commonFields._6,
+      width = commonFields._7,
+      attributes = commonFields._8
+    )
   }
 }

@@ -37,7 +37,9 @@ object OutputGateware {
   ): Unit = {
     // Get the gateware definition with explicit type casting
     val gateware = instance.definition.asInstanceOf[GatewareDefinitionTrait]
-    
+
+    /* TODO: Process actions
+      
     // Get the actions from the gateware definition
     val actions = gateware.actionsFile.actions
 
@@ -55,6 +57,7 @@ object OutputGateware {
     // Execute actions for the current phase with explicit dependency injection
     for { action <- actions.filter(_.phase == phase) }
       action.execute(instance, instance.finalParameterTable.toMap)
+      */
   }
 
   private def extractParameters(
