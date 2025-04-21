@@ -54,7 +54,7 @@ class CpuInstanceSpec
       "core_count" -> Utils.toVariant(4),
       "triple" -> Utils.toVariant("riscv32-unknown-elf")
     )
-    when(mockConfig.attributes).thenReturn(attributes)
+    when(mockConfig.attributesAsVariant).thenReturn(attributes)
     when(mockConfig.triple).thenReturn("riscv32-unknown-elf")
     when(mockConfig.core_count).thenReturn(4)
 
@@ -99,7 +99,7 @@ class CpuInstanceSpec
       "core_count" -> Utils.toVariant(8),
       "triple" -> Utils.toVariant("x86_64-unknown-linux-gnu")
     )
-    when(mockConfig.attributes).thenReturn(attributes)
+    when(mockConfig.attributesAsVariant).thenReturn(attributes)
     when(mockConfig.triple).thenReturn("x86_64-unknown-linux-gnu")
     when(mockConfig.core_count).thenReturn(8)
 
@@ -154,7 +154,7 @@ class CpuInstanceSpec
       "heap_size" -> Utils.toVariant("0x2000"), // Add heap size
       "cpu_type" -> Utils.toVariant("arm") // Explicit CPU type
     )
-    when(mockConfig.attributesAsVariant).thenReturn(Utils.toVariant(attributes))
+    when(mockConfig.attributesAsVariant).thenReturn(attributes)
     when(mockConfig.attributes).thenReturn(attributes)
     when(mockConfig.core_count).thenReturn(2)
     when(mockConfig.triple).thenReturn("arm-none-eabi")
@@ -198,7 +198,7 @@ class CpuInstanceSpec
     when(mockDefinition.config).thenReturn(mockConfig)
 
     // Set up the mock to throw an exception when attributes are accessed
-    when(mockConfig.attributes).thenThrow(
+    when(mockConfig.attributesAsVariant).thenThrow(
       new RuntimeException("Test exception")
     )
 
