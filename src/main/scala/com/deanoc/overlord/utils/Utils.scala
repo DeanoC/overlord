@@ -271,7 +271,7 @@ object Utils extends Logging {
     Some(s)
   }
 
-  def parseYamlString[T](
+  def parseYaml[T](
       yamlString: String
   )(implicit decoder: Decoder[T]): Either[String, T] = {
     val json = parser.parse(yamlString) match {
@@ -302,24 +302,36 @@ object Utils extends Logging {
     }
   }
 
-  def loadAndParseYamlFile[T](
-      filePath: Path
-  )(implicit decoder: Decoder[T]): Either[String, T] = {
+  def loadFileToParse[T](
+    filePath: Path
+  ) : Either[String, String] = { // Error string or contents
     if (!Files.exists(filePath.toAbsolutePath)) {
-      return Left(s"Local catalog file not found at $filePath")
+      return Left(s"file not found at $filePath")
     }
 
     if (Files.size(filePath.toAbsolutePath) == 0) {
-      return Left(s"Local catalog file is empty: $filePath")
+      return Left(s"file is empty: $filePath")
     }
 
-    val yamlString = scala.util.Try(scala.io.Source.fromFile(filePath.toFile).mkString) match {
-      case scala.util.Success(content) => content
+    scala.util.Try(scala.io.Source.fromFile(filePath.toFile).mkString) match {
+      case scala.util.Success(content) => Right(content)
       case scala.util.Failure(exception) =>
-        return Left(s"Failed to read file $filePath.toAbsolutePath: ${exception.getMessage}")
+        Left(s"Failed to read file $filePath.toAbsolutePath: ${exception.getMessage}")
     }
 
-    parseYamlString(yamlString) match {
+  }
+
+  def loadAndParseYamlFile[T](
+      filePath: Path
+  )(implicit decoder: Decoder[T]): Either[String, T] = {
+
+    val yamlString = loadFileToParse(filePath) match {
+      case Right(content) => content
+      case Left(err) =>
+        return Left(s"Failed to load file $filePath: ${err}")
+    }
+
+    parseYaml(yamlString) match {
       case Right(parsedConfig) => Right(parsedConfig)
       case Left(err) =>
         return Left(s"Failed to parse YAML to JSON from $filePath: ${err}")

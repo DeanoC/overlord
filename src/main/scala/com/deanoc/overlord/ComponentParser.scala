@@ -3,7 +3,7 @@ package com.deanoc.overlord
 import com.deanoc.overlord.connections._
 import com.deanoc.overlord.instances._
 import com.deanoc.overlord.utils.{Logging, Utils, NamespaceUtils}
-import com.deanoc.overlord.config.{ComponentFileConfig, InstanceConfig, PrefabConfig, ConnectionConfig, InfoConfig, SourceConfig} // Import specific config case classes
+import com.deanoc.overlord.config.{ComponentFileConfig, InstanceConfig, ConnectionConfig, InfoConfig, SourceConfig} // Import specific config case classes
 import com.deanoc.overlord.definitions.{DefinitionType, ComponentDefinition}
 
 import java.nio.file.Path

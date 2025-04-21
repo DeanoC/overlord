@@ -13,6 +13,8 @@ object CirceDefaults {
     cursor.downField(field).as[Option[T]].orElse(Right(None))
   }
 }
+import scala.collection.mutable
+
 // Represents a memory range within a RAM definition
 case class MemoryRangeConfig(
   address: String, // Assuming address is represented as a hex string in YAML
@@ -81,10 +83,6 @@ object BoardConfig {
   implicit val decoder: Decoder[BoardConfig] = deriveDecoder[BoardConfig]
 }
 
-// Note: Case classes for Graphic, Storage, Net, Soc, Switch, and Other
-// Definition Types are not included as their attributes are marked as TBD
-// in the documentation.
-
 // Custom decoder for Map[String, Any]
 object CustomDecoders {
   implicit val decodeMapStringAny: Decoder[Map[String, Any]] = new Decoder[Map[String, Any]] {
@@ -101,31 +99,6 @@ object CustomDecoders {
     }
   }
 }
-
-// Represents a resource in a prefab
-case class PrefabResourceConfig(
-  resource: String
-)
-object PrefabResourceConfig {
-  implicit val decoder: Decoder[PrefabResourceConfig] = deriveDecoder[PrefabResourceConfig]
-}
-
-// Represents an included prefab in a prefab
-case class PrefabIncludeConfig(
-  resource: String
-)
-object PrefabIncludeConfig {
-  implicit val decoder: Decoder[PrefabIncludeConfig] = deriveDecoder[PrefabIncludeConfig]
-}
-
-// Represents a single prefab reference in the project file
-case class PrefabConfig(
-  name: String
-)
-object PrefabConfig {
-  implicit val decoder: Decoder[PrefabConfig] = deriveDecoder[PrefabConfig]
-}
-
 // Define an enum for source types
 sealed trait SourceType
 object SourceType {

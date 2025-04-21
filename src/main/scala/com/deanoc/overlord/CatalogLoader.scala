@@ -62,6 +62,15 @@ object CatalogLoader extends Logging {
       case SourceType.Git   => loadFromGit(sourceConfig.url.get, defaultMap)
       case SourceType.Fetch => loadFromUrl(sourceConfig.url.get, defaultMap)
       case SourceType.Local => loadFromFile(sourceConfig.path.get, defaultMap)
+      case SourceType.Inline => sourceConfig.inline match {
+        case Some(inlineMap) =>
+          inlineMap.collect {
+            case (_, value: DefinitionTrait) => value
+          }.toSeq
+        case None =>
+          error("Inline source type requires an inline map.")
+          Seq.empty
+      }
       case _       => Seq.empty // Already handled above
     }
   }
@@ -108,19 +117,25 @@ object CatalogLoader extends Logging {
     boundary.break(Seq.empty)
   }
 
-
   private def loadFromFile(
       fileName: String,
       defaultMap: Map[String, Any]
   ): Seq[DefinitionTrait] = {
     val filePath = Overlord.projectPath.resolve(fileName)
 
-    Utils.loadAndParseYamlFile[CatalogFileConfig](filePath) match {
+    val yamlString = Utils.loadFileToParse(filePath)
+    yamlString match {
       case Left(errorMsg) =>
         error(errorMsg)
         Seq.empty
-      case Right(parsed) =>
-        processParsedCatalog(parsed, filePath, defaultMap)
+      case Right(yaml) =>
+        Utils.parseYaml[CatalogFileConfig](yaml) match {
+          case Left(errorMsg) =>
+            error(errorMsg)
+            Seq.empty
+          case Right(parsed) =>
+            processParsedCatalog(parsed, filePath, defaultMap)
+        }
     }
   }
 /*

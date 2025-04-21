@@ -55,7 +55,7 @@ class UnconnectedBusExtendedSpec
   private def createCpuDef(): FixedHardwareDefinition = {
     val defType = DefinitionType.CpuDefinition(Seq("cpu", "riscv", "verilog"))
     val sourcePath = java.nio.file.Paths.get("path/to/source")
-    val config = Utils.parseYamlString[DefinitionConfig](
+    val config = Utils.parseYaml[DefinitionConfig](
       """
 buses:
 - base_address: '0xFD00_0000'
@@ -82,7 +82,7 @@ width: 32
   private def createRamDef(): FixedHardwareDefinition = {
     val defType = DefinitionType.RamDefinition(Seq("ram", "verilog"))
     val sourcePath = java.nio.file.Paths.get("path/to/source")
-    val config = Utils.parseYamlString[DefinitionConfig](
+    val config = Utils.parseYaml[DefinitionConfig](
       """
 buses:
 - base_address: '0xFD00_0000'
