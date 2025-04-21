@@ -43,7 +43,6 @@ class RamInstanceSpec
 
     // Create a type-safe RamConfig with memory ranges
     val ramConfig = RamDefinitionConfig(
-      name = "test_ram_config",
       `type` = "ram.sram",
       ranges = List(
         MemoryRangeConfig(

@@ -78,7 +78,6 @@ class ComponentParserTest
     // Assert the content of the CPU definition
     val cpuDefinition = catalogConfig.definitions(0)
     cpuDefinition.`type` shouldBe "cpu"
-    cpuDefinition.name shouldBe "Cortex-A53"
     
     // Cast to the specific CPU definition type to access CPU-specific fields
     cpuDefinition match {
@@ -91,7 +90,6 @@ class ComponentParserTest
     // Assert the content of the RAM definition
     val ramDefinition = catalogConfig.definitions(1)
     ramDefinition.`type` shouldBe "ram"
-    ramDefinition.name shouldBe "MainMemory"
     
     // Check RAM config and ranges if supported by the schema
     ramDefinition match {
@@ -104,19 +102,16 @@ class ComponentParserTest
     // Assert the content of the clock definition
     val clockDefinition = catalogConfig.definitions(2)
     clockDefinition.`type` shouldBe "clock"
-    clockDefinition.name shouldBe "SystemClock"
     clockDefinition.attributes.get("frequency") shouldBe Some("100MHz")
     
     // Assert the content of the IO definition
     val ioDefinition = catalogConfig.definitions(3)
     ioDefinition.`type` shouldBe "io"
-    ioDefinition.name shouldBe "GPIO"
     ioDefinition.attributes.get("visible_to_software") shouldBe Some("true")
     
     // Assert the content of the pingroup definition
     val pinGroupDefinition = catalogConfig.definitions(4)
     pinGroupDefinition.`type` shouldBe "pingroup"
-    pinGroupDefinition.name shouldBe "ControlPins"
     pinGroupDefinition.attributes.get("pins") should not be None
     pinGroupDefinition.attributes.get("direction") shouldBe Some("output")
     
@@ -189,7 +184,7 @@ class ComponentParserTest
     projectConfig.definitions should have size 3
     
     // Check CPU definition
-    val cpuDefinition = projectConfig.definitions.find(_.name == "Cortex-A53").get
+    val cpuDefinition = projectConfig.definitions.find(_.`type` == "cpu.arm.a53").get
     cpuDefinition match {
       case cpu: CpuDefinitionConfig =>
         cpu.`type` shouldBe "cpu.arm.a53"
@@ -199,7 +194,7 @@ class ComponentParserTest
     }
     
     // Check RAM definition
-    val ramDefinition = projectConfig.definitions.find(_.name == "MainMemory").get
+    val ramDefinition = projectConfig.definitions.find(_.`type` == "ram.sram.main").get
     ramDefinition match {
       case ram: RamDefinitionConfig =>
         ram.`type` shouldBe "ram.sram.main"

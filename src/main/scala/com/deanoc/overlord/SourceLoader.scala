@@ -103,13 +103,12 @@ object SourceLoader extends Logging {
    *         Map[String, Any] for Inline.
    */
   def loadSource[L: io.circe.Decoder, T](sourceConfig: SourceConfig): Either[String, T] = {
+  try {
     sourceConfig.`type` match {
       case SourceType.Git =>
         sourceConfig.url match {
           case Some(url) =>
-            // For Git, we need to know which file in the repo to load.
-            // Assuming the path field in SourceConfig can specify this,
-            // otherwise default to "catalog.yaml".
+            // use path as the filename if provided, otherwise default to "catalog.yaml"
             val filePathInRepo = sourceConfig.path.getOrElse("catalog.yaml")
             loadFromGit(url, filePathInRepo)
           case None => Left("Git source type requires a url.")
@@ -137,5 +136,10 @@ object SourceLoader extends Logging {
         }
       case null => Left(s"Unknown source type: ${SourceType.toString(sourceConfig.`type`)}")
     }
+  } catch {
+    case ex: Exception =>
+      error(s"An error occurred while processing ${sourceConfig}: ${ex.getMessage}")
+      throw ex
   }
+}
 }

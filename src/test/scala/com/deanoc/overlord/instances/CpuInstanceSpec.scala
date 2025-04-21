@@ -161,7 +161,6 @@ class CpuInstanceSpec
 
     // Create a type-safe CpuConfig
     val cpuConfig = CpuDefinitionConfig(
-      name = "arm_cpu",
       `type` = "cpu.arm.test",
       triple = "arm-none-eabi",
       core_count = 2,

@@ -36,17 +36,6 @@ object HardwareDefinition {
     val configMap: Map[String, Variant] = config.attributes.map { case (k, v) =>
       k -> Utils.toVariant(v) // Convert Any to Variant
     }
-
-    // Filter out reserved keys from the config map to extract attributes
-    val attribs = configMap.filter(a =>
-      a._1 match {
-        case "type" | "software" | "gateware" | "hardware" | "ports" |
-            "registers" | "drivers" =>
-          false
-        case _ => true
-      }
-    )
-
     // Extract register definitions from config map
     val registers: Seq[Variant] = Utils.lookupArray(configMap, "registers").toSeq
 

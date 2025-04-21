@@ -155,7 +155,43 @@ object SourceConfig {
     }
   }
 }
+case class FieldConfig(
+  bits: String, // Bit range "high:low"
+  name: String, // Field identifier
+  `type`: String, // Access type: raz/rw/ro/wo/mixed
+  shortdesc: Option[String] = None, // Brief functional description
+  longdesc: Option[String] = None // Detailed technical documentation
+)
 
+object FieldConfig {
+  implicit val decoder: Decoder[FieldConfig] = deriveDecoder[FieldConfig]
+}
+
+case class RegisterConfig(
+  default: String, // Power-on value (e.g., "0x00000000")
+  description: String, // Functional purpose
+  field: List[FieldConfig], // Bitfield definitions
+  name: String, // Register name (e.g., "MCU_RESET")
+  offset: String, // Address offset from bank base
+  `type`: String, // Access type: mixed/rw/ro/wo
+  width: String // Bit width (e.g., "32")
+)
+
+object RegisterConfig {
+  implicit val decoder: Decoder[RegisterConfig] = new Decoder[RegisterConfig] {
+    def apply(c: HCursor): Decoder.Result[RegisterConfig] = {
+      for {
+        default <- c.downField("default").as[String]
+        description <- c.downField("description").as[String]
+        field <- c.downField("field").as[List[FieldConfig]]
+        name <- c.downField("name").as[String]
+        offset <- c.downField("offset").as[String]
+        `type` <- c.downField("type").as[String]
+        width <- c.downField("width").as[String]
+      } yield RegisterConfig(default, description, field, name, offset, `type`, width)
+    }
+  }
+}
 case class InfoConfig(
   name: String = "",
   version: Option[String] = None,

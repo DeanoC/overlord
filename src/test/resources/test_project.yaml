@@ -114,19 +114,16 @@ connections:
     value: "0x00000000"
     
 definitions:
-  - name: "Cortex-A53"
-    type: "cpu.arm.a53"
+  - type: "cpu.arm.a53"
     core_count: 4
     triple: "aarch64-none-elf"
   
-  - name: "MainMemory"
-    type: "ram.sram.main"
+  - type: "ram.sram.main"
     ranges:
       - address: "0x80000000"
         size: "0x40000000"
       - address: "0xC0000000" 
         size: "0x20000000"
   
-  - name: "SystemClock"
-    type: "clock.system.100mhz"
+  - type: "clock.system.100mhz"
     frequency: "100MHz"

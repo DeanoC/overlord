@@ -13,28 +13,23 @@ catalogs:
 
 # Hardware component definitions
 definitions:
-  - name: "Cortex-A53"
-    type: "cpu"
+  - type: "cpu.arm.test"
     core_count: 4
     triple: "aarch64-none-elf"
   
-  - name: "MainMemory"
-    type: "ram"
+  - type: "ram.ddr.test"
     ranges:
       - address: "0x80000000"
         size: "0x40000000"
       - address: "0xC0000000"
         size: "0x20000000"
   
-  - name: "SystemClock"
-    type: "clock"
+  - type: "clock.test.100mhz"
     frequency: "100MHz"
 
-  - name: "GPIO"
-    type: "io"
+  - type: "io.gpio.test"
     visible_to_software: true
   
-  - name: "ControlPins"
-    type: "pingroup"
+  - type: "pingroup.test.test"
     pins: ["reset", "boot", "power"]
     direction: "output"
