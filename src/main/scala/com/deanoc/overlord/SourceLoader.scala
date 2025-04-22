@@ -24,14 +24,14 @@ object SourceLoader extends Logging {
       filePath: String = "catalog.yaml"
   ): Either[String, T] = {
     val catalogsDir = ConfigPaths.projectPath.resolve("catalogs")
-    if (!Files.exists(catalogsDir) && !GlobalState.isReadOnly) {
+    if (!Files.exists(catalogsDir) && GlobalState.isProjectGenerating) {
       Files.createDirectories(catalogsDir)
     }
 
     val cloneFolderName = url.split('/').last.replaceAll(".git$", "")
     val repoPath = catalogsDir.resolve(cloneFolderName)
 
-    if (!Files.exists(repoPath) && !GlobalState.isReadOnly) {
+    if (!Files.exists(repoPath) && GlobalState.isProjectGenerating) {
       info(s"Cloning repository from $url to $repoPath")
       val cloneCommand = s"git clone $url ${repoPath.toAbsolutePath}".!
       if (cloneCommand != 0) {
@@ -45,11 +45,19 @@ object SourceLoader extends Logging {
         }
       }
     } else {
-      if(!GlobalState.isReadOnly) {
-        info(s"Repository already exists at $repoPath, skipping clone.")
+      if(!GlobalState.isProjectReadOnly) {
+        if(GlobalState.isProjectUpdating) {
+          info(s"Updating repository at $repoPath")
+          val updateCommand = s"git -C ${repoPath.toAbsolutePath} pull".!
+          if (updateCommand != 0) {
+            return Left(s"Failed to update repository at $repoPath")
+          }
+        } else {
+          info(s"Repository already exists at $repoPath, skipping clone.")
+        }
       } else {
         if (!Files.exists(repoPath)) {
-          error(s"Repository does not exist at $repoPath, cannot load in read-only mode.")
+          error(s"Repository does not exist at $repoPath, generate required to fetch it.")
           return Left(s"Repository does not exist at $repoPath")
         }
       } 

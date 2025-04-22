@@ -10,7 +10,7 @@ object ProjectCreateHandler extends CommandHandler {
     val templateNameOpt = config.templateName
     val projectNameOpt = config.projectName
 
-    GlobalState.allowWrites()
+    GlobalState.setProjectToGenerateMode()
 
     (templateNameOpt, projectNameOpt) match {
       case (Some(templateName), Some(projectName)) =>

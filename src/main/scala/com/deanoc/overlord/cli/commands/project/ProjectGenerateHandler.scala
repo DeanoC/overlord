@@ -11,7 +11,7 @@ object ProjectGenerateHandler extends CommandHandler {
   override def execute(config: CliConfig): Boolean = {
     val projectNameOpt = config.projectName
 
-    GlobalState.allowWrites()
+    GlobalState.setProjectToGenerateMode()
 
     projectNameOpt match {
       case Some(projectPath) =>
