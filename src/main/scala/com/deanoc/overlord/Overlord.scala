@@ -13,12 +13,13 @@ import com.deanoc.overlord.utils.{
   StringV,
   Logging
 }
-import com.deanoc.overlord.definitions.{GatewareDefinitionTrait, SoftwareDefinitionTrait}
+import com.deanoc.overlord.definitions.{GatewareDefinition, SoftwareDefinitionTrait}
 import com.deanoc.overlord.definitions.DefinitionType
 
 import scala.collection.mutable
 import scala.reflect.ClassTag
 import scala.util.boundary, boundary.break
+import com.deanoc.overlord.definitions.GatewareDefinition
 
 /** Represents a project in the Overlord system, containing instances,
   * connections, constants, and more. Provides utility methods for managing and
@@ -95,7 +96,7 @@ case class Overlord(
     .map(_.asInstanceOf[ClockInstance])
 
   lazy val gatewares: Seq[ChipInstance] =
-    flatChipChildren.filter(_.definition.isInstanceOf[GatewareDefinitionTrait])
+    flatChipChildren.filter(_.definition.isInstanceOf[GatewareDefinition])
 
   lazy val libraries: Seq[LibraryInstance] = flatSoftwareChildren
     .filter(_.isInstanceOf[LibraryInstance])

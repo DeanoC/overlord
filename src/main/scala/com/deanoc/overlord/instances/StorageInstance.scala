@@ -1,11 +1,11 @@
 package com.deanoc.overlord.instances
 
 import com.deanoc.overlord.utils.Variant
-import com.deanoc.overlord.definitions.ChipDefinitionTrait
+import com.deanoc.overlord.definitions.HardwareDefinition
 
-case class StorageInstance(name: String, private val defi: ChipDefinitionTrait)
+case class StorageInstance(name: String, private val defi: HardwareDefinition)
     extends ChipInstance {
-  override def definition: ChipDefinitionTrait = defi
+  override def definition: HardwareDefinition = defi
 
   override def isVisibleToSoftware: Boolean = true
 
@@ -14,7 +14,7 @@ case class StorageInstance(name: String, private val defi: ChipDefinitionTrait)
 object StorageInstance {
   def apply(
       name: String, // Keep name as it's part of InstanceTrait
-      definition: ChipDefinitionTrait,
+      definition: HardwareDefinition,
       config: Map[String, Any] // Accept generic Map[String, Any] for config
   ): Either[String, StorageInstance] = {
     val storage = StorageInstance(name, definition)

@@ -39,7 +39,7 @@ object SourceLoader extends Logging {
       } else {
         val targetFile = repoPath.resolve(filePath)
         if (Files.exists(targetFile)) {
-          loadFromFile[L, T](filePath)
+          loadFromFile[L, T](repoPath.resolve(filePath).toString)
         } else {
           Left(s"File '$filePath' not found in cloned repository at $repoPath")
         }
@@ -49,7 +49,7 @@ object SourceLoader extends Logging {
       // Optionally, add logic to pull latest changes here
       val targetFile = repoPath.resolve(filePath)
       if (Files.exists(targetFile)) {
-        loadFromFile[L, T](filePath)
+        loadFromFile[L, T](repoPath.resolve(filePath).toString)
       } else {
         Left(s"File '$filePath' not found in existing repository at $repoPath")
       }

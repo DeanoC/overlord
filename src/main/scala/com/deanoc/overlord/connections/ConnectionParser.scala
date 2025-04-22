@@ -3,13 +3,8 @@ package com.deanoc.overlord.connections
 import com.deanoc.overlord._
 import com.deanoc.overlord.connections.ConnectionDirection
 import com.deanoc.overlord.utils.{Utils, Variant, Logging, StringV}
-import com.deanoc.overlord.hardware.{
-  Port,
-  BitsDesc,
-  InWireDirection,
-  OutWireDirection,
-  InOutWireDirection
-}
+import com.deanoc.overlord.config.BitsDesc
+import com.deanoc.overlord.hardware.Port
 import com.deanoc.overlord.interfaces._
 import com.deanoc.overlord.instances.{
   ChipInstance,
@@ -18,6 +13,7 @@ import com.deanoc.overlord.instances.{
 }
 import com.deanoc.overlord.connections.ConnectionTypes.{BusName}
 import com.deanoc.overlord.config._
+import com.deanoc.overlord.config.WireDirection
 import io.circe.{Json, JsonObject}
 
 /** Module containing parsers for various connection types.
@@ -484,10 +480,10 @@ object ConnectionParser extends Logging {
       else if (fil.isPin) {
         fil.instance.asInstanceOf[PinGroupInstance].constraint.ports.head
       } else if (fil.isClock) {
-        Port(fil.fullName, BitsDesc(1), InWireDirection())
+        Port(fil.fullName, BitsDesc(1), WireDirection.Input)
       } else {
         if (fil.isGateware) error(s"${fil.fullName} unable to get port")
-        Port(fil.fullName, BitsDesc(1), InWireDirection())
+        Port(fil.fullName, BitsDesc(1), WireDirection.Input)
       }
     }
     val sp = {
@@ -495,19 +491,19 @@ object ConnectionParser extends Logging {
       else if (sil.isPin) {
         sil.instance.asInstanceOf[PinGroupInstance].constraint.ports.head
       } else if (sil.isClock) {
-        Port(sil.fullName, BitsDesc(1), OutWireDirection())
+        Port(sil.fullName, BitsDesc(1), WireDirection.Output)
       } else {
         if (sil.isGateware) error(s"${sil.fullName} unable to get port")
-        Port(sil.fullName, fp.width, InWireDirection())
+        Port(sil.fullName, fp.width, WireDirection.Input)
       }
     }
 
     var firstDirection = fp.direction
     var secondDirection = sp.direction
 
-    if (fp.direction != InOutWireDirection()) {
-      if (sp.direction == InOutWireDirection()) secondDirection = fp.direction
-    } else if (sp.direction != InOutWireDirection())
+    if (fp.direction != WireDirection.InOut) {
+      if (sp.direction == WireDirection.InOut) secondDirection = fp.direction
+    } else if (sp.direction != WireDirection.InOut)
       firstDirection = sp.direction
 
     val fport = fp.copy(direction = firstDirection)

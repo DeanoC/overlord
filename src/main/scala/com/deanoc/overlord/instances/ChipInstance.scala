@@ -5,7 +5,7 @@ import com.deanoc.overlord.hardware.{Port, RegisterBank, Registers}
 import com.deanoc.overlord.{
   QueryInterface
 }
-import com.deanoc.overlord.definitions.{ChipDefinitionTrait, GatewareDefinitionTrait, HardwareDefinitionTrait}
+import com.deanoc.overlord.definitions.{HardwareDefinition, GatewareDefinition}
 import com.deanoc.overlord.interfaces.{
   PortsLike,
   RegisterBankLike,
@@ -18,13 +18,14 @@ import com.deanoc.overlord.interfaces._
 
 import scala.collection.mutable
 import scala.reflect.ClassTag
+import com.deanoc.overlord.definitions.GatewareDefinition
 
 trait ChipInstance
     extends InstanceTrait
     with PortsLike
     with RegisterBankLike
     with MultiBusLike {
-  override def definition: ChipDefinitionTrait
+  override def definition: HardwareDefinition
 
   var moduleName: String = name
   lazy val instanceNumber: Int = Utils.lookupInt(attributes, "instance", 0)
@@ -81,9 +82,9 @@ trait ChipInstance
   private val buses: Seq[Bus] =
     busSpecs.map(Bus(this, name, definition.config.attributesAsVariant, _)) 
 
-  def isGateware: Boolean = definition.isInstanceOf[GatewareDefinitionTrait]
+  def isGateware: Boolean = definition.isInstanceOf[GatewareDefinition]
 
-  def isHardware: Boolean = definition.isInstanceOf[HardwareDefinitionTrait]
+  def isHardware: Boolean = definition.isInstanceOf[HardwareDefinition]
 
   def mergeParameterKey(key: String): Unit = instanceParameterKeys += key
 

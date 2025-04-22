@@ -1,7 +1,7 @@
 package com.deanoc.overlord.definitions
 
 import com.deanoc.overlord.actions.ActionsFile
-import com.deanoc.overlord.hardware.{Port, Ports}
+import com.deanoc.overlord.hardware.Port
 import com.deanoc.overlord.utils.{Utils, Variant}
 import com.deanoc.overlord.utils.Utils.VariantTable
 import com.deanoc.overlord.{Overlord}
@@ -14,7 +14,7 @@ import com.deanoc.overlord.config.GatewareConfig
 /** Represents a gateware definition with associated metadata, ports, registers, and parameters.
   *
   * @param defType
-  *   The type of the definition.
+  *   The type of the definition.``
   * @param sourcePath
   *   The source path of the definition.
   * @param attributes
@@ -44,4 +44,4 @@ case class GatewareDefinition(
     gatewareConfig: GatewareConfig
 //    parameters: Map[String, Variant],
 //    actionsFile: ActionsFile
-) extends GatewareDefinitionTrait {}
+) extends HardwareDefinition {}

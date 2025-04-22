@@ -1,7 +1,7 @@
 package com.deanoc.overlord.cli
 
 /** Configuration parsed from command line arguments */
-case class Config(
+case class CliConfig(
   // Main command and subcommand
   command: Option[String] = None,
   subCommand: Option[String] = None,

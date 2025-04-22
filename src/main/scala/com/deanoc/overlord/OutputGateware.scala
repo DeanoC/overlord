@@ -10,8 +10,9 @@ import com.deanoc.overlord.instances.{ChipInstance, Container}
 import com.deanoc.overlord.interfaces.UnconnectedLike
 import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.utils._
-import definitions.GatewareDefinitionTrait
+import definitions.GatewareDefinition
 import com.deanoc.overlord.config.ConfigPaths
+import com.deanoc.overlord.definitions.GatewareDefinition
 object OutputGateware {
   def apply(
       top: Container,
@@ -36,7 +37,7 @@ object OutputGateware {
       phase: Int
   ): Unit = {
     // Get the gateware definition with explicit type casting
-    val gateware = instance.definition.asInstanceOf[GatewareDefinitionTrait]
+    val gateware = instance.definition.asInstanceOf[GatewareDefinition]
 
     /* TODO: Process actions
       

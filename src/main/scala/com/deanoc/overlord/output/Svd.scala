@@ -1,6 +1,7 @@
 package com.deanoc.overlord.output
 
-import com.deanoc.overlord.hardware.{BitsDesc, Register}
+import com.deanoc.overlord.config.BitsDesc
+import com.deanoc.overlord.hardware.Register
 import com.deanoc.overlord.utils.Utils
 import com.deanoc.overlord.instances.{ChipInstance, CpuInstance}
 import com.deanoc.overlord._

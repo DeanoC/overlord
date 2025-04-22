@@ -1,7 +1,7 @@
 package com.deanoc.overlord.instances
 
 import com.deanoc.overlord.utils.{Utils, Variant}
-import com.deanoc.overlord.definitions.ChipDefinitionTrait
+import com.deanoc.overlord.definitions.HardwareDefinition
 import com.deanoc.overlord.config.CpuDefinitionConfig
 
 import com.deanoc.overlord.interfaces.{MultiBusLike, SupplierBusLike}
@@ -12,24 +12,21 @@ import com.deanoc.overlord.utils.Logging
 
 case class CpuInstance(
     name: String,
-    override val definition: ChipDefinitionTrait
+    override val definition: HardwareDefinition
 ) extends ChipInstance
     with MultiBusLike {
 
   lazy val cpuConfig = definition.config.asInstanceOf[CpuDefinitionConfig]
-  lazy val triple: String = cpuConfig.triple // Use triple from the specific config
-  lazy val maxAtomicWidth: Int =
-    Utils.lookupInt(attributes, "max_atomic_width", 0)
-
-  lazy val width: Int = Utils.lookupInt(attributes, "width", 32)
-  lazy val maxBitOpTypeWidth: Int =
-    Utils.lookupInt(attributes, "max_bitop_type_width", 32)
+  lazy val triple: String = cpuConfig.triple
+  lazy val maxAtomicWidth: Int = cpuConfig.max_atomic_width
+  lazy val width: Int = cpuConfig.width
+  lazy val maxBitOpTypeWidth: Int = cpuConfig.max_bitop_type_width
   lazy val sanitizedTriple: String = triple.replace("-", "_")
-  lazy val cpuCount: Int = cpuConfig.core_count // Use core_count from the specific config
+  lazy val cpuCount: Int = cpuConfig.core_count
   lazy val host: Boolean = definition.defType.ident.last == "host"
-  lazy val cpuType: String =
-    if (host) "host" else definition.defType.ident(1) // cpu.$CpuType.blah.blash
-  lazy val gccFlags: String = Utils.lookupString(attributes, "gcc_flags", "")
+  lazy val cpuType: String = if (host) "host" else definition.defType.ident(1)
+  lazy val gccFlags: String = cpuConfig.gcc_flags
+
   private val busSpecs: Seq[BusSpec] = {
     val attrs = definition.config.attributesAsVariant
     if (!attrs.contains("buses")) Seq()

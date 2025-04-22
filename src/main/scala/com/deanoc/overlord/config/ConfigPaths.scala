@@ -20,7 +20,7 @@ object ConfigPaths extends Logging {
   }
 
   def setupPaths(projectPath: Path): Unit = {
-    baseProjectPath = projectPath.toAbsolutePath
+    baseProjectPath = if (projectPath.toFile.isFile) projectPath.toAbsolutePath.getParent else projectPath.toAbsolutePath
     resetPaths()
 
     catalogPathStack.push(projectPath)

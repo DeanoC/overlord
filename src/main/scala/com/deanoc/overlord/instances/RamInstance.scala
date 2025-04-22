@@ -1,7 +1,7 @@
 package com.deanoc.overlord.instances
 
 import com.deanoc.overlord.utils.{Utils, Variant}
-import com.deanoc.overlord.definitions.ChipDefinitionTrait
+import com.deanoc.overlord.definitions.HardwareDefinition
 import com.deanoc.overlord.interfaces.RamLike
 
 import scala.reflect.ClassTag
@@ -10,7 +10,7 @@ import com.deanoc.overlord.config.RamDefinitionConfig
 
 case class RamInstance(
     name: String,
-    override val definition: ChipDefinitionTrait,
+    override val definition: HardwareDefinition,
 ) extends ChipInstance
     with RamLike {
   private val cpuRegEx = "\\s*,\\s*".r

@@ -1,6 +1,6 @@
 package com.deanoc.overlord.connections
 
-import com.deanoc.overlord.hardware.InWireDirection
+import com.deanoc.overlord.config.WireDirection
 import com.deanoc.overlord.instances.ChipInstance
 import com.deanoc.overlord.DistanceMatrix
 import com.deanoc.overlord.instances.{ClockInstance, PinGroupInstance}
@@ -153,7 +153,7 @@ object Wires:
         yield els match
           case arr
               if arr.length == 1 && sl.port.exists(
-                _.direction == InWireDirection()
+                _.direction == WireDirection.Input
               ) =>
             sTmpWires += (arr(0) -> (pr, sl))
             None

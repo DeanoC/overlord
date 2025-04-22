@@ -6,16 +6,14 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import com.deanoc.overlord._
 import com.deanoc.overlord.utils.SilentLogger
-import com.deanoc.overlord.hardware.{
-  Port,
-  BitsDesc,
-  InWireDirection,
-  OutWireDirection
-}
+import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.config.BitsDesc
+
+import com.deanoc.overlord.config.WireDirection
 import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
 import org.mockito.Mockito._
 import com.deanoc.overlord.connections.ConnectedExtensions._
-import com.deanoc.overlord.definitions.HardwareDefinitionTrait
+import com.deanoc.overlord.definitions.HardwareDefinition
 
 /** Test suite for the ConnectedLogical class. This test suite focuses on
   * establishing a baseline for the behavior of logical connections before
@@ -28,7 +26,7 @@ class ConnectedLogicalSpec
     with SilentLogger {
 
   // Create mock definitions and instances for testing
-  val mockHardwareDef = mock[HardwareDefinitionTrait]
+  val mockHardwareDef = mock[HardwareDefinition]
 
   // Test basic ConnectedLogical properties
   "ConnectedLogical" should "store and retrieve basic properties correctly" in {

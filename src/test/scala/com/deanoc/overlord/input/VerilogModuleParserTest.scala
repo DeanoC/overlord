@@ -3,7 +3,7 @@ package com.deanoc.overlord.input
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import java.nio.file.{Files, Path, Paths}
-import com.deanoc.overlord.hardware.BitsDesc
+import com.deanoc.overlord.config.BitsDesc
 import java.io.File
 import scala.jdk.CollectionConverters._
 

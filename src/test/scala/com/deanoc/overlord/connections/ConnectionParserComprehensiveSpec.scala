@@ -6,13 +6,10 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import com.deanoc.overlord._
 import com.deanoc.overlord.utils.{Utils, Variant, SilentLogger, ArrayV}
-import com.deanoc.overlord.hardware.{
-  Port,
-  BitsDesc,
-  InWireDirection,
-  OutWireDirection,
-  InOutWireDirection
-}
+import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.config.BitsDesc
+
+import com.deanoc.overlord.config.WireDirection
 import com.deanoc.overlord.instances.{
   ChipInstance,
   InstanceTrait,
@@ -21,7 +18,8 @@ import com.deanoc.overlord.instances.{
 }
 import org.mockito.Mockito._
 import com.deanoc.overlord.connections.TestUtils._
-import com.deanoc.overlord.definitions.{GatewareDefinitionTrait, HardwareDefinitionTrait}
+import com.deanoc.overlord.definitions.HardwareDefinition
+import com.deanoc.overlord.definitions.GatewareDefinition
 
 /** Comprehensive test suite for the ConnectionParser object. This test suite
   * focuses on all aspects of the ConnectionParser's functionality to establish
@@ -432,14 +430,14 @@ class ConnectionParserComprehensiveSpec
     // Create mock instances and ports
     val chipInstance1 = mock[ChipInstance]
     val chipInstance2 = mock[ChipInstance]
-    val gatewareDef = mock[GatewareDefinitionTrait]
-    val hardwareDef = mock[HardwareDefinitionTrait]
+    val gatewareDef = mock[GatewareDefinition]
+    val hardwareDef = mock[HardwareDefinition]
 
     when(chipInstance1.definition).thenReturn(gatewareDef)
     when(chipInstance2.definition).thenReturn(hardwareDef)
 
-    val inPort = Port("in_port", BitsDesc(8), InWireDirection())
-    val outPort = Port("out_port", BitsDesc(8), OutWireDirection())
+    val inPort = Port("in_port", BitsDesc(8), WireDirection.Input)
+    val outPort = Port("out_port", BitsDesc(8), WireDirection.Output)
 
     // Create instance locations
     val srcLoc = InstanceLoc(chipInstance1, Some(inPort), "source")
@@ -457,10 +455,10 @@ class ConnectionParserComprehensiveSpec
     result.connectionPriority shouldBe ConnectionPriority.Explicit
     result.first.get.instance shouldBe chipInstance1
     result.first.get.port.get.name shouldBe "in_port"
-    result.first.get.port.get.direction shouldBe a[InWireDirection]
+    result.first.get.port.get.direction shouldBe WireDirection.Input
     result.second.get.instance shouldBe chipInstance2
     result.second.get.port.get.name shouldBe "out_port"
-    result.second.get.port.get.direction shouldBe a[OutWireDirection]
+    result.second.get.port.get.direction shouldBe WireDirection.Output
     (result.direction == ConnectionDirection.FirstToSecond) shouldBe true
   }
 
@@ -468,14 +466,14 @@ class ConnectionParserComprehensiveSpec
     // Create mock instances and ports
     val chipInstance1 = mock[ChipInstance]
     val chipInstance2 = mock[ChipInstance]
-    val hardwareDef = mock[HardwareDefinitionTrait]
+    val hardwareDef = mock[HardwareDefinition]
 
     when(chipInstance1.definition).thenReturn(hardwareDef)
     when(chipInstance2.definition).thenReturn(hardwareDef)
 
-    val inOutPort = Port("inout_port", BitsDesc(8), InOutWireDirection())
-    val inPort = Port("in_port", BitsDesc(8), InWireDirection())
-    val outPort = Port("out_port", BitsDesc(8), OutWireDirection())
+    val inOutPort = Port("inout_port", BitsDesc(8), WireDirection.InOut)
+    val inPort = Port("in_port", BitsDesc(8), WireDirection.Input)
+    val outPort = Port("out_port", BitsDesc(8), WireDirection.Output)
 
     // Test InOutWireDirection with InWireDirection
     val srcLoc1 = InstanceLoc(chipInstance1, Some(inOutPort), "source1")
@@ -487,8 +485,8 @@ class ConnectionParserComprehensiveSpec
       destLoc1
     )
 
-    result1.first.get.port.get.direction shouldBe a[InWireDirection]
-    result1.second.get.port.get.direction shouldBe a[InWireDirection]
+    result1.first.get.port.get.direction shouldBe WireDirection.Input
+    result1.second.get.port.get.direction shouldBe WireDirection.Input
 
     // Test InOutWireDirection with OutWireDirection
     val srcLoc2 = InstanceLoc(chipInstance1, Some(inOutPort), "source2")
@@ -500,8 +498,8 @@ class ConnectionParserComprehensiveSpec
       destLoc2
     )
 
-    result2.first.get.port.get.direction shouldBe a[OutWireDirection]
-    result2.second.get.port.get.direction shouldBe a[OutWireDirection]
+    result2.first.get.port.get.direction shouldBe WireDirection.Output
+    result2.second.get.port.get.direction shouldBe WireDirection.Output
 
     // Test both InOutWireDirection
     val srcLoc3 = InstanceLoc(chipInstance1, Some(inOutPort), "source3")
@@ -513,7 +511,7 @@ class ConnectionParserComprehensiveSpec
       destLoc3
     )
 
-    result3.first.get.port.get.direction shouldBe a[InOutWireDirection]
-    result3.second.get.port.get.direction shouldBe a[InOutWireDirection]
+    result3.first.get.port.get.direction shouldBe WireDirection.InOut
+    result3.second.get.port.get.direction shouldBe WireDirection.InOut
   }
 }

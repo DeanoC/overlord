@@ -18,21 +18,14 @@ class DefinitionCatalog extends Logging {
   type value = DefinitionTrait
   type keyStore = mutable.HashMap[key, value]
 
-  val catalogs: keyStore = mutable.HashMap()
+  val definitions: keyStore = mutable.HashMap()
 
-  def printDefinitionCatalogs(): Unit = {
-    info("Definition Catalogs:")
-    for { k <- catalogs.keys } {
-      info(s"k  ${k.ident.mkString(".")} ${k.getClass}")
-    }
-  }
   def findDefinition(name: String): Option[value] = {
     val ident = name.split('.').toList
     var defi: Option[value] = None
 
     for {
-      k <- catalogs.keys
-      if (k.isInstanceOf[DefinitionType])
+      k <- definitions.keys
       if k.ident.length >= ident.length
     } {
       var curMatch = 0
@@ -44,7 +37,7 @@ class DefinitionCatalog extends Logging {
       } curMatch += 1
 
       if (curMatch >= ident.length) {
-        defi = Some(catalogs(k))
+        defi = Some(definitions(k))
       }
     }
 
@@ -56,8 +49,7 @@ class DefinitionCatalog extends Logging {
     var defi: Option[value] = None
 
     for {
-      k <- catalogs.keys
-      if (k.isInstanceOf[DefinitionType])
+      k <- definitions.keys
       if k.ident.length >= defType.ident.length
     } {
       var curMatch = 0
@@ -72,7 +64,7 @@ class DefinitionCatalog extends Logging {
         curMatch > bestMatch &&
         curMatch >= defType.ident.length
       ) {
-        defi = Some(catalogs(k))
+        defi = Some(definitions(k))
         bestMatch = curMatch
       }
     }
@@ -86,18 +78,16 @@ class DefinitionCatalog extends Logging {
     val withType : Map[DefinitionType, DefinitionTrait] = incoming.map { t =>
       DefinitionType(t.defType.ident.mkString(".")) -> t
     }.toMap
-      
-      //incoming.map(_.defType.ident.mkString(".")).toArray
 
     // check for duplicates
-    for (i <- catalogs.keys) {
+    for (i <- definitions.keys) {
       if (withType.contains(i)) {
         warn(
           s"Duplicate definition name ${i.ident.mkString(".")} detected"
         )
       }
     }
-    catalogs ++= withType
+    definitions ++= withType
   }
   
   /**
@@ -108,7 +98,7 @@ class DefinitionCatalog extends Logging {
    */
   def addComponentDefinition(component: Component): DefinitionCatalog = {
     val componentDef = ComponentDefinition(component)
-    catalogs += (componentDef.defType -> componentDef)
+    definitions += (componentDef.defType -> componentDef)
     this
   }
 }

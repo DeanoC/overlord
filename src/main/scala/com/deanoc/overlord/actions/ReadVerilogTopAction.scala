@@ -9,7 +9,8 @@ import com.deanoc.overlord.input.{
   VerilogPort,
   VerilogModuleParser
 }
-import com.deanoc.overlord.hardware.{Port, WireDirection}
+import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.config.{BitsDesc, WireDirection}
 import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
 

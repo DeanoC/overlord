@@ -121,7 +121,7 @@ object HelpTextManager {
     }
   }
 
-  def getFocusedUsage(config: Config): String = {
+  def getFocusedUsage(config: CliConfig): String = {
     (config.command, config.subCommand) match {
       case (Some(cmd), Some(sub)) =>
         if (CommandLineParser.commandExists(cmd)) {

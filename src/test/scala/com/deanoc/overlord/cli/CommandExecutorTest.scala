@@ -2,7 +2,6 @@ package com.deanoc.overlord.cli
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
-
 /**
  * Test for CommandExecutor to ensure it correctly displays help text
  * for various command scenarios.
@@ -27,7 +26,7 @@ class CommandExecutorTest extends AnyFlatSpec with Matchers {
   // Helper function to test help output for a command or subcommand
   def testHelpOutput(command: String, subcommand: Option[String], options: Map[String, String] = Map(), expectedReturnValue: Boolean = false): Unit = {
     val actual = withOutputCapture {
-      val config = Config(
+      val config = CliConfig(
         command = Some(command),
         subCommand = subcommand,
         options = options
@@ -79,7 +78,7 @@ class CommandExecutorTest extends AnyFlatSpec with Matchers {
 
   it should "display error for create with an invalid subcommand" in {
     val actual = withOutputCapture {
-      val config = Config(
+      val config = CliConfig(
         command = Some("create"),
         subCommand = Some("invalid"),
         options = Map()

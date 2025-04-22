@@ -14,14 +14,11 @@ import com.deanoc.overlord.instances.{
   PinGroupInstance,
   ClockInstance
 }
-import com.deanoc.overlord.hardware.{
-  Port,
-  BitsDesc,
-  InWireDirection,
-  OutWireDirection,
-  InOutWireDirection
-}
-import com.deanoc.overlord.definitions.ChipDefinitionTrait
+import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.config.BitsDesc
+
+import com.deanoc.overlord.config.WireDirection
+import com.deanoc.overlord.definitions.HardwareDefinition
 
 /** Additional test suite for Wire class focusing on:
   *   1. Testing wire creation from different connection types 2. Testing
@@ -35,7 +32,7 @@ class WireAdditionalSpec
 
   "Wire" should "correctly identify pin and clock instances" in {
     // Create mock instances
-    val chipDef = mock[ChipDefinitionTrait]
+    val chipDef = mock[HardwareDefinition]
 
     val chipInstance = mock[ChipInstance]
     doReturn(chipDef).when(chipInstance).definition
@@ -72,7 +69,7 @@ class WireAdditionalSpec
 
   it should "handle wires with multiple end locations" in {
     // Create mock instances
-    val chipDef = mock[ChipDefinitionTrait]
+    val chipDef = mock[HardwareDefinition]
 
     val sourceInstance = mock[ChipInstance]
     doReturn(chipDef).when(sourceInstance).definition
@@ -113,7 +110,7 @@ class WireAdditionalSpec
 
   it should "handle wires with mixed end location types" in {
     // Create mock instances
-    val chipDef = mock[ChipDefinitionTrait]
+    val chipDef = mock[HardwareDefinition]
 
     val sourceInstance = mock[ChipInstance]
     doReturn(chipDef).when(sourceInstance).definition
@@ -153,7 +150,7 @@ class WireAdditionalSpec
 
   "Wires" should "handle complex routing scenarios" in {
     // Create mock instances
-    val chipDef = mock[ChipDefinitionTrait]
+    val chipDef = mock[HardwareDefinition]
 
     val sourceInstance = mock[ChipInstance]
     doReturn(chipDef).when(sourceInstance).definition
@@ -214,7 +211,7 @@ class WireAdditionalSpec
 
   it should "handle connections with different priorities correctly" in {
     // Create mock instances
-    val chipDef = mock[ChipDefinitionTrait]
+    val chipDef = mock[HardwareDefinition]
 
     val sourceInstance = mock[ChipInstance]
     doReturn(chipDef).when(sourceInstance).definition
@@ -291,7 +288,7 @@ class WireAdditionalSpec
 
   it should "handle connections with unknown width ports" in {
     // Create mock instances
-    val chipDef = mock[ChipDefinitionTrait]
+    val chipDef = mock[HardwareDefinition]
 
     val sourceInstance = mock[ChipInstance]
     doReturn(chipDef).when(sourceInstance).definition
@@ -304,12 +301,12 @@ class WireAdditionalSpec
     // Create ports with unknown width
     val sourcePort = mock[Port]
     doReturn("out").when(sourcePort).name
-    doReturn(OutWireDirection()).when(sourcePort).direction
+    doReturn(WireDirection.Output).when(sourcePort).direction
     doReturn(false).when(sourcePort).knownWidth
 
     val destPort = mock[Port]
     doReturn("in").when(destPort).name
-    doReturn(InWireDirection()).when(destPort).direction
+    doReturn(WireDirection.Input).when(destPort).direction
     doReturn(false).when(destPort).knownWidth
 
     // Create InstanceLoc objects

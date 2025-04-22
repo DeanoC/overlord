@@ -1,8 +1,9 @@
 package com.deanoc.overlord.connections
 import com.deanoc.overlord._
 
-import com.deanoc.overlord.hardware.{InOutWireDirection, Port}
+import com.deanoc.overlord.hardware.Port
 import com.deanoc.overlord.connections.ConnectionDirection
+import com.deanoc.overlord.config.WireDirection
 
 import com.deanoc.overlord.instances.ChipInstance
 import com.deanoc.overlord.interfaces.PortsLike
@@ -116,9 +117,9 @@ object ConnectedPortGroup {
     var firstDirection = fp.direction
     var secondDirection = sp.direction
 
-    if (fp.direction != InOutWireDirection()) {
-      if (sp.direction == InOutWireDirection()) secondDirection = fp.direction
-    } else if (sp.direction != InOutWireDirection())
+    if (fp.direction != WireDirection.InOut) {
+      if (sp.direction == WireDirection.InOut) secondDirection = fp.direction
+    } else if (sp.direction != WireDirection.InOut)
       firstDirection = sp.direction
 
     val fport = fp.copy(direction = firstDirection)

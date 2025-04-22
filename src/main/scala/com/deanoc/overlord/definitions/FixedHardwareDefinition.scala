@@ -31,4 +31,4 @@ case class FixedHardwareDefinition(
     ports: Map[String, Port],
     maxInstances: Int,
     registersV: Seq[Variant]
-) extends HardwareDefinitionTrait
+) extends HardwareDefinition

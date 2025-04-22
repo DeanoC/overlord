@@ -1,15 +1,15 @@
 package com.deanoc.overlord.instances
 
 import com.deanoc.overlord.utils.Variant
-import com.deanoc.overlord.definitions.ChipDefinitionTrait
+import com.deanoc.overlord.definitions.HardwareDefinition
 
-case class SwitchInstance(name: String, definition: ChipDefinitionTrait)
+case class SwitchInstance(name: String, definition: HardwareDefinition)
     extends ChipInstance {}
 
 object SwitchInstance {
   def apply(
       name: String, // Keep name as it's part of InstanceTrait
-      definition: ChipDefinitionTrait,
+      definition: HardwareDefinition,
       config: Map[String, Any] // Accept generic Map[String, Any] for config
   ): Either[String, SwitchInstance] = {
     val chip = SwitchInstance(name, definition)

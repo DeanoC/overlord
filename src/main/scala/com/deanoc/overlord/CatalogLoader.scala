@@ -22,13 +22,14 @@ object CatalogLoader extends Logging {
   // This is the main entry point for loading catalogs
   def processParsedCatalog(parsed: FileConfigBase): Seq[DefinitionTrait] = {
 
+    val defs = mutable.ArrayBuffer[DefinitionTrait]()
+
     info(s"Processing parsed catalogs ${parsed.catalogs.size}")
     parsed.catalogs.foreach { catSourceConfig =>
-      processCatalogSource(catSourceConfig)
+      defs ++= processCatalogSource(catSourceConfig)
     }
 
     info(s"Processing parsed definitions ${parsed.definitions.size}")
-    val defs = mutable.ArrayBuffer[DefinitionTrait]()
     parsed.definitions.foreach { definitionConfig =>
       Definition(definitionConfig) match {
         case Right(defn: DefinitionTrait) => 
@@ -36,6 +37,7 @@ object CatalogLoader extends Logging {
           defs += defn
         case Left(err) =>
           error(s"Error creating definition ${definitionConfig.`type`}: $err")
+          throw new Exception(s"Error creating definition ${definitionConfig.`type`}: $err")  
       }
     }
     defs.toSeq
@@ -46,8 +48,10 @@ object CatalogLoader extends Logging {
       sourceConfig: SourceConfig
   ): Seq[DefinitionTrait] = {
     info(s"Processing catalog from source: $sourceConfig")
-    SourceLoader.loadSource[CatalogFileConfig, Seq[DefinitionTrait]](sourceConfig) match {
-      case Right(content: Seq[DefinitionTrait]) => content
+    SourceLoader.loadSource[CatalogFileConfig, CatalogFileConfig](sourceConfig) match {
+      case Right(catalogConfig: CatalogFileConfig) => 
+        // Process the catalog config to extract definitions
+        processParsedCatalog(catalogConfig)
       case Left(err) =>
         error(s"Failed to load catalog from source ${sourceConfig.`type`}: $err")
         Seq.empty

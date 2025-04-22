@@ -15,19 +15,15 @@ import com.deanoc.overlord.connections.ConnectionTypes._
 // Import the new enum-based DefinitionType
 import com.deanoc.overlord.definitions.DefinitionType
 import com.deanoc.overlord.instances.{CpuInstance, RamInstance, ChipInstance, InstanceTrait}
-import com.deanoc.overlord.config.{CpuDefinitionConfig, RamDefinitionConfig, MemoryRangeConfig}
+import com.deanoc.overlord.config.{CpuDefinitionConfig, RamDefinitionConfig, MemoryRangeConfig, WireDirection}
 import com.deanoc.overlord.connections.InstanceLoc
 import com.deanoc.overlord.interfaces._
-import com.deanoc.overlord.hardware.{
-  Port,
-  BitsDesc,
-  InWireDirection,
-  OutWireDirection
-}
+import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.config.BitsDesc
 
 import scala.collection.mutable
 import scala.reflect.ClassTag
-import com.deanoc.overlord.definitions.HardwareDefinitionTrait
+import com.deanoc.overlord.definitions.HardwareDefinition
 import scala.util.Failure
 
 /** Extended test suite for UnconnectedBus class focusing on:

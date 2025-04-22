@@ -1,7 +1,7 @@
 package com.deanoc.overlord
 
 import com.deanoc.overlord.{CatalogLoader, ComponentParser}
-import com.deanoc.overlord.definitions.{DefinitionType, DefinitionTrait, SoftwareDefinitionTrait, Definition, HardwareDefinitionTrait}
+import com.deanoc.overlord.definitions.{DefinitionType, DefinitionTrait, SoftwareDefinitionTrait, Definition, HardwareDefinition}
 
 import com.deanoc.overlord.utils._ // Import all members from utils
 import com.deanoc.overlord.config._

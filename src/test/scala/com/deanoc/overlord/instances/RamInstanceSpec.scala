@@ -32,7 +32,7 @@ class RamInstanceSpec
 
   "RamInstance" should "be created with type-safe configuration" in {
     // Create a mock ChipDefinitionTrait
-    val mockDefinition = mock[ChipDefinitionTrait]
+    val mockDefinition = mock[HardwareDefinition]
     val mockDefType = mock[DefinitionType]
     val mockConfig = mock[RamDefinitionConfig]
 
@@ -84,7 +84,7 @@ class RamInstanceSpec
 
   it should "handle bus specifications correctly" in {
     // Create a mock ChipDefinitionTrait
-    val mockDefinition = mock[ChipDefinitionTrait]
+    val mockDefinition = mock[HardwareDefinition]
     val mockDefType = mock[DefinitionType]
     val mockConfig = mock[RamDefinitionConfig]
 
@@ -137,7 +137,7 @@ class RamInstanceSpec
 
   it should "calculate total memory size correctly" in {
     // Create a mock ChipDefinitionTrait
-    val mockDefinition = mock[ChipDefinitionTrait]
+    val mockDefinition = mock[HardwareDefinition]
     val mockDefType = mock[DefinitionType]
     val mockConfig = mock[RamDefinitionConfig]
 
@@ -180,7 +180,7 @@ class RamInstanceSpec
 
   it should "handle empty memory ranges gracefully" in {
     // Create a mock ChipDefinitionTrait
-    val mockDefinition = mock[ChipDefinitionTrait]
+    val mockDefinition = mock[HardwareDefinition]
     val mockDefType = mock[DefinitionType]
     val mockConfig = mock[RamDefinitionConfig]
 

@@ -6,12 +6,15 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import com.deanoc.overlord._
 import com.deanoc.overlord.utils.SilentLogger
-import com.deanoc.overlord.hardware.{Port, BitsDesc, InWireDirection, OutWireDirection}
+import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.config.BitsDesc
+
+import com.deanoc.overlord.config.WireDirection
 import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait, PinGroupInstance, ClockInstance}
 import org.mockito.Mockito._
 import org.mockito.Mockito
 import scala.collection.mutable
-import com.deanoc.overlord.definitions.ChipDefinitionTrait
+import com.deanoc.overlord.definitions.HardwareDefinition
 
 /**
  * Test suite for the Wire class and Wires object.
@@ -22,7 +25,7 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
   // Wire case class tests
   "Wire" should "correctly identify if start location is a pin or clock" in {
     // Create mock instances
-    val chipDef = mock[ChipDefinitionTrait]
+    val chipDef = mock[HardwareDefinition]
     
     val chipInstance = mock[ChipInstance]
     when(chipInstance.definition).thenReturn(chipDef)
@@ -51,7 +54,7 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
   
   it should "correctly find ending locations that are pins or clocks" in {
     // Create mock instances
-    val chipDef = mock[ChipDefinitionTrait]
+    val chipDef = mock[HardwareDefinition]
     
     val chipInstance = mock[ChipInstance]
     when(chipInstance.definition).thenReturn(chipDef)
@@ -85,7 +88,7 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
   // Wires object tests
   "Wires" should "create correct wires from connected instances" in {
     // Create mock instances and definitions
-    val chipDef = mock[ChipDefinitionTrait]
+    val chipDef = mock[HardwareDefinition]
     
     val chipInstance1 = mock[ChipInstance]
     when(chipInstance1.definition).thenReturn(chipDef)
@@ -100,8 +103,8 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
     when(pinInstance.name).thenReturn("pin")
     
     // Create ports with concrete Port implementations
-    val port1 = Port("port1", BitsDesc(8), InWireDirection())
-    val port2 = Port("port2", BitsDesc(8), OutWireDirection())
+    val port1 = Port("port1", BitsDesc(8), WireDirection.Input)
+    val port2 = Port("port2", BitsDesc(8), WireDirection.Output)
     
     // Create InstanceLocs
     val chipLoc1 = InstanceLoc(chipInstance1, Some(port1), "chip1")
@@ -140,7 +143,7 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
   
   it should "handle multi-hop connections correctly" in {
     // Create mock instances and definitions
-    val chipDef = mock[ChipDefinitionTrait]
+    val chipDef = mock[HardwareDefinition]
     
     val chipInstance1 = mock[ChipInstance]
     when(chipInstance1.definition).thenReturn(chipDef)
@@ -155,9 +158,9 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
     when(chipInstance3.name).thenReturn("chip3")
     
     // Create ports
-    val port1 = Port("port1", BitsDesc(8), InWireDirection())
-    val port2 = Port("port2", BitsDesc(8), OutWireDirection())
-    val port3 = Port("port3", BitsDesc(8), OutWireDirection())
+    val port1 = Port("port1", BitsDesc(8), WireDirection.Input)
+    val port2 = Port("port2", BitsDesc(8), WireDirection.Output)
+    val port3 = Port("port3", BitsDesc(8), WireDirection.Output)
     
     // Create InstanceLocs
     val chipLoc1 = InstanceLoc(chipInstance1, Some(port1), "chip1")
@@ -199,7 +202,7 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
   
   it should "handle fan-out connections correctly" in {
     // Create mock instances and definitions
-    val chipDef = mock[ChipDefinitionTrait]
+    val chipDef = mock[HardwareDefinition]
     
     val chipInstance1 = mock[ChipInstance]
     when(chipInstance1.definition).thenReturn(chipDef)
@@ -214,9 +217,9 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
     when(chipInstance3.name).thenReturn("chip3")
     
     // Create ports
-    val port1 = Port("port1", BitsDesc(8), OutWireDirection())
-    val port2 = Port("port2", BitsDesc(8), InWireDirection())
-    val port3 = Port("port3", BitsDesc(8), InWireDirection())
+    val port1 = Port("port1", BitsDesc(8), WireDirection.Output)
+    val port2 = Port("port2", BitsDesc(8), WireDirection.Input)
+    val port3 = Port("port3", BitsDesc(8), WireDirection.Input)
     
     // Create InstanceLocs
     val chipLoc1 = InstanceLoc(chipInstance1, Some(port1), "chip1")
@@ -269,7 +272,7 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
   
   it should "handle connections with different priorities" in {
     // Create mock instances and definitions
-    val chipDef = mock[ChipDefinitionTrait]
+    val chipDef = mock[HardwareDefinition]
     
     val chipInstance1 = mock[ChipInstance]
     when(chipInstance1.definition).thenReturn(chipDef)
@@ -280,8 +283,8 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
     when(chipInstance2.name).thenReturn("chip2")
     
     // Create ports
-    val port1 = Port("port1", BitsDesc(8), OutWireDirection())
-    val port2 = Port("port2", BitsDesc(8), InWireDirection())
+    val port1 = Port("port1", BitsDesc(8), WireDirection.Output)
+    val port2 = Port("port2", BitsDesc(8), WireDirection.Input)
     
     // Create InstanceLocs
     val chipLoc1 = InstanceLoc(chipInstance1, Some(port1), "chip1")
@@ -332,7 +335,7 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
   
   it should "handle port information correctly" in {
     // Create mock instances and definitions
-    val chipDef = mock[ChipDefinitionTrait]
+    val chipDef = mock[HardwareDefinition]
     
     val chipInstance1 = mock[ChipInstance]
     when(chipInstance1.definition).thenReturn(chipDef)
@@ -343,8 +346,8 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
     when(chipInstance2.name).thenReturn("chip2")
     
     // Create ports with different properties
-    val port1 = Port("port1", BitsDesc(8), OutWireDirection())
-    val port2 = Port("port2", BitsDesc(0), InWireDirection())
+    val port1 = Port("port1", BitsDesc(8), WireDirection.Output)
+    val port2 = Port("port2", BitsDesc(0), WireDirection.Input)
     
     // Create InstanceLocs
     val loc1 = InstanceLoc(chipInstance1, Some(port1), "chip1")
@@ -378,7 +381,7 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
   
   it should "handle empty or invalid routes" in {
     // Create mock instances and definitions
-    val chipDef = mock[ChipDefinitionTrait]
+    val chipDef = mock[HardwareDefinition]
     
     val chipInstance1 = mock[ChipInstance]
     when(chipInstance1.definition).thenReturn(chipDef)
@@ -389,8 +392,8 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
     when(chipInstance2.name).thenReturn("chip2")
     
     // Create ports
-    val port1 = Port("port1", BitsDesc(8), OutWireDirection())
-    val port2 = Port("port2", BitsDesc(8), InWireDirection())
+    val port1 = Port("port1", BitsDesc(8), WireDirection.Output)
+    val port2 = Port("port2", BitsDesc(8), WireDirection.Input)
     
     // Create InstanceLocs
     val chipLoc1 = InstanceLoc(chipInstance1, Some(port1), "chip1")

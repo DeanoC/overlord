@@ -15,7 +15,9 @@ import io.circe.HCursor
 import scala.quoted.*
 import scala.compiletime.{constValue, erasedValue}
 import scala.deriving.Mirror
-
+// Add this import near the top with your other imports
+import org.yaml.snakeyaml.nodes.MappingNode
+import scala.jdk.CollectionConverters._
 sealed trait Variant {
   def toYamlString: String
 
@@ -274,31 +276,65 @@ object Utils extends Logging {
   def parseYaml[T](
       yamlString: String
   )(implicit decoder: Decoder[T]): Either[String, T] = {
-    val json = parser.parse(yamlString) match {
-      case Right(parsedJson) => parsedJson
-      case Left(err) =>
-        return Left(s"Failed to parse YAML to JSON: ${err.getMessage}")
-    }
-
-    json.as[T] match {
-      case Right(config) => Right(config)
-      case Left(err) =>
-        val errorDetails = err match {
-          case decodingFailure: io.circe.DecodingFailure =>
-            val historyPath = decodingFailure.history.map {
-              case io.circe.CursorOp.DownField(field) => s"Field: '$field'"
-              case io.circe.CursorOp.DownArray        => "Array element"
-              case other                              => other.toString
-            }.mkString(" -> ")
-            s"""
-               |Decoding Failure:
-               |  Message: ${decodingFailure.message}
-               |  History: $historyPath
-               |""".stripMargin.trim
-          case null =>
-            s"Unexpected error: null"
+    // First, use SnakeYAML to check for duplicate keys
+    try {
+      val yamlStream = new java.io.StringReader(yamlString)
+      val constructor = new org.yaml.snakeyaml.constructor.Constructor() {
+        override def constructMapping(node: org.yaml.snakeyaml.nodes.MappingNode): java.util.Map[Any, Any] = {
+          val tuples = node.getValue.asScala
+          val keys = mutable.HashSet[Any]()
+          val duplicates = mutable.ListBuffer[String]()
+          
+          tuples.foreach { tuple =>
+            val keyNode = tuple.getKeyNode
+            val key = this.constructObject(keyNode)
+            if (keys.contains(key)) {
+              duplicates += (if (key == null) "null" else key.toString)
+            } else {
+              keys += key
+            }
+          }
+          
+          if (duplicates.nonEmpty) {
+            throw new RuntimeException(s"Duplicate key(s) found in YAML: ${duplicates.mkString(", ")}")
+          }
+          
+          super.constructMapping(node)
         }
-        Left(s"Failed to decode JSON to ${implicitly[Decoder[T]].getClass.getSimpleName}:\n$errorDetails")
+      }
+      val yaml = new org.yaml.snakeyaml.Yaml(constructor)
+      yaml.load(yamlStream) // This will throw if duplicates are found
+      
+      // If no duplicates found, continue with normal parsing
+      val json = parser.parse(yamlString) match {
+        case Right(parsedJson) => parsedJson
+        case Left(err) =>
+          return Left(s"Failed to parse YAML to JSON: ${err.getMessage}")
+      }
+
+      json.as[T] match {
+        case Right(config) => Right(config)
+        case Left(err) =>
+          val errorDetails = err match {
+            case decodingFailure: io.circe.DecodingFailure =>
+              val historyPath = decodingFailure.history.map {
+                case io.circe.CursorOp.DownField(field) => s"Field: '$field'"
+                case io.circe.CursorOp.DownArray        => "Array element"
+                case other                              => other.toString
+              }.mkString(" -> ")
+              s"""
+                 |Decoding Failure:
+                 |  Message: ${decodingFailure.message}
+                 |  History: $historyPath
+                 |""".stripMargin.trim
+            case null =>
+              s"Unexpected error: null"
+          }
+          Left(s"Failed to decode JSON to ${implicitly[Decoder[T]].getClass.getSimpleName}:\n$errorDetails")
+      }
+    } catch {
+      case e: Exception =>
+        Left(s"YAML parsing error: ${e.getMessage}")
     }
   }
 

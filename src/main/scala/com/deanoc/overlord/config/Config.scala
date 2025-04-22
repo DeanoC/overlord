@@ -17,6 +17,23 @@ object CirceDefaults {
   }
 }
 
+sealed case class BitsDesc(text: String) {
+  private val txt: String = text.filterNot(c => c == '[' || c == ']')
+  private val singleDigit: Boolean = txt.split(":").length < 2
+
+  lazy val mask: Long = ((1L << bitCount.toLong) - 1L) << lo.toLong
+  val hi: Int = Integer.parseInt(txt.split(":")(0))
+  val lo: Int =
+    if (singleDigit) hi
+    else Integer.parseInt(txt.split(":")(1))
+  val bitCount: Int = (hi - lo) + 1
+  val singleBit: Boolean = singleDigit || bitCount == 1
+}
+
+object BitsDesc {
+  def apply(width: Int): BitsDesc = BitsDesc(s"[${width - 1}:0]")
+}
+
 // Represents a memory range within a RAM definition
 case class MemoryRangeConfig(
   address: String, // Assuming address is represented as a hex string in YAML
@@ -96,11 +113,34 @@ case class RegisterConfig(
   width: String // Bit width (e.g., "32")
 ) derives Decoder
 
+// WireDirection moved to its own file
+
+// Updated PortConfig to include converted WireDirection and parsed BitsDesc
 case class PortConfig(
   name: String,
   width: String,
-  direction: String
-) derives Decoder
+  direction: WireDirection = WireDirection.InOut,
+  bitsDesc: BitsDesc = null
+)
+
+object PortConfig {
+  
+  implicit val decoder: Decoder[PortConfig] = (c: HCursor) => {
+    for {
+      name <- c.downField("name").as[String]
+      width <- c.downField("width").as[String]
+      dirStr <- withDefault(c, "direction", "inout")
+      wireDir = WireDirection(dirStr)
+      bitsDesc = try {
+        BitsDesc(width)
+      } catch {
+        case e: Exception => 
+          println(s"Failed to parse width '$width': ${e.getMessage}")
+          BitsDesc(1)
+      }
+    } yield PortConfig(name, width, wireDir, bitsDesc)
+  }
+}
 
 case class InfoConfig(
   name: String = "",
@@ -111,7 +151,7 @@ case class InfoConfig(
 
 // configuration specific to gateware
 case class GatewareConfig(
-  actions: List[String] = List.empty,
+  actions: List[ActionConfig] = List.empty,
   parameters: Map[String, Any] = Map.empty,
 )
  
@@ -121,7 +161,7 @@ object GatewareConfig {
   implicit val decoder: Decoder[GatewareConfig] = new Decoder[GatewareConfig] {
     def apply(c: HCursor): Decoder.Result[GatewareConfig] = {
       for {
-        actions <- c.downField("actions").as[List[String]]
+        actions <- c.downField("actions").as[List[ActionConfig]]
         parameters <- withDefault(c, "parameters", Map.empty)
       } yield GatewareConfig(actions, parameters)
     }

@@ -1,7 +1,8 @@
 package com.deanoc.overlord
 
 import com.deanoc.overlord.utils._
-import com.deanoc.overlord.hardware.{BitsDesc, RegisterList, Registers}
+import com.deanoc.overlord.config.BitsDesc
+import com.deanoc.overlord.hardware.{RegisterList, Registers}
 import com.deanoc.overlord.connections._
 import com.deanoc.overlord.connections.ConnectionDirection
 import com.deanoc.overlord.instances._

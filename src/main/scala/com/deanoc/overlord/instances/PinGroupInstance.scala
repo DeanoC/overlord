@@ -1,13 +1,14 @@
 package com.deanoc.overlord.instances
 
-import com.deanoc.overlord.hardware.{BitsDesc, Port, WireDirection}
+import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.config.{BitsDesc, WireDirection}
 import com.deanoc.overlord.utils.Variant
 import com.deanoc.overlord.{
   DiffPinConstraint,
   PinConstraint,
   PinConstraintType
 }
-import com.deanoc.overlord.definitions.ChipDefinitionTrait
+import com.deanoc.overlord.definitions.HardwareDefinition
 import com.deanoc.overlord.utils.Utils
 
 import scala.collection.mutable
@@ -15,7 +16,7 @@ import scala.collection.mutable
 case class PinGroupInstance(
     name: String,
     constraint: PinConstraintType,
-    override val definition: ChipDefinitionTrait,
+    override val definition: HardwareDefinition,
     config: com.deanoc.overlord.config.PinGroupConfig // Store the specific config
 ) extends ChipInstance {
 
@@ -28,7 +29,7 @@ case class PinGroupInstance(
 object PinGroupInstance {
   def apply(
       name: String, // Keep name as it's part of InstanceTrait
-      definition: ChipDefinitionTrait,
+      definition: HardwareDefinition,
       config: com.deanoc.overlord.config.PinGroupConfig // Accept PinGroupConfig
   ): Either[String, PinGroupInstance] = {
     try {

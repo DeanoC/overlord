@@ -1,11 +1,11 @@
 package com.deanoc.overlord.instances
 
 import com.deanoc.overlord.utils.Variant
-import com.deanoc.overlord.definitions.ChipDefinitionTrait
+import com.deanoc.overlord.definitions.HardwareDefinition
 
 case class NetInstance(
     name: String,
-    override val definition: ChipDefinitionTrait
+    override val definition: HardwareDefinition
 ) extends ChipInstance {
   override def isVisibleToSoftware: Boolean = true
 }
@@ -13,7 +13,7 @@ case class NetInstance(
 object NetInstance {
   def apply(
       name: String, // Keep name as it's part of InstanceTrait
-      definition: ChipDefinitionTrait,
+      definition: HardwareDefinition,
       config: Map[String, Any] // Accept generic Map[String, Any] for config
   ): Either[String, NetInstance] = {
     val net = NetInstance(name, definition)

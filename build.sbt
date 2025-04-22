@@ -28,15 +28,15 @@ executableScriptName := "overlord"
 
 // JVM memory configuration to address GC warnings
 Universal / javaOptions ++= Seq(
-  "-Xmx2G",
-  "-XX:+UseG1GC",
-  "-XX:MaxGCPauseMillis=200"
+  "-J-Xmx2G",
+  "-J-XX:+UseG1GC",
+  "-J-XX:MaxGCPauseMillis=200"
 )
 
 // Fork JVM for both run and test to apply these settings
 fork := true
 run / javaOptions ++= Seq(
-  "-Xmx2G", 
+  "-Xmx2G",
   "-XX:+UseG1GC",
   "-XX:MaxGCPauseMillis=200",
   "-XX:+HeapDumpOnOutOfMemoryError"

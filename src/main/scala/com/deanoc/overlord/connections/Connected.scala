@@ -4,8 +4,8 @@ import com.deanoc.overlord.hardware.Port
 import com.deanoc.overlord.connections.ConnectionDirection
 import com.deanoc.overlord.definitions.{ 
   DefinitionTrait,
-  GatewareDefinitionTrait,
-  HardwareDefinitionTrait,
+  GatewareDefinition,
+  HardwareDefinition,
   SoftwareDefinitionTrait
 }
 import com.deanoc.overlord.QueryInterface

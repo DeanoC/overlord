@@ -32,7 +32,7 @@ class CpuInstanceSpec
 
   "CpuInstance" should "be created with type-safe configuration" in {
     // Create a mock ChipDefinitionTrait
-    val mockDefinition = mock[ChipDefinitionTrait]
+    val mockDefinition = mock[HardwareDefinition]
     val mockDefType = mock[DefinitionType]
     val mockConfig = mock[CpuDefinitionConfig]
 
@@ -81,7 +81,7 @@ class CpuInstanceSpec
 
   it should "handle host CPU type correctly" in {
     // Create a mock ChipDefinitionTrait for a host CPU
-    val mockDefinition = mock[ChipDefinitionTrait]
+    val mockDefinition = mock[HardwareDefinition]
     val mockDefType = mock[DefinitionType]
     val mockConfig = mock[CpuDefinitionConfig]
 
@@ -113,7 +113,7 @@ class CpuInstanceSpec
 
   it should "handle bus specifications correctly" in {
     // Create a mock ChipDefinitionTrait
-    val mockDefinition = mock[ChipDefinitionTrait]
+    val mockDefinition = mock[HardwareDefinition]
     val mockDefType = mock[DefinitionType]
     val mockConfig = mock[CpuDefinitionConfig]
 
@@ -191,7 +191,7 @@ class CpuInstanceSpec
 
   it should "handle error cases gracefully" in {
     // Create a mock ChipDefinitionTrait that will cause an error
-    val mockDefinition = mock[ChipDefinitionTrait]
+    val mockDefinition = mock[HardwareDefinition]
     val mockConfig = mock[CpuDefinitionConfig]
 
     when(mockDefinition.config).thenReturn(mockConfig)

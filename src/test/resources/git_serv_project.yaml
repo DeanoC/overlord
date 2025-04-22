@@ -1,10 +1,14 @@
 # Overlord Project YAML File
 
 info:
-  name: "flat.test.project"
+  name: "serv_from_git.project"
   version: "1.0.0"
   author: ""
   description: ""
+
+catalogs:
+- type: "git"
+  url: "https://github.com/DeanoC/overlord_serv.git"
 
 definitions:
 - type: cpu.riscv32im.vexriscv_smallest
@@ -56,8 +60,6 @@ definitions:
   max_instances: 1
   triple: riscv32-none-elf
   width: 32
-
-catalogs: []
 
 components: []
 

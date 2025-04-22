@@ -4,12 +4,9 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import com.deanoc.overlord._
 import com.deanoc.overlord.utils.SilentLogger
-import com.deanoc.overlord.hardware.{
-  Port,
-  BitsDesc,
-  InWireDirection,
-  OutWireDirection
-}
+import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.config.BitsDesc
+import com.deanoc.overlord.config.WireDirection
 import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
 import com.deanoc.overlord.interfaces.{BusLike, SupplierBusLike}
 import org.mockito.Mockito

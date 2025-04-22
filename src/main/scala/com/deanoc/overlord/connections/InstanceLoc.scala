@@ -1,11 +1,12 @@
 package com.deanoc.overlord.connections
 
-import com.deanoc.overlord.definitions.{HardwareDefinitionTrait, GatewareDefinitionTrait, SoftwareDefinitionTrait}
+import com.deanoc.overlord.definitions.{HardwareDefinition, GatewareDefinition, SoftwareDefinitionTrait}
 import com.deanoc.overlord.instances.{PinGroupInstance, ClockInstance}
 
 import com.deanoc.overlord.instances.InstanceTrait
 import com.deanoc.overlord.hardware.Port
 import com.deanoc.overlord.definitions.DefinitionTrait
+import com.deanoc.overlord.definitions.GatewareDefinition
 
 /** Represents a location in the connection system, combining an instance, an
   * optional port, and a fully qualified name.
@@ -27,10 +28,10 @@ case class InstanceLoc(
   def definition: DefinitionTrait = instance.definition
 
   /** Checks if this instance represents hardware. */
-  val isHardware: Boolean = definition.isInstanceOf[HardwareDefinitionTrait]
+  val isHardware: Boolean = definition.isInstanceOf[HardwareDefinition]
 
   /** Checks if this instance represents gateware. */
-  def isGateware: Boolean = definition.isInstanceOf[GatewareDefinitionTrait]
+  def isGateware: Boolean = definition.isInstanceOf[GatewareDefinition]
 
   /** Checks if this instance represents software. */
   def isSoftware: Boolean = definition.isInstanceOf[SoftwareDefinitionTrait]

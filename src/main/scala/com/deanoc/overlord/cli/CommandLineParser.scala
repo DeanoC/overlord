@@ -53,8 +53,8 @@ object CommandLineParser extends Logging {
   )
 
   // Generate scopt OParser from CLI metadata
-  def toOParser: OParser[_, Config] = {
-    val builder = scopt.OParser.builder[Config]
+  def toOParser: OParser[_, CliConfig] = {
+    val builder = scopt.OParser.builder[CliConfig]
     import builder._
 
     // Helper to convert CLIOption to scopt opt
@@ -117,7 +117,7 @@ object CommandLineParser extends Logging {
   }
 
   // Parse command line arguments using the generated OParser
-  def parse(args: Array[String]): Option[Config] = {
+  def parse(args: Array[String]): Option[CliConfig] = {
     // Debug parsing attempt
     trace(s"Processing command: ${args.mkString(" ")}")
     
@@ -128,12 +128,12 @@ object CommandLineParser extends Logging {
       
       if (commandExists(cmd) && subcommandExists(cmd, subcmd)) {
         // It's a valid command and subcommand - create a partial config
-        val partialConfig = Config(command = Some(cmd), subCommand = Some(subcmd))
+        val partialConfig = CliConfig(command = Some(cmd), subCommand = Some(subcmd))
         
         // Further args would be processed as options/arguments
         if (args.length > 2) {
           // Has additional args - let scopt process as normal
-          val result = OParser.parse(toOParser, args, Config())
+          val result = OParser.parse(toOParser, args, CliConfig())
           if (result.isDefined) return result
         }
         
@@ -143,7 +143,7 @@ object CommandLineParser extends Logging {
     }
     
     // Use the scopt OParser to parse the arguments normally
-    val result = OParser.parse(toOParser, args, Config())
+    val result = OParser.parse(toOParser, args, CliConfig())
     
     result.flatMap { config =>
       trace(s"Parsing partial config: $config")
@@ -185,7 +185,7 @@ object CommandLineParser extends Logging {
   }
   
   // Validate that all required arguments are present
-  def validateRequiredArguments(config: Config, args: List[CLIArgument]): Option[String] = {
+  def validateRequiredArguments(config: CliConfig, args: List[CLIArgument]): Option[String] = {
     val requiredArgs = args.filter(_.required)
     val missingArgs = requiredArgs.filterNot(arg => config.options.contains(arg.name))
     
@@ -197,18 +197,196 @@ object CommandLineParser extends Logging {
     }
   }
 
-  // "create" command and subcommands
-  val createCommandMeta = CLICommand(
-    name = "create",
-    description = "Create a new project or from a template.",
+
+  // --- Metadata-based utility functions for help system ---
+
+  def getAllCommands: List[(String, String)] =
+    allCommandMetas.filter(_ != null).map(cmd => (cmd.name, cmd.description))
+
+  def getSubcommandsFor(command: String): List[(String, String)] =
+    allCommandMetas.find(_.name == command).map(_.subcommands.map(sc => (sc.name, sc.description))).getOrElse(Nil)
+
+  def getArgsAndOptions(command: String, subcommand: Option[String] = None): (List[CLIArgument], List[CLIOption]) = {
+    allCommandMetas.find(_.name == command) match {
+      case Some(cmdMeta) =>
+        subcommand match {
+          case Some(sub) =>
+            cmdMeta.subcommands.find(_.name == sub) match {
+              case Some(subMeta) =>
+                (subMeta.arguments, subMeta.options)
+              case None => (Nil, Nil)
+            }
+          case None =>
+            (cmdMeta.arguments, cmdMeta.options)
+        }
+      case None => (Nil, Nil)
+    }
+  }
+  
+  // Check if a command exists
+  def commandExists(command: String): Boolean = {
+    allCommandMetas.exists(_.name == command)
+  }
+  
+  // Check if a subcommand exists for a given command
+  def subcommandExists(command: String, subcommand: String): Boolean = {
+    allCommandMetas.find(_.name == command) match {
+      case Some(cmdMeta) => cmdMeta.subcommands.exists(_.name == subcommand)
+      case None => false
+    }
+  }
+  
+  // Find the closest matching subcommand for a given command
+  def findClosestSubcommand(command: String, subcommand: String): Option[String] = {
+    allCommandMetas.find(_.name == command) match {
+      case Some(cmdMeta) =>
+        val subcommands = cmdMeta.subcommands.map(_.name)
+        if (subcommands.isEmpty) {
+          None
+        } else {
+          // Find the closest match using Levenshtein distance
+          val distances = subcommands.map(s => (s, levenshteinDistance(s, subcommand)))
+          val closest = distances.minBy(_._2)
+          // Only suggest if the distance is reasonable (less than half the length of the subcommand)
+          if (closest._2 <= subcommand.length / 2) {
+            Some(closest._1)
+          } else {
+            None
+          }
+        }
+      case None => None
+    }
+  }
+  
+  // Calculate Levenshtein distance between two strings
+  private def levenshteinDistance(s1: String, s2: String): Int = {
+    val dist = Array.tabulate(s2.length + 1, s1.length + 1) { (j, i) =>
+      if (j == 0) i else if (i == 0) j else 0
+    }
+    
+    for (j <- 1 to s2.length; i <- 1 to s1.length) {
+      dist(j)(i) = if (s2(j - 1) == s1(i - 1)) {
+        dist(j - 1)(i - 1)
+      } else {
+        math.min(math.min(dist(j - 1)(i) + 1, dist(j)(i - 1) + 1), dist(j - 1)(i - 1) + 1)
+      }
+    }
+    
+    dist(s2.length)(s1.length)
+  }
+
+  /**
+   * Validates the configuration and displays help or errors if needed.
+   * This method should be called before `CommandExecutor.execute`.
+   *
+   * @param config The parsed configuration
+   * @param displayErrorMessages Whether to display error messages about missing arguments (true for CLI, false for tests)
+   * @return true if the configuration is valid, false otherwise
+   */
+  def validateAndDisplayHelp(config: CliConfig, displayErrorMessages: Boolean = true): Boolean = {
+    (config.command, config.subCommand) match {
+      case (Some(cmd), Some(subcmd)) if commandExists(cmd) && subcommandExists(cmd, subcmd) =>
+        val (requiredArgs, _) = getArgsAndOptions(cmd, Some(subcmd))
+        validateRequiredArguments(config, requiredArgs) match {
+          case Some(errorMsg) if displayErrorMessages =>
+            // Print the error messages about missing arguments - but only in CLI mode
+            errorMsg.split("\n").foreach(bufferedPrintln)
+            
+            // Display focused help for just this subcommand
+            bufferedPrintln(HelpTextManager.getSubcommandHelp(cmd, subcmd))
+            false
+          case Some(_) =>
+            // In test mode, don't display error messages, just the help
+            bufferedPrintln(HelpTextManager.getSubcommandHelp(cmd, subcmd))
+            false
+          case None => true
+        }
+
+      case (Some(cmd), None) if commandExists(cmd) =>
+        val cmdMeta = allCommandMetas.find(_.name == cmd).get
+        if (cmdMeta.subcommands.nonEmpty) {
+          // Command requires a subcommand but none was supplied
+          bufferedPrintln(HelpTextManager.getCommandHelp(cmd))
+          false
+        } else {
+          val (requiredArgs, _) = getArgsAndOptions(cmd)
+          validateRequiredArguments(config, requiredArgs) match {
+            case Some(errorMsg) =>
+              // Print the error messages about missing arguments
+              errorMsg.split("\n").foreach(bufferedPrintln)
+              // Then display only the relevant command help
+              bufferedPrintln(HelpTextManager.getCommandHelp(cmd))
+              false
+            case None => true
+          }
+        }
+
+      case (Some(cmd), _) if !commandExists(cmd) =>
+        bufferedPrintln(HelpTextManager.getInvalidCommandHelp(cmd))
+        false
+
+      case (Some(cmd), Some(subcmd)) =>
+        bufferedPrintln(HelpTextManager.getInvalidSubcommandHelp(cmd, subcmd))
+        false
+
+      case (Some("help"), _) =>
+        bufferedPrintln(HelpTextManager.getGlobalHelp())
+        false
+
+      case _ =>
+        bufferedPrintln(HelpTextManager.getGlobalHelp())
+        false
+    }
+  }
+
+  private var printBuffer: StringBuilder = new StringBuilder
+
+  /**
+   * Custom print function that captures output to a buffer and also prints to the terminal.
+   */
+  def bufferedPrintln(message: String): Unit = {
+    printBuffer.append(message).append("\n")
+    println(message)
+  }
+
+  /**
+   * Retrieve the current contents of the print buffer.
+   */
+  def getPrintBuffer: String = printBuffer.toString
+
+  /**
+   * Clear the print buffer.
+   */
+  def clearPrintBuffer(): Unit = {
+    printBuffer.clear()
+  }
+
+  // List of all top-level commands (metadata)
+  lazy val allCommandMetas: List[CLICommand] = List(
+    projectCommandMeta,
+    helpCommandMeta
+  )
+
+  // "help" command
+  val helpCommandMeta = CLICommand(
+    name = "help",
+    description = "Display help for a specific command",
+    arguments = List(
+      CLIArgument("command", "Command to get help for", required = false),
+      CLIArgument("subcommand", "Subcommand to get help for", required = false)
+    )
+  )
+
+  // "project" command and subcommands
+  val projectCommandMeta = CLICommand(
+    name = "project",
+    description = "Project related commands",
     longDescription = Some(
-      """Create a new project or from a template. This command allows you to create
-projects either from scratch using a YAML configuration file or from
-predefined templates."""
+      """Create or update a project"""
     ),
     subcommands = List(
       CLISubcommand(
-        name = "project",
+        name = "create",
         description = "Create a new project from a template",
         longDescription = Some(
           """Create a new project from a .yaml file. This command creates a new project
@@ -218,8 +396,40 @@ directory using the specified YAML configuration file."""
           CLIArgument("template-name", "name of the template to use (e.g., bare-metal, linux-app)", required = true),
           CLIArgument("project-name", "name of the project to create (will be created in the same directory as the project YAML file)", required = true)
         ),
-        examples = List("overlord create project my-project.yaml --board arty-a7")
+        examples = List("overlord project create bare-metal my-project.yaml")
       ),
+      CLISubcommand(
+        name = "update",
+        description = "Update an existing project",
+        longDescription = Some(
+          """Reparse the project and perform any updates required."""
+        ),
+        arguments = List(
+          CLIArgument("project-name", "name of the project to update", required = true)
+        ),
+        examples = List("overlord project update my-project.yaml")
+      ),
+      CLISubcommand(
+        name = "report",
+        description = "create a report about the project structure",
+        arguments = List(
+          CLIArgument("project-name", "name of the project to produce a report", required = true)
+        ),
+        examples = List("overlord project report my-project.yaml")
+      ),
+      CLISubcommand(
+        name = "definition-list",
+        description = "Generate a list of all definition in a project",
+        arguments = List(
+          CLIArgument("project-file", "filename should be a .yaml file to use for the project", required = true)
+        ),
+        examples = List("overlord project definition-list my-project.yaml")
+      )
+    )
+  )
+/*
+
+
       CLISubcommand(
         name = "default-templates",
         description = "Download standard templates without creating a project",
@@ -258,20 +468,16 @@ directory using the specified YAML configuration file."""
           CLIArgument("project-name", "name of the project to generate tests for", required = true)
         )
       ),
-      CLISubcommand(
-        name = "report",
-        description = "Generate a report about the project structure",
-        arguments = List(
-          CLIArgument("infile", "filename should be a .yaml file to use for the project", required = true)
-        )
-      ),
+
       CLISubcommand(
         name = "svd",
         description = "Generate a CMSIS-SVD file",
         arguments = List(
           CLIArgument("infile", "filename should be a .yaml file to use for the project", required = true)
         )
-      )
+      ),
+
+  
     )
   )
 
@@ -285,7 +491,8 @@ directory using the specified YAML configuration file."""
         description = "Clean test files for a project",
         arguments = List(
           CLIArgument("project-name", "name of the project to clean tests for", required = true)
-        )
+        ),
+        options = Nil // Ensure options is an empty list
       )
     )
   )
@@ -371,187 +578,5 @@ directory using the specified YAML configuration file."""
       )
     )
   )
-
-  // "help" command
-  val helpCommandMeta = CLICommand(
-    name = "help",
-    description = "Display help for a specific command",
-    arguments = List(
-      CLIArgument("command", "Command to get help for", required = false),
-      CLIArgument("subcommand", "Subcommand to get help for", required = false)
-    )
-  )
-
-  // List of all top-level commands (metadata)
-  val allCommandMetas: List[CLICommand] = List(
-    createCommandMeta,
-    generateCommandMeta,
-    cleanCommandMeta,
-    updateCommandMeta,
-    templateCommandMeta,
-    helpCommandMeta
-  )
-
-  // --- Metadata-based utility functions for help system ---
-
-  def getAllCommands: List[(String, String)] =
-    allCommandMetas.map(cmd => (cmd.name, cmd.description))
-
-  def getSubcommandsFor(command: String): List[(String, String)] =
-    allCommandMetas.find(_.name == command).map(_.subcommands.map(sc => (sc.name, sc.description))).getOrElse(Nil)
-
-  def getArgsAndOptions(command: String, subcommand: Option[String] = None): (List[CLIArgument], List[CLIOption]) = {
-    allCommandMetas.find(_.name == command) match {
-      case Some(cmdMeta) =>
-        subcommand match {
-          case Some(sub) =>
-            cmdMeta.subcommands.find(_.name == sub) match {
-              case Some(subMeta) =>
-                (subMeta.arguments, subMeta.options)
-              case None => (Nil, Nil)
-            }
-          case None =>
-            (cmdMeta.arguments, cmdMeta.options)
-        }
-      case None => (Nil, Nil)
-    }
-  }
-  
-  // Check if a command exists
-  def commandExists(command: String): Boolean = {
-    allCommandMetas.exists(_.name == command)
-  }
-  
-  // Check if a subcommand exists for a given command
-  def subcommandExists(command: String, subcommand: String): Boolean = {
-    allCommandMetas.find(_.name == command) match {
-      case Some(cmdMeta) => cmdMeta.subcommands.exists(_.name == subcommand)
-      case None => false
-    }
-  }
-  
-  // Find the closest matching subcommand for a given command
-  def findClosestSubcommand(command: String, subcommand: String): Option[String] = {
-    allCommandMetas.find(_.name == command) match {
-      case Some(cmdMeta) =>
-        val subcommands = cmdMeta.subcommands.map(_.name)
-        if (subcommands.isEmpty) {
-          None
-        } else {
-          // Find the closest match using Levenshtein distance
-          val distances = subcommands.map(s => (s, levenshteinDistance(s, subcommand)))
-          val closest = distances.minBy(_._2)
-          // Only suggest if the distance is reasonable (less than half the length of the subcommand)
-          if (closest._2 <= subcommand.length / 2) {
-            Some(closest._1)
-          } else {
-            None
-          }
-        }
-      case None => None
-    }
-  }
-  
-  // Calculate Levenshtein distance between two strings
-  private def levenshteinDistance(s1: String, s2: String): Int = {
-    val dist = Array.tabulate(s2.length + 1, s1.length + 1) { (j, i) =>
-      if (j == 0) i else if (i == 0) j else 0
-    }
-    
-    for (j <- 1 to s2.length; i <- 1 to s1.length) {
-      dist(j)(i) = if (s2(j - 1) == s1(i - 1)) {
-        dist(j - 1)(i - 1)
-      } else {
-        math.min(math.min(dist(j - 1)(i) + 1, dist(j)(i - 1) + 1), dist(j - 1)(i - 1) + 1)
-      }
-    }
-    
-    dist(s2.length)(s1.length)
-  }
-
-  /**
-   * Validates the configuration and displays help or errors if needed.
-   * This method should be called before `CommandExecutor.execute`.
-   *
-   * @param config The parsed configuration
-   * @param displayErrorMessages Whether to display error messages about missing arguments (true for CLI, false for tests)
-   * @return true if the configuration is valid, false otherwise
-   */
-  def validateAndDisplayHelp(config: Config, displayErrorMessages: Boolean = true): Boolean = {
-    (config.command, config.subCommand) match {
-      case (Some(cmd), Some(subcmd)) if commandExists(cmd) && subcommandExists(cmd, subcmd) =>
-        val (requiredArgs, _) = getArgsAndOptions(cmd, Some(subcmd))
-        validateRequiredArguments(config, requiredArgs) match {
-          case Some(errorMsg) if displayErrorMessages =>
-            // Print the error messages about missing arguments - but only in CLI mode
-            errorMsg.split("\n").foreach(bufferedPrintln)
-            
-            // Display focused help for just this subcommand
-            bufferedPrintln(HelpTextManager.getSubcommandHelp(cmd, subcmd))
-            false
-          case Some(_) =>
-            // In test mode, don't display error messages, just the help
-            bufferedPrintln(HelpTextManager.getSubcommandHelp(cmd, subcmd))
-            false
-          case None => true
-        }
-
-      case (Some(cmd), None) if commandExists(cmd) =>
-        val cmdMeta = allCommandMetas.find(_.name == cmd).get
-        if (cmdMeta.subcommands.nonEmpty) {
-          // Command requires a subcommand but none was supplied
-          bufferedPrintln(HelpTextManager.getCommandHelp(cmd))
-          false
-        } else {
-          val (requiredArgs, _) = getArgsAndOptions(cmd)
-          validateRequiredArguments(config, requiredArgs) match {
-            case Some(errorMsg) =>
-              // Print the error messages about missing arguments
-              errorMsg.split("\n").foreach(bufferedPrintln)
-              // Then display only the relevant command help
-              bufferedPrintln(HelpTextManager.getCommandHelp(cmd))
-              false
-            case None => true
-          }
-        }
-
-      case (Some(cmd), _) if !commandExists(cmd) =>
-        bufferedPrintln(HelpTextManager.getInvalidCommandHelp(cmd))
-        false
-
-      case (Some(cmd), Some(subcmd)) =>
-        bufferedPrintln(HelpTextManager.getInvalidSubcommandHelp(cmd, subcmd))
-        false
-
-      case (Some("help"), _) =>
-        bufferedPrintln(HelpTextManager.getGlobalHelp())
-        false
-
-      case _ =>
-        bufferedPrintln(HelpTextManager.getGlobalHelp())
-        false
-    }
-  }
-
-  private var printBuffer: StringBuilder = new StringBuilder
-
-  /**
-   * Custom print function that captures output to a buffer and also prints to the terminal.
-   */
-  def bufferedPrintln(message: String): Unit = {
-    printBuffer.append(message).append("\n")
-    println(message)
-  }
-
-  /**
-   * Retrieve the current contents of the print buffer.
-   */
-  def getPrintBuffer: String = printBuffer.toString
-
-  /**
-   * Clear the print buffer.
-   */
-  def clearPrintBuffer(): Unit = {
-    printBuffer.clear()
-  }
+*/
 }

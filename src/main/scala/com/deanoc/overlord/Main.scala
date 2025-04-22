@@ -2,13 +2,15 @@ package com.deanoc.overlord
 
 import com.deanoc.overlord.utils._
 import com.deanoc.overlord.utils.Logging
-import com.deanoc.overlord.cli.{CommandLineParser, CommandExecutor, Config}
+import com.deanoc.overlord.cli.{CommandLineParser, CommandExecutor, CliConfig}
+import com.deanoc.overlord.cli.CommandHandlerInitializer
 
 import org.slf4j.event.Level
 import scala.sys.process._
 import scopt.OParser
 import java.io.{ByteArrayOutputStream, PrintStream}
 import com.deanoc.overlord.utils.ModuleLogger.exitApplication
+import com.deanoc.overlord.cli.HelpTextManager
 
 /** Main entry point for the Overlord CLI.
   */
@@ -20,6 +22,9 @@ object Main extends Logging {
     *   Command line arguments
     */
   def main(args: Array[String]): Unit = {
+    // Initialize command handlers
+    CommandHandlerInitializer.initialize()
+    
     // Simple CLI dispatch for help output
     args.toList match {
       case "help" :: cmd :: sub :: _ =>
@@ -42,21 +47,21 @@ object Main extends Logging {
         System.setErr(nullPrintStream)
         
         try {
-          com.deanoc.overlord.cli.CommandLineParser.parse(args) match {
+          CommandLineParser.parse(args) match {
             case Some(config) =>
               // Restore System.err before executing command
               System.setErr(originalErr)
-              if (!com.deanoc.overlord.cli.CommandLineParser.validateAndDisplayHelp(config)) {
+              if (!CommandLineParser.validateAndDisplayHelp(config)) {
                 sys.exit(1)
               }
-              val success = com.deanoc.overlord.cli.CommandExecutor.execute(config)
+              val success = CommandExecutor.execute(config)
               if (!success) sys.exit(1)
             case None =>
               // Command parsing failed, try to extract command and subcommand for focused help
               val partialConfig = extractPartialConfig(args)
               // Restore System.err before printing our custom help
               System.setErr(originalErr)
-              println(com.deanoc.overlord.cli.HelpTextManager.getFocusedUsage(partialConfig))
+              println(HelpTextManager.getFocusedUsage(partialConfig))
               sys.exit(1)
           }
         } finally {
@@ -74,8 +79,8 @@ object Main extends Logging {
     * @return
     *   A Config object with command and subCommand fields populated if possible
     */
-  private def extractPartialConfig(args: Array[String]): Config = {
-    val config = Config()
+  private def extractPartialConfig(args: Array[String]): CliConfig = {
+    val config = CliConfig()
     
     if (args.length > 0) {
       // First argument is likely the command
@@ -102,7 +107,7 @@ object Main extends Logging {
     * @param config
     *   The parsed configuration
     */
-  private def configureLogging(config: Config): Unit = {
+  private def configureLogging(config: CliConfig): Unit = {
     // Helper function to process module names and set log levels
     def configureModuleLogLevels(modulesList: String, level: Level): Unit = {
       val moduleNames = modulesList.split(',').map(_.trim).filter(_.nonEmpty)

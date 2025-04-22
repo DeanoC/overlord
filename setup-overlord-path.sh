@@ -102,13 +102,28 @@ else
   fi
 fi
 
-# Add ~/bin to PATH in .bashrc if not already there
-if ! grep -q 'export PATH="$HOME/bin:$PATH"' ~/.bashrc; then
-  echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
-  echo -e "${GREEN}✓ Added ~/bin to PATH in ~/.bashrc${RESET}"
-  echo "To apply this change immediately, run: source ~/.bashrc"
+# Detect shell type
+SHELL_TYPE=$(basename "$SHELL")
+echo "Detected shell: $SHELL_TYPE"
+
+# Add ~/bin to PATH in the appropriate shell configuration file
+if [ "$SHELL_TYPE" = "zsh" ]; then
+  CONFIG_FILE=~/.zshrc
+elif [ "$SHELL_TYPE" = "bash" ]; then
+  CONFIG_FILE=~/.bashrc
 else
-  echo "~/bin is already in PATH (in ~/.bashrc)."
+  echo -e "${YELLOW}Warning: Unsupported shell type. Please add ~/bin to your PATH manually.${RESET}"
+  CONFIG_FILE=""
+fi
+
+if [ -n "$CONFIG_FILE" ]; then
+  if ! grep -q 'export PATH="$HOME/bin:$PATH"' "$CONFIG_FILE"; then
+    echo 'export PATH="$HOME/bin:$PATH"' >> "$CONFIG_FILE"
+    echo -e "${GREEN}✓ Added ~/bin to PATH in $CONFIG_FILE${RESET}"
+    echo "To apply this change immediately, run: source $CONFIG_FILE"
+  else
+    echo "~/bin is already in PATH (in $CONFIG_FILE)."
+  fi
 fi
 
 # Make the script executable
@@ -130,9 +145,11 @@ if command -v overlord &>/dev/null; then
   echo -e "${GREEN}✓ overlord is now available in your PATH${RESET}"
 else
   echo -e "${YELLOW}Warning: overlord is not yet in your PATH.${RESET}"
-  echo "You need to run 'source ~/.bashrc' or restart your terminal."
-  echo "Running 'source ~/.bashrc' for you now..."
-  source ~/.bashrc
+  if [ -n "$CONFIG_FILE" ]; then
+    echo "You need to run 'source $CONFIG_FILE' or restart your terminal."
+    echo "Running 'source $CONFIG_FILE' for you now..."
+    source "$CONFIG_FILE"
+  fi
 
   # Test again after sourcing .bashrc
   if command -v overlord &>/dev/null; then
@@ -147,7 +164,11 @@ fi
 echo -e "${GREEN}=== Setup completed successfully ===${RESET}"
 echo "You can now run 'overlord' from anywhere after:"
 echo "1. Ensuring a build is complete (run ./build-local.sh if needed)"
-echo "2. Applying PATH changes with 'source ~/.bashrc' or opening a new terminal"
+if [ -n "$CONFIG_FILE" ]; then
+  echo "2. Applying PATH changes with 'source $CONFIG_FILE' or opening a new terminal"
+else
+  echo "2. Applying PATH changes manually or opening a new terminal"
+fi
 echo ""
 echo -e "${YELLOW}Important note in VS Code Dev Containers:${RESET}"
 echo "If you're using this in a Dev Container, note that ~/bin may not persist between sessions."

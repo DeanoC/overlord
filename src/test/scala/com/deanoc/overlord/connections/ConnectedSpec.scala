@@ -6,11 +6,12 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import com.deanoc.overlord._
 import com.deanoc.overlord.utils.SilentLogger
-import com.deanoc.overlord.hardware.{Port, BitsDesc, InWireDirection, OutWireDirection}
+import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.config.{BitsDesc, WireDirection}
 import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait, PinGroupInstance, ClockInstance}
 import org.mockito.Mockito._
 import org.mockito.Mockito
-import com.deanoc.overlord.definitions.ChipDefinitionTrait
+import com.deanoc.overlord.definitions.HardwareDefinition
 
 /**
  * Test suite for the Connected trait and its implementations.
@@ -45,7 +46,7 @@ class ConnectedSpec extends AnyFlatSpec with Matchers with MockitoSugar with Sil
   // InstanceLoc tests - simpler version without SoftwareDef/GatewareDef
   "InstanceLoc" should "identify instance types correctly" in {
     // Create a mock ChipDefinitionTrait that we can use as base for all definition types
-    val chipDef = mock[ChipDefinitionTrait]
+    val chipDef = mock[HardwareDefinition]
     
     // Create mock instances
     val chipInstance = mock[ChipInstance]
@@ -76,7 +77,7 @@ class ConnectedSpec extends AnyFlatSpec with Matchers with MockitoSugar with Sil
   
   it should "handle name operations correctly" in {
     // Create mock definition and instance
-    val chipDef = mock[ChipDefinitionTrait]
+    val chipDef = mock[HardwareDefinition]
     
     val instance = mock[ChipInstance]
     when(instance.definition).thenReturn(chipDef)
@@ -91,7 +92,7 @@ class ConnectedSpec extends AnyFlatSpec with Matchers with MockitoSugar with Sil
   // ConnectedPortGroup tests
   "ConnectedPortGroup" should "identify connection types correctly" in {
     // Create a single mock for ChipDefinitionTrait
-    val chipDef = mock[ChipDefinitionTrait]
+    val chipDef = mock[HardwareDefinition]
     
     // Create mock instances
     val chipInstance1 = mock[ChipInstance]
@@ -112,8 +113,8 @@ class ConnectedSpec extends AnyFlatSpec with Matchers with MockitoSugar with Sil
     when(clockInstance.name).thenReturn("clock")
     
     // Create ports
-    val port1 = Port("port1", BitsDesc(8), InWireDirection())
-    val port2 = Port("port2", BitsDesc(8), OutWireDirection())
+    val port1 = Port("port1", BitsDesc(8), WireDirection.Input)
+    val port2 = Port("port2", BitsDesc(8), WireDirection.Output)
     
     // Create InstanceLocs
     val chipLoc1 = InstanceLoc(chipInstance1, Some(port1), "chip1")
@@ -162,7 +163,7 @@ class ConnectedSpec extends AnyFlatSpec with Matchers with MockitoSugar with Sil
   
   it should "check connection between instances correctly" in {
     // Create mock hardware definition
-    val chipDef = mock[ChipDefinitionTrait]
+    val chipDef = mock[HardwareDefinition]
     
     // Create mock instances
     val chipInstance1 = mock[ChipInstance]
@@ -178,8 +179,8 @@ class ConnectedSpec extends AnyFlatSpec with Matchers with MockitoSugar with Sil
     when(chipInstance3.name).thenReturn("chip3")
     
     // Create ports
-    val port1 = Port("port1", BitsDesc(8), InWireDirection())
-    val port2 = Port("port2", BitsDesc(8), OutWireDirection())
+    val port1 = Port("port1", BitsDesc(8), WireDirection.Input)
+    val port2 = Port("port2", BitsDesc(8), WireDirection.Output)
     
     // Create InstanceLocs
     val chipLoc1 = InstanceLoc(chipInstance1, Some(port1), "chip1")

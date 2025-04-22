@@ -39,27 +39,41 @@ object DefinitionConfig {
 
 sealed trait HardwareDefinitionConfig extends DefinitionConfig {
   val gateware: Option[SourceConfig]
-  val ports: Option[List[PortConfig]]
-  val registers: Option[List[SourceConfig]]
-  val drivers: Option[List[String]]
-  val max_instances: Option[Int]
+  val ports: List[PortConfig]
+  val registers: List[SourceConfig]
+  val drivers: List[String]
+  val max_instances: Int
   val supplier_prefix: Option[List[String]]
-  val width: Option[Int]
+  val width: Int
 }
 
 object HardwareDefinitionConfig {
   import CustomDecoders._
 
   // Helper method to decode common fields
-  def decodeCommonFields(c: HCursor): Decoder.Result[(Option[SourceConfig], Option[List[PortConfig]], Option[List[SourceConfig]], Option[List[String]], Option[Int], Option[List[String]], Option[Int], Map[String, Any])] = {
+  def decodeCommonFields(c: HCursor): Decoder.Result[(Option[SourceConfig], List[PortConfig], List[SourceConfig], List[String], Int, Option[List[String]], Int, Map[String, Any])] = {
     for {
       gateware <- c.downField("gateware").as[Option[SourceConfig]]
-      ports <- c.downField("ports").as[Option[List[PortConfig]]]
-      registers <- c.downField("registers").as[Option[List[SourceConfig]]]
-      drivers <- c.downField("drivers").as[Option[List[String]]]
-      maxInstances <- c.downField("max_instances").as[Option[Int]]
+      
+      // Handle both singular "port" and plural "ports" fields
+      ports <- {
+        val hasPort = c.downField("port").succeeded
+        val hasPorts = c.downField("ports").succeeded
+        
+        if (hasPort && hasPorts) {
+          Left(io.circe.DecodingFailure("Cannot have both 'port' and 'ports' in the same definition", c.history))
+        } else if (hasPort) {
+          c.downField("port").as[PortConfig].map(port => List(port))
+        } else {
+          withDefault(c, "ports", List.empty[PortConfig])
+        }
+      }
+      
+      registers <- withDefault(c, "registers", List.empty[SourceConfig])
+      drivers <- withDefault(c, "drivers", List.empty[String])
+      maxInstances <- withDefault(c, "max_instances", 1)
       supplierPrefix <- c.downField("supplier_prefix").as[Option[List[String]]]
-      width <- c.downField("width").as[Option[Int]]
+      width <- withDefault(c, "width", 32)
       attributes = ReflectionHelper.extractUnhandledFields[HardwareDefinitionConfig](c)
     } yield (gateware, ports, registers, drivers, maxInstances, supplierPrefix, width, attributes)
   }
@@ -72,12 +86,12 @@ case class RamDefinitionConfig(
   `type`: String,
   ranges: List[MemoryRangeConfig],
   gateware: Option[SourceConfig] = None,
-  ports: Option[List[PortConfig]] = None,
-  registers: Option[List[SourceConfig]] = None,
-  drivers: Option[List[String]] = None,
-  max_instances: Option[Int] = None,
+  ports: List[PortConfig] = List(),
+  registers: List[SourceConfig] = List(),
+  drivers: List[String] = List(),
+  max_instances: Int = 1,
   supplier_prefix: Option[List[String]] = None,
-  width: Option[Int] = None,
+  width: Int = 32,
   attributes: Map[String, Any] = Map.empty
 ) extends HardwareDefinitionConfig {
   def withAttributes(newAttributes: Map[String, Any]): DefinitionConfig = 
@@ -112,12 +126,15 @@ case class CpuDefinitionConfig(
   triple: String,
   core_count: Int = 1,
   gateware: Option[SourceConfig] = None,
-  ports: Option[List[PortConfig]] = None,
-  registers: Option[List[SourceConfig]] = None,
-  drivers: Option[List[String]] = None,
-  max_instances: Option[Int] = None,
+  ports: List[PortConfig] = List(),
+  registers: List[SourceConfig] = List(),
+  drivers: List[String] = List(),
+  max_instances: Int = 1,
   supplier_prefix: Option[List[String]] = None,
-  width: Option[Int] = None,
+  width: Int = 32,
+  max_atomic_width: Int = 32, // Default same as width
+  max_bitop_type_width: Int = 32,
+  gcc_flags: String = "",
   attributes: Map[String, Any] = Map.empty
 ) extends HardwareDefinitionConfig {
   def withAttributes(newAttributes: Map[String, Any]): DefinitionConfig = 
@@ -132,6 +149,10 @@ object CpuDefinitionConfig {
       typeVal <- c.downField("type").as[String]
       triple <- c.downField("triple").as[String]
       coreCount <- withDefault(c, "core_count", 1)
+      width <- withDefault(c, "width", 32)
+      maxAtomicWidth <- withDefault(c, "max_atomic_width", width) // Default to width
+      maxBitOpTypeWidth <- withDefault(c, "max_bitop_type_width", 32)
+      gccFlags <- withDefault(c, "gcc_flags", "")
       commonFields <- HardwareDefinitionConfig.decodeCommonFields(c)
     } yield CpuDefinitionConfig(
       `type` = typeVal,
@@ -144,6 +165,9 @@ object CpuDefinitionConfig {
       max_instances = commonFields._5,
       supplier_prefix = commonFields._6,
       width = commonFields._7,
+      max_atomic_width = maxAtomicWidth,
+      max_bitop_type_width = maxBitOpTypeWidth,
+      gcc_flags = gccFlags,
       attributes = commonFields._8
     )
   }
@@ -152,17 +176,18 @@ object CpuDefinitionConfig {
 case class OtherDefinitionConfig(
   `type`: String,
   gateware: Option[SourceConfig] = None,
-  ports: Option[List[PortConfig]] = None,
-  registers: Option[List[SourceConfig]] = None,
-  drivers: Option[List[String]] = None,
-  max_instances: Option[Int] = None,
+  ports: List[PortConfig] = List(),
+  registers: List[SourceConfig] = List(),
+  drivers: List[String] = List(),
+  max_instances: Int = 1,
   supplier_prefix: Option[List[String]] = None,
-  width: Option[Int] = None,
+  width: Int = 32,
   attributes: Map[String, Any] = Map.empty
 ) extends HardwareDefinitionConfig {
   def withAttributes(newAttributes: Map[String, Any]): DefinitionConfig = 
     copy(attributes = newAttributes)
 }
+
 object OtherDefinitionConfig {
   import CustomDecoders._
 
