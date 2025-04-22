@@ -44,8 +44,11 @@ class ComponentAdvancedTest
     // Use Component.fromTopLevelComponentFile to load it
     try {
       val component = Component.fromTopLevelComponentFile("TestGame", "TestBoard", sourceFilePath)
-    } finally {
-      fail("Test failed: flat_serv_project.yaml not loaded correctly")
+    } catch {
+      case e: Exception =>
+        // If an exception is thrown, the test fails
+        e.printStackTrace()
+        fail("Test failed: flat_serv_project.yaml not loaded correctly")
     }
   }
 }

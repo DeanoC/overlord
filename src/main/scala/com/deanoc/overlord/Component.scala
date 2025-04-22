@@ -123,9 +123,9 @@ object Component extends Logging {
 
     val config = SourceLoader.loadSource[ComponentFileConfig, ComponentFileConfig](source) match {
       case Right(c) => c
-      case Left(error) =>
-        this.error(s"Failed to load source: $error")
-        throw new RuntimeException(s"Failed to load source: $error")
+      case Left(err) =>
+        error(s"Failed to load source: $err")
+        throw new RuntimeException(s"Failed to load source: $err")
     }
     val (container, catalog) = parser.parseComponentFileConfig(config)
 

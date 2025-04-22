@@ -134,7 +134,7 @@ object SourceLoader extends Logging {
           case None =>
             Left("Inline source type requires an inline JSON block.")
         }
-      case null => Left(s"Unknown source type: ${SourceType.toString(sourceConfig.`type`)}")
+      case null => Left(s"Unknown source type: ${sourceConfig.`type`}")
     }
   } catch {
     case ex: Exception =>

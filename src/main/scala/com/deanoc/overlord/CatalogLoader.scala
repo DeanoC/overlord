@@ -49,7 +49,7 @@ object CatalogLoader extends Logging {
     SourceLoader.loadSource[CatalogFileConfig, Seq[DefinitionTrait]](sourceConfig) match {
       case Right(content: Seq[DefinitionTrait]) => content
       case Left(err) =>
-        error(s"Failed to load catalog from source ${SourceType.toString(sourceConfig.`type`)}: $err")
+        error(s"Failed to load catalog from source ${sourceConfig.`type`}: $err")
         Seq.empty
     }
   }
