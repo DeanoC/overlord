@@ -3,13 +3,8 @@ package com.deanoc.overlord.cli
 import com.deanoc.overlord.cli.commands.CommandHandlerRegistry
 import com.deanoc.overlord.utils.Logging
 
-import com.deanoc.overlord.cli.commands.create.DefaultTemplatesCreateHandler
-import com.deanoc.overlord.cli.commands.create.GccToolchainCreateHandler
-
-import com.deanoc.overlord.cli.commands.project.ProjectCreateHandler
-import com.deanoc.overlord.cli.commands.project.ProjectDefinitionListHandler
-import com.deanoc.overlord.cli.commands.project.ProjectReportHandler
-import com.deanoc.overlord.cli.commands.project.ProjectUpdateHandler
+import com.deanoc.overlord.cli.commands.project._
+import com.deanoc.overlord.cli.commands.create._
 
 /**
  * Initializes command handlers during application startup
@@ -22,13 +17,14 @@ object CommandHandlerInitializer extends Logging {
   def initialize(): Unit = {
     info("Initializing command handlers...")
     
-    // Register create commands
+    // Register project commands
     CommandHandlerRegistry.registerHandler("project", "create", ProjectCreateHandler)
     CommandHandlerRegistry.registerHandler("project", "definition-list", ProjectDefinitionListHandler)
     CommandHandlerRegistry.registerHandler("project", "update", ProjectUpdateHandler)
     CommandHandlerRegistry.registerHandler("project", "report", ProjectReportHandler)
+    CommandHandlerRegistry.registerHandler("project", "generate", ProjectGenerateHandler)
     
-    // Register generate commands
+    // Register create commands
     CommandHandlerRegistry.registerHandler("create", "default-templates", DefaultTemplatesCreateHandler)
     CommandHandlerRegistry.registerHandler("create", "gcc-toolchain", GccToolchainCreateHandler)    
    

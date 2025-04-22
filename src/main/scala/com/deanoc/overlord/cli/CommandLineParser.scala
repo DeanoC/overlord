@@ -399,10 +399,21 @@ directory using the specified YAML configuration file."""
         examples = List("overlord project create bare-metal my-project.yaml")
       ),
       CLISubcommand(
+        name = "generate",
+        description = "Generate everything from the project file",
+        longDescription = Some(
+          """Reparse the project file and generate all."""
+        ),
+        arguments = List(
+          CLIArgument("project-name", "name of the project to update", required = true)
+        ),
+        examples = List("overlord project generate my-project.yaml")
+      ),
+      CLISubcommand(
         name = "update",
         description = "Update an existing project",
         longDescription = Some(
-          """Reparse the project and perform any updates required."""
+          """Perform any updates required (git pulls etc.)."""
         ),
         arguments = List(
           CLIArgument("project-name", "name of the project to update", required = true)

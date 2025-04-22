@@ -3,11 +3,14 @@ package com.deanoc.overlord.cli.commands.project
 import com.deanoc.overlord.cli.CliConfig
 import com.deanoc.overlord.cli.commands.CommandHandler
 import com.deanoc.overlord.templates.TemplateManager
+import com.deanoc.overlord.GlobalState
 
 object ProjectCreateHandler extends CommandHandler {
   override def execute(config: CliConfig): Boolean = {
     val templateNameOpt = config.templateName
     val projectNameOpt = config.projectName
+
+    GlobalState.allowWrites()
 
     (templateNameOpt, projectNameOpt) match {
       case (Some(templateName), Some(projectName)) =>
