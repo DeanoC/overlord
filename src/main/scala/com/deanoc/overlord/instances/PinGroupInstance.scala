@@ -1,7 +1,7 @@
 package com.deanoc.overlord.instances
 
 import com.deanoc.overlord.hardware.HardwareBoundrary
-import com.deanoc.overlord.config.{BitsDesc, WireDirection}
+import com.deanoc.overlord.config.{BitsDesc, WireDirection, PingroupsConfig}
 import com.deanoc.overlord.utils.Variant
 import com.deanoc.overlord.{
   DiffPinConstraint,
@@ -17,7 +17,7 @@ case class PinGroupInstance(
     name: String,
     constraint: PinConstraintType,
     override val definition: HardwareDefinition,
-    config: com.deanoc.overlord.config.PinGroupConfig // Store the specific config
+    config: PingroupsConfig // Store the specific config
 ) extends HardwareInstance {
 
   override lazy val ports: mutable.HashMap[String, HardwareBoundrary] =
@@ -30,8 +30,10 @@ object PinGroupInstance {
   def apply(
       name: String, // Keep name as it's part of InstanceTrait
       definition: HardwareDefinition,
-      config: com.deanoc.overlord.config.PinGroupConfig // Accept PinGroupConfig
+      config: PingroupsConfig // Accept PinGroupConfig
   ): Either[String, PinGroupInstance] = {
+    Left("TODO: PinGroupInstance.apply")
+    /*
     try {
       // The PinGroupConfig only contains 'pins' and 'direction'.
       // Other attributes like standard, pullup, etc., are assumed to be
@@ -63,6 +65,6 @@ object PinGroupInstance {
     } catch {
       case e: Exception =>
         Left(s"Error creating PinGroupInstance: ${e.getMessage}")
-    }
+    }*/
   }
 }

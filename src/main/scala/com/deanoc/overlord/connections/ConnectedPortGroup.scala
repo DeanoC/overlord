@@ -6,7 +6,7 @@ import com.deanoc.overlord.connections.ConnectionDirection
 import com.deanoc.overlord.config.WireDirection
 
 import com.deanoc.overlord.instances.HardwareInstance
-import com.deanoc.overlord.interfaces.PortsLike
+import com.deanoc.overlord.interfaces.BoundrariesLike
 
 /** Represents a group of connected ports between two components.
   *
@@ -106,10 +106,10 @@ object ConnectedPortGroup {
     *   A new `ConnectedPortGroup` instance.
     */
   def apply(
-      fi: PortsLike,
+      fi: BoundrariesLike,
       fp: HardwareBoundrary,
       fn: String,
-      si: PortsLike,
+      si: BoundrariesLike,
       sp: HardwareBoundrary,
       direction: ConnectionDirection
   ): ConnectedPortGroup = {

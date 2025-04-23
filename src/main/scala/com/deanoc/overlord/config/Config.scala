@@ -15,7 +15,89 @@ object CirceDefaults {
   def withDefaultOption[T](cursor: HCursor, field: String)(implicit decoder: Decoder[T]): Decoder.Result[Option[T]] = {
     cursor.downField(field).as[Option[T]].orElse(Right(None))
   }
+
+  /**
+   * Checks Defaults stack for a value for the given field.
+   * If present, uses it (with type conversion), otherwise falls back to JSON.
+   */
+  def withDefaultsOverride[T](cursor: HCursor, field: String)(implicit decoder: Decoder[T]): Decoder.Result[T] = {
+    if (Defaults.contains(field)) {
+      // Try to convert the Any to T using circe's Decoder
+      val value = Defaults(field)
+      // Convert value to Json, then decode as T
+      io.circe.parser.parse(io.circe.Printer.noSpaces.print(io.circe.Json.fromString(value.toString))).getOrElse(io.circe.Json.Null).as[T] match {
+        case Right(v) => Right(v)
+        case Left(_) =>
+          // Fallback: try to cast directly if possible
+          try Right(value.asInstanceOf[T])
+          catch { case _: Throwable => Left(DecodingFailure(s"Failed to convert default for $field", cursor.history)) }
+      }
+    } else {
+      cursor.downField(field).as[T]
+    }
+  }
 }
+
+// Custom decoder for Map[String, Any]
+object CustomDecoders {
+  implicit val decodeMapStringAny: Decoder[Map[String, Any]] = new Decoder[Map[String, Any]] {
+    def apply(c: HCursor): Decoder.Result[Map[String, Any]] = {
+      c.as[Map[String, Json]].map { jsonMap =>
+        jsonMap.map { case (k, v) =>
+          k -> (v.asString.orElse(v.asBoolean.map(_.toString))
+                .orElse(v.asNumber.map(_.toString))
+                .orElse(v.asArray.map(_.toString))
+                .orElse(v.asObject.map(_.toString))
+                .getOrElse(v.toString))
+        }
+      }
+    }
+  }
+
+  /**
+   * Decoder for a field called "defaults" that decodes all key-value pairs into a Map[String, Any].
+   * Only allows primitive values (String, Boolean, Number). Objects/arrays cause decoding failure.
+   * When decoded, pushes the map onto the Defaults stack.
+   */
+  val decodeDefaultsAsMap: Decoder[Map[String, Any]] = Decoder.instance { c =>
+    c.downField("defaults").as[Option[Map[String, Json]]].flatMap {
+      case Some(map) =>
+        val result = map.foldLeft(Right(Map.empty[String, Any]): Decoder.Result[Map[String, Any]]) {
+          case (acc, (k, v)) =>
+            acc.flatMap { m =>
+              if (v.isString) Right(m + (k -> v.asString.get))
+              else if (v.isBoolean) Right(m + (k -> v.asBoolean.get))
+              else if (v.isNumber) Right(m + (k -> v.asNumber.flatMap(_.toBigDecimal).get))
+              else Left(DecodingFailure(s"defaults field '$k' must be a primitive (string, boolean, number), got: $v", c.history))
+            }
+        }
+        result.foreach(Defaults.push)
+        result
+      case None =>
+        Defaults.push(Map.empty) // Always push an empty map if no defaults block
+        Right(Map.empty[String, Any])
+    }
+  }
+}
+// Example usage for a config class with a defaults block
+// case class ExampleConfig(defaults: Map[String, Any], other: String)
+
+// object ExampleConfig {
+//   import CustomDecoders._
+//   implicit val decoder: Decoder[ExampleConfig] = Decoder.instance { c =>
+//     for {
+//       defaults <- decodeDefaultsAsMap(c)
+//       other <- c.downField("other").as[String]
+//     } yield {
+//       try {
+//         ExampleConfig(defaults, other)
+//       } finally {
+//         Defaults.pop()
+//       }
+//     }
+//   }
+// }
+
 
 sealed case class BitsDesc(text: String) {
   private val txt: String = text.filterNot(c => c == '[' || c == ']')
@@ -38,68 +120,6 @@ object BitsDesc {
 case class MemoryRangeConfig(
   address: String, // Assuming address is represented as a hex string in YAML
   size: String     // Assuming size is represented as a hex string in YAML
-) derives Decoder
-// Represents the configuration for an IO definition
-case class IoConfig(
-  visible_to_software: Boolean
-) derives Decoder
-
-// Represents the configuration for a PinGroup definition
-case class PinGroupConfig(
-  pins: List[String],
-  direction: String // Assuming direction is a string like "input" or "output"
-) derives Decoder
-
-// Represents the configuration for a Clock definition
-case class ClockConfig(
-  frequency: String // Assuming frequency is a string like "100MHz"
-) derives Decoder
-
-// Represents the configuration for a Program definition
-case class ProgramConfig(
-  dependencies: List[String]
-) derives Decoder
-
-// Represents the configuration for a Library definition
-case class LibraryConfig(
-  dependencies: List[String]
-) derives Decoder
-
-
-// Custom decoder for Map[String, Any]
-object CustomDecoders {
-  implicit val decodeMapStringAny: Decoder[Map[String, Any]] = new Decoder[Map[String, Any]] {
-    def apply(c: HCursor): Decoder.Result[Map[String, Any]] = {
-      c.as[Map[String, Json]].map { jsonMap =>
-        jsonMap.map { case (k, v) =>
-          k -> (v.asString.orElse(v.asBoolean.map(_.toString))
-                .orElse(v.asNumber.map(_.toString))
-                .orElse(v.asArray.map(_.toString))
-                .orElse(v.asObject.map(_.toString))
-                .getOrElse(v.toString))
-        }
-      }
-    }
-  }
-}
-
-
-case class FieldConfig(
-  bits: String, // Bit range "high:low"
-  name: String, // Field identifier
-  `type`: String, // Access type: raz/rw/ro/wo/mixed
-  shortdesc: Option[String] = None, // Brief functional description
-  longdesc: Option[String] = None // Detailed technical documentation
-) derives Decoder
-
-case class RegisterConfig(
-  default: String, // Power-on value (e.g., "0x00000000")
-  description: String, // Functional purpose
-  field: List[FieldConfig], // Bitfield definitions
-  name: String, // Register name (e.g., "MCU_RESET")
-  offset: String, // Address offset from bank base
-  `type`: String, // Access type: mixed/rw/ro/wo
-  width: String // Bit width (e.g., "32")
 ) derives Decoder
 
 case class BoundraryConfig(
@@ -153,3 +173,39 @@ object GatewareConfig {
     }
   }
 }
+
+object DefaultsAwareDecoders {
+  import io.circe.Decoder
+  import io.circe.CursorOp
+
+  private def fieldNameFromCursor(c: HCursor): Option[String] =
+    c.history.collectFirst { case CursorOp.DownField(field) => field }
+
+  implicit val stringDecoder: Decoder[String] = Decoder.instance { c =>
+    val field = fieldNameFromCursor(c).getOrElse("")
+    if (Defaults.contains(field)) CirceDefaults.withDefaultsOverride[String](c, field)
+    else Decoder.decodeString(c)
+  }
+
+  implicit val intDecoder: Decoder[Int] = Decoder.instance { c =>
+    val field = fieldNameFromCursor(c).getOrElse("")
+    if (Defaults.contains(field)) CirceDefaults.withDefaultsOverride[Int](c, field)
+    else Decoder.decodeInt(c)
+  }
+
+  implicit val booleanDecoder: Decoder[Boolean] = Decoder.instance { c =>
+    val field = fieldNameFromCursor(c).getOrElse("")
+    if (Defaults.contains(field)) CirceDefaults.withDefaultsOverride[Boolean](c, field)
+    else Decoder.decodeBoolean(c)
+  }
+
+  implicit val doubleDecoder: Decoder[Double] = Decoder.instance { c =>
+    val field = fieldNameFromCursor(c).getOrElse("")
+    if (Defaults.contains(field)) CirceDefaults.withDefaultsOverride[Double](c, field)
+    else Decoder.decodeDouble(c)
+  }
+
+  // Add more for other basic types as needed (Long, Float, etc.)
+}
+
+// To activate these globally, import DefaultsAwareDecoders._ in your config package or relevant files.

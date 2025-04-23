@@ -7,7 +7,7 @@ import com.deanoc.overlord.{
 }
 import com.deanoc.overlord.definitions.{HardwareDefinition, GatewareDefinition}
 import com.deanoc.overlord.interfaces.{
-  PortsLike,
+  BoundrariesLike,
   RegisterBankLike,
   MultiBusLike,
   RamLike,
@@ -22,7 +22,7 @@ import com.deanoc.overlord.definitions.GatewareDefinition
 
 trait HardwareInstance
     extends InstanceTrait
-    with PortsLike
+    with BoundrariesLike
     with RegisterBankLike
     with MultiBusLike {
   override def definition: HardwareDefinition
@@ -105,7 +105,7 @@ trait HardwareInstance
     if (ports.contains(lastName)) Some(ports(lastName)) else None
 
   override def getInterface[T](implicit tag: ClassTag[T]): Option[T] = {
-    val PortsLike_ = classOf[PortsLike]
+    val PortsLike_ = classOf[BoundrariesLike]
     val RegisterBankLike_ = classOf[RegisterBankLike]
     val MultiBusLike_ = classOf[MultiBusLike]
 
@@ -120,10 +120,10 @@ trait HardwareInstance
   // ports like interface
   override def getOwner: HardwareInstance = this
 
-  override def getPortsStartingWith(startsWith: String): Seq[HardwareBoundrary] =
+  override def getBoundrariesStartingWith(startsWith: String): Seq[HardwareBoundrary] =
     ports.filter(_._1.startsWith(startsWith)).values.toSeq
 
-  override def getPortsMatchingName(name: String): Seq[HardwareBoundrary] =
+  override def getBoundrariesMatchingName(name: String): Seq[HardwareBoundrary] =
     ports.filter(_._1 == name).values.toSeq
 
   // register bank like

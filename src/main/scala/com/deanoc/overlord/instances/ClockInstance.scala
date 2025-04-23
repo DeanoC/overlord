@@ -2,11 +2,12 @@ package com.deanoc.overlord.instances
 
 import com.deanoc.overlord.utils._
 import com.deanoc.overlord.definitions.HardwareDefinition
+import com.deanoc.overlord.config.BoardClockConfig
 
 case class ClockInstance(
     name: String,
     override val definition: HardwareDefinition,
-    config: com.deanoc.overlord.config.ClockConfig // Store the specific config
+    config: BoardClockConfig // Store the specific config
 ) extends HardwareInstance {
 
   lazy val pin: String = Utils.lookupString(attributes, "pin", or = "INVALID")
@@ -22,7 +23,7 @@ object ClockInstance {
   def apply(
       name: String, // Keep name as it's part of InstanceTrait
       definition: HardwareDefinition,
-      config: com.deanoc.overlord.config.ClockConfig // Accept ClockConfig
+      config: BoardClockConfig // Accept ClockConfig
   ): Either[String, ClockInstance] = {
     try {
       // Create the ClockInstance, passing the config

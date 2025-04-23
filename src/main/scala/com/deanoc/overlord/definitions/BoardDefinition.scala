@@ -9,11 +9,9 @@ import java.nio.file.Path
 import com.deanoc.overlord.config.HardwareDefinitionConfig
 import com.deanoc.overlord.SourceLoader
 import com.deanoc.overlord.config.GatewareConfig
+import com.deanoc.overlord.config.PingroupsConfig
+
 import com.deanoc.overlord.hardware.RegisterBank
-import com.deanoc.overlord.config.IoConfig
-import com.deanoc.overlord.config.PinGroupConfig
-import com.deanoc.overlord.config.ClockConfig
-import com.deanoc.overlord.config.BoardConfig
 import com.deanoc.overlord.instances._
 
 import io.circe.parser.decode 
@@ -24,29 +22,19 @@ case class BoardDefinition(
   config: BoardDefinitionConfig,
   sourcePath: Path,
   dependencies: Seq[String],
-  pinGroups: Map[String, PinGroupConfig]
+  pinGroups: Map[String, PingroupsConfig]
 ) extends DefinitionTrait {
 
   def createInstance(
       name: String,
       instanceConfig: Map[String, Any]
   ): Either[String, InstanceTrait] = {
-    decode[BoardConfig](
-      Definition.anyToJson(instanceConfig).noSpaces
-    ) match {
-      case Right(boardConfig) =>
-        BoardInstance(
-          name = name,
-          definition = this,
-          config = boardConfig
-        )
-      case Left(error) =>
-        Left(
-          s"Failed to decode BoardConfig for instance $name: ${error.getMessage}"
-        )
-    }    
+    Left("TODO: Implement createInstance for BoardDefinition")
+    // Right(BoardInstance(
+    //   name = name,
+    //   definition = this,
+    // ))
   }
-
 }
 
 /** Companion object for BoardDefinition. 

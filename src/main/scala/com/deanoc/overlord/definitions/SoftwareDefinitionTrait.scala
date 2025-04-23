@@ -18,6 +18,8 @@ trait SoftwareDefinitionTrait extends DefinitionTrait {
       name: String,
       instanceConfig: Map[String, Any]
   ): Either[String, InstanceTrait] = {
+    Left("TODO: Implement createInstance in SoftwareDefinitionTrait")
+    /*  
     defType match {
       case _: DefinitionType.LibraryDefinition =>
         decode[LibraryConfig](
@@ -49,5 +51,6 @@ trait SoftwareDefinitionTrait extends DefinitionTrait {
         }
       case _ => Left(s"$defType is invalid for software")
     }
+      */
   }
 }

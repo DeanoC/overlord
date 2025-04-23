@@ -50,6 +50,11 @@ object Defaults {
     cachedFlattened.get
   }
 
+  def contains(key: String): Boolean = flatten.contains(key)
+
+  def apply(key: String): Any = 
+    flatten.getOrElse(key, throw new NoSuchElementException(s"Key '$key' not found in Defaults"))
+
   private def computeFlatten(): Map[String, Any] = {
     val flattened = stack.foldRight(Map.empty[String, Any]) { (map, acc) =>
       val result = map ++ acc

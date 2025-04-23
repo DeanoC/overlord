@@ -8,7 +8,6 @@ import scala.util.boundary, boundary.break
 
 import scala.collection.immutable
 import com.deanoc.overlord.definitions.DefinitionType
-import com.deanoc.overlord.config.BoardConfig
 
 // Represents a generic type of board with default attributes.
 sealed trait BoardType {
@@ -71,13 +70,13 @@ object BoardInstance {
   // Factory method to create a BoardInstance from attributes and a definition.
   def apply(
       name: String,
-      definition: BoardDefinition,
-      config: BoardConfig 
+      definition: BoardDefinition
   ): Either[String, BoardInstance] = {
-
+    Left("TODO - Implement BoardInstance.apply")
+/*
     // Determine the type of board based on the config.board_type field.
     val boardTypeResult = config.board_type match {
-/*      case "Xilinx" =>
+      case "Xilinx" =>
         // Assuming board_family and board_device are now part of BoardConfig or definition attributes
         // For now, I'll assume they are still in definition.attributes and will need to be passed or looked up.
         // This part might need further refinement based on the actual structure of BoardConfig and definition attributes.
@@ -117,7 +116,7 @@ object BoardInstance {
               Utils.toString(definition.config.attributesAsVariant("board_device"))
             )
           )
-        }*/
+        }
       case _ =>
         Left(s"$name board has an unknown board_type: ${config.board_type}")
     }
@@ -129,7 +128,7 @@ object BoardInstance {
     val boardType = boardTypeResult.toOption.get
 
     Left("Not implemented yet")
-    /*
+    
     // Clocks are now directly available in config.clocks
     val clocksResult = config.clocks.foldLeft[Either[String, Seq[InstanceTrait]]](Right(Seq.empty)) {
       case (Left(error), _) => Left(error)

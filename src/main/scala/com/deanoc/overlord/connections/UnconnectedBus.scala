@@ -7,7 +7,7 @@ import com.deanoc.overlord.connections.ConnectionDirection
 import com.deanoc.overlord.connections.ConnectionTypes.{BusName, InstanceName}
 
 import com.deanoc.overlord.interfaces.{
-  PortsLike,
+  BoundrariesLike,
   RamLike,
   SupplierBusLike,
   MultiBusLike
@@ -185,8 +185,8 @@ case class UnconnectedBus(
     // pure hardware buses require no pre-connecting
     if (mainIL.isHardware && otherIL.isHardware) return busConnection
 
-    val busPortsOpt = bus.getInterface[PortsLike]
-    val otherPortsOpt = other.getInterface[PortsLike]
+    val busPortsOpt = bus.getInterface[BoundrariesLike]
+    val otherPortsOpt = other.getInterface[BoundrariesLike]
 
     if (busPortsOpt.isEmpty || otherPortsOpt.isEmpty) {
       val missingInterfaces = Seq(
@@ -205,9 +205,9 @@ case class UnconnectedBus(
     val otherPrefix = Utils.lookupString(other.attributes, "bus_prefix", "bus_")
 
     val cpgs: Seq[Connected] = for {
-      fp <- busPorts.getPortsStartingWith(busPrefix)
+      fp <- busPorts.getBoundrariesStartingWith(busPrefix)
       otherName = s"${otherPrefix}${fp.name.replace(busPrefix, "")}"
-      sp <- otherPorts.getPortsMatchingName(otherName)
+      sp <- otherPorts.getBoundrariesMatchingName(otherName)
     } yield ConnectedPortGroup(
       busPorts,
       fp,
@@ -245,13 +245,13 @@ case class UnconnectedBus(
 		}*/
 
     // check both instance have ports
-    if (!mainIL.instance.hasInterface[PortsLike]) {
+    if (!mainIL.instance.hasInterface[BoundrariesLike]) {
       error(
         s"$firstFullName doesn't expose a ports interface, so can't be connected to a bus"
       );
       return None
     }
-    if (!otherIL.instance.hasInterface[PortsLike]) {
+    if (!otherIL.instance.hasInterface[BoundrariesLike]) {
       error(
         s"$secondFullName doesn't expose a ports interface, so can't be connected to a bus"
       );

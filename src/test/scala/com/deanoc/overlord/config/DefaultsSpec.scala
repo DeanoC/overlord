@@ -1,7 +1,27 @@
 package com.deanoc.overlord.config
 
+import io.circe.yaml.parser
+import io.circe.Decoder
+import io.circe.HCursor
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
+
+case class SimpleConfig(
+  foo: String,
+  bar: Int,
+  baz: Boolean
+)
+
+object SimpleConfig {
+  import com.deanoc.overlord.config.DefaultsAwareDecoders._
+  implicit val decoder: Decoder[SimpleConfig] = Decoder.instance { c =>
+    for {
+      foo <- c.downField("foo").as[String]
+      bar <- c.downField("bar").as[Int]
+      baz <- c.downField("baz").as[Boolean]
+    } yield SimpleConfig(foo, bar, baz)
+  }
+}
 
 class DefaultsSpec extends AnyFlatSpec with Matchers {
 
@@ -231,5 +251,72 @@ class DefaultsSpec extends AnyFlatSpec with Matchers {
 
     Defaults.clear()
     Defaults.cacheValid shouldBe false // Clear should invalidate
+  }
+
+  "Defaults YAML decoding" should "override value-type keys from the defaults stack" in {
+    Defaults.clear()
+    // Push defaults that should override YAML
+    Defaults.push(Map("foo" -> "from-defaults", "bar" -> 123, "baz" -> true))
+
+    val yaml =
+      """
+      |foo: original
+      |bar: 42
+      |baz: false
+      """.stripMargin
+
+    val doc = parser.parse(yaml).toOption.get
+    val decoded = SimpleConfig.decoder.decodeJson(doc)
+    decoded shouldBe Right(SimpleConfig("from-defaults", 123, true))
+  }
+
+  it should "fall back to YAML values if not in defaults stack" in {
+    Defaults.clear()
+    // Only override 'foo'
+    Defaults.push(Map("foo" -> "from-defaults"))
+
+    val yaml =
+      """
+      |foo: original
+      |bar: 42
+      |baz: false
+      """.stripMargin
+
+    val doc = parser.parse(yaml).toOption.get
+    val decoded = SimpleConfig.decoder.decodeJson(doc)
+    decoded shouldBe Right(SimpleConfig("from-defaults", 42, false))
+  }
+
+  it should "decode YAML values if defaults stack is empty" in {
+    Defaults.clear()
+
+    val yaml =
+      """
+      |foo: original
+      |bar: 42
+      |baz: false
+      """.stripMargin
+
+    val doc = parser.parse(yaml).toOption.get
+    val decoded = SimpleConfig.decoder.decodeJson(doc)
+    decoded shouldBe Right(SimpleConfig("original", 42, false))
+  }
+
+  it should "respect excludes when decoding" in {
+    Defaults.clear()
+    Defaults.push(Map("foo" -> "from-defaults", "bar" -> 123, "baz" -> true))
+    Defaults.addExclude("bar")
+
+    val yaml =
+      """
+      |foo: original
+      |bar: 42
+      |baz: false
+      """.stripMargin
+
+    val doc = parser.parse(yaml).toOption.get
+    val decoded = SimpleConfig.decoder.decodeJson(doc)
+    // 'bar' should come from YAML, others from defaults
+    decoded shouldBe Right(SimpleConfig("from-defaults", 42, true))
   }
 }

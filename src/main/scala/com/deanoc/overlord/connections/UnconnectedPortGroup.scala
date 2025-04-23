@@ -1,7 +1,7 @@
 package com.deanoc.overlord.connections
 
 import com.deanoc.overlord.instances.{HardwareInstance, InstanceTrait}
-import com.deanoc.overlord.interfaces.PortsLike
+import com.deanoc.overlord.interfaces.BoundrariesLike
 import com.deanoc.overlord._
 import com.deanoc.overlord.connections.ConnectionDirection
 
@@ -47,10 +47,10 @@ case class UnconnectedPortGroup(
   override def connect(unexpanded: Seq[HardwareInstance]): Seq[Connected] = for {
     mloc <- matchInstances(firstFullName, unexpanded)
     sloc <- matchInstances(secondFullName, unexpanded)
-    mi <- mloc.instance.getInterface[PortsLike].toSeq
-    si <- sloc.instance.getInterface[PortsLike].toSeq
-    fp <- mi.getPortsStartingWith(first_prefix).filter(p => firstFullName.contains(p.name))
-    sp <- si.getPortsStartingWith(second_prefix).filter(p => secondFullName.contains(p.name))
+    mi <- mloc.instance.getInterface[BoundrariesLike].toSeq
+    si <- sloc.instance.getInterface[BoundrariesLike].toSeq
+    fp <- mi.getBoundrariesStartingWith(first_prefix).filter(p => firstFullName.contains(p.name))
+    sp <- si.getBoundrariesStartingWith(second_prefix).filter(p => secondFullName.contains(p.name))
 
     if (fp.name.stripPrefix(first_prefix) == sp.name.stripPrefix(second_prefix)) &&
        !excludes.contains(fp.name) && !excludes.contains(sp.name)
