@@ -10,7 +10,7 @@ import com.deanoc.overlord.hardware.Port
 import com.deanoc.overlord.config.BitsDesc
 
 import com.deanoc.overlord.config.WireDirection
-import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait, PinGroupInstance, ClockInstance}
+import com.deanoc.overlord.instances.{HardwareInstance, InstanceTrait, PinGroupInstance, ClockInstance}
 import org.mockito.Mockito._
 import org.mockito.Mockito
 import scala.collection.mutable
@@ -27,7 +27,7 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
     // Create mock instances
     val chipDef = mock[HardwareDefinition]
     
-    val chipInstance = mock[ChipInstance]
+    val chipInstance = mock[HardwareInstance]
     when(chipInstance.definition).thenReturn(chipDef)
     
     val pinInstance = mock[PinGroupInstance]
@@ -56,7 +56,7 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
     // Create mock instances
     val chipDef = mock[HardwareDefinition]
     
-    val chipInstance = mock[ChipInstance]
+    val chipInstance = mock[HardwareInstance]
     when(chipInstance.definition).thenReturn(chipDef)
     
     val pinInstance = mock[PinGroupInstance]
@@ -90,11 +90,11 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
     // Create mock instances and definitions
     val chipDef = mock[HardwareDefinition]
     
-    val chipInstance1 = mock[ChipInstance]
+    val chipInstance1 = mock[HardwareInstance]
     when(chipInstance1.definition).thenReturn(chipDef)
     when(chipInstance1.name).thenReturn("chip1")
     
-    val chipInstance2 = mock[ChipInstance]
+    val chipInstance2 = mock[HardwareInstance]
     when(chipInstance2.definition).thenReturn(chipDef)
     when(chipInstance2.name).thenReturn("chip2")
     
@@ -145,15 +145,15 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
     // Create mock instances and definitions
     val chipDef = mock[HardwareDefinition]
     
-    val chipInstance1 = mock[ChipInstance]
+    val chipInstance1 = mock[HardwareInstance]
     when(chipInstance1.definition).thenReturn(chipDef)
     when(chipInstance1.name).thenReturn("chip1")
     
-    val chipInstance2 = mock[ChipInstance]
+    val chipInstance2 = mock[HardwareInstance]
     when(chipInstance2.definition).thenReturn(chipDef)
     when(chipInstance2.name).thenReturn("chip2")
     
-    val chipInstance3 = mock[ChipInstance]
+    val chipInstance3 = mock[HardwareInstance]
     when(chipInstance3.definition).thenReturn(chipDef)
     when(chipInstance3.name).thenReturn("chip3")
     
@@ -204,15 +204,15 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
     // Create mock instances and definitions
     val chipDef = mock[HardwareDefinition]
     
-    val chipInstance1 = mock[ChipInstance]
+    val chipInstance1 = mock[HardwareInstance]
     when(chipInstance1.definition).thenReturn(chipDef)
     when(chipInstance1.name).thenReturn("chip1")
     
-    val chipInstance2 = mock[ChipInstance]
+    val chipInstance2 = mock[HardwareInstance]
     when(chipInstance2.definition).thenReturn(chipDef)
     when(chipInstance2.name).thenReturn("chip2")
     
-    val chipInstance3 = mock[ChipInstance]
+    val chipInstance3 = mock[HardwareInstance]
     when(chipInstance3.definition).thenReturn(chipDef)
     when(chipInstance3.name).thenReturn("chip3")
     
@@ -274,11 +274,11 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
     // Create mock instances and definitions
     val chipDef = mock[HardwareDefinition]
     
-    val chipInstance1 = mock[ChipInstance]
+    val chipInstance1 = mock[HardwareInstance]
     when(chipInstance1.definition).thenReturn(chipDef)
     when(chipInstance1.name).thenReturn("chip1")
     
-    val chipInstance2 = mock[ChipInstance]
+    val chipInstance2 = mock[HardwareInstance]
     when(chipInstance2.definition).thenReturn(chipDef)
     when(chipInstance2.name).thenReturn("chip2")
     
@@ -337,11 +337,11 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
     // Create mock instances and definitions
     val chipDef = mock[HardwareDefinition]
     
-    val chipInstance1 = mock[ChipInstance]
+    val chipInstance1 = mock[HardwareInstance]
     when(chipInstance1.definition).thenReturn(chipDef)
     when(chipInstance1.name).thenReturn("chip1")
     
-    val chipInstance2 = mock[ChipInstance]
+    val chipInstance2 = mock[HardwareInstance]
     when(chipInstance2.definition).thenReturn(chipDef)
     when(chipInstance2.name).thenReturn("chip2")
     
@@ -383,11 +383,11 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
     // Create mock instances and definitions
     val chipDef = mock[HardwareDefinition]
     
-    val chipInstance1 = mock[ChipInstance]
+    val chipInstance1 = mock[HardwareInstance]
     when(chipInstance1.definition).thenReturn(chipDef)
     when(chipInstance1.name).thenReturn("chip1")
     
-    val chipInstance2 = mock[ChipInstance]
+    val chipInstance2 = mock[HardwareInstance]
     when(chipInstance2.definition).thenReturn(chipDef)
     when(chipInstance2.name).thenReturn("chip2")
     

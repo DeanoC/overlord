@@ -5,7 +5,7 @@ import com.deanoc.overlord.hardware.Port
 import com.deanoc.overlord.connections.ConnectionDirection
 import com.deanoc.overlord.config.WireDirection
 
-import com.deanoc.overlord.instances.ChipInstance
+import com.deanoc.overlord.instances.HardwareInstance
 import com.deanoc.overlord.interfaces.PortsLike
 
 /** Represents a group of connected ports between two components.
@@ -36,7 +36,7 @@ case class ConnectedPortGroup(
     )
 
   /** Checks if the connection involves the specified chip instance. */
-  override def connectedTo(inst: ChipInstance): Boolean =
+  override def connectedTo(inst: HardwareInstance): Boolean =
     (main.instance.name == inst.name) || (secondary.instance.name == inst.name)
 
   /** Returns the first (source) instance location in this connection. */
@@ -67,8 +67,8 @@ case class ConnectedPortGroup(
     * specified direction.
     */
   override def connectedBetween(
-      s: ChipInstance,
-      e: ChipInstance,
+      s: HardwareInstance,
+      e: HardwareInstance,
       d: ConnectionDirection
   ): Boolean = {
     d match {

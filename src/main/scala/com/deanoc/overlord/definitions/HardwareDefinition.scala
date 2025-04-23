@@ -99,7 +99,7 @@ trait HardwareDefinition extends DefinitionTrait {
           case Right(boardConfig) =>
             BoardInstance(
               name = name,
-              definition = this,
+              definition = this.asInstanceOf[BoardDefinition],
               config = boardConfig
             )
           case Left(error) =>

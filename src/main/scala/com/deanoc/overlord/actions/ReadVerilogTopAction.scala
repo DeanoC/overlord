@@ -12,7 +12,7 @@ import com.deanoc.overlord.input.{
 import com.deanoc.overlord.hardware.Port
 import com.deanoc.overlord.config.{BitsDesc, WireDirection}
 import com.deanoc.overlord.Overlord
-import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
+import com.deanoc.overlord.instances.{HardwareInstance, InstanceTrait}
 
 case class ReadVerilogTopAction(filename: String)
     extends GatewareAction
@@ -20,23 +20,23 @@ case class ReadVerilogTopAction(filename: String)
 
   override val phase: Int = 2
 
-  // Executes the action on a given instance, ensuring it is a ChipInstance
+  // Executes the action on a given instance, ensuring it is a HardwareInstance
   def execute(
       instance: InstanceTrait,
       parameters: Map[String, Variant]
   ): Unit = {
-    if (!instance.isInstanceOf[ChipInstance]) {
+    if (!instance.isInstanceOf[HardwareInstance]) {
       warn(
         s"${instance.name} is not a chip but is being processed by a gateware action"
       )
     } else {
-      execute(instance.asInstanceOf[ChipInstance], parameters)
+      execute(instance.asInstanceOf[HardwareInstance], parameters)
     }
   }
 
   // Executes the action specifically for ChipInstance, parsing Verilog modules
   override def execute(
-      instance: ChipInstance,
+      instance: HardwareInstance,
       parameters: Map[String, Variant]
   ): Unit = {
     import scala.util.boundary, boundary.break

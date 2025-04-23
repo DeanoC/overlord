@@ -7,7 +7,7 @@ case class ClockInstance(
     name: String,
     override val definition: HardwareDefinition,
     config: com.deanoc.overlord.config.ClockConfig // Store the specific config
-) extends ChipInstance {
+) extends HardwareInstance {
 
   lazy val pin: String = Utils.lookupString(attributes, "pin", or = "INVALID")
   lazy val standard: String =

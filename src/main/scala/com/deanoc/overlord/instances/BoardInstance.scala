@@ -2,11 +2,13 @@ package com.deanoc.overlord.instances
 
 import com.deanoc.overlord.utils._
 import com.deanoc.overlord.interfaces.UnconnectedLike
-import com.deanoc.overlord.definitions.{HardwareDefinition, Definition}
+import com.deanoc.overlord.definitions.BoardDefinition
 import com.deanoc.overlord.instances.Instance.variantToAny
 import scala.util.boundary, boundary.break
 
 import scala.collection.immutable
+import com.deanoc.overlord.definitions.DefinitionType
+import com.deanoc.overlord.config.BoardConfig
 
 // Represents a generic type of board with default attributes.
 sealed trait BoardType {
@@ -57,17 +59,11 @@ case class GowinBoard(family: String, device: String) extends BoardType {
 case class BoardInstance(
     name: String,
     boardType: BoardType,
-    override val definition: HardwareDefinition,
-    override val children: Seq[InstanceTrait] = Seq()
-) extends ChipInstance
-    with Container {
-  // Indicates whether the board is physical.
-  override val physical: Boolean = true
+    val definition: BoardDefinition,
+    val children: Seq[InstanceTrait] = Seq()
+) extends InstanceTrait {
   // Represents unconnected elements on the board.
-  override val unconnected: Seq[UnconnectedLike] = Seq()
-
-  // Determines if the board is visible to software.
-  override def isVisibleToSoftware: Boolean = true
+  val unconnected: Seq[UnconnectedLike] = Seq()
 }
 
 object BoardInstance {
@@ -75,13 +71,13 @@ object BoardInstance {
   // Factory method to create a BoardInstance from attributes and a definition.
   def apply(
       name: String,
-      definition: HardwareDefinition,
-      config: com.deanoc.overlord.config.BoardConfig // Accept BoardConfig
+      definition: BoardDefinition,
+      config: BoardConfig 
   ): Either[String, BoardInstance] = {
 
     // Determine the type of board based on the config.board_type field.
     val boardTypeResult = config.board_type match {
-      case "Xilinx" =>
+/*      case "Xilinx" =>
         // Assuming board_family and board_device are now part of BoardConfig or definition attributes
         // For now, I'll assume they are still in definition.attributes and will need to be passed or looked up.
         // This part might need further refinement based on the actual structure of BoardConfig and definition attributes.
@@ -121,7 +117,7 @@ object BoardInstance {
               Utils.toString(definition.config.attributesAsVariant("board_device"))
             )
           )
-        }
+        }*/
       case _ =>
         Left(s"$name board has an unknown board_type: ${config.board_type}")
     }

@@ -208,3 +208,28 @@ object OtherDefinitionConfig {
     )
   }
 }
+
+case class BoardDefinitionConfig(
+  `type`: String,
+  ports: List[PortConfig] = List(),
+  attributes: Map[String, Any] = Map.empty
+) extends DefinitionConfig {
+  def withAttributes(newAttributes: Map[String, Any]): DefinitionConfig = 
+    copy(attributes = newAttributes)
+}
+
+object BoardDefinitionConfig {
+  import CustomDecoders._
+
+  implicit val decoder: Decoder[BoardDefinitionConfig] = (c: HCursor) => {
+    for {
+      typeVal <- c.downField("type").as[String]
+      ports <- withDefault(c, "ports", List.empty[PortConfig])
+      attributes = ReflectionHelper.extractUnhandledFields[BoardDefinitionConfig](c)
+    } yield BoardDefinitionConfig(
+      `type` = typeVal,
+      ports = ports,
+      attributes = attributes
+    )
+  }
+}

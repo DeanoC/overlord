@@ -4,7 +4,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import com.deanoc.overlord._
 import com.deanoc.overlord.utils.SilentLogger
-import com.deanoc.overlord.instances.ChipInstance
+import com.deanoc.overlord.instances.HardwareInstance
 import org.scalatestplus.mockito.MockitoSugar
 
 class UnconnectedClockSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLogger {
@@ -55,14 +55,14 @@ class UnconnectedClockSpec extends AnyFlatSpec with Matchers with MockitoSugar w
     // Test with empty data - methods should not throw exceptions
     withSilentLogs {
       noException should be thrownBy {
-        clock.preConnect(Seq.empty[ChipInstance])
+        clock.preConnect(Seq.empty[HardwareInstance])
       }
       
       noException should be thrownBy {
-        clock.finaliseBuses(Seq.empty[ChipInstance])
+        clock.finaliseBuses(Seq.empty[HardwareInstance])
       }
       
-      val connections = clock.connect(Seq.empty[ChipInstance])
+      val connections = clock.connect(Seq.empty[HardwareInstance])
       connections shouldBe empty
       
       val constants = clock.collectConstants(Seq.empty)

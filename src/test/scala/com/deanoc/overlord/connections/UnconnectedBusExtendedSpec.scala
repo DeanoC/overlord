@@ -14,7 +14,7 @@ import com.deanoc.overlord.definitions._
 import com.deanoc.overlord.connections.ConnectionTypes._
 // Import the new enum-based DefinitionType
 import com.deanoc.overlord.definitions.DefinitionType
-import com.deanoc.overlord.instances.{CpuInstance, RamInstance, ChipInstance, InstanceTrait}
+import com.deanoc.overlord.instances.{CpuInstance, RamInstance, HardwareInstance, InstanceTrait}
 import com.deanoc.overlord.config.{CpuDefinitionConfig, RamDefinitionConfig, MemoryRangeConfig, WireDirection}
 import com.deanoc.overlord.connections.InstanceLoc
 import com.deanoc.overlord.interfaces._
@@ -41,7 +41,7 @@ class UnconnectedBusExtendedSpec
 
   // Helper method to create an InstanceLoc
   private def createInstanceLoc(
-      instance: ChipInstance,
+      instance: HardwareInstance,
       fullName: String
   ): InstanceLoc = {
     InstanceLoc(instance, None, fullName)

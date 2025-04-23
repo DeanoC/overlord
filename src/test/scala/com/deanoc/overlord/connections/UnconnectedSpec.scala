@@ -4,7 +4,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import com.deanoc.overlord._
 import com.deanoc.overlord.utils.SilentLogger
-import com.deanoc.overlord.instances.ChipInstance
+import com.deanoc.overlord.instances.HardwareInstance
 import com.deanoc.overlord.utils.Variant
 import com.deanoc.overlord.interfaces.UnconnectedLike
 import org.scalatestplus.mockito.MockitoSugar
@@ -59,21 +59,21 @@ class UnconnectedSpec extends AnyFlatSpec with Matchers with MockitoSugar with S
     // Test with empty data - should not throw exceptions
     withSilentLogs {
       noException should be thrownBy {
-        port.preConnect(Seq.empty[ChipInstance])
-        logical.preConnect(Seq.empty[ChipInstance])
-        clock.preConnect(Seq.empty[ChipInstance])
+        port.preConnect(Seq.empty[HardwareInstance])
+        logical.preConnect(Seq.empty[HardwareInstance])
+        clock.preConnect(Seq.empty[HardwareInstance])
       }
       
       noException should be thrownBy {
-        port.finaliseBuses(Seq.empty[ChipInstance])
-        logical.finaliseBuses(Seq.empty[ChipInstance])
-        clock.finaliseBuses(Seq.empty[ChipInstance])
+        port.finaliseBuses(Seq.empty[HardwareInstance])
+        logical.finaliseBuses(Seq.empty[HardwareInstance])
+        clock.finaliseBuses(Seq.empty[HardwareInstance])
       }
       
       // Connect returns empty sequences with no instances
-      port.connect(Seq.empty[ChipInstance]) shouldBe empty
-      logical.connect(Seq.empty[ChipInstance]) shouldBe empty
-      clock.connect(Seq.empty[ChipInstance]) shouldBe empty
+      port.connect(Seq.empty[HardwareInstance]) shouldBe empty
+      logical.connect(Seq.empty[HardwareInstance]) shouldBe empty
+      clock.connect(Seq.empty[HardwareInstance]) shouldBe empty
     }
   }
 }

@@ -9,7 +9,7 @@ import org.mockito.ArgumentMatchers._
 import com.deanoc.overlord._
 import com.deanoc.overlord.utils.SilentLogger
 import com.deanoc.overlord.instances.{
-  ChipInstance,
+  HardwareInstance,
   InstanceTrait,
   PinGroupInstance,
   ClockInstance
@@ -34,7 +34,7 @@ class WireAdditionalSpec
     // Create mock instances
     val chipDef = mock[HardwareDefinition]
 
-    val chipInstance = mock[ChipInstance]
+    val chipInstance = mock[HardwareInstance]
     doReturn(chipDef).when(chipInstance).definition
 
     val pinInstance = mock[PinGroupInstance]
@@ -71,16 +71,16 @@ class WireAdditionalSpec
     // Create mock instances
     val chipDef = mock[HardwareDefinition]
 
-    val sourceInstance = mock[ChipInstance]
+    val sourceInstance = mock[HardwareInstance]
     doReturn(chipDef).when(sourceInstance).definition
 
-    val destInstance1 = mock[ChipInstance]
+    val destInstance1 = mock[HardwareInstance]
     doReturn(chipDef).when(destInstance1).definition
 
-    val destInstance2 = mock[ChipInstance]
+    val destInstance2 = mock[HardwareInstance]
     doReturn(chipDef).when(destInstance2).definition
 
-    val destInstance3 = mock[ChipInstance]
+    val destInstance3 = mock[HardwareInstance]
     doReturn(chipDef).when(destInstance3).definition
 
     // Create InstanceLoc objects
@@ -112,10 +112,10 @@ class WireAdditionalSpec
     // Create mock instances
     val chipDef = mock[HardwareDefinition]
 
-    val sourceInstance = mock[ChipInstance]
+    val sourceInstance = mock[HardwareInstance]
     doReturn(chipDef).when(sourceInstance).definition
 
-    val chipInstance = mock[ChipInstance]
+    val chipInstance = mock[HardwareInstance]
     doReturn(chipDef).when(chipInstance).definition
 
     val pinInstance = mock[PinGroupInstance]
@@ -152,19 +152,19 @@ class WireAdditionalSpec
     // Create mock instances
     val chipDef = mock[HardwareDefinition]
 
-    val sourceInstance = mock[ChipInstance]
+    val sourceInstance = mock[HardwareInstance]
     doReturn(chipDef).when(sourceInstance).definition
     doReturn("source").when(sourceInstance).name
 
-    val intermediateInstance1 = mock[ChipInstance]
+    val intermediateInstance1 = mock[HardwareInstance]
     doReturn(chipDef).when(intermediateInstance1).definition
     doReturn("intermediate1").when(intermediateInstance1).name
 
-    val intermediateInstance2 = mock[ChipInstance]
+    val intermediateInstance2 = mock[HardwareInstance]
     doReturn(chipDef).when(intermediateInstance2).definition
     doReturn("intermediate2").when(intermediateInstance2).name
 
-    val destInstance = mock[ChipInstance]
+    val destInstance = mock[HardwareInstance]
     doReturn(chipDef).when(destInstance).definition
     doReturn("dest").when(destInstance).name
 
@@ -213,11 +213,11 @@ class WireAdditionalSpec
     // Create mock instances
     val chipDef = mock[HardwareDefinition]
 
-    val sourceInstance = mock[ChipInstance]
+    val sourceInstance = mock[HardwareInstance]
     doReturn(chipDef).when(sourceInstance).definition
     doReturn("source").when(sourceInstance).name
 
-    val destInstance = mock[ChipInstance]
+    val destInstance = mock[HardwareInstance]
     doReturn(chipDef).when(destInstance).definition
     doReturn("dest").when(destInstance).name
 
@@ -290,11 +290,11 @@ class WireAdditionalSpec
     // Create mock instances
     val chipDef = mock[HardwareDefinition]
 
-    val sourceInstance = mock[ChipInstance]
+    val sourceInstance = mock[HardwareInstance]
     doReturn(chipDef).when(sourceInstance).definition
     doReturn("source").when(sourceInstance).name
 
-    val destInstance = mock[ChipInstance]
+    val destInstance = mock[HardwareInstance]
     doReturn(chipDef).when(destInstance).definition
     doReturn("dest").when(destInstance).name
 

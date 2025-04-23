@@ -18,7 +18,7 @@ case class PinGroupInstance(
     constraint: PinConstraintType,
     override val definition: HardwareDefinition,
     config: com.deanoc.overlord.config.PinGroupConfig // Store the specific config
-) extends ChipInstance {
+) extends HardwareInstance {
 
   override lazy val ports: mutable.HashMap[String, Port] =
     mutable.HashMap.from(

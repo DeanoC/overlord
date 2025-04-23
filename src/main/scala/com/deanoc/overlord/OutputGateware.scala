@@ -6,7 +6,7 @@ import java.nio.file.Path
 
 import com.deanoc.overlord.connections._
 import com.deanoc.overlord.connections.ConnectionDirection
-import com.deanoc.overlord.instances.{ChipInstance, Container}
+import com.deanoc.overlord.instances.{HardwareInstance, Container}
 import com.deanoc.overlord.interfaces.UnconnectedLike
 import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.utils._
@@ -23,7 +23,7 @@ object OutputGateware {
     ConfigPaths.pushCatalogPath(gatePath)
 
     top.children
-      .collect { case c: ChipInstance => c }
+      .collect { case c: HardwareInstance => c }
       .filter(_.isGateware)
       .foreach(executePhase(_, top.unconnected, constants, phase))
 
@@ -31,7 +31,7 @@ object OutputGateware {
   }
 
   private def executePhase(
-      instance: ChipInstance,
+      instance: HardwareInstance,
       unconnections: Seq[UnconnectedLike],
       constants: Seq[Constant],
       phase: Int
@@ -62,7 +62,7 @@ object OutputGateware {
   }
 
   private def extractParameters(
-      instance: ChipInstance,
+      instance: HardwareInstance,
       unconnections: Seq[UnconnectedLike],
       constants: Seq[Constant],
       gatewareParameters: Map[String, Variant]

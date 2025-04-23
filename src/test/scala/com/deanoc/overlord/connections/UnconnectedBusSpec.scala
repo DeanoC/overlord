@@ -4,7 +4,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import com.deanoc.overlord._
 import com.deanoc.overlord.utils.SilentLogger
-import com.deanoc.overlord.instances.ChipInstance
+import com.deanoc.overlord.instances.HardwareInstance
 import org.scalatestplus.mockito.MockitoSugar
 import scala.language.implicitConversions
 import org.mockito.Mockito.{when, doAnswer}
@@ -57,14 +57,14 @@ class UnconnectedBusSpec
     // Test with empty data - methods should not throw exceptions
     withSilentLogs {
       noException should be thrownBy {
-        bus.preConnect(Seq.empty[ChipInstance])
+        bus.preConnect(Seq.empty[HardwareInstance])
       }
 
       noException should be thrownBy {
-        bus.finaliseBuses(Seq.empty[ChipInstance])
+        bus.finaliseBuses(Seq.empty[HardwareInstance])
       }
 
-      val connections = bus.connect(Seq.empty[ChipInstance])
+      val connections = bus.connect(Seq.empty[HardwareInstance])
       connections shouldBe empty
     }
   }

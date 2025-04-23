@@ -11,7 +11,7 @@ import com.deanoc.overlord.config.BitsDesc
 
 import com.deanoc.overlord.config.WireDirection
 import com.deanoc.overlord.instances.{
-  ChipInstance,
+  HardwareInstance,
   InstanceTrait,
   PinGroupInstance,
   ClockInstance
@@ -428,8 +428,8 @@ class ConnectionParserComprehensiveSpec
   // Tests for parsePortConnection method
   "ConnectionParser.parsePortConnection" should "create connected port groups between instances" in {
     // Create mock instances and ports
-    val chipInstance1 = mock[ChipInstance]
-    val chipInstance2 = mock[ChipInstance]
+    val chipInstance1 = mock[HardwareInstance]
+    val chipInstance2 = mock[HardwareInstance]
     val gatewareDef = mock[GatewareDefinition]
     val hardwareDef = mock[HardwareDefinition]
 
@@ -464,8 +464,8 @@ class ConnectionParserComprehensiveSpec
 
   it should "handle InOutWireDirection correctly" in {
     // Create mock instances and ports
-    val chipInstance1 = mock[ChipInstance]
-    val chipInstance2 = mock[ChipInstance]
+    val chipInstance1 = mock[HardwareInstance]
+    val chipInstance2 = mock[HardwareInstance]
     val hardwareDef = mock[HardwareDefinition]
 
     when(chipInstance1.definition).thenReturn(hardwareDef)

@@ -1,7 +1,7 @@
 package com.deanoc.overlord.connections
 
 import com.deanoc.overlord.connections.ConnectionTypes._
-import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
+import com.deanoc.overlord.instances.{HardwareInstance, InstanceTrait}
 
 /** Extension methods for the Connected trait and related types.
   *
@@ -64,7 +64,7 @@ object ConnectedExtensions:
   /** Extension methods for the ConnectedBetween trait */
   extension (connectedBetween: ConnectedBetween)
     /** Checks if this connection is between two chip instances */
-    def isChipToChip(instances: Seq[ChipInstance]): Boolean =
+    def isChipToChip(instances: Seq[HardwareInstance]): Boolean =
       val firstChip =
         instances.find(chip => connectedBetween.firstFullName.endsWith(chip.name))
       val secondChip =

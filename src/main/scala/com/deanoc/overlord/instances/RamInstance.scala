@@ -11,7 +11,7 @@ import com.deanoc.overlord.config.RamDefinitionConfig
 case class RamInstance(
     name: String,
     override val definition: HardwareDefinition,
-) extends ChipInstance
+) extends HardwareInstance
     with RamLike {
   private val cpuRegEx = "\\s*,\\s*".r
 

@@ -7,7 +7,7 @@ import com.deanoc.overlord.config.BitsDesc
 import com.deanoc.overlord.hardware.Port
 import com.deanoc.overlord.interfaces._
 import com.deanoc.overlord.instances.{
-  ChipInstance,
+  HardwareInstance,
   InstanceTrait,
   PinGroupInstance
 }

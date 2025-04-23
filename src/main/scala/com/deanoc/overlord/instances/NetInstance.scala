@@ -6,7 +6,7 @@ import com.deanoc.overlord.definitions.HardwareDefinition
 case class NetInstance(
     name: String,
     override val definition: HardwareDefinition
-) extends ChipInstance {
+) extends HardwareInstance {
   override def isVisibleToSoftware: Boolean = true
 }
 

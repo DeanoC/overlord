@@ -7,7 +7,7 @@ import com.deanoc.overlord.utils.SilentLogger
 import com.deanoc.overlord.hardware.Port
 import com.deanoc.overlord.config.BitsDesc
 import com.deanoc.overlord.config.WireDirection
-import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
+import com.deanoc.overlord.instances.{HardwareInstance, InstanceTrait}
 import com.deanoc.overlord.interfaces.{BusLike, SupplierBusLike}
 import org.mockito.Mockito
 import com.deanoc.overlord.connections.ConnectedExtensions._
@@ -24,8 +24,8 @@ class ConnectedBusSpec extends AnyFlatSpec with Matchers with SilentLogger {
   // Test basic ConnectedBus properties
   "ConnectedBus" should "store and retrieve basic properties correctly" in {
     // Create mock instances
-    val srcInstance = Mockito.mock(classOf[ChipInstance])
-    val destInstance = Mockito.mock(classOf[ChipInstance])
+    val srcInstance = Mockito.mock(classOf[HardwareInstance])
+    val destInstance = Mockito.mock(classOf[HardwareInstance])
 
     Mockito.when(srcInstance.name).thenReturn("source")
     Mockito.when(destInstance.name).thenReturn("destination")
@@ -61,9 +61,9 @@ class ConnectedBusSpec extends AnyFlatSpec with Matchers with SilentLogger {
 
   it should "identify connection between instances correctly" in {
     // Create mock instances
-    val srcInstance = Mockito.mock(classOf[ChipInstance])
-    val destInstance = Mockito.mock(classOf[ChipInstance])
-    val otherInstance = Mockito.mock(classOf[ChipInstance])
+    val srcInstance = Mockito.mock(classOf[HardwareInstance])
+    val destInstance = Mockito.mock(classOf[HardwareInstance])
+    val otherInstance = Mockito.mock(classOf[HardwareInstance])
 
     Mockito.when(srcInstance.name).thenReturn("source")
     Mockito.when(destInstance.name).thenReturn("destination")
@@ -175,8 +175,8 @@ class ConnectedBusSpec extends AnyFlatSpec with Matchers with SilentLogger {
 
   it should "correctly identify chip-to-chip connections" in {
     // Create mock instances
-    val srcInstance = Mockito.mock(classOf[ChipInstance])
-    val destInstance = Mockito.mock(classOf[ChipInstance])
+    val srcInstance = Mockito.mock(classOf[HardwareInstance])
+    val destInstance = Mockito.mock(classOf[HardwareInstance])
 
     Mockito.when(srcInstance.name).thenReturn("source")
     Mockito.when(destInstance.name).thenReturn("destination")
@@ -204,8 +204,8 @@ class ConnectedBusSpec extends AnyFlatSpec with Matchers with SilentLogger {
 
   it should "handle name operations correctly" in {
     // Create mock instances
-    val srcInstance = Mockito.mock(classOf[ChipInstance])
-    val destInstance = Mockito.mock(classOf[ChipInstance])
+    val srcInstance = Mockito.mock(classOf[HardwareInstance])
+    val destInstance = Mockito.mock(classOf[HardwareInstance])
 
     Mockito.when(srcInstance.name).thenReturn("source")
     Mockito.when(destInstance.name).thenReturn("destination")

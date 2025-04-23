@@ -3,7 +3,7 @@ package com.deanoc.overlord.output
 import com.deanoc.overlord.config.BitsDesc
 import com.deanoc.overlord.hardware.Register
 import com.deanoc.overlord.utils.Utils
-import com.deanoc.overlord.instances.{ChipInstance, CpuInstance}
+import com.deanoc.overlord.instances.{HardwareInstance, CpuInstance}
 import com.deanoc.overlord._
 import com.deanoc.overlord.Overlord
 
@@ -121,5 +121,5 @@ object Svd {
     <endian>little</endian>
   }
 
-  private def outputRegisters(s: ChipInstance): Seq[xml.Elem] = ???
+  private def outputRegisters(s: HardwareInstance): Seq[xml.Elem] = ???
 }

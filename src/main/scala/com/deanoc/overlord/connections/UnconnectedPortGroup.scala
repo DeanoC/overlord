@@ -1,6 +1,6 @@
 package com.deanoc.overlord.connections
 
-import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
+import com.deanoc.overlord.instances.{HardwareInstance, InstanceTrait}
 import com.deanoc.overlord.interfaces.PortsLike
 import com.deanoc.overlord._
 import com.deanoc.overlord.connections.ConnectionDirection
@@ -44,7 +44,7 @@ case class UnconnectedPortGroup(
     * @return
     *   A sequence of connected port groups.
     */
-  override def connect(unexpanded: Seq[ChipInstance]): Seq[Connected] = for {
+  override def connect(unexpanded: Seq[HardwareInstance]): Seq[Connected] = for {
     mloc <- matchInstances(firstFullName, unexpanded)
     sloc <- matchInstances(secondFullName, unexpanded)
     mi <- mloc.instance.getInterface[PortsLike].toSeq
@@ -62,7 +62,7 @@ case class UnconnectedPortGroup(
     * @param unexpanded
     *   A sequence of unexpanded chip instances.
     */
-  override def preConnect(unexpanded: Seq[ChipInstance]): Unit = None
+  override def preConnect(unexpanded: Seq[HardwareInstance]): Unit = None
 
   /**
     * Collects constants associated with the unconnected port group.
@@ -81,5 +81,5 @@ case class UnconnectedPortGroup(
     * @param unexpanded
     *   A sequence of unexpanded chip instances.
     */
-  override def finaliseBuses(unexpanded: Seq[ChipInstance]): Unit = None
+  override def finaliseBuses(unexpanded: Seq[HardwareInstance]): Unit = None
 }

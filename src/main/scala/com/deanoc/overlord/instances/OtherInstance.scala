@@ -4,7 +4,7 @@ import com.deanoc.overlord.utils.Variant
 import com.deanoc.overlord.definitions.HardwareDefinition
 
 case class OtherInstance(name: String, definition: HardwareDefinition)
-    extends ChipInstance {
+    extends HardwareInstance {
   override def isVisibleToSoftware: Boolean = true
 
 }

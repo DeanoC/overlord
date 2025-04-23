@@ -7,7 +7,7 @@ case class IoInstance(
     name: String,
     override val definition: HardwareDefinition,
     config: com.deanoc.overlord.config.IoConfig // Store the specific config
-) extends ChipInstance {
+) extends HardwareInstance {
   override def isVisibleToSoftware: Boolean = config.visible_to_software // Use visible_to_software from the specific config
 }
 

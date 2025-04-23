@@ -4,7 +4,7 @@ import com.deanoc.overlord.utils.Variant
 import com.deanoc.overlord.definitions.HardwareDefinition
 
 case class SwitchInstance(name: String, definition: HardwareDefinition)
-    extends ChipInstance {}
+    extends HardwareInstance {}
 
 object SwitchInstance {
   def apply(

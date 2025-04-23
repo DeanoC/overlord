@@ -211,7 +211,7 @@ object OutputSoftware {
     */
   private def addCpuRegisterBanks(
       cpu: CpuInstance,
-      chipAddresses: mutable.ArrayBuffer[(String, String, ChipInstance, BigInt)]
+      chipAddresses: mutable.ArrayBuffer[(String, String, HardwareInstance, BigInt)]
   ): Unit = {
     for (rb <- cpu.banks if rb.baseAddress != -1) {
       chipAddresses += ((rb.name, rb.name, cpu, rb.baseAddress))
@@ -255,7 +255,7 @@ object OutputSoftware {
   /** Generates memory map definitions for chip addresses.
     */
   private def generateChipMap(
-      chipAddresses: Seq[(String, String, ChipInstance, BigInt)]
+      chipAddresses: Seq[(String, String, HardwareInstance, BigInt)]
   ): String = {
     val rsb = new mutable.StringBuilder
 
@@ -312,7 +312,7 @@ object OutputSoftware {
 
     val ramRanges = mutable.ArrayBuffer[(RamLike, Int, BigInt, BigInt)]()
     val chipAddresses =
-      mutable.ArrayBuffer[(String, String, ChipInstance, BigInt)]()
+      mutable.ArrayBuffer[(String, String, HardwareInstance, BigInt)]()
 
     // handle cpu system registers
     for {
@@ -387,7 +387,7 @@ object OutputSoftware {
                 true
               }
 
-              val other = r.second.get.instance.asInstanceOf[ChipInstance]
+              val other = r.second.get.instance.asInstanceOf[HardwareInstance]
               handleConnectedChip(cpu, other, address, chipAddresses)
             }
           }
@@ -398,9 +398,9 @@ object OutputSoftware {
 
   private def handleConnectedChip(
       cpu: CpuInstance,
-      other: ChipInstance,
+      other: HardwareInstance,
       address: BigInt,
-      chipAddresses: mutable.ArrayBuffer[(String, String, ChipInstance, BigInt)]
+      chipAddresses: mutable.ArrayBuffer[(String, String, HardwareInstance, BigInt)]
   ): Unit = {
     if (
       !chipAddresses.exists { case (_, _, o, _) => o == other } &&
@@ -415,10 +415,10 @@ object OutputSoftware {
 
   private def processRegisterBank(
       cpu: CpuInstance,
-      other: ChipInstance,
+      other: HardwareInstance,
       registerBank: RegisterBankLike,
       address: BigInt,
-      chipAddresses: mutable.ArrayBuffer[(String, String, ChipInstance, BigInt)]
+      chipAddresses: mutable.ArrayBuffer[(String, String, HardwareInstance, BigInt)]
   ): Boolean = {
     if (other.instanceNumber >= registerBank.maxInstances) {
       println(s"${other.name}: not enough instances\n")

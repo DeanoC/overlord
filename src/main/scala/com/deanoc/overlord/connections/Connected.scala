@@ -11,7 +11,7 @@ import com.deanoc.overlord.definitions.{
 import com.deanoc.overlord.QueryInterface
 
 import com.deanoc.overlord.instances.{
-  ChipInstance,
+  HardwareInstance,
   ClockInstance,
   InstanceTrait,
   PinGroupInstance
@@ -41,7 +41,7 @@ trait Connected extends QueryInterface {
     * @return
     *   True if the connection involves the specified instance.
     */
-  def connectedTo(inst: ChipInstance): Boolean
+  def connectedTo(inst: HardwareInstance): Boolean
 
   /** Checks if this connection is between two specified instances with
     * bidirectional flow.
@@ -53,7 +53,7 @@ trait Connected extends QueryInterface {
     * @return
     *   True if the connection is between the two instances.
     */
-  def connectedBetween(s: ChipInstance, e: ChipInstance): Boolean =
+  def connectedBetween(s: HardwareInstance, e: HardwareInstance): Boolean =
     connectedBetween(s, e, ConnectionDirection.BiDirectional)
 
   /** Checks if this connection is between two specified instances with a
@@ -70,8 +70,8 @@ trait Connected extends QueryInterface {
     *   direction.
     */
   def connectedBetween(
-      s: ChipInstance,
-      e: ChipInstance,
+      s: HardwareInstance,
+      e: HardwareInstance,
       d: ConnectionDirection
   ): Boolean
 

@@ -5,7 +5,7 @@ import com.deanoc.overlord.input.{VerilogPort, YamlRegistersParser}
 import com.deanoc.overlord.hardware.Port
 import com.deanoc.overlord.config.WireDirection
 import com.deanoc.overlord.Overlord
-import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
+import com.deanoc.overlord.instances.{HardwareInstance, InstanceTrait}
 import scala.util.boundary, boundary.break
 
 // Represents an action to read YAML-defined registers and associate them with a chip instance.
@@ -21,19 +21,19 @@ case class ReadYamlRegistersAction(name: String, filename: String)
       parameters: Map[String, Variant]
   ): Unit = {
     // Check if the instance is a ChipInstance; otherwise, log a warning.
-    if (!instance.isInstanceOf[ChipInstance]) {
+    if (!instance.isInstanceOf[HardwareInstance]) {
       println(
         s"${instance.name} is not a chip but is being processed by a gateware action"
       )
     } else {
       // Cast the instance to ChipInstance and execute the action.
-      execute(instance.asInstanceOf[ChipInstance], parameters)
+      execute(instance.asInstanceOf[HardwareInstance], parameters)
     }
   }
 
   // Executes the action specifically for a ChipInstance.
   override def execute(
-      instance: ChipInstance,
+      instance: HardwareInstance,
       parameters: Map[String, Variant]
   ): Unit = {
     // Resolve macros in the filename based on the instance context.

@@ -4,7 +4,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import com.deanoc.overlord._
 import com.deanoc.overlord.utils.SilentLogger
-import com.deanoc.overlord.instances.ChipInstance
+import com.deanoc.overlord.instances.HardwareInstance
 import org.scalatestplus.mockito.MockitoSugar
 
 class UnconnectedPortGroupSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLogger {
@@ -100,14 +100,14 @@ class UnconnectedPortGroupSpec extends AnyFlatSpec with Matchers with MockitoSug
     // Test with empty data - methods should not throw exceptions
     withSilentLogs {
       noException should be thrownBy {
-        portGroup.preConnect(Seq.empty[ChipInstance])
+        portGroup.preConnect(Seq.empty[HardwareInstance])
       }
       
       noException should be thrownBy {
-        portGroup.finaliseBuses(Seq.empty[ChipInstance])
+        portGroup.finaliseBuses(Seq.empty[HardwareInstance])
       }
       
-      val connections = portGroup.connect(Seq.empty[ChipInstance])
+      val connections = portGroup.connect(Seq.empty[HardwareInstance])
       connections shouldBe empty
       
       val constants = portGroup.collectConstants(Seq.empty)

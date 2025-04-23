@@ -19,20 +19,20 @@ case class BusSpec(
 )
 
 case class Bus(
-    owner: ChipInstance,
+    owner: HardwareInstance,
     ident: String,
     attributes: VariantTable,
     spec: BusSpec
 ) extends SupplierBusLike {
   private val fixedRelativeAddrConsumers =
-    mutable.ArrayBuffer[(ChipInstance, BigInt, BigInt)]()
+    mutable.ArrayBuffer[(HardwareInstance, BigInt, BigInt)]()
   private val variableAddrConsumers =
-    mutable.ArrayBuffer[(ChipInstance, BigInt)]()
+    mutable.ArrayBuffer[(HardwareInstance, BigInt)]()
 
   private var consumers =
-    mutable.HashMap[(ChipInstance, BigInt), (BigInt, BigInt)]()
+    mutable.HashMap[(HardwareInstance, BigInt), (BigInt, BigInt)]()
 
-  def consumerInstances: Seq[ChipInstance] = consumers.keys.toSeq.map(_._1)
+  def consumerInstances: Seq[HardwareInstance] = consumers.keys.toSeq.map(_._1)
 
   def consumerCount: Int = consumers.size
 
@@ -49,7 +49,7 @@ case class Bus(
     Utils.lookupBigInt(attributes.toMap, "bus_bank_alignment", 1024)
 
   override def addFixedRelativeAddressConsumer(
-      instance: ChipInstance,
+      instance: HardwareInstance,
       address: BigInt,
       size: BigInt
   ): Unit = {
@@ -66,7 +66,7 @@ case class Bus(
   }
 
   override def addVariableAddressConsumer(
-      instance: ChipInstance,
+      instance: HardwareInstance,
       size: BigInt
   ): Unit = {
     if (instance == owner) {
@@ -85,7 +85,7 @@ case class Bus(
     case (addr, size) => Seq(BigIntV(addr), BigIntV(size))
   }.toArray)
 
-  override def getOwner: ChipInstance = owner
+  override def getOwner: HardwareInstance = owner
 
   override def computeConsumerAddresses(): Unit = {
     fixedRelativeAddrConsumers.sortInPlaceWith((a, b) => a._2 < b._2)

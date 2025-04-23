@@ -1,7 +1,7 @@
 package com.deanoc.overlord.connections
 
 import com.deanoc.overlord.utils.{Utils, Variant}
-import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
+import com.deanoc.overlord.instances.{HardwareInstance, InstanceTrait}
 import com.deanoc.overlord.connections.ConnectionDirection
 import com.deanoc.overlord._
 import com.deanoc.overlord.interfaces._
@@ -66,7 +66,7 @@ case class UnconnectedParameters(
     * @return
     *   An empty sequence of connected components.
     */
-  override def connect(unexpanded: Seq[ChipInstance]): Seq[Connected] = Seq()
+  override def connect(unexpanded: Seq[HardwareInstance]): Seq[Connected] = Seq()
 
   /**
     * Collects constants associated with the unconnected parameters.
@@ -95,7 +95,7 @@ case class UnconnectedParameters(
     * @param unexpanded
     *   A sequence of unexpanded chip instances.
     */
-  override def preConnect(unexpanded: Seq[ChipInstance]): Unit = None
+  override def preConnect(unexpanded: Seq[HardwareInstance]): Unit = None
 
   /**
     * Finalizes the parameter connections (no operation for this implementation).
@@ -103,7 +103,7 @@ case class UnconnectedParameters(
     * @param unexpanded
     *   A sequence of unexpanded chip instances.
     */
-  override def finaliseBuses(unexpanded: Seq[ChipInstance]): Unit = None
+  override def finaliseBuses(unexpanded: Seq[HardwareInstance]): Unit = None
 }
 
 /**

@@ -4,7 +4,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import com.deanoc.overlord._
 import com.deanoc.overlord.utils.{SilentLogger, Variant, IntV, StringV}
-import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
+import com.deanoc.overlord.instances.{HardwareInstance, InstanceTrait}
 import org.scalatestplus.mockito.MockitoSugar
 import org.mockito.Mockito.mock
 
@@ -55,14 +55,14 @@ class UnconnectedParametersSpec extends AnyFlatSpec with Matchers with MockitoSu
     // Test with empty data - methods should not throw exceptions
     withSilentLogs {
       noException should be thrownBy {
-        params.preConnect(Seq.empty[ChipInstance])
+        params.preConnect(Seq.empty[HardwareInstance])
       }
       
       noException should be thrownBy {
-        params.finaliseBuses(Seq.empty[ChipInstance])
+        params.finaliseBuses(Seq.empty[HardwareInstance])
       }
       
-      val connections = params.connect(Seq.empty[ChipInstance])
+      val connections = params.connect(Seq.empty[HardwareInstance])
       connections shouldBe empty
       
       val constants = params.collectConstants(Seq.empty)

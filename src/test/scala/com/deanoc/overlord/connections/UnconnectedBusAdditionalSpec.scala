@@ -5,7 +5,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import com.deanoc.overlord._
 import com.deanoc.overlord.utils.{Logging, SilentLogger}
-import com.deanoc.overlord.instances.ChipInstance
+import com.deanoc.overlord.instances.HardwareInstance
 import scala.language.implicitConversions
 
 /**

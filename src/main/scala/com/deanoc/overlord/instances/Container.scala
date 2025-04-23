@@ -13,10 +13,10 @@ trait Container {
       .map(_.asInstanceOf[Container])
       .flatMap(_.flatChildren) ++ children).toSeq
 
-  def chipChildren: Seq[ChipInstance] =
+  def chipChildren: Seq[HardwareInstance] =
     children
-      .filter(_.isInstanceOf[ChipInstance])
-      .map(_.asInstanceOf[ChipInstance])
+      .filter(_.isInstanceOf[HardwareInstance])
+      .map(_.asInstanceOf[HardwareInstance])
       .toSeq
 }
 

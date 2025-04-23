@@ -7,7 +7,7 @@ import com.deanoc.overlord.hardware.Registers
 import com.deanoc.overlord.instances.InstanceTrait
 import com.deanoc.overlord.instances.{
   BoardInstance,
-  ChipInstance,
+  HardwareInstance,
   Container,
   CpuInstance
 }
@@ -135,7 +135,7 @@ object Report {
     val id = instance.definition.defType.ident.mkString(".")
     sb ++= (indent + f"type: $id%n")
     instance match {
-      case ci: ChipInstance =>
+      case ci: HardwareInstance =>
         for (rb <- ci.banks) {
           val rl = Registers.registerListCache(rb.registerListName)
           sb ++= f"   ${rb.name} - ${rb.registerListName} ${rl.description}%n"

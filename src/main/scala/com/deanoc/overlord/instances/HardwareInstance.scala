@@ -20,7 +20,7 @@ import scala.collection.mutable
 import scala.reflect.ClassTag
 import com.deanoc.overlord.definitions.GatewareDefinition
 
-trait ChipInstance
+trait HardwareInstance
     extends InstanceTrait
     with PortsLike
     with RegisterBankLike
@@ -118,7 +118,7 @@ trait ChipInstance
   }
 
   // ports like interface
-  override def getOwner: ChipInstance = this
+  override def getOwner: HardwareInstance = this
 
   override def getPortsStartingWith(startsWith: String): Seq[Port] =
     ports.filter(_._1.startsWith(startsWith)).values.toSeq

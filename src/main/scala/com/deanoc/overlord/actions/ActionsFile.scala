@@ -1,7 +1,7 @@
 package com.deanoc.overlord.actions
 
 import com.deanoc.overlord.utils.{Variant, ArrayV, Utils}
-import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
+import com.deanoc.overlord.instances.{HardwareInstance, InstanceTrait}
 import scala.util.boundary, boundary.break
 
 // Represents a generic action with a phase and an execution method.
@@ -14,7 +14,7 @@ trait Action {
 
 // Represents an action specific to gateware with a specialized execution method.
 trait GatewareAction extends Action {
-  def execute(instance: ChipInstance, parameters: Map[String, Variant]): Unit
+  def execute(instance: HardwareInstance, parameters: Map[String, Variant]): Unit
 }
 
 // Represents an action specific to software.

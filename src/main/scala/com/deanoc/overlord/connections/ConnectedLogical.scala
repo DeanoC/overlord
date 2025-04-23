@@ -2,7 +2,7 @@ package com.deanoc.overlord.connections
 
 import com.deanoc.overlord._
 import com.deanoc.overlord.connections.ConnectionDirection
-import com.deanoc.overlord.instances.ChipInstance
+import com.deanoc.overlord.instances.HardwareInstance
 
 /** Represents a logical connection between two components in the system.
   *
@@ -50,13 +50,13 @@ case class ConnectedLogical(
   override def second: Option[InstanceLoc] = Some(secondary)
 
   // Implement abstract methods from ConnectedBetween
-  override def connectedTo(inst: ChipInstance): Boolean =
+  override def connectedTo(inst: HardwareInstance): Boolean =
     (first.nonEmpty && first.get.instance.name == inst.name) ||
       (second.nonEmpty && second.get.instance.name == inst.name)
 
   override def connectedBetween(
-      s: ChipInstance,
-      e: ChipInstance,
+      s: HardwareInstance,
+      e: HardwareInstance,
       d: ConnectionDirection
   ): Boolean =
     if (first.isEmpty || second.isEmpty) false

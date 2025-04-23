@@ -50,7 +50,7 @@ case class UnconnectedBus(
     * @param unexpanded
     *   A sequence of unexpanded chip instances.
     */
-  override def preConnect(unexpanded: Seq[ChipInstance]): Unit = {
+  override def preConnect(unexpanded: Seq[HardwareInstance]): Unit = {
     if (direction == ConnectionDirection.BiDirectional) {
       error(
         s"connection between ${firstFullName} and $secondFullName is a undirected bus connection"
@@ -84,7 +84,7 @@ case class UnconnectedBus(
     // hardware buses require no pre-connecting
     //		if (mainIL.isHardware || otherIL.isHardware) return None
 
-    val (bus: SupplierBusLike, other: ChipInstance) =
+    val (bus: SupplierBusLike, other: HardwareInstance) =
       getBus(mainIL, otherIL, direction) match {
         case Some(result) => result
         case None         => return
@@ -105,7 +105,7 @@ case class UnconnectedBus(
 
   private def supplierToConsumerHookup(
       bus: SupplierBusLike,
-      other: ChipInstance
+      other: HardwareInstance
   ): Unit = {
     other.getInterface[RamLike].exists { ram =>
       if (ram.getRanges.isEmpty) {
@@ -122,7 +122,7 @@ case class UnconnectedBus(
     }
   }
 
-  override def finaliseBuses(unexpanded: Seq[ChipInstance]): Unit = {
+  override def finaliseBuses(unexpanded: Seq[HardwareInstance]): Unit = {
     val mo = matchInstances(firstFullName, unexpanded)
     val so = matchInstances(secondFullName, unexpanded)
 
@@ -131,7 +131,7 @@ case class UnconnectedBus(
     val mainIL = mo.head
     val otherIL = so.head
 
-    val (bus: SupplierBusLike, other: ChipInstance) =
+    val (bus: SupplierBusLike, other: HardwareInstance) =
       getBus(mainIL, otherIL, direction) match {
         case Some(result) => result
         case None         => return
@@ -148,7 +148,7 @@ case class UnconnectedBus(
     * @return
     *   A sequence of connected components.
     */
-  override def connect(unexpanded: Seq[ChipInstance]): Seq[Connected] = {
+  override def connect(unexpanded: Seq[HardwareInstance]): Seq[Connected] = {
     val mo = matchInstances(firstFullName, unexpanded)
     val so = matchInstances(secondFullName, unexpanded)
 
@@ -163,7 +163,7 @@ case class UnconnectedBus(
     val mainIL = mo.head
     val otherIL = so.head
 
-    val (bus: SupplierBusLike, other: ChipInstance) =
+    val (bus: SupplierBusLike, other: HardwareInstance) =
       getBus(mainIL, otherIL, direction) match {
         case Some(result) => result
         case None         => return Seq()
@@ -236,7 +236,7 @@ case class UnconnectedBus(
       mainIL: InstanceLoc,
       otherIL: InstanceLoc,
       direction: ConnectionDirection
-  ): Option[(SupplierBusLike, ChipInstance)] = {
+  ): Option[(SupplierBusLike, HardwareInstance)] = {
     /*
 		// hardware can't be connected to another type
 		if (mainIL.isHardware != otherIL.isHardware) {
@@ -303,7 +303,7 @@ case class UnconnectedBus(
 
     if (
       direction == ConnectionDirection.SecondToFirst && !mainIL.instance
-        .isInstanceOf[ChipInstance]
+        .isInstanceOf[HardwareInstance]
     ) {
       error(
         s"$firstFullName isn't a chip instance, so can't be connected to a bus"
@@ -311,7 +311,7 @@ case class UnconnectedBus(
       return None
     } else if (
       direction == ConnectionDirection.FirstToSecond && !otherIL.instance
-        .isInstanceOf[ChipInstance]
+        .isInstanceOf[HardwareInstance]
     ) {
       error(
         s"$secondFullName isn't a chip instance, so can't be connected to a bus"
@@ -319,9 +319,9 @@ case class UnconnectedBus(
       return None
     }
 
-    val other: ChipInstance =
+    val other: HardwareInstance =
       (if (direction == ConnectionDirection.SecondToFirst) mainIL.instance
-       else otherIL.instance).asInstanceOf[ChipInstance]
+       else otherIL.instance).asInstanceOf[HardwareInstance]
     // search through suppliers name and protocols for a match
     val supplierBus: SupplierBusLike = {
       trace(s"looking for bus $supplierBusName and protocol $busProtocol on $firstFullName")

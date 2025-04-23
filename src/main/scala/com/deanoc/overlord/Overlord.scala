@@ -35,13 +35,13 @@ case class Overlord(
     wires: Seq[Wire]
 ) {
   // Lazy evaluation of connected gateware instances.
-  lazy val setOfConnectedGateware: Set[ChipInstance] = {
-    val setOfGateware = mutable.HashSet[ChipInstance]()
+  lazy val setOfConnectedGateware: Set[HardwareInstance] = {
+    val setOfGateware = mutable.HashSet[HardwareInstance]()
     connected.foreach { c =>
       if (c.first.nonEmpty && c.first.get.isGateware)
-        setOfGateware += c.first.get.instance.asInstanceOf[ChipInstance]
+        setOfGateware += c.first.get.instance.asInstanceOf[HardwareInstance]
       if (c.second.nonEmpty && c.second.get.isGateware)
-        setOfGateware += c.second.get.instance.asInstanceOf[ChipInstance]
+        setOfGateware += c.second.get.instance.asInstanceOf[HardwareInstance]
     }
     setOfGateware.toSet
   }
@@ -58,20 +58,20 @@ case class Overlord(
     setOfSoftware.toSet
   }
 
-  lazy val flatChipChildren: Seq[ChipInstance] =
+  lazy val flatChipChildren: Seq[HardwareInstance] =
     children
-      .filter(_.isInstanceOf[ChipInstance])
-      .map(_.asInstanceOf[ChipInstance]) ++
+      .filter(_.isInstanceOf[HardwareInstance])
+      .map(_.asInstanceOf[HardwareInstance]) ++
       children
         .filter(_.isInstanceOf[Container])
         .map(_.asInstanceOf[Container])
-        .flatMap(_.flatChildren.map(_.asInstanceOf[ChipInstance]))
+        .flatMap(_.flatChildren.map(_.asInstanceOf[HardwareInstance]))
 
   lazy val flatSoftwareChildren: Seq[SoftwareInstance] = children
     .filter(_.isInstanceOf[SoftwareInstance])
     .map(_.asInstanceOf[SoftwareInstance])
 
-  lazy val allChipInstances: Seq[ChipInstance] = flatChipChildren
+  lazy val allChipInstances: Seq[HardwareInstance] = flatChipChildren
 
   lazy val allSoftwareInstances: Seq[SoftwareInstance] = flatSoftwareChildren
 
@@ -95,7 +95,7 @@ case class Overlord(
     .filter(_.isInstanceOf[ClockInstance])
     .map(_.asInstanceOf[ClockInstance])
 
-  lazy val gatewares: Seq[ChipInstance] =
+  lazy val gatewares: Seq[HardwareInstance] =
     flatChipChildren.filter(_.definition.isInstanceOf[GatewareDefinition])
 
   lazy val libraries: Seq[LibraryInstance] = flatSoftwareChildren
@@ -121,7 +121,7 @@ case class Overlord(
     *   A sequence of interfaces of type T directly connected to the instance.
     */
   def getInterfacesDirectlyConnectedTo[T <: ChipLike](
-      instance: ChipInstance
+      instance: HardwareInstance
   )(implicit tag: ClassTag[T]): Seq[T] =
     flatChipChildren
       .flatMap(c => c.getInterface[T])
@@ -141,9 +141,9 @@ case class Overlord(
     *   the start and end instances.
     */
   def getInstancesWithInterfaceBetween[T <: ChipLike](
-      start: ChipInstance,
-      end: ChipInstance
-  )(implicit tag: ClassTag[T]): Seq[ChipInstance] =
+      start: HardwareInstance,
+      end: HardwareInstance
+  )(implicit tag: ClassTag[T]): Seq[HardwareInstance] =
     getInterfacesConnectedTo[T](start).flatMap(inf =>
       if (distanceMatrix.isConnectedBetween(inf.getOwner, end)) Some(end)
       else None
@@ -160,7 +160,7 @@ case class Overlord(
     *   A sequence of interfaces of type T connected to the instance.
     */
   def getInterfacesConnectedTo[T <: ChipLike](
-      instance: ChipInstance
+      instance: HardwareInstance
   )(implicit tag: ClassTag[T]): Seq[T] =
     flatChipChildren
       .flatMap(_.getInterface[T])
@@ -273,7 +273,7 @@ object Overlord extends Logging {
 
     // Get chips (hardware or gateware)
     val instances = container.children.collect {
-      case i: ChipInstance     => i
+      case i: HardwareInstance     => i
       case s: SoftwareInstance => s
     }
 
@@ -345,7 +345,7 @@ object Overlord extends Logging {
     pushOutPath("gate")
     Utils.ensureDirectories(outPath)
 
-    val chipInstances = rootContainer.children.collect { case i: ChipInstance =>
+    val chipInstances = rootContainer.children.collect { case i: HardwareInstance =>
       i
     }
 

@@ -10,7 +10,7 @@ import com.deanoc.overlord.hardware.Port
 import com.deanoc.overlord.config.BitsDesc
 
 import com.deanoc.overlord.config.WireDirection
-import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
+import com.deanoc.overlord.instances.{HardwareInstance, InstanceTrait}
 import org.mockito.Mockito._
 import com.deanoc.overlord.connections.ConnectedExtensions._
 import com.deanoc.overlord.definitions.HardwareDefinition
@@ -31,11 +31,11 @@ class ConnectedLogicalSpec
   // Test basic ConnectedLogical properties
   "ConnectedLogical" should "store and retrieve basic properties correctly" in {
     // Create mock instances
-    val srcInstance = mock[ChipInstance]
+    val srcInstance = mock[HardwareInstance]
     when(srcInstance.definition).thenReturn(mockHardwareDef)
     when(srcInstance.name).thenReturn("source")
 
-    val destInstance = mock[ChipInstance]
+    val destInstance = mock[HardwareInstance]
     when(destInstance.definition).thenReturn(mockHardwareDef)
     when(destInstance.name).thenReturn("destination")
 
@@ -64,15 +64,15 @@ class ConnectedLogicalSpec
 
   it should "identify connection between instances correctly" in {
     // Create mock instances
-    val srcInstance = mock[ChipInstance]
+    val srcInstance = mock[HardwareInstance]
     when(srcInstance.definition).thenReturn(mockHardwareDef)
     when(srcInstance.name).thenReturn("source")
 
-    val destInstance = mock[ChipInstance]
+    val destInstance = mock[HardwareInstance]
     when(destInstance.definition).thenReturn(mockHardwareDef)
     when(destInstance.name).thenReturn("destination")
 
-    val otherInstance = mock[ChipInstance]
+    val otherInstance = mock[HardwareInstance]
     when(otherInstance.definition).thenReturn(mockHardwareDef)
     when(otherInstance.name).thenReturn("other")
 
@@ -178,11 +178,11 @@ class ConnectedLogicalSpec
 
   it should "correctly identify chip-to-chip connections" in {
     // Create mock instances
-    val srcInstance = mock[ChipInstance]
+    val srcInstance = mock[HardwareInstance]
     when(srcInstance.definition).thenReturn(mockHardwareDef)
     when(srcInstance.name).thenReturn("source")
 
-    val destInstance = mock[ChipInstance]
+    val destInstance = mock[HardwareInstance]
     when(destInstance.definition).thenReturn(mockHardwareDef)
     when(destInstance.name).thenReturn("destination")
 
@@ -207,11 +207,11 @@ class ConnectedLogicalSpec
 
   it should "handle name operations correctly" in {
     // Create mock instances
-    val srcInstance = mock[ChipInstance]
+    val srcInstance = mock[HardwareInstance]
     when(srcInstance.definition).thenReturn(mockHardwareDef)
     when(srcInstance.name).thenReturn("source")
 
-    val destInstance = mock[ChipInstance]
+    val destInstance = mock[HardwareInstance]
     when(destInstance.definition).thenReturn(mockHardwareDef)
     when(destInstance.name).thenReturn("destination")
 
@@ -238,9 +238,9 @@ class ConnectedLogicalSpec
 
   it should "handle different connection priorities" in {
     // Create mock instances
-    val srcInstance = mock[ChipInstance]
+    val srcInstance = mock[HardwareInstance]
     when(srcInstance.definition).thenReturn(mockHardwareDef)
-    val destInstance = mock[ChipInstance]
+    val destInstance = mock[HardwareInstance]
     when(destInstance.definition).thenReturn(mockHardwareDef)
 
     // Create InstanceLocs

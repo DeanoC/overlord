@@ -2,7 +2,7 @@ package com.deanoc.overlord.connections
 
 import com.deanoc.overlord._
 import com.deanoc.overlord.definitions.DefinitionType
-import com.deanoc.overlord.instances.ChipInstance
+import com.deanoc.overlord.instances.HardwareInstance
 
 /** Trait representing a connection between two components with a defined
   * priority and direction.
@@ -30,7 +30,7 @@ trait ConnectedBetween extends Connected {
     *   True if the connection involves the specified instance, false otherwise.
     */
   // Connection check moved to extension methods in ConnectedExtensions
-  override def connectedTo(inst: ChipInstance): Boolean
+  override def connectedTo(inst: HardwareInstance): Boolean
 
   /** Determines if the connection exists between two chip instances in the
     * specified direction.
@@ -46,8 +46,8 @@ trait ConnectedBetween extends Connected {
     */
   // Connection between check moved to extension methods in ConnectedExtensions
   override def connectedBetween(
-      s: ChipInstance,
-      e: ChipInstance,
+      s: HardwareInstance,
+      e: HardwareInstance,
       d: ConnectionDirection
   ): Boolean
 

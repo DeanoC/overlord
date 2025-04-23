@@ -6,7 +6,7 @@ import com.deanoc.overlord.utils._
 import com.deanoc.overlord.{Overlord}
 import com.deanoc.overlord.connections.{ConnectionPriority, InstanceLoc, Wire}
 import com.deanoc.overlord.instances.{
-  ChipInstance,
+  HardwareInstance,
   ClockInstance,
   PinGroupInstance
 }
@@ -139,7 +139,7 @@ object Top {
   }
 
   private def writeChipWires(
-      instance: ChipInstance,
+      instance: HardwareInstance,
       wires: Seq[Wire]
   ): String = {
     val sb = new mutable.StringBuilder

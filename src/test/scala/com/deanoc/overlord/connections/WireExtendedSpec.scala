@@ -9,7 +9,7 @@ import org.mockito.ArgumentMatchers._
 import com.deanoc.overlord._
 import com.deanoc.overlord.utils.SilentLogger
 import com.deanoc.overlord.instances.{
-  ChipInstance,
+  HardwareInstance,
   InstanceTrait,
   PinGroupInstance,
   ClockInstance
@@ -52,7 +52,7 @@ class WireExtendedSpec
     val definition = mock[HardwareDefinition]
 
     if (isChip) {
-      val instance = mock[ChipInstance]
+      val instance = mock[HardwareInstance]
       when(instance.definition).thenReturn(definition)
       when(instance.name).thenReturn(name)
       instance
@@ -128,8 +128,8 @@ class WireExtendedSpec
     val dm = createMockDistanceMatrix()
     when(dm.indicesOf(connected)).thenReturn((0, 1))
     when(dm.routeBetween(0, 1)).thenReturn(Seq(1))
-    when(dm.instanceOf(0)).thenReturn(chipInstance1.asInstanceOf[ChipInstance])
-    when(dm.instanceOf(1)).thenReturn(chipInstance2.asInstanceOf[ChipInstance])
+    when(dm.instanceOf(0)).thenReturn(chipInstance1.asInstanceOf[HardwareInstance])
+    when(dm.instanceOf(1)).thenReturn(chipInstance2.asInstanceOf[HardwareInstance])
 
     // Create wires
     val wires = Wires(dm, Seq(connected))
@@ -150,9 +150,9 @@ class WireExtendedSpec
   it should "be created correctly from ConnectedBus" in {
     // Create mock instances
     val chipInstance1 =
-      createMockInstance("chip1", isChip = true).asInstanceOf[ChipInstance]
+      createMockInstance("chip1", isChip = true).asInstanceOf[HardwareInstance]
     val chipInstance2 =
-      createMockInstance("chip2", isChip = true).asInstanceOf[ChipInstance]
+      createMockInstance("chip2", isChip = true).asInstanceOf[HardwareInstance]
 
     // Create instance locations
     val loc1 = createInstanceLoc(chipInstance1, "chip1")
@@ -194,9 +194,9 @@ class WireExtendedSpec
   it should "be created correctly from ConnectedLogical" in {
     // Create mock instances
     val chipInstance1 =
-      createMockInstance("chip1", isChip = true).asInstanceOf[ChipInstance]
+      createMockInstance("chip1", isChip = true).asInstanceOf[HardwareInstance]
     val chipInstance2 =
-      createMockInstance("chip2", isChip = true).asInstanceOf[ChipInstance]
+      createMockInstance("chip2", isChip = true).asInstanceOf[HardwareInstance]
 
     // Create instance locations
     val loc1 = createInstanceLoc(chipInstance1, "chip1")
@@ -233,7 +233,7 @@ class WireExtendedSpec
   it should "be created correctly for connections involving pins" in {
     // Create mock instances
     val chipInstance =
-      createMockInstance("chip", isChip = true).asInstanceOf[ChipInstance]
+      createMockInstance("chip", isChip = true).asInstanceOf[HardwareInstance]
     val pinInstance = createMockInstance("pin", isChip = false, isPin = true)
       .asInstanceOf[PinGroupInstance]
 
@@ -277,7 +277,7 @@ class WireExtendedSpec
   it should "be created correctly for connections involving clocks" in {
     // Create mock instances
     val chipInstance =
-      createMockInstance("chip", isChip = true).asInstanceOf[ChipInstance]
+      createMockInstance("chip", isChip = true).asInstanceOf[HardwareInstance]
     val clockInstance =
       createMockInstance("clock", isChip = false, isClock = true)
         .asInstanceOf[ClockInstance]
@@ -323,11 +323,11 @@ class WireExtendedSpec
   "Wires" should "handle fan-out connections correctly" in {
     // Create mock instances
     val sourceInstance =
-      createMockInstance("source", isChip = true).asInstanceOf[ChipInstance]
+      createMockInstance("source", isChip = true).asInstanceOf[HardwareInstance]
     val destInstance1 =
-      createMockInstance("dest1", isChip = true).asInstanceOf[ChipInstance]
+      createMockInstance("dest1", isChip = true).asInstanceOf[HardwareInstance]
     val destInstance2 =
-      createMockInstance("dest2", isChip = true).asInstanceOf[ChipInstance]
+      createMockInstance("dest2", isChip = true).asInstanceOf[HardwareInstance]
 
     // Create ports
     val sourcePort = Port("out", BitsDesc(8), WireDirection.Output)
@@ -382,11 +382,11 @@ class WireExtendedSpec
   it should "handle fan-out connections with different priorities" in {
     // Create mock instances with different names to ensure they're treated as separate
     val sourceInstance =
-      createMockInstance("source", isChip = true).asInstanceOf[ChipInstance]
+      createMockInstance("source", isChip = true).asInstanceOf[HardwareInstance]
     val destInstance1 =
-      createMockInstance("dest1", isChip = true).asInstanceOf[ChipInstance]
+      createMockInstance("dest1", isChip = true).asInstanceOf[HardwareInstance]
     val destInstance2 =
-      createMockInstance("dest2", isChip = true).asInstanceOf[ChipInstance]
+      createMockInstance("dest2", isChip = true).asInstanceOf[HardwareInstance]
 
     // Create ports with different names
     val sourcePort = Port("out", BitsDesc(8), WireDirection.Output)
@@ -449,11 +449,11 @@ class WireExtendedSpec
   it should "handle fan-in connections correctly" in {
     // Create mock instances
     val sourceInstance1 =
-      createMockInstance("source1", isChip = true).asInstanceOf[ChipInstance]
+      createMockInstance("source1", isChip = true).asInstanceOf[HardwareInstance]
     val sourceInstance2 =
-      createMockInstance("source2", isChip = true).asInstanceOf[ChipInstance]
+      createMockInstance("source2", isChip = true).asInstanceOf[HardwareInstance]
     val destInstance =
-      createMockInstance("dest", isChip = true).asInstanceOf[ChipInstance]
+      createMockInstance("dest", isChip = true).asInstanceOf[HardwareInstance]
 
     // Create ports
     val sourcePort1 = Port("out1", BitsDesc(8), WireDirection.Output)
@@ -513,7 +513,7 @@ class WireExtendedSpec
   it should "handle connections with missing first location" in {
     // Create mock instances
     val instance =
-      createMockInstance("instance", isChip = true).asInstanceOf[ChipInstance]
+      createMockInstance("instance", isChip = true).asInstanceOf[HardwareInstance]
     val instanceLoc = createInstanceLoc(instance, "instance")
 
     // Create a broken Connected with missing first location
@@ -538,7 +538,7 @@ class WireExtendedSpec
   it should "handle connections with missing second location" in {
     // Create mock instances
     val instance =
-      createMockInstance("instance", isChip = true).asInstanceOf[ChipInstance]
+      createMockInstance("instance", isChip = true).asInstanceOf[HardwareInstance]
     val instanceLoc = createInstanceLoc(instance, "instance")
 
     // Create a broken Connected with missing second location
@@ -563,9 +563,9 @@ class WireExtendedSpec
   it should "handle connections with invalid routes" in {
     // Create mock instances
     val sourceInstance =
-      createMockInstance("source", isChip = true).asInstanceOf[ChipInstance]
+      createMockInstance("source", isChip = true).asInstanceOf[HardwareInstance]
     val destInstance =
-      createMockInstance("dest", isChip = true).asInstanceOf[ChipInstance]
+      createMockInstance("dest", isChip = true).asInstanceOf[HardwareInstance]
 
     // Create instance locations
     val sourceLoc = createInstanceLoc(sourceInstance, "source")
@@ -596,11 +596,11 @@ class WireExtendedSpec
   it should "handle multi-hop routes correctly" in {
     // Create mock instances
     val sourceInstance =
-      createMockInstance("source", isChip = true).asInstanceOf[ChipInstance]
+      createMockInstance("source", isChip = true).asInstanceOf[HardwareInstance]
     val intermediateInstance = createMockInstance("intermediate", isChip = true)
-      .asInstanceOf[ChipInstance]
+      .asInstanceOf[HardwareInstance]
     val destInstance =
-      createMockInstance("dest", isChip = true).asInstanceOf[ChipInstance]
+      createMockInstance("dest", isChip = true).asInstanceOf[HardwareInstance]
 
     // Create instance locations with ports to make them distinct
     val sourcePort = Port("out", BitsDesc(8), WireDirection.Output)
@@ -641,9 +641,9 @@ class WireExtendedSpec
   it should "handle unknown width ports correctly" in {
     // Create mock instances
     val sourceInstance =
-      createMockInstance("source", isChip = true).asInstanceOf[ChipInstance]
+      createMockInstance("source", isChip = true).asInstanceOf[HardwareInstance]
     val destInstance =
-      createMockInstance("dest", isChip = true).asInstanceOf[ChipInstance]
+      createMockInstance("dest", isChip = true).asInstanceOf[HardwareInstance]
 
     // Create a port with unknown width (BitsDesc with width 0)
     // and ensure the knownWidth method returns false

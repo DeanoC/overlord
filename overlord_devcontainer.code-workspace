@@ -10,6 +10,7 @@
 	"settings": {
 		"files.watcherExclude": {
 			"**/target": true
-		}
+		},
+		"editor.tabSize": 2
 	}
 }

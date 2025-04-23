@@ -2,7 +2,7 @@ package com.deanoc.overlord.connections
 
 import com.deanoc.overlord._
 import com.deanoc.overlord.connections.ConnectionDirection
-import com.deanoc.overlord.instances.ChipInstance
+import com.deanoc.overlord.instances.HardwareInstance
 import com.deanoc.overlord.interfaces.SupplierBusLike
 import com.deanoc.overlord.connections.ConnectedExtensions._
 
@@ -46,7 +46,7 @@ case class ConnectedBus(
     direction: ConnectionDirection,
     secondary: InstanceLoc,
     bus: SupplierBusLike,
-    other: ChipInstance
+    other: HardwareInstance
 ) extends ConnectedBetween {
 
   /** The name of this connection */
@@ -60,13 +60,13 @@ case class ConnectedBus(
   override def second: Option[InstanceLoc] = Some(secondary)
 
   // Implement abstract methods from ConnectedBetween
-  override def connectedTo(inst: ChipInstance): Boolean =
+  override def connectedTo(inst: HardwareInstance): Boolean =
     (first.nonEmpty && first.get.instance.name == inst.name) ||
       (second.nonEmpty && second.get.instance.name == inst.name)
 
   override def connectedBetween(
-      s: ChipInstance,
-      e: ChipInstance,
+      s: HardwareInstance,
+      e: HardwareInstance,
       d: ConnectionDirection
   ): Boolean =
     if (first.isEmpty || second.isEmpty) false

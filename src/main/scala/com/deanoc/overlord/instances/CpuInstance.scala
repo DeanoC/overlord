@@ -13,7 +13,7 @@ import com.deanoc.overlord.utils.Logging
 case class CpuInstance(
     name: String,
     override val definition: HardwareDefinition
-) extends ChipInstance
+) extends HardwareInstance
     with MultiBusLike {
 
   lazy val cpuConfig = definition.config.asInstanceOf[CpuDefinitionConfig]

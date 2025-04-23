@@ -1,7 +1,7 @@
 package com.deanoc.overlord.connections
 
 import com.deanoc.overlord.config.WireDirection
-import com.deanoc.overlord.instances.ChipInstance
+import com.deanoc.overlord.instances.HardwareInstance
 import com.deanoc.overlord.DistanceMatrix
 import com.deanoc.overlord.instances.{ClockInstance, PinGroupInstance}
 import com.deanoc.overlord._

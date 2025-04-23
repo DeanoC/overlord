@@ -11,55 +11,17 @@ catalogs:
   url: "https://github.com/DeanoC/overlord_serv.git"
 
 definitions:
-- type: cpu.riscv32im.vexriscv_smallest
+- type: board.tangnano9k.stock
   ports:
   registers:
   drivers:
-  max_instances: 1
-  supplier_prefix:
-  - dBus_
-  - iBus_
   triple: riscv32-none-elf
   width: 32
-
-  gateware: 
-    type: "inline"
+  gateware:
+    type: inline
     inline:
       actions:
         - action: sources
-          language: verilog
-          files: 
-            - rtl/axi_adapter.v
-            - rtl/axi_adapter_rd.v
-            - rtl/axi_adapter_wr.v
-        - action: read_rtl_top
-          language: verilog
-          file: rtl/axi_adapter.v
-      parameters:
-        - ADDR_WIDTH: 32
-        - ARUSER_ENABLE: 0
-        - ARUSER_WIDTH: 1
-        - AWUSER_ENABLE: 0
-        - AWUSER_WIDTH: 1
-        - BUSER_ENABLE: 0
-        - BUSER_WIDTH: 1
-        - CONVERT_BURST: 1
-        - CONVERT_NARROW_BURST: 0
-        - FORWARD_ID: 0
-        - ID_WIDTH: 8
-        - M_DATA_WIDTH: 32
-        - RUSER_ENABLE: 0
-        - RUSER_WIDTH: 1
-        - S_DATA_WIDTH: 32
-        - WUSER_ENABLE: 0
-        - WUSER_WIDTH: 1 
-- type: cpu.riscv32im.biggest
-  ports:
-  registers:
-  drivers:
-  max_instances: 1
-  triple: riscv32-none-elf
-  width: 32
 
 components: []
 

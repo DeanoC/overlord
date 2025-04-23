@@ -8,7 +8,7 @@ import com.deanoc.overlord._
 import com.deanoc.overlord.utils.SilentLogger
 import com.deanoc.overlord.hardware.Port
 import com.deanoc.overlord.config.{BitsDesc, WireDirection}
-import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait, PinGroupInstance, ClockInstance}
+import com.deanoc.overlord.instances.{HardwareInstance, InstanceTrait, PinGroupInstance, ClockInstance}
 import org.mockito.Mockito._
 import org.mockito.Mockito
 import com.deanoc.overlord.definitions.HardwareDefinition
@@ -49,7 +49,7 @@ class ConnectedSpec extends AnyFlatSpec with Matchers with MockitoSugar with Sil
     val chipDef = mock[HardwareDefinition]
     
     // Create mock instances
-    val chipInstance = mock[ChipInstance]
+    val chipInstance = mock[HardwareInstance]
     when(chipInstance.definition).thenReturn(chipDef)
     
     val pinInstance = mock[PinGroupInstance]
@@ -79,7 +79,7 @@ class ConnectedSpec extends AnyFlatSpec with Matchers with MockitoSugar with Sil
     // Create mock definition and instance
     val chipDef = mock[HardwareDefinition]
     
-    val instance = mock[ChipInstance]
+    val instance = mock[HardwareInstance]
     when(instance.definition).thenReturn(chipDef)
     
     // Create InstanceLoc with a hierarchical name
@@ -95,11 +95,11 @@ class ConnectedSpec extends AnyFlatSpec with Matchers with MockitoSugar with Sil
     val chipDef = mock[HardwareDefinition]
     
     // Create mock instances
-    val chipInstance1 = mock[ChipInstance]
+    val chipInstance1 = mock[HardwareInstance]
     when(chipInstance1.definition).thenReturn(chipDef)
     when(chipInstance1.name).thenReturn("chip1")
     
-    val chipInstance2 = mock[ChipInstance]
+    val chipInstance2 = mock[HardwareInstance]
     when(chipInstance2.definition).thenReturn(chipDef)
     when(chipInstance2.name).thenReturn("chip2")
     
@@ -166,15 +166,15 @@ class ConnectedSpec extends AnyFlatSpec with Matchers with MockitoSugar with Sil
     val chipDef = mock[HardwareDefinition]
     
     // Create mock instances
-    val chipInstance1 = mock[ChipInstance]
+    val chipInstance1 = mock[HardwareInstance]
     when(chipInstance1.definition).thenReturn(chipDef)
     when(chipInstance1.name).thenReturn("chip1")
     
-    val chipInstance2 = mock[ChipInstance]
+    val chipInstance2 = mock[HardwareInstance]
     when(chipInstance2.definition).thenReturn(chipDef)
     when(chipInstance2.name).thenReturn("chip2")
     
-    val chipInstance3 = mock[ChipInstance]
+    val chipInstance3 = mock[HardwareInstance]
     when(chipInstance3.definition).thenReturn(chipDef)
     when(chipInstance3.name).thenReturn("chip3")
     

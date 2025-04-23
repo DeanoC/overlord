@@ -1,6 +1,6 @@
 package com.deanoc.overlord.connections
 
-import com.deanoc.overlord.instances.{ChipInstance, InstanceTrait}
+import com.deanoc.overlord.instances.{HardwareInstance, InstanceTrait}
 import com.deanoc.overlord._
 import com.deanoc.overlord.connections.ConnectionDirection
 
@@ -30,7 +30,7 @@ case class UnconnectedLogical(
     * @return
     *   A sequence of connected components.
     */
-  override def connect(unexpanded: Seq[ChipInstance]): Seq[Connected] = {
+  override def connect(unexpanded: Seq[HardwareInstance]): Seq[Connected] = {
     val mo = matchInstances(firstFullName, unexpanded)
     val so = matchInstances(secondFullName, unexpanded)
 
@@ -53,7 +53,7 @@ case class UnconnectedLogical(
     * @param unexpanded
     *   A sequence of unexpanded chip instances.
     */
-  override def preConnect(unexpanded: Seq[ChipInstance]): Unit = None
+  override def preConnect(unexpanded: Seq[HardwareInstance]): Unit = None
 
   /** Collects constants associated with the unconnected logical connection.
     *
@@ -70,5 +70,5 @@ case class UnconnectedLogical(
     * @param unexpanded
     *   A sequence of unexpanded chip instances.
     */
-  override def finaliseBuses(unexpanded: Seq[ChipInstance]): Unit = None
+  override def finaliseBuses(unexpanded: Seq[HardwareInstance]): Unit = None
 }

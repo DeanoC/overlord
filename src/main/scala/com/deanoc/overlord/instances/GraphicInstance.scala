@@ -4,7 +4,7 @@ import com.deanoc.overlord.utils.Variant
 import com.deanoc.overlord.definitions.HardwareDefinition
 
 case class GraphicInstance(name: String, private val defi: HardwareDefinition)
-    extends ChipInstance {
+    extends HardwareInstance {
   override def definition: HardwareDefinition = defi
 
   override def isVisibleToSoftware: Boolean = true
