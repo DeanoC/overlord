@@ -1,7 +1,7 @@
 package com.deanoc.overlord.connections
 import com.deanoc.overlord._
 
-import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.hardware.HardwareBoundrary
 import com.deanoc.overlord.connections.ConnectionDirection
 import com.deanoc.overlord.config.WireDirection
 
@@ -107,10 +107,10 @@ object ConnectedPortGroup {
     */
   def apply(
       fi: PortsLike,
-      fp: Port,
+      fp: HardwareBoundrary,
       fn: String,
       si: PortsLike,
-      sp: Port,
+      sp: HardwareBoundrary,
       direction: ConnectionDirection
   ): ConnectedPortGroup = {
     // Handle wire directions - wires need to be properly directed

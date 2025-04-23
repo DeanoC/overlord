@@ -2,7 +2,7 @@ package com.deanoc.overlord.actions
 
 import com.deanoc.overlord.utils._
 import com.deanoc.overlord.input.{VerilogPort, YamlRegistersParser}
-import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.hardware.HardwareBoundrary
 import com.deanoc.overlord.config.WireDirection
 import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.instances.{HardwareInstance, InstanceTrait}

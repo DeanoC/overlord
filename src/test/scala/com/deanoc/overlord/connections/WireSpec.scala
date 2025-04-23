@@ -6,7 +6,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import com.deanoc.overlord._
 import com.deanoc.overlord.utils.SilentLogger
-import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.hardware.HardwareBoundrary
 import com.deanoc.overlord.config.BitsDesc
 
 import com.deanoc.overlord.config.WireDirection
@@ -103,8 +103,8 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
     when(pinInstance.name).thenReturn("pin")
     
     // Create ports with concrete Port implementations
-    val port1 = Port("port1", BitsDesc(8), WireDirection.Input)
-    val port2 = Port("port2", BitsDesc(8), WireDirection.Output)
+    val port1 = HardwareBoundrary("port1", BitsDesc(8), WireDirection.Input)
+    val port2 = HardwareBoundrary("port2", BitsDesc(8), WireDirection.Output)
     
     // Create InstanceLocs
     val chipLoc1 = InstanceLoc(chipInstance1, Some(port1), "chip1")
@@ -158,9 +158,9 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
     when(chipInstance3.name).thenReturn("chip3")
     
     // Create ports
-    val port1 = Port("port1", BitsDesc(8), WireDirection.Input)
-    val port2 = Port("port2", BitsDesc(8), WireDirection.Output)
-    val port3 = Port("port3", BitsDesc(8), WireDirection.Output)
+    val port1 = HardwareBoundrary("port1", BitsDesc(8), WireDirection.Input)
+    val port2 = HardwareBoundrary("port2", BitsDesc(8), WireDirection.Output)
+    val port3 = HardwareBoundrary("port3", BitsDesc(8), WireDirection.Output)
     
     // Create InstanceLocs
     val chipLoc1 = InstanceLoc(chipInstance1, Some(port1), "chip1")
@@ -217,9 +217,9 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
     when(chipInstance3.name).thenReturn("chip3")
     
     // Create ports
-    val port1 = Port("port1", BitsDesc(8), WireDirection.Output)
-    val port2 = Port("port2", BitsDesc(8), WireDirection.Input)
-    val port3 = Port("port3", BitsDesc(8), WireDirection.Input)
+    val port1 = HardwareBoundrary("port1", BitsDesc(8), WireDirection.Output)
+    val port2 = HardwareBoundrary("port2", BitsDesc(8), WireDirection.Input)
+    val port3 = HardwareBoundrary("port3", BitsDesc(8), WireDirection.Input)
     
     // Create InstanceLocs
     val chipLoc1 = InstanceLoc(chipInstance1, Some(port1), "chip1")
@@ -283,8 +283,8 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
     when(chipInstance2.name).thenReturn("chip2")
     
     // Create ports
-    val port1 = Port("port1", BitsDesc(8), WireDirection.Output)
-    val port2 = Port("port2", BitsDesc(8), WireDirection.Input)
+    val port1 = HardwareBoundrary("port1", BitsDesc(8), WireDirection.Output)
+    val port2 = HardwareBoundrary("port2", BitsDesc(8), WireDirection.Input)
     
     // Create InstanceLocs
     val chipLoc1 = InstanceLoc(chipInstance1, Some(port1), "chip1")
@@ -346,8 +346,8 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
     when(chipInstance2.name).thenReturn("chip2")
     
     // Create ports with different properties
-    val port1 = Port("port1", BitsDesc(8), WireDirection.Output)
-    val port2 = Port("port2", BitsDesc(0), WireDirection.Input)
+    val port1 = HardwareBoundrary("port1", BitsDesc(8), WireDirection.Output)
+    val port2 = HardwareBoundrary("port2", BitsDesc(0), WireDirection.Input)
     
     // Create InstanceLocs
     val loc1 = InstanceLoc(chipInstance1, Some(port1), "chip1")
@@ -392,8 +392,8 @@ class WireSpec extends AnyFlatSpec with Matchers with MockitoSugar with SilentLo
     when(chipInstance2.name).thenReturn("chip2")
     
     // Create ports
-    val port1 = Port("port1", BitsDesc(8), WireDirection.Output)
-    val port2 = Port("port2", BitsDesc(8), WireDirection.Input)
+    val port1 = HardwareBoundrary("port1", BitsDesc(8), WireDirection.Output)
+    val port2 = HardwareBoundrary("port2", BitsDesc(8), WireDirection.Input)
     
     // Create InstanceLocs
     val chipLoc1 = InstanceLoc(chipInstance1, Some(port1), "chip1")

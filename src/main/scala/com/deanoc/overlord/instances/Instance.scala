@@ -1,7 +1,7 @@
 package com.deanoc.overlord.instances
 
 import com.deanoc.overlord.utils.{Utils, Variant}
-import com.deanoc.overlord.hardware.{Port}
+import com.deanoc.overlord.hardware.{HardwareBoundrary}
 import com.deanoc.overlord.definitions.HardwareDefinition
 import com.deanoc.overlord.{
   DefinitionCatalog,
@@ -49,12 +49,12 @@ trait InstanceTrait extends QueryInterface {
     }
   }
 
-  protected def getPort(lastName: String): Option[Port] = None
+  protected def getPort(lastName: String): Option[HardwareBoundrary] = None
 
   protected def wildCardMatch(
       nameId: Array[String],
       instanceId: Array[String]
-  ): (Option[String], Option[Port]) = {
+  ): (Option[String], Option[HardwareBoundrary]) = {
     // wildcard match
     val is =
       for ((id, i) <- instanceId.zipWithIndex)
@@ -79,7 +79,7 @@ trait InstanceTrait extends QueryInterface {
 
   def getMatchNameAndPort(
       nameToMatch: String
-  ): (Option[String], Option[Port]) = {
+  ): (Option[String], Option[HardwareBoundrary]) = {
     val nameWithoutBits = nameToMatch.split('[').head
 
     if (nameToMatch == name)

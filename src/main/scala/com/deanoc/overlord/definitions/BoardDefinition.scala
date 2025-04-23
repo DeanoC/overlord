@@ -3,7 +3,6 @@ package com.deanoc.overlord.definitions
 import com.deanoc.overlord.utils.Utils
 import com.deanoc.overlord.utils.Variant
 
-import com.deanoc.overlord.hardware.Port
 import com.deanoc.overlord.config.DefinitionConfig
 
 import java.nio.file.Path
@@ -25,7 +24,7 @@ case class BoardDefinition(
   config: BoardDefinitionConfig,
   sourcePath: Path,
   dependencies: Seq[String],
-  ports: Map[String, Port]
+  pinGroups: Map[String, PinGroupConfig]
 ) extends DefinitionTrait {
 
   def createInstance(
@@ -76,7 +75,7 @@ object BoardDefinition {
             config,
             path,
             Seq.empty,
-            Map.empty[String, Port] // Initialize ports as empty
+            Map.empty
         ))
     }
 }

@@ -14,7 +14,7 @@ import com.deanoc.overlord.instances.{
   PinGroupInstance,
   ClockInstance
 }
-import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.hardware.HardwareBoundrary
 import com.deanoc.overlord.config.BitsDesc
 
 import com.deanoc.overlord.config.WireDirection
@@ -299,12 +299,12 @@ class WireAdditionalSpec
     doReturn("dest").when(destInstance).name
 
     // Create ports with unknown width
-    val sourcePort = mock[Port]
+    val sourcePort = mock[HardwareBoundrary]
     doReturn("out").when(sourcePort).name
     doReturn(WireDirection.Output).when(sourcePort).direction
     doReturn(false).when(sourcePort).knownWidth
 
-    val destPort = mock[Port]
+    val destPort = mock[HardwareBoundrary]
     doReturn("in").when(destPort).name
     doReturn(WireDirection.Input).when(destPort).direction
     doReturn(false).when(destPort).knownWidth

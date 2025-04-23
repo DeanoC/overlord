@@ -1,6 +1,6 @@
 package com.deanoc.overlord.instances
 
-import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.hardware.HardwareBoundrary
 import com.deanoc.overlord.config.{BitsDesc, WireDirection}
 import com.deanoc.overlord.utils.Variant
 import com.deanoc.overlord.{
@@ -20,9 +20,9 @@ case class PinGroupInstance(
     config: com.deanoc.overlord.config.PinGroupConfig // Store the specific config
 ) extends HardwareInstance {
 
-  override lazy val ports: mutable.HashMap[String, Port] =
+  override lazy val ports: mutable.HashMap[String, HardwareBoundrary] =
     mutable.HashMap.from(
-      definition.ports ++ constraint.ports.map(p => p.name -> p)
+      definition.boundraries ++ constraint.ports.map(p => p.name -> p)
     )
 }
 
@@ -45,7 +45,7 @@ object PinGroupInstance {
   
       // Create ports with the correct WireDirection
       val wireDirection = WireDirection(config.direction)
-      val ports = pinNames.map(name => Port(name, BitsDesc(1), wireDirection))
+      val ports = pinNames.map(name => HardwareBoundrary(name, BitsDesc(1), wireDirection))
   
       // For the directions parameter, we need to use the string representation
       val directionStrings = List.fill(pinNames.length)(config.direction)

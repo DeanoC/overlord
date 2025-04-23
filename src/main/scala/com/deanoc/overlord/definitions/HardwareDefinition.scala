@@ -3,7 +3,7 @@ package com.deanoc.overlord.definitions
 import com.deanoc.overlord.utils.Utils
 import com.deanoc.overlord.utils.Variant
 
-import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.hardware.HardwareBoundrary
 import com.deanoc.overlord.config.DefinitionConfig
 
 import java.nio.file.Path
@@ -20,7 +20,7 @@ import com.deanoc.overlord.instances._
 import io.circe.parser.decode 
 
 trait HardwareDefinition extends DefinitionTrait {
-  val ports: Map[String, Port]
+  val boundraries: Map[String, HardwareBoundrary]
   val maxInstances: Int
   protected val registersV: Seq[Variant]
   var registers: Seq[RegisterBank] = Seq()

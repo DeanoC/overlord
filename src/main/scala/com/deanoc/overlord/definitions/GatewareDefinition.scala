@@ -1,7 +1,7 @@
 package com.deanoc.overlord.definitions
 
 import com.deanoc.overlord.actions.ActionsFile
-import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.hardware.HardwareBoundrary
 import com.deanoc.overlord.utils.{Utils, Variant}
 import com.deanoc.overlord.utils.Utils.VariantTable
 import com.deanoc.overlord.{Overlord}
@@ -37,7 +37,7 @@ case class GatewareDefinition(
     sourcePath: Path,
     config: DefinitionConfig,
     dependencies: Seq[String],
-    ports: Map[String, Port],
+    boundraries: Map[String, HardwareBoundrary],
     maxInstances: Int = 1,
     registersV: Seq[Variant],
 

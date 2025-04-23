@@ -1,7 +1,7 @@
 package com.deanoc.overlord.instances
 
 import com.deanoc.overlord.utils.{Utils, Variant}
-import com.deanoc.overlord.hardware.{Port, RegisterBank, Registers}
+import com.deanoc.overlord.hardware.{HardwareBoundrary, RegisterBank, Registers}
 import com.deanoc.overlord.{
   QueryInterface
 }
@@ -29,8 +29,8 @@ trait HardwareInstance
 
   var moduleName: String = name
   lazy val instanceNumber: Int = Utils.lookupInt(attributes, "instance", 0)
-  lazy val ports: mutable.HashMap[String, Port] =
-    mutable.HashMap[String, Port](definition.ports.toSeq: _*)
+  lazy val ports: mutable.HashMap[String, HardwareBoundrary] =
+    mutable.HashMap[String, HardwareBoundrary](definition.boundraries.toSeq: _*)
   lazy val instanceRegisterBanks: mutable.ArrayBuffer[RegisterBank] = {
     if (attributes.contains("registers")) {
       // Use scala.collection.immutable.ArraySeq to avoid implicit array conversion
@@ -94,14 +94,14 @@ trait HardwareInstance
     or = false
   )
 
-  def mergePort(key: String, port: Port): Unit = ports.updateWith(key) {
+  def mergePort(key: String, port: HardwareBoundrary): Unit = ports.updateWith(key) {
     case Some(_) => Some(port)
     case None    => Some(port)
   }
 
   lazy val parameterKeys: Set[String] = instanceParameterKeys.toSet
 
-  override def getPort(lastName: String): Option[Port] =
+  override def getPort(lastName: String): Option[HardwareBoundrary] =
     if (ports.contains(lastName)) Some(ports(lastName)) else None
 
   override def getInterface[T](implicit tag: ClassTag[T]): Option[T] = {
@@ -120,10 +120,10 @@ trait HardwareInstance
   // ports like interface
   override def getOwner: HardwareInstance = this
 
-  override def getPortsStartingWith(startsWith: String): Seq[Port] =
+  override def getPortsStartingWith(startsWith: String): Seq[HardwareBoundrary] =
     ports.filter(_._1.startsWith(startsWith)).values.toSeq
 
-  override def getPortsMatchingName(name: String): Seq[Port] =
+  override def getPortsMatchingName(name: String): Seq[HardwareBoundrary] =
     ports.filter(_._1 == name).values.toSeq
 
   // register bank like

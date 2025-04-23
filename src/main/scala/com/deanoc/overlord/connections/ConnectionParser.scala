@@ -4,7 +4,7 @@ import com.deanoc.overlord._
 import com.deanoc.overlord.connections.ConnectionDirection
 import com.deanoc.overlord.utils.{Utils, Variant, Logging, StringV}
 import com.deanoc.overlord.config.BitsDesc
-import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.hardware.HardwareBoundrary
 import com.deanoc.overlord.interfaces._
 import com.deanoc.overlord.instances.{
   HardwareInstance,
@@ -480,10 +480,10 @@ object ConnectionParser extends Logging {
       else if (fil.isPin) {
         fil.instance.asInstanceOf[PinGroupInstance].constraint.ports.head
       } else if (fil.isClock) {
-        Port(fil.fullName, BitsDesc(1), WireDirection.Input)
+        HardwareBoundrary(fil.fullName, BitsDesc(1), WireDirection.Input)
       } else {
         if (fil.isGateware) error(s"${fil.fullName} unable to get port")
-        Port(fil.fullName, BitsDesc(1), WireDirection.Input)
+        HardwareBoundrary(fil.fullName, BitsDesc(1), WireDirection.Input)
       }
     }
     val sp = {
@@ -491,10 +491,10 @@ object ConnectionParser extends Logging {
       else if (sil.isPin) {
         sil.instance.asInstanceOf[PinGroupInstance].constraint.ports.head
       } else if (sil.isClock) {
-        Port(sil.fullName, BitsDesc(1), WireDirection.Output)
+        HardwareBoundrary(sil.fullName, BitsDesc(1), WireDirection.Output)
       } else {
         if (sil.isGateware) error(s"${sil.fullName} unable to get port")
-        Port(sil.fullName, fp.width, WireDirection.Input)
+        HardwareBoundrary(sil.fullName, fp.width, WireDirection.Input)
       }
     }
 

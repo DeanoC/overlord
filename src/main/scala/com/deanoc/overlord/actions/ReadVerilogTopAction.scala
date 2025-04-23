@@ -9,7 +9,7 @@ import com.deanoc.overlord.input.{
   VerilogPort,
   VerilogModuleParser
 }
-import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.hardware.HardwareBoundrary
 import com.deanoc.overlord.config.{BitsDesc, WireDirection}
 import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.instances.{HardwareInstance, InstanceTrait}
@@ -102,7 +102,7 @@ case class ReadVerilogTopAction(filename: String)
           ports.foreach(p =>
             instance.mergePort(
               p.name,
-              Port(p.name, p.bits, WireDirection(p.direction), p.knownWidth)
+              HardwareBoundrary(p.name, p.bits, WireDirection(p.direction), p.knownWidth)
             )
           )
           parameterKeys.foreach(p => instance.mergeParameterKey(p.parameter))

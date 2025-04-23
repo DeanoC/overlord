@@ -1,6 +1,6 @@
 package com.deanoc.overlord.definitions
 
-import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.hardware.HardwareBoundrary
 import com.deanoc.overlord.utils.Variant
 import com.deanoc.overlord.config.HardwareDefinitionConfig
 import java.nio.file.Path
@@ -28,7 +28,7 @@ case class FixedHardwareDefinition(
     sourcePath: Path,
     val config: HardwareDefinitionConfig,
     dependencies: Seq[String],
-    ports: Map[String, Port],
+    boundraries: Map[String, HardwareBoundrary],
     maxInstances: Int,
     registersV: Seq[Variant]
 ) extends HardwareDefinition

@@ -4,7 +4,7 @@ import com.deanoc.overlord.definitions.{HardwareDefinition, GatewareDefinition, 
 import com.deanoc.overlord.instances.{PinGroupInstance, ClockInstance}
 
 import com.deanoc.overlord.instances.InstanceTrait
-import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.hardware.HardwareBoundrary
 import com.deanoc.overlord.definitions.DefinitionTrait
 import com.deanoc.overlord.definitions.GatewareDefinition
 
@@ -20,7 +20,7 @@ import com.deanoc.overlord.definitions.GatewareDefinition
   */
 case class InstanceLoc(
     instance: InstanceTrait,
-    port: Option[Port],
+    port: Option[HardwareBoundrary],
     fullName: String
 ) {
 

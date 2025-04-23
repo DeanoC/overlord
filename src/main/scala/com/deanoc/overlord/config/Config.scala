@@ -65,17 +65,6 @@ case class LibraryConfig(
   dependencies: List[String]
 ) derives Decoder
 
-// Represents a clock within a Board definition
-case class BoardClockConfig(
-  name: String,
-  frequency: String // Assuming frequency is a string like "100MHz"
-) derives Decoder
-
-// Represents the configuration for a Board definition
-case class BoardConfig(
-  board_type: String,
-  clocks: List[BoardClockConfig]
-) derives Decoder
 
 // Custom decoder for Map[String, Any]
 object CustomDecoders {
@@ -113,19 +102,16 @@ case class RegisterConfig(
   width: String // Bit width (e.g., "32")
 ) derives Decoder
 
-// WireDirection moved to its own file
-
-// Updated PortConfig to include converted WireDirection and parsed BitsDesc
-case class PortConfig(
+case class BoundraryConfig(
   name: String,
   width: String,
   direction: WireDirection = WireDirection.InOut,
   bitsDesc: BitsDesc = null
 )
 
-object PortConfig {
+object BoundraryConfig {
   
-  implicit val decoder: Decoder[PortConfig] = (c: HCursor) => {
+  implicit val decoder: Decoder[BoundraryConfig] = (c: HCursor) => {
     for {
       name <- c.downField("name").as[String]
       width <- c.downField("width").as[String]
@@ -138,7 +124,7 @@ object PortConfig {
           println(s"Failed to parse width '$width': ${e.getMessage}")
           BitsDesc(1)
       }
-    } yield PortConfig(name, width, wireDir, bitsDesc)
+    } yield BoundraryConfig(name, width, wireDir, bitsDesc)
   }
 }
 

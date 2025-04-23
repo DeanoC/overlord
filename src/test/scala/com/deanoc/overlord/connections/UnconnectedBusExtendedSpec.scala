@@ -18,7 +18,7 @@ import com.deanoc.overlord.instances.{CpuInstance, RamInstance, HardwareInstance
 import com.deanoc.overlord.config.{CpuDefinitionConfig, RamDefinitionConfig, MemoryRangeConfig, WireDirection}
 import com.deanoc.overlord.connections.InstanceLoc
 import com.deanoc.overlord.interfaces._
-import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.hardware.HardwareBoundrary
 import com.deanoc.overlord.config.BitsDesc
 
 import scala.collection.mutable
@@ -68,7 +68,7 @@ width: 32
       """
     ).getOrElse(throw new RuntimeException("Failed to parse CPU definition config")).asInstanceOf[CpuDefinitionConfig]
     val dependencies = Seq.empty[String]
-    val ports = Map.empty[String, Port]
+    val ports = Map.empty[String, HardwareBoundrary]
     val maxInstances = 1
     val registersV = Seq.empty[Variant]
 
@@ -89,7 +89,7 @@ buses:
       """
     ).getOrElse(throw new RuntimeException("Failed to parse RAM definition config")).asInstanceOf[RamDefinitionConfig]
     val dependencies = Seq.empty[String]
-    val ports = Map.empty[String, Port]
+    val ports = Map.empty[String, HardwareBoundrary]
     val maxInstances = 1
     val registersV = Seq.empty[Variant]
 

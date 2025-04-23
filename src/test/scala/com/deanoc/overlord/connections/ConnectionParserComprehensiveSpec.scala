@@ -6,7 +6,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import com.deanoc.overlord._
 import com.deanoc.overlord.utils.{Utils, Variant, SilentLogger, ArrayV}
-import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.hardware.HardwareBoundrary
 import com.deanoc.overlord.config.BitsDesc
 
 import com.deanoc.overlord.config.WireDirection
@@ -436,8 +436,8 @@ class ConnectionParserComprehensiveSpec
     when(chipInstance1.definition).thenReturn(gatewareDef)
     when(chipInstance2.definition).thenReturn(hardwareDef)
 
-    val inPort = Port("in_port", BitsDesc(8), WireDirection.Input)
-    val outPort = Port("out_port", BitsDesc(8), WireDirection.Output)
+    val inPort = HardwareBoundrary("in_port", BitsDesc(8), WireDirection.Input)
+    val outPort = HardwareBoundrary("out_port", BitsDesc(8), WireDirection.Output)
 
     // Create instance locations
     val srcLoc = InstanceLoc(chipInstance1, Some(inPort), "source")
@@ -471,9 +471,9 @@ class ConnectionParserComprehensiveSpec
     when(chipInstance1.definition).thenReturn(hardwareDef)
     when(chipInstance2.definition).thenReturn(hardwareDef)
 
-    val inOutPort = Port("inout_port", BitsDesc(8), WireDirection.InOut)
-    val inPort = Port("in_port", BitsDesc(8), WireDirection.Input)
-    val outPort = Port("out_port", BitsDesc(8), WireDirection.Output)
+    val inOutPort = HardwareBoundrary("inout_port", BitsDesc(8), WireDirection.InOut)
+    val inPort = HardwareBoundrary("in_port", BitsDesc(8), WireDirection.Input)
+    val outPort = HardwareBoundrary("out_port", BitsDesc(8), WireDirection.Output)
 
     // Test InOutWireDirection with InWireDirection
     val srcLoc1 = InstanceLoc(chipInstance1, Some(inOutPort), "source1")

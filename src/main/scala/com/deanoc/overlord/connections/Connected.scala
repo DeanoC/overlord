@@ -1,6 +1,6 @@
 package com.deanoc.overlord.connections
 
-import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.hardware.HardwareBoundrary
 import com.deanoc.overlord.connections.ConnectionDirection
 import com.deanoc.overlord.definitions.{ 
   DefinitionTrait,

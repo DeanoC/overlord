@@ -1,10 +1,10 @@
 package com.deanoc.overlord
 
-import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.hardware.HardwareBoundrary
 import com.deanoc.overlord.instances.InstanceTrait
 
 sealed trait PinConstraintType {
-  val ports: Seq[Port]
+  val ports: Seq[HardwareBoundrary]
   val names: Seq[String]
   val directions: Seq[String]
   val pullups: Seq[Boolean]
@@ -12,7 +12,7 @@ sealed trait PinConstraintType {
 
 case class PinConstraint(
     pins: Seq[String],
-    ports: Seq[Port],
+    ports: Seq[HardwareBoundrary],
     standard: String,
     names: Seq[String] = Seq(),
     directions: Seq[String] = Seq(),
@@ -21,7 +21,7 @@ case class PinConstraint(
 
 case class DiffPinConstraint(
     pins: Seq[(String, String)],
-    ports: Seq[Port],
+    ports: Seq[HardwareBoundrary],
     standard: String,
     names: Seq[String] = Seq(),
     directions: Seq[String] = Seq(),

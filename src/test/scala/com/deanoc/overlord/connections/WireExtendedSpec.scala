@@ -15,7 +15,7 @@ import com.deanoc.overlord.instances.{
   ClockInstance
 }
 import com.deanoc.overlord.interfaces.SupplierBusLike
-import com.deanoc.overlord.hardware.Port
+import com.deanoc.overlord.hardware.HardwareBoundrary
 import com.deanoc.overlord.config.BitsDesc
 
 import com.deanoc.overlord.config.WireDirection
@@ -78,7 +78,7 @@ class WireExtendedSpec
   private def createInstanceLoc(
       instance: InstanceTrait,
       fullName: String,
-      port: Option[Port] = None
+      port: Option[HardwareBoundrary] = None
   ): InstanceLoc = {
     InstanceLoc(instance, port, fullName)
   }
@@ -89,8 +89,8 @@ class WireExtendedSpec
       secondInstance: InstanceTrait,
       direction: ConnectionDirection = ConnectionDirection.FirstToSecond,
       priority: ConnectionPriority = ConnectionPriority.Explicit,
-      firstPort: Option[Port] = None,
-      secondPort: Option[Port] = None
+      firstPort: Option[HardwareBoundrary] = None,
+      secondPort: Option[HardwareBoundrary] = None
   ): Connected = {
     val firstLoc =
       createInstanceLoc(firstInstance, firstInstance.name, firstPort)
@@ -111,8 +111,8 @@ class WireExtendedSpec
     val chipInstance1 = createMockInstance("chip1", isChip = true)
     val chipInstance2 = createMockInstance("chip2", isChip = true)
 
-    val inPort = Port("in_port", BitsDesc(8), WireDirection.Input)
-    val outPort = Port("out_port", BitsDesc(8), WireDirection.Output)
+    val inPort = HardwareBoundrary("in_port", BitsDesc(8), WireDirection.Input)
+    val outPort = HardwareBoundrary("out_port", BitsDesc(8), WireDirection.Output)
 
     // Create a ConnectedPortGroup
     val connected = createConnected(
@@ -238,8 +238,8 @@ class WireExtendedSpec
       .asInstanceOf[PinGroupInstance]
 
     // Create ports
-    val chipPort = Port("chip_port", BitsDesc(8), WireDirection.Input)
-    val pinPort = Port("pin_port", BitsDesc(8), WireDirection.Output)
+    val chipPort = HardwareBoundrary("chip_port", BitsDesc(8), WireDirection.Input)
+    val pinPort = HardwareBoundrary("pin_port", BitsDesc(8), WireDirection.Output)
 
     // Create instance locations
     val chipLoc = createInstanceLoc(chipInstance, "chip", Some(chipPort))
@@ -283,8 +283,8 @@ class WireExtendedSpec
         .asInstanceOf[ClockInstance]
 
     // Create ports
-    val chipPort = Port("clk", BitsDesc(1), WireDirection.Input)
-    val clockPort = Port("clk_out", BitsDesc(1), WireDirection.Output)
+    val chipPort = HardwareBoundrary("clk", BitsDesc(1), WireDirection.Input)
+    val clockPort = HardwareBoundrary("clk_out", BitsDesc(1), WireDirection.Output)
 
     // Create instance locations
     val chipLoc = createInstanceLoc(chipInstance, "chip", Some(chipPort))
@@ -330,9 +330,9 @@ class WireExtendedSpec
       createMockInstance("dest2", isChip = true).asInstanceOf[HardwareInstance]
 
     // Create ports
-    val sourcePort = Port("out", BitsDesc(8), WireDirection.Output)
-    val destPort1 = Port("in1", BitsDesc(8), WireDirection.Input)
-    val destPort2 = Port("in2", BitsDesc(8), WireDirection.Input)
+    val sourcePort = HardwareBoundrary("out", BitsDesc(8), WireDirection.Output)
+    val destPort1 = HardwareBoundrary("in1", BitsDesc(8), WireDirection.Input)
+    val destPort2 = HardwareBoundrary("in2", BitsDesc(8), WireDirection.Input)
 
     // Create instance locations
     val sourceLoc =
@@ -389,9 +389,9 @@ class WireExtendedSpec
       createMockInstance("dest2", isChip = true).asInstanceOf[HardwareInstance]
 
     // Create ports with different names
-    val sourcePort = Port("out", BitsDesc(8), WireDirection.Output)
-    val destPort1 = Port("in1", BitsDesc(8), WireDirection.Input)
-    val destPort2 = Port("in2", BitsDesc(8), WireDirection.Input)
+    val sourcePort = HardwareBoundrary("out", BitsDesc(8), WireDirection.Output)
+    val destPort1 = HardwareBoundrary("in1", BitsDesc(8), WireDirection.Input)
+    val destPort2 = HardwareBoundrary("in2", BitsDesc(8), WireDirection.Input)
 
     // Create instance locations with distinct names
     val sourceLoc1 =
@@ -456,9 +456,9 @@ class WireExtendedSpec
       createMockInstance("dest", isChip = true).asInstanceOf[HardwareInstance]
 
     // Create ports
-    val sourcePort1 = Port("out1", BitsDesc(8), WireDirection.Output)
-    val sourcePort2 = Port("out2", BitsDesc(8), WireDirection.Output)
-    val destPort = Port("in", BitsDesc(8), WireDirection.Input)
+    val sourcePort1 = HardwareBoundrary("out1", BitsDesc(8), WireDirection.Output)
+    val sourcePort2 = HardwareBoundrary("out2", BitsDesc(8), WireDirection.Output)
+    val destPort = HardwareBoundrary("in", BitsDesc(8), WireDirection.Input)
 
     // Create instance locations
     val sourceLoc1 =
@@ -603,8 +603,8 @@ class WireExtendedSpec
       createMockInstance("dest", isChip = true).asInstanceOf[HardwareInstance]
 
     // Create instance locations with ports to make them distinct
-    val sourcePort = Port("out", BitsDesc(8), WireDirection.Output)
-    val destPort = Port("in", BitsDesc(8), WireDirection.Input)
+    val sourcePort = HardwareBoundrary("out", BitsDesc(8), WireDirection.Output)
+    val destPort = HardwareBoundrary("in", BitsDesc(8), WireDirection.Input)
     val sourceLoc =
       createInstanceLoc(sourceInstance, "source", Some(sourcePort))
     val destLoc = createInstanceLoc(destInstance, "dest", Some(destPort))
@@ -647,12 +647,12 @@ class WireExtendedSpec
 
     // Create a port with unknown width (BitsDesc with width 0)
     // and ensure the knownWidth method returns false
-    val sourcePort = mock[Port]
+    val sourcePort = mock[HardwareBoundrary]
     when(sourcePort.name).thenReturn("out")
     when(sourcePort.direction).thenReturn(WireDirection.Output)
     when(sourcePort.knownWidth).thenReturn(false) // Explicitly set to false
 
-    val destPort = mock[Port]
+    val destPort = mock[HardwareBoundrary]
     when(destPort.name).thenReturn("in")
     when(destPort.direction).thenReturn(WireDirection.Input)
     when(destPort.knownWidth).thenReturn(false) // Explicitly set to false
