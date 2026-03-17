@@ -8,7 +8,7 @@ Spans hardware configuration, system generation, and operating environments, exp
 
 Part of a broader focus on constructing complex systems from first principles.
 
-Example packagesat https://github.com/DeanoC/ikuy_std_resources
+Example packages at https://github.com/DeanoC/ikuy_std_resources
 
 ## Features
 
