@@ -1,7 +1,12 @@
 # Overlord
 
 [![Scala CI](https://github.com/deanoc/overlord/actions/workflows/scala.yml/badge.svg)](https://github.com/deanoc/overlord/actions/workflows/scala.yml)
-Overlord is a high-performance software framework designed for managing and generating projects for FPGA-based boards. This framework is tailored for developers working on embedded systems, FPGA designs, and software projects that leverage the powerful capabilities of modern FPGA boards.
+
+Framework for building FPGA-based systems across hardware, software, and bare-metal runtime.
+
+Spans hardware configuration, system generation, and operating environments, exploring full-stack design from silicon to software.
+
+Part of a broader focus on constructing complex systems from first principles.
 
 ## Features
 
