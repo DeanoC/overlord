@@ -24,10 +24,10 @@ case class CopyAction(filename: String, language: String, srcPath: String)
     // Extracts the filename from the full path
     val fn = filename.split('/').last
 
-    // Resolves the absolute source path using project macros
-    val srcAbsPath = Overlord.projectPath
-      .resolve(Overlord.resolvePathMacros(instance, srcPath))
-      .toAbsolutePath
+    // Resolve catalog-owned sources through the same fallback chain used by
+    // other software actions. A copy entry is normally relative to the
+    // software definition directory, not the project file directory.
+    val srcAbsPath = Overlord.tryPaths(instance, srcPath).toAbsolutePath
 
     // Constructs the absolute destination path
     dstAbsPath =
@@ -37,8 +37,13 @@ case class CopyAction(filename: String, language: String, srcPath: String)
     Utils.ensureDirectories(dstAbsPath.getParent)
 
     // Reads the source file and writes its content to the destination
-    val source = Utils.readFile(srcAbsPath)
-    Utils.writeFile(dstAbsPath, source.toString)
+    Utils.readFile(srcAbsPath) match {
+      case Some(source) => Utils.writeFile(dstAbsPath, source)
+      case None =>
+        throw new IllegalArgumentException(
+          s"copy source does not exist: $srcAbsPath"
+        )
+    }
   }
 
   // Returns the destination path as a string with forward slashes
