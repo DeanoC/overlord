@@ -12,6 +12,28 @@ case class CpuInstance(
     override val definition: ChipDefinitionTrait
 ) extends ChipInstance
     with MultiBusLike {
+  /** A CPU-visible physical memory window that is not a register bank.
+    *
+    * These windows are emitted into software memory maps with both their base
+    * address and size. They are descriptive; the surrounding project still
+    * owns the actual interconnect and driver implementation.
+    */
+  lazy val memoryWindows: Seq[MemoryWindowSpec] = {
+    val attrs = definition.attributes
+    if (!attrs.contains("memory_windows")) Seq()
+    else {
+      Utils.toArray(attrs("memory_windows")).toIndexedSeq.map { value =>
+        val table = Utils.toTable(value)
+        MemoryWindowSpec(
+          name = Utils.lookupString(table, "name", "NO_NAME"),
+          baseAddr = Utils.lookupBigInt(table, "base_address", -1),
+          size = Utils.lookupBigInt(table, "size", -1),
+          dataWidth = Utils.lookupBigInt(table, "data_width", 32),
+          addrWidth = Utils.lookupBigInt(table, "address_width", 32)
+        )
+      }
+    }
+  }
   lazy val triple: String =
     Utils.lookupString(attributes, key = "triple", or = "ERR-ERR-ERR")
   lazy val maxAtomicWidth: Int =
@@ -85,6 +107,14 @@ case class CpuInstance(
     buses.find(b => b.spec.protocol == protocol && !b.spec.supplier)
 
 }
+
+case class MemoryWindowSpec(
+    name: String,
+    baseAddr: BigInt,
+    size: BigInt,
+    dataWidth: BigInt,
+    addrWidth: BigInt
+)
 
 object CpuInstance {
   def apply(

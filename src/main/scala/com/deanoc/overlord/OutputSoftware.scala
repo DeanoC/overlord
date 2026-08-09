@@ -147,9 +147,10 @@ object OutputSoftware {
     // Generate memory map strings for RAM ranges and chip addresses
     val ramMap = generateRamMap(ramRanges.toSeq)
     val chipMap = generateChipMap(chipAddresses.toSeq)
+    val windowMap = generateMemoryWindowMap(cpu.memoryWindows)
 
     // Combine and return the memory map
-    ramMap + chipMap
+    ramMap + chipMap + windowMap
   }
 
   /** Adds CPU-specific register banks to the chip addresses list.
@@ -215,6 +216,27 @@ object OutputSoftware {
       }
     }
 
+    rsb.result()
+  }
+
+  /** Generates explicit CPU physical memory-window definitions.
+    *
+    * Register banks only expose a base address, which is insufficient for
+    * Main_MiSTer's full /dev/mem aperture and FPGA shared-memory range. Keep
+    * the size in the generated contract so consumers cannot silently infer a
+    * smaller window from the first register.
+    */
+  private def generateMemoryWindowMap(
+      windows: Seq[MemoryWindowSpec]
+  ): String = {
+    val rsb = new mutable.StringBuilder
+    for (window <- windows) {
+      val name = window.name.replace('.', '_').toUpperCase
+      if (window.baseAddr >= 0 && window.size > 0) {
+        rsb ++= f"%n#define ${name}_BASE_ADDR 0x${window.baseAddr}%x${cPostFix(window.baseAddr)}%n"
+        rsb ++= f"#define ${name}_SIZE_IN_BYTES ${window.size}${cPostFix(window.size)}%n"
+      }
+    }
     rsb.result()
   }
 
