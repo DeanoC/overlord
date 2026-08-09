@@ -118,6 +118,12 @@ object PrefabCatalog extends Logging {
           )
         }
 
+        // Register prefabs declared by this file as well as included
+        // catalogs.  The previous implementation constructed `prefabs` but
+        // returned only `newPrefabs`, making every local prefab invisible to
+        // ProjectParser (including the board prefab injected by the CLI).
+        newPrefabs ++= prefabs.map(p => p.name -> p)
+
         // Pop the instance path stack.
         Overlord.popInstancePath()
 

@@ -204,8 +204,14 @@ object Overlord extends Logging {
       if (projectPath.toFile.isFile) projectPath.getParent else projectPath
 
     catalogPathStack.clear()
+    // Catalogs and prefabs in a project are resolved relative to the project
+    // file unless a nested definition explicitly pushes another path.  The
+    // CLI previously left both stacks empty, making normal project loading
+    // fail with a NoSuchElementException before a catalog could be read.
+    catalogPathStack.push(projectDir)
 
     instancePathStack.clear()
+    instancePathStack.push(projectDir)
 
     outPathStack.clear()
     outPathStack.push(projectDir)

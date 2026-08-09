@@ -47,6 +47,7 @@ object CommandLineParser extends Logging {
   // Common/global options available to all commands
   val commonOptions: List[CLIOption] = List(
     CLIOption("yes", Some("y"), "Automatically agree (e.g., download resource files without prompting)", required = false),
+    CLIOption("board", None, "Board resource to target when loading a project", required = false),
     CLIOption("noexit", None, "Disable automatic exit on error logs", required = false),
     CLIOption("trace", None, "Enable trace logging for comma-separated list of modules (can use short names)", required = false),
     CLIOption("debug", None, "Enable debug logging for comma-separated list of modules (can use short names)", required = false)
@@ -66,7 +67,9 @@ object CommandLineParser extends Logging {
         case Some(s) => base.abbr(s)
         case None    => base
       }
-      withShort
+      withShort.action((value, config) =>
+        config.copy(options = config.options.updated(opt.name, value))
+      )
     }
 
     // Build a flat command structure with explicit command and subcommand handling
