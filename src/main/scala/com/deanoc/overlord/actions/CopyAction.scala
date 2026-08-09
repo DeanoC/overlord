@@ -4,7 +4,7 @@ import com.deanoc.overlord.Overlord
 import com.deanoc.overlord.instances.InstanceTrait
 import com.deanoc.overlord.utils.{Variant, ArrayV, Utils}
 
-import java.nio.file.{Path, Paths} // Use java.nio.file.Paths directly
+import java.nio.file.{Files, Path, Paths, StandardCopyOption}
 
 // Represents an action to copy a file from a source path to a destination path
 case class CopyAction(filename: String, language: String, srcPath: String)
@@ -36,14 +36,13 @@ case class CopyAction(filename: String, language: String, srcPath: String)
     // Ensures that the destination directory exists
     Utils.ensureDirectories(dstAbsPath.getParent)
 
-    // Reads the source file and writes its content to the destination
-    Utils.readFile(srcAbsPath) match {
-      case Some(source) => Utils.writeFile(dstAbsPath, source)
-      case None =>
-        throw new IllegalArgumentException(
-          s"copy source does not exist: $srcAbsPath"
-        )
-    }
+    // Preserve source bytes (including the final newline) and fail closed if
+    // the catalog entry cannot be resolved.
+    if (!Files.isRegularFile(srcAbsPath))
+      throw new IllegalArgumentException(
+        s"copy source does not exist: $srcAbsPath"
+      )
+    Files.copy(srcAbsPath, dstAbsPath, StandardCopyOption.REPLACE_EXISTING)
   }
 
   // Returns the destination path as a string with forward slashes

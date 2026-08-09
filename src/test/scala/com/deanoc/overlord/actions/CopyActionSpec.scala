@@ -34,7 +34,7 @@ class CopyActionSpec extends AnyFlatSpec with Matchers {
       action.execute(instance, Map.empty)
 
       Files.readString(projectDir.resolve("copy_fixture/payload.txt")) shouldBe
-        "adapter source"
+        "adapter source\n"
     } finally {
       deleteRecursively(projectDir)
       deleteRecursively(catalogDir)
